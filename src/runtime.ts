@@ -260,6 +260,7 @@ interface CompiledTemplate {
   readonly element: HTMLTemplateElement;
   readonly strings: TemplateStringsArray;
   readonly descriptors: readonly PartDescriptor[];
+  readonly rootNodesStable: boolean;
 }
 
 interface ChildInstance {
@@ -384,9 +385,6 @@ class NodePart implements Part {
   }
 
   private setTemplate(result: TemplateResult): void {
-    this.disconnectArrayChildren();
-    this.disconnectKeyedChildren();
-    this.unsafeMarkup = undefined;
     const compiled = getCompiledTemplate(result);
 
     if (
@@ -397,14 +395,21 @@ class NodePart implements Part {
         ? this.nodes[this.nodes.length - 1]!.nextSibling
         : this.marker.nextSibling;
       applyBindings(this.child.bindings, result.values);
-      const nodes = collectNodesUntil(this.marker, boundary);
-      this.child.nodes = nodes;
-      this.nodes = nodes;
+      if (compiled.rootNodesStable) {
+        this.nodes = this.child.nodes;
+      } else {
+        const nodes = collectNodesUntil(this.marker, boundary);
+        this.child.nodes = nodes;
+        this.nodes = nodes;
+      }
       this.textNode = undefined;
       this.lastPrimitive = unsetValue;
       return;
     }
 
+    this.disconnectArrayChildren();
+    this.disconnectKeyedChildren();
+    this.unsafeMarkup = undefined;
     if (this.child) disconnectBindings(this.child.bindings);
     this.child = createChildInstance(result, compiled);
     this.textNode = undefined;
@@ -971,7 +976,9 @@ export function render(
     } else {
       applyBindings(current.bindings, result.values);
     }
-    current.nodes = [...container.childNodes];
+    if (!current.template.rootNodesStable && !rootNodesAreInPlace(container, current.nodes)) {
+      current.nodes = [...container.childNodes];
+    }
     current.suspended = false;
     return;
   }
@@ -1064,6 +1071,7 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
     element,
     strings: result.strings,
     descriptors,
+    rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 0),
   };
   templateCache.set(result.strings, compiled);
   return compiled;
@@ -1615,6 +1623,9 @@ function rootNodesAreInPlace(
   container: Element | DocumentFragment,
   nodes: readonly Node[],
 ): boolean {
+  if (nodes.length === 1) {
+    return container.firstChild === nodes[0] && container.lastChild === nodes[0];
+  }
   if (container.childNodes.length !== nodes.length) return false;
   for (let index = 0; index < nodes.length; index += 1) {
     if (container.childNodes.item(index) !== nodes[index]) return false;

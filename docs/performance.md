@@ -34,13 +34,15 @@ npm run benchmark:rendering -- \
   --browsers=chromium,firefox \
   --samples=10 \
   --warmup=4 \
+  --timeout=180000 \
   --output=.tmp/rendering-diagnostic.json
 ```
 
 The command builds the benchmark with Vite in production mode, serves that
 exact output locally, launches each browser headlessly, rejects console errors
-or warnings, and writes both JSON and Markdown results. The JSON path supplied
-with `--output` must end in `.json`; the Markdown summary uses the same basename.
+or warnings, applies a 180-second per-browser evaluation timeout by default,
+and writes both JSON and Markdown results. The JSON path supplied with
+`--output` must end in `.json`; the Markdown summary uses the same basename.
 
 For an interactive demonstration in a browser:
 

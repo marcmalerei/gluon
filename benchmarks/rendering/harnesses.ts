@@ -4,7 +4,7 @@ import {
   repeat as gluonRepeat,
   unmount as gluonUnmount,
 } from '@gluonjs/core';
-import { html as litHtml, nothing as litNothing, render as litRender } from 'lit';
+import { html as litHtml, nothing as litNothing, render as litRender } from 'lit-html';
 import { repeat as litRepeat } from 'lit/directives/repeat.js';
 import { h as vueH, render as vueRender } from 'vue';
 

@@ -42,9 +42,13 @@ try {
         }
       });
       await page.goto(url, { waitUntil: 'networkidle' });
-      const result = await page.evaluate(
-        (config) => window.runRenderingComparison(config),
-        { samples: options.samples, warmupRounds: options.warmupRounds },
+      const result = await withTimeout(
+        page.evaluate(
+          (config) => window.runRenderingComparison(config),
+          { samples: options.samples, warmupRounds: options.warmupRounds },
+        ),
+        options.browserTimeoutMs,
+        `${browserName} benchmark`,
       );
       if (consoleProblems.length > 0) {
         throw new Error(`${browserName} logged benchmark errors: ${JSON.stringify(consoleProblems)}`);
@@ -81,6 +85,7 @@ const evidence = {
     packages: {
       gluon: packageJson.version,
       lit: installedVersion('lit'),
+      litHtml: installedVersion('lit-html'),
       vue: installedVersion('vue'),
       playwright: installedVersion('playwright'),
       vite: installedVersion('vite'),
@@ -96,6 +101,7 @@ const evidence = {
     samples: options.samples,
     warmupRounds: options.warmupRounds,
     minimumBatchDurationMs: 8,
+    browserTimeoutMs: options.browserTimeoutMs,
     productionBuild: true,
     headless: true,
     frameworkOrder: 'rotated for every warm-up and measured sample',
@@ -120,9 +126,10 @@ function parseOptions(args) {
   const browsers = (values['--browsers'] ?? 'chromium,firefox,webkit').split(',');
   const samples = positiveInteger(values['--samples'] ?? '40', 'samples');
   const warmupRounds = positiveInteger(values['--warmup'] ?? '8', 'warmup');
+  const browserTimeoutMs = positiveInteger(values['--timeout'] ?? '180000', 'timeout');
   const output = values['--output'] ?? '.tmp/rendering-benchmark-results.json';
   if (extname(output) !== '.json') throw new Error('--output must end in .json.');
-  return { browsers, samples, warmupRounds, output };
+  return { browsers, samples, warmupRounds, browserTimeoutMs, output };
 }
 
 function positiveInteger(value, name) {
@@ -141,6 +148,20 @@ function installedVersion(packageName) {
   return version;
 }
 
+async function withTimeout(promise, timeoutMs, label) {
+  let timer;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} exceeded ${timeoutMs} ms.`)), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function renderMarkdown(evidence) {
   const lines = [
     '# Rendering benchmark evidence',
@@ -151,7 +172,7 @@ function renderMarkdown(evidence) {
     '',
     `Environment: ${evidence.environment.cpu}, ${evidence.environment.logicalCpus} logical CPUs, ${formatBytes(evidence.environment.totalMemoryBytes)} memory, ${evidence.environment.platform} ${evidence.environment.release}`,
     '',
-    `Packages: Gluon ${evidence.environment.packages.gluon}, Lit ${evidence.environment.packages.lit}, Vue ${evidence.environment.packages.vue}, Playwright ${evidence.environment.packages.playwright}, Vite ${evidence.environment.packages.vite}`,
+    `Packages: Gluon ${evidence.environment.packages.gluon}, Lit ${evidence.environment.packages.lit} / lit-html ${evidence.environment.packages.litHtml}, Vue ${evidence.environment.packages.vue}, Playwright ${evidence.environment.packages.playwright}, Vite ${evidence.environment.packages.vite}`,
     '',
     `Method: production build, batches calibrated to at least ${evidence.methodology.minimumBatchDurationMs} ms for the fastest renderer, ${evidence.methodology.warmupRounds} warm-up rounds, and ${evidence.methodology.samples} interleaved samples per renderer and scenario. The text scenario updates one binding; create, update, and reverse operate on 1,000 keyed rows. Lower latency is faster. Ratios are renderer median ÷ Gluon median; values above 1 mean Gluon was faster in that browser/scenario.`,
     '',
