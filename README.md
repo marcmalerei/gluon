@@ -1,4 +1,4 @@
-![Gluon — native UI layers growing from a glowing core](docs/assets/gluon-hero-v2.jpg)
+![Gluon — native UI layers growing from a glowing core](docs/assets/gluon-hero.jpg)
 
 <p align="center">
   <img src="docs/assets/gluon-logo.jpg" alt="Gluon logo — interface layers orbiting a glowing core" width="180">
@@ -11,54 +11,157 @@
 </p>
 
 > [!IMPORTANT]
-> Gluon is currently in the design stage. This repository does not yet contain a runtime, package, or public API. The capabilities below describe the intended direction and are not published features.
+> Gluon is an early prototype. A working runtime and component-layer foundation now exist in this repository, but the package is private, unpublished, and its public API is not stable.
 
-## The idea
+## What works today
 
-Gluon is being designed as a Vue alternative that stays close to the web platform. Components use [Custom Elements](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements), templates use an HTML tagged template literal inspired by `lit-html`, and styling uses adopted stylesheets exclusively.
+- cached `html` and `svg` template results with part-level DOM updates
+- child, attribute, property, boolean, event, and first-class spread bindings
+- nested templates and array rendering with cached template instances
+- reactive Custom Elements through `GluonElement`
+- constructable `CSSStyleSheet` creation and `adoptedStyleSheets` adoption only
+- typed `q.<tag>()` Quark factories for `HTMLElementTagNameMap`
+- working Atom, Molecule, and Organism entry points
+- TypeScript declarations, an ESM library build, and real-browser tests
 
-The goal is a small, composable system with:
+No benchmark currently proves that Gluon is faster than Lit, Vue, or another renderer.
 
-- Custom Elements as the component foundation
-- a declarative HTML template literal
-- first-class attribute spreading
-- `adoptedStyleSheets` as the only styling mechanism
-- performance treated as a measurable design constraint
-- UI layers that scale from native elements to complete interface structures
+## Install for development
 
-Gluon aims to improve template-rendering performance relative to existing approaches. That goal still needs to be validated with reproducible benchmarks once an implementation exists.
+The package is not published. Work from this repository:
 
-## Why Gluon?
+```bash
+npm install
+npm run check
+```
 
-The following points describe architectural advantages and design goals. Outcomes that depend on the implementation—including rendering speed, runtime size, and developer ergonomics—must be verified once working code exists.
+`npm run check` runs strict type checking, the Chromium browser suite, and the production library build.
 
-1. **A web-platform foundation.** Custom Elements are a browser standard, giving Gluon a native component boundary instead of a framework-specific component format.
-2. **Framework interoperability.** Custom Elements can be consumed from plain HTML and integrated into frameworks that support them, making Gluon components useful beyond Gluon applications.
-3. **Incremental adoption.** A standards-based component can be introduced one element at a time; an existing application does not need to be rewritten before it can use a Gluon component.
-4. **Less framework-specific surface area.** The core model uses HTML, JavaScript, Custom Elements, and stylesheets rather than depending on a proprietary single-file component format.
-5. **Declarative templates without another file format.** An HTML tagged template literal keeps declarative markup in JavaScript or TypeScript while avoiding an additional component-file syntax.
-6. **Composable attribute sets.** First-class attribute spreading is intended to make related accessibility, form, state, and configuration attributes easier to group, forward, and reuse.
-7. **One styling contract.** Using `adoptedStyleSheets` exclusively gives the component system one explicit styling mechanism instead of several competing internal paths.
-8. **Reusable stylesheet instances.** A `CSSStyleSheet` can be adopted by multiple compatible roots, allowing components to share a stylesheet instance rather than recreating identical style text for every instance.
-9. **A design-system foundation.** Quarks, Atoms, Molecules, and Organisms give components named positions at increasing levels of UI scope.
-10. **A consistent native-element layer.** Representing HTML elements as Quarks creates one place to define how native elements participate in Gluon composition.
-11. **Focused UI primitives.** Atoms such as icons encourage small responsibilities, focused APIs, and isolated verification before primitives are combined into larger structures.
-12. **A scalable composition vocabulary.** The same model covers native elements, primitives, intermediate compositions, and complete interface structures.
-13. **Performance as an initial constraint.** Rendering work, updates, and allocations can be considered during the first API design rather than treated only as later optimization. Any performance advantage remains unverified until benchmarks exist.
-14. **The potential for a smaller runtime.** Reusing browser-provided component, DOM, and stylesheet capabilities may reduce the amount of runtime code Gluon needs to provide. The resulting size must be measured against comparable systems.
-15. **A distinct position.** The combination of Custom Elements, an HTML template literal, attribute spreading, adopted stylesheets, and the Gluon component vocabulary gives the project a specific direction relative to Vue- and Lit-style approaches.
+## Quick start
+
+```ts
+import {
+  adoptStyles,
+  foundationStyles,
+  layerOrderStyles,
+  render,
+} from 'gluon';
+import { q } from 'gluon/quarks';
+import { Button, atomStyles } from 'gluon/atoms';
+import { Card, moleculeStyles } from 'gluon/molecules';
+
+adoptStyles(
+  document,
+  layerOrderStyles,
+  foundationStyles,
+  atomStyles,
+  moleculeStyles,
+);
+
+render(Card({
+  title: 'Hello Gluon',
+  children: q.p({ children: 'Native elements, composed.' }),
+  actions: Button({ label: 'Continue' }),
+}), document.body);
+```
+
+The same renderer can be used directly:
+
+```ts
+import { html, render } from 'gluon';
+
+const view = (name: string) => html`<h1>Hello ${name}</h1>`;
+render(view('world'), document.body);
+render(view('Gluon'), document.body);
+```
+
+The second call updates the existing text part when the template shape is unchanged.
+
+## Bindings and spreading
+
+Gluon keeps bindings explicit:
+
+| Syntax | Effect |
+| --- | --- |
+| `title=${value}` | Set or remove an attribute. |
+| `.value=${value}` | Write directly to an element property. |
+| `?disabled=${condition}` | Toggle a boolean attribute. |
+| `@click=${handler}` | Add, replace, or remove an event listener. |
+| `...=${props}` | Reconcile a complete prop set. |
+
+Spread props support classes, styles, `data`, `dataset`, `aria`, property and boolean prefixes, event handlers, and callback or object refs:
+
+```ts
+const inputRef: { value?: Element } = {};
+
+html`<input ...=${{
+  class: { field: true, invalid: false },
+  '.value': 'Ada',
+  '?disabled': false,
+  aria: { label: 'Name', invalid: false },
+  data: { testId: 'name' },
+  onInput: (event: InputEvent) => console.log(event),
+  ref: inputRef,
+}}>`;
+```
+
+Each expression must occupy a complete child or attribute value. Compose partial attribute strings before binding them.
+
+## Custom Elements
+
+`GluonElement` turns the renderer and stylesheet contract into a small reactive Custom Element base:
+
+```ts
+import { GluonElement, css, defineElement, html } from 'gluon';
+
+class GreetingElement extends GluonElement {
+  static override readonly properties = {
+    name: { type: String, reflect: true, default: 'World' },
+  };
+
+  static override readonly styles = css`
+    :host { display: block; }
+  `;
+
+  declare name: string;
+
+  protected override render() {
+    return html`<p>Hello ${this.name}</p>`;
+  }
+}
+
+defineElement('gluon-greeting', GreetingElement);
+```
+
+Declared properties receive accessors, schedule microtask-batched updates, may reflect to attributes, and expose an `updateComplete` promise.
+
+## Adopted stylesheets only
+
+Gluon component styles are `CSSStyleSheet` instances. They are installed through `adoptedStyleSheets`; the library deliberately ships no `<style>` fallback:
+
+```ts
+import { adoptStyles, css } from 'gluon/styles';
+
+const theme = css`
+  :root { color-scheme: light dark; }
+`;
+
+adoptStyles(document, theme);
+```
+
+Unsupported browsers fail with an explicit error instead of silently switching styling strategies.
 
 ## The system
 
-Gluon is the base system. It provides a vocabulary for building interfaces at increasing levels of scope:
+Gluon is the base system. Its UI vocabulary increases in scope without changing rendering primitives:
 
-| Layer | Intended role |
+| Layer | Current role and entry point |
 | --- | --- |
-| **Gluon** | The rendering, composition, and styling foundation shared by every layer. |
-| **Quarks** | Representations of all native HTML elements. |
-| **Atoms** | Focused UI primitives, such as an icon. |
-| **Molecules** | The composition layer above individual primitives. Its concrete API is not defined yet. |
-| **Organisms** | The highest named composition layer. Its concrete API is not defined yet. |
+| **Gluon** | Template runtime, Custom Element base, prop merging, and stylesheet adoption from `gluon`. |
+| **Quarks** | Typed factories for native HTML elements through `gluon/quarks` and `q.<tag>()`. |
+| **Atoms** | Focused primitives such as `Icon`, `Button`, `Input`, and `Label` from `gluon/atoms`. |
+| **Molecules** | Reusable compositions such as `Card` and `FormField` from `gluon/molecules`. |
+| **Organisms** | Larger interface structures such as `AppShell` from `gluon/organisms`. |
 
 ```text
                          increasing UI scope
@@ -68,35 +171,69 @@ Gluon is the base system. It provides a vocabulary for building interfaces at in
                    Gluon provides the base system
 ```
 
-## Core design decisions
+Every component created with `defineAtom`, `defineMolecule`, or `defineOrganism` carries explicit `layer` and `displayName` metadata.
 
-### Custom Elements
+## Why Gluon?
 
-Gluon is based on the browser's native component model rather than a framework-specific component format. The exact authoring and lifecycle APIs have not been specified yet.
+The following points describe architectural advantages and design goals. Outcomes that depend on implementation—including rendering speed, runtime size, and developer ergonomics—must continue to be verified as the prototype evolves.
 
-### HTML template literals
+1. **A web-platform foundation.** Custom Elements are a browser standard, giving Gluon a native component boundary instead of a framework-specific component format.
+2. **Framework interoperability.** Custom Elements can be consumed from plain HTML and integrated into frameworks that support them, making Gluon components useful beyond Gluon applications.
+3. **Incremental adoption.** A standards-based component can be introduced one element at a time; an existing application does not need to be rewritten before it can use a Gluon component.
+4. **Less framework-specific surface area.** The core model uses HTML, JavaScript, Custom Elements, and stylesheets rather than depending on a proprietary single-file component format.
+5. **Declarative templates without another file format.** An HTML tagged template literal keeps declarative markup in JavaScript or TypeScript while avoiding an additional component-file syntax.
+6. **Composable attribute sets.** First-class attribute spreading makes related accessibility, form, state, and configuration attributes easier to group, forward, and reuse.
+7. **One styling contract.** Using `adoptedStyleSheets` exclusively gives the component system one explicit styling mechanism instead of several competing internal paths.
+8. **Reusable stylesheet instances.** A `CSSStyleSheet` can be adopted by multiple compatible roots, allowing components to share a stylesheet instance rather than recreating identical style text for every instance.
+9. **A design-system foundation.** Quarks, Atoms, Molecules, and Organisms give components named positions at increasing levels of UI scope.
+10. **A consistent native-element layer.** Representing HTML elements as Quarks creates one place to define how native elements participate in Gluon composition.
+11. **Focused UI primitives.** Atoms such as icons encourage small responsibilities, focused APIs, and isolated verification before primitives are combined into larger structures.
+12. **A scalable composition vocabulary.** The same model covers native elements, primitives, intermediate compositions, and complete interface structures.
+13. **Performance as an initial constraint.** Rendering work, updates, and allocations are considered during API design rather than treated only as later optimization. Any performance advantage remains unverified until reproducible comparative benchmarks exist.
+14. **The potential for a smaller runtime.** Reusing browser-provided component, DOM, and stylesheet capabilities may reduce the amount of runtime code Gluon needs to provide. The resulting size must be measured against comparable systems.
+15. **A distinct position.** The combination of Custom Elements, an HTML template literal, attribute spreading, adopted stylesheets, and the Gluon component vocabulary gives the project a specific direction relative to Vue- and Lit-style approaches.
 
-Templates will use a tagged template literal for HTML, similar in purpose to `lit-html`. The concrete syntax and update model are still to be designed.
+## Architecture and provenance
 
-### Attribute spreading
+- [Architecture](docs/architecture.md)
+- [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
+- [Runnable source example](examples/quick-start.ts)
 
-Attribute spreading is a first-class requirement for composing reusable sets of element attributes. Its public syntax has not been defined yet.
+The initial implementation was transferred and restructured from the local `tiny-lit-main` snapshot named in the transfer record. Features outside the current Gluon vision were intentionally not copied.
 
-### Adopted stylesheets only
+## Current scope
 
-The styling model is intentionally constrained to [`adoptedStyleSheets`](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/adoptedStyleSheets). This constraint is part of the architecture, not an optional styling mode.
+Included now:
 
-### Measured performance
+- browser-side rendering and updates
+- Custom Element authoring
+- adopted stylesheet management
+- Quark, Atom, Molecule, and Organism composition
+- browser tests, type checking, and ESM builds
 
-Performance is a project objective, not yet a verified result. Future performance claims should be accompanied by reproducible benchmarks, documented environments, and comparable workloads.
+Not included now:
 
-## Current status
+- server-side rendering or hydration
+- islands
+- a reactivity package outside `GluonElement` properties
+- Vue compatibility APIs or migration tooling
+- published performance comparisons
+- a stable or published package release
 
-Only the project direction and visual identity are present today. There are no installation, build, test, or usage instructions because no implementation has been published in this repository yet.
+## Development
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm audit --audit-level=moderate
+```
+
+Run all project checks with `npm run check`.
 
 ## Contributing
 
-The public API and runtime design are still open. Use [GitHub Issues](https://github.com/marcmalerei/gluon/issues) to propose and discuss changes before implementation.
+The runtime exists, but the API remains experimental. Use [GitHub Issues](https://github.com/marcmalerei/gluon/issues) to discuss changes before implementation.
 
 ## License
 
