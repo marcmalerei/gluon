@@ -22,7 +22,11 @@ packages/reactivity/
 ├── src/effect.ts       Dependency graph, effects, cleanup, debug hooks
 ├── src/reactive.ts     Deep/shallow mutable/readonly object and collection proxies
 ├── src/ref.ts          Deep and shallow primitive refs
-└── src/computed.ts     Lazy cached readonly and writable computed refs
+├── src/computed.ts     Lazy cached readonly and writable computed refs
+├── src/scheduler.ts    Dedupe, batching, phases, ordering, nextTick
+├── src/scope.ts        Hierarchical effect ownership and cleanup
+├── src/watch.ts        Scheduled source and effect watchers
+└── src/error.ts        Contained low-level reactivity error channel
 ```
 
 The current private package builds separate ESM entry points for `@gluonjs/core`,
@@ -44,8 +48,37 @@ Deep and shallow mutable or readonly proxies cover plain objects, arrays,
 `Map`, and `Set`. Collection dependencies distinguish specific keys, membership,
 size, map-key iteration, and value/entry iteration. Computed refs use an internal
 effect only to mark their cache dirty; their getter executes lazily on the next
-read. Issue #19 owns asynchronous scheduling, batching, `nextTick`, and effect
-scope lifecycles, which are not added by this package foundation.
+read.
+
+### Scheduling and ownership
+
+Scheduler work is deduplicated by function within `pre`, `update`, and `post`
+phases. Each phase sorts ascending numeric IDs before insertion order, providing
+an explicit parent-before-child mechanism. A phase queued after that phase has
+already completed runs in the next cycle; one flush drains all cycles before
+`nextTick` resolves. Promise-returning jobs are awaited within their phase and
+their rejections use the same error channel. A recursion limit routes
+self-queueing failures through the error channel without rejecting the flush
+promise.
+
+Effects remain synchronous unless they select `pre` or `post`. The outermost
+synchronous `batch` deduplicates all affected effects before dispatch. `untracked`
+temporarily suppresses subscription collection while preserving nested active
+effect behavior.
+
+Attached scopes own effects, computed dependency effects, watchers, child
+scopes, and cleanup callbacks. Stop order is reverse-created effects,
+reverse-created child scopes, then reverse-registered cleanup callbacks.
+Detached scopes remain independent. Scope stop invalidates queued work and
+permanently disables scope-owned runners.
+
+Low-level failures select the closest effect, watcher, job, or scope handler;
+the configured global reactivity handler is used when no local handler exists.
+The default uses platform `reportError` or `console.error`; handler failures are
+contained by that default channel. Application-
+specific error ownership remains issue #23. Issue #22 integrates these scheduler
+and scope primitives with `GluonElement`; the element still uses its current
+property-update microtask until that lifecycle integration is implemented.
 
 ## Runtime contract
 

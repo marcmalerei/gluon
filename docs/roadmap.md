@@ -54,6 +54,7 @@ Gluon currently provides:
 - child, attribute, property, boolean, event, directive, ref, and spread bindings
 - nested templates and index-based array rendering
 - standalone DOM-free refs, reactive and readonly proxies, effects, and computed values
+- deterministic batching, phased scheduling, `nextTick`, effect scopes, and watchers
 - reactive declared properties through `GluonElement`
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements

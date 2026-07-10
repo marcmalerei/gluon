@@ -101,6 +101,9 @@ count.value = 2;
 Deep and shallow mutable or readonly proxies support plain objects, arrays,
 `Map`, and `Set`. Effects track only the properties and collection operations
 they read; computed values remain lazy and cached until a dependency changes.
+The package also provides deduplicated pre/update/post scheduling, `batch`,
+`nextTick`, untracked reads, effect scopes, scheduled watchers, deterministic
+cleanup, and a contained error channel.
 
 ## Bindings and spreading
 

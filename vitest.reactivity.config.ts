@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['tests-node/reactivity.spec.ts'],
+    include: ['tests-node/*.spec.ts'],
     coverage: {
       provider: 'v8',
       include: ['packages/reactivity/src/**/*.ts'],
