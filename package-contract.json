@@ -15,7 +15,7 @@
     {
       "name": "@gluonjs/reactivity",
       "directory": "packages/reactivity",
-      "state": "planned",
+      "state": "current",
       "environment": "universal",
       "exports": ["."],
       "dependencies": []
