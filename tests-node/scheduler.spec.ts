@@ -300,6 +300,30 @@ describe('effect scopes and error routing', () => {
     ]);
   });
 
+  it('continues stopping a scope when one effect stop hook throws', () => {
+    const order: string[] = [];
+    const errors: ReactivityErrorContext[] = [];
+    const scope = effectScope({ onError: (context) => { errors.push(context); } });
+
+    scope.run(() => {
+      effect(() => undefined, { onStop: () => { order.push('first'); } });
+      effect(() => undefined, {
+        onStop: () => {
+          order.push('failing');
+          throw new Error('stop failed');
+        },
+      });
+      effect(() => undefined, { onStop: () => { order.push('last'); } });
+      onScopeDispose(() => { order.push('cleanup'); });
+    });
+
+    expect(() => scope.stop()).not.toThrow();
+    expect(order).toEqual(['last', 'failing', 'first', 'cleanup']);
+    expect(errors).toEqual([
+      expect.objectContaining({ phase: 'cleanup' }),
+    ]);
+  });
+
   it('keeps detached scopes alive when their creating scope stops', () => {
     const state = ref(0);
     const parent = effectScope();

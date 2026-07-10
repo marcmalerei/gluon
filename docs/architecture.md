@@ -8,6 +8,8 @@ tree-shakable.
 
 ```text
 src/
+├── application.ts      App instances, plugins, providers, registries, mount
+├── application-context.ts  Context propagation, event guards, errors, warnings
 ├── runtime.ts          Template results, compiler plans, Parts, spreading, render
 ├── element.ts          Reactive Custom Element base and definition helper
 ├── component.ts        Atom, Molecule, and Organism metadata helpers
@@ -107,6 +109,25 @@ The production binding semantics for forms, lifecycle directives, event
 options, qualified namespaces, unsafe-content boundaries, root suspension,
 permanent unmount, and external DOM recovery are specified by the
 [DOM runtime contract](dom-runtime.md).
+
+## Application runtime
+
+`createApp` owns a renderer container, detached reactive scope, plugin cleanup
+stack, provider map, functional component registry, configuration, and explicit
+public exposure. Container-to-context ownership uses weak roots. A connected
+`GluonElement` walks its composed ancestry to resolve the nearest root, so
+nested applications override outer context without a process-global registry.
+
+Application root functions and element update/lifecycle callbacks run inside a
+synchronous context frame. That frame supplies typed injection, error ownership,
+warning ownership, and stable event-listener guards. Runtime event Parts capture
+the frame while they install a listener, preserving native listener behavior
+while routing synchronous throws and returned promise rejections.
+
+Custom Elements remain the only stateful component instances. Per-app named
+components are functional render functions; they do not own state, lifecycle,
+or a second DOM identity. The complete isolation, ordering, failure, and cleanup
+contract is documented in [Application runtime](application-runtime.md).
 
 ### List identity
 

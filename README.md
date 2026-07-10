@@ -20,6 +20,8 @@
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
+- isolated application instances with plugins, providers, lifecycle, dynamic
+  functional components, error boundaries, and controlled public exposure
 - constructable `CSSStyleSheet` creation and `adoptedStyleSheets` adoption only
 - typed `q.<tag>()` Quark factories for `HTMLElementTagNameMap`
 - working Atom, Molecule, and Organism entry points
@@ -219,6 +221,28 @@ after commit, and disconnect stops owned effects while retaining state and
 matching DOM for reconnection. The complete behavior and development render
 diagnostics are defined in the
 [Reactive Custom Element contract](docs/reactive-elements.md).
+
+## Application runtime
+
+`createApp()` owns one renderer root and reactive scope while keeping plugins,
+providers, component registrations, configuration, warnings, and errors
+isolated from every other application on the page:
+
+```ts
+import { createApp, createInjectionKey, html, inject } from '@gluonjs/core';
+
+const greetingKey = createInjectionKey<string>('greeting');
+const app = createApp(() => html`<h1>${inject(greetingKey)}</h1>`);
+
+app.provide(greetingKey, 'Hello Gluon');
+const mount = app.mount(document.querySelector('#app')!);
+mount.unmount();
+```
+
+Application and component lifecycle, plugin cleanup, dynamic component
+registries, error/warning ownership, event/async protection, and explicit
+public exposure are defined in the
+[Application runtime contract](docs/application-runtime.md).
 
 ## Adopted stylesheets only
 

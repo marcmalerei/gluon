@@ -6,8 +6,16 @@ import {
   queueJob,
   type EffectDebuggerEvent,
   type EffectScope,
+  type ReactivityErrorContext,
   type ReactiveEffectRunner,
 } from '@gluonjs/reactivity';
+import {
+  reportApplicationError,
+  resolveApplicationContext,
+  runWithApplicationContext,
+  type AppErrorSource,
+  type ApplicationContext,
+} from './application-context.js';
 
 export type GluonRenderCause =
   | { readonly type: 'connection' }
@@ -32,6 +40,16 @@ export interface GluonRenderDebugEvent {
 }
 
 export type GluonRenderDebugHook = (event: GluonRenderDebugEvent) => void;
+
+export type ComponentLifecycleCallback = () => void | PromiseLike<void>;
+
+export interface ComponentErrorInfo {
+  readonly error: unknown;
+  readonly source: AppErrorSource;
+  readonly element: GluonElement;
+}
+
+export type ComponentErrorBoundary = (info: ComponentErrorInfo) => boolean | void;
 
 let renderDebugHook: GluonRenderDebugHook | undefined;
 
@@ -80,12 +98,19 @@ const declarationCache = new WeakMap<Function, PropertyDeclarations>();
 const styleCache = new WeakMap<Function, readonly CSSStyleSheet[]>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
+const publicInstance = Symbol('gluon.public-instance');
 let elementUpdateSequence = 0;
 
 interface UpdateDeferred {
   readonly promise: Promise<void>;
   readonly resolve: () => void;
   readonly reject: (reason?: unknown) => void;
+}
+
+interface CapturedComponentBoundary {
+  readonly element: GluonElement;
+  readonly context?: ApplicationContext;
+  readonly callbacks: readonly ComponentErrorBoundary[];
 }
 
 export abstract class GluonElement extends HTMLElement {
@@ -98,11 +123,19 @@ export abstract class GluonElement extends HTMLElement {
   private connected = false;
   private reflectingAttribute?: string;
   private readonly initialAttributePrecedence = new Map<string, string>();
+  private applicationContext?: ApplicationContext;
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
   private pendingUpdate?: UpdateDeferred;
   private readonly pendingRenderCauses: GluonRenderCause[] = [];
   private activeRenderDependencies?: EffectDebuggerEvent[];
+  private connectionRendered = false;
+  private readonly connectedHooks: ComponentLifecycleCallback[] = [];
+  private readonly beforeUpdateHooks: ComponentLifecycleCallback[] = [];
+  private readonly updatedHooks: ComponentLifecycleCallback[] = [];
+  private readonly disconnectedHooks: ComponentLifecycleCallback[] = [];
+  private readonly errorBoundaries: ComponentErrorBoundary[] = [];
+  [publicInstance]?: Readonly<object>;
   private updatePromise: Promise<void> = Promise.resolve();
 
   constructor() {
@@ -127,6 +160,7 @@ export abstract class GluonElement extends HTMLElement {
   connectedCallback(): void {
     if (this.connected) return;
     this.connected = true;
+    this.applicationContext = resolveApplicationContext(this);
     adoptStyles(this.renderRoot, ...getStyles(this.constructor as GluonElementConstructor));
     this.reflectCurrentProperties();
     this.createRenderEffect();
@@ -145,7 +179,13 @@ export abstract class GluonElement extends HTMLElement {
       this.resolvePendingUpdate();
       this.pendingRenderCauses.length = 0;
       this.activeRenderDependencies = undefined;
-      suspendRender(this.renderRoot);
+      try {
+        suspendRender(this.renderRoot);
+      } finally {
+        this.invokeLifecycle(this.disconnectedHooks);
+        this.connectionRendered = false;
+        this.applicationContext = undefined;
+      }
     }
   }
 
@@ -183,6 +223,32 @@ export abstract class GluonElement extends HTMLElement {
 
   protected requestUpdate(): Promise<void> {
     return this.queueUpdate({ type: 'request' });
+  }
+
+  protected onConnected(callback: ComponentLifecycleCallback): void {
+    this.connectedHooks.push(callback);
+  }
+
+  protected onBeforeUpdate(callback: ComponentLifecycleCallback): void {
+    this.beforeUpdateHooks.push(callback);
+  }
+
+  protected onUpdated(callback: ComponentLifecycleCallback): void {
+    this.updatedHooks.push(callback);
+  }
+
+  protected onDisconnected(callback: ComponentLifecycleCallback): void {
+    this.disconnectedHooks.push(callback);
+  }
+
+  protected onErrorCaptured(callback: ComponentErrorBoundary): void {
+    this.errorBoundaries.push(callback);
+  }
+
+  protected expose<Public extends object>(value: Public): Readonly<Public> {
+    const exposed = Object.freeze(value);
+    this[publicInstance] = exposed;
+    return exposed;
   }
 
   protected update(): void {
@@ -228,7 +294,13 @@ export abstract class GluonElement extends HTMLElement {
 
   private createRenderEffect(): void {
     if (this.renderEffect) return;
-    const scope = effectScope(true);
+    const ownsErrorRouting = Boolean(this.applicationContext) || this.hasAncestorErrorBoundary();
+    const scope = effectScope({
+      detached: true,
+      ...(ownsErrorRouting
+        ? { onError: (errorContext: ReactivityErrorContext) => this.reportReactiveError(errorContext) }
+        : {}),
+    });
     const runner = scope.run(() => effect(
       () => scope.run(() => this.performUpdate()),
       {
@@ -273,7 +345,13 @@ export abstract class GluonElement extends HTMLElement {
     let renderError: unknown;
 
     try {
-      this.update();
+      if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
+      this.runOwned(() => this.update());
+      if (!this.connectionRendered) {
+        this.connectionRendered = true;
+        this.invokeLifecycle(this.connectedHooks);
+      }
+      this.invokeLifecycle(this.updatedHooks);
       deferred.resolve();
     } catch (error) {
       failed = true;
@@ -312,6 +390,107 @@ export abstract class GluonElement extends HTMLElement {
 
   private recordRenderCause(cause: GluonRenderCause): void {
     if (isDevelopment() && renderDebugHook) this.pendingRenderCauses.push(cause);
+  }
+
+  private runOwned<Result>(callback: () => Result): Result {
+    const reportError = this.createComponentErrorReporter();
+    return runWithApplicationContext(
+      this.applicationContext,
+      this,
+      reportError,
+      callback,
+    );
+  }
+
+  private invokeLifecycle(callbacks: readonly ComponentLifecycleCallback[]): void {
+    for (const callback of callbacks) {
+      const reportError = this.createComponentErrorReporter();
+      try {
+        const result = runWithApplicationContext(
+          this.applicationContext,
+          this,
+          reportError,
+          callback,
+        );
+        if (isPromiseLike(result)) {
+          void Promise.resolve(result).catch((error: unknown) => {
+            reportError(error, 'lifecycle');
+          });
+        }
+      } catch (error) {
+        reportError(error, 'lifecycle');
+      }
+    }
+  }
+
+  private reportReactiveError(errorContext: ReactivityErrorContext): void {
+    const source: AppErrorSource = errorContext.source === this.renderEffect
+      ? 'render'
+      : errorContext.phase === 'cleanup'
+        ? 'lifecycle'
+        : 'effect';
+    this.handleComponentError(errorContext.error, source);
+  }
+
+  private handleComponentError(error: unknown, source: AppErrorSource): void {
+    this.createComponentErrorReporter()(error, source);
+  }
+
+  private createComponentErrorReporter(): (
+    error: unknown,
+    source: AppErrorSource,
+  ) => void {
+    const applicationContext = this.applicationContext;
+    const boundaries: CapturedComponentBoundary[] = [];
+    let current = getComposedParent(this);
+    while (current) {
+      if (current instanceof GluonElement && current.errorBoundaries.length > 0) {
+        boundaries.push({
+          element: current,
+          context: current.applicationContext ?? applicationContext,
+          callbacks: [...current.errorBoundaries],
+        });
+      }
+      current = getComposedParent(current);
+    }
+
+    return (error, source) => {
+      for (const captured of boundaries) {
+        for (const boundary of captured.callbacks) {
+          try {
+            const handled = runWithApplicationContext(
+              captured.context,
+              captured.element,
+              (boundaryError) => reportApplicationError(
+                applicationContext,
+                boundaryError,
+                'application',
+                captured.element,
+              ),
+              () => boundary({ error, source, element: this }),
+            );
+            if (handled === true) return;
+          } catch (boundaryError) {
+            reportApplicationError(
+              applicationContext,
+              boundaryError,
+              'application',
+              captured.element,
+            );
+          }
+        }
+      }
+      reportApplicationError(applicationContext, error, source, this);
+    };
+  }
+
+  private hasAncestorErrorBoundary(): boolean {
+    let current = getComposedParent(this);
+    while (current) {
+      if (current instanceof GluonElement && current.errorBoundaries.length > 0) return true;
+      current = getComposedParent(current);
+    }
+    return false;
   }
 
   private capturePreUpgradeProperties(constructor: GluonElementConstructor): void {
@@ -409,6 +588,23 @@ function isDevelopment(): boolean {
   return (
     globalThis as { process?: { env?: { NODE_ENV?: string } } }
   ).process?.env?.NODE_ENV !== 'production';
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return (
+    (typeof value === 'object' && value !== null) || typeof value === 'function'
+  ) && typeof Reflect.get(value, 'then') === 'function';
+}
+
+function getComposedParent(node: Node): Node | null {
+  if (node.parentNode) return node.parentNode;
+  return node instanceof ShadowRoot ? node.host : null;
+}
+
+export function getPublicInstance<Public extends object>(
+  element: GluonElement,
+): Readonly<Public> | undefined {
+  return element[publicInstance] as Readonly<Public> | undefined;
 }
 
 export type GluonElementClass<ElementType extends GluonElement = GluonElement> = {

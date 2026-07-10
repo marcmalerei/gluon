@@ -11,3 +11,5 @@
   routing.
 - Lazy effects, update-phase effect scheduling, and an eager invalidation hook
   for render-owner integration.
+- Scope stopping continues through remaining owned effects and cleanup when an
+  effect stop hook fails.
