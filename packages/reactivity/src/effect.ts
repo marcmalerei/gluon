@@ -31,6 +31,8 @@ export interface EffectDebuggerEvent {
 export interface EffectOptions {
   readonly flush?: EffectFlush;
   readonly id?: number;
+  readonly lazy?: boolean;
+  readonly onSchedule?: () => void;
   readonly onTrack?: (event: EffectDebuggerEvent) => void;
   readonly onTrigger?: (event: EffectDebuggerEvent) => void;
   readonly onStop?: () => void;
@@ -159,6 +161,7 @@ export function effect<T>(
   let runner!: ReactiveEffectRunner<T>;
   const onError = options.onError ?? getCurrentScope()?.onError;
   const scheduler = () => {
+    options.onSchedule?.();
     scheduleEffect(
       runner,
       options.flush ?? 'sync',
@@ -167,7 +170,7 @@ export function effect<T>(
     );
   };
   runner = createReactiveEffect(callback, scheduler, { ...options, onError });
-  runner();
+  if (!options.lazy) runner();
   return runner;
 }
 

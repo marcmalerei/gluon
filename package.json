@@ -58,9 +58,12 @@
     "access": "public",
     "provenance": true
   },
+  "dependencies": {
+    "@gluonjs/reactivity": "0.0.0"
+  },
   "scripts": {
-    "build": "npm run build:core && npm run build:reactivity",
-    "build:core": "vite build && tsc -p tsconfig.build.json",
+    "build": "npm run build:core",
+    "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:reactivity": "npm run build --workspace @gluonjs/reactivity",
     "typecheck": "npm run typecheck:core && npm run typecheck:reactivity",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",

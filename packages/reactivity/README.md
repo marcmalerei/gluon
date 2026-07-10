@@ -23,7 +23,8 @@ await nextTick();
 - `ref`, `shallowRef`, `isRef`, and `unref`
 - `reactive`, `shallowReactive`, `readonly`, and `shallowReadonly`
 - `isReactive`, `isReadonly`, `isProxy`, and `toRaw`
-- `effect`, `stop`, and development-only `onTrack`/`onTrigger` callbacks
+- `effect`, `stop`, lazy activation, scheduling hooks, and development-only
+  `onTrack`/`onTrigger` callbacks
 - lazy, cached readonly and writable `computed` values
 - `batch`, `untracked`, phased queue helpers, and `nextTick`
 - attached or detached `effectScope` ownership and `onScopeDispose`
@@ -45,10 +46,12 @@ cycle, including post-flush work, is complete. A queued job may return a promise
 the current phase waits for it and routes rejection through the same error
 channel.
 
-Effects are synchronous by default. `flush: 'pre'` and `flush: 'post'` opt into
-the shared microtask queue. `batch()` deduplicates synchronous invalidations
-until the outermost synchronous batch returns; it does not extend across an
-`await` boundary.
+Effects are synchronous by default. `flush: 'pre'`, `flush: 'update'`, and
+`flush: 'post'` opt into the matching shared microtask phase. `lazy: true`
+returns a runner without executing it; `onSchedule` runs synchronously before
+an invalidated effect enters its selected phase. `batch()` deduplicates
+synchronous invalidations until the outermost synchronous batch returns; it
+does not extend across an `await` boundary.
 
 An attached scope stops its owned effects in reverse creation order, then child
 scopes in reverse creation order, then cleanup callbacks in reverse registration
