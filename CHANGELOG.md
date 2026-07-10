@@ -15,6 +15,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - A deterministic phased scheduler with batching, `nextTick`, untracked reads,
   hierarchical effect scopes, scheduled watchers, cleanup, and a contained
   reactivity error channel.
+- Keyed `repeat()` reconciliation with stable DOM and Custom Element identity,
+  deterministic invalid-key diagnostics, renderer conformance coverage, and a
+  1,000-row Chromium benchmark harness.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.

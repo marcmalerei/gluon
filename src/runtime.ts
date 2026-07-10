@@ -1,5 +1,6 @@
 const templateResultBrand = Symbol('gluon.template-result');
 const directiveBrand = Symbol('gluon.directive');
+const repeatResultBrand = Symbol('gluon.repeat-result');
 const unsetValue = Symbol('gluon.unset');
 
 /** Explicitly renders no child content or removes an attribute value. */
@@ -12,11 +13,25 @@ export type TemplateValue =
   | PrimitiveValue
   | Node
   | TemplateResult
+  | RepeatResult
   | DirectiveValue
   | EventListenerOrEventListenerObject
   | typeof nothing
   | Readonly<Record<string, unknown>>
   | readonly TemplateValue[];
+
+/** A stable primitive identity used by {@link repeat}. */
+export type Key = PropertyKey;
+
+export interface KeyedItem {
+  readonly key: Key;
+  readonly value: TemplateValue;
+}
+
+export interface RepeatResult {
+  readonly [repeatResultBrand]: true;
+  readonly items: readonly KeyedItem[];
+}
 
 export class TemplateResult {
   readonly [templateResultBrand] = true;
@@ -52,6 +67,53 @@ export function svg(
   ...values: TemplateValue[]
 ): TemplateResult {
   return new TemplateResult(strings, values, 'svg');
+}
+
+/**
+ * Renders an iterable with stable key-based identity.
+ *
+ * Keys must be non-null strings, numbers, or symbols and unique within one
+ * result. Invalid keys throw while the result is created, before render() can
+ * mutate the DOM.
+ */
+export function repeat<Item>(
+  items: Iterable<Item>,
+  key: (item: Item, index: number) => Key,
+  renderItem: (item: Item, index: number) => TemplateValue,
+): RepeatResult {
+  const keyedItems: KeyedItem[] = [];
+  const keys = new Set<Key>();
+  let index = 0;
+
+  for (const item of items) {
+    const itemKey = key(item, index);
+    if (!isKey(itemKey)) {
+      throw new TypeError(`repeat() received a missing key at index ${index}.`);
+    }
+    if (keys.has(itemKey)) {
+      throw new Error(`repeat() received the duplicate key ${formatKey(itemKey)} at index ${index}.`);
+    }
+
+    keys.add(itemKey);
+    keyedItems.push(Object.freeze({
+      key: itemKey,
+      value: renderItem(item, index),
+    }));
+    index += 1;
+  }
+
+  return Object.freeze({
+    [repeatResultBrand]: true as const,
+    items: Object.freeze(keyedItems),
+  });
+}
+
+function isRepeatResult(value: unknown): value is RepeatResult {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && repeatResultBrand in value,
+  );
 }
 
 export interface PartController {
@@ -111,12 +173,19 @@ interface ChildInstance {
   readonly nodes: readonly Node[];
 }
 
+interface KeyedChild {
+  readonly key: Key;
+  readonly marker: Comment;
+  readonly part: NodePart;
+}
+
 class NodePart implements Part {
   private nodes: Node[] = [];
   private textNode?: Text;
   private lastPrimitive: PrimitiveValue | typeof unsetValue = unsetValue;
   private child?: ChildInstance;
   private arrayChildren: Array<ChildInstance | undefined> = [];
+  private keyedChildren: KeyedChild[] = [];
 
   constructor(private readonly marker: Comment) {}
 
@@ -136,6 +205,11 @@ class NodePart implements Part {
 
     if (Array.isArray(value)) {
       this.setArray(value);
+      return;
+    }
+
+    if (isRepeatResult(value)) {
+      this.setKeyed(value);
       return;
     }
 
@@ -168,6 +242,7 @@ class NodePart implements Part {
 
   private setTemplate(result: TemplateResult): void {
     this.disconnectArrayChildren();
+    this.disconnectKeyedChildren();
     const compiled = getCompiledTemplate(result);
 
     if (this.child?.template === compiled) {
@@ -189,6 +264,7 @@ class NodePart implements Part {
       disconnectBindings(this.child.bindings);
       this.child = undefined;
     }
+    this.disconnectKeyedChildren();
 
     const flatValues = flattenValues(values);
     const nextNodes: Node[] = [];
@@ -231,6 +307,55 @@ class NodePart implements Part {
     this.replaceNodes(nextNodes);
   }
 
+  private setKeyed(result: RepeatResult): void {
+    if (this.child) {
+      disconnectBindings(this.child.bindings);
+      this.child = undefined;
+    }
+    this.disconnectArrayChildren();
+
+    const previousByKey = new Map(
+      this.keyedChildren.map((child) => [child.key, child] as const),
+    );
+    const nextKeys = new Set(result.items.map((item) => item.key));
+    const nextChildren: KeyedChild[] = [];
+    const nextNodes: Node[] = [];
+
+    for (const [key, removed] of previousByKey) {
+      if (!nextKeys.has(key)) {
+        removed.part.disconnect();
+        previousByKey.delete(key);
+      }
+    }
+
+    for (const item of result.items) {
+      const previous = previousByKey.get(item.key);
+      const child = previous ?? this.createKeyedChild(item);
+
+      if (previous) {
+        previousByKey.delete(item.key);
+        child.part.setValue(item.value);
+      }
+
+      nextChildren.push(child);
+      nextNodes.push(child.marker, ...child.part.nodes);
+    }
+
+    this.keyedChildren = nextChildren;
+    this.textNode = undefined;
+    this.lastPrimitive = unsetValue;
+    this.replaceNodes(nextNodes);
+  }
+
+  private createKeyedChild(item: KeyedItem): KeyedChild {
+    const fragment = document.createDocumentFragment();
+    const marker = document.createComment('gluon:key');
+    fragment.append(marker);
+    const part = new NodePart(marker);
+    part.setValue(item.value);
+    return { key: item.key, marker, part };
+  }
+
   private replaceNodes(nextNodes: Node[]): void {
     const parent = this.marker.parentNode;
     if (!parent) {
@@ -269,6 +394,7 @@ class NodePart implements Part {
       this.child = undefined;
     }
     this.disconnectArrayChildren();
+    this.disconnectKeyedChildren();
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
   }
@@ -278,6 +404,11 @@ class NodePart implements Part {
       if (child) disconnectBindings(child.bindings);
     }
     this.arrayChildren = [];
+  }
+
+  private disconnectKeyedChildren(): void {
+    for (const child of this.keyedChildren) child.part.disconnect();
+    this.keyedChildren = [];
   }
 }
 
@@ -822,6 +953,16 @@ function isRenderablePrimitive(value: unknown): value is string | number | bigin
     || typeof value === 'number'
     || typeof value === 'bigint'
     || value === true;
+}
+
+function isKey(value: unknown): value is Key {
+  return typeof value === 'string'
+    || typeof value === 'number'
+    || typeof value === 'symbol';
+}
+
+function formatKey(key: Key): string {
+  return typeof key === 'string' ? JSON.stringify(key) : String(key);
 }
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {

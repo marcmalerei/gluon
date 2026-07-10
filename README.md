@@ -17,7 +17,7 @@
 
 - cached `html` and `svg` template results with part-level DOM updates
 - child, attribute, property, boolean, event, and first-class spread bindings
-- nested templates and array rendering with cached template instances
+- nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
 - constructable `CSSStyleSheet` creation and `adoptedStyleSheets` adoption only
@@ -81,6 +81,47 @@ render(view('Gluon'), document.body);
 ```
 
 The second call updates the existing text part when the template shape is unchanged.
+
+## Keyed lists
+
+Use `repeat()` when item identity must survive insertion, deletion, or a move:
+
+```ts
+import { html, repeat, render } from '@gluonjs/core';
+
+interface Todo {
+  id: string;
+  label: string;
+}
+
+const view = (todos: readonly Todo[]) => html`
+  <ul>
+    ${repeat(
+      todos,
+      (todo) => todo.id,
+      (todo) => html`<li data-id=${todo.id}>${todo.label}</li>`,
+    )}
+  </ul>
+`;
+
+const todos: Todo[] = [{ id: 'first', label: 'Try Gluon' }];
+render(view(todos), document.body);
+```
+
+Keys are strings, numbers, or symbols. A key that survives an update retains
+its Part, DOM nodes, Custom Element instance, listeners, refs, and local element
+state. Removing it disconnects its renderer-owned bindings once. The contract
+for invalid or changing keys is explicit:
+
+| Input | Behavior |
+| --- | --- |
+| Duplicate key in one result | `repeat()` throws before `render()` can change the DOM. |
+| `null` or `undefined` key from untyped JavaScript | `repeat()` throws before `render()` can change the DOM. |
+| Key changes for an item | The old keyed child is removed and cleaned; a new child is inserted. |
+| Ordinary array without `repeat()` | Template instances remain cached by array index, not item identity. |
+
+Key functions and item renderers should be free of side effects. Stable keys
+must come from item identity rather than the current list position.
 
 ## Standalone reactivity
 
@@ -271,12 +312,21 @@ Not included now:
 npm run typecheck
 npm test
 npm run test:coverage
+npm run benchmark:keyed
 npm run build
 npm run check:packages
 npm audit --audit-level=moderate
 ```
 
-`npm run test:coverage` prints the V8 coverage summary and writes the ignored HTML report to `coverage/`. `npm run check:packages` validates every planned package contract and the built export and pack contents of current packages. Run all project checks, including the coverage thresholds and package contract, with `npm run check`.
+`npm run test:coverage` prints the V8 coverage summary and writes the ignored
+HTML report to `coverage/`. `npm run benchmark:keyed` runs Chromium benchmarks
+for reversing 1,000 surviving rows, moving a 100-row block, and replacing a
+100-row window. These scenarios measure the Gluon implementation only and do
+not support a comparison claim. Pass `-- --outputJson=path/to/results.json` to
+write machine-readable local results. `npm run check:packages` validates every
+planned package contract and the built export and pack contents of current
+packages. Run all project checks, including the coverage thresholds and package
+contract, with `npm run check`.
 
 ## Contributing
 

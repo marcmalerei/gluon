@@ -15,6 +15,7 @@
     "src/**/*.ts",
     "tests/**/*.ts",
     "tests-node/reactivity.spec.ts",
+    "benchmarks/**/*.ts",
     "examples/**/*.ts",
     "vite.config.ts",
     "vitest.reactivity.config.ts"
