@@ -18,6 +18,7 @@
 - cached `html` and `svg` template results with part-level DOM updates
 - child, attribute, property, boolean, event, and first-class spread bindings
 - official browser, hash, and memory routing with typed locations and guards
+- a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -287,6 +288,21 @@ Node and server code imports `@gluonjs/router/memory`, which does not expose or
 evaluate browser history and UI bindings. The full API and navigation pipeline
 are documented in the [Router contract](docs/router.md).
 
+## Living reference shop
+
+[`examples/shop`](examples/shop/README.md) is the canonical application
+acceptance surface. GLUON GOODS is a coherent responsive shop—not a component
+gallery—with real navigation, catalog and product URLs, product configuration,
+search, and a reactive bag. Every applicable Gluon feature must improve this
+same customer journey under the rules in [`AGENTS.md`](AGENTS.md).
+
+```bash
+npm run dev:shop
+npm run build:shop
+```
+
+![GLUON GOODS desktop home](examples/shop/design/rendered-home-desktop.png)
+
 ## Component contracts
 
 `PropertyDeclarations<Props>` and `EventDeclarations<Events>` connect runtime
@@ -380,6 +396,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Gluon 1.0 roadmap](docs/roadmap.md)
 - [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
 - [Runnable source example](examples/quick-start.ts)
+- [Living GLUON GOODS reference shop](examples/shop/README.md)
 
 The initial implementation was transferred and restructured from the local `tiny-lit-main` snapshot named in the transfer record. Features outside the current Gluon vision were intentionally not copied.
 
@@ -390,6 +407,7 @@ Included now:
 - browser-side rendering and updates
 - standalone DOM-free reactive state
 - application routing with browser, hash, and memory histories
+- a responsive living reference shop using public package APIs
 - Custom Element authoring
 - adopted stylesheet management
 - Quark, Atom, Molecule, and Organism composition

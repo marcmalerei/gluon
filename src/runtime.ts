@@ -264,7 +264,7 @@ interface CompiledTemplate {
 interface ChildInstance {
   readonly template: CompiledTemplate;
   readonly bindings: readonly Binding[];
-  readonly nodes: readonly Node[];
+  nodes: Node[];
 }
 
 interface PartChild {
@@ -367,11 +367,19 @@ class NodePart implements Part {
     this.unsafeMarkup = undefined;
     const compiled = getCompiledTemplate(result);
 
-    if (this.child?.template === compiled) {
+    if (
+      this.child?.template === compiled
+      && nodesAreInPlace(this.marker, this.nodes)
+    ) {
+      const boundary = this.nodes.length > 0
+        ? this.nodes[this.nodes.length - 1]!.nextSibling
+        : this.marker.nextSibling;
       applyBindings(this.child.bindings, result.values);
+      const nodes = collectNodesUntil(this.marker, boundary);
+      this.child.nodes = nodes;
+      this.nodes = nodes;
       this.textNode = undefined;
       this.lastPrimitive = unsetValue;
-      this.replaceNodes([...this.child.nodes]);
       return;
     }
 
@@ -893,7 +901,7 @@ class SpreadPart implements Part {
 interface RootInstance {
   readonly template: CompiledTemplate;
   readonly bindings: readonly Binding[];
-  readonly nodes: readonly Node[];
+  nodes: Node[];
   suspended: boolean;
 }
 
@@ -917,6 +925,7 @@ export function render(
     && rootNodesAreInPlace(container, current.nodes)
   ) {
     applyBindings(current.bindings, result.values);
+    current.nodes = [...container.childNodes];
     current.suspended = false;
     return;
   }
@@ -1517,6 +1526,16 @@ function nodesAreInPlace(marker: Comment, nodes: readonly Node[]): boolean {
     cursor = cursor.nextSibling;
   }
   return true;
+}
+
+function collectNodesUntil(marker: Comment, boundary: Node | null): Node[] {
+  const nodes: Node[] = [];
+  let cursor = marker.nextSibling;
+  while (cursor && cursor !== boundary) {
+    nodes.push(cursor);
+    cursor = cursor.nextSibling;
+  }
+  return nodes;
 }
 
 function rootNodesAreInPlace(

@@ -62,10 +62,13 @@
     "@gluonjs/reactivity": "0.0.0"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:router",
+    "build": "npm run build:core && npm run build:router && npm run build:shop",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:reactivity": "npm run build --workspace @gluonjs/reactivity",
     "build:router": "npm run build --workspace @gluonjs/router",
+    "build:shop": "vite build --config examples/shop/vite.config.ts",
+    "dev:shop": "vite --config examples/shop/vite.config.ts",
+    "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
     "typecheck": "npm run typecheck:core && npm run typecheck:reactivity && npm run typecheck:router",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:reactivity": "npm run typecheck --workspace @gluonjs/reactivity",
@@ -85,8 +88,9 @@
     "test:watch": "vitest",
     "benchmark:keyed": "vitest bench --run benchmarks/keyed-list.bench.ts",
     "check:router-lazy": "node scripts/validate-router-lazy-build.mjs",
+    "check:shop-boundaries": "node scripts/validate-shop-boundaries.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
-    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run check:router-lazy && npm run check:packages"
+    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run build && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run check:router-lazy && npm run check:packages"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
