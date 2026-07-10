@@ -30,6 +30,14 @@ packages/reactivity/
 ├── src/scope.ts        Hierarchical effect ownership and cleanup
 ├── src/watch.ts        Scheduled source and effect watchers
 └── src/error.ts        Contained low-level reactivity error channel
+
+packages/router/
+├── src/history.ts      Browser, hash, and memory history adapters
+├── src/matcher.ts      Route records, ranking, params, aliases, redirects
+├── src/query.ts        Deterministic query parsing and serialization
+├── src/router.ts       Navigation, guards, failures, lazy loading, snapshots
+├── src/ui.ts           Gluon plugin, RouterLink, RouterView, injection helpers
+└── src/memory.ts       DOM-free Node/server entry point
 ```
 
 The current private package builds separate ESM entry points for `@gluonjs/core`,
@@ -38,6 +46,13 @@ The current private package builds separate ESM entry points for `@gluonjs/core`
 [package governance ADR](adrs/0002-package-release-and-supply-chain-governance.md)
 makes the four UI-layer subpaths transitional and defines their final optional
 packages.
+
+The separate `@gluonjs/router` package owns application routing and depends on
+Core and Reactivity. Its `./memory` entry excludes browser histories and Gluon
+UI bindings, so Node resolution and server snapshots do not evaluate a DOM
+global. Browser and hash adapters access `window` only when their factory is
+called. The complete navigation and ownership rules are documented in the
+[Router contract](router.md).
 
 ## Standalone reactivity
 

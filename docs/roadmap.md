@@ -62,13 +62,16 @@ Gluon currently provides:
   component registries, lifecycle, warnings, error boundaries, and exposure
 - typed prop and event declarations, native and scoped slot contracts,
   controlled form/Custom Element models, and deterministic public refs
+- an official router with typed static, dynamic, named, nested, redirected,
+  aliased, and lazy routes; browser, hash, and memory histories; guards,
+  failures, scroll restoration, and server snapshots
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide routing, an official shared-state
-package, SSR, hydration, SSG, Gluon-specific
+The current repository does not provide an official shared-state package, SSR,
+DOM hydration, SSG, Gluon-specific
 HMR, language tooling, Devtools, consumer test utilities, or a public release.
 
 ## Product principles

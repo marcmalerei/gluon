@@ -17,6 +17,7 @@
 
 - cached `html` and `svg` template results with part-level DOM updates
 - child, attribute, property, boolean, event, and first-class spread bindings
+- official browser, hash, and memory routing with typed locations and guards
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -40,11 +41,11 @@ npm install
 npm run check
 ```
 
-`npm run check` runs DOM-free Reactivity type and Node tests, strict Core type
-checking, the instrumented Chromium browser suite, both production builds,
-public declaration contract tests, and package archive validation. Each coverage
-gate requires at least 95% statement, function, and line coverage plus 90%
-branch coverage.
+`npm run check` runs DOM-free Reactivity and Router Node tests, strict type
+checking, the instrumented Chromium browser suite, all production builds,
+public declaration contract tests, the lazy-route chunk check, and package
+archive validation. Each coverage gate requires at least 95% statement,
+function, and line coverage plus 90% branch coverage.
 
 ## Quick start
 
@@ -249,6 +250,43 @@ registries, error/warning ownership, event/async protection, and explicit
 public exposure are defined in the
 [Application runtime contract](docs/application-runtime.md).
 
+## Application routing
+
+`@gluonjs/router` supplies browser, hash, and DOM-free memory histories,
+deterministic matching, typed named routes, guards, lazy route chunks, scroll
+restoration, `RouterLink`, and `RouterView`:
+
+```ts
+import { createApp, html } from '@gluonjs/core';
+import {
+  RouterLink,
+  RouterView,
+  createRouter,
+  createRouterPlugin,
+  createWebHistory,
+} from '@gluonjs/router';
+
+const router = createRouter({
+  history: createWebHistory('/app'),
+  routes: [
+    { path: '/', name: 'home', component: () => html`<h1>Home</h1>` },
+    { path: '/team/:id', name: 'team', component: ({ route }) => html`${route.params.id}` },
+  ],
+});
+await router.isReady();
+
+const app = createApp(() => html`
+  ${RouterLink({ to: '/', children: 'Home' })}
+  ${RouterView()}
+`);
+app.use(createRouterPlugin(router));
+app.mount(document.querySelector('#app')!);
+```
+
+Node and server code imports `@gluonjs/router/memory`, which does not expose or
+evaluate browser history and UI bindings. The full API and navigation pipeline
+are documented in the [Router contract](docs/router.md).
+
 ## Component contracts
 
 `PropertyDeclarations<Props>` and `EventDeclarations<Events>` connect runtime
@@ -351,6 +389,7 @@ Included now:
 
 - browser-side rendering and updates
 - standalone DOM-free reactive state
+- application routing with browser, hash, and memory histories
 - Custom Element authoring
 - adopted stylesheet management
 - Quark, Atom, Molecule, and Organism composition
@@ -372,6 +411,7 @@ npm test
 npm run test:coverage
 npm run benchmark:keyed
 npm run build
+npm run check:router-lazy
 npm run check:packages
 npm audit --audit-level=moderate
 ```
@@ -383,8 +423,9 @@ for reversing 1,000 surviving rows, moving a 100-row block, and replacing a
 not support a comparison claim. Pass `-- --outputJson=path/to/results.json` to
 write machine-readable local results. `npm run check:packages` validates every
 planned package contract and the built export and pack contents of current
-packages. Run all project checks, including the coverage thresholds and package
-contract, with `npm run check`.
+packages. `npm run check:router-lazy` verifies that an explicit lazy route emits
+a separate production chunk. Run all project checks, including the coverage
+thresholds and package contract, with `npm run check`.
 
 ## Contributing
 

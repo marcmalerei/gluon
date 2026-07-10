@@ -32,6 +32,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Typed property and event declarations, native and scoped slot contracts,
   standard and Custom Element model bindings, and deterministic host, callback,
   element, and exposed-instance refs.
+- The official `@gluonjs/router` package with browser, hash, and memory
+  histories; typed route matching and queries; nested, aliased, redirected, and
+  lazy routes; guards, navigation failures, scroll restoration, Gluon app
+  bindings, and server location snapshots.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.
