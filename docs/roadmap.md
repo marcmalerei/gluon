@@ -51,7 +51,8 @@ be added through a superseding RFC.
 Gluon currently provides:
 
 - cached `html` and `svg` templates with part-level DOM updates
-- child, attribute, property, boolean, event, directive, ref, and spread bindings
+- production child, attribute, property, boolean, event-option, lifecycle-directive,
+  ref, spread, form-control, namespace, and explicit unsafe-content bindings
 - nested templates, index-based array rendering, and keyed `repeat()` reconciliation
 - standalone DOM-free refs, reactive and readonly proxies, effects, and computed values
 - deterministic batching, phased scheduling, `nextTick`, effect scopes, and watchers

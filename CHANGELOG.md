@@ -18,6 +18,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Keyed `repeat()` reconciliation with stable DOM and Custom Element identity,
   deterministic invalid-key diagnostics, renderer conformance coverage, and a
   1,000-row Chromium benchmark harness.
+- Production DOM semantics for controlled and uncontrolled forms, lifecycle
+  directives, native event options, qualified namespaces, explicit unsafe HTML
+  and URL escapes, reversible render suspension, permanent unmount, external
+  DOM recovery, and pre-upgrade property precedence.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.

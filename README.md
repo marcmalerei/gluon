@@ -176,6 +176,16 @@ html`<input ...=${{
 
 Each expression must occupy a complete child or attribute value. Compose partial attribute strings before binding them.
 
+Controlled form state uses property bindings such as `.value` and `.checked`;
+uncontrolled initial/default state uses attributes such as `value` and
+`?checked`. Multi-select controls accept an array through `.value`. Native event
+options use `event(listener, options)`. Dynamic raw markup is text unless it is
+explicitly wrapped with `unsafeHTML()`, and unsafe URL protocols are blocked
+unless reviewed code opts out with `unsafeURL()`. The complete behavior,
+including directives, namespaces, file inputs, form-associated elements,
+suspension, and unmount cleanup, is defined in the
+[DOM runtime contract](docs/dom-runtime.md).
+
 ## Custom Elements
 
 `GluonElement` turns the renderer and stylesheet contract into a small reactive Custom Element base:

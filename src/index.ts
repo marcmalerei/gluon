@@ -1,15 +1,23 @@
 export {
   TemplateResult,
   directive,
+  event,
   html,
   isTemplateResult,
   nothing,
   repeat,
   render,
+  suspendRender,
   svg,
+  unmount,
+  unsafeHTML,
+  unsafeURL,
+  type DirectiveDefinition,
   type DirectiveFactory,
+  type DirectiveLifecycle,
   type DirectiveRunner,
   type DirectiveValue,
+  type EventBinding,
   type Key,
   type KeyedItem,
   type PartController,
@@ -17,6 +25,8 @@ export {
   type RepeatResult,
   type TemplateType,
   type TemplateValue,
+  type UnsafeHtmlResult,
+  type UnsafeUrlResult,
 } from './runtime.js';
 
 export {
