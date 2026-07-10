@@ -447,7 +447,8 @@ contract in issue #16; the presence of a standard alone is not compatibility evi
 
 ## Follow-up delivery
 
-- #16 fixes the browser, adopted stylesheet, and initial server-style contract.
+- [ADR 0001](../adrs/0001-browser-runtime-and-style-transport.md), tracked by
+  #16, fixes the browser, adopted stylesheet, and initial server-style contract.
 - #21 implements production DOM, form, event, directive, and cleanup semantics.
 - #22 integrates reactive scopes and scheduling with the element lifecycle.
 - #23 implements application context, plugins, lifecycle APIs, and error ownership.
