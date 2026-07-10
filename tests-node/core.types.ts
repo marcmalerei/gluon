@@ -4,10 +4,14 @@ import {
   createInjectionKey,
   directive,
   dynamicComponent,
+  elementRef,
   event,
+  exposedRef,
   getPublicInstance,
   html,
+  model,
   repeat,
+  renderScopedSlot,
   runWithErrorHandling,
   setGluonRenderDebugHook,
   suspendRender,
@@ -16,10 +20,14 @@ import {
   unsafeURL,
   type DirectiveLifecycle,
   type EventBinding,
+  type EventDeclarations,
   type GluonRenderDebugEvent,
   type GluonPlugin,
   type Key,
+  type PropertyDeclarations,
   type RepeatResult,
+  type ScopedSlot,
+  type SlotDeclarations,
   type TemplateValue,
 } from '@gluonjs/core';
 
@@ -106,6 +114,71 @@ class PublicElement extends GluonElement {
 }
 const publicInstance = getPublicInstance<{ reset(): void }>(null as unknown as PublicElement);
 publicInstance?.reset();
+
+interface TypedProps {
+  count: number;
+  label: string;
+}
+interface TypedEvents {
+  advance: { id: number };
+}
+class TypedElement extends GluonElement<TypedEvents> {
+  static override readonly properties = {
+    count: { type: Number, required: true, validate: (value) => value >= 0 },
+    label: { type: String, default: 'typed' },
+  } satisfies PropertyDeclarations<TypedProps>;
+
+  static override readonly events = {
+    advance: { cancelable: true, validate: ({ id }) => id > 0 },
+  } satisfies EventDeclarations<TypedEvents>;
+
+  static override readonly slots = {
+    default: { fallback: true },
+    actions: { required: true },
+  } satisfies SlotDeclarations<'default' | 'actions'>;
+
+  fire(): void {
+    this.emit('advance', { id: 1 });
+    // @ts-expect-error emitted details retain their declared type
+    this.emit('advance', { id: 'invalid' });
+    // @ts-expect-error undeclared event names are rejected
+    this.emit('missing', { id: 1 });
+  }
+
+  protected override render() {
+    return html`<slot></slot><slot name="actions"></slot>`;
+  }
+}
+void TypedElement;
+
+const typedSlot: ScopedSlot<{ count: number }> = ({ count }) => html`<b>${count}</b>`;
+renderScopedSlot(typedSlot, { count: 1 });
+// @ts-expect-error scoped slot props retain their type
+renderScopedSlot(typedSlot, { count: 'invalid' });
+
+const typedModel = { value: 'first' };
+model(typedModel, { kind: 'radio', value: 'second' });
+model({ value: false }, { kind: 'checkbox' });
+const arrayModel: { value: string[] } = { value: ['first'] };
+model<string[]>(arrayModel, { kind: 'checkbox', value: 'second' });
+// @ts-expect-error radio model values match the writable model type
+model(typedModel, { kind: 'radio', value: 2 });
+// @ts-expect-error array checkbox models require their item value
+model<string[]>(arrayModel, { kind: 'checkbox' });
+// @ts-expect-error boolean checkbox models do not accept an item value
+model({ value: false }, { kind: 'checkbox', value: 'invalid' });
+
+const buttonRef = elementRef<HTMLButtonElement>();
+buttonRef.value?.disabled;
+const exposedTarget: { value: Readonly<{ reset(): void }> | undefined } = { value: undefined };
+exposedRef(exposedTarget);
+
+const invalidPropertyDeclarations: PropertyDeclarations<TypedProps> = {
+  // @ts-expect-error prop validators receive the declared prop value type
+  count: { validate: (value: string) => value.length > 0 },
+  label: String,
+};
+void invalidPropertyDeclarations;
 
 // @ts-expect-error keys cannot be null
 repeat(rows, () => null, (row) => row.label);

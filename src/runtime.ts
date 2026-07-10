@@ -626,9 +626,15 @@ interface ResolvedEvent {
   readonly options?: boolean | AddEventListenerOptions;
 }
 
-type RefTarget =
-  | { value?: Element }
-  | ((element: Element | undefined) => void);
+export type RefTarget<ElementType extends Element = Element> =
+  | { value: ElementType | undefined }
+  | ((element: ElementType | undefined) => void);
+
+export function elementRef<ElementType extends Element = Element>(): {
+  value: ElementType | undefined;
+} {
+  return { value: undefined };
+}
 
 class SpreadPart implements Part {
   private readonly keys = new Set<string>();

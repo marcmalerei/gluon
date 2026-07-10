@@ -18,6 +18,7 @@ export {
   type DirectiveRunner,
   type DirectiveValue,
   type EventBinding,
+  type RefTarget,
   type Key,
   type KeyedItem,
   type PartController,
@@ -27,16 +28,21 @@ export {
   type TemplateValue,
   type UnsafeHtmlResult,
   type UnsafeUrlResult,
+  elementRef,
 } from './runtime.js';
 
 export {
   GluonElement,
   defineElement,
+  exposedRef,
   getPublicInstance,
   setGluonRenderDebugHook,
   type ComponentErrorBoundary,
   type ComponentErrorInfo,
   type ComponentLifecycleCallback,
+  type ComponentEventMap,
+  type EventDeclaration,
+  type EventDeclarations,
   type GluonElementClass,
   type GluonRenderCause,
   type GluonRenderDebugEvent,
@@ -46,6 +52,9 @@ export {
   type PropertyDeclarations,
   type PropertyDefinition,
   type PropertyType,
+  type SlotDeclaration,
+  type SlotDeclarations,
+  type ValueRefTarget,
 } from './element.js';
 
 export {
@@ -78,9 +87,24 @@ export {
   defineAtom,
   defineMolecule,
   defineOrganism,
+  renderScopedSlot,
   type Component,
   type ComponentLayer,
+  type ScopedSlot,
 } from './component.js';
+
+export {
+  model,
+  type CheckboxModelOptions,
+  type CustomModelOptions,
+  type ModelBinding,
+  type ModelModifiers,
+  type ModelOptions,
+  type RadioModelOptions,
+  type SelectModelOptions,
+  type TextModelOptions,
+  type WritableModel,
+} from './model.js';
 
 export {
   mergeProps,

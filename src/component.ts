@@ -1,4 +1,4 @@
-import type { TemplateResult } from './runtime.js';
+import { nothing, type TemplateResult, type TemplateValue } from './runtime.js';
 
 export type ComponentLayer = 'atom' | 'molecule' | 'organism';
 
@@ -6,6 +6,18 @@ export interface Component<Props = Record<string, never>> {
   (props: Props): TemplateResult;
   readonly layer: ComponentLayer;
   readonly displayName: string;
+}
+
+export type ScopedSlot<Props = Record<string, never>> = (
+  props: Readonly<Props>,
+) => TemplateValue;
+
+export function renderScopedSlot<Props>(
+  slot: ScopedSlot<Props> | undefined,
+  props: Readonly<Props>,
+  fallback: TemplateValue = nothing,
+): TemplateValue {
+  return slot ? slot(props) : fallback;
 }
 
 function defineComponent<Props>(
