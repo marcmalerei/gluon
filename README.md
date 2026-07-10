@@ -196,6 +196,7 @@ The following points describe architectural advantages and design goals. Outcome
 ## Architecture and provenance
 
 - [Architecture](docs/architecture.md)
+- [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Gluon 1.0 roadmap](docs/roadmap.md)
 - [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
 - [Runnable source example](examples/quick-start.ts)
