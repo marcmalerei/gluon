@@ -246,6 +246,7 @@ type PartDescriptor =
 interface Binding {
   readonly index: number;
   readonly part: Part;
+  readonly priority: number;
   directive?: ActiveDirective;
 }
 
@@ -291,7 +292,26 @@ class NodePart implements Part {
     private readonly contextMarker: Comment = marker,
   ) {}
 
+  setStringValue(value: string): void {
+    if (!this.textNode) {
+      this.setValue(value);
+      return;
+    }
+    if (value !== this.lastPrimitive) {
+      this.textNode.data = value;
+      this.lastPrimitive = value;
+    }
+    if (this.textNode.previousSibling !== this.marker) {
+      this.replaceNodes([this.textNode]);
+    }
+  }
+
   setValue(value: TemplateValue): void {
+    if (typeof value === 'string' && this.textNode) {
+      this.setStringValue(value);
+      return;
+    }
+
     if (isEmptyValue(value)) {
       this.resetChildren();
       this.replaceNodes([]);
@@ -303,7 +323,9 @@ class NodePart implements Part {
         this.textNode.data = String(value);
         this.lastPrimitive = value;
       }
-      this.replaceNodes([this.textNode]);
+      if (this.textNode.previousSibling !== this.marker) {
+        this.replaceNodes([this.textNode]);
+      }
       return;
     }
 
@@ -432,6 +454,19 @@ class NodePart implements Part {
     this.disconnectArrayChildren();
     this.unsafeMarkup = undefined;
 
+    if (
+      this.keyedChildren.length === result.items.length
+      && this.keyedChildren.every((child, index) => child.key === result.items[index]!.key)
+    ) {
+      for (let index = 0; index < result.items.length; index += 1) {
+        applyBinding(this.keyedChildren[index]!.binding, result.items[index]!.value);
+      }
+      this.textNode = undefined;
+      this.lastPrimitive = unsetValue;
+      if (!nodesAreInPlace(this.marker, this.nodes)) this.replaceNodes([...this.nodes]);
+      return;
+    }
+
     const previousByKey = new Map(
       this.keyedChildren.map((child) => [child.key, child] as const),
     );
@@ -452,7 +487,7 @@ class NodePart implements Part {
 
       if (previous) {
         previousByKey.delete(item.key);
-        applyBindings([child.binding], [item.value]);
+        applyBinding(child.binding, item.value);
       }
 
       nextChildren.push(child);
@@ -474,7 +509,7 @@ class NodePart implements Part {
     const marker = document.createComment(markerData);
     fragment.append(marker);
     const part = new NodePart(marker, this.contextMarker);
-    const binding: Binding = { index: 0, part };
+    const binding: Binding = { index: 0, part, priority: 0 };
     applyBindings([binding], [value]);
     return { marker, part, binding };
   }
@@ -499,12 +534,15 @@ class NodePart implements Part {
       return;
     }
 
-    if (
-      nextNodes.length === this.nodes.length
-      && nextNodes.every((node, index) => node === this.nodes[index])
-      && nodesAreInPlace(this.marker, nextNodes)
-    ) {
-      return;
+    if (nextNodes.length === this.nodes.length) {
+      let sameNodes = true;
+      for (let index = 0; index < nextNodes.length; index += 1) {
+        if (nextNodes[index] !== this.nodes[index]) {
+          sameNodes = false;
+          break;
+        }
+      }
+      if (sameNodes && nodesAreInPlace(this.marker, nextNodes)) return;
     }
 
     const keep = new Set(nextNodes);
@@ -924,7 +962,15 @@ export function render(
     current?.template === compiled
     && rootNodesAreInPlace(container, current.nodes)
   ) {
-    applyBindings(current.bindings, result.values);
+    const binding = current.bindings.length === 1 ? current.bindings[0] : undefined;
+    const value = binding && binding.index < result.values.length
+      ? result.values[binding.index]
+      : undefined;
+    if (binding && typeof value === 'string' && binding.part instanceof NodePart && !binding.directive) {
+      binding.part.setStringValue(value);
+    } else {
+      applyBindings(current.bindings, result.values);
+    }
     current.nodes = [...container.childNodes];
     current.suspended = false;
     return;
@@ -1080,7 +1126,7 @@ function instantiateBindings(
     else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
     else part = new AttributePart(node as Element, descriptor.name);
 
-    return { index: descriptor.index, part };
+    return { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
   });
 }
 
@@ -1099,19 +1145,46 @@ function applyBindings(
   bindings: readonly Binding[],
   values: readonly TemplateValue[],
 ): void {
+  if (bindings.length === 1 && bindings[0]!.priority === 0) {
+    applyBinding(bindings[0]!, bindings[0]!.index < values.length
+      ? values[bindings[0]!.index]!
+      : nothing);
+    return;
+  }
+
+  let hasPriorityOne = false;
+  for (const binding of bindings) {
+    if (binding.priority === 1) {
+      hasPriorityOne = true;
+      break;
+    }
+  }
+
+  if (!hasPriorityOne) {
+    for (const binding of bindings) {
+      applyBinding(binding, binding.index < values.length ? values[binding.index]! : nothing);
+    }
+    return;
+  }
+
   for (const priority of [0, 1]) {
     for (const binding of bindings) {
-      if ((binding.part.commitPriority ?? 0) !== priority) continue;
-      const value = binding.index < values.length
-        ? values[binding.index]!
-        : nothing;
-      if (isDirectiveValue(value)) {
-        applyDirective(binding, value);
-      } else {
-        deactivateDirective(binding);
-        binding.part.setValue(value);
-      }
+      if (binding.priority !== priority) continue;
+      applyBinding(binding, binding.index < values.length ? values[binding.index]! : nothing);
     }
+  }
+}
+
+function applyBinding(binding: Binding, value: TemplateValue): void {
+  if (typeof value === 'string' && binding.part instanceof NodePart && !binding.directive) {
+    binding.part.setStringValue(value);
+    return;
+  }
+  if (isDirectiveValue(value)) {
+    applyDirective(binding, value);
+  } else {
+    if (binding.directive) deactivateDirective(binding);
+    binding.part.setValue(value);
   }
 }
 
@@ -1542,8 +1615,11 @@ function rootNodesAreInPlace(
   container: Element | DocumentFragment,
   nodes: readonly Node[],
 ): boolean {
-  return container.childNodes.length === nodes.length
-    && nodes.every((node, index) => container.childNodes.item(index) === node);
+  if (container.childNodes.length !== nodes.length) return false;
+  for (let index = 0; index < nodes.length; index += 1) {
+    if (container.childNodes.item(index) !== nodes[index]) return false;
+  }
+  return true;
 }
 
 function isEventListener(value: unknown): value is EventListenerOrEventListenerObject {

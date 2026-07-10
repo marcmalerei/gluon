@@ -52,6 +52,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 - Renamed the private root package from the occupied unscoped name `gluon` to
   the planned scoped name `@gluonjs/core`.
+- Renderer hot paths now specialize stable string bindings, precompute binding
+  commit priorities, and update unchanged keyed order without rebuilding lookup
+  maps; external DOM recovery and keyed identity contracts remain covered by
+  browser tests.
 
 ### Fixed
 
