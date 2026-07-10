@@ -43,9 +43,9 @@
     {
       "name": "@gluonjs/router",
       "directory": "packages/router",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
-      "exports": ["."],
+      "exports": [".", "./memory"],
       "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
     },
     {
