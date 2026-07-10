@@ -1,0 +1,58 @@
+{
+  "name": "gluon",
+  "version": "0.0.0",
+  "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
+  "private": true,
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles": {
+      "types": "./dist/types/styles/index.d.ts",
+      "import": "./dist/styles.js"
+    },
+    "./quarks": {
+      "types": "./dist/types/quarks/index.d.ts",
+      "import": "./dist/quarks.js"
+    },
+    "./atoms": {
+      "types": "./dist/types/atoms/index.d.ts",
+      "import": "./dist/atoms.js"
+    },
+    "./molecules": {
+      "types": "./dist/types/molecules/index.d.ts",
+      "import": "./dist/molecules.js"
+    },
+    "./organisms": {
+      "types": "./dist/types/organisms/index.d.ts",
+      "import": "./dist/organisms.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/browser-playwright": "^4.0.18",
+    "playwright": "^1.58.2",
+    "typescript": "^5.7.0",
+    "vite": "^8.1.4",
+    "vitest": "^4.0.18"
+  }
+}
