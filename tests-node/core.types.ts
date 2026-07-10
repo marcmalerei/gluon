@@ -1,8 +1,14 @@
 import {
+  GluonElement,
+  createApp,
+  createInjectionKey,
   directive,
+  dynamicComponent,
   event,
+  getPublicInstance,
   html,
   repeat,
+  runWithErrorHandling,
   setGluonRenderDebugHook,
   suspendRender,
   unmount,
@@ -11,6 +17,7 @@ import {
   type DirectiveLifecycle,
   type EventBinding,
   type GluonRenderDebugEvent,
+  type GluonPlugin,
   type Key,
   type RepeatResult,
   type TemplateValue,
@@ -54,6 +61,50 @@ const restoreRenderDebugHook = setGluonRenderDebugHook((diagnostic: GluonRenderD
 });
 restoreRenderDebugHook();
 
+const counterKey = createInjectionKey<{ count: number }>('counter');
+const counterPlugin: GluonPlugin<{ initial: number }> = {
+  install(app, options) {
+    app.provide(counterKey, { count: options.initial });
+    return () => undefined;
+  },
+};
+const application = createApp<{ reset(): void }>((context) => {
+  const counter = context.inject(counterKey);
+  context.expose({ reset: () => { counter.count = 0; } });
+  return html`<main>${dynamicComponent(
+    (props: { count: number }) => html`<output>${props.count}</output>`,
+    counter,
+  )}</main>`;
+});
+application.config.errorHandler = ({ error, source }) => { void error; void source; };
+application.config.warnHandler = ({ message, code }) => { void message; void code; };
+application.use(counterPlugin, { initial: 1 });
+application.component<{ label: string }>('label', ({ label }) => html`<span>${label}</span>`);
+application.onMounted(() => undefined).onUnmounted(() => undefined);
+const appMount = application.mount(document.createElement('div'));
+appMount.exposed?.reset();
+void application.run(async () => 'complete');
+void runWithErrorHandling(async () => 'complete');
+appMount.unmount();
+
+class PublicElement extends GluonElement {
+  constructor() {
+    super();
+    this.onConnected(() => undefined);
+    this.onBeforeUpdate(() => undefined);
+    this.onUpdated(() => undefined);
+    this.onDisconnected(() => undefined);
+    this.onErrorCaptured(({ error, source }) => { void error; void source; return true; });
+    this.expose({ reset: () => undefined });
+  }
+
+  protected override render() {
+    return html`<p>Public</p>`;
+  }
+}
+const publicInstance = getPublicInstance<{ reset(): void }>(null as unknown as PublicElement);
+publicInstance?.reset();
+
 // @ts-expect-error keys cannot be null
 repeat(rows, () => null, (row) => row.label);
 
@@ -65,3 +116,5 @@ event(() => undefined, { capture: 'yes' });
 
 // @ts-expect-error unsafe URLs accept strings or URL objects
 unsafeURL(42);
+// @ts-expect-error injection keys retain their value type
+application.provide(counterKey, { count: 'invalid' });

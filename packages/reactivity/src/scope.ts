@@ -56,7 +56,12 @@ export class EffectScope {
     this.stopped = true;
 
     for (let index = this.effects.length - 1; index >= 0; index -= 1) {
-      this.effects[index]?.stop(true);
+      const effect = this.effects[index];
+      try {
+        effect?.stop(true);
+      } catch (error) {
+        reportReactivityError(error, 'cleanup', effect, this.onError);
+      }
     }
     for (let index = this.childScopes.length - 1; index >= 0; index -= 1) {
       this.childScopes[index]?.stop();

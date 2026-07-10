@@ -24,6 +24,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   DOM recovery, and pre-upgrade property precedence.
 - Scope-owned reactive `GluonElement` rendering through the shared update
   scheduler, including reconnect retention and render-cause/timing diagnostics.
+- Isolated application instances with plugins, typed providers, dynamic
+  functional components, lifecycle hooks, warnings, error boundaries,
+  event/async ownership, deterministic unmount, and controlled exposure.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.

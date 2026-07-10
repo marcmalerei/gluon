@@ -58,13 +58,15 @@ Gluon currently provides:
 - deterministic batching, phased scheduling, `nextTick`, effect scopes, and watchers
 - scope-owned reactive render effects, batched declared properties, reconnect
   retention, and render diagnostics through `GluonElement`
+- isolated application instances with plugins, providers, dynamic functional
+  component registries, lifecycle, warnings, error boundaries, and exposure
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide an application runtime, routing, shared
-state management, SSR, hydration, SSG, Gluon-specific
+The current repository does not provide routing, an official shared-state
+package, SSR, hydration, SSG, Gluon-specific
 HMR, language tooling, Devtools, consumer test utilities, or a public release.
 
 ## Product principles

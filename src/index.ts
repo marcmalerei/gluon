@@ -32,7 +32,11 @@ export {
 export {
   GluonElement,
   defineElement,
+  getPublicInstance,
   setGluonRenderDebugHook,
+  type ComponentErrorBoundary,
+  type ComponentErrorInfo,
+  type ComponentLifecycleCallback,
   type GluonElementClass,
   type GluonRenderCause,
   type GluonRenderDebugEvent,
@@ -43,6 +47,31 @@ export {
   type PropertyDefinition,
   type PropertyType,
 } from './element.js';
+
+export {
+  createApp,
+  createInjectionKey,
+  dynamicComponent,
+  inject,
+  runWithErrorHandling,
+  warn,
+  type AppConfig,
+  type AppErrorHandler,
+  type AppErrorInfo,
+  type AppErrorSource,
+  type AppMount,
+  type AppPluginCleanup,
+  type AppRoot,
+  type AppRootRenderContext,
+  type AppWarningHandler,
+  type AppWarningInfo,
+  type FunctionalComponent,
+  type GluonApp,
+  type GluonAppPlugin,
+  type GluonPlugin,
+  type GluonPluginFunction,
+  type InjectionKey,
+} from './application.js';
 
 export {
   defineAtom,
