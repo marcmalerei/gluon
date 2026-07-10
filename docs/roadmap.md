@@ -53,14 +53,15 @@ Gluon currently provides:
 - cached `html` and `svg` templates with part-level DOM updates
 - child, attribute, property, boolean, event, directive, ref, and spread bindings
 - nested templates and index-based array rendering
+- standalone DOM-free refs, reactive and readonly proxies, effects, and computed values
 - reactive declared properties through `GluonElement`
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide standalone reactivity, an application
-runtime, routing, shared state management, SSR, hydration, SSG, Gluon-specific
+The current repository does not provide an application runtime, routing, shared
+state management, SSR, hydration, SSG, Gluon-specific
 HMR, language tooling, Devtools, consumer test utilities, or a public release.
 
 ## Product principles
@@ -197,7 +198,7 @@ editing, testing, debugging, and production building.
 | [#30](https://github.com/marcmalerei/gluon/issues/30) | Build the Gluon Vite plugin and state-preserving HMR. |
 | [#31](https://github.com/marcmalerei/gluon/issues/31) | Build the Gluon language server and editor extension. |
 | [#32](https://github.com/marcmalerei/gluon/issues/32) | Build Gluon Devtools. |
-| [#33](https://github.com/marcmalerei/gluon/issues/33) | Build `@gluon/test-utils`. |
+| [#33](https://github.com/marcmalerei/gluon/issues/33) | Build `@gluonjs/test-utils`. |
 | [#34](https://github.com/marcmalerei/gluon/issues/34) | Build the Gluon playground and diagnostic reference. |
 
 ### Exit gate

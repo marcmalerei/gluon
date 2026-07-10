@@ -18,6 +18,7 @@
 - cached `html` and `svg` template results with part-level DOM updates
 - child, attribute, property, boolean, event, and first-class spread bindings
 - nested templates and array rendering with cached template instances
+- standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
 - constructable `CSSStyleSheet` creation and `adoptedStyleSheets` adoption only
 - typed `q.<tag>()` Quark factories for `HTMLElementTagNameMap`
@@ -35,7 +36,11 @@ npm install
 npm run check
 ```
 
-`npm run check` runs strict type checking, the instrumented Chromium browser suite, and the production library build. The coverage gate requires at least 95% statement, function, and line coverage plus 90% branch coverage.
+`npm run check` runs DOM-free Reactivity type and Node tests, strict Core type
+checking, the instrumented Chromium browser suite, both production builds,
+public declaration contract tests, and package archive validation. Each coverage
+gate requires at least 95% statement, function, and line coverage plus 90%
+branch coverage.
 
 ## Quick start
 
@@ -76,6 +81,26 @@ render(view('Gluon'), document.body);
 ```
 
 The second call updates the existing text part when the template shape is unchanged.
+
+## Standalone reactivity
+
+`@gluonjs/reactivity` is a separate, DOM-free package for state that can be
+shared by browser components, stores, and server code:
+
+```ts
+import { computed, effect, reactive, ref } from '@gluonjs/reactivity';
+
+const count = ref(1);
+const settings = reactive({ multiplier: 2 });
+const total = computed(() => count.value * settings.multiplier);
+
+effect(() => console.log(total.value));
+count.value = 2;
+```
+
+Deep and shallow mutable or readonly proxies support plain objects, arrays,
+`Map`, and `Set`. Effects track only the properties and collection operations
+they read; computed values remain lazy and cached until a dependency changes.
 
 ## Bindings and spreading
 
@@ -223,6 +248,7 @@ The initial implementation was transferred and restructured from the local `tiny
 Included now:
 
 - browser-side rendering and updates
+- standalone DOM-free reactive state
 - Custom Element authoring
 - adopted stylesheet management
 - Quark, Atom, Molecule, and Organism composition
@@ -232,7 +258,6 @@ Not included now:
 
 - server-side rendering or hydration
 - islands
-- a reactivity package outside `GluonElement` properties
 - Vue compatibility APIs or migration tooling
 - published performance comparisons
 - a stable or published package release

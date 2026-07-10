@@ -1,22 +1,15 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["node"],
+    "types": [],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "useDefineForClassFields": true
   },
-  "include": [
-    "src/**/*.ts",
-    "tests/**/*.ts",
-    "tests-node/reactivity.spec.ts",
-    "examples/**/*.ts",
-    "vite.config.ts",
-    "vitest.reactivity.config.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }

@@ -1,6 +1,8 @@
 # Gluon architecture
 
-Gluon separates its renderer, browser integration, and UI vocabulary so each public entry point can remain small and tree-shakable.
+Gluon separates standalone reactivity, its renderer, browser integration, and
+UI vocabulary so each public package and entry point can remain focused and
+tree-shakable.
 
 ## Source layout
 
@@ -15,6 +17,12 @@ src/
 ├── atoms/              Icon, Button, Input, Label
 ├── molecules/          Card, FormField
 └── organisms/          AppShell
+
+packages/reactivity/
+├── src/effect.ts       Dependency graph, effects, cleanup, debug hooks
+├── src/reactive.ts     Deep/shallow mutable/readonly object and collection proxies
+├── src/ref.ts          Deep and shallow primitive refs
+└── src/computed.ts     Lazy cached readonly and writable computed refs
 ```
 
 The current private package builds separate ESM entry points for `@gluonjs/core`,
@@ -23,6 +31,21 @@ The current private package builds separate ESM entry points for `@gluonjs/core`
 [package governance ADR](adrs/0002-package-release-and-supply-chain-governance.md)
 makes the four UI-layer subpaths transitional and defines their final optional
 packages.
+
+## Standalone reactivity
+
+`@gluonjs/reactivity` is compiled with `lib: ["ES2022"]` and no ambient DOM or
+Node types. Its dependency graph is keyed by raw target and accessed property or
+collection operation. Effects clear and rebuild their subscriptions on every
+run, so conditional dependencies stop receiving updates when they are no longer
+read.
+
+Deep and shallow mutable or readonly proxies cover plain objects, arrays,
+`Map`, and `Set`. Collection dependencies distinguish specific keys, membership,
+size, map-key iteration, and value/entry iteration. Computed refs use an internal
+effect only to mark their cache dirty; their getter executes lazily on the next
+read. Issue #19 owns asynchronous scheduling, batching, `nextTick`, and effect
+scope lifecycles, which are not added by this package foundation.
 
 ## Runtime contract
 
@@ -118,6 +141,8 @@ The machine-readable [`package-contract.json`](../package-contract.json) defines
 the complete planned package graph. `npm run check:packages` validates every
 declared package independently and additionally verifies built exports, types,
 license, changelog, README, and `npm pack` contents for implemented packages.
+Reactivity behavior runs in a Node Vitest configuration; the public generated
+declarations are compiled again through `tests-node/reactivity.types.ts`.
 
 The browser suite verifies DOM identity, nested templates, arrays, all binding forms, spread cleanup, refs, Custom Element properties and reflection, SVG namespaces, Quark factories, layer composition, and stylesheet adoption.
 

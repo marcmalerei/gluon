@@ -26,6 +26,7 @@ export default defineConfig({
     },
   },
   test: {
+    include: ['tests/**/*.spec.ts'],
     browser: {
       enabled: true,
       headless: true,
