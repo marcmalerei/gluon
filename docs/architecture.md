@@ -52,6 +52,12 @@ Compose the full string first. This keeps compilation deterministic and avoids a
 
 ## Custom Elements
 
+The accepted long-term division between stateful element components and
+stateless functional components is defined in
+[RFC 0002](rfcs/0002-unified-component-model.md). This section describes the
+current implementation of those two roles; the RFC separately records known
+prototype gaps and the required Gluon 1.0 contract.
+
 `GluonElement` finalizes declared property accessors once per constructor. It supports:
 
 - attribute names and opt-out
@@ -85,6 +91,10 @@ The type of `q` maps every key in `HTMLElementTagNameMap` to a cached factory. `
 ## UI layers
 
 Atoms, Molecules, and Organisms are ordinary render functions with explicit metadata. They all return `TemplateResult` and compose through Quarks; there is no second component runtime.
+
+They have no host, state instance, or lifecycle of their own. Stateful and
+publicly interoperable components use `GluonElement`; their render methods may
+compose any of these functional layers.
 
 Layer styles are exported as constructable sheets and must be adopted explicitly. This avoids import-time DOM mutation and keeps application stylesheet ownership visible.
 

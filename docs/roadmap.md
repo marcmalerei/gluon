@@ -11,8 +11,9 @@ GitHub is the source of truth for delivery status:
 - [Open roadmap issues](https://github.com/marcmalerei/gluon/issues?q=is%3Aissue%20is%3Aopen%20label%3Aroadmap)
 - [Milestones](https://github.com/marcmalerei/gluon/milestones)
 
-The accepted product boundary is defined by
-[RFC 0001: Gluon 1.0 product scope and non-goals](rfcs/0001-gluon-1.0-product-scope.md).
+The accepted product and component boundaries are defined by
+[RFC 0001: Gluon 1.0 product scope and non-goals](rfcs/0001-gluon-1.0-product-scope.md)
+and [RFC 0002: Unified component and Custom Element model](rfcs/0002-unified-component-model.md).
 
 This document records the product contract, dependency order, milestone exit
 criteria, and release gates. Individual issues contain the authoritative

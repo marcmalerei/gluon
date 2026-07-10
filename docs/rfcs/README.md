@@ -7,6 +7,7 @@ accepted RFC without a superseding RFC.
 | RFC | Status | Decision |
 | --- | --- | --- |
 | [0001](0001-gluon-1.0-product-scope.md) | Accepted | Gluon 1.0 product scope and non-goals |
+| [0002](0002-unified-component-model.md) | Accepted | Unified component and Custom Element model |
 
 ## Process
 
