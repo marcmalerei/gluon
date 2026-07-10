@@ -27,6 +27,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Isolated application instances with plugins, typed providers, dynamic
   functional components, lifecycle hooks, warnings, error boundaries,
   event/async ownership, deterministic unmount, and controlled exposure.
+- Persistent application mount ownership for `Element` and `ShadowRoot`, with
+  deterministic rejection of drainable plain `DocumentFragment` roots.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.

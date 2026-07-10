@@ -56,6 +56,7 @@ export {
   runWithErrorHandling,
   warn,
   type AppConfig,
+  type AppContainer,
   type AppErrorHandler,
   type AppErrorInfo,
   type AppErrorSource,
