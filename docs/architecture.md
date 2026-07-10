@@ -10,6 +10,7 @@ tree-shakable.
 src/
 ├── application.ts      App instances, plugins, providers, registries, mount
 ├── application-context.ts  Context propagation, event guards, errors, warnings
+├── model.ts            Controlled native and Custom Element model bindings
 ├── runtime.ts          Template results, compiler plans, Parts, spreading, render
 ├── element.ts          Reactive Custom Element base and definition helper
 ├── component.ts        Atom, Molecule, and Organism metadata helpers
@@ -128,6 +129,17 @@ Custom Elements remain the only stateful component instances. Per-app named
 components are functional render functions; they do not own state, lifecycle,
 or a second DOM identity. The complete isolation, ordering, failure, and cleanup
 contract is documented in [Application runtime](application-runtime.md).
+
+## Public component contracts
+
+`element.ts` keeps property, event, native-slot, lifecycle, and public-exposure
+metadata on the Custom Element class. Runtime validation warns through the
+nearest application but preserves the supplied prop or event value. Native slot
+assignment retains Light DOM ownership. `component.ts` provides the scoped-slot
+functional convention, while `model.ts` composes controlled property/event
+spreads over the existing renderer. Element and callback refs remain renderer
+Parts; the exposed-ref adapter resolves only the frozen object published by the
+upgraded Custom Element. See [Component contracts](component-contracts.md).
 
 ### List identity
 
