@@ -1,3 +1,19 @@
+import {
+  containReactivityError,
+  reportReactivityError,
+  type ReactivityErrorHandler,
+} from './error.js';
+import {
+  invalidateJob,
+  scheduleEffect,
+  type EffectFlush,
+} from './scheduler.js';
+import {
+  getCurrentScope,
+  recordEffectScope,
+  type ScopedEffect,
+} from './scope.js';
+
 export type TrackOperation = 'get' | 'has' | 'iterate';
 export type TriggerOperation = 'set' | 'add' | 'delete' | 'clear';
 
@@ -13,9 +29,12 @@ export interface EffectDebuggerEvent {
 }
 
 export interface EffectOptions {
+  readonly flush?: EffectFlush;
+  readonly id?: number;
   readonly onTrack?: (event: EffectDebuggerEvent) => void;
   readonly onTrigger?: (event: EffectDebuggerEvent) => void;
   readonly onStop?: () => void;
+  readonly onError?: ReactivityErrorHandler;
 }
 
 type Dependency = Set<ReactiveEffect>;
@@ -40,24 +59,35 @@ function isDevelopment(): boolean {
   ).process?.env?.NODE_ENV !== 'production';
 }
 
-class ReactiveEffect {
+class ReactiveEffect implements ScopedEffect {
   readonly dependencies = new Set<Dependency>();
   active = true;
   runner!: ReactiveEffectRunner;
   private lastValue: unknown;
+  private scopeStopped = false;
+  removeFromScope: (() => void) | undefined;
 
   constructor(
     private readonly callback: () => unknown,
-    readonly scheduler?: Scheduler,
+    readonly scheduler: Scheduler,
     readonly options: EffectOptions = {},
   ) {}
 
   run(): unknown {
+    if (this.scopeStopped) return this.lastValue;
     if (!this.active) {
       trackingStack.push(trackingEnabled);
       trackingEnabled = false;
       try {
-        return this.callback();
+        return containReactivityError(
+          this.callback(),
+          'effect',
+          this.runner,
+          this.options.onError,
+        );
+      } catch (error) {
+        reportReactivityError(error, 'effect', this.runner, this.options.onError);
+        return this.lastValue;
       } finally {
         trackingEnabled = trackingStack.pop() ?? true;
       }
@@ -71,7 +101,15 @@ class ReactiveEffect {
     activeEffect = this;
 
     try {
-      this.lastValue = this.callback();
+      this.lastValue = containReactivityError(
+        this.callback(),
+        'effect',
+        this.runner,
+        this.options.onError,
+      );
+      return this.lastValue;
+    } catch (error) {
+      reportReactivityError(error, 'effect', this.runner, this.options.onError);
       return this.lastValue;
     } finally {
       effectStack.pop();
@@ -80,10 +118,14 @@ class ReactiveEffect {
     }
   }
 
-  stop(): void {
+  stop(fromScope = false): void {
+    if (fromScope) this.scopeStopped = true;
+    invalidateJob(this.runner);
     if (!this.active) return;
     cleanupEffect(this);
     this.active = false;
+    this.removeFromScope?.();
+    this.removeFromScope = undefined;
     this.options.onStop?.();
   }
 }
@@ -95,13 +137,18 @@ function cleanupEffect(effect: ReactiveEffect): void {
 
 export function createReactiveEffect<T>(
   callback: () => T,
-  scheduler?: Scheduler,
+  scheduler: Scheduler,
   options: EffectOptions = {},
 ): ReactiveEffectRunner<T> {
-  const reactiveEffect = new ReactiveEffect(callback, scheduler, options);
+  const scopeErrorHandler = getCurrentScope()?.onError;
+  const resolvedOptions = options.onError || !scopeErrorHandler
+    ? options
+    : { ...options, onError: scopeErrorHandler };
+  const reactiveEffect = new ReactiveEffect(callback, scheduler, resolvedOptions);
   const runner = (() => reactiveEffect.run()) as ReactiveEffectRunner<T>;
   reactiveEffect.runner = runner;
   runnerEffects.set(runner, reactiveEffect);
+  reactiveEffect.removeFromScope = recordEffectScope(reactiveEffect);
   return runner;
 }
 
@@ -109,13 +156,33 @@ export function effect<T>(
   callback: () => T,
   options: EffectOptions = {},
 ): ReactiveEffectRunner<T> {
-  const runner = createReactiveEffect(callback, undefined, options);
+  let runner!: ReactiveEffectRunner<T>;
+  const onError = options.onError ?? getCurrentScope()?.onError;
+  const scheduler = () => {
+    scheduleEffect(
+      runner,
+      options.flush ?? 'sync',
+      options.id,
+      onError,
+    );
+  };
+  runner = createReactiveEffect(callback, scheduler, { ...options, onError });
   runner();
   return runner;
 }
 
 export function stop(runner: ReactiveEffectRunner): void {
   runnerEffects.get(runner)?.stop();
+}
+
+export function untracked<T>(callback: () => T): T {
+  trackingStack.push(trackingEnabled);
+  trackingEnabled = false;
+  try {
+    return callback();
+  } finally {
+    trackingEnabled = trackingStack.pop() ?? true;
+  }
 }
 
 export function track(
@@ -252,7 +319,15 @@ export function trigger(
         oldValue,
       });
     }
-    if (reactiveEffect.scheduler) reactiveEffect.scheduler();
-    else reactiveEffect.run();
+    try {
+      reactiveEffect.scheduler();
+    } catch (error) {
+      reportReactivityError(
+        error,
+        'scheduler',
+        reactiveEffect.runner,
+        reactiveEffect.options.onError,
+      );
+    }
   }
 }

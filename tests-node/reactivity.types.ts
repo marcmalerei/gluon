@@ -1,16 +1,28 @@
 import {
+  batch,
   computed,
   effect,
+  effectScope,
+  nextTick,
+  onScopeDispose,
+  queueJob,
   reactive,
   readonly,
   ref,
+  setReactivityErrorHandler,
   shallowReadonly,
   stop,
+  untracked,
+  watch,
+  watchEffect,
   type ComputedRef,
   type DeepReadonly,
   type EffectDebuggerEvent,
+  type FlushPhase,
+  type ReactivityErrorHandler,
   type ReactiveEffectRunner,
   type Ref,
+  type WatchStopHandle,
   type WritableComputedRef,
 } from '../packages/reactivity/dist/index.js';
 
@@ -25,14 +37,42 @@ const writable: WritableComputedRef<number> = computed({
   set: (value) => { count.value = value; },
 });
 const runner: ReactiveEffectRunner<number> = effect(() => state.count, {
+  flush: 'pre',
+  id: 1,
   onTrack(event: EffectDebuggerEvent) {
     event.effect;
     event.key;
   },
 });
+const phase: FlushPhase = 'update';
+const scope = effectScope({
+  onError(context) {
+    context.phase;
+  },
+});
+const stopWatch: WatchStopHandle = watch(count, (value, oldValue, onCleanup) => {
+  value.toFixed();
+  oldValue?.toFixed();
+  onCleanup(() => undefined);
+});
+const stopWatchEffect = watchEffect((onCleanup) => {
+  count.value;
+  onCleanup(() => undefined);
+});
+const errorHandler: ReactivityErrorHandler = ({ error }) => { void error; };
+const restoreErrorHandler = setReactivityErrorHandler(errorHandler);
 
 writable.value = doubled.value;
 shallow.count;
+phase;
+scope.run(() => onScopeDispose(() => undefined));
+queueJob(() => undefined, { phase: 'update', id: 1, onError: errorHandler });
+const batched: number = batch(() => untracked(() => count.value));
+const tick: Promise<number> = nextTick(() => batched);
+void tick;
+stopWatch();
+stopWatchEffect();
+restoreErrorHandler();
 stop(runner);
 
 // @ts-expect-error deep readonly properties cannot be assigned
