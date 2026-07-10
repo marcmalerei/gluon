@@ -11,6 +11,9 @@ GitHub is the source of truth for delivery status:
 - [Open roadmap issues](https://github.com/marcmalerei/gluon/issues?q=is%3Aissue%20is%3Aopen%20label%3Aroadmap)
 - [Milestones](https://github.com/marcmalerei/gluon/milestones)
 
+The accepted product boundary is defined by
+[RFC 0001: Gluon 1.0 product scope and non-goals](rfcs/0001-gluon-1.0-product-scope.md).
+
 This document records the product contract, dependency order, milestone exit
 criteria, and release gates. Individual issues contain the authoritative
 implementation scope, acceptance criteria, and dependency links.
@@ -34,8 +37,8 @@ The target includes:
 - Custom Element interoperability with plain HTML and third-party frameworks
 
 Vue compatibility syntax, Vue Single-File Component compilation, and automatic
-Vue source migration are not assumed to be Gluon 1.0 requirements. Any such
-requirement must be added through the accepted product-scope RFC.
+Vue source migration are not Gluon 1.0 requirements. Any such requirement must
+be added through a superseding RFC.
 
 ## Verified starting point
 
