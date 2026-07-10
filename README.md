@@ -45,10 +45,10 @@ import {
   foundationStyles,
   layerOrderStyles,
   render,
-} from 'gluon';
-import { q } from 'gluon/quarks';
-import { Button, atomStyles } from 'gluon/atoms';
-import { Card, moleculeStyles } from 'gluon/molecules';
+} from '@gluonjs/core';
+import { q } from '@gluonjs/core/quarks';
+import { Button, atomStyles } from '@gluonjs/core/atoms';
+import { Card, moleculeStyles } from '@gluonjs/core/molecules';
 
 adoptStyles(
   document,
@@ -68,7 +68,7 @@ render(Card({
 The same renderer can be used directly:
 
 ```ts
-import { html, render } from 'gluon';
+import { html, render } from '@gluonjs/core';
 
 const view = (name: string) => html`<h1>Hello ${name}</h1>`;
 render(view('world'), document.body);
@@ -112,7 +112,7 @@ Each expression must occupy a complete child or attribute value. Compose partial
 `GluonElement` turns the renderer and stylesheet contract into a small reactive Custom Element base:
 
 ```ts
-import { GluonElement, css, defineElement, html } from 'gluon';
+import { GluonElement, css, defineElement, html } from '@gluonjs/core';
 
 class GreetingElement extends GluonElement {
   static override readonly properties = {
@@ -140,7 +140,7 @@ Declared properties receive accessors, schedule microtask-batched updates, may r
 Gluon component styles are `CSSStyleSheet` instances. They are installed through `adoptedStyleSheets`; the library deliberately ships no `<style>` fallback:
 
 ```ts
-import { adoptStyles, css } from 'gluon/styles';
+import { adoptStyles, css } from '@gluonjs/core/styles';
 
 const theme = css`
   :root { color-scheme: light dark; }
@@ -164,11 +164,11 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 
 | Layer | Current role and entry point |
 | --- | --- |
-| **Gluon** | Template runtime, Custom Element base, prop merging, and stylesheet adoption from `gluon`. |
-| **Quarks** | Typed factories for native HTML elements through `gluon/quarks` and `q.<tag>()`. |
-| **Atoms** | Focused primitives such as `Icon`, `Button`, `Input`, and `Label` from `gluon/atoms`. |
-| **Molecules** | Reusable compositions such as `Card` and `FormField` from `gluon/molecules`. |
-| **Organisms** | Larger interface structures such as `AppShell` from `gluon/organisms`. |
+| **Gluon** | Template runtime, Custom Element base, prop merging, and stylesheet adoption from `@gluonjs/core`. |
+| **Quarks** | Typed factories for native HTML elements through the transitional `@gluonjs/core/quarks` subpath and `q.<tag>()`. |
+| **Atoms** | Focused primitives such as `Icon`, `Button`, `Input`, and `Label` through the transitional `@gluonjs/core/atoms` subpath. |
+| **Molecules** | Reusable compositions such as `Card` and `FormField` through the transitional `@gluonjs/core/molecules` subpath. |
+| **Organisms** | Larger interface structures such as `AppShell` through the transitional `@gluonjs/core/organisms` subpath. |
 
 ```text
                          increasing UI scope
@@ -179,6 +179,10 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 ```
 
 Every component created with `defineAtom`, `defineMolecule`, or `defineOrganism` carries explicit `layer` and `displayName` metadata.
+
+The accepted package graph moves Quarks, Atoms, Molecules, and Organisms into
+optional `@gluonjs/*` packages before 1.0. The current subpaths remain documented
+as transitional because those separate packages are not implemented yet.
 
 ## Why Gluon?
 
@@ -206,6 +210,8 @@ The following points describe architectural advantages and design goals. Outcome
 - [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
+- [Package, release, and supply-chain governance ADR](docs/adrs/0002-package-release-and-supply-chain-governance.md)
+- [Machine-readable package contract](package-contract.json)
 - [Gluon 1.0 roadmap](docs/roadmap.md)
 - [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
 - [Runnable source example](examples/quick-start.ts)
@@ -238,10 +244,11 @@ npm run typecheck
 npm test
 npm run test:coverage
 npm run build
+npm run check:packages
 npm audit --audit-level=moderate
 ```
 
-`npm run test:coverage` prints the V8 coverage summary and writes the ignored HTML report to `coverage/`. Run all project checks, including the coverage thresholds, with `npm run check`.
+`npm run test:coverage` prints the V8 coverage summary and writes the ignored HTML report to `coverage/`. `npm run check:packages` validates every planned package contract and the built export and pack contents of current packages. Run all project checks, including the coverage thresholds and package contract, with `npm run check`.
 
 ## Contributing
 
@@ -249,4 +256,4 @@ The runtime exists, but the API remains experimental. Use [GitHub Issues](https:
 
 ## License
 
-No license file is currently included in this repository.
+[MIT](LICENSE) — Copyright © 2026 Marc Malerei.

@@ -7,6 +7,7 @@ weaken an accepted ADR without a superseding decision record.
 | ADR | Status | Decision |
 | --- | --- | --- |
 | [0001](0001-browser-runtime-and-style-transport.md) | Accepted | Browser, runtime, adopted stylesheet, and SSR style transport contract |
+| [0002](0002-package-release-and-supply-chain-governance.md) | Accepted | Package topology, licensing, releases, and supply-chain governance |
 
 ## Process
 

@@ -1,14 +1,23 @@
 {
-  "name": "gluon",
+  "name": "@gluonjs/core",
   "version": "0.0.0",
   "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git"
+  },
+  "homepage": "https://github.com/marcmalerei/gluon#readme",
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
   "type": "module",
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "sideEffects": false,
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^22.12.0 || ^24.0.0"
   },
   "exports": {
     ".": {
@@ -38,15 +47,22 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "check": "npm run typecheck && npm run test:coverage && npm run build"
+    "check:packages": "node scripts/validate-package-contract.mjs",
+    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run check:packages"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

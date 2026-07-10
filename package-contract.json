@@ -1,0 +1,147 @@
+{
+  "$schema": "./schemas/package-contract.schema.json",
+  "version": 1,
+  "releaseGroup": "gluon-framework",
+  "versioning": "lockstep",
+  "registry": {
+    "url": "https://registry.npmjs.org",
+    "checkedAt": "2026-07-10",
+    "scope": "@gluonjs",
+    "scopeControl": "unverified",
+    "publicationState": "blocked",
+    "observation": "The exact scoped package requests returned HTTP 404 when checked; this does not prove scope ownership, reservation, or future availability."
+  },
+  "packages": [
+    {
+      "name": "@gluonjs/reactivity",
+      "directory": "packages/reactivity",
+      "state": "planned",
+      "environment": "universal",
+      "exports": ["."],
+      "dependencies": []
+    },
+    {
+      "name": "@gluonjs/compiler",
+      "directory": "packages/compiler",
+      "state": "planned",
+      "environment": "universal",
+      "exports": ["."],
+      "dependencies": []
+    },
+    {
+      "name": "@gluonjs/core",
+      "directory": ".",
+      "state": "current",
+      "environment": "browser",
+      "exports": [".", "./styles", "./quarks", "./atoms", "./molecules", "./organisms"],
+      "finalExports": [".", "./styles"],
+      "currentDependencies": [],
+      "dependencies": ["@gluonjs/reactivity"]
+    },
+    {
+      "name": "@gluonjs/router",
+      "directory": "packages/router",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
+    },
+    {
+      "name": "@gluonjs/store",
+      "directory": "packages/store",
+      "state": "planned",
+      "environment": "universal",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/reactivity"]
+    },
+    {
+      "name": "@gluonjs/ssr",
+      "directory": "packages/ssr",
+      "state": "planned",
+      "environment": "node",
+      "exports": [".", "./streaming"],
+      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
+    },
+    {
+      "name": "@gluonjs/vite",
+      "directory": "packages/vite",
+      "state": "planned",
+      "environment": "node",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/compiler"]
+    },
+    {
+      "name": "@gluonjs/test-utils",
+      "directory": "packages/test-utils",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
+    },
+    {
+      "name": "@gluonjs/devtools-api",
+      "directory": "packages/devtools-api",
+      "state": "planned",
+      "environment": "universal",
+      "exports": ["."],
+      "dependencies": []
+    },
+    {
+      "name": "@gluonjs/devtools",
+      "directory": "packages/devtools",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/devtools-api"]
+    },
+    {
+      "name": "@gluonjs/language-server",
+      "directory": "packages/language-server",
+      "state": "planned",
+      "environment": "node",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/compiler"]
+    },
+    {
+      "name": "@gluonjs/quarks",
+      "directory": "packages/quarks",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core"]
+    },
+    {
+      "name": "@gluonjs/atoms",
+      "directory": "packages/atoms",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core", "@gluonjs/quarks"]
+    },
+    {
+      "name": "@gluonjs/molecules",
+      "directory": "packages/molecules",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms"]
+    },
+    {
+      "name": "@gluonjs/organisms",
+      "directory": "packages/organisms",
+      "state": "planned",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms", "@gluonjs/molecules"]
+    },
+    {
+      "name": "create-gluon",
+      "directory": "packages/create-gluon",
+      "state": "planned",
+      "environment": "node",
+      "exports": ["."],
+      "bins": ["create-gluon"],
+      "dependencies": []
+    }
+  ]
+}
