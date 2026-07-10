@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -56,13 +59,22 @@
     "provenance": true
   },
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "build": "npm run build:core && npm run build:reactivity",
+    "build:core": "vite build && tsc -p tsconfig.build.json",
+    "build:reactivity": "npm run build --workspace @gluonjs/reactivity",
+    "typecheck": "npm run typecheck:core && npm run typecheck:reactivity",
+    "typecheck:core": "tsc -p tsconfig.json --noEmit",
+    "typecheck:reactivity": "npm run typecheck --workspace @gluonjs/reactivity",
+    "typecheck:reactivity-api": "tsc -p tests-node/tsconfig.reactivity-types.json",
+    "test": "npm run test:browser && npm run test:reactivity",
+    "test:browser": "vitest run",
+    "test:reactivity": "vitest run --config vitest.reactivity.config.ts",
+    "test:coverage": "npm run test:browser:coverage && npm run test:reactivity:coverage",
+    "test:browser:coverage": "vitest run --coverage",
+    "test:reactivity:coverage": "vitest run --config vitest.reactivity.config.ts --coverage",
     "test:watch": "vitest",
     "check:packages": "node scripts/validate-package-contract.mjs",
-    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run check:packages"
+    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run typecheck:reactivity-api && npm run check:packages"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
