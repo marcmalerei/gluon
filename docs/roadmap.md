@@ -52,7 +52,7 @@ Gluon currently provides:
 
 - cached `html` and `svg` templates with part-level DOM updates
 - child, attribute, property, boolean, event, directive, ref, and spread bindings
-- nested templates and index-based array rendering
+- nested templates, index-based array rendering, and keyed `repeat()` reconciliation
 - standalone DOM-free refs, reactive and readonly proxies, effects, and computed values
 - deterministic batching, phased scheduling, `nextTick`, effect scopes, and watchers
 - reactive declared properties through `GluonElement`

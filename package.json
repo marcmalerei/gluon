@@ -66,6 +66,7 @@
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:reactivity": "npm run typecheck --workspace @gluonjs/reactivity",
     "typecheck:reactivity-api": "tsc -p tests-node/tsconfig.reactivity-types.json",
+    "typecheck:core-api": "tsc -p tests-node/tsconfig.core-types.json",
     "test": "npm run test:browser && npm run test:reactivity",
     "test:browser": "vitest run",
     "test:reactivity": "vitest run --config vitest.reactivity.config.ts",
@@ -73,8 +74,9 @@
     "test:browser:coverage": "vitest run --coverage",
     "test:reactivity:coverage": "vitest run --config vitest.reactivity.config.ts --coverage",
     "test:watch": "vitest",
+    "benchmark:keyed": "vitest bench --run benchmarks/keyed-list.bench.ts",
     "check:packages": "node scripts/validate-package-contract.mjs",
-    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run typecheck:reactivity-api && npm run check:packages"
+    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run check:packages"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -88,11 +88,34 @@ Compilation stores direct child-node paths for every dynamic Part. Cloned templa
 
 The runtime currently has three Part types:
 
-- `NodePart` updates children, nested templates, DOM nodes, and arrays.
+- `NodePart` updates children, nested templates, DOM nodes, index-based arrays,
+  and keyed `repeat()` results.
 - `AttributePart` handles attributes plus `.property`, `?boolean`, and `@event` prefixes.
 - `SpreadPart` reconciles prop objects, including classes, style maps, `data`, `aria`, events, and refs.
 
 Event listeners and refs are disconnected when a binding changes or a template is replaced. Spread sub-maps remove only attributes or style properties previously owned by that Part.
+
+### List identity
+
+Ordinary arrays retain the original index-based behavior: a compatible template
+instance belongs to its current array position. Reordering array values updates
+those position-owned instances and does not attach item identity.
+
+`repeat(items, key, renderItem)` creates the explicit keyed path. It materializes
+the iterable and validates every `PropertyKey` before producing a
+`RepeatResult`. Missing (`null` or `undefined`) and duplicate keys throw before
+the result reaches `render()`. Each accepted key owns a child `NodePart` and an
+internal marker. Reconciliation updates surviving Parts and moves their marker
+and rendered node group into the requested order. It disconnects only keys that
+do not survive. Consequently, a surviving template or Custom Element keeps its
+DOM identity, binding state, and local element state across prepend, append,
+reverse, sort, and arbitrary moves.
+
+A changed key has no identity relationship to the previous key. Reconciliation
+disconnects the old child and creates a new one. Switching between a keyed
+result and an ordinary array also disconnects the previous mode before mounting
+the next one. Key extractors must therefore use stable item identity rather than
+the current index.
 
 ## Template constraints
 
@@ -175,8 +198,17 @@ the complete planned package graph. `npm run check:packages` validates every
 declared package independently and additionally verifies built exports, types,
 license, changelog, README, and `npm pack` contents for implemented packages.
 Reactivity behavior runs in a Node Vitest configuration; the public generated
-declarations are compiled again through `tests-node/reactivity.types.ts`.
+Core and Reactivity declarations are compiled again through
+`tests-node/core.types.ts` and `tests-node/reactivity.types.ts`.
 
-The browser suite verifies DOM identity, nested templates, arrays, all binding forms, spread cleanup, refs, Custom Element properties and reflection, SVG namespaces, Quark factories, layer composition, and stylesheet adoption.
+The browser suite verifies DOM identity, nested templates, index-based arrays,
+keyed insert/delete/prepend/append/reverse/sort/arbitrary moves, keyed cleanup,
+invalid-key diagnostics, all binding forms, spread cleanup, refs, Custom Element
+properties and reflection, SVG namespaces, Quark factories, layer composition,
+and stylesheet adoption.
 
-The suite does not constitute a comparative performance benchmark. Performance claims require a separate reproducible benchmark design and baseline implementations.
+`npm run benchmark:keyed` provides three Gluon-only Chromium scenarios with
+1,000 rows: full reverse, a 100-row block move, and a 100-row replacement
+window. It is a repeatable regression harness, not a comparative benchmark.
+Performance claims require a separate reproducible benchmark design and
+baseline implementations.
