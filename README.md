@@ -31,7 +31,9 @@
 - working Atom, Molecule, and Organism entry points
 - TypeScript declarations, an ESM library build, and real-browser tests
 
-No benchmark currently proves that Gluon is faster than Lit, Vue, or another renderer.
+The repository includes a reproducible production comparison with Lit, Vue,
+and optimized Vanilla DOM. The retained baseline does not establish that Gluon
+is generally faster; see [Rendering performance evidence](docs/performance.md).
 
 ## Install for development
 
@@ -418,7 +420,7 @@ Not included now:
 - server-side rendering or hydration
 - islands
 - Vue compatibility APIs or migration tooling
-- published performance comparisons
+- a supported performance-superiority claim
 - a stable or published package release
 
 ## Development
@@ -428,6 +430,8 @@ npm run typecheck
 npm test
 npm run test:coverage
 npm run benchmark:keyed
+npm run benchmark:rendering
+npm run dev:benchmark
 npm run build
 npm run check:router-lazy
 npm run check:packages
@@ -444,6 +448,16 @@ planned package contract and the built export and pack contents of current
 packages. `npm run check:router-lazy` verifies that an explicit lazy route emits
 a separate production chunk. Run all project checks, including the coverage
 thresholds and package contract, with `npm run check`.
+
+`npm run benchmark:rendering` production-builds identical Gluon, Lit, Vue, and
+optimized Vanilla DOM workloads, validates their output, then records 40
+interleaved samples in Chromium, Firefox, and WebKit. Install the managed
+engines with `npx playwright install chromium firefox webkit`. The methodology,
+result format, limits, and interactive `dev:benchmark` page are documented in
+[Rendering performance evidence](docs/performance.md). Current evidence must
+not be generalized into an unsupported superiority claim. The historical
+`~/Downloads/tiny-lit-main/public/benchmark.html` test is also documented there;
+it measures the old `gluon@0.1.0` build and is not evidence for this package.
 
 ## Contributing
 

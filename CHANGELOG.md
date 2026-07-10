@@ -43,6 +43,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.
+- A production-built Gluon, Lit, Vue, and optimized Vanilla DOM rendering
+  comparison with identical-output tests, calibrated interleaved samples,
+  Chromium/Firefox/WebKit evidence, exact environment metadata, raw results,
+  and an interactive browser demonstration.
 
 ### Changed
 

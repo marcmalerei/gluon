@@ -76,3 +76,9 @@ bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results
 before the repository makes a speed claim.
+
+That comparison is now available through `npm run benchmark:rendering` and
+documented in [`docs/performance.md`](../../docs/performance.md). It remains a
+separate performance surface rather than a shop route because running renderer
+microbenchmarks is not part of the GLUON GOODS customer journey. The retained
+baseline does not establish a general Gluon speed advantage.

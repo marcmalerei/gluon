@@ -68,6 +68,7 @@
     "build:router": "npm run build --workspace @gluonjs/router",
     "build:shop": "vite build --config examples/shop/vite.config.ts",
     "dev:shop": "vite --config examples/shop/vite.config.ts",
+    "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
     "typecheck": "npm run typecheck:core && npm run typecheck:reactivity && npm run typecheck:router",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
@@ -87,6 +88,7 @@
     "test:router-browser:coverage": "vitest run --config vitest.router-browser.config.ts --coverage",
     "test:watch": "vitest",
     "benchmark:keyed": "vitest bench --run benchmarks/keyed-list.bench.ts",
+    "benchmark:rendering": "node scripts/run-rendering-benchmark.mjs",
     "check:router-lazy": "node scripts/validate-router-lazy-build.mjs",
     "check:shop-boundaries": "node scripts/validate-shop-boundaries.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
@@ -96,9 +98,11 @@
     "@types/node": "^22.10.0",
     "@vitest/browser-playwright": "^4.0.18",
     "@vitest/coverage-v8": "^4.1.10",
+    "lit": "3.3.3",
     "playwright": "^1.58.2",
     "typescript": "^5.7.0",
     "vite": "^8.1.4",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vue": "3.5.39"
   }
 }

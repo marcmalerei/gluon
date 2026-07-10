@@ -265,6 +265,11 @@ licensed, and publicly consumable Gluon 1.0 release.
 | [#40](https://github.com/marcmalerei/gluon/issues/40) | Publish versioned guides, API docs, cookbook, examples, and migration material. |
 | [#41](https://github.com/marcmalerei/gluon/issues/41) | Prepare and publish Gluon 1.0. |
 
+The first #38 performance slice provides the production Gluon/Lit/Vue/Vanilla
+DOM comparison harness, cross-browser runner, output-equivalence tests, and
+retained raw baseline. Browser-matrix CI, accessibility, security, memory, and
+regression-budget gates remain open acceptance work.
+
 ### Exit gate
 
 - The accepted browser and runtime matrix is enforced in CI.
