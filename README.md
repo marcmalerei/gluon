@@ -1,4 +1,8 @@
-![Gluon — native UI layers connected through a lightweight core](docs/assets/gluon-hero.jpg)
+![Gluon — native UI layers growing from a glowing core](docs/assets/gluon-hero-v2.jpg)
+
+<p align="center">
+  <img src="docs/assets/gluon-logo.jpg" alt="Gluon logo — interface layers orbiting a glowing core" width="180">
+</p>
 
 <h1 align="center">Gluon</h1>
 
