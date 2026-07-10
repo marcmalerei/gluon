@@ -43,8 +43,6 @@ export interface RepeatResult {
 }
 
 export class TemplateResult {
-  readonly [templateResultBrand] = true;
-
   constructor(
     readonly strings: TemplateStringsArray,
     readonly values: readonly TemplateValue[],
@@ -53,6 +51,7 @@ export class TemplateResult {
 }
 
 export function isTemplateResult(value: unknown): value is TemplateResult {
+  if (value instanceof TemplateResult) return true;
   return Boolean(
     value
       && typeof value === 'object'
