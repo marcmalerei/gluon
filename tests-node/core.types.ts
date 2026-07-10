@@ -86,6 +86,8 @@ appMount.exposed?.reset();
 void application.run(async () => 'complete');
 void runWithErrorHandling(async () => 'complete');
 appMount.unmount();
+// @ts-expect-error plain DocumentFragments are drainable and cannot own an application
+application.mount(document.createDocumentFragment());
 
 class PublicElement extends GluonElement {
   constructor() {

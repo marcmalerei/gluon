@@ -239,6 +239,9 @@ const mount = app.mount(document.querySelector('#app')!);
 mount.unmount();
 ```
 
+Application mount roots are persistent `Element` or `ShadowRoot` instances;
+plain `DocumentFragment` objects are drainable and therefore rejected.
+
 Application and component lifecycle, plugin cleanup, dynamic component
 registries, error/warning ownership, event/async protection, and explicit
 public exposure are defined in the
