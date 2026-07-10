@@ -9,7 +9,12 @@
 - Its README ended with the text `MIT`.
 - The inspected snapshot contained no `LICENSE`, `LICENSE.md`, `COPYING`, or `NOTICE` file, and its `package.json` contained no `license` field.
 
-This repository does not infer a copyright holder or add a license from those incomplete files. Gluon's existing README continues to state that no license file is present.
+Those incomplete snapshot files did not establish a copyright holder or license
+authority. On 2026-07-10, Marc Malerei explicitly authorized Gluon under the MIT
+License with `Copyright © 2026 Marc Malerei`. The repository license is therefore
+based on that later authorization, not an inference from the Tiny-Lit snapshot.
+See [ADR 0002](adrs/0002-package-release-and-supply-chain-governance.md)
+and the root [`LICENSE`](../LICENSE).
 
 ## Transferred concepts and code paths
 

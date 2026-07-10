@@ -16,6 +16,9 @@ The accepted product and component boundaries are defined by
 and [RFC 0002: Unified component and Custom Element model](rfcs/0002-unified-component-model.md).
 The supported environments and style transport are defined by
 [ADR 0001: Browser, runtime, and style transport contract](adrs/0001-browser-runtime-and-style-transport.md).
+The package graph, authorized license, versioning, release, and supply-chain
+rules are defined by
+[ADR 0002: Package, release, and supply-chain governance](adrs/0002-package-release-and-supply-chain-governance.md).
 
 This document records the product contract, dependency order, milestone exit
 criteria, and release gates. Individual issues contain the authoritative
@@ -58,8 +61,7 @@ Gluon currently provides:
 
 The current repository does not provide standalone reactivity, an application
 runtime, routing, shared state management, SSR, hydration, SSG, Gluon-specific
-HMR, language tooling, Devtools, consumer test utilities, a public release, or a
-license file.
+HMR, language tooling, Devtools, consumer test utilities, or a public release.
 
 ## Product principles
 
