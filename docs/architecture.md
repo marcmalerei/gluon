@@ -17,7 +17,12 @@ src/
 └── organisms/          AppShell
 ```
 
-The package builds separate ESM entry points for `gluon`, `gluon/styles`, `gluon/quarks`, `gluon/atoms`, `gluon/molecules`, and `gluon/organisms`.
+The current private package builds separate ESM entry points for `@gluonjs/core`,
+`@gluonjs/core/styles`, `@gluonjs/core/quarks`, `@gluonjs/core/atoms`,
+`@gluonjs/core/molecules`, and `@gluonjs/core/organisms`. The accepted
+[package governance ADR](adrs/0002-package-release-and-supply-chain-governance.md)
+makes the four UI-layer subpaths transitional and defines their final optional
+packages.
 
 ## Runtime contract
 
@@ -108,6 +113,11 @@ compose any of these functional layers.
 Layer styles are exported as constructable sheets and must be adopted explicitly. This avoids import-time DOM mutation and keeps application stylesheet ownership visible.
 
 ## Verification boundaries
+
+The machine-readable [`package-contract.json`](../package-contract.json) defines
+the complete planned package graph. `npm run check:packages` validates every
+declared package independently and additionally verifies built exports, types,
+license, changelog, README, and `npm pack` contents for implemented packages.
 
 The browser suite verifies DOM identity, nested templates, arrays, all binding forms, spread cleanup, refs, Custom Element properties and reflection, SVG namespaces, Quark factories, layer composition, and stylesheet adoption.
 
