@@ -35,7 +35,7 @@ npm install
 npm run check
 ```
 
-`npm run check` runs strict type checking, the Chromium browser suite, and the production library build.
+`npm run check` runs strict type checking, the instrumented Chromium browser suite, and the production library build. The coverage gate requires at least 95% statement, function, and line coverage plus 90% branch coverage.
 
 ## Quick start
 
@@ -225,11 +225,12 @@ Not included now:
 ```bash
 npm run typecheck
 npm test
+npm run test:coverage
 npm run build
 npm audit --audit-level=moderate
 ```
 
-Run all project checks with `npm run check`.
+`npm run test:coverage` prints the V8 coverage summary and writes the ignored HTML report to `coverage/`. Run all project checks, including the coverage thresholds, with `npm run check`.
 
 ## Contributing
 
