@@ -12,6 +12,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - A standalone, DOM-free `@gluonjs/reactivity` package with refs, deep and
   shallow object and collection proxies, effects, computed values, dependency
   debugging hooks, Node tests, and declaration contract tests.
+- A deterministic phased scheduler with batching, `nextTick`, untracked reads,
+  hierarchical effect scopes, scheduled watchers, cleanup, and a contained
+  reactivity error channel.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.
