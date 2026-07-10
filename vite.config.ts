@@ -16,6 +16,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
+      '@gluonjs/router': resolve(import.meta.dirname, 'packages/router/src/index.ts'),
     },
   },
   build: {

@@ -36,6 +36,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   histories; typed route matching and queries; nested, aliased, redirected, and
   lazy routes; guards, navigation failures, scroll restoration, Gluon app
   bindings, and server location snapshots.
+- The living mobile-first GLUON GOODS reference shop with responsive
+  navigation, catalog and product routes, configurable products, search, a
+  reactive bag, generated product imagery, adopted stylesheet-only design, and
+  a repository rule requiring applicable Gluon features to grow the same app.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.
@@ -44,3 +48,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 - Renamed the private root package from the occupied unscoped name `gluon` to
   the planned scoped name `@gluonjs/core`.
+
+### Fixed
+
+- Renderer ownership now refreshes top-level nodes after reactive application
+  and nested-template updates, so conditional dialogs are removed without
+  stale nodes being reinserted by a later render.

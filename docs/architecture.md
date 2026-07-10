@@ -38,6 +38,15 @@ packages/router/
 ├── src/router.ts       Navigation, guards, failures, lazy loading, snapshots
 ├── src/ui.ts           Gluon plugin, RouterLink, RouterView, injection helpers
 └── src/memory.ts       DOM-free Node/server entry point
+
+examples/shop/
+├── src/app.ts          Public-package application composition and routes
+├── src/pages.ts        Home, catalog, product, policy, and fallback pages
+├── src/components.ts   Navigation, product rail, search, menu, and bag
+├── src/state.ts        Temporary local shop domain state pending Store
+├── src/styles.ts       Document-level constructable stylesheet design system
+├── assets/             Production product and editorial imagery
+└── design/             Accepted concepts and verified browser renders
 ```
 
 The current private package builds separate ESM entry points for `@gluonjs/core`,
@@ -53,6 +62,12 @@ UI bindings, so Node resolution and server snapshots do not evaluate a DOM
 global. Browser and hash adapters access `window` only when their factory is
 called. The complete navigation and ownership rules are documented in the
 [Router contract](router.md).
+
+The GLUON GOODS reference shop consumes only public package names in
+application source. Its monorepo Vite and test aliases resolve those names to
+workspace sources until package publication. `AGENTS.md` makes the shop a
+mandatory living acceptance surface: applicable framework work integrates into
+the same customer flow instead of creating disconnected demos.
 
 ## Standalone reactivity
 
@@ -120,6 +135,11 @@ The runtime currently has three Part types:
 - `SpreadPart` reconciles prop objects, including classes, style maps, `data`, `aria`, events, and refs.
 
 Event listeners and refs are disconnected when a binding changes or a template is replaced. Spread sub-maps remove only attributes or style properties previously owned by that Part.
+
+Root and nested template instances refresh their rendered top-level node sets
+after every successful update. This keeps renderer ownership accurate when a
+top-level conditional or list adds and removes nodes between cached static
+siblings, while the next render can still detect external DOM replacement.
 
 The production binding semantics for forms, lifecycle directives, event
 options, qualified namespaces, unsafe-content boundaries, root suspension,
