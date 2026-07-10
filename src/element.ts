@@ -1,4 +1,4 @@
-import { render, type TemplateResult } from './runtime.js';
+import { render, suspendRender, type TemplateResult } from './runtime.js';
 import { adoptStyles } from './styles/index.js';
 
 export type PropertyType =
@@ -45,6 +45,7 @@ export abstract class GluonElement extends HTMLElement {
   private updatePending = false;
   private connected = false;
   private reflectingAttribute?: string;
+  private readonly initialAttributePrecedence = new Map<string, string>();
   private updatePromise: Promise<void> = Promise.resolve();
 
   constructor() {
@@ -74,6 +75,7 @@ export abstract class GluonElement extends HTMLElement {
 
   disconnectedCallback(): void {
     this.connected = false;
+    suspendRender(this.renderRoot);
   }
 
   attributeChangedCallback(
@@ -87,6 +89,11 @@ export abstract class GluonElement extends HTMLElement {
     for (const [property, definition] of Object.entries(declarations)) {
       const declaration = normalizeDeclaration(definition);
       if (getAttributeName(property, declaration) !== name) continue;
+      const initialAttribute = this.initialAttributePrecedence.get(name);
+      if (initialAttribute !== undefined) {
+        this.initialAttributePrecedence.delete(name);
+        if (oldValue === null && value === initialAttribute) return;
+      }
       const converted = declaration.converter?.fromAttribute
         ? declaration.converter.fromAttribute(value, declaration.type)
         : fromAttribute(value, declaration.type);
@@ -109,6 +116,10 @@ export abstract class GluonElement extends HTMLElement {
     this.updatePromise = new Promise((resolve, reject) => {
       queueMicrotask(() => {
         this.updatePending = false;
+        if (!this.connected) {
+          resolve();
+          return;
+        }
         try {
           this.update();
           resolve();
@@ -162,7 +173,12 @@ export abstract class GluonElement extends HTMLElement {
       if (!Object.prototype.hasOwnProperty.call(this, name)) continue;
       const value = (this as unknown as Record<string, unknown>)[name];
       delete (this as unknown as Record<string, unknown>)[name];
-      this[setProperty](name, value, normalizeDeclaration(definition));
+      const declaration = normalizeDeclaration(definition);
+      const attribute = getAttributeName(name, declaration);
+      if (attribute && this.hasAttribute(attribute)) {
+        this.initialAttributePrecedence.set(attribute, this.getAttribute(attribute)!);
+      }
+      this[setProperty](name, value, declaration);
     }
   }
 

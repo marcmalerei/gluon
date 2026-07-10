@@ -1,6 +1,9 @@
 const templateResultBrand = Symbol('gluon.template-result');
 const directiveBrand = Symbol('gluon.directive');
 const repeatResultBrand = Symbol('gluon.repeat-result');
+const eventBindingBrand = Symbol('gluon.event-binding');
+const unsafeHtmlBrand = Symbol('gluon.unsafe-html');
+const unsafeUrlBrand = Symbol('gluon.unsafe-url');
 const unsetValue = Symbol('gluon.unset');
 
 /** Explicitly renders no child content or removes an attribute value. */
@@ -12,9 +15,13 @@ export type PrimitiveValue = string | number | bigint | boolean | null | undefin
 export type TemplateValue =
   | PrimitiveValue
   | Node
+  | URL
   | TemplateResult
   | RepeatResult
   | DirectiveValue
+  | EventBinding
+  | UnsafeHtmlResult
+  | UnsafeUrlResult
   | EventListenerOrEventListenerObject
   | typeof nothing
   | Readonly<Record<string, unknown>>
@@ -108,6 +115,60 @@ export function repeat<Item>(
   });
 }
 
+export interface EventBinding {
+  readonly [eventBindingBrand]: true;
+  readonly listener: EventListenerOrEventListenerObject;
+  readonly options?: boolean | AddEventListenerOptions;
+}
+
+/** Associates native addEventListener options with an event binding. */
+export function event(
+  listener: EventListenerOrEventListenerObject,
+  options?: boolean | AddEventListenerOptions,
+): EventBinding {
+  const retainedOptions = typeof options === 'object'
+    ? Object.freeze({
+        capture: options.capture,
+        once: options.once,
+        passive: options.passive,
+        signal: options.signal,
+      })
+    : options;
+  return Object.freeze({
+    [eventBindingBrand]: true as const,
+    listener,
+    options: retainedOptions,
+  });
+}
+
+export interface UnsafeHtmlResult {
+  readonly [unsafeHtmlBrand]: true;
+  readonly markup: string;
+}
+
+/**
+ * Opts a trusted string into raw HTML parsing. Gluon performs no sanitization.
+ */
+export function unsafeHTML(markup: string): UnsafeHtmlResult {
+  return Object.freeze({
+    [unsafeHtmlBrand]: true as const,
+    markup,
+  });
+}
+
+export interface UnsafeUrlResult {
+  readonly [unsafeUrlBrand]: true;
+  readonly value: string;
+}
+
+/** Bypasses Gluon's unsafe-protocol check for one URL-valued binding. */
+export function unsafeURL(value: string | URL): UnsafeUrlResult {
+  return Object.freeze({
+    [unsafeUrlBrand]: true as const,
+    value: String(value),
+  });
+}
+
 function isRepeatResult(value: unknown): value is RepeatResult {
   return Boolean(
     value
@@ -121,7 +182,9 @@ export interface PartController {
 }
 
 interface Part extends PartController {
+  readonly commitPriority?: number;
   disconnect(): void;
+  suspend(): void;
 }
 
 export type DirectiveRunner = (part: PartController) => void;
@@ -129,17 +192,28 @@ export type DirectiveFactory<Args extends readonly unknown[] = readonly unknown[
   ...args: Args
 ) => DirectiveRunner;
 
+export interface DirectiveLifecycle<Args extends readonly unknown[] = readonly unknown[]> {
+  mount(part: PartController, args: Args): void;
+  update(part: PartController, args: Args, previousArgs: Args): void;
+  cleanup?(part: PartController, args: Args): void;
+  disconnect?(part: PartController, args: Args): void;
+}
+
+export type DirectiveDefinition<Args extends readonly unknown[] = readonly unknown[]> =
+  | DirectiveFactory<Args>
+  | DirectiveLifecycle<Args>;
+
 export interface DirectiveValue {
-  readonly [directiveBrand]: DirectiveFactory;
+  readonly [directiveBrand]: DirectiveDefinition;
   readonly args: readonly unknown[];
 }
 
 export function directive<Args extends readonly unknown[]>(
-  factory: DirectiveFactory<Args>,
+  definition: DirectiveDefinition<Args>,
 ): (...args: Args) => DirectiveValue {
-  return (...args: Args) => ({
-    [directiveBrand]: factory as DirectiveFactory,
-    args,
+  return (...args: Args) => Object.freeze({
+    [directiveBrand]: definition as DirectiveDefinition,
+    args: Object.freeze(args),
   });
 }
 
@@ -151,6 +225,17 @@ function isDirectiveValue(value: unknown): value is DirectiveValue {
   );
 }
 
+function isDirectiveLifecycle(
+  definition: DirectiveDefinition,
+): definition is DirectiveLifecycle {
+  return Boolean(
+    definition
+      && typeof definition === 'object'
+      && typeof definition.mount === 'function'
+      && typeof definition.update === 'function',
+  );
+}
+
 type PartDescriptor =
   | { readonly kind: 'node'; readonly index: number; readonly path: readonly number[] }
   | { readonly kind: 'attribute'; readonly index: number; readonly path: readonly number[]; readonly name: string }
@@ -159,6 +244,13 @@ type PartDescriptor =
 interface Binding {
   readonly index: number;
   readonly part: Part;
+  directive?: ActiveDirective;
+}
+
+interface ActiveDirective {
+  readonly definition: DirectiveLifecycle;
+  args: readonly unknown[];
+  cleaned: boolean;
 }
 
 interface CompiledTemplate {
@@ -173,10 +265,14 @@ interface ChildInstance {
   readonly nodes: readonly Node[];
 }
 
-interface KeyedChild {
-  readonly key: Key;
+interface PartChild {
   readonly marker: Comment;
   readonly part: NodePart;
+  readonly binding: Binding;
+}
+
+interface KeyedChild extends PartChild {
+  readonly key: Key;
 }
 
 class NodePart implements Part {
@@ -184,10 +280,14 @@ class NodePart implements Part {
   private textNode?: Text;
   private lastPrimitive: PrimitiveValue | typeof unsetValue = unsetValue;
   private child?: ChildInstance;
-  private arrayChildren: Array<ChildInstance | undefined> = [];
+  private arrayChildren: Array<PartChild | undefined> = [];
   private keyedChildren: KeyedChild[] = [];
+  private unsafeMarkup?: string;
 
-  constructor(private readonly marker: Comment) {}
+  constructor(
+    private readonly marker: Comment,
+    private readonly contextMarker: Comment = marker,
+  ) {}
 
   setValue(value: TemplateValue): void {
     if (isEmptyValue(value)) {
@@ -197,10 +297,21 @@ class NodePart implements Part {
     }
 
     if (isRenderablePrimitive(value) && this.textNode) {
-      if (Object.is(value, this.lastPrimitive)) return;
-      this.textNode.data = String(value);
-      this.lastPrimitive = value;
+      if (!Object.is(value, this.lastPrimitive)) {
+        this.textNode.data = String(value);
+        this.lastPrimitive = value;
+      }
+      this.replaceNodes([this.textNode]);
       return;
+    }
+
+    if (isUnsafeHtmlResult(value)) {
+      this.setUnsafeHTML(value);
+      return;
+    }
+
+    if (isUnsafeUrlResult(value) || isEventBinding(value)) {
+      throw new TypeError('URL and event binding helpers can only be used in matching attribute bindings.');
     }
 
     if (Array.isArray(value)) {
@@ -240,15 +351,25 @@ class NodePart implements Part {
     this.lastPrimitive = unsetValue;
   }
 
+  suspend(): void {
+    if (this.child) suspendBindings(this.child.bindings);
+    for (const child of this.arrayChildren) {
+      if (child) suspendBindings([child.binding]);
+    }
+    for (const child of this.keyedChildren) suspendBindings([child.binding]);
+  }
+
   private setTemplate(result: TemplateResult): void {
     this.disconnectArrayChildren();
     this.disconnectKeyedChildren();
+    this.unsafeMarkup = undefined;
     const compiled = getCompiledTemplate(result);
 
     if (this.child?.template === compiled) {
       applyBindings(this.child.bindings, result.values);
       this.textNode = undefined;
       this.lastPrimitive = unsetValue;
+      this.replaceNodes([...this.child.nodes]);
       return;
     }
 
@@ -265,40 +386,26 @@ class NodePart implements Part {
       this.child = undefined;
     }
     this.disconnectKeyedChildren();
+    this.unsafeMarkup = undefined;
 
     const flatValues = flattenValues(values);
     const nextNodes: Node[] = [];
-    const nextChildren: Array<ChildInstance | undefined> = [];
-    const reused = new Set<ChildInstance>();
+    const nextChildren: Array<PartChild | undefined> = [];
+    const reused = new Set<PartChild>();
 
     for (let index = 0; index < flatValues.length; index += 1) {
       const value = flatValues[index]!;
       if (isEmptyValue(value)) continue;
-
-      if (isTemplateResult(value)) {
-        const compiled = getCompiledTemplate(value);
-        const cached = this.arrayChildren[index];
-        const instance = cached?.template === compiled
-          ? cached
-          : createChildInstance(value, compiled);
-
-        if (instance === cached) applyBindings(instance.bindings, value.values);
-        reused.add(instance);
-        nextChildren[index] = instance;
-        nextNodes.push(...instance.nodes);
-        continue;
-      }
-
-      if (value instanceof Node) {
-        nextNodes.push(value);
-        continue;
-      }
-
-      nextNodes.push(document.createTextNode(String(value)));
+      const cached = this.arrayChildren[index];
+      const instance = cached ?? this.createPartChild(value);
+      if (cached) applyBindings([cached.binding], [value]);
+      reused.add(instance);
+      nextChildren[index] = instance;
+      nextNodes.push(instance.marker, ...instance.part.nodes);
     }
 
     for (const previous of this.arrayChildren) {
-      if (previous && !reused.has(previous)) disconnectBindings(previous.bindings);
+      if (previous && !reused.has(previous)) disconnectBindings([previous.binding]);
     }
 
     this.arrayChildren = nextChildren;
@@ -313,6 +420,7 @@ class NodePart implements Part {
       this.child = undefined;
     }
     this.disconnectArrayChildren();
+    this.unsafeMarkup = undefined;
 
     const previousByKey = new Map(
       this.keyedChildren.map((child) => [child.key, child] as const),
@@ -323,7 +431,7 @@ class NodePart implements Part {
 
     for (const [key, removed] of previousByKey) {
       if (!nextKeys.has(key)) {
-        removed.part.disconnect();
+        disconnectBindings([removed.binding]);
         previousByKey.delete(key);
       }
     }
@@ -334,7 +442,7 @@ class NodePart implements Part {
 
       if (previous) {
         previousByKey.delete(item.key);
-        child.part.setValue(item.value);
+        applyBindings([child.binding], [item.value]);
       }
 
       nextChildren.push(child);
@@ -348,12 +456,30 @@ class NodePart implements Part {
   }
 
   private createKeyedChild(item: KeyedItem): KeyedChild {
+    return { key: item.key, ...this.createPartChild(item.value, 'gluon:key') };
+  }
+
+  private createPartChild(value: TemplateValue, markerData = 'gluon:item'): PartChild {
     const fragment = document.createDocumentFragment();
-    const marker = document.createComment('gluon:key');
+    const marker = document.createComment(markerData);
     fragment.append(marker);
-    const part = new NodePart(marker);
-    part.setValue(item.value);
-    return { key: item.key, marker, part };
+    const part = new NodePart(marker, this.contextMarker);
+    const binding: Binding = { index: 0, part };
+    applyBindings([binding], [value]);
+    return { marker, part, binding };
+  }
+
+  private setUnsafeHTML(result: UnsafeHtmlResult): void {
+    if (this.unsafeMarkup === result.markup) {
+      this.replaceNodes([...this.nodes]);
+      return;
+    }
+
+    this.resetChildren();
+    const fragment = createContextualFragment(this.contextMarker, result.markup);
+    const nodes = [...fragment.childNodes];
+    this.unsafeMarkup = result.markup;
+    this.replaceNodes(nodes);
   }
 
   private replaceNodes(nextNodes: Node[]): void {
@@ -366,6 +492,7 @@ class NodePart implements Part {
     if (
       nextNodes.length === this.nodes.length
       && nextNodes.every((node, index) => node === this.nodes[index])
+      && nodesAreInPlace(this.marker, nextNodes)
     ) {
       return;
     }
@@ -395,76 +522,106 @@ class NodePart implements Part {
     }
     this.disconnectArrayChildren();
     this.disconnectKeyedChildren();
+    this.unsafeMarkup = undefined;
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
   }
 
   private disconnectArrayChildren(): void {
     for (const child of this.arrayChildren) {
-      if (child) disconnectBindings(child.bindings);
+      if (child) disconnectBindings([child.binding]);
     }
     this.arrayChildren = [];
   }
 
   private disconnectKeyedChildren(): void {
-    for (const child of this.keyedChildren) child.part.disconnect();
+    for (const child of this.keyedChildren) disconnectBindings([child.binding]);
     this.keyedChildren = [];
   }
 }
 
 class AttributePart implements Part {
   private lastValue: unknown = unsetValue;
-  private listener?: EventListenerOrEventListenerObject;
+  private event?: ResolvedEvent;
 
   constructor(
     private readonly element: Element,
     private readonly name: string,
   ) {}
 
+  get commitPriority(): number {
+    return this.name.startsWith('.') && isNativeFormControl(this.element) ? 1 : 0;
+  }
+
   setValue(value: TemplateValue): void {
-    if (Object.is(value, this.lastValue)) return;
+    if (this.name.startsWith('.')) {
+      setElementProperty(this.element, this.name.slice(1), value);
+      this.lastValue = value;
+      return;
+    }
 
     if (this.name.startsWith('@')) {
+      if (Object.is(value, this.lastValue)) return;
       this.setEvent(value);
       this.lastValue = value;
       return;
     }
 
-    this.lastValue = value;
-
-    if (this.name.startsWith('.')) {
-      (this.element as unknown as Record<string, unknown>)[this.name.slice(1)] = value;
-      return;
-    }
-
     if (this.name.startsWith('?')) {
       const attribute = this.name.slice(1);
-      if (value) this.element.setAttribute(attribute, '');
-      else this.element.removeAttribute(attribute);
+      const enabled = !isEmptyValue(value) && Boolean(value);
+      if (enabled !== this.element.hasAttribute(attribute)) {
+        if (enabled) this.element.setAttribute(attribute, '');
+        else this.element.removeAttribute(attribute);
+      }
+      this.lastValue = value;
       return;
     }
 
     if (isEmptyValue(value)) {
-      this.element.removeAttribute(this.name);
+      if (getOwnedAttribute(this.element, this.name) !== null) {
+        removeOwnedAttribute(this.element, this.name);
+      }
     } else {
-      this.element.setAttribute(this.name, String(value));
+      const serialized = serializeAttributeValue(this.name, value);
+      if (getOwnedAttribute(this.element, this.name) !== serialized) {
+        setOwnedAttribute(this.element, this.name, serialized);
+      }
     }
+    this.lastValue = value;
   }
 
   disconnect(): void {
-    if (this.listener && this.name.startsWith('@')) {
-      this.element.removeEventListener(this.name.slice(1), this.listener);
-    }
-    this.listener = undefined;
+    this.suspend();
+    this.lastValue = unsetValue;
+  }
+
+  suspend(): void {
+    if (!this.event || !this.name.startsWith('@')) return;
+    this.element.removeEventListener(
+      this.name.slice(1),
+      this.event.listener,
+      this.event.options,
+    );
+    this.event = undefined;
     this.lastValue = unsetValue;
   }
 
   private setEvent(value: TemplateValue): void {
     const eventName = this.name.slice(1);
-    if (this.listener) this.element.removeEventListener(eventName, this.listener);
-    this.listener = isEventListener(value) ? value : undefined;
-    if (this.listener) this.element.addEventListener(eventName, this.listener);
+    if (this.event) {
+      this.element.removeEventListener(eventName, this.event.listener, this.event.options);
+    }
+    this.event = resolveEvent(value);
+    if (this.event) {
+      this.element.addEventListener(eventName, this.event.listener, this.event.options);
+    }
   }
+}
+
+interface ResolvedEvent {
+  readonly listener: EventListenerOrEventListenerObject;
+  readonly options?: boolean | AddEventListenerOptions;
 }
 
 type RefTarget =
@@ -473,7 +630,7 @@ type RefTarget =
 
 class SpreadPart implements Part {
   private readonly keys = new Set<string>();
-  private readonly events = new Map<string, { eventName: string; listener: EventListenerOrEventListenerObject }>();
+  private readonly events = new Map<string, ResolvedEvent & { readonly eventName: string }>();
   private readonly dataAttributes = new Set<string>();
   private readonly ariaAttributes = new Set<string>();
   private readonly styleProperties = new Set<string>();
@@ -481,6 +638,10 @@ class SpreadPart implements Part {
   private ref?: RefTarget;
 
   constructor(private readonly element: Element) {}
+
+  get commitPriority(): number {
+    return isNativeFormControl(this.element) ? 1 : 0;
+  }
 
   setValue(value: TemplateValue): void {
     const props = isObjectRecord(value) ? value : undefined;
@@ -505,6 +666,14 @@ class SpreadPart implements Part {
     this.keys.clear();
   }
 
+  suspend(): void {
+    for (const { eventName, listener, options } of this.events.values()) {
+      this.element.removeEventListener(eventName, listener, options);
+    }
+    this.events.clear();
+    this.setRef(undefined);
+  }
+
   private applyKey(key: string, value: unknown): void {
     if (key === 'ref') {
       this.setRef(isRefTarget(value) ? value : undefined);
@@ -512,18 +681,18 @@ class SpreadPart implements Part {
     }
 
     if (key.startsWith('@') || /^on[A-Z]|^on[a-z]/.test(key)) {
-      this.setEvent(key, isEventListener(value) ? value : undefined);
+      this.setEvent(key, resolveEvent(value));
       return;
     }
 
     if (key.startsWith('.') && key.length > 1) {
-      (this.element as unknown as Record<string, unknown>)[key.slice(1)] = value;
+      setElementProperty(this.element, key.slice(1), value);
       return;
     }
 
     if (key.startsWith('?') && key.length > 1) {
       const attribute = key.slice(1);
-      if (value) this.element.setAttribute(attribute, '');
+      if (!isEmptyValue(value) && value) this.element.setAttribute(attribute, '');
       else this.element.removeAttribute(attribute);
       return;
     }
@@ -551,9 +720,9 @@ class SpreadPart implements Part {
     }
 
     if (value == null || value === false || value === nothing) {
-      this.element.removeAttribute(key);
+      removeOwnedAttribute(this.element, key);
     } else {
-      this.element.setAttribute(key, String(value));
+      setOwnedAttribute(this.element, key, serializeAttributeValue(key, value));
     }
   }
 
@@ -569,7 +738,7 @@ class SpreadPart implements Part {
     }
 
     if (key.startsWith('.') && key.length > 1) {
-      (this.element as unknown as Record<string, unknown>)[key.slice(1)] = undefined;
+      setElementProperty(this.element, key.slice(1), undefined);
       return;
     }
 
@@ -598,24 +767,29 @@ class SpreadPart implements Part {
       return;
     }
 
-    this.element.removeAttribute(key);
+    removeOwnedAttribute(this.element, key);
   }
 
   private setEvent(
     key: string,
-    listener: EventListenerOrEventListenerObject | undefined,
+    event: ResolvedEvent | undefined,
   ): void {
     const eventName = key.startsWith('@')
       ? key.slice(1)
       : key.slice(2).toLowerCase();
     const previous = this.events.get(key);
 
-    if (previous?.listener === listener) return;
-    if (previous) this.element.removeEventListener(previous.eventName, previous.listener);
+    if (
+      previous?.listener === event?.listener
+      && previous?.options === event?.options
+    ) return;
+    if (previous) {
+      this.element.removeEventListener(previous.eventName, previous.listener, previous.options);
+    }
 
-    if (listener) {
-      this.element.addEventListener(eventName, listener);
-      this.events.set(key, { eventName, listener });
+    if (event) {
+      this.element.addEventListener(eventName, event.listener, event.options);
+      this.events.set(key, { eventName, ...event });
     } else {
       this.events.delete(key);
     }
@@ -711,6 +885,8 @@ class SpreadPart implements Part {
 interface RootInstance {
   readonly template: CompiledTemplate;
   readonly bindings: readonly Binding[];
+  readonly nodes: readonly Node[];
+  suspended: boolean;
 }
 
 const templateCache = new WeakMap<TemplateStringsArray, CompiledTemplate>();
@@ -728,18 +904,54 @@ export function render(
   const compiled = getCompiledTemplate(result);
   const current = containerInstances.get(container);
 
-  if (current?.template === compiled) {
+  if (
+    current?.template === compiled
+    && rootNodesAreInPlace(container, current.nodes)
+  ) {
     applyBindings(current.bindings, result.values);
+    current.suspended = false;
     return;
   }
 
-  if (current) disconnectBindings(current.bindings);
+  if (current) {
+    containerInstances.delete(container);
+    disconnectBindings(current.bindings);
+  }
 
   const fragment = compiled.element.content.cloneNode(true) as DocumentFragment;
   const bindings = instantiateBindings(fragment, compiled.descriptors);
   applyBindings(bindings, result.values);
+  const nodes = [...fragment.childNodes];
   container.replaceChildren(fragment);
-  containerInstances.set(container, { template: compiled, bindings });
+  containerInstances.set(container, {
+    template: compiled,
+    bindings,
+    nodes,
+    suspended: false,
+  });
+}
+
+/** Temporarily releases active listeners, refs, and directive resources. */
+export function suspendRender(container: Element | DocumentFragment | null): void {
+  if (!container) return;
+  const current = containerInstances.get(container);
+  if (!current || current.suspended) return;
+  current.suspended = true;
+  suspendBindings(current.bindings);
+}
+
+/** Permanently releases a render root and removes its renderer-owned DOM. */
+export function unmount(container: Element | DocumentFragment | null): void {
+  if (!container) return;
+  const current = containerInstances.get(container);
+  try {
+    if (current) {
+      containerInstances.delete(container);
+      disconnectBindings(current.bindings);
+    }
+  } finally {
+    container.replaceChildren();
+  }
 }
 
 function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
@@ -870,19 +1082,142 @@ function applyBindings(
   bindings: readonly Binding[],
   values: readonly TemplateValue[],
 ): void {
-  for (const binding of bindings) {
-    const value = values[binding.index] ?? nothing;
-    if (isDirectiveValue(value)) {
-      const runner = value[directiveBrand](...value.args);
-      runner(binding.part);
-    } else {
-      binding.part.setValue(value);
+  for (const priority of [0, 1]) {
+    for (const binding of bindings) {
+      if ((binding.part.commitPriority ?? 0) !== priority) continue;
+      const value = binding.index < values.length
+        ? values[binding.index]!
+        : nothing;
+      if (isDirectiveValue(value)) {
+        applyDirective(binding, value);
+      } else {
+        deactivateDirective(binding);
+        binding.part.setValue(value);
+      }
     }
   }
 }
 
 function disconnectBindings(bindings: readonly Binding[]): void {
-  for (const binding of bindings) binding.part.disconnect();
+  runBindingCleanup(bindings, (binding) => {
+    let error: unknown;
+    try {
+      deactivateDirective(binding);
+    } catch (cause) {
+      error = cause;
+    }
+    try {
+      binding.part.disconnect();
+    } catch (cause) {
+      error ??= cause;
+    }
+    if (error) throw error;
+  });
+}
+
+function suspendBindings(bindings: readonly Binding[]): void {
+  runBindingCleanup(bindings, (binding) => {
+    let error: unknown;
+    try {
+      deactivateDirective(binding);
+    } catch (cause) {
+      error = cause;
+    }
+    try {
+      binding.part.suspend();
+    } catch (cause) {
+      error ??= cause;
+    }
+    if (error) throw error;
+  });
+}
+
+function applyDirective(binding: Binding, value: DirectiveValue): void {
+  const definition = value[directiveBrand];
+
+  if (!isDirectiveLifecycle(definition)) {
+    deactivateDirective(binding);
+    definition(...value.args)(binding.part);
+    return;
+  }
+
+  const current = binding.directive;
+  if (current?.definition === definition) {
+    cleanupDirective(current, binding.part);
+    const previousArgs = current.args;
+    try {
+      definition.update(binding.part, value.args, previousArgs);
+    } catch (error) {
+      binding.directive = undefined;
+      try {
+        definition.disconnect?.(binding.part, previousArgs);
+      } catch {
+        // Preserve the update failure while still attempting lifecycle disconnection.
+      }
+      throw error;
+    }
+    current.args = value.args;
+    current.cleaned = false;
+    return;
+  }
+
+  deactivateDirective(binding);
+  const active: ActiveDirective = {
+    definition,
+    args: value.args,
+    cleaned: false,
+  };
+  binding.directive = active;
+  try {
+    definition.mount(binding.part, value.args);
+  } catch (error) {
+    try {
+      deactivateDirective(binding);
+    } catch {
+      // Preserve the mount failure while still attempting lifecycle cleanup.
+    }
+    throw error;
+  }
+}
+
+function deactivateDirective(binding: Binding): void {
+  const active = binding.directive;
+  if (!active) return;
+  binding.directive = undefined;
+
+  let error: unknown;
+  try {
+    cleanupDirective(active, binding.part);
+  } catch (cause) {
+    error = cause;
+  }
+  try {
+    active.definition.disconnect?.(binding.part, active.args);
+  } catch (cause) {
+    error ??= cause;
+  }
+  if (error) throw error;
+}
+
+function cleanupDirective(active: ActiveDirective, part: PartController): void {
+  if (active.cleaned) return;
+  active.cleaned = true;
+  active.definition.cleanup?.(part, active.args);
+}
+
+function runBindingCleanup(
+  bindings: readonly Binding[],
+  cleanup: (binding: Binding) => void,
+): void {
+  let error: unknown;
+  for (const binding of bindings) {
+    try {
+      cleanup(binding);
+    } catch (cause) {
+      error ??= cause;
+    }
+  }
+  if (error) throw error;
 }
 
 function pathFromRoot(root: Node, descendant: Node): number[] {
@@ -955,6 +1290,40 @@ function isRenderablePrimitive(value: unknown): value is string | number | bigin
     || value === true;
 }
 
+function isEventBinding(value: unknown): value is EventBinding {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && eventBindingBrand in value,
+  );
+}
+
+function resolveEvent(value: unknown): ResolvedEvent | undefined {
+  if (isEventBinding(value)) {
+    return {
+      listener: value.listener,
+      options: value.options,
+    };
+  }
+  return isEventListener(value) ? { listener: value } : undefined;
+}
+
+function isUnsafeHtmlResult(value: unknown): value is UnsafeHtmlResult {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && unsafeHtmlBrand in value,
+  );
+}
+
+function isUnsafeUrlResult(value: unknown): value is UnsafeUrlResult {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && unsafeUrlBrand in value,
+  );
+}
+
 function isKey(value: unknown): value is Key {
   return typeof value === 'string'
     || typeof value === 'number'
@@ -967,6 +1336,187 @@ function formatKey(key: Key): string {
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function isNativeFormControl(element: Element): boolean {
+  return element instanceof HTMLInputElement
+    || element instanceof HTMLTextAreaElement
+    || element instanceof HTMLSelectElement
+    || element instanceof HTMLOptionElement
+    || element instanceof HTMLButtonElement;
+}
+
+const attributeNamespaces = new Map<string, string>([
+  ['xlink', 'http://www.w3.org/1999/xlink'],
+  ['xml', 'http://www.w3.org/XML/1998/namespace'],
+  ['xmlns', 'http://www.w3.org/2000/xmlns/'],
+]);
+
+const urlAttributes = new Set([
+  'action',
+  'archive',
+  'background',
+  'cite',
+  'codebase',
+  'data',
+  'formaction',
+  'href',
+  'icon',
+  'longdesc',
+  'manifest',
+  'ping',
+  'poster',
+  'profile',
+  'src',
+  'srcset',
+  'usemap',
+  'xlink:href',
+]);
+
+function setElementProperty(element: Element, property: string, value: unknown): void {
+  if (property === 'innerHTML' || property === 'outerHTML' || property === 'textContent') {
+    throw new TypeError(`.${property} is not supported because it replaces renderer-owned DOM.`);
+  }
+
+  let nextValue = value;
+  if (property === 'srcdoc') {
+    if (!isUnsafeHtmlResult(value)) {
+      throw new TypeError(`.${property} requires an explicit unsafeHTML() value.`);
+    }
+    nextValue = value.markup;
+  }
+
+  const urlProperty = property.toLowerCase();
+  if (
+    urlAttributes.has(urlProperty)
+    && (urlProperty !== 'data' || element instanceof HTMLObjectElement)
+  ) {
+    nextValue = serializeAttributeValue(urlProperty, value);
+  }
+
+  if (element instanceof HTMLSelectElement && property === 'value' && Array.isArray(nextValue)) {
+    if (!element.multiple) {
+      throw new TypeError('An array .value binding requires a <select multiple> element.');
+    }
+    const selectedValues = new Set(nextValue.map((item) => String(item)));
+    for (const option of element.options) {
+      option.selected = selectedValues.has(option.value);
+    }
+    return;
+  }
+
+  const target = element as unknown as Record<string, unknown>;
+  if (!Object.is(target[property], nextValue)) target[property] = nextValue;
+}
+
+function serializeAttributeValue(name: string, value: unknown): string {
+  const normalizedName = name.toLowerCase();
+
+  if (normalizedName === 'srcdoc') {
+    if (!isUnsafeHtmlResult(value)) {
+      throw new TypeError('The srcdoc attribute requires an explicit unsafeHTML() value.');
+    }
+    return value.markup;
+  }
+
+  if (isUnsafeHtmlResult(value)) {
+    throw new TypeError('unsafeHTML() can only be used in child content or srcdoc.');
+  }
+
+  if (isUnsafeUrlResult(value)) {
+    if (!urlAttributes.has(normalizedName)) {
+      throw new TypeError('unsafeURL() can only be used with a URL-valued attribute.');
+    }
+    return value.value;
+  }
+
+  const serialized = String(value);
+  if (urlAttributes.has(normalizedName)) assertSafeUrl(normalizedName, serialized);
+  return serialized;
+}
+
+function assertSafeUrl(name: string, value: string): void {
+  const candidates = name === 'srcset'
+    ? value.split(',')
+    : name === 'ping'
+      ? value.split(/\s+/)
+      : [value];
+
+  for (const candidate of candidates) {
+    const normalized = candidate
+      .trimStart()
+      .replace(/[\u0000-\u0020\u007f-\u009f]+/g, '')
+      .toLowerCase();
+    if (/^(?:javascript|vbscript|data):/.test(normalized)) {
+      throw new TypeError(
+        `Blocked unsafe URL protocol in ${name}; use unsafeURL() only for reviewed trusted input.`,
+      );
+    }
+  }
+}
+
+function setOwnedAttribute(element: Element, name: string, value: string): void {
+  if (/^on/i.test(name)) {
+    throw new TypeError('String event-handler attributes are not supported; use an event binding.');
+  }
+  const namespace = getAttributeNamespace(name);
+  if (namespace) element.setAttributeNS(namespace.uri, name, value);
+  else element.setAttribute(name, value);
+}
+
+function removeOwnedAttribute(element: Element, name: string): void {
+  const namespace = getAttributeNamespace(name);
+  if (namespace) element.removeAttributeNS(namespace.uri, namespace.localName);
+  else element.removeAttribute(name);
+}
+
+function getOwnedAttribute(element: Element, name: string): string | null {
+  const namespace = getAttributeNamespace(name);
+  return namespace
+    ? element.getAttributeNS(namespace.uri, namespace.localName)
+    : element.getAttribute(name);
+}
+
+function getAttributeNamespace(
+  name: string,
+): { readonly uri: string; readonly localName: string } | undefined {
+  const separator = name.indexOf(':');
+  if (separator < 0 && name !== 'xmlns') return undefined;
+  const prefix = (separator < 0 ? name : name.slice(0, separator)).toLowerCase();
+  const uri = attributeNamespaces.get(prefix);
+  if (!uri) return undefined;
+  return {
+    uri,
+    localName: separator < 0 ? name : name.slice(separator + 1),
+  };
+}
+
+function createContextualFragment(marker: Comment, markup: string): DocumentFragment {
+  if (marker.parentNode) {
+    const range = document.createRange();
+    range.selectNode(marker);
+    return range.createContextualFragment(markup);
+  }
+  const template = document.createElement('template');
+  template.innerHTML = markup;
+  return template.content;
+}
+
+function nodesAreInPlace(marker: Comment, nodes: readonly Node[]): boolean {
+  let cursor = marker.nextSibling;
+  for (const node of nodes) {
+    if (node !== cursor) return false;
+    cursor = cursor.nextSibling;
+  }
+  return true;
+}
+
+function rootNodesAreInPlace(
+  container: Element | DocumentFragment,
+  nodes: readonly Node[],
+): boolean {
+  return container.childNodes.length === nodes.length
+    && nodes.every((node, index) => container.childNodes.item(index) === node);
 }
 
 function isEventListener(value: unknown): value is EventListenerOrEventListenerObject {
