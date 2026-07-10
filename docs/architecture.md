@@ -61,7 +61,9 @@ their rejections use the same error channel. A recursion limit routes
 self-queueing failures through the error channel without rejecting the flush
 promise.
 
-Effects remain synchronous unless they select `pre` or `post`. The outermost
+Effects remain synchronous unless they select `pre`, `update`, or `post`. Lazy
+effects can defer their first execution and expose an eager scheduling hook for
+render-owner integration. The outermost
 synchronous `batch` deduplicates all affected effects before dispatch. `untracked`
 temporarily suppresses subscription collection while preserving nested active
 effect behavior.
@@ -76,9 +78,15 @@ Low-level failures select the closest effect, watcher, job, or scope handler;
 the configured global reactivity handler is used when no local handler exists.
 The default uses platform `reportError` or `console.error`; handler failures are
 contained by that default channel. Application-
-specific error ownership remains issue #23. Issue #22 integrates these scheduler
-and scope primitives with `GluonElement`; the element still uses its current
-property-update microtask until that lifecycle integration is implemented.
+specific error ownership remains issue #23.
+
+`GluonElement` owns one lazy update-phase render effect per connection. Declared
+property requests and reactive invalidations queue the same runner, conditional
+render dependencies are rebuilt each run, and disconnect stops the complete
+scope before suspending DOM bindings. Reconnection retains state and matching
+DOM while creating fresh reactive ownership. The public diagnostic hook reports
+batched render causes, tracked dependencies, and timings. The full contract is
+documented in [Reactive Custom Elements](reactive-elements.md).
 
 ## Runtime contract
 
@@ -154,8 +162,9 @@ prototype gaps and the required Gluon 1.0 contract.
 - defaults and custom converters
 - change predicates
 - property-to-attribute reflection
-- microtask-batched rendering
+- scoped reactive rendering through the shared phased scheduler
 - `updateComplete`
+- disconnect/reconnect effect ownership and development render diagnostics
 - inherited constructable stylesheets
 
 Every instance renders into an open ShadowRoot. Component styles are always adopted `CSSStyleSheet` instances.

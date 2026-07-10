@@ -5,7 +5,7 @@ import {
 import { getCurrentScope } from './scope.js';
 
 export type FlushPhase = 'pre' | 'update' | 'post';
-export type EffectFlush = 'sync' | 'pre' | 'post';
+export type EffectFlush = 'sync' | FlushPhase;
 export type SchedulerJob = () => unknown;
 
 export interface SchedulerJobOptions {

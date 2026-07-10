@@ -1,5 +1,50 @@
 import { render, suspendRender, type TemplateResult } from './runtime.js';
 import { adoptStyles } from './styles/index.js';
+import {
+  effect,
+  effectScope,
+  queueJob,
+  type EffectDebuggerEvent,
+  type EffectScope,
+  type ReactiveEffectRunner,
+} from '@gluonjs/reactivity';
+
+export type GluonRenderCause =
+  | { readonly type: 'connection' }
+  | { readonly type: 'request' }
+  | {
+    readonly type: 'property';
+    readonly name: string;
+    readonly value: unknown;
+    readonly oldValue: unknown;
+  }
+  | { readonly type: 'reactive'; readonly dependency: EffectDebuggerEvent };
+
+export interface GluonRenderDebugEvent {
+  readonly element: GluonElement;
+  readonly causes: readonly GluonRenderCause[];
+  readonly dependencies: readonly EffectDebuggerEvent[];
+  readonly startedAt: number;
+  readonly endedAt: number;
+  readonly duration: number;
+  readonly failed: boolean;
+  readonly error?: unknown;
+}
+
+export type GluonRenderDebugHook = (event: GluonRenderDebugEvent) => void;
+
+let renderDebugHook: GluonRenderDebugHook | undefined;
+
+/** Installs the development render diagnostic hook and returns a restore handle. */
+export function setGluonRenderDebugHook(
+  hook: GluonRenderDebugHook | undefined,
+): () => void {
+  const previous = renderDebugHook;
+  renderDebugHook = hook;
+  return () => {
+    renderDebugHook = previous;
+  };
+}
 
 export type PropertyType =
   | StringConstructor
@@ -35,6 +80,13 @@ const declarationCache = new WeakMap<Function, PropertyDeclarations>();
 const styleCache = new WeakMap<Function, readonly CSSStyleSheet[]>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
+let elementUpdateSequence = 0;
+
+interface UpdateDeferred {
+  readonly promise: Promise<void>;
+  readonly resolve: () => void;
+  readonly reject: (reason?: unknown) => void;
+}
 
 export abstract class GluonElement extends HTMLElement {
   static readonly properties: PropertyDeclarations = {};
@@ -42,14 +94,20 @@ export abstract class GluonElement extends HTMLElement {
 
   protected readonly renderRoot: ShadowRoot;
   private readonly [propertyValues] = new Map<string, unknown>();
-  private updatePending = false;
+  private readonly updateId = elementUpdateSequence;
   private connected = false;
   private reflectingAttribute?: string;
   private readonly initialAttributePrecedence = new Map<string, string>();
+  private renderScope?: EffectScope;
+  private renderEffect?: ReactiveEffectRunner<void | undefined>;
+  private pendingUpdate?: UpdateDeferred;
+  private readonly pendingRenderCauses: GluonRenderCause[] = [];
+  private activeRenderDependencies?: EffectDebuggerEvent[];
   private updatePromise: Promise<void> = Promise.resolve();
 
   constructor() {
     super();
+    elementUpdateSequence += 1;
     this.renderRoot = this.createRenderRoot();
     const constructor = this.constructor as GluonElementConstructor;
     finalizeProperties(constructor);
@@ -67,15 +125,28 @@ export abstract class GluonElement extends HTMLElement {
   }
 
   connectedCallback(): void {
+    if (this.connected) return;
     this.connected = true;
     adoptStyles(this.renderRoot, ...getStyles(this.constructor as GluonElementConstructor));
     this.reflectCurrentProperties();
-    void this.requestUpdate();
+    this.createRenderEffect();
+    void this.queueUpdate({ type: 'connection' });
   }
 
   disconnectedCallback(): void {
+    if (!this.connected) return;
     this.connected = false;
-    suspendRender(this.renderRoot);
+    const scope = this.renderScope;
+    this.renderScope = undefined;
+    this.renderEffect = undefined;
+    try {
+      scope?.stop();
+    } finally {
+      this.resolvePendingUpdate();
+      this.pendingRenderCauses.length = 0;
+      this.activeRenderDependencies = undefined;
+      suspendRender(this.renderRoot);
+    }
   }
 
   attributeChangedCallback(
@@ -111,24 +182,7 @@ export abstract class GluonElement extends HTMLElement {
   }
 
   protected requestUpdate(): Promise<void> {
-    if (!this.connected || this.updatePending) return this.updatePromise;
-    this.updatePending = true;
-    this.updatePromise = new Promise((resolve, reject) => {
-      queueMicrotask(() => {
-        this.updatePending = false;
-        if (!this.connected) {
-          resolve();
-          return;
-        }
-        try {
-          this.update();
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      });
-    });
-    return this.updatePromise;
+    return this.queueUpdate({ type: 'request' });
   }
 
   protected update(): void {
@@ -164,7 +218,100 @@ export abstract class GluonElement extends HTMLElement {
     if (reflect && declaration.reflect && this.connected) {
       this.reflectProperty(name, value, declaration);
     }
-    void this.requestUpdate();
+    void this.queueUpdate({
+      type: 'property',
+      name,
+      value,
+      oldValue,
+    });
+  }
+
+  private createRenderEffect(): void {
+    if (this.renderEffect) return;
+    const scope = effectScope(true);
+    const runner = scope.run(() => effect(
+      () => scope.run(() => this.performUpdate()),
+      {
+        flush: 'update',
+        id: this.updateId,
+        lazy: true,
+        onSchedule: () => {
+          if (this.connected) this.ensurePendingUpdate();
+        },
+        onTrack: (dependency) => {
+          this.activeRenderDependencies?.push(dependency);
+        },
+        onTrigger: (dependency) => {
+          this.recordRenderCause({ type: 'reactive', dependency });
+        },
+      },
+    ))!;
+    this.renderScope = scope;
+    this.renderEffect = runner;
+  }
+
+  private queueUpdate(cause: GluonRenderCause): Promise<void> {
+    const runner = this.renderEffect;
+    if (!this.connected || !runner) return this.updatePromise;
+    this.recordRenderCause(cause);
+    const promise = this.ensurePendingUpdate();
+    queueJob(runner, { phase: 'update', id: this.updateId });
+    return promise;
+  }
+
+  private performUpdate(): void {
+    const deferred = this.pendingUpdate ?? createUpdateDeferred();
+    if (!this.pendingUpdate) this.updatePromise = deferred.promise;
+    this.pendingUpdate = undefined;
+
+    const causes = Object.freeze([...this.pendingRenderCauses]);
+    this.pendingRenderCauses.length = 0;
+    const dependencies: EffectDebuggerEvent[] = [];
+    this.activeRenderDependencies = dependencies;
+    const startedAt = performance.now();
+    let failed = false;
+    let renderError: unknown;
+
+    try {
+      this.update();
+      deferred.resolve();
+    } catch (error) {
+      failed = true;
+      renderError = error;
+      deferred.reject(error);
+      throw error;
+    } finally {
+      const endedAt = performance.now();
+      this.activeRenderDependencies = undefined;
+      emitRenderDebugEvent({
+        element: this,
+        causes,
+        dependencies: Object.freeze([...dependencies]),
+        startedAt,
+        endedAt,
+        duration: endedAt - startedAt,
+        failed,
+        ...(failed ? { error: renderError } : {}),
+      });
+    }
+  }
+
+  private ensurePendingUpdate(): Promise<void> {
+    if (!this.pendingUpdate) {
+      this.pendingUpdate = createUpdateDeferred();
+      this.updatePromise = this.pendingUpdate.promise;
+    }
+    return this.pendingUpdate.promise;
+  }
+
+  private resolvePendingUpdate(): void {
+    this.pendingUpdate?.resolve();
+    this.pendingUpdate = undefined;
+    this.updatePromise = Promise.resolve();
+  }
+
+  private recordRenderCause(cause: GluonRenderCause): void {
+    if (isDevelopment() && renderDebugHook) this.pendingRenderCauses.push(cause);
   }
 
   private capturePreUpgradeProperties(constructor: GluonElementConstructor): void {
@@ -223,6 +370,45 @@ export abstract class GluonElement extends HTMLElement {
       this.reflectingAttribute = undefined;
     }
   }
+}
+
+function createUpdateDeferred(): UpdateDeferred {
+  let resolve!: () => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<void>((promiseResolve, promiseReject) => {
+    resolve = promiseResolve;
+    reject = promiseReject;
+  });
+  return { promise, resolve, reject };
+}
+
+function emitRenderDebugEvent(event: GluonRenderDebugEvent): void {
+  const hook = renderDebugHook;
+  if (!hook || !isDevelopment()) return;
+  try {
+    hook(Object.freeze(event));
+  } catch (error) {
+    reportDebugHookError(error);
+  }
+}
+
+function reportDebugHookError(error: unknown): void {
+  const environment = globalThis as {
+    reportError?: (reason: unknown) => void;
+    console?: { error?: (...values: unknown[]) => void };
+  };
+  try {
+    if (typeof environment.reportError === 'function') environment.reportError(error);
+    else environment.console?.error?.(error);
+  } catch {
+    // A development observer cannot turn a completed render into an application failure.
+  }
+}
+
+function isDevelopment(): boolean {
+  return (
+    globalThis as { process?: { env?: { NODE_ENV?: string } } }
+  ).process?.env?.NODE_ENV !== 'production';
 }
 
 export type GluonElementClass<ElementType extends GluonElement = GluonElement> = {

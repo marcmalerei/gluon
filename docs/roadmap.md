@@ -56,7 +56,8 @@ Gluon currently provides:
 - nested templates, index-based array rendering, and keyed `repeat()` reconciliation
 - standalone DOM-free refs, reactive and readonly proxies, effects, and computed values
 - deterministic batching, phased scheduling, `nextTick`, effect scopes, and watchers
-- reactive declared properties through `GluonElement`
+- scope-owned reactive render effects, batched declared properties, reconnect
+  retention, and render diagnostics through `GluonElement`
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements
 - representative Atom, Molecule, and Organism packages

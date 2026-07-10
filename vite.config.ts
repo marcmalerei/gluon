@@ -12,6 +12,11 @@ const entry = {
 };
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
+    },
+  },
   build: {
     emptyOutDir: true,
     minify: 'oxc',
@@ -20,6 +25,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
+      external: ['@gluonjs/reactivity'],
       output: {
         entryFileNames: '[name].js',
       },
@@ -36,6 +42,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
+      exclude: ['packages/**'],
       reporter: ['text', 'html'],
       thresholds: {
         statements: 95,

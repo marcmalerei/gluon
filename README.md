@@ -212,7 +212,13 @@ class GreetingElement extends GluonElement {
 defineElement('gluon-greeting', GreetingElement);
 ```
 
-Declared properties receive accessors, schedule microtask-batched updates, may reflect to attributes, and expose an `updateComplete` promise.
+Declared properties receive accessors, may reflect to attributes, and join
+reactive values read during render on one scope-owned, update-phase scheduler
+runner. Synchronous invalidations are deduplicated, `updateComplete` resolves
+after commit, and disconnect stops owned effects while retaining state and
+matching DOM for reconnection. The complete behavior and development render
+diagnostics are defined in the
+[Reactive Custom Element contract](docs/reactive-elements.md).
 
 ## Adopted stylesheets only
 

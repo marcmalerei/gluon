@@ -4,6 +4,10 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"]
+    },
     "types": ["node"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
