@@ -3,6 +3,7 @@ dist/
 coverage/
 playwright-report/
 test-results/
+.tmp/
 tests/__screenshots__/
 .vitest-attachments/
 .DS_Store

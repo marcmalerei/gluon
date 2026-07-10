@@ -6,6 +6,7 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
+      "@gluonjs/core": ["src/index.ts"],
       "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"]
     },
     "types": ["node"],
