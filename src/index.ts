@@ -32,7 +32,11 @@ export {
 export {
   GluonElement,
   defineElement,
+  setGluonRenderDebugHook,
   type GluonElementClass,
+  type GluonRenderCause,
+  type GluonRenderDebugEvent,
+  type GluonRenderDebugHook,
   type PropertyConverter,
   type PropertyDeclaration,
   type PropertyDeclarations,

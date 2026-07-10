@@ -36,6 +36,29 @@ describe('reactivity scheduler', () => {
     expect(values).toEqual([0, 3]);
   });
 
+  it('supports lazy update-phase effects with an eager scheduling hook', async () => {
+    const state = reactive({ count: 0 });
+    const values: number[] = [];
+    const scheduled = vi.fn();
+    const runner = effect(() => values.push(state.count), {
+      flush: 'update',
+      lazy: true,
+      onSchedule: scheduled,
+    });
+
+    expect(values).toEqual([]);
+    runner();
+    expect(values).toEqual([0]);
+
+    state.count = 1;
+    state.count = 2;
+    expect(scheduled).toHaveBeenCalledTimes(2);
+    expect(values).toEqual([0]);
+
+    await nextTick();
+    expect(values).toEqual([0, 2]);
+  });
+
   it('orders phases and parent ids deterministically while deduplicating jobs', async () => {
     const order: string[] = [];
     const preParent = () => order.push('pre-parent');

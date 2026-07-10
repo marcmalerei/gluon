@@ -3,12 +3,14 @@ import {
   event,
   html,
   repeat,
+  setGluonRenderDebugHook,
   suspendRender,
   unmount,
   unsafeHTML,
   unsafeURL,
   type DirectiveLifecycle,
   type EventBinding,
+  type GluonRenderDebugEvent,
   type Key,
   type RepeatResult,
   type TemplateValue,
@@ -43,6 +45,14 @@ html`<div>${unsafeHTML('<strong>trusted</strong>')}</div>`;
 html`<a href=${unsafeURL('data:text/plain,reviewed')}>Reviewed</a>`;
 suspendRender(null);
 unmount(null);
+const restoreRenderDebugHook = setGluonRenderDebugHook((diagnostic: GluonRenderDebugEvent) => {
+  diagnostic.element;
+  diagnostic.duration.toFixed();
+  for (const cause of diagnostic.causes) {
+    if (cause.type === 'reactive') cause.dependency.key;
+  }
+});
+restoreRenderDebugHook();
 
 // @ts-expect-error keys cannot be null
 repeat(rows, () => null, (row) => row.label);

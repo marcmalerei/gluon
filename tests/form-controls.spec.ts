@@ -273,6 +273,7 @@ describe('form control integration', () => {
 
     control.setAttribute('disabled', '');
     await Promise.resolve();
+    await control.updateComplete;
     expect(new FormData(form).has('entry')).toBe(false);
     expect((control.shadowRoot?.querySelector('input') as HTMLInputElement).disabled).toBe(true);
   });

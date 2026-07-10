@@ -6,6 +6,9 @@
     "emitDeclarationOnly": true,
     "outDir": "dist/types",
     "rootDir": "src",
+    "paths": {
+      "@gluonjs/reactivity": ["packages/reactivity/dist/index.d.ts"]
+    },
     "stripInternal": true
   },
   "include": ["src/**/*.ts"],

@@ -35,7 +35,9 @@
       "environment": "browser",
       "exports": [".", "./styles", "./quarks", "./atoms", "./molecules", "./organisms"],
       "finalExports": [".", "./styles"],
-      "currentDependencies": [],
+      "currentDependencies": [
+        "@gluonjs/reactivity"
+      ],
       "dependencies": ["@gluonjs/reactivity"]
     },
     {

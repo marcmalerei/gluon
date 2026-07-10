@@ -37,8 +37,10 @@ const writable: WritableComputedRef<number> = computed({
   set: (value) => { count.value = value; },
 });
 const runner: ReactiveEffectRunner<number> = effect(() => state.count, {
-  flush: 'pre',
+  flush: 'update',
   id: 1,
+  lazy: true,
+  onSchedule() {},
   onTrack(event: EffectDebuggerEvent) {
     event.effect;
     event.key;
@@ -83,3 +85,5 @@ doubled.value = 4;
 listView.push({ count: 2 });
 // @ts-expect-error refs preserve their value type
 count.value = 'invalid';
+// @ts-expect-error effect phases use the shared scheduler phase names
+effect(() => state.count, { flush: 'render' });
