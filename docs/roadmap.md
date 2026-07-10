@@ -65,6 +65,8 @@ Gluon currently provides:
 - an official router with typed static, dynamic, named, nested, redirected,
   aliased, and lazy routes; browser, hash, and memory histories; guards,
   failures, scroll restoration, and server snapshots
+- the first living GLUON GOODS reference-shop slice with public-package routes,
+  responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements
 - representative Atom, Molecule, and Organism packages
@@ -180,7 +182,7 @@ production single-page application without Vue.
 | [#25](https://github.com/marcmalerei/gluon/issues/25) | Build the official Gluon router. |
 | [#26](https://github.com/marcmalerei/gluon/issues/26) | Build the official Gluon store. |
 | [#27](https://github.com/marcmalerei/gluon/issues/27) | Add async components, Suspense, Teleport, KeepAlive, and transitions. |
-| [#28](https://github.com/marcmalerei/gluon/issues/28) | Build the production-like Gluon reference SPA. |
+| [#28](https://github.com/marcmalerei/gluon/issues/28) | Grow the production-like GLUON GOODS reference shop alongside every applicable framework capability. |
 
 ### Exit gate
 
