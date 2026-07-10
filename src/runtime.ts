@@ -1623,7 +1623,7 @@ function rootNodesAreInPlace(
   nodes: readonly Node[],
 ): boolean {
   if (nodes.length === 1) {
-    return container.firstChild === nodes[0] && container.lastChild === nodes[0];
+    return container.childNodes.length === 1 && container.firstChild === nodes[0];
   }
   if (container.childNodes.length !== nodes.length) return false;
   for (let index = 0; index < nodes.length; index += 1) {
