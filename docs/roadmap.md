@@ -14,6 +14,8 @@ GitHub is the source of truth for delivery status:
 The accepted product and component boundaries are defined by
 [RFC 0001: Gluon 1.0 product scope and non-goals](rfcs/0001-gluon-1.0-product-scope.md)
 and [RFC 0002: Unified component and Custom Element model](rfcs/0002-unified-component-model.md).
+The supported environments and style transport are defined by
+[ADR 0001: Browser, runtime, and style transport contract](adrs/0001-browser-runtime-and-style-transport.md).
 
 This document records the product contract, dependency order, milestone exit
 criteria, and release gates. Individual issues contain the authoritative

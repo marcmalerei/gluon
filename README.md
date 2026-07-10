@@ -151,6 +151,13 @@ adoptStyles(document, theme);
 
 Unsupported browsers fail with an explicit error instead of silently switching styling strategies.
 
+The accepted browser matrix and the server-to-browser style handoff are defined
+by [ADR 0001](docs/adrs/0001-browser-runtime-and-style-transport.md). SSR may
+serialize marked initial style carriers inside Declarative Shadow DOM; after a
+successful hydration handoff, Gluon removes those carriers and the hydrated
+runtime again contains adopted stylesheets only. This contract is not yet
+implemented in the current browser-only prototype.
+
 ## The system
 
 Gluon is the base system. Its UI vocabulary increases in scope without changing rendering primitives:
@@ -198,6 +205,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Architecture](docs/architecture.md)
 - [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)
+- [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
 - [Gluon 1.0 roadmap](docs/roadmap.md)
 - [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
 - [Runnable source example](examples/quick-start.ts)

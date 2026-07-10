@@ -73,9 +73,18 @@ Every instance renders into an open ShadowRoot. Component styles are always adop
 
 ## Styling invariant
 
+The accepted browser/runtime matrix, SSR carrier format, and hydration handoff
+are defined in
+[ADR 0001](adrs/0001-browser-runtime-and-style-transport.md). The current source
+implements only the client-side constructed-sheet portion of that contract.
+
 Gluon does not create or inject `<style>` elements. `css` creates a `CSSStyleSheet`; `adoptStyles` and `unadoptStyles` manage `adoptedStyleSheets` while preserving unrelated sheets.
 
 This is a deliberate browser baseline. A browser without constructable and adopted stylesheet support receives a descriptive error.
+
+The adopted-only statement describes client rendering and the final hydrated
+state. Server-rendered initial style carriers are serialized transport state and
+must be removed after successful adoption; they are not a client runtime fallback.
 
 ## Quark DX
 
