@@ -72,9 +72,11 @@ export type AppRoot<Public = unknown> =
   | TemplateResult
   | ((context: AppRootRenderContext<Public>) => TemplateResult);
 
+export type AppContainer = Element | ShadowRoot;
+
 export interface AppMount<Public = unknown> {
   readonly app: GluonApp<Public>;
-  readonly container: Element | DocumentFragment;
+  readonly container: AppContainer;
   readonly exposed: Readonly<Public> | undefined;
   unmount(): void;
 }
@@ -88,7 +90,7 @@ export interface GluonApp<Public = unknown> {
   component<Props>(name: string, component: FunctionalComponent<Props>): this;
   onMounted(callback: () => void | PromiseLike<void>): this;
   onUnmounted(callback: () => void | PromiseLike<void>): this;
-  mount(container: Element | DocumentFragment): AppMount<Public>;
+  mount(container: AppContainer): AppMount<Public>;
   unmount(): void;
   run<Result>(callback: () => Result | PromiseLike<Result>): Result | Promise<Result | undefined> | undefined;
 }

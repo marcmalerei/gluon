@@ -17,6 +17,7 @@ import {
   unregisterApplicationRoot,
   warn,
   type AppConfig,
+  type AppContainer,
   type AppErrorSource,
   type AppMount,
   type AppPluginCleanup,
@@ -45,6 +46,7 @@ export {
   runActiveGuarded as runWithErrorHandling,
   warn,
   type AppConfig,
+  type AppContainer,
   type AppErrorHandler,
   type AppErrorInfo,
   type AppErrorSource,
@@ -107,7 +109,7 @@ class GluonAppImpl<Public> implements GluonApp<Public> {
   private readonly unmountedHooks: Array<() => void | PromiseLike<void>> = [];
   private readonly updateId = applicationSequence;
   private state: 'created' | 'mounted' | 'unmounted' = 'created';
-  private container?: Element | DocumentFragment;
+  private container?: AppContainer;
   private scope?: EffectScope;
   private runner?: ReactiveEffectRunner<void | undefined>;
   private publicExposure?: Readonly<Public>;
@@ -174,8 +176,11 @@ class GluonAppImpl<Public> implements GluonApp<Public> {
     return this;
   }
 
-  mount(container: Element | DocumentFragment): AppMount<Public> {
+  mount(container: AppContainer): AppMount<Public> {
     if (this.state !== 'created') throw new Error('A Gluon application can only be mounted once.');
+    if (!(container instanceof Element || container instanceof ShadowRoot)) {
+      throw new TypeError('A Gluon application mount requires a persistent Element or ShadowRoot.');
+    }
     if (mountedContainers.has(container)) throw new Error('The mount container already owns a Gluon application.');
     this.state = 'mounted';
     this.container = container;

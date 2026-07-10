@@ -36,6 +36,11 @@ mount.exposed?.increment();
 mount.unmount();
 ```
 
+The mount container is a persistent `Element` or `ShadowRoot`. A plain
+`DocumentFragment` is rejected: inserting it into another node drains its
+children, so it cannot continue owning renderer state, application context, or
+later reactive updates.
+
 An application has three states: created, mounted, and unmounted. Plugins,
 providers, functional component registrations, and application hooks are
 registered while created. One application mounts once. A container can own one

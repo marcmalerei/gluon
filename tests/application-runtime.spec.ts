@@ -344,6 +344,38 @@ describe('application runtime', () => {
     app.unmount();
   });
 
+  it('accepts persistent ShadowRoots and rejects drainable DocumentFragments', async () => {
+    let fragmentRenders = 0;
+    const fragmentApp = createApp(() => {
+      fragmentRenders += 1;
+      return html`<p>fragment</p>`;
+    });
+    const fragment = document.createDocumentFragment();
+    expect(() => fragmentApp.mount(fragment as never)).toThrow(/persistent Element or ShadowRoot/i);
+    expect(fragmentApp.mounted).toBe(false);
+    expect(fragmentRenders).toBe(0);
+    expect(fragment.childNodes).toHaveLength(0);
+
+    const valueKey = createInjectionKey<string>('shadow-value');
+    class ShadowContextFixture extends GluonElement {
+      protected override render() {
+        return html`<span>${inject(valueKey)}</span>`;
+      }
+    }
+    defineElement('gluon-shadow-context-fixture', ShadowContextFixture);
+    const host = document.createElement('div');
+    const shadowRoot = host.attachShadow({ mode: 'open' });
+    document.body.append(host);
+    const shadowApp = createApp(html`<gluon-shadow-context-fixture></gluon-shadow-context-fixture>`);
+    shadowApp.provide(valueKey, 'owned');
+    shadowApp.mount(shadowRoot);
+    const fixture = shadowRoot.querySelector('gluon-shadow-context-fixture') as ShadowContextFixture;
+    await fixture.updateComplete;
+    expect(fixture.shadowRoot?.textContent).toBe('owned');
+    shadowApp.unmount();
+    expect(shadowRoot.childNodes).toHaveLength(0);
+  });
+
   it('enforces application state and reports root and plugin failures', () => {
     const errors: AppErrorInfo[] = [];
     const missing = createInjectionKey<string>('required');
