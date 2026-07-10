@@ -155,6 +155,7 @@ describe('advanced GluonElement behavior', () => {
   it('captures properties assigned before upgrade and rejects conflicting definitions', async () => {
     const tagName = `gluon-preupgrade-${advancedElementSequence += 1}` as `${string}-${string}`;
     const element = document.createElement(tagName) as HTMLElement & { value?: string };
+    element.setAttribute('value', 'attribute');
     element.value = 'captured';
     document.body.append(element);
 
@@ -182,6 +183,10 @@ describe('advanced GluonElement behavior', () => {
     expect((element as unknown as PreUpgradeElement).value).toBe('captured');
     expect(element.getAttribute('value')).toBe('captured');
     expect(element.shadowRoot?.textContent).toBe('captured');
+    element.setAttribute('value', 'later-attribute');
+    await (element as unknown as PreUpgradeElement).updateComplete;
+    expect((element as unknown as PreUpgradeElement).value).toBe('later-attribute');
+    expect(element.shadowRoot?.textContent).toBe('later-attribute');
     expect(() => defineElement(tagName, ConflictingElement)).toThrow(/already defined/i);
   });
 });

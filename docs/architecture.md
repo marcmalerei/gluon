@@ -95,6 +95,11 @@ The runtime currently has three Part types:
 
 Event listeners and refs are disconnected when a binding changes or a template is replaced. Spread sub-maps remove only attributes or style properties previously owned by that Part.
 
+The production binding semantics for forms, lifecycle directives, event
+options, qualified namespaces, unsafe-content boundaries, root suspension,
+permanent unmount, and external DOM recovery are specified by the
+[DOM runtime contract](dom-runtime.md).
+
 ### List identity
 
 Ordinary arrays retain the original index-based behavior: a compatible template
