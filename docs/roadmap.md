@@ -60,6 +60,8 @@ Gluon currently provides:
   retention, and render diagnostics through `GluonElement`
 - isolated application instances with plugins, providers, dynamic functional
   component registries, lifecycle, warnings, error boundaries, and exposure
+- typed prop and event declarations, native and scoped slot contracts,
+  controlled form/Custom Element models, and deterministic public refs
 - constructable stylesheet creation and adopted stylesheet management
 - typed Quark factories for native HTML elements
 - representative Atom, Molecule, and Organism packages

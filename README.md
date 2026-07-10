@@ -22,6 +22,8 @@
 - reactive Custom Elements through `GluonElement`
 - isolated application instances with plugins, providers, lifecycle, dynamic
   functional components, error boundaries, and controlled public exposure
+- typed prop and event declarations, native/scoped slots, model bindings, and
+  deterministic element, callback, component-host, and exposed-instance refs
 - constructable `CSSStyleSheet` creation and `adoptedStyleSheets` adoption only
 - typed `q.<tag>()` Quark factories for `HTMLElementTagNameMap`
 - working Atom, Molecule, and Organism entry points
@@ -246,6 +248,19 @@ Application and component lifecycle, plugin cleanup, dynamic component
 registries, error/warning ownership, event/async protection, and explicit
 public exposure are defined in the
 [Application runtime contract](docs/application-runtime.md).
+
+## Component contracts
+
+`PropertyDeclarations<Props>` and `EventDeclarations<Events>` connect runtime
+validation to TypeScript contracts without replacing browser-native Custom
+Element properties and events. `SlotDeclarations` documents and checks native
+slots, `renderScopedSlot()` covers caller-owned functional slots, and
+`model()` provides controlled bindings for text, checkbox, radio, select, and
+Custom Element models. Renderer refs resolve to real nodes; `exposedRef()` maps
+a component host to only its explicitly exposed public object.
+
+The complete validation, ownership, modifier, fallthrough, and cleanup rules are
+defined in the [Component contracts](docs/component-contracts.md).
 
 ## Adopted stylesheets only
 

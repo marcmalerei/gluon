@@ -29,6 +29,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   event/async ownership, deterministic unmount, and controlled exposure.
 - Persistent application mount ownership for `Element` and `ShadowRoot`, with
   deterministic rejection of drainable plain `DocumentFragment` roots.
+- Typed property and event declarations, native and scoped slot contracts,
+  standard and Custom Element model bindings, and deterministic host, callback,
+  element, and exposed-instance refs.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.

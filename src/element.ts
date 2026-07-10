@@ -1,4 +1,4 @@
-import { render, suspendRender, type TemplateResult } from './runtime.js';
+import { render, suspendRender, type RefTarget, type TemplateResult, type TemplateValue } from './runtime.js';
 import { adoptStyles } from './styles/index.js';
 import {
   effect,
@@ -11,6 +11,7 @@ import {
 } from '@gluonjs/reactivity';
 import {
   reportApplicationError,
+  reportApplicationWarning,
   resolveApplicationContext,
   runWithApplicationContext,
   type AppErrorSource,
@@ -29,7 +30,7 @@ export type GluonRenderCause =
   | { readonly type: 'reactive'; readonly dependency: EffectDebuggerEvent };
 
 export interface GluonRenderDebugEvent {
-  readonly element: GluonElement;
+  readonly element: GluonElement<any>;
   readonly causes: readonly GluonRenderCause[];
   readonly dependencies: readonly EffectDebuggerEvent[];
   readonly startedAt: number;
@@ -46,10 +47,34 @@ export type ComponentLifecycleCallback = () => void | PromiseLike<void>;
 export interface ComponentErrorInfo {
   readonly error: unknown;
   readonly source: AppErrorSource;
-  readonly element: GluonElement;
+  readonly element: GluonElement<any>;
 }
 
 export type ComponentErrorBoundary = (info: ComponentErrorInfo) => boolean | void;
+
+export interface EventDeclaration<Detail = unknown> {
+  readonly bubbles?: boolean;
+  readonly composed?: boolean;
+  readonly cancelable?: boolean;
+  readonly validate?: (detail: Detail) => boolean | string;
+}
+
+export type EventDeclarations<Events extends object = Record<string, unknown>> = Readonly<{
+  [Name in keyof Events]?: EventDeclaration<Events[Name]>;
+}>;
+
+export type ComponentEventMap<Events extends object> = {
+  readonly [Name in keyof Events]: CustomEvent<Events[Name]>;
+};
+
+export interface SlotDeclaration {
+  readonly required?: boolean;
+  readonly fallback?: boolean;
+}
+
+export type SlotDeclarations<Names extends string = string> = Readonly<
+  Partial<Record<Names, SlotDeclaration>>
+>;
 
 let renderDebugHook: GluonRenderDebugHook | undefined;
 
@@ -83,19 +108,27 @@ export interface PropertyDeclaration<Value = unknown> {
   readonly default?: Value | (() => Value);
   readonly converter?: PropertyConverter<Value>;
   readonly hasChanged?: (value: Value, oldValue: Value | undefined) => boolean;
+  readonly required?: boolean;
+  readonly validate?: (value: Value) => boolean | string;
 }
 
 export type PropertyDefinition<Value = unknown> = PropertyType | PropertyDeclaration<Value>;
-export type PropertyDeclarations = Readonly<Record<string, PropertyDefinition>>;
+export type PropertyDeclarations<Props extends object = Record<string, unknown>> = Readonly<{
+  [Name in keyof Props]: PropertyDefinition<Props[Name]>;
+}>;
 
-type GluonElementConstructor = typeof GluonElement & {
-  readonly properties?: PropertyDeclarations;
+type GluonElementConstructor = GluonElementClass & {
+  readonly properties?: Readonly<Record<string, PropertyDefinition<any>>>;
+  readonly events?: Readonly<Record<string, EventDeclaration<any>>>;
+  readonly slots?: SlotDeclarations;
   readonly styles?: CSSStyleSheet | readonly CSSStyleSheet[];
 };
 
 const finalizedConstructors = new WeakSet<Function>();
 const declarationCache = new WeakMap<Function, PropertyDeclarations>();
 const styleCache = new WeakMap<Function, readonly CSSStyleSheet[]>();
+const eventDeclarationCache = new WeakMap<Function, EventDeclarations>();
+const slotDeclarationCache = new WeakMap<Function, SlotDeclarations>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
 const publicInstance = Symbol('gluon.public-instance');
@@ -108,17 +141,22 @@ interface UpdateDeferred {
 }
 
 interface CapturedComponentBoundary {
-  readonly element: GluonElement;
+  readonly element: GluonElement<any>;
   readonly context?: ApplicationContext;
   readonly callbacks: readonly ComponentErrorBoundary[];
 }
 
-export abstract class GluonElement extends HTMLElement {
-  static readonly properties: PropertyDeclarations = {};
+export abstract class GluonElement<
+  Events extends object = Record<string, unknown>,
+> extends HTMLElement {
+  static readonly properties: Readonly<Record<string, PropertyDefinition<any>>> = {};
+  static readonly events: Readonly<Record<string, EventDeclaration<any>>> = {};
+  static readonly slots: SlotDeclarations = {};
   static readonly styles: CSSStyleSheet | readonly CSSStyleSheet[] = [];
 
   protected readonly renderRoot: ShadowRoot;
   private readonly [propertyValues] = new Map<string, unknown>();
+  private readonly providedProperties = new Set<string>();
   private readonly updateId = elementUpdateSequence;
   private connected = false;
   private reflectingAttribute?: string;
@@ -150,7 +188,9 @@ export abstract class GluonElement extends HTMLElement {
 
   static get observedAttributes(): string[] {
     const attributes: string[] = [];
-    for (const [name, definition] of Object.entries(getDeclarations(this as GluonElementConstructor))) {
+    for (const [name, definition] of Object.entries(getDeclarations(
+      this as unknown as GluonElementConstructor,
+    ))) {
       const attribute = getAttributeName(name, normalizeDeclaration(definition));
       if (attribute) attributes.push(attribute);
     }
@@ -161,6 +201,7 @@ export abstract class GluonElement extends HTMLElement {
     if (this.connected) return;
     this.connected = true;
     this.applicationContext = resolveApplicationContext(this);
+    this.validateDeclaredProperties();
     adoptStyles(this.renderRoot, ...getStyles(this.constructor as GluonElementConstructor));
     this.reflectCurrentProperties();
     this.createRenderEffect();
@@ -255,14 +296,28 @@ export abstract class GluonElement extends HTMLElement {
     render(this.render(), this.renderRoot);
   }
 
-  protected emit<Detail>(
-    type: string,
-    detail: Detail,
-    init: Omit<CustomEventInit<Detail>, 'detail'> = {},
+  protected emit<Name extends keyof Events & string>(
+    type: Name,
+    detail: Events[Name],
+    init: Omit<CustomEventInit<Events[Name]>, 'detail'> = {},
   ): boolean {
+    const declarations = getEventDeclarations(this.constructor as GluonElementConstructor);
+    const declaration = declarations[type] as EventDeclaration<Events[Name]> | undefined;
+    if (Object.keys(declarations).length > 0 && !declaration) {
+      reportApplicationWarning(
+        this.applicationContext,
+        `Event "${type}" is not declared by ${this.localName}.`,
+        'GLUON_EVENT_UNDECLARED',
+        this,
+      );
+    }
+    if (declaration?.validate) {
+      this.validateContractValue('event', type, detail, declaration.validate);
+    }
     return this.dispatchEvent(new CustomEvent(type, {
-      bubbles: true,
-      composed: true,
+      bubbles: declaration?.bubbles ?? true,
+      composed: declaration?.composed ?? true,
+      cancelable: declaration?.cancelable ?? false,
       ...init,
       detail,
     }));
@@ -276,6 +331,10 @@ export abstract class GluonElement extends HTMLElement {
     declaration: PropertyDeclaration,
     reflect = true,
   ): void {
+    this.providedProperties.add(name);
+    if (this.connected && declaration.validate) {
+      this.validateContractValue('property', name, value, declaration.validate);
+    }
     const oldValue = this[propertyValues].get(name);
     const hasChanged = declaration.hasChanged ?? defaultHasChanged;
     if (!hasChanged(value, oldValue)) return;
@@ -348,6 +407,7 @@ export abstract class GluonElement extends HTMLElement {
       if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
       this.runOwned(() => this.update());
       if (!this.connectionRendered) {
+        this.validateDeclaredSlots();
         this.connectionRendered = true;
         this.invokeLifecycle(this.connectedHooks);
       }
@@ -493,6 +553,71 @@ export abstract class GluonElement extends HTMLElement {
     return false;
   }
 
+  private validateDeclaredProperties(): void {
+    const declarations = getDeclarations(this.constructor as GluonElementConstructor);
+    for (const [name, definition] of Object.entries(declarations)) {
+      const declaration = normalizeDeclaration(definition);
+      if (declaration.required && !this.providedProperties.has(name)) {
+        reportApplicationWarning(
+          this.applicationContext,
+          `Required property "${name}" is missing on ${this.localName}.`,
+          'GLUON_PROP_REQUIRED',
+          this,
+        );
+      }
+      if (declaration.validate && this[propertyValues].has(name)) {
+        this.validateContractValue(
+          'property',
+          name,
+          this[propertyValues].get(name),
+          declaration.validate,
+        );
+      }
+    }
+  }
+
+  private validateDeclaredSlots(): void {
+    const declarations = getSlotDeclarations(this.constructor as GluonElementConstructor);
+    const slots = [...this.renderRoot.querySelectorAll('slot')];
+    for (const [name, declaration] of Object.entries(declarations)) {
+      if (!declaration?.required) continue;
+      const slotName = name === 'default' ? '' : name;
+      const assigned = slots
+        .filter((slot) => (slot.getAttribute('name') ?? '') === slotName)
+        .some((slot) => slot.assignedNodes().length > 0);
+      if (!assigned) {
+        reportApplicationWarning(
+          this.applicationContext,
+          `Required slot "${name}" is empty on ${this.localName}.`,
+          'GLUON_SLOT_REQUIRED',
+          this,
+        );
+      }
+    }
+  }
+
+  private validateContractValue<Value>(
+    kind: 'property' | 'event',
+    name: string,
+    value: Value,
+    validator: (value: Value) => boolean | string,
+  ): void {
+    try {
+      const result = validator(value);
+      if (result === true) return;
+      reportApplicationWarning(
+        this.applicationContext,
+        typeof result === 'string'
+          ? result
+          : `Invalid ${kind} value for "${name}" on ${this.localName}.`,
+        kind === 'property' ? 'GLUON_PROP_INVALID' : 'GLUON_EVENT_INVALID',
+        this,
+      );
+    } catch (error) {
+      reportApplicationError(this.applicationContext, error, 'application', this);
+    }
+  }
+
   private capturePreUpgradeProperties(constructor: GluonElementConstructor): void {
     const declarations = getDeclarations(constructor);
     for (const [name, definition] of Object.entries(declarations)) {
@@ -602,19 +727,58 @@ function getComposedParent(node: Node): Node | null {
 }
 
 export function getPublicInstance<Public extends object>(
-  element: GluonElement,
+  element: GluonElement<any>,
 ): Readonly<Public> | undefined {
   return element[publicInstance] as Readonly<Public> | undefined;
 }
 
-export type GluonElementClass<ElementType extends GluonElement = GluonElement> = {
-  new (): ElementType;
-} & typeof GluonElement;
+export type ValueRefTarget<Value> =
+  | { value: Value | undefined }
+  | ((value: Value | undefined) => void);
 
-export function defineElement<ElementType extends GluonElement>(
+export function exposedRef<Public extends object>(
+  target: ValueRefTarget<Readonly<Public>>,
+): RefTarget<GluonElement<any>> {
+  let currentElement: GluonElement<any> | undefined;
+  let attached = false;
+  const publish = (value: Readonly<Public> | undefined): void => {
+    if (typeof target === 'function') target(value);
+    else target.value = value;
+    attached = value !== undefined;
+  };
+  return (element) => {
+    currentElement = element;
+    if (!element) {
+      if (attached) publish(undefined);
+      return;
+    }
+    const resolve = (): void => {
+      if (currentElement !== element) return;
+      const value = getPublicInstance<Public>(element);
+      if (value !== undefined) publish(value);
+    };
+    resolve();
+    if (!attached) {
+      void customElements.whenDefined(element.localName).then(() => {
+        queueMicrotask(resolve);
+      });
+    }
+  };
+}
+
+export type GluonElementClass<ElementType extends GluonElement<any> = GluonElement<any>> = {
+  new (): ElementType;
+  readonly prototype: ElementType;
+  readonly properties?: Readonly<Record<string, PropertyDefinition<any>>>;
+  readonly events?: Readonly<Record<string, EventDeclaration<any>>>;
+  readonly slots?: SlotDeclarations;
+  readonly styles?: CSSStyleSheet | readonly CSSStyleSheet[];
+};
+
+export function defineElement<Constructor extends GluonElementClass>(
   tagName: `${string}-${string}`,
-  constructor: GluonElementClass<ElementType>,
-): GluonElementClass<ElementType> {
+  constructor: Constructor,
+): Constructor {
   const existing = customElements.get(tagName);
   if (existing && existing !== constructor) {
     throw new Error(`Custom element "${tagName}" is already defined with another constructor.`);
@@ -671,6 +835,30 @@ function getStyles(constructor: GluonElementConstructor): readonly CSSStyleSheet
   const styles = [...new Set([...inherited, ...ownStyles])];
   styleCache.set(constructor, styles);
   return styles;
+}
+
+function getEventDeclarations(constructor: GluonElementConstructor): EventDeclarations {
+  const cached = eventDeclarationCache.get(constructor);
+  if (cached) return cached;
+  const parent = Object.getPrototypeOf(constructor) as GluonElementConstructor | undefined;
+  const declarations = {
+    ...(parent?.prototype instanceof GluonElement ? getEventDeclarations(parent) : {}),
+    ...(constructor.events ?? {}),
+  } satisfies EventDeclarations;
+  eventDeclarationCache.set(constructor, declarations);
+  return declarations;
+}
+
+function getSlotDeclarations(constructor: GluonElementConstructor): SlotDeclarations {
+  const cached = slotDeclarationCache.get(constructor);
+  if (cached) return cached;
+  const parent = Object.getPrototypeOf(constructor) as GluonElementConstructor | undefined;
+  const declarations = {
+    ...(parent?.prototype instanceof GluonElement ? getSlotDeclarations(parent) : {}),
+    ...(constructor.slots ?? {}),
+  } satisfies SlotDeclarations;
+  slotDeclarationCache.set(constructor, declarations);
+  return declarations;
 }
 
 function normalizeDeclaration(definition: PropertyDefinition): PropertyDeclaration {
