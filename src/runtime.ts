@@ -1,3 +1,5 @@
+import { guardEventListener } from './application-context.js';
+
 const templateResultBrand = Symbol('gluon.template-result');
 const directiveBrand = Symbol('gluon.directive');
 const repeatResultBrand = Symbol('gluon.repeat-result');
@@ -1301,11 +1303,11 @@ function isEventBinding(value: unknown): value is EventBinding {
 function resolveEvent(value: unknown): ResolvedEvent | undefined {
   if (isEventBinding(value)) {
     return {
-      listener: value.listener,
+      listener: guardEventListener(value.listener),
       options: value.options,
     };
   }
-  return isEventListener(value) ? { listener: value } : undefined;
+  return isEventListener(value) ? { listener: guardEventListener(value) } : undefined;
 }
 
 function isUnsafeHtmlResult(value: unknown): value is UnsafeHtmlResult {

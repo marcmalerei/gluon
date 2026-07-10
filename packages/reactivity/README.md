@@ -57,6 +57,8 @@ An attached scope stops its owned effects in reverse creation order, then child
 scopes in reverse creation order, then cleanup callbacks in reverse registration
 order. A detached scope has independent ownership. Stopping a scope cancels its
 queued effects and watchers and prevents their runners from executing again.
+If an effect stop hook throws, the scope reports a cleanup error and continues
+stopping the remaining effects and resources.
 
 Errors are delivered to the closest explicit effect, watcher, job, or scope
 handler. When no local handler exists, the handler installed by
