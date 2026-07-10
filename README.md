@@ -28,6 +28,26 @@ The goal is a small, composable system with:
 
 Gluon aims to improve template-rendering performance relative to existing approaches. That goal still needs to be validated with reproducible benchmarks once an implementation exists.
 
+## Why Gluon?
+
+The following points describe architectural advantages and design goals. Outcomes that depend on the implementation—including rendering speed, runtime size, and developer ergonomics—must be verified once working code exists.
+
+1. **A web-platform foundation.** Custom Elements are a browser standard, giving Gluon a native component boundary instead of a framework-specific component format.
+2. **Framework interoperability.** Custom Elements can be consumed from plain HTML and integrated into frameworks that support them, making Gluon components useful beyond Gluon applications.
+3. **Incremental adoption.** A standards-based component can be introduced one element at a time; an existing application does not need to be rewritten before it can use a Gluon component.
+4. **Less framework-specific surface area.** The core model uses HTML, JavaScript, Custom Elements, and stylesheets rather than depending on a proprietary single-file component format.
+5. **Declarative templates without another file format.** An HTML tagged template literal keeps declarative markup in JavaScript or TypeScript while avoiding an additional component-file syntax.
+6. **Composable attribute sets.** First-class attribute spreading is intended to make related accessibility, form, state, and configuration attributes easier to group, forward, and reuse.
+7. **One styling contract.** Using `adoptedStyleSheets` exclusively gives the component system one explicit styling mechanism instead of several competing internal paths.
+8. **Reusable stylesheet instances.** A `CSSStyleSheet` can be adopted by multiple compatible roots, allowing components to share a stylesheet instance rather than recreating identical style text for every instance.
+9. **A design-system foundation.** Quarks, Atoms, Molecules, and Organisms give components named positions at increasing levels of UI scope.
+10. **A consistent native-element layer.** Representing HTML elements as Quarks creates one place to define how native elements participate in Gluon composition.
+11. **Focused UI primitives.** Atoms such as icons encourage small responsibilities, focused APIs, and isolated verification before primitives are combined into larger structures.
+12. **A scalable composition vocabulary.** The same model covers native elements, primitives, intermediate compositions, and complete interface structures.
+13. **Performance as an initial constraint.** Rendering work, updates, and allocations can be considered during the first API design rather than treated only as later optimization. Any performance advantage remains unverified until benchmarks exist.
+14. **The potential for a smaller runtime.** Reusing browser-provided component, DOM, and stylesheet capabilities may reduce the amount of runtime code Gluon needs to provide. The resulting size must be measured against comparable systems.
+15. **A distinct position.** The combination of Custom Elements, an HTML template literal, attribute spreading, adopted stylesheets, and the Gluon component vocabulary gives the project a specific direction relative to Vue- and Lit-style approaches.
+
 ## The system
 
 Gluon is the base system. It provides a vocabulary for building interfaces at increasing levels of scope:
