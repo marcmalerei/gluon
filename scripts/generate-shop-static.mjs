@@ -7,7 +7,7 @@ const repositoryRoot = resolve(import.meta.dirname, '..');
 const assets = JSON.parse(await readFile(resolve(repositoryRoot, 'examples/shop/dist/gluon-assets.json'), 'utf8'));
 const result = await generateStaticSite({
   routes: ['/', '/shop', '/products/orbit-lamp', '/shipping', '/returns'],
-  dynamicRoutes: ['/products/:slug'],
+  dynamicRoutes: ['/products/:slug', '/checkout', '/orders/:id'],
   outputDirectory: resolve(repositoryRoot, 'examples/shop/dist-static'),
   assets,
   render: (url) => renderShopRequest(url, { assets }),

@@ -80,6 +80,37 @@ describe('GLUON GOODS reference shop', () => {
     app.unmount();
   });
 
+  it('completes bag checkout and renders a durable order confirmation route', async () => {
+    const { app, router, store } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']), { storage: null });
+    await router.isReady();
+    const root = document.createElement('div');
+    document.body.append(root);
+    app.mount(root);
+    expect(() => store.placeOrder()).toThrow('at least one bag line');
+    root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    await settleShop();
+    document.querySelector<HTMLAnchorElement>('.bag-summary a')!.click();
+    await settleShop();
+    expect(router.currentRoute.value.path).toBe('/checkout');
+    expect(root.querySelector('h1')?.textContent).toBe('Delivery details');
+
+    for (const [name, value] of Object.entries({
+      email: 'ada@example.com', name: 'Ada Lovelace', address: '1 Gluon Way', postalCode: '10115', city: 'Berlin',
+    })) {
+      const input = root.querySelector<HTMLInputElement>(`input[name="${name}"]`)!;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    root.querySelector<HTMLFormElement>('form')!.requestSubmit();
+    await settleShop();
+    expect(router.currentRoute.value.path).toMatch(/^\/orders\/GG-/);
+    expect(root.querySelector('.order-confirmation')?.textContent).toContain('ada@example.com');
+    expect(root.querySelector('.order-confirmation')?.textContent).toContain('€189');
+    expect(store.bagCount).toBe(0);
+    expect(store.order?.lines[0]?.configuration.finish).toBe('Cobalt');
+    app.unmount();
+  });
+
   it('searches the catalog and exposes a useful empty bag path', async () => {
     const { app, router, store } = createShopApplication(createMemoryHistory(['/']), { storage: null });
     await router.isReady();

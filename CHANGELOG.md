@@ -14,6 +14,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   and abortable nested progressive streaming in `@gluonjs/ssr`.
 - Route-aware static generation, Vite asset manifests, resource hints,
   request-nonce style carriers, and transactional adopted-sheet hydration.
+- A complete GLUON GOODS bag-to-checkout journey with typed delivery state,
+  order placement, and URL-addressable confirmation.
 
 - A standalone, DOM-free `@gluonjs/reactivity` package with refs, deep and
   shallow object and collection proxies, effects, computed values, dependency
