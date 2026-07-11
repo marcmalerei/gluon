@@ -1,4 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   GluonElement,
   KeepAlive,
@@ -22,6 +25,9 @@ import { defineStore } from '@gluonjs/store';
 import {
   SsrRenderError,
   prepareForHydration,
+  createStyleManifest,
+  renderResourceHints,
+  renderStyleCarriers,
   renderElement,
   renderRequest,
   renderProgressively,
@@ -30,6 +36,7 @@ import {
   serializeSsrState,
 } from '@gluonjs/ssr';
 import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
+import { generateStaticSite } from '@gluonjs/ssr/static';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -343,6 +350,49 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     expect(transport).toContain('loading');
     expect(transport).toContain('data-gluon-async-patch="0"');
     expect(transport).toContain('done');
+  });
+});
+
+describe('@gluonjs/ssr static output and style transport', () => {
+  it('emits safe ordered style carriers, assets, hints, and mixed static/dynamic output', async () => {
+    const assets = {
+      entry: '/assets/app.js',
+      imports: ['/assets/vendor.js'],
+      styles: ['/assets/app.css'],
+      assets: ['/assets/orbit.webp'],
+    };
+    const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
+    expect(response.styles.entries).toHaveLength(1);
+    expect(response.head).toContain('data-gluon-style="gluon-');
+    expect(response.head).toContain('nonce="request-nonce"');
+    expect(response.head).toContain('rel="modulepreload" href="/assets/vendor.js"');
+    expect(response.head).toContain('rel="stylesheet" href="/assets/app.css"');
+    expect(response.head).toContain('src="/assets/app.js"');
+
+    const manifest = createStyleManifest([css`p::after { content: "</style><script>bad</script>"; }`]);
+    expect(renderStyleCarriers(manifest)).not.toContain('</style><script>');
+    expect(renderResourceHints(undefined)).toBe('');
+
+    const output = await mkdtemp(join(tmpdir(), 'gluon-static-'));
+    try {
+      const generated = await generateStaticSite({
+        routes: ['/', '/products/orbit-lamp'],
+        dynamicRoutes: ['/products/:slug'],
+        outputDirectory: output,
+        assets,
+        render: (url) => renderShopRequest(url, { assets }),
+      });
+      expect(generated.pages.map((page) => page.url)).toEqual(['/', '/products/orbit-lamp']);
+      expect(generated.dynamicRoutes).toEqual(['/products/:slug']);
+      const product = await readFile(join(output, 'products/orbit-lamp/index.html'), 'utf8');
+      expect(product).toContain('Orbit Lamp');
+      expect(product).toContain('data-gluon-style');
+      const deployment = JSON.parse(await readFile(generated.manifestFile, 'utf8'));
+      expect(deployment.pages[1].file).toBe('products/orbit-lamp/index.html');
+      expect(deployment.assets.entry).toBe('/assets/app.js');
+    } finally {
+      await rm(output, { recursive: true, force: true });
+    }
   });
 });
 

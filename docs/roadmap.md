@@ -76,6 +76,8 @@ Gluon currently provides:
 - DOM-independent marked rendering, DSD output, safe embedded state, isolated
   requests, identity-preserving hydration, mismatch recovery, and nested
   abortable progressive streaming
+- universal Vite asset manifests, route-aware SSG with mixed dynamic fallbacks,
+  resource hints, initial style carriers, and adopted-sheet hydration handoff
 - the first living GLUON GOODS reference-shop slice with public-package routes,
   responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management
@@ -83,8 +85,8 @@ Gluon currently provides:
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide SSG/style manifests, language tooling,
-Devtools, or a public release.
+The current repository does not provide language tooling, Devtools, or a public
+release.
 
 ## Product principles
 

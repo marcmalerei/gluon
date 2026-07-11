@@ -2,6 +2,7 @@ import { GluonElement, createApp, defineElement, html } from '@gluonjs/core';
 import { defineStore } from '@gluonjs/store';
 import {
   prepareForHydration,
+  createStyleManifest,
   renderProgressively,
   renderElement,
   renderRequest,
@@ -11,6 +12,7 @@ import {
 } from '../packages/ssr/dist/index.js';
 import { hydrateApplication, hydrateTemplate } from '../packages/ssr/dist/hydration.js';
 import { renderProgressiveReadableStream, renderToReadableStream } from '../packages/ssr/dist/streaming.js';
+import { generateStaticSite } from '../packages/ssr/dist/static.js';
 
 class GreetingElement extends GluonElement {
   static override readonly properties = { name: String };
@@ -41,6 +43,13 @@ const request: Promise<SsrRequestResult> = renderRequest<{ path: string }>({
 });
 void request;
 serializeSsrState({ ready: true });
+createStyleManifest([]);
+void generateStaticSite({
+  routes: ['/'],
+  outputDirectory: 'dist-static',
+  assets: { entry: '/assets/app.js' },
+  render: async () => request,
+});
 
 // @ts-expect-error url is required for request ownership
 renderRequest({ createApp: () => createApp(() => html`Missing URL`) });

@@ -2,6 +2,7 @@ export type StyleTarget = Document | ShadowRoot;
 export type CssValue = string | number;
 
 const serverStyleSheetBrand = Symbol('gluon.server-style-sheet');
+const styleSheetText = new WeakMap<CSSStyleSheet, string>();
 
 interface ServerStyleSheet {
   readonly [serverStyleSheetBrand]: true;
@@ -25,6 +26,7 @@ export function createStyleSheet(cssText: string): CSSStyleSheet {
 
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(cssText);
+  styleSheetText.set(sheet, cssText);
   return sheet;
 }
 
@@ -32,6 +34,8 @@ export function createStyleSheet(cssText: string): CSSStyleSheet {
 export function getStyleSheetText(sheet: CSSStyleSheet): string {
   const serverSheet = sheet as unknown as Partial<ServerStyleSheet>;
   if (serverSheet[serverStyleSheetBrand]) return serverSheet.cssText ?? '';
+  const source = styleSheetText.get(sheet);
+  if (source !== undefined) return source;
   return [...sheet.cssRules].map((rule) => rule.cssText).join('\n');
 }
 

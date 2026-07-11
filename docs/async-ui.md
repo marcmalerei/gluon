@@ -113,7 +113,8 @@ Built-in directive markers remain private to the browser renderer.
 The server renderer and progressive coordinator consume these descriptors
 rather than inspecting private runtime symbols. `resolve(signal)` propagates a
 response abort to Suspense sources; hydration resolves the same contracts once
-before binding marker DOM. Production style/asset transport remains #37.
+before binding marker DOM. The production asset manifest and initial style
+transport are documented in [Static and server deployment](deployment.md).
 
 ## Verification
 

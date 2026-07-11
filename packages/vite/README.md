@@ -34,6 +34,13 @@ inject the virtual HMR client, `import.meta.hot` handlers, stable proxies, or
 module identity strings. The plugin defines `__GLUON_DEV__` as `false`, which
 allows Rollup to remove Core render-debug branches from application bundles.
 
+Set `universal: true` for a production client build. The plugin emits
+`gluon-assets.json` with the hashed entry chunk, modulepreload imports, CSS, and
+referenced assets consumed by `@gluonjs/ssr` and static generation. Pass
+`universal: { manifestFile }` only when deployment requires another filename.
+Build the server entry separately with Vite SSR; the canonical shop commands
+are documented in [Static and server deployment](../../docs/deployment.md).
+
 The default transform boundary is the Vite project root and excludes
 `node_modules`. `include` accepts a regular expression or predicate when a
 monorepo keeps application modules outside that root. Set `diagnostics: false`

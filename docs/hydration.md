@@ -40,7 +40,7 @@ Diagnostics use stable categories and codes:
 | attribute | `GLUON_HYDRATION_ATTRIBUTE_MISMATCH` | Non-style attributes and binding markers |
 | structure | `GLUON_HYDRATION_STRUCTURE_MISMATCH` | Node count, type, element name, namespace, and marker ranges |
 | state | `GLUON_HYDRATION_STATE_MISMATCH` | Caller-supplied server/client snapshots |
-| style | `GLUON_HYDRATION_STYLE_MISMATCH` | Inline style attributes; manifest/style-carrier validation joins in #37 |
+| style | `GLUON_HYDRATION_STYLE_MISMATCH` | Inline style attributes; SSR carrier failures use `GLUON_UNSUPPORTED_SSR_TRANSPORT` before DOM hydration |
 
 Each record includes the DOM/state path, expected and actual values, chosen
 recovery, and suppression status. Default recovery replaces the complete root

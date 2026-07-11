@@ -3,6 +3,7 @@ import {
   createApp,
   createInjectionKey,
   defineElement,
+  css,
   elementRef,
   GluonElement,
   html,
@@ -19,7 +20,7 @@ import {
   hydrateElement,
   hydrateTemplate,
 } from '@gluonjs/ssr/hydration';
-import { prepareForHydration, renderProgressively } from '@gluonjs/ssr';
+import { createStyleManifest, prepareForHydration, renderProgressively, renderStyleCarriers } from '@gluonjs/ssr';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 import { hydrateShop } from '../examples/shop/src/hydrate.js';
 
@@ -95,6 +96,8 @@ describe('SSR hydration', () => {
   it('hydrates GLUON GOODS route and Store snapshots into an interactive product flow', async () => {
     history.replaceState({}, '', '/products/orbit-lamp');
     const response = await renderShopRequest('/products/orbit-lamp');
+    const previousSheets = [...document.adoptedStyleSheets];
+    document.head.insertAdjacentHTML('beforeend', response.head);
     const root = document.createElement('div');
     root.innerHTML = response.html;
     document.body.append(root);
@@ -115,6 +118,7 @@ describe('SSR hydration', () => {
     hydrated.mount.unmount();
     hydrated.router.destroy();
     hydrated.storeManager.dispose();
+    document.adoptedStyleSheets = previousSheets;
     root.remove();
   });
 
@@ -221,5 +225,32 @@ describe('SSR hydration', () => {
       state: { server: circular, client: { self: 'different' } },
     });
     expect(state.mismatches[0]?.category).toBe('state');
+  });
+
+  it('adopts validated SSR style carriers once and retains them on validation failure', async () => {
+    const previous = [...document.adoptedStyleSheets];
+    const sheet = css`body { --hydrated-color: blue; }`;
+    const manifest = createStyleManifest([sheet]);
+    const result = html`<p>${'styled'}</p>`;
+    const prepared = await prepareForHydration(result);
+    const styleHost = document.createElement('div');
+    const styleRoot = styleHost.attachShadow({ mode: 'open' });
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    styleRoot.innerHTML = renderStyleCarriers(manifest);
+    styleRoot.append(root);
+    const hydrated = await hydrateTemplate(result, root, { styles: manifest, styleRoot });
+    expect(hydrated.retained).toBe(true);
+    expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
+    expect(styleRoot.adoptedStyleSheets).toHaveLength(1);
+
+    const invalidRoot = document.createElement('div');
+    invalidRoot.innerHTML = prepared.html;
+    styleRoot.innerHTML = renderStyleCarriers(manifest).replace(manifest.entries[0]!.digest, 'invalid');
+    styleRoot.append(invalidRoot);
+    await expect(hydrateTemplate(result, invalidRoot, { styles: manifest, styleRoot }))
+      .rejects.toMatchObject({ code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT' });
+    expect(styleRoot.querySelector('style[data-gluon-style]')).not.toBeNull();
+    document.adoptedStyleSheets = previous;
   });
 });
