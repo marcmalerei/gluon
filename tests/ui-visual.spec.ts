@@ -65,6 +65,10 @@ test('matches the stable light-theme UI composition', async () => {
 
   await expect.element(page.getByTestId('ui-visual')).toMatchScreenshot('stable-ui-light', {
     comparatorName: 'pixelmatch',
-    comparatorOptions: { allowedMismatchedPixelRatio: 0.05 },
+    comparatorOptions: {
+      allowedMismatchedPixelRatio: 0.05,
+      // Preserve geometric/color sensitivity while ignoring minor cross-OS font rasterization.
+      threshold: 0.15,
+    },
   });
 });
