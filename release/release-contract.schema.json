@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/marcmalerei/gluon/blob/main/release/release-contract.schema.json",
+  "title": "Gluon release contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "releaseGroup",
+    "targetVersion",
+    "tagPrefix",
+    "environment",
+    "artifactDirectory",
+    "manualEvidencePath",
+    "compatibilityManifestPath",
+    "spdxSchema",
+    "artifacts",
+    "publication",
+    "externalPrerequisites"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "releaseGroup": { "const": "gluon-framework" },
+    "targetVersion": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "tagPrefix": { "const": "v" },
+    "environment": { "const": "npm" },
+    "artifactDirectory": { "const": ".tmp/release" },
+    "manualEvidencePath": { "const": "release/evidence/{version}.json" },
+    "compatibilityManifestPath": { "const": "release/compatibility/{version}.json" },
+    "spdxSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "source", "sourceCommit", "sha256"],
+      "properties": {
+        "path": { "const": "release/spdx-2.3.schema.json" },
+        "source": { "type": "string", "format": "uri", "pattern": "^https://raw\\.githubusercontent\\.com/spdx/spdx-spec/[a-f0-9]{40}/schemas/spdx-schema\\.json$" },
+        "sourceCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packageArchives",
+        "canonicalPackageDigests",
+        "aggregateSbomFormats",
+        "perPackageSbomFormats",
+        "checksums",
+        "releaseEvidence"
+      ],
+      "properties": {
+        "packageArchives": { "const": true },
+        "canonicalPackageDigests": { "const": true },
+        "aggregateSbomFormats": {
+          "type": "array",
+          "prefixItems": [{ "const": "spdx-2.3" }, { "const": "cyclonedx-1.7" }],
+          "items": false
+        },
+        "perPackageSbomFormats": {
+          "type": "array",
+          "prefixItems": [{ "const": "spdx-2.3" }, { "const": "cyclonedx-1.7" }],
+          "items": false
+        },
+        "checksums": { "const": "sha256" },
+        "releaseEvidence": { "const": true }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry", "access", "provenance", "distTag", "stagingDistTagPrefix", "promotion", "identity", "longLivedTokenAllowed"],
+      "properties": {
+        "registry": { "const": "https://registry.npmjs.org" },
+        "access": { "const": "public" },
+        "provenance": { "const": true },
+        "distTag": { "const": "latest" },
+        "stagingDistTagPrefix": { "const": "gluon-staging-v" },
+        "promotion": { "const": "interactive-2fa" },
+        "identity": { "const": "npm-trusted-publishing" },
+        "longLivedTokenAllowed": { "const": false }
+      }
+    },
+    "externalPrerequisites": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

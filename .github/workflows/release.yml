@@ -1,0 +1,275 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing lockstep version to validate without publication
+        required: true
+        type: string
+      phase:
+        description: Validate a candidate or finalize an owner-promoted draft
+        required: true
+        default: validate
+        type: choice
+        options:
+          - validate
+          - finalize
+
+concurrency:
+  group: release-${{ github.ref }}-${{ inputs.version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.x
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Resolve release version
+        env:
+          DISPATCH_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_VERSION=$DISPATCH_VERSION" >> "$GITHUB_ENV"
+          fi
+      - run: npm run check
+      - run: npm run release:validate -- --candidate "$RELEASE_VERSION"
+      - run: npm run release:artifacts -- --version "$RELEASE_VERSION"
+      - name: Retain release candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: gluon-${{ github.sha }}-candidate
+          path: .tmp/release
+          retention-days: 30
+          if-no-files-found: error
+          include-hidden-files: true
+
+  publish:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    needs: [candidate, reproducibility, browser-engines, node-runtime, performance-evidence]
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+      GLUON_RELEASE_ENVIRONMENT: npm
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.x
+          package-manager-cache: false
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11.18.0
+      - run: npm ci --ignore-scripts
+      - name: Resolve release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: gluon-${{ github.sha }}-candidate
+          path: .tmp/release
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: gluon-${{ github.sha }}-reproducibility
+          path: .tmp/release
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: gluon-${{ github.sha }}-performance
+          path: .tmp/release/performance
+      - run: node scripts/verify-release-hosting.mjs
+      - run: npm run release:finalize-assets
+      - name: Attest release archives and evidence
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: |
+            .tmp/release/packages/*.tgz
+            .tmp/release/sbom/*.json
+            .tmp/release/release-evidence.json
+            .tmp/release/SHA256SUMS
+            .tmp/release/CHANGELOG.md
+            .tmp/release/RELEASE_NOTES.md
+            .tmp/release/manual-release-evidence.json
+            .tmp/release/compatibility-manifest.json
+            .tmp/release/reproducibility.json
+            .tmp/release/performance/*
+      - name: Create immutable-release draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          assets=(.tmp/release/packages/*.tgz .tmp/release/sbom/*.json .tmp/release/performance/* .tmp/release/release-evidence.json .tmp/release/manual-release-evidence.json .tmp/release/compatibility-manifest.json .tmp/release/reproducibility.json .tmp/release/SHA256SUMS .tmp/release/CHANGELOG.md .tmp/release/RELEASE_NOTES.md)
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "${assets[@]}" --verify-tag --draft --title "Gluon $GITHUB_REF_NAME" --notes-file .tmp/release/RELEASE_NOTES.md
+          fi
+      - name: Publish reviewed archives under the recoverable staging dist-tag
+        run: npm run release:publish -- --version "$RELEASE_VERSION"
+
+  reproducibility:
+    needs: candidate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.x
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Resolve release version
+        env:
+          DISPATCH_VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_VERSION=$DISPATCH_VERSION" >> "$GITHUB_ENV"
+          fi
+      - run: npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:create-gluon
+      - run: npm run release:artifacts -- --version "$RELEASE_VERSION" --output .tmp/release-reproduced
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: gluon-${{ github.sha }}-candidate
+          path: .tmp/release-candidate
+      - name: Compare canonical package contents
+        run: npm run release:compare-artifacts -- --candidate .tmp/release-candidate --reproduced .tmp/release-reproduced > .tmp/reproducibility.json
+      - name: Retain reproducibility evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: gluon-${{ github.sha }}-reproducibility
+          path: .tmp/reproducibility.json
+          retention-days: 30
+          if-no-files-found: error
+          include-hidden-files: true
+
+  browser-engines:
+    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run test:browser-matrix
+        env:
+          GLUON_BROWSER: ${{ matrix.browser }}
+
+  node-runtime:
+    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22.12.0, 24.x]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run test:ssr
+
+  performance-evidence:
+    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
+      - run: npm run check:shop-performance
+      - name: Retain release performance evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: gluon-${{ github.sha }}-performance
+          path: .tmp/quality-evidence
+          retention-days: 30
+          if-no-files-found: error
+          include-hidden-files: true
+
+  finalize:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.phase == 'finalize' }}
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+      GLUON_RELEASE_ENVIRONMENT: npm
+      RELEASE_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.x
+          package-manager-cache: false
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11.18.0
+      - run: npm ci --ignore-scripts
+      - name: Require the exact release tag and draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REF_TYPE" = tag
+          test "$GITHUB_REF_NAME" = "v$RELEASE_VERSION"
+          test "$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft)" = true
+      - run: node scripts/verify-release-hosting.mjs
+      - name: Download reviewed draft assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download "$GITHUB_REF_NAME" --dir .tmp/release-assets
+      - name: Verify latest registry train from a clean directory
+        run: npm run release:verify-registry -- --version "$RELEASE_VERSION" --directory .tmp/release-assets --output .tmp/release-assets/registry-verification.json
+      - run: npm run release:finalize-assets -- --directory .tmp/release-assets
+      - name: Attest registry verification
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: |
+            .tmp/release-assets/registry-verification.json
+            .tmp/release-assets/SHA256SUMS
+      - name: Attach verification and publish the immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" .tmp/release-assets/registry-verification.json .tmp/release-assets/SHA256SUMS --clobber
+          gh release edit "$GITHUB_REF_NAME" --draft=false --latest

@@ -549,6 +549,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
 - [Package, release, and supply-chain governance ADR](docs/adrs/0002-package-release-and-supply-chain-governance.md)
+- [Release operations and protected publication runbook](docs/releasing.md)
 - [Machine-readable package contract](package-contract.json)
 - [Gluon 1.0 roadmap](docs/roadmap.md)
 - [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
