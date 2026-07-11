@@ -1,0 +1,43 @@
+# API reference
+
+TypeDoc generates this reference from every current export in
+`package-contract.json`. The build fails when generation emits a warning, when
+the documented entry-point count differs from the public package contract, or
+when an internal link is broken.
+
+## Runtime
+
+- [`@gluonjs/core`](generated/src/)
+- [`@gluonjs/core/styles`](generated/src/styles/)
+- [`@gluonjs/reactivity`](generated/packages/reactivity/src/)
+- [`@gluonjs/router`](generated/packages/router/src/)
+- [`@gluonjs/router/memory`](generated/packages/router/src/memory/)
+- [`@gluonjs/store`](generated/packages/store/src/)
+
+## Universal rendering
+
+- [`@gluonjs/ssr`](generated/packages/ssr/src/)
+- [`@gluonjs/ssr/hydration`](generated/packages/ssr/src/hydration/)
+- [`@gluonjs/ssr/static`](generated/packages/ssr/src/static/)
+- [`@gluonjs/ssr/streaming`](generated/packages/ssr/src/streaming/)
+
+## Tooling
+
+- [`@gluonjs/compiler`](generated/packages/compiler/src/)
+- [`@gluonjs/compiler/diagnostics`](generated/packages/compiler/src/diagnostics/)
+- [`@gluonjs/vite`](generated/packages/vite/src/)
+- [`@gluonjs/test-utils`](generated/packages/test-utils/src/)
+- [`@gluonjs/devtools-api`](generated/packages/devtools-api/src/)
+- [`@gluonjs/devtools`](generated/packages/devtools/src/)
+- [`@gluonjs/language-server`](generated/packages/language-server/src/)
+- [`create-gluon`](generated/packages/create-gluon/src/)
+
+## Transitional UI entry points
+
+- [`@gluonjs/core/quarks`](generated/src/quarks/)
+- [`@gluonjs/core/atoms`](generated/src/atoms/)
+- [`@gluonjs/core/molecules`](generated/src/molecules/)
+- [`@gluonjs/core/organisms`](generated/src/organisms/)
+
+Issue #39 moves these four transitional subpaths into their separately
+versioned final packages before 1.0.

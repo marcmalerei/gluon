@@ -540,6 +540,7 @@ The following points describe architectural advantages and design goals. Outcome
 
 ## Architecture and provenance
 
+- [Public versioned documentation](https://marcmalerei.github.io/gluon/)
 - [Architecture](docs/architecture.md)
 - [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)
@@ -562,6 +563,7 @@ Included now:
 - application routing with browser, hash, and memory histories
 - application-scoped stores with transactions, persistence, HMR, and snapshots
 - a responsive living reference shop using public package APIs
+- versioned guides, generated API reference, cookbook, migration material, and compiled interop examples
 - Custom Element authoring
 - adopted stylesheet management
 - Quark, Atom, Molecule, and Organism composition

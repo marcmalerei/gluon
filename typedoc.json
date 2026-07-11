@@ -1,0 +1,42 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/styles/index.ts",
+    "src/quarks/index.ts",
+    "src/atoms/index.ts",
+    "src/molecules/index.ts",
+    "src/organisms/index.ts",
+    "packages/reactivity/src/index.ts",
+    "packages/compiler/src/index.ts",
+    "packages/compiler/src/diagnostics.ts",
+    "packages/router/src/index.ts",
+    "packages/router/src/memory.ts",
+    "packages/store/src/index.ts",
+    "packages/ssr/src/index.ts",
+    "packages/ssr/src/hydration.ts",
+    "packages/ssr/src/static.ts",
+    "packages/ssr/src/streaming.ts",
+    "packages/vite/src/index.ts",
+    "packages/test-utils/src/index.ts",
+    "packages/devtools-api/src/index.ts",
+    "packages/devtools/src/index.ts",
+    "packages/language-server/src/index.ts",
+    "packages/create-gluon/src/index.ts"
+  ],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "tsconfig.typedoc.json",
+  "plugin": ["typedoc-plugin-markdown"],
+  "out": ".tmp/docs-api",
+  "readme": "none",
+  "excludeInternal": true,
+  "disableSources": true,
+  "validation": {
+    "notExported": false,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "hideGenerator": true,
+  "githubPages": false,
+  "cleanOutputDir": true
+}
