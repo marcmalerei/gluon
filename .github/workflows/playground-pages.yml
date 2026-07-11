@@ -49,10 +49,10 @@ jobs:
       - run: npm run typecheck:docs
       - run: node scripts/validate-docs.mjs
       - run: mkdir -p .pages/playground && cp -R docs-site/dist/. .pages/ && cp -R examples/playground/dist/. .pages/playground/
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: .pages
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
