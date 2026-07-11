@@ -79,6 +79,20 @@ sample. Reported values are milliseconds per operation, so lower is faster. A
 ratio is the comparison renderer's median divided by Gluon's median; a ratio
 above 1 means Gluon was faster for only that browser and workload.
 
+## Current committed matrix
+
+The retained matrix for commit `4c0f0b9` uses 20 measured samples, eight warm-up
+rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit 26.5
+engines on the recorded Apple M4 environment. The paired
+[`rendering-comparison-4c0f0b9.md`](../benchmarks/results/rendering-comparison-4c0f0b9.md)
+file contains the medians and p95 values; its JSON file retains every sample.
+
+Gluon is faster than Lit for keyed `update` and `reverse` in all three engines:
+1.09×/1.70× in Chromium, 1.28×/1.83× in Firefox, and 1.14×/1.91× in WebKit.
+Text is at parity in Firefox and WebKit; Lit is faster in Chromium. Fresh
+1,000-row `create` remains faster in Lit in this matrix, so the evidence does
+not support a universal “Gluon is faster” claim or the historical 6× claim.
+
 ## Interpretation and limits
 
 The benchmark measures synchronous template creation, renderer reconciliation,
