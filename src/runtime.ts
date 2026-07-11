@@ -468,16 +468,6 @@ class NodePart implements Part {
     this.setTemplate(result, assumeInPlace);
   }
 
-  updateTemplateResult(result: TemplateResult): boolean {
-    const currentChild = this.child;
-    if (!currentChild || currentChild.template.strings !== result.strings) return false;
-    applyBindings(currentChild.bindings, result.values, true);
-    this.nodes = currentChild.nodes;
-    this.textNode = undefined;
-    this.lastPrimitive = unsetValue;
-    return true;
-  }
-
   private setArray(values: readonly TemplateValue[]): void {
     if (this.child) {
       disconnectBindings(this.child.bindings);

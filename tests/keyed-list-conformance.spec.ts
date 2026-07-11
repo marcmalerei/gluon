@@ -198,6 +198,28 @@ describe('keyed list renderer conformance', () => {
     expect(Object.isFrozen(result.items[0])).toBe(true);
   });
 
+  it('updates keyed primitive and nested repeat children without wrapper bindings', () => {
+    const root = document.createElement('div');
+    const primitiveView = (rows: readonly Row[]) => html`<div>${repeat(
+      rows,
+      (item) => item.id,
+      (item) => item.label,
+    )}</div>`;
+
+    render(primitiveView([row('a', 'A')]), root);
+    render(primitiveView([row('a', 'B')]), root);
+    expect(root.textContent).toBe('B');
+
+    const nestedView = (rows: readonly Row[]) => html`<div>${repeat(
+      [{ id: 'group', rows }],
+      (group) => group.id,
+      (group) => repeat(group.rows, (item) => item.id, (item) => item.label),
+    )}</div>`;
+    render(nestedView([row('x', 'X')]), root);
+    render(nestedView([row('x', 'Y')]), root);
+    expect(root.textContent).toBe('Y');
+  });
+
   it('keeps ordinary arrays index-based and reuses the instance at each position', () => {
     const root = document.createElement('div');
     const view = (rows: readonly Row[]) => html`<ul>${rows.map(
