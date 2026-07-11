@@ -751,6 +751,11 @@ class NodePart implements Part {
     }
 
     if (this.nodes.length === 0) {
+      if (nextNodes.length === 1) {
+        parent.insertBefore(nextNodes[0]!, this.marker.nextSibling);
+        this.nodes = nextNodes;
+        return;
+      }
       const fragment = document.createDocumentFragment();
       fragment.append(...nextNodes);
       parent.insertBefore(fragment, this.marker.nextSibling);

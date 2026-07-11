@@ -5,11 +5,11 @@ against pinned Lit, Vue, and optimized Vanilla DOM implementations. It exists to
 produce inspectable evidence, not to guarantee that one renderer wins.
 
 The runtime's measured hot paths include direct string-binding updates,
-precomputed binding priorities, parallel key/value storage for keyed repeats,
-detached keyed-child anchors, batched initial insertion, and keyed-list fast
-paths for unchanged and reversed order. These shortcuts retain the
-external-DOM recovery and keyed-identity contracts covered by the browser
-suite.
+direct insertion when a new part contains one node, fragment batching when it
+contains multiple nodes, precomputed binding priorities, parallel key/value
+storage for keyed repeats, detached keyed-child anchors, and keyed-list fast
+paths for unchanged and reversed order. These shortcuts retain the external-DOM
+recovery and keyed-identity contracts covered by the browser suite.
 
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
@@ -87,17 +87,25 @@ above 1 means Gluon was faster for only that browser and workload.
 
 ## Current committed matrix
 
-The retained matrix for commit `4c0f0b9` uses 20 measured samples, eight warm-up
+The retained matrix for commit `55206f4` uses 20 measured samples, eight warm-up
 rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit 26.5
 engines on the recorded Apple M4 environment. The paired
-[`rendering-comparison-4c0f0b9.md`](../benchmarks/results/rendering-comparison-4c0f0b9.md)
+[`rendering-comparison-55206f4.md`](../benchmarks/results/rendering-comparison-55206f4.md)
 file contains the medians and p95 values; its JSON file retains every sample.
 
 Gluon is faster than Lit for keyed `update` and `reverse` in all three engines:
-1.09×/1.70× in Chromium, 1.28×/1.83× in Firefox, and 1.14×/1.91× in WebKit.
+1.22×/1.74× in Chromium, 1.23×/1.94× in Firefox, and 1.21×/2.00× in WebKit.
 Text is at parity in Firefox and WebKit; Lit is faster in Chromium. Fresh
 1,000-row `create` remains faster in Lit in this matrix, so the evidence does
 not support a universal “Gluon is faster” claim or the historical 6× claim.
+
+The single-node insertion fast path removes one renderer-created
+`DocumentFragment` and its `append()` call for each newly committed text node.
+Compared with the previous retained `4c0f0b9` matrix, the `create` median is
+lower by 5% in Chromium (1.2083 to 1.1472 ms/op), 6% in Firefox (2.0417 to
+1.9167 ms/op), and 15% in WebKit (1.7083 to 1.4583 ms/op). These are separate
+benchmark runs, so the distributions remain the evidence; the percentages are
+not a browser-independent speedup claim.
 
 ## Interpretation and limits
 
