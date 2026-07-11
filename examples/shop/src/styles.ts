@@ -357,6 +357,20 @@ export const shopStyles = css`
     .product-story dt { color: var(--shop-muted); font-size: 12px; }
     .product-story dd { margin: 4px 0 0; }
     .paired-product .product-card { display: block; border: 1px solid var(--shop-rule); }
+    .checkout-page { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: clamp(40px, 8vw, 130px); padding: clamp(42px, 7vw, 100px) var(--shop-gutter); }
+    .checkout-page h1, .order-confirmation h1, .checkout-empty h1 { font-size: clamp(42px, 7vw, 92px); line-height: .94; letter-spacing: -.055em; }
+    .checkout-page form { display: grid; gap: 18px; max-width: 720px; margin-top: 42px; }
+    .checkout-page label { display: grid; gap: 7px; font-size: 12px; }
+    .checkout-page input { min-height: 52px; padding: 0 14px; border: 1px solid var(--shop-rule); background: white; }
+    .checkout-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px; }
+    .place-order { width: 100%; margin-top: 12px; }
+    .order-summary { align-self: start; padding: 28px; border: 1px solid var(--shop-rule); }
+    .order-summary h2 { margin-bottom: 24px; font-size: 22px; }
+    .order-summary > div, .order-summary footer { display: flex; justify-content: space-between; gap: 20px; padding: 15px 0; border-top: 1px solid var(--shop-rule); }
+    .order-summary footer { margin-top: 12px; border-color: var(--shop-black); font-size: 20px; }
+    .order-confirmation, .checkout-empty { min-height: 65vh; padding: clamp(54px, 9vw, 130px) var(--shop-gutter); }
+    .order-confirmation > p { max-width: 620px; margin-top: 22px; font-size: 18px; }
+    .order-total { display: block; margin: 30px 0; font-size: 28px; }
     .paired-product .product-copy strong { font-size: 19px; }
 
     .not-found { display: grid; place-items: start; align-content: center; min-height: 70vh; padding: 70px var(--shop-gutter); }
@@ -455,6 +469,9 @@ export const shopStyles = css`
 
       .bag-line { grid-template-columns: 90px 1fr; padding: 18px; }
       .bag-line > img { width: 90px; }
+      .checkout-page { grid-template-columns: 1fr; padding-top: 36px; }
+      .checkout-row { grid-template-columns: 1fr; }
+      .order-summary { order: -1; }
     }
 
     @media (max-width: 390px) {

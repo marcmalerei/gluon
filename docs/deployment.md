@@ -18,7 +18,8 @@ under `examples/shop/dist-static`.
 `generateStaticSite()` accepts explicit public URLs, an asset manifest, and the
 same `renderShopRequest()` used for dynamic requests. GLUON GOODS prerenders
 home, catalog, Orbit Lamp, shipping, and returns. `gluon-static.json` records
-those pages and `/products/:slug` as a dynamic fallback. Hosts serve generated
+those pages and `/products/:slug`, `/checkout`, and `/orders/:id` as dynamic
+stateful fallbacks. Hosts serve generated
 `index.html` files at their recorded URLs and immutable hashed `/assets/` files.
 
 Generated documents contain resource hints, the module entry, SSR state, and

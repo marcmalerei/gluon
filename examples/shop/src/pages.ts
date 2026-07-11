@@ -1,5 +1,5 @@
 import { Suspense, html, repeat, type AsyncLoadContext, type TemplateValue } from '@gluonjs/core';
-import { RouterLink, useRoute } from '@gluonjs/router';
+import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
   findProduct,
@@ -144,6 +144,45 @@ export function ReturnsPage(_store: ShopStore): TemplateValue {
     'Returns',
     'Unused objects can be returned within 30 days. Start with a message to hello@example.com and we will provide the closest return route.',
   );
+}
+
+export function CheckoutPage(store: ShopStore): TemplateValue {
+  const router = useRouter();
+  if (store.bag.length === 0) return html`
+    <section class="checkout-empty"><h1>Your bag is empty.</h1>
+      ${RouterLink({ to: '/shop', children: 'Return to the collection', attributes: { class: 'primary-button' } })}
+    </section>`;
+  const field = (name: keyof typeof store.checkout, label: string, type = 'text') => html`
+    <label><span>${label}</span><input name=${name} type=${type} required .value=${store.checkout[name]}
+      @input=${(event: Event) => store.updateCheckout(name, (event.currentTarget as HTMLInputElement).value)}></label>`;
+  return html`
+    <section class="checkout-page" aria-labelledby="checkout-title">
+      <div><p class="eyebrow">Secure checkout</p><h1 id="checkout-title">Delivery details</h1>
+        <form @submit=${(event: Event) => {
+          event.preventDefault();
+          const order = store.placeOrder();
+          void router.push(`/orders/${encodeURIComponent(order.id)}`);
+        }}>
+          ${field('email', 'Email', 'email')}${field('name', 'Full name')}${field('address', 'Address')}
+          <div class="checkout-row">${field('postalCode', 'Postal code')}${field('city', 'City')}</div>
+          <button class="primary-button place-order" type="submit">Place order — ${formatPrice(store.bagTotal)}</button>
+        </form>
+      </div>
+      <aside class="order-summary" aria-label="Order summary"><h2>Order summary</h2>
+        ${repeat(store.bag, (line) => line.key, (line) => html`<div><span>${line.quantity} × ${line.product.name}</span><strong>${formatPrice(line.product.price * line.quantity)}</strong></div>`)}
+        <footer><span>Total</span><strong>${formatPrice(store.bagTotal)}</strong></footer>
+      </aside>
+    </section>`;
+}
+
+export function OrderConfirmationPage(store: ShopStore): TemplateValue {
+  const route = useRoute();
+  const order = store.order;
+  if (!order || route.params.id !== order.id) return NotFoundPage(store);
+  return html`<section class="order-confirmation"><p class="eyebrow">Order confirmed</p>
+    <h1>Thank you, your objects are reserved.</h1><p>Order <strong>${order.id}</strong> is confirmed.</p>
+    <p>We sent the delivery details to ${order.email}.</p><strong class="order-total">${formatPrice(order.total)}</strong>
+    ${RouterLink({ to: '/shop', children: 'Continue shopping', attributes: { class: 'primary-button' } })}</section>`;
 }
 
 function ProductGallery(product: Product): TemplateValue {

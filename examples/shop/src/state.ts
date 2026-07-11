@@ -14,6 +14,13 @@ export interface BagLine {
   quantity: number;
 }
 
+export interface ShopOrder {
+  readonly id: string;
+  readonly lines: readonly BagLine[];
+  readonly total: number;
+  readonly email: string;
+}
+
 const defaultConfiguration = (): ProductConfiguration => ({
   finish: 'Cobalt',
   temperature: 'Warm 2700K',
@@ -27,6 +34,8 @@ export const shopStoreDefinition = defineStore('shop', () => ({
   searchQuery: '',
   configuration: defaultConfiguration(),
   bag: [] as BagLine[],
+  checkout: { email: '', name: '', address: '', city: '', postalCode: '' },
+  order: null as ShopOrder | null,
 }), {
   getters: (state) => ({
     bagCount: state.bag.reduce((total, line) => total + line.quantity, 0),
@@ -61,6 +70,22 @@ export const shopStoreDefinition = defineStore('shop', () => ({
     removeFromBag(key: string): void {
       const index = store.bag.findIndex((line) => line.key === key);
       if (index >= 0) store.bag.splice(index, 1);
+    },
+    updateCheckout(field: keyof typeof store.checkout, value: string): void {
+      store.checkout[field] = value;
+    },
+    placeOrder(): ShopOrder {
+      if (store.bag.length === 0) throw new Error('An order requires at least one bag line.');
+      const order: ShopOrder = {
+        id: `GG-${String(store.bagCount).padStart(2, '0')}-${String(store.bagTotal)}`,
+        lines: store.bag.map((line) => ({ ...line, configuration: { ...line.configuration } })),
+        total: store.bagTotal,
+        email: store.checkout.email,
+      };
+      store.order = order;
+      store.bag = [];
+      store.bagOpen = false;
+      return order;
     },
   }),
   persist: { paths: ['bag'] },

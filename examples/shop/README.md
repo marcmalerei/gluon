@@ -14,6 +14,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - a realistic product catalog and product-detail surface
 - keyboard-operable product configuration
 - a reactive bag with configured line items and quantities
+- a labeled checkout form, exact order summary, and URL-addressable confirmation
 - one isolated Store manager per shop application and persisted configured bag lines
 - abortable product availability with explicit loading, error, timeout, and retry UI
 - cached route views across back/forward traversal
@@ -36,7 +37,8 @@ the product flow.
 
 The production pipeline emits hashed client assets and `gluon-assets.json`, a
 Vite SSR request bundle, and five route-aware static documents with one recorded
-dynamic product fallback. See [static and server deployment](../../docs/deployment.md).
+dynamic product family plus stateful checkout and order fallbacks. See [static
+and server deployment](../../docs/deployment.md).
 
 ## Run
 
@@ -88,12 +90,18 @@ maintained in [FEATURES.md](FEATURES.md). `npm run check:shop-boundaries`
 rejects private or undeclared package imports and `<style>` fallback paths in
 shop source.
 
+The checkout acceptance flow was verified at 390px from product through bag,
+labeled delivery fields, order submission, and confirmation. At 320px the
+confirmation has no horizontal overflow and every visible link/button remains
+at least 44px high. This frontend confirmation does not claim payment-provider
+or fulfillment integration.
+
 ## Reproducible bundle evidence
 
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
-is 116,909 bytes raw and 33,371 bytes gzip. The five WebP product/editorial assets total 155,126
+is 137,169 bytes raw and 40,088 bytes gzip. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

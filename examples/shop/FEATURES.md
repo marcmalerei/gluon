@@ -9,6 +9,7 @@
 | Adopted stylesheets | Complete responsive shop presentation | Shop browser test + visual QA | Integrated |
 | Native dialog and control accessibility | Search, mobile menu, product choices, and bag | `tests/shop-example.spec.ts` + 390px/320px browser QA | Integrated |
 | Official Store | Per-app bag state, configured line items, persisted bag, derived totals | Store Node/type suites + `tests/shop-example.spec.ts` | Integrated |
+| Store actions + Router forms | Labeled delivery checkout, order summary, atomic order placement, and confirmation URL | Desktop/mobile shop flow + Store snapshot and browser assertions | Integrated purchase path |
 | `Suspense` and async component contract | Abortable product availability loading, explicit pending/error/retry states | Built-ins browser suite + `tests/shop-example.spec.ts` | Integrated |
 | `Teleport` and `Transition` | Application-owned, animated accessible bag overlay | Built-ins context/cleanup suite + shop browser test | Integrated |
 | `KeepAlive` | Route view retention across product back/forward traversal | Built-ins LRU suite + shop node-identity assertion | Integrated |

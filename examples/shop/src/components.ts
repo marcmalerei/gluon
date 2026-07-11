@@ -178,7 +178,7 @@ function BagDrawer(store: ShopStore): TemplateValue {
           <footer class="bag-summary">
             <div><span>Subtotal</span><strong>${formatPrice(store.bagTotal)}</strong></div>
             <p>Shipping calculated at checkout.</p>
-            ${RouterLink({ to: '/shop', children: 'Continue shopping', attributes: { class: 'primary-button' } })}
+            ${RouterLink({ to: '/checkout', children: 'Checkout', attributes: { class: 'primary-button' } })}
           </footer>
         `}
       </aside>
