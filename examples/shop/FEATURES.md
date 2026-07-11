@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | Application runtime and plugin context | Isolated shop mount and Router plugin | `tests/shop-example.spec.ts` | Integrated |
 | HTML templates and attribute spreading | Every page and reusable control | Core renderer suite + shop browser test | Integrated |
-| Core `render()` single-node insertion | Dynamic product, bag, delivery, and order text throughout the existing customer journey | Direct-vs-fragment DOM regression + retained 40-sample Chromium comparison + shop performance budgets | Integrated renderer optimization |
+| Core `render()` single-node insertion and single-pass binding instantiation | Dynamic product, bag, delivery, and order templates throughout the existing customer journey | Direct-vs-fragment and parser-reordered traversal regressions + retained rendering comparison + shop performance budgets | Integrated renderer optimization |
 | Standalone reactivity | Bag, configuration, search, and navigation UI state | `tests/shop-example.spec.ts` | Integrated |
 | Router histories and links | Home, catalog, product deep links, active navigation | Router suite + shop browser test | Integrated |
 | Adopted stylesheets | Complete responsive shop presentation | Shop browser test + visual QA | Integrated |
