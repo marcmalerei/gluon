@@ -287,9 +287,13 @@ the iterable and validates every `PropertyKey` before producing a
 `RepeatResult`. Missing (`null` or `undefined`) and duplicate keys throw before
 the result reaches `render()`. Each accepted key owns a child `NodePart` and an
 internal marker. Reconciliation updates surviving Parts and moves their marker
-and rendered node group into the requested order. It disconnects only keys that
-do not survive. Consequently, a surviving template or Custom Element keeps its
-DOM identity, binding state, and local element state across prepend, append,
+and rendered node group into the requested order. The generic path trims equal
+keyed heads and tails before allocating its middle lookup, retains the longest
+contiguous run whose rendered nodes did not change, and moves only groups
+outside that run. If renderer-owned nodes were changed externally, it falls
+back to the ordinary recovery path. It disconnects only keys that do not
+survive. Consequently, a surviving template or Custom Element keeps its DOM
+identity, binding state, and local element state across prepend, append,
 reverse, sort, and arbitrary moves.
 
 A changed key has no identity relationship to the previous key. Reconciliation
@@ -393,6 +397,8 @@ and stylesheet adoption.
 `npm run benchmark:keyed` provides three Gluon-only Chromium scenarios with
 1,000 rows: full reverse, a 100-row block move, and a 100-row replacement
 window. It is a repeatable regression harness, not a comparative benchmark.
+The retained issue #95 comparison and its interpretation are recorded in
+[`performance.md`](performance.md).
 
 `npm run benchmark:rendering` production-builds a separate comparison surface
 with Gluon, Lit, Vue, and optimized Vanilla DOM implementations. It validates
