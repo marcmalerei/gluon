@@ -109,6 +109,68 @@ describe('keyed list renderer conformance', () => {
     expect(moved.textContent?.trim()).toBe('Bee');
   });
 
+  it('moves only displaced keyed groups around the longest stable run', () => {
+    const root = document.createElement('div');
+    const view = (ids: readonly string[]) => html`<ol>${repeat(
+      ids,
+      (id) => id,
+      (id) => html`<li data-id=${id}>${id}</li><li data-detail=${id}>detail</li>`,
+    )}</ol>`;
+    const ids = ['a', 'b', 'c', 'd', 'e'];
+    render(view(ids), root);
+
+    const list = root.querySelector('ol')!;
+    const identities = new Map(
+      [...list.children].map((item) => [
+        item.getAttribute('data-id') ?? `detail:${item.getAttribute('data-detail')}`,
+        item,
+      ]),
+    );
+    const insertBefore = vi.spyOn(list, 'insertBefore');
+
+    render(view([...ids.slice(2), ...ids.slice(0, 2)]), root);
+
+    expect(insertBefore).toHaveBeenCalledTimes(4);
+    expect([...list.querySelectorAll('[data-id]')].map((item) => item.getAttribute('data-id'))).toEqual([
+      'c', 'd', 'e', 'a', 'b',
+    ]);
+    for (const [key, item] of identities) {
+      const selector = key.startsWith('detail:')
+        ? `[data-detail="${key.slice(7)}"]`
+        : `[data-id="${key}"]`;
+      expect(list.querySelector(selector)).toBe(item);
+    }
+  });
+
+  it('inserts only the new keyed groups for a bounded replacement window', () => {
+    const root = document.createElement('div');
+    const ids = Array.from({ length: 10 }, (_, index) => String(index));
+    const view = (values: readonly string[]) => html`<ol>${repeat(
+      values,
+      (id) => id,
+      (id) => html`<li data-id=${id}>${id}</li>`,
+    )}</ol>`;
+    render(view(ids), root);
+
+    const list = root.querySelector('ol')!;
+    const survivors = new Map(
+      [...list.children].slice(2).map((item) => [item.getAttribute('data-id'), item]),
+    );
+    const insertBefore = vi.spyOn(list, 'insertBefore');
+
+    render(view([...ids.slice(2), 'new-a', 'new-b']), root);
+
+    expect(insertBefore).toHaveBeenCalledTimes(2);
+    expect([...list.children].map((item) => item.getAttribute('data-id'))).toEqual([
+      ...ids.slice(2),
+      'new-a',
+      'new-b',
+    ]);
+    for (const [id, item] of survivors) {
+      expect(list.querySelector(`[data-id="${id}"]`)).toBe(item);
+    }
+  });
+
   it('cleans a removed keyed child exactly once without cleaning moved survivors', () => {
     const root = document.createElement('div');
     const firstRef = vi.fn<(element: Element | undefined) => void>();

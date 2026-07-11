@@ -327,6 +327,12 @@ interface KeyedChild {
   binding?: Binding;
 }
 
+interface PreviousKeyedChild {
+  readonly child: KeyedChild;
+  readonly index: number;
+  readonly nodes: readonly Node[];
+}
+
 const emptyPartChildren: Array<PartChild | undefined> = [];
 const emptyKeyedChildren: KeyedChild[] = [];
 
@@ -638,40 +644,102 @@ class NodePart implements Part {
       return;
     }
 
-    const previousByKey = new Map(
-      this.keyedChildren.map((child) => [child.key, child] as const),
-    );
-    const nextKeys = new Set(keys);
-    const nextChildren: KeyedChild[] = [];
+    const previousChildren = this.keyedChildren;
+    const previousNodes = this.nodes;
+    const parent = this.marker.parentNode;
+    const nodesInPlace = Boolean(parent && nodesAreInPlace(this.marker, previousNodes));
+    const boundary = nodesInPlace && previousNodes.length > 0
+      ? previousNodes[previousNodes.length - 1]!.nextSibling
+      : this.marker.nextSibling;
+    const nextChildren = new Array<KeyedChild>(keys.length);
+    const reused = new Array<PreviousKeyedChild | undefined>(keys.length);
     const nextNodes: Node[] = [];
 
-    for (const [key, removed] of previousByKey) {
-      if (!nextKeys.has(key)) {
-        if (removed.binding) disconnectBindings([removed.binding]);
-        else removed.part.disconnect();
-        previousByKey.delete(key);
-      }
+    let start = 0;
+    let previousEnd = previousChildren.length;
+    let nextEnd = keys.length;
+
+    while (start < previousEnd && start < nextEnd && previousChildren[start]!.key === keys[start]) {
+      const child = previousChildren[start]!;
+      reused[start] = { child, index: start, nodes: child.part.nodes };
+      this.updateKeyedChild(child, values[start]!, true);
+      nextChildren[start] = child;
+      start += 1;
     }
 
-    for (let index = 0; index < keys.length; index += 1) {
+    while (
+      start < previousEnd
+      && start < nextEnd
+      && previousChildren[previousEnd - 1]!.key === keys[nextEnd - 1]
+    ) {
+      previousEnd -= 1;
+      nextEnd -= 1;
+      const child = previousChildren[previousEnd]!;
+      reused[nextEnd] = { child, index: previousEnd, nodes: child.part.nodes };
+      this.updateKeyedChild(child, values[nextEnd]!, true);
+      nextChildren[nextEnd] = child;
+    }
+
+    const previousByKey = new Map<Key, PreviousKeyedChild>();
+    for (let index = start; index < previousEnd; index += 1) {
+      const child = previousChildren[index]!;
+      previousByKey.set(child.key, { child, index, nodes: child.part.nodes });
+    }
+
+    const nextMiddleKeys = new Set<Key>();
+    for (let index = start; index < nextEnd; index += 1) nextMiddleKeys.add(keys[index]!);
+    for (const [key, { child: removed }] of previousByKey) {
+      if (nextMiddleKeys.has(key)) continue;
+      if (removed.binding) disconnectBindings([removed.binding]);
+      else removed.part.disconnect();
+      previousByKey.delete(key);
+    }
+
+    for (let index = start; index < nextEnd; index += 1) {
       const key = keys[index]!;
       const value = values[index]!;
       const previous = previousByKey.get(key);
-      const child = previous ?? this.createKeyedChild(key, value);
+      const child = previous?.child ?? this.createKeyedChild(key, value);
 
       if (previous) {
         previousByKey.delete(key);
+        reused[index] = previous;
         this.updateKeyedChild(child, value, true);
       }
 
-      nextChildren.push(child);
-      nextNodes.push(...child.part.nodes);
+      nextChildren[index] = child;
     }
 
+    const nextNodeGroups = nextChildren.map((child) => child.part.nodes);
+    for (const nodes of nextNodeGroups) nextNodes.push(...nodes);
     this.keyedChildren = nextChildren;
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
-    this.replaceNodes(nextNodes);
+    if (!parent || !nodesInPlace) {
+      this.replaceNodes(nextNodes);
+      return;
+    }
+
+    const stable = longestStableKeyedRun(nextNodeGroups, reused);
+    const keep = new Set(nextNodes);
+    for (const node of previousNodes) {
+      if (!keep.has(node) && node.parentNode === parent) parent.removeChild(node);
+    }
+
+    if (stable.length === 0) {
+      moveKeyedNodeGroupsBefore(parent, nextNodeGroups, 0, nextNodeGroups.length, boundary);
+    } else {
+      const stableFirst = nextNodeGroups[stable.start]![0]!;
+      moveKeyedNodeGroupsBefore(parent, nextNodeGroups, 0, stable.start, stableFirst);
+      moveKeyedNodeGroupsBefore(
+        parent,
+        nextNodeGroups,
+        stable.start + stable.length,
+        nextNodeGroups.length,
+        boundary,
+      );
+    }
+    this.nodes = nextNodes;
   }
 
   private updateKeyedInOrder(keys: readonly Key[], values: readonly TemplateValue[]): void {
@@ -2107,6 +2175,81 @@ function nodesAreInPlace(marker: Comment, nodes: readonly Node[]): boolean {
 
 function moveNodesBefore(parent: Node, nodes: readonly Node[], reference: Node | null): void {
   for (const node of nodes) parent.insertBefore(node, reference);
+}
+
+function longestStableKeyedRun(
+  nextNodeGroups: readonly (readonly Node[])[],
+  reused: readonly (PreviousKeyedChild | undefined)[],
+): { readonly start: number; readonly length: number } {
+  let longestStart = 0;
+  let longestLength = 0;
+  let currentStart = 0;
+  let currentLength = 0;
+  let previousIndex = -2;
+
+  for (let index = 0; index < reused.length; index += 1) {
+    const previous = reused[index];
+    const nodes = nextNodeGroups[index]!;
+    const stable = Boolean(
+      previous
+      && nodes.length > 0
+      && sameNodes(previous.nodes, nodes),
+    );
+    if (stable && previous!.index === previousIndex + 1) {
+      currentLength += 1;
+    } else if (stable) {
+      currentStart = index;
+      currentLength = 1;
+    } else {
+      currentLength = 0;
+    }
+    previousIndex = stable ? previous!.index : -2;
+    if (currentLength > longestLength) {
+      longestStart = currentStart;
+      longestLength = currentLength;
+    }
+  }
+
+  return { start: longestStart, length: longestLength };
+}
+
+function sameNodes(left: readonly Node[], right: readonly Node[]): boolean {
+  if (left === right) return true;
+  if (left.length !== right.length) return false;
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]) return false;
+  }
+  return true;
+}
+
+function moveKeyedNodeGroupsBefore(
+  parent: Node,
+  groups: readonly (readonly Node[])[],
+  start: number,
+  end: number,
+  boundary: Node | null,
+): void {
+  let reference = boundary;
+  for (let index = end - 1; index >= start; index -= 1) {
+    const nodes = groups[index]!;
+    if (nodes.length === 0) continue;
+    if (!nodesAreImmediatelyBefore(parent, nodes, reference)) {
+      moveNodesBefore(parent, nodes, reference);
+    }
+    reference = nodes[0]!;
+  }
+}
+
+function nodesAreImmediatelyBefore(
+  parent: Node,
+  nodes: readonly Node[],
+  reference: Node | null,
+): boolean {
+  if (nodes[0]?.parentNode !== parent) return false;
+  for (let index = 1; index < nodes.length; index += 1) {
+    if (nodes[index - 1]!.nextSibling !== nodes[index]) return false;
+  }
+  return nodes[nodes.length - 1]!.nextSibling === reference;
 }
 
 function collectNodesUntil(marker: Comment, boundary: Node | null): Node[] {
