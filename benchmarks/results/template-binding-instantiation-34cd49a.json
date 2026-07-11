@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-11T17:29:36.937Z",
+  "source": {
+    "commit": "34cd49a0e47c310457d6098b59855759e333b97f",
+    "workingTreeDirty": false
+  },
+  "browser": {
+    "name": "chromium",
+    "version": "149.0.7827.55"
+  },
+  "method": {
+    "productionBuild": true,
+    "samplingIntervalMicroseconds": 100,
+    "benchmarkSamples": 10,
+    "warmupRounds": 4,
+    "workloads": [
+      "text",
+      "create",
+      "update",
+      "reverse"
+    ]
+  },
+  "totalProfileNodes": 1116,
+  "walkPathSelfSamples": 0,
+  "childNodesItemSelfSamples": 0,
+  "treeWalkerNextNodeSelfSamples": 402,
+  "topFunctions": [
+    {
+      "name": "insertBefore",
+      "selfSamples": 5963
+    },
+    {
+      "name": "run",
+      "selfSamples": 4250
+    },
+    {
+      "name": "setElementText",
+      "selfSamples": 3553
+    },
+    {
+      "name": "(garbage collector)",
+      "selfSamples": 1891
+    },
+    {
+      "name": "_",
+      "selfSamples": 1667
+    },
+    {
+      "name": "append",
+      "selfSamples": 1640
+    },
+    {
+      "name": "setStringValue",
+      "selfSamples": 1235
+    },
+    {
+      "name": "Oc",
+      "selfSamples": 1057
+    },
+    {
+      "name": "importNode",
+      "selfSamples": 1051
+    },
+    {
+      "name": "setAttribute",
+      "selfSamples": 987
+    },
+    {
+      "name": "ye",
+      "selfSamples": 939
+    },
+    {
+      "name": "te",
+      "selfSamples": 855
+    },
+    {
+      "name": "me",
+      "selfSamples": 672
+    },
+    {
+      "name": "(anonymous)",
+      "selfSamples": 594
+    },
+    {
+      "name": "$t",
+      "selfSamples": 592
+    },
+    {
+      "name": "et",
+      "selfSamples": 543
+    },
+    {
+      "name": "createElement",
+      "selfSamples": 494
+    },
+    {
+      "name": "replaceNodes",
+      "selfSamples": 474
+    },
+    {
+      "name": "ie",
+      "selfSamples": 452
+    },
+    {
+      "name": "fe",
+      "selfSamples": 431
+    },
+    {
+      "name": "nextNode",
+      "selfSamples": 402
+    },
+    {
+      "name": "h",
+      "selfSamples": 381
+    },
+    {
+      "name": "Ec",
+      "selfSamples": 372
+    },
+    {
+      "name": "Uo",
+      "selfSamples": 364
+    },
+    {
+      "name": "u",
+      "selfSamples": 352
+    },
+    {
+      "name": "p",
+      "selfSamples": 350
+    },
+    {
+      "name": "_$AI",
+      "selfSamples": 347
+    },
+    {
+      "name": "setValue",
+      "selfSamples": 318
+    },
+    {
+      "name": "createTextNode",
+      "selfSamples": 304
+    },
+    {
+      "name": "Ze",
+      "selfSamples": 294
+    },
+    {
+      "name": "S",
+      "selfSamples": 292
+    },
+    {
+      "name": "C",
+      "selfSamples": 288
+    },
+    {
+      "name": "oe",
+      "selfSamples": 287
+    },
+    {
+      "name": "vt",
+      "selfSamples": 276
+    },
+    {
+      "name": "(program)",
+      "selfSamples": 268
+    },
+    {
+      "name": "es",
+      "selfSamples": 257
+    },
+    {
+      "name": "setTemplate",
+      "selfSamples": 251
+    },
+    {
+      "name": "Tc",
+      "selfSamples": 250
+    },
+    {
+      "name": "Dc",
+      "selfSamples": 233
+    },
+    {
+      "name": "createComment",
+      "selfSamples": 223
+    },
+    {
+      "name": "qo",
+      "selfSamples": 213
+    },
+    {
+      "name": "v",
+      "selfSamples": 205
+    },
+    {
+      "name": "setKeyed",
+      "selfSamples": 192
+    },
+    {
+      "name": "It",
+      "selfSamples": 187
+    },
+    {
+      "name": "so",
+      "selfSamples": 187
+    },
+    {
+      "name": "Jo",
+      "selfSamples": 186
+    },
+    {
+      "name": "en",
+      "selfSamples": 166
+    },
+    {
+      "name": "O",
+      "selfSamples": 162
+    },
+    {
+      "name": "update",
+      "selfSamples": 158
+    },
+    {
+      "name": "_$AS",
+      "selfSamples": 138
+    }
+  ]
+}

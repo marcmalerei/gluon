@@ -93,6 +93,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Empty Core node parts insert a single new node directly while preserving
   fragment batching for multi-node commits, with DOM regression coverage and
   retained before/after rendering evidence.
+- Cloned Core templates instantiate all element/comment bindings in one DOM
+  traversal while preserving expression-index and hydration-marker order.
 - Renamed the private root package from the occupied unscoped name `gluon` to
   the planned scoped name `@gluonjs/core`.
 - Renderer hot paths now specialize stable string bindings, precompute binding

@@ -1396,7 +1396,9 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   markup += result.strings[result.strings.length - 1] ?? '';
   element.innerHTML = markup;
   const descriptors = buildDescriptors(element.content, attributeNames);
-  const traversalDescriptors = [...descriptors];
+  const traversalDescriptors = [...descriptors].sort(
+    (left, right) => left.traversalIndex - right.traversalIndex || left.index - right.index,
+  );
   const expressionCount = result.strings.length - 1;
 
   if (descriptors.length !== expressionCount) {
@@ -1478,9 +1480,9 @@ function instantiateBindings(
   walker.currentNode = root;
   let node = walker.nextNode();
   let traversalIndex = 0;
+
   try {
-    for (let descriptorIndex = 0; descriptorIndex < descriptors.length; descriptorIndex += 1) {
-      const descriptor = descriptors[descriptorIndex]!;
+    for (const descriptor of descriptors) {
       while (node && traversalIndex < descriptor.traversalIndex) {
         node = walker.nextNode();
         traversalIndex += 1;
@@ -1494,7 +1496,7 @@ function instantiateBindings(
       else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
       else part = new AttributePart(node as Element, descriptor.name);
 
-      bindings[descriptorIndex] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
+      bindings[descriptor.index] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
     }
   } finally {
     walker.currentNode = document;
