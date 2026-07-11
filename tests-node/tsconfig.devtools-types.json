@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "noEmit": true, "paths": {
+    "@gluonjs/core": ["src/index.ts"],
+    "@gluonjs/devtools-api": ["packages/devtools-api/dist/index.d.ts"]
+  } },
+  "include": ["devtools.types.ts"]
+}
