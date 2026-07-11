@@ -13,7 +13,8 @@ non-interactive defaults. Available feature switches are `--[no-]router`,
 Router and Store; explicitly combining `--ssr` with `--no-router` or
 `--no-store` fails before files are written.
 
-Every selection includes TypeScript, Vite, typecheck, test, and build scripts.
+Every selection includes TypeScript, Vite, typecheck, template-check, test, and build scripts.
+`npm run check:templates` runs the same diagnostics exposed by the Gluon editor service.
 `--ui` uses the current public `@gluonjs/core/atoms` boundary. `--testing` adds
 the official browser fixture utilities and a Playwright-backed Vitest test.
 `--ssr` adds one request-isolated server entry plus hydration. All Gluon

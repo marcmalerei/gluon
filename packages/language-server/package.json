@@ -1,0 +1,22 @@
+{
+  "name": "@gluonjs/language-server",
+  "version": "0.0.0",
+  "description": "Gluon template language service, LSP server, and CI checker.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/marcmalerei/gluon.git", "directory": "packages/language-server" },
+  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/language-server#readme",
+  "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
+  "engines": { "node": "^22.12.0 || ^24.0.0" },
+  "sideEffects": false,
+  "bin": {
+    "gluon-language-server": "./dist/server-cli.js",
+    "gluon-template-check": "./dist/check-cli.js"
+  },
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
+  "publishConfig": { "access": "public", "provenance": true },
+  "dependencies": { "@gluonjs/compiler": "0.0.0", "typescript": "^5.7.0" },
+  "scripts": { "build": "tsc -p tsconfig.build.json", "typecheck": "tsc -p tsconfig.json --noEmit" }
+}
