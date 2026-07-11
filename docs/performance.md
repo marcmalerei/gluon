@@ -4,10 +4,12 @@ Gluon's comparative rendering benchmark measures the current repository source
 against pinned Lit, Vue, and optimized Vanilla DOM implementations. It exists to
 produce inspectable evidence, not to guarantee that one renderer wins.
 
-The runtime's measured hot paths include a direct string-binding update,
-precomputed binding priorities, and a keyed-list fast path when key order is
-unchanged. These shortcuts retain the external-DOM recovery and keyed-identity
-contracts covered by the browser suite.
+The runtime's measured hot paths include direct string-binding updates,
+precomputed binding priorities, parallel key/value storage for keyed repeats,
+detached keyed-child anchors, batched initial insertion, and keyed-list fast
+paths for unchanged and reversed order. These shortcuts retain the
+external-DOM recovery and keyed-identity contracts covered by the browser
+suite.
 
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
