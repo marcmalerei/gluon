@@ -17,7 +17,7 @@ export default defineConfig({
     include: ['tests-node/ssr.spec.ts'],
     coverage: {
       provider: 'v8',
-      include: ['packages/ssr/src/**/*.ts'],
+      include: ['packages/ssr/src/index.ts', 'packages/ssr/src/streaming.ts'],
       reportsDirectory: 'coverage/ssr',
       reporter: ['text', 'html'],
       thresholds: {

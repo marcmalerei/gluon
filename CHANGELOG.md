@@ -9,6 +9,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Identity-preserving SSR hydration with actionable mismatch diagnostics,
+  request snapshot restoration, Declarative Shadow DOM upgrade coordination,
+  and abortable nested progressive streaming in `@gluonjs/ssr`.
+
 - A standalone, DOM-free `@gluonjs/reactivity` package with refs, deep and
   shallow object and collection proxies, effects, computed values, dependency
   debugging hooks, Node tests, and declaration contract tests.

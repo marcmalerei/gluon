@@ -61,7 +61,7 @@
       "directory": "packages/ssr",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./streaming"],
+      "exports": [".", "./hydration", "./streaming"],
       "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/store"]
     },
     {

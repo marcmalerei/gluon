@@ -213,7 +213,8 @@ behavior. Teleport retains application context and cleans its external host.
 KeepAlive suspends cached renderer resources and evicts least-recently-used
 entries. Transition and TransitionGroup cancel stale Web Animations and honor
 reduced-motion preferences. A public DOM-free descriptor is available to the
-future server renderer. See [Async UI and rendering built-ins](docs/async-ui.md).
+server renderer and progressive boundary coordinator. See [Async UI and
+rendering built-ins](docs/async-ui.md).
 
 ## Black-box test utilities
 
@@ -277,8 +278,11 @@ const response = await renderRequest({
 
 Dynamic content and state are safely escaped; event bindings and browser
 lifecycle do not run. See the [`@gluonjs/ssr` guide](packages/ssr/README.md).
-Hydration/incremental streaming and style manifests remain scoped to #36 and
-#37 respectively.
+`@gluonjs/ssr/hydration` retains matching DOM while restoring events, refs,
+context, Router, and Store state; categorized mismatches either recover with one
+root render or abort before mutation. `@gluonjs/ssr/streaming` emits fallback
+shells and nested abortable boundary patches. See [the hydration and streaming
+contract](docs/hydration.md). Production style and asset manifests remain #37.
 
 ## Bindings and spreading
 

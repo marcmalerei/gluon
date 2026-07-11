@@ -12,7 +12,10 @@ export default defineConfig({
     alias: {
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
       '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
+      '@gluonjs/router/memory': resolve(repositoryRoot, 'packages/router/src/memory.ts'),
       '@gluonjs/router': resolve(repositoryRoot, 'packages/router/src/index.ts'),
+      '@gluonjs/ssr/hydration': resolve(repositoryRoot, 'packages/ssr/src/hydration.ts'),
+      '@gluonjs/ssr': resolve(repositoryRoot, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(repositoryRoot, 'packages/store/src/index.ts'),
     },
   },

@@ -21,13 +21,15 @@ import {
 import { defineStore } from '@gluonjs/store';
 import {
   SsrRenderError,
+  prepareForHydration,
   renderElement,
   renderRequest,
+  renderProgressively,
   renderToChunks,
   renderToString,
   serializeSsrState,
 } from '@gluonjs/ssr';
-import { renderToReadableStream } from '@gluonjs/ssr/streaming';
+import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -57,19 +59,21 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       </section>
     `;
     const rendered = await renderToString(value);
-    expect(rendered).toContain('title="A &amp; &quot;B&quot;"');
-    expect(rendered).toContain('value="field"');
-    expect(rendered).not.toContain('hidden=');
-    expect(rendered).not.toContain('@click');
-    expect(rendered).toContain('class="card active"');
-    expect(rendered).toContain('style="background-color:red;opacity:0.5"');
-    expect(rendered).toContain('data-item-id="4"');
-    expect(rendered).toContain('aria-label="Card"');
-    expect(rendered).toContain('disabled');
-    expect(rendered).toContain('&lt;unsafe&gt;');
-    expect(rendered).toContain('<b>1</b><b>2</b>');
-    expect(rendered).toContain('<em>trusted</em>');
-    expect(rendered).toContain('<svg viewBox="0 0 1 1"><path d="M0 0"></path></svg>');
+    const visible = withoutHydrationMarkers(rendered);
+    expect(visible).toContain('title="A &amp; &quot;B&quot;"');
+    expect(visible).toContain('value="field"');
+    expect(visible).not.toContain('hidden=');
+    expect(visible).not.toContain('@click');
+    expect(visible).toContain('class="card active"');
+    expect(visible).toContain('style="background-color:red;opacity:0.5"');
+    expect(visible).toContain('data-item-id="4"');
+    expect(visible).toContain('aria-label="Card"');
+    expect(visible).toContain('disabled');
+    expect(visible).toContain('&lt;unsafe&gt;');
+    expect(visible).toContain('<b>1</b><b>2</b>');
+    expect(visible).toContain('<em>trusted</em>');
+    expect(visible).toContain('<svg viewBox="0 0 1 1"><path d="M0 0"></path></svg>');
+    expect(rendered).toContain('<!--gluon:h:');
     expect(click).not.toHaveBeenCalled();
   });
 
@@ -91,10 +95,10 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     await expect(renderToString(html`<p broken ${'value'}></p>`)).rejects.toEqual(expect.objectContaining({
       code: 'GLUON_SSR_INVALID_VALUE',
     }));
-    expect(await renderToString(html`${unsafeURL('https://example.test/?a=1&b=2')}`))
+    expect(withoutHydrationMarkers(await renderToString(html`${unsafeURL('https://example.test/?a=1&b=2')}`)))
       .toBe('https://example.test/?a=1&amp;b=2');
-    expect(await renderToString(html`${event(() => undefined)}`)).toBe('');
-    expect(await renderToString(html`<p title="${'quoted'}"></p>`)).toBe('<p title="quoted"></p>');
+    expect(withoutHydrationMarkers(await renderToString(html`${event(() => undefined)}`))).toBe('');
+    expect(withoutHydrationMarkers(await renderToString(html`<p title="${'quoted'}"></p>`))).toBe('<p title="quoted"></p>');
     await expect(renderToString(html`<p ...=${{ 'bad name': 'value' }}></p>`))
       .rejects.toThrow('Unsafe SSR attribute name');
     await expect(renderToString(html`<img srcset=${'safe.png 1x, data:text/html,bad 2x'}>`))
@@ -109,11 +113,12 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
         ${[null, false, undefined, true, 2n, new URL('https://example.test/path')]}
       </p>
     `);
-    expect(rendered).toContain('class="4"');
-    expect(rendered).toContain('style="color:blue"');
-    expect(rendered).not.toContain('empty=');
-    expect(rendered).not.toContain('payload=');
-    expect(rendered).toContain('true2https://example.test/path');
+    const visible = withoutHydrationMarkers(rendered);
+    expect(visible).toContain('class="4"');
+    expect(visible).toContain('style="color:blue"');
+    expect(visible).not.toContain('empty=');
+    expect(visible).not.toContain('payload=');
+    expect(visible).toContain('true2https://example.test/path');
   });
 
   it('resolves async and layout built-in server contracts without browser effects', async () => {
@@ -127,7 +132,7 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       ${KeepAlive({ cacheKey: 'page', children: html`<article>cached</article>` })}
       ${Transition({ transitionKey: 'visible', children: html`<div>stable</div>` })}
     `;
-    expect(await renderToString(value)).toContain(
+    expect(withoutHydrationMarkers(await renderToString(value))).toContain(
       '<p>ready</p>\n      <aside>teleported</aside>\n      <article>cached</article>\n      <div>stable</div>',
     );
   });
@@ -154,7 +159,7 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       properties: { name: 'Ada', details: { private: true } },
       children: html`<span>Light DOM</span>`,
     }));
-    expect(rendered).toBe(
+    expect(withoutHydrationMarkers(rendered)).toBe(
       '<server-greeting name="Ada" details="[object Object]">'
       + '<template shadowrootmode="open"><p>Hello Ada</p><slot></slot></template>'
       + '<span>Light DOM</span></server-greeting>',
@@ -172,8 +177,9 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
 describe('@gluonjs/ssr request ownership and state', () => {
   it('renders a deep GLUON GOODS product URL through public server APIs', async () => {
     const response = await renderShopRequest('/products/orbit-lamp');
-    expect(response.html).toContain('<h1 id="product-title">Orbit Lamp</h1>');
-    expect(response.html).toContain('In stock · dispatches in 2–3 days');
+    const visible = withoutHydrationMarkers(response.html);
+    expect(visible).toContain('<h1 id="product-title">Orbit Lamp</h1>');
+    expect(visible).toContain('In stock · dispatches in 2–3 days');
     expect(response.html).toContain('href="/products/stack-tray"');
     expect(response.router.location).toBe('/products/orbit-lamp');
     expect(response.store.stores.shop).toEqual(expect.objectContaining({ bag: [] }));
@@ -215,8 +221,8 @@ describe('@gluonjs/ssr request ownership and state', () => {
       createRequest('alpha', 10),
       createRequest('beta', 1),
     ]);
-    expect(first.html.trim()).toBe('<main>alpha:alpha:alpha</main>');
-    expect(second.html.trim()).toBe('<main>beta:beta:beta</main>');
+    expect(withoutHydrationMarkers(first.html).trim()).toBe('<main>alpha:alpha:alpha</main>');
+    expect(withoutHydrationMarkers(second.html).trim()).toBe('<main>beta:beta:beta</main>');
     expect(first.store.stores['request-counter']).toEqual({ value: 'alpha' });
     expect(second.store.stores['request-counter']).toEqual({ value: 'beta' });
     expect(first.router.location).toBe('/reports/alpha');
@@ -268,10 +274,10 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     const value = html`<main>${['A', html`<b>B</b>`]}</main>`;
     const chunks: string[] = [];
     for await (const chunk of renderToChunks(value)) chunks.push(chunk);
-    expect(chunks.join('')).toBe('<main>A<b>B</b></main>');
+    expect(withoutHydrationMarkers(chunks.join(''))).toBe('<main>A<b>B</b></main>');
 
     const response = new Response(renderToReadableStream(value));
-    expect(await response.text()).toBe('<main>A<b>B</b></main>');
+    expect(withoutHydrationMarkers(await response.text())).toBe('<main>A<b>B</b></main>');
   });
 
   it('cancels a readable stream without evaluating remaining chunks', async () => {
@@ -280,4 +286,68 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     expect((await reader.read()).done).toBe(false);
     await reader.cancel();
   });
+
+  it('streams nested async fallbacks and resolutions and aborts pending work', async () => {
+    const nested = Suspense({
+      source: Promise.resolve('outer'),
+      fallback: html`<p>outer loading</p>`,
+      children: (outer) => html`<section>${outer}${Suspense({
+        source: Promise.resolve('inner'),
+        fallback: html`<p>inner loading</p>`,
+        children: (inner) => html`<strong>${inner}</strong>`,
+      })}</section>`,
+    });
+    const chunks = [];
+    for await (const chunk of renderProgressively(html`<main>${nested}</main>`)) chunks.push(chunk);
+    expect(chunks.map((chunk) => chunk.kind)).toEqual(['shell', 'boundary', 'boundary']);
+    expect(withoutHydrationMarkers(chunks[0]!.html)).toContain('outer loading');
+    expect(withoutHydrationMarkers(chunks[1]!.html)).toContain('outer');
+    expect(withoutHydrationMarkers(chunks[1]!.html)).toContain('inner loading');
+    expect(withoutHydrationMarkers(chunks[2]!.html)).toContain('<strong>inner</strong>');
+
+    const controller = new AbortController();
+    let sourceAborted = false;
+    const pending = Suspense({
+      source: ({ signal }) => new Promise<string>(() => {
+        signal.addEventListener('abort', () => { sourceAborted = true; }, { once: true });
+      }),
+      fallback: html`<p>pending</p>`,
+      children: (value) => value,
+    });
+    const stream = renderProgressively(html`${pending}`, { signal: controller.signal });
+    expect((await stream.next()).value?.kind).toBe('shell');
+    controller.abort(new DOMException('Response aborted', 'AbortError'));
+    await expect(stream.next()).rejects.toMatchObject({ name: 'AbortError' });
+    expect(sourceAborted).toBe(true);
+  });
+
+  it('prepares resolved hydration trees and encodes progressive boundary templates', async () => {
+    const value = html`<main>${[
+      repeat([1], (item) => item, (item) => html`<b>${item}</b>`),
+      Suspense({
+        source: Promise.resolve('ready'),
+        fallback: html`<i>pending</i>`,
+        children: (result) => html`<strong>${result}</strong>`,
+      }),
+      KeepAlive({ cacheKey: 'prepared', children: html`<u>kept</u>` }),
+    ]}</main>`;
+    const prepared = await prepareForHydration(value);
+    expect(withoutHydrationMarkers(prepared.html)).toBe('<main><b>1</b><strong>ready</strong><u>kept</u></main>');
+
+    const streamed = renderProgressiveReadableStream(html`${Suspense({
+      source: Promise.resolve('done'),
+      fallback: html`<p>loading</p>`,
+      children: (result) => html`<p>${result}</p>`,
+    })}`);
+    const transport = await new Response(streamed).text();
+    expect(transport).toContain('loading');
+    expect(transport).toContain('data-gluon-async-patch="0"');
+    expect(transport).toContain('done');
+  });
 });
+
+function withoutHydrationMarkers(value: string): string {
+  return value
+    .replace(/<!--gluon:\/?(?:h|i|k):\d+-->/g, '')
+    .replace(/ data-gluon-h-\d+=""/g, '');
+}

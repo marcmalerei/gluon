@@ -25,16 +25,26 @@ and event/directive hooks do not run.
 `renderToString()` escapes child and attribute data, rejects unsafe URL
 protocols, omits event bindings, resolves async built-in server contracts, and
 honors explicit `unsafeHTML()`/`unsafeURL()` values. `renderElement()` emits open
-Declarative Shadow DOM for a class registered through `defineElement()`.
-Stylesheet carriers and manifests are delivered by issue #37.
+Declarative Shadow DOM for a class registered through `defineElement()`. Its
+deterministic comment and temporary `data-gluon-h-*` markers let
+`@gluonjs/ssr/hydration` reconstruct client bindings without replacing matching
+nodes. Stylesheet carriers and manifests are delivered by issue #37.
 
 `serializeSsrState()` accepts finite JSON data made from plain objects and
 arrays and escapes HTML-significant characters plus U+2028/U+2029. The request
 result includes the serialized value and a safe `data-gluon-state` script.
 
-`@gluonjs/ssr/streaming` exposes an ordered async chunk iterator and a byte
-`ReadableStream`. Incremental async-boundary streaming is intentionally owned
-by issue #36.
+`hydrateTemplate()`, `hydrateApplication()`, and `hydrateElement()` validate
+server DOM before binding events, refs, application context, and reactive
+updates. Diagnostics distinguish text, attribute, structure, state, and style
+mismatches. The default recovery replaces the root once; `recovery: 'throw'`
+aborts without mutation. Suppressed categories remain recorded but do not call
+the diagnostic callback.
+
+`@gluonjs/ssr/streaming` exposes ordered chunks, byte `ReadableStream`s, and
+progressive rendering. The shell contains fallbacks; resolved nested boundaries
+arrive as inert patch records or templates. An external `AbortSignal` cancels
+pending response work and reaches async sources.
 
 ## License
 

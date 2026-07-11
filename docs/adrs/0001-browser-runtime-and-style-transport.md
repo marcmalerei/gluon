@@ -55,8 +55,8 @@ current browser-only prototype has already implemented it.
 | Stable unsupported-environment diagnostics and capability report | Style helpers throw ordinary `Error` instances with descriptive text. | #21, #38 |
 | Supported Node LTS lines only | `package.json` allows Node 20.19 and every future version from 22.12 upward; Node 20 is EOL. | #17 |
 | Isomorphic, serializable style definitions | `css()` creates a browser `CSSStyleSheet` or a DOM-free server descriptor; extraction/manifests remain pending. | #37 |
-| Existing DSD roots are claimed without clearing server nodes | `GluonElement` calls `attachShadow()` unconditionally in its constructor. | #35, #36 |
-| SSR style extraction, manifest, carrier output, and hydration handoff | DOM-free HTML/DSD rendering exists; style carriers, manifests, and hydration remain pending. | #36–#37 |
+| Existing DSD roots are claimed without clearing server nodes | `GluonElement` reuses an existing open declarative root; `hydrateElement()` defers connection rendering until marker binding completes. | Delivered in #36 |
+| SSR style extraction, manifest, carrier output, and hydration handoff | DOM/DSD hydration exists; style carriers, manifests, and transactional style handoff remain pending. | #37 |
 
 Closing this ADR records the architecture. The implementation issues above
 remain open until their own evidence passes.
@@ -450,8 +450,10 @@ manifest and tests above establish Gluon's actual support claim.
 - #21 implements stable capability and unsupported-environment diagnostics.
 - #30 extracts styles and emits browser/server manifest modules.
 - #35 implements the Node renderer, request isolation, DSD output, and carriers.
-- #36 implements identity-preserving hydration and transactional style handoff.
-- #37 implements the production manifest, streaming/SSG assets, and CSP metadata.
+- #36 implements identity-preserving DOM hydration, mismatch recovery, and
+  nested abortable progressive streaming.
+- #37 implements transactional style handoff, the production manifest,
+  streaming/SSG assets, and CSP metadata.
 - #38 executes and publishes the browser, device, Node, CSP, accessibility,
   security, performance, and memory evidence.
 

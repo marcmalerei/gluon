@@ -102,7 +102,7 @@ Both APIs accept custom enter/leave keyframes, duration, and easing.
 ## Server contract
 
 Built-in directive markers remain private to the browser renderer.
-`getBuiltinServerContract(value)` is the public, DOM-free handoff for issue #35:
+`getBuiltinServerContract(value)` is the public, DOM-free SSR and streaming handoff:
 
 - Suspense exposes `resolve()`, including timeout and error/fallback behavior.
 - Teleport exposes target and content for collection or in-place server policy.
@@ -110,9 +110,10 @@ Built-in directive markers remain private to the browser renderer.
   browser lifecycle behavior.
 - TransitionGroup exposes keyed repeated content.
 
-The future server renderer consumes these descriptors rather than inspecting
-private runtime symbols. The descriptor contract itself is covered now; HTML
-streaming and hydration behavior remain owned by issues #35–#37.
+The server renderer and progressive coordinator consume these descriptors
+rather than inspecting private runtime symbols. `resolve(signal)` propagates a
+response abort to Suspense sources; hydration resolves the same contracts once
+before binding marker DOM. Production style/asset transport remains #37.
 
 ## Verification
 
