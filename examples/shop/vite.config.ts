@@ -5,7 +5,7 @@ import gluon from '@gluonjs/vite';
 const repositoryRoot = resolve(import.meta.dirname, '../..');
 
 export default defineConfig({
-  plugins: [gluon()],
+  plugins: [gluon({ universal: true })],
   root: import.meta.dirname,
   publicDir: false,
   resolve: {

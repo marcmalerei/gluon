@@ -9,3 +9,5 @@
 - Added deterministic hydration markers, identity-preserving application and
   Declarative Shadow DOM hydration, categorized mismatch recovery, request
   snapshot restoration, nested progressive boundaries, and abort propagation.
+- Added route-aware static output, mixed deployment manifests, resource hints,
+  request-nonce style carriers, and transactional adopted-sheet handoff.

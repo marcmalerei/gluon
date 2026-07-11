@@ -2180,7 +2180,7 @@ function compareHydrationAttributes(
   for (const name of names) {
     const expectedValue = expected.getAttribute(name);
     const actualValue = actual.getAttribute(name);
-    if (expectedValue === actualValue) continue;
+    if (expectedValue === actualValue || equivalentHydrationAttribute(name, expectedValue, actualValue, actual.ownerDocument.baseURI)) continue;
     recordHydrationMismatch(
       name === 'style' ? 'style' : 'attribute',
       `${path}@${name}`,
@@ -2189,6 +2189,20 @@ function compareHydrationAttributes(
       options,
       mismatches,
     );
+  }
+}
+
+function equivalentHydrationAttribute(
+  name: string,
+  expected: string | null,
+  actual: string | null,
+  base: string,
+): boolean {
+  if (expected === null || actual === null || !urlAttributes.has(name.toLowerCase())) return false;
+  try {
+    return new URL(expected, base).href === new URL(actual, base).href;
+  } catch {
+    return false;
   }
 }
 

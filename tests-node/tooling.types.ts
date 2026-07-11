@@ -5,6 +5,7 @@ import gluon, { type GluonVitePluginOptions } from '../packages/vite/dist/index.
 const options: GluonVitePluginOptions = {
   diagnostics: true,
   include: (id) => id.endsWith('.ts'),
+  universal: { manifestFile: 'assets.json' },
 };
 const plugin: Plugin = gluon(options);
 void plugin;

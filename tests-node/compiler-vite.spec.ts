@@ -150,6 +150,39 @@ describe('@gluonjs/vite real server contract', () => {
     expect(code).not.toContain('pendingRenderCauses');
     expect(code).not.toContain('GLUON_TEMPLATE_STYLE_ELEMENT');
   }, 30_000);
+
+  it('emits a deterministic universal client asset manifest', async () => {
+    const root = await createFixture('universal', 1, 'rgb(9, 8, 7)');
+    const mainFile = resolve(root, 'main.ts');
+    await writeFile(mainFile, `${await readFile(mainFile, 'utf8')}\nimport './universal.css';\nvoid new URL('./universal.svg', import.meta.url);\n`);
+    await writeFile(resolve(root, 'universal.css'), 'body { color: black; }');
+    await writeFile(resolve(root, 'universal.svg'), '<svg xmlns="http://www.w3.org/2000/svg"></svg>');
+    const config = viteConfig(root);
+    const output = await build({
+      ...config,
+      plugins: [gluon({ universal: true })],
+      build: { write: false },
+    });
+    const outputs = Array.isArray(output) ? output : [output];
+    const asset = outputs
+      .flatMap((entry) => (entry as Rollup.RollupOutput).output)
+      .find((entry): entry is Rollup.OutputAsset => entry.type === 'asset' && entry.fileName === 'gluon-assets.json');
+    expect(asset).toBeDefined();
+    const manifest = JSON.parse(String(asset!.source));
+    expect(manifest).toEqual(expect.objectContaining({ version: 1 }));
+    expect(manifest.entry).toMatch(/^\/assets\/.*\.js$/);
+    expect(manifest.imports).toEqual(expect.any(Array));
+
+    const customOutput = await build({
+      ...config,
+      plugins: [gluon({ universal: { manifestFile: 'custom-assets.json' } })],
+      build: { write: false },
+    });
+    const customOutputs = Array.isArray(customOutput) ? customOutput : [customOutput];
+    expect(customOutputs
+      .flatMap((entry) => (entry as Rollup.RollupOutput).output)
+      .some((entry) => entry.type === 'asset' && entry.fileName === 'custom-assets.json')).toBe(true);
+  });
 });
 
 async function createFixture(version: string, increment: number, color: string): Promise<string> {

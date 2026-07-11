@@ -62,7 +62,7 @@
     "@gluonjs/reactivity": "0.0.0"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:shop",
+    "build": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:shop && npm run build:shop:server && npm run build:shop:static",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:reactivity": "npm run build --workspace @gluonjs/reactivity",
     "build:router": "npm run build --workspace @gluonjs/router",
@@ -72,6 +72,8 @@
     "build:vite": "npm run build --workspace @gluonjs/vite",
     "build:test-utils": "npm run build --workspace @gluonjs/test-utils",
     "build:shop": "vite build --config examples/shop/vite.config.ts",
+    "build:shop:server": "vite build --config examples/shop/vite.config.ts --ssr src/server.ts --outDir dist-server",
+    "build:shop:static": "node scripts/generate-shop-static.mjs",
     "dev:shop": "vite --config examples/shop/vite.config.ts",
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",

@@ -1,5 +1,6 @@
 import {
   hydrate,
+  getStyleSheetText,
   renderGluonApplicationForServer,
   TemplateResult,
   type AppContainer,
@@ -12,12 +13,15 @@ import {
 import type { Router, RouterSnapshot } from '@gluonjs/router/memory';
 import type { StoreManager, StoreSnapshot } from '@gluonjs/store';
 import { prepareForHydration } from './index.js';
+import type { StyleManifest } from './index.js';
 
 export interface HydrateTemplateOptions {
   readonly recovery?: 'replace' | 'throw';
   readonly suppress?: boolean | readonly HydrationMismatchCategory[];
   readonly onMismatch?: Parameters<typeof hydrate>[2]['onMismatch'];
   readonly state?: { readonly server: unknown; readonly client: unknown };
+  readonly styles?: StyleManifest;
+  readonly styleRoot?: Document | ShadowRoot;
 }
 
 export interface HydratedApplication<Public = unknown> {
@@ -50,10 +54,70 @@ export async function hydrateTemplate(
   if (!(prepared.value instanceof TemplateResult)) {
     throw new TypeError('A hydration root must resolve to a TemplateResult.');
   }
-  return hydrate(prepared.value, container, {
-    expectedMarkup: prepared.html,
-    ...options,
-  });
+  const handoff = options.styles
+    ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, options.styles)
+    : undefined;
+  try {
+    const result = hydrate(prepared.value, container, {
+      expectedMarkup: prepared.html,
+      recovery: options.recovery,
+      suppress: options.suppress,
+      onMismatch: options.onMismatch,
+      state: options.state,
+    });
+    if (!result.retained && handoff) throw new SsrTransportError('DOM hydration recovery is incompatible with an active style handoff.');
+    handoff?.commit();
+    return result;
+  } catch (error) {
+    handoff?.rollback();
+    throw error;
+  }
+}
+
+export class SsrTransportError extends Error {
+  readonly code = 'GLUON_UNSUPPORTED_SSR_TRANSPORT';
+  constructor(message: string) {
+    super(message);
+    this.name = 'SsrTransportError';
+  }
+}
+
+function prepareStyleHandoff(root: Document | ShadowRoot, manifest: StyleManifest) {
+  if (!('adoptedStyleSheets' in root)) throw new SsrTransportError('The hydration root does not support adoptedStyleSheets.');
+  const carriers = [...root.querySelectorAll<HTMLStyleElement>('style[data-gluon-style]')];
+  if (carriers.length !== manifest.entries.length) throw new SsrTransportError('The SSR style carrier count does not match the manifest.');
+  const sheets: CSSStyleSheet[] = [];
+  for (let index = 0; index < manifest.entries.length; index += 1) {
+    const entry = manifest.entries[index]!;
+    const carrier = carriers[index]!;
+    if (carrier.dataset.gluonStyle !== entry.id || carrier.dataset.gluonDigest !== entry.digest) {
+      throw new SsrTransportError(`SSR style carrier ${index} does not match manifest order or digest.`);
+    }
+    if ((carrier.textContent ?? '').replace(/<\\\/style/gi, '</style') !== entry.cssText) {
+      throw new SsrTransportError(`SSR style carrier ${entry.id} CSS does not match its manifest entry.`);
+    }
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(entry.cssText);
+    if (getStyleSheetText(sheet).length === 0 && entry.cssText.length > 0) {
+      throw new SsrTransportError(`SSR style carrier ${entry.id} could not be constructed.`);
+    }
+    sheets.push(sheet);
+  }
+  const previous = [...root.adoptedStyleSheets];
+  root.adoptedStyleSheets = [...previous, ...sheets.filter((sheet) => !previous.includes(sheet))];
+  let complete = false;
+  return {
+    commit() {
+      if (complete) return;
+      complete = true;
+      for (const carrier of carriers) carrier.remove();
+    },
+    rollback() {
+      if (complete) return;
+      complete = true;
+      root.adoptedStyleSheets = previous;
+    },
+  };
 }
 
 /** Hydrates one created application, then mounts its reactive client runtime on the retained root. */
@@ -67,12 +131,28 @@ export async function hydrateApplication<Public = unknown>(
   if (!(prepared.value instanceof TemplateResult)) {
     throw new TypeError('A Gluon application hydration root must resolve to a TemplateResult.');
   }
-  const hydration = await app.run(() => hydrate(prepared.value as TemplateResult, container, {
-    expectedMarkup: prepared.html,
-    ...options,
-  }));
-  if (!hydration) throw new Error('The Gluon application hydration did not complete.');
-  return Object.freeze({ hydration, mount: app.mount(container) });
+  const handoff = options.styles
+    ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, options.styles)
+    : undefined;
+  try {
+    const hydration = await app.run(() => hydrate(prepared.value as TemplateResult, container, {
+      expectedMarkup: prepared.html,
+      recovery: options.recovery,
+      suppress: options.suppress,
+      onMismatch: options.onMismatch,
+      state: options.state,
+    }));
+    if (!hydration) throw new Error('The Gluon application hydration did not complete.');
+    if (!hydration.retained && handoff) throw new SsrTransportError(
+      `DOM hydration recovery is incompatible with an active style handoff: ${hydration.mismatches.map((mismatch) => `${mismatch.category} ${mismatch.path} expected ${mismatch.expected} actual ${mismatch.actual}`).join('; ')}`,
+    );
+    const mount = app.mount(container);
+    handoff?.commit();
+    return Object.freeze({ hydration, mount });
+  } catch (error) {
+    handoff?.rollback();
+    throw error;
+  }
 }
 
 export interface RequestHydrationState<Data = unknown> {

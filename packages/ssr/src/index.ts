@@ -1,6 +1,7 @@
 import {
   disposeGluonApplicationForServer,
   getBuiltinServerContract,
+  getStyleSheetText,
   getTemplateValueServerContract,
   isTemplateResult,
   nothing,
@@ -72,15 +73,21 @@ export function renderElement<Constructor extends GluonElementClass>(
 }
 
 /** Resolves all current async boundaries and returns deterministic HTML. */
-export async function renderToString(value: TemplateValue): Promise<string> {
+export async function renderToString(
+  value: TemplateValue,
+  options: { readonly assets?: AssetManifest } = {},
+): Promise<string> {
   let html = '';
-  for await (const chunk of renderToChunks(value)) html += chunk;
+  for await (const chunk of renderToChunks(value, options)) html += chunk;
   return html;
 }
 
 /** Emits ordered hydration-marked serialization chunks. */
-export async function* renderToChunks(value: TemplateValue): AsyncGenerator<string> {
-  yield* serializeValue(value, { marker: 0 });
+export async function* renderToChunks(
+  value: TemplateValue,
+  options: { readonly assets?: AssetManifest } = {},
+): AsyncGenerator<string> {
+  yield* serializeValue(value, { marker: 0, assets: options.assets });
 }
 
 export type ProgressiveRenderChunk =
@@ -144,12 +151,17 @@ export interface SsrRequestOptions<Data = undefined> {
   readonly load?: (context: Omit<SsrRequestContext<Data>, 'data'>) => Promise<Data> | Data;
   readonly createApp: (context: SsrRequestContext<Data>) => GluonApp;
   readonly state?: Readonly<Record<string, unknown>>;
+  readonly styles?: readonly CSSStyleSheet[];
+  readonly nonce?: string;
+  readonly assets?: AssetManifest;
 }
 
 export interface SsrRequestResult {
   readonly html: string;
   readonly state: string;
   readonly stateScript: string;
+  readonly head: string;
+  readonly styles: StyleManifest;
   readonly router: RouterSnapshot;
   readonly store: StoreSnapshot;
 }
@@ -180,7 +192,7 @@ export async function renderRequest<Data = undefined>(
     if (!app) throw new Error('The request effect scope stopped before application creation.');
     const template = scope.run(() => renderGluonApplicationForServer(app!));
     if (!template) throw new Error('The request effect scope stopped before application rendering.');
-    const html = await renderToString(template);
+    const html = await renderToString(template, { assets: options.assets });
     const routerSnapshot = router.dehydrate();
     const storeSnapshot = store.dehydrate();
     const state = serializeSsrState({
@@ -189,10 +201,13 @@ export async function renderRequest<Data = undefined>(
       store: storeSnapshot,
       data,
     });
+    const styles = createStyleManifest(options.styles ?? []);
     return Object.freeze({
       html,
       state,
       stateScript: `<script type="application/json" data-gluon-state>${state}</script>`,
+      head: `${renderResourceHints(options.assets)}${renderStyleCarriers(styles, { nonce: options.nonce })}`,
+      styles,
       router: routerSnapshot,
       store: storeSnapshot,
     });
@@ -202,6 +217,55 @@ export async function renderRequest<Data = undefined>(
     store.dispose();
     scope.stop();
   }
+}
+
+export interface StyleManifestEntry {
+  readonly id: string;
+  readonly cssText: string;
+  readonly digest: string;
+  readonly order: number;
+}
+
+export interface StyleManifest {
+  readonly version: 1;
+  readonly entries: readonly StyleManifestEntry[];
+}
+
+export interface AssetManifest {
+  readonly entry: string;
+  readonly imports?: readonly string[];
+  readonly styles?: readonly string[];
+  readonly assets?: readonly string[];
+}
+
+export function createStyleManifest(sheets: readonly CSSStyleSheet[]): StyleManifest {
+  const entries = sheets.map((sheet, order) => {
+    const cssText = getStyleSheetText(sheet);
+    const digest = stableContentDigest(cssText);
+    return Object.freeze({ id: `gluon-${digest}`, cssText, digest, order });
+  });
+  return Object.freeze({ version: 1 as const, entries: Object.freeze(entries) });
+}
+
+export function renderStyleCarriers(
+  manifest: StyleManifest,
+  options: { readonly nonce?: string } = {},
+): string {
+  return manifest.entries.map((entry) => {
+    const nonce = options.nonce === undefined ? '' : ` nonce="${escapeAttribute(options.nonce)}"`;
+    return `<style data-gluon-style="${entry.id}" data-gluon-digest="${entry.digest}"${nonce}>${escapeStyleText(entry.cssText)}</style>`;
+  }).join('');
+}
+
+export function renderResourceHints(manifest: AssetManifest | undefined): string {
+  if (!manifest) return '';
+  const hints = [
+    ...(manifest.imports ?? []).map((href) => `<link rel="modulepreload" href="${escapeAttribute(href)}">`),
+    ...(manifest.styles ?? []).map((href) => `<link rel="stylesheet" href="${escapeAttribute(href)}">`),
+    ...(manifest.assets ?? []).map((href) => `<link rel="preload" href="${escapeAttribute(href)}" as="image">`),
+    `<script type="module" src="${escapeAttribute(manifest.entry)}"></script>`,
+  ];
+  return hints.join('');
 }
 
 /** Serializes JSON-compatible request data safely inside an HTML script element. */
@@ -220,6 +284,7 @@ export function serializeSsrState(value: unknown): string {
 interface SerializationContext {
   marker: number;
   readonly progressive?: ProgressiveCoordinator;
+  readonly assets?: AssetManifest;
 }
 
 interface ProgressiveCoordinator {
@@ -354,7 +419,7 @@ async function* serializeTemplate(
     const prefix = chunk.slice(0, nameOffset);
     const marker = context.marker++;
     yield /\s$/.test(prefix) ? prefix.slice(0, -1) : prefix;
-    yield serializeBinding(name, result.values[index]);
+    yield serializeBinding(name, result.values[index], context.assets);
     yield ` data-gluon-h-${marker}=""`;
     skipQuote = match[2] ?? '';
   }
@@ -385,8 +450,8 @@ async function resolveHydrationValue(value: TemplateValue): Promise<TemplateValu
   return value;
 }
 
-function serializeBinding(name: string, value: unknown): string {
-  if (name === '...') return serializeSpread(value);
+function serializeBinding(name: string, value: unknown, assets?: AssetManifest): string {
+  if (name === '...') return serializeSpread(value, assets);
   if (name.startsWith('@')) return '';
   if (name.startsWith('?')) return value ? ` ${safeAttributeName(name.slice(1))}` : '';
   const attribute = name.startsWith('.') ? name.slice(1) : name;
@@ -400,12 +465,27 @@ function serializeBinding(name: string, value: unknown): string {
     return ` ${safeAttributeName(attribute)}="${escapeAttribute(contract.markup)}"`;
   }
   if (name.startsWith('.') && typeof value === 'object' && contract?.kind !== 'unsafe-url') return '';
-  const serialized = contract?.kind === 'unsafe-url' ? contract.value : String(value);
+  const serialized = resolveAssetUrl(
+    contract?.kind === 'unsafe-url' ? contract.value : String(value),
+    assets,
+  );
   assertSafeUrl(attribute, serialized, contract?.kind === 'unsafe-url');
   return ` ${safeAttributeName(attribute)}="${escapeAttribute(serialized)}"`;
 }
 
-function serializeSpread(value: unknown): string {
+function resolveAssetUrl(value: string, manifest: AssetManifest | undefined): string {
+  if (!manifest || !value.startsWith('file:')) return value;
+  const basename = decodeURIComponent(new URL(value).pathname.split('/').pop() ?? '');
+  const dot = basename.lastIndexOf('.');
+  const stem = dot < 0 ? basename : basename.slice(0, dot);
+  const extension = dot < 0 ? '' : basename.slice(dot);
+  return manifest.assets?.find((asset) => {
+    const candidate = asset.split('/').pop() ?? '';
+    return candidate.startsWith(`${stem}-`) && candidate.endsWith(extension);
+  }) ?? value;
+}
+
+function serializeSpread(value: unknown, assets?: AssetManifest): string {
   if (!isRecord(value)) return '';
   let result = '';
   for (const [key, entry] of Object.entries(value)) {
@@ -414,20 +494,20 @@ function serializeSpread(value: unknown): string {
       if (isRecord(entry)) {
         const prefix = key === 'aria' ? 'aria-' : 'data-';
         for (const [name, nested] of Object.entries(entry)) {
-          result += serializeBinding(`${prefix}${toKebabCase(name)}`, nested);
+          result += serializeBinding(`${prefix}${toKebabCase(name)}`, nested, assets);
         }
       }
       continue;
     }
     if (key === 'class' || key === 'className') {
-      result += serializeBinding('class', normalizeClass(entry));
+      result += serializeBinding('class', normalizeClass(entry), assets);
       continue;
     }
     if (key === 'style') {
-      result += serializeBinding('style', normalizeStyle(entry));
+      result += serializeBinding('style', normalizeStyle(entry), assets);
       continue;
     }
-    result += serializeBinding(key, entry);
+    result += serializeBinding(key, entry, assets);
   }
   return result;
 }
@@ -516,6 +596,19 @@ function escapeText(value: string): string {
 
 function escapeAttribute(value: string): string {
   return escapeText(value).replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+
+function escapeStyleText(value: string): string {
+  return value.replace(/<\/style/gi, '<\\/style');
+}
+
+function stableContentDigest(value: string): string {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
 function updateMarkupState(state: { inTag: boolean; quote: string }, chunk: string): void {

@@ -9,6 +9,7 @@ const resolvedVirtualId = `\0${publicVirtualId}`;
 export interface GluonVitePluginOptions {
   readonly diagnostics?: boolean;
   readonly include?: RegExp | ((id: string) => boolean);
+  readonly universal?: boolean | { readonly manifestFile?: string };
 }
 
 export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
@@ -55,6 +56,34 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
       }
       if (!result.hmr && result.templates.length === 0) return null;
       return { code: result.code, map: result.map };
+    },
+    generateBundle(_output, bundle) {
+      if (!options.universal || config.build.ssr) return;
+      const chunks = Object.values(bundle).filter((entry) => entry.type === 'chunk');
+      const entry = chunks.find((chunk) => chunk.isEntry);
+      if (!entry) this.error('GLUON_UNIVERSAL_ENTRY_MISSING: production client entry was not emitted.');
+      const styles = Object.values(bundle)
+        .filter((asset) => asset.type === 'asset' && asset.fileName.endsWith('.css'))
+        .map((asset) => `/${asset.fileName}`)
+        .sort();
+      const assets = Object.values(bundle)
+        .filter((asset) => asset.type === 'asset' && !asset.fileName.endsWith('.css'))
+        .map((asset) => `/${asset.fileName}`)
+        .sort();
+      const manifest = {
+        version: 1,
+        entry: `/${entry.fileName}`,
+        imports: entry.imports.map((file) => `/${file}`).sort(),
+        styles,
+        assets,
+      };
+      this.emitFile({
+        type: 'asset',
+        fileName: typeof options.universal === 'object'
+          ? options.universal.manifestFile ?? 'gluon-assets.json'
+          : 'gluon-assets.json',
+        source: `${JSON.stringify(manifest, null, 2)}\n`,
+      });
     },
   };
 }

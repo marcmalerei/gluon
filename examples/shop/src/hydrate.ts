@@ -1,8 +1,10 @@
 import { hydrateApplication, hydrateRequestState, readHydrationState } from '@gluonjs/ssr/hydration';
+import { createStyleManifest } from '@gluonjs/ssr';
 import { createRouter, createWebHistory } from '@gluonjs/router';
 import { createStoreManager } from '@gluonjs/store';
 import { createShopApplication, createShopRoutes } from './app.js';
 import { createShopStore } from './state.js';
+import { shopStyles } from './styles.js';
 
 /** Restores the request snapshots and hydrates the server-rendered GLUON GOODS root. */
 export async function hydrateShop(
@@ -25,6 +27,8 @@ export async function hydrateShop(
   });
   const hydrated = await hydrateApplication(app, container, {
     state: { server: state.store, client: storeManager.dehydrate() },
+    styles: createStyleManifest([shopStyles]),
+    styleRoot: document,
   });
   return Object.freeze({ ...hydrated, router, storeManager, store });
 }

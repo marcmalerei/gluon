@@ -54,9 +54,9 @@ current browser-only prototype has already implemented it.
 | Release-gated Chromium, Firefox, Safari, and mobile targets | Vitest runs one headless Chromium instance. | #38 |
 | Stable unsupported-environment diagnostics and capability report | Style helpers throw ordinary `Error` instances with descriptive text. | #21, #38 |
 | Supported Node LTS lines only | `package.json` allows Node 20.19 and every future version from 22.12 upward; Node 20 is EOL. | #17 |
-| Isomorphic, serializable style definitions | `css()` creates a browser `CSSStyleSheet` or a DOM-free server descriptor; extraction/manifests remain pending. | #37 |
+| Isomorphic, serializable style definitions | `css()` creates a browser sheet or DOM-free descriptor; `createStyleManifest()` produces ordered content IDs, digests, and CSS text. | Delivered in #37 |
 | Existing DSD roots are claimed without clearing server nodes | `GluonElement` reuses an existing open declarative root; `hydrateElement()` defers connection rendering until marker binding completes. | Delivered in #36 |
-| SSR style extraction, manifest, carrier output, and hydration handoff | DOM/DSD hydration exists; style carriers, manifests, and transactional style handoff remain pending. | #37 |
+| SSR style extraction, manifest, carrier output, and hydration handoff | Document carriers, content IDs/digests, request nonces, order validation, rollback, removal, and adopted-sheet ownership are implemented. | Delivered in #37 |
 
 Closing this ADR records the architecture. The implementation issues above
 remain open until their own evidence passes.
