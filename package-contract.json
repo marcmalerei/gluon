@@ -84,7 +84,7 @@
     {
       "name": "@gluonjs/devtools-api",
       "directory": "packages/devtools-api",
-      "state": "planned",
+      "state": "current",
       "environment": "universal",
       "exports": ["."],
       "dependencies": []
@@ -92,10 +92,10 @@
     {
       "name": "@gluonjs/devtools",
       "directory": "packages/devtools",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
       "exports": ["."],
-      "dependencies": ["@gluonjs/devtools-api"]
+      "dependencies": ["@gluonjs/core", "@gluonjs/devtools-api"]
     },
     {
       "name": "@gluonjs/language-server",
