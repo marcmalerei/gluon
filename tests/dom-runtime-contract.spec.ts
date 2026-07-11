@@ -24,18 +24,22 @@ describe('DOM runtime contract', () => {
 
   it('inserts one new node directly and batches multiple new nodes in a fragment', () => {
     const createFragment = vi.spyOn(document, 'createDocumentFragment');
-    const singleRoot = document.createElement('div');
+    try {
+      const singleRoot = document.createElement('div');
 
-    render(html`<p>${'single'}</p>`, singleRoot);
+      render(html`<p>${'single'}</p>`, singleRoot);
 
-    expect(singleRoot.innerHTML).toBe('<p><!--gluon:0-->single</p>');
-    expect(createFragment).not.toHaveBeenCalled();
+      expect(singleRoot.innerHTML).toBe('<p><!--gluon:0-->single</p>');
+      expect(createFragment).not.toHaveBeenCalled();
 
-    const multipleRoot = document.createElement('div');
-    render(html`<p>${['first', 'second']}</p>`, multipleRoot);
+      const multipleRoot = document.createElement('div');
+      render(html`<p>${['first', 'second']}</p>`, multipleRoot);
 
-    expect(multipleRoot.textContent).toBe('firstsecond');
-    expect(createFragment).toHaveBeenCalledOnce();
+      expect(multipleRoot.textContent).toBe('firstsecond');
+      expect(createFragment).toHaveBeenCalledOnce();
+    } finally {
+      createFragment.mockRestore();
+    }
   });
 
   it('runs lifecycle directives through mount, update, cleanup, and disconnect', () => {
