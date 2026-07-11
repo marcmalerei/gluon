@@ -284,9 +284,9 @@ function isDirectiveLifecycle(
 }
 
 type PartDescriptor =
-  | { readonly kind: 'node'; readonly index: number; readonly path: readonly number[] }
-  | { readonly kind: 'attribute'; readonly index: number; readonly path: readonly number[]; readonly name: string }
-  | { readonly kind: 'spread'; readonly index: number; readonly path: readonly number[] };
+  | { readonly kind: 'node'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number }
+  | { readonly kind: 'attribute'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number; readonly name: string }
+  | { readonly kind: 'spread'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number };
 
 interface Binding {
   readonly index: number;
@@ -305,6 +305,7 @@ interface CompiledTemplate {
   readonly element: HTMLTemplateElement;
   readonly strings: TemplateStringsArray;
   readonly descriptors: readonly PartDescriptor[];
+  readonly traversalDescriptors: readonly PartDescriptor[];
   readonly rootNodesStable: boolean;
 }
 
@@ -1241,7 +1242,7 @@ export function render(
   }
 
   const fragment = document.importNode(compiled.element.content, true);
-  const bindings = instantiateBindings(fragment, compiled.descriptors);
+  const bindings = instantiateBindings(fragment, compiled.traversalDescriptors);
   applyBindings(bindings, result.values);
   const nodes = [...fragment.childNodes];
   container.replaceChildren(fragment);
@@ -1395,6 +1396,7 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   markup += result.strings[result.strings.length - 1] ?? '';
   element.innerHTML = markup;
   const descriptors = buildDescriptors(element.content, attributeNames);
+  const traversalDescriptors = [...descriptors];
   const expressionCount = result.strings.length - 1;
 
   if (descriptors.length !== expressionCount) {
@@ -1409,6 +1411,7 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
     element,
     strings: result.strings,
     descriptors,
+    traversalDescriptors,
     rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 1),
   };
   templateCache.set(result.strings, compiled);
@@ -1426,8 +1429,10 @@ function buildDescriptors(
     content,
     NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
   );
+  let traversalIndex = -1;
 
   while (walker.nextNode()) {
+    traversalIndex += 1;
     const node = walker.currentNode;
 
     if (node.nodeType === Node.COMMENT_NODE) {
@@ -1437,6 +1442,7 @@ function buildDescriptors(
           kind: 'node',
           index: Number(match[1]),
           path: pathFromRoot(content, node),
+          traversalIndex,
         });
       }
       continue;
@@ -1451,8 +1457,8 @@ function buildDescriptors(
       const originalName = attributeNames.get(index) ?? attribute.name;
       descriptors.push(
         originalName === '...'
-          ? { kind: 'spread', index, path: pathFromRoot(content, node) }
-          : { kind: 'attribute', index, path: pathFromRoot(content, node), name: originalName },
+          ? { kind: 'spread', index, path: pathFromRoot(content, node), traversalIndex }
+          : { kind: 'attribute', index, path: pathFromRoot(content, node), traversalIndex, name: originalName },
       );
       element.removeAttribute(attribute.name);
     }
@@ -1466,17 +1472,32 @@ function instantiateBindings(
   root: DocumentFragment,
   descriptors: readonly PartDescriptor[],
 ): Binding[] {
+  if (descriptors.length === 0) return [];
   const bindings = new Array<Binding>(descriptors.length);
-  for (let descriptorIndex = 0; descriptorIndex < descriptors.length; descriptorIndex += 1) {
-    const descriptor = descriptors[descriptorIndex]!;
-    const node = walkPath(root, descriptor.path);
-    let part: Part;
+  const walker = getBindingWalker();
+  walker.currentNode = root;
+  let node = walker.nextNode();
+  let traversalIndex = 0;
+  try {
+    for (let descriptorIndex = 0; descriptorIndex < descriptors.length; descriptorIndex += 1) {
+      const descriptor = descriptors[descriptorIndex]!;
+      while (node && traversalIndex < descriptor.traversalIndex) {
+        node = walker.nextNode();
+        traversalIndex += 1;
+      }
+      if (!node || traversalIndex !== descriptor.traversalIndex) {
+        throw new Error('A cached Gluon template traversal index is no longer valid.');
+      }
+      let part: Part;
 
-    if (descriptor.kind === 'node') part = new NodePart(node as Comment);
-    else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
-    else part = new AttributePart(node as Element, descriptor.name);
+      if (descriptor.kind === 'node') part = new NodePart(node as Comment);
+      else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
+      else part = new AttributePart(node as Element, descriptor.name);
 
-    bindings[descriptorIndex] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
+      bindings[descriptorIndex] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
+    }
+  } finally {
+    walker.currentNode = document;
   }
   return bindings;
 }
@@ -1579,7 +1600,7 @@ function createChildInstance(
   compiled = getCompiledTemplate(result),
 ): ChildInstance {
   const fragment = document.importNode(compiled.element.content, true);
-  const bindings = instantiateBindings(fragment, compiled.descriptors);
+  const bindings = instantiateBindings(fragment, compiled.traversalDescriptors);
   applyBindings(bindings, result.values);
   const nodes = [...fragment.childNodes];
   return { template: compiled, bindings, nodes };
@@ -1807,26 +1828,13 @@ function pathFromRoot(root: Node, descendant: Node): number[] {
   return path;
 }
 
-function walkPath(root: Node, path: readonly number[]): Node {
-  if (path.length === 1) {
-    const node = root.childNodes.item(path[0]!);
-    if (!node) throw new Error('A cached Gluon template path is no longer valid.');
-    return node;
-  }
-  if (path.length === 2) {
-    const parent = root.childNodes.item(path[0]!);
-    const node = parent?.childNodes.item(path[1]!);
-    if (!node) throw new Error('A cached Gluon template path is no longer valid.');
-    return node;
-  }
+let bindingWalker: TreeWalker | undefined;
 
-  let current = root;
-  for (const index of path) {
-    const next = current.childNodes.item(index);
-    if (!next) throw new Error('A cached Gluon template path is no longer valid.');
-    current = next;
-  }
-  return current;
+function getBindingWalker(): TreeWalker {
+  return bindingWalker ??= document.createTreeWalker(
+    document,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
+  );
 }
 
 function updateMarkupState(

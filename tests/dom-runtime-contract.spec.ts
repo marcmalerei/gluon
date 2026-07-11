@@ -42,6 +42,37 @@ describe('DOM runtime contract', () => {
     }
   });
 
+  it('instantiates multiple element bindings and nested child parts in traversal order', () => {
+    const root = document.createElement('div');
+    const view = (first: string, second: string, child: string, value: string) => html`
+      <section data-first=${first} aria-label=${second}>
+        <div data-second=${second}><span>${child}</span></div>
+        <input .value=${value} ?disabled=${false}>
+      </section>
+    `;
+
+    render(view('one', 'two', 'child-a', 'value-a'), root);
+    const section = root.querySelector('section')!;
+    const input = root.querySelector('input') as HTMLInputElement;
+
+    expect(section.dataset.first).toBe('one');
+    expect(section.getAttribute('aria-label')).toBe('two');
+    expect(section.querySelector('div')?.dataset.second).toBe('two');
+    expect(section.querySelector('span')?.textContent).toBe('child-a');
+    expect(input.value).toBe('value-a');
+    expect(input.disabled).toBe(false);
+
+    render(view('next', 'label', 'child-b', 'value-b'), root);
+
+    expect(root.querySelector('section')).toBe(section);
+    expect(root.querySelector('input')).toBe(input);
+    expect(section.dataset.first).toBe('next');
+    expect(section.getAttribute('aria-label')).toBe('label');
+    expect(section.querySelector('div')?.dataset.second).toBe('label');
+    expect(section.querySelector('span')?.textContent).toBe('child-b');
+    expect(input.value).toBe('value-b');
+  });
+
   it('runs lifecycle directives through mount, update, cleanup, and disconnect', () => {
     const root = document.createElement('div');
     const calls: string[] = [];
