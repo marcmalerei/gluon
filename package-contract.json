@@ -59,10 +59,10 @@
     {
       "name": "@gluonjs/ssr",
       "directory": "packages/ssr",
-      "state": "planned",
+      "state": "current",
       "environment": "node",
       "exports": [".", "./streaming"],
-      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
+      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/store"]
     },
     {
       "name": "@gluonjs/vite",

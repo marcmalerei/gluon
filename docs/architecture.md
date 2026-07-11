@@ -44,6 +44,11 @@ packages/store/
 └── src/index.ts        Definitions, managers, transactions, plugins, snapshots,
                         HMR, persistence, and testing isolation
 
+packages/ssr/
+├── src/index.ts        DOM-free serialization, DSD elements, request ownership,
+│                       Router/Store snapshots, and safe embedded state
+└── src/streaming.ts    Ordered async chunks and ReadableStream byte adapter
+
 packages/compiler/
 └── src/index.ts        Template/part locations, diagnostics, source maps, and
                         development transform insertion
@@ -58,6 +63,7 @@ packages/test-utils/
 
 examples/shop/
 ├── src/app.ts          Public-package application composition and routes
+├── src/server.ts       Public SSR request entry reusing the shop application
 ├── src/pages.ts        Home, catalog, product, policy, and fallback pages
 ├── src/components.ts   Navigation, product rail, search, menu, and bag
 ├── src/state.ts        Official per-application Store definition and bag actions
@@ -86,6 +92,15 @@ application, request, or test manager owns its live state, computed scope,
 transactions, plugins, persistence adapter, and teardown. Its snapshot,
 security, HMR compatibility, and inspection rules are documented in the
 [Store contract](store.md).
+
+`@gluonjs/ssr` imports the public Core server contracts, Router memory entry,
+Store, and Reactivity. Browser style definitions become inert serializable
+descriptors when `CSSStyleSheet` is absent; `GluonElement` uses a DOM-free base
+and server render entry without running connection lifecycle. A request creates
+one detached scope, memory Router, Store manager, and application, then releases
+them in `finally`. The public serializer owns escaping, URL validation, async
+built-in resolution, DSD output, and JSON-safe state embedding. Hydration and
+style transport do not share hidden state with this request pipeline.
 
 `@gluonjs/test-utils` composes only public Core, Reactivity, Router, and Store
 exports. Each fixture owns a real application root and records its cleanup

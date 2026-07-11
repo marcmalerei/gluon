@@ -78,8 +78,9 @@ store state.
 `settle({ cycles, timers })` repeats that boundary and can include one zero-delay
 timer turn per cycle for async UI tests.
 
-SSR and hydration harnesses will be added when the public universal renderer
-from issues #35–#37 exists. The package does not emulate private SSR behavior.
+Server rendering tests use the public `@gluonjs/ssr` package directly. A
+hydration fixture will join these browser utilities when #36 provides the
+public hydration contract; this package does not emulate private behavior.
 
 ## Verification
 

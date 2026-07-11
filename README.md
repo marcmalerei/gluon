@@ -21,6 +21,7 @@
 - typed application-scoped stores with transactions, persistence, HMR, and SSR snapshots
 - async boundaries/components, application-owned teleports, cached views, and transitions
 - official Vite transforms with template source maps and state-preserving HMR
+- DOM-independent SSR with isolated requests and safe serialized state
 - public black-box component, Router, Store, and scheduler test utilities
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
@@ -252,6 +253,32 @@ export default defineConfig({ plugins: [gluon()] });
 Production builds do not receive the virtual HMR client or `import.meta.hot`
 handlers. See the [`@gluonjs/vite` guide](packages/vite/README.md) and the
 [tooling architecture](docs/architecture.md#vite-transform-and-hmr-boundary).
+
+## Server rendering and request isolation
+
+`@gluonjs/ssr` renders public `html` templates, functional components,
+applications, async built-ins, and registered `GluonElement` definitions in
+Node without a DOM implementation. Each `renderRequest()` owns a memory Router,
+Store manager, detached reactive scope, and application and disposes all four
+after success or failure.
+
+```ts
+import { createApp, html } from '@gluonjs/core';
+import { renderRequest } from '@gluonjs/ssr';
+
+const response = await renderRequest({
+  url: '/reports/42',
+  routes: [{ path: '/reports/:id', name: 'report' }],
+  createApp: ({ router }) => createApp(() =>
+    html`<main>${router.currentRoute.value.params.id}</main>`,
+  ),
+});
+```
+
+Dynamic content and state are safely escaped; event bindings and browser
+lifecycle do not run. See the [`@gluonjs/ssr` guide](packages/ssr/README.md).
+Hydration/incremental streaming and style manifests remain scoped to #36 and
+#37 respectively.
 
 ## Bindings and spreading
 

@@ -10,6 +10,7 @@ import {
   RouterView,
   type Router,
   type RouterHistory,
+  type RouteRecordRaw,
 } from '@gluonjs/router';
 import {
   createPersistencePlugin,
@@ -36,31 +37,28 @@ export interface ShopApplication {
 
 export interface ShopApplicationOptions {
   readonly storage?: StorageLike | null;
+  readonly router?: Router;
+  readonly storeManager?: StoreManager;
 }
 
 export function createShopApplication(
-  history: RouterHistory,
+  history: RouterHistory | undefined,
   options: ShopApplicationOptions = {},
 ): ShopApplication {
+  if (!options.router && !history) throw new Error('A shop application requires a Router or history.');
   const storage = options.storage === undefined
     ? globalThis.localStorage
     : options.storage;
-  const storeManager = createStoreManager({
+  const ownsStoreManager = options.storeManager === undefined;
+  const storeManager = options.storeManager ?? createStoreManager({
     plugins: storage
       ? [createPersistencePlugin({ storage, namespace: 'gluon-goods' })]
       : [],
   });
   const store = createShopStore(storeManager);
-  const router = createRouter({
-    history,
-    routes: [
-      { path: '/', name: 'home', component: () => HomePage(store) },
-      { path: '/shop', name: 'shop', component: () => CatalogPage(store) },
-      { path: '/products/:slug', name: 'product', component: () => ProductPage(store) },
-      { path: '/shipping', name: 'shipping', component: () => ShippingPage(store) },
-      { path: '/returns', name: 'returns', component: () => ReturnsPage(store) },
-      { path: '/:path*', name: 'not-found', component: () => NotFoundPage(store) },
-    ],
+  const router = options.router ?? createRouter({
+    history: history!,
+    routes: createShopRoutes(store),
     scrollBehavior: (_to, _from, saved) => saved ?? { left: 0, top: 0 },
   });
   router.afterEach(() => {
@@ -82,6 +80,17 @@ export function createShopApplication(
     `;
   });
   app.use(createRouterPlugin(router));
-  app.onUnmounted(() => storeManager.dispose());
+  if (ownsStoreManager) app.onUnmounted(() => storeManager.dispose());
   return { app, router, storeManager, store };
+}
+
+export function createShopRoutes(store: ShopStore): readonly RouteRecordRaw[] {
+  return [
+    { path: '/', name: 'home', component: () => HomePage(store) },
+    { path: '/shop', name: 'shop', component: () => CatalogPage(store) },
+    { path: '/products/:slug', name: 'product', component: () => ProductPage(store) },
+    { path: '/shipping', name: 'shipping', component: () => ShippingPage(store) },
+    { path: '/returns', name: 'returns', component: () => ReturnsPage(store) },
+    { path: '/:path*', name: 'not-found', component: () => NotFoundPage(store) },
+  ];
 }
