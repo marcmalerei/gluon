@@ -1,0 +1,118 @@
+import { execFileSync } from 'node:child_process';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { basename, join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const root = resolve(import.meta.dirname, '..');
+const temporaryRoot = await mkdtemp(join(tmpdir(), 'create-gluon-matrix-'));
+const artifactDirectory = join(temporaryRoot, 'artifacts');
+const fixtureDirectory = join(temporaryRoot, 'fixtures');
+
+const packageSources = new Map([
+  ['@gluonjs/reactivity', 'packages/reactivity'],
+  ['@gluonjs/compiler', 'packages/compiler'],
+  ['@gluonjs/core', '.'],
+  ['@gluonjs/router', 'packages/router'],
+  ['@gluonjs/store', 'packages/store'],
+  ['@gluonjs/ssr', 'packages/ssr'],
+  ['@gluonjs/vite', 'packages/vite'],
+  ['@gluonjs/test-utils', 'packages/test-utils'],
+]);
+
+try {
+  await mkdir(artifactDirectory, { recursive: true });
+  const archives = packWorkspacePackages();
+  const { scaffoldProject } = await import(
+    pathToFileURL(resolve(root, 'packages/create-gluon/dist/index.js')).href
+  );
+  const matrix = supportedMatrix();
+  for (const [index, features] of matrix.entries()) {
+    const name = matrixName(index, features);
+    const result = await scaffoldProject({ directory: name, cwd: fixtureDirectory, ...features });
+    await pointOfficialDependenciesAtArchives(result.directory, archives, features);
+    run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], result.directory);
+    run('npm', ['run', 'typecheck'], result.directory);
+    run('npm', ['test'], result.directory);
+    run('npm', ['run', 'build'], result.directory);
+    process.stdout.write(`validated starter ${index + 1}/${matrix.length}: ${name}\n`);
+  }
+  process.stdout.write(`create-gluon fixture matrix valid: ${matrix.length} projects\n`);
+} finally {
+  await rm(temporaryRoot, { recursive: true, force: true });
+}
+
+function packWorkspacePackages() {
+  const archives = new Map();
+  for (const [name, directory] of packageSources) {
+    const output = execFileSync(
+      'npm',
+      ['pack', resolve(root, directory), '--pack-destination', artifactDirectory, '--json', '--ignore-scripts'],
+      { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    const result = JSON.parse(output)[0];
+    archives.set(name, join(artifactDirectory, basename(result.filename)));
+  }
+  return archives;
+}
+
+function supportedMatrix() {
+  const matrix = [];
+  for (let bits = 0; bits < 16; bits += 1) {
+    matrix.push({
+      router: Boolean(bits & 1),
+      store: Boolean(bits & 2),
+      testing: Boolean(bits & 4),
+      ui: Boolean(bits & 8),
+      ssr: false,
+    });
+  }
+  for (let bits = 0; bits < 4; bits += 1) {
+    matrix.push({
+      router: true,
+      store: true,
+      testing: Boolean(bits & 1),
+      ui: Boolean(bits & 2),
+      ssr: true,
+    });
+  }
+  return matrix;
+}
+
+function matrixName(index, features) {
+  const selected = Object.entries(features).filter(([, enabled]) => enabled).map(([name]) => name);
+  return `${String(index + 1).padStart(2, '0')}-${selected.join('-') || 'minimal'}`;
+}
+
+async function pointOfficialDependenciesAtArchives(directory, archives, features) {
+  const path = join(directory, 'package.json');
+  const manifest = JSON.parse(await readFile(path, 'utf8'));
+  const required = new Set(['@gluonjs/reactivity', '@gluonjs/compiler', '@gluonjs/core', '@gluonjs/vite']);
+  if (features.router || features.ssr || features.testing) required.add('@gluonjs/router');
+  if (features.store || features.ssr || features.testing) required.add('@gluonjs/store');
+  if (features.ssr) required.add('@gluonjs/ssr');
+  if (features.testing) required.add('@gluonjs/test-utils');
+
+  for (const name of required) {
+    const archive = archives.get(name);
+    if (!archive) throw new Error(`Missing packed archive for ${name}.`);
+    if (name in manifest.dependencies) manifest.dependencies[name] = `file:${archive}`;
+    else manifest.devDependencies[name] = `file:${archive}`;
+  }
+  await writeFile(path, `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
+function run(command, arguments_, cwd) {
+  try {
+    execFileSync(command, arguments_, {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, CI: '1' },
+    });
+  } catch (error) {
+    const stdout = error?.stdout?.toString() ?? '';
+    const stderr = error?.stderr?.toString() ?? '';
+    throw new Error(`${command} ${arguments_.join(' ')} failed in ${cwd}\n${stdout}${stderr}`);
+  }
+}
