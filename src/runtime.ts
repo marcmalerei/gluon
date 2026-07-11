@@ -344,6 +344,61 @@ class NodePart implements Part {
     private readonly contextMarker: Comment = marker,
   ) {}
 
+  hydrateValue(value: TemplateValue, end: Comment, context: HydrationAdoptionContext): void {
+    this.nodes = collectNodesUntil(this.marker, end);
+    if (isEmptyValue(value)) return;
+    if (isRenderablePrimitive(value)) {
+      if (value === '' && this.nodes.length === 0) {
+        this.lastPrimitive = value;
+        return;
+      }
+      const node = this.nodes.length === 1 ? this.nodes[0] : undefined;
+      if (!(node instanceof Text)) throw new Error('A hydrated primitive requires one text node.');
+      this.textNode = node;
+      this.lastPrimitive = value;
+      return;
+    }
+    if (isTemplateResult(value)) {
+      this.child = hydrateChildInstance(value, this.marker, end, context);
+      this.nodes = collectNodesUntil(this.marker, end);
+      return;
+    }
+    if (Array.isArray(value)) {
+      const children: Array<PartChild | undefined> = [];
+      for (let index = 0; index < value.length; index += 1) {
+        const childValue = value[index]!;
+        const range = takeHydrationRange(context, 'i');
+        const part = new NodePart(range.start, this.contextMarker);
+        const binding: Binding = { index: 0, part, priority: 0 };
+        part.hydrateValue(childValue, range.end, context);
+        range.end.remove();
+        children[index] = { marker: range.start, part, binding };
+      }
+      this.arrayChildren = children;
+      this.nodes = collectNodesUntil(this.marker, end);
+      return;
+    }
+    if (isRepeatResult(value)) {
+      const children: KeyedChild[] = [];
+      for (let index = 0; index < value[repeatKeys].length; index += 1) {
+        const range = takeHydrationRange(context, 'k');
+        const part = new NodePart(range.start, this.contextMarker);
+        part.hydrateValue(value[repeatValues][index]!, range.end, context);
+        range.start.remove();
+        range.end.remove();
+        children.push({ key: value[repeatKeys][index]!, part });
+      }
+      this.keyedChildren = children;
+      this.nodes = collectNodesUntil(this.marker, end);
+      return;
+    }
+    if (isUnsafeHtmlResult(value)) {
+      this.unsafeMarkup = value.markup;
+      return;
+    }
+    throw new Error('The prepared hydration value is not supported by the DOM renderer.');
+  }
+
   setStringValue(value: string, assumeInPlace = false): void {
     if (!this.textNode) {
       this.setValue(value, assumeInPlace);
@@ -1117,6 +1172,7 @@ interface RootInstance {
   readonly bindings: readonly Binding[];
   nodes: Node[];
   suspended: boolean;
+  hydrated?: boolean;
 }
 
 const templateCache = new WeakMap<TemplateStringsArray, CompiledTemplate>();
@@ -1153,6 +1209,11 @@ export function render(
     current?.template === compiled
     && rootNodesAreInPlace(container, current.nodes)
   ) {
+    if (current.hydrated) {
+      current.hydrated = false;
+      current.suspended = false;
+      return;
+    }
     const binding = current.bindings.length === 1 ? current.bindings[0] : undefined;
     const value = binding && binding.index < result.values.length
       ? result.values[binding.index]
@@ -1185,6 +1246,86 @@ export function render(
     nodes,
     suspended: false,
   });
+}
+
+export type HydrationMismatchCategory = 'text' | 'attribute' | 'structure' | 'state' | 'style';
+
+export interface HydrationMismatch {
+  readonly code: `GLUON_HYDRATION_${Uppercase<HydrationMismatchCategory>}_MISMATCH`;
+  readonly category: HydrationMismatchCategory;
+  readonly path: string;
+  readonly expected: string;
+  readonly actual: string;
+  readonly recovery: 'replace-root' | 'abort';
+  readonly suppressed: boolean;
+}
+
+export interface HydrationOptions {
+  readonly expectedMarkup: string;
+  readonly recovery?: 'replace' | 'throw';
+  readonly suppress?: boolean | readonly HydrationMismatchCategory[];
+  readonly onMismatch?: (mismatch: HydrationMismatch) => void;
+  readonly state?: { readonly server: unknown; readonly client: unknown };
+}
+
+export interface HydrationResult {
+  readonly mismatches: readonly HydrationMismatch[];
+  readonly retained: boolean;
+  readonly recovered: boolean;
+}
+
+export class HydrationMismatchError extends Error {
+  constructor(readonly mismatches: readonly HydrationMismatch[]) {
+    super(`Hydration aborted with ${mismatches.length} mismatch${mismatches.length === 1 ? '' : 'es'}.`);
+    this.name = 'HydrationMismatchError';
+  }
+}
+
+/** Binds matching marker HTML in place and deterministically replaces or aborts on mismatch. */
+export function hydrate(
+  result: TemplateResult,
+  container: Element | DocumentFragment | null,
+  options: HydrationOptions,
+): HydrationResult {
+  if (!container) return Object.freeze({ mismatches: [], retained: false, recovered: false });
+  if (!isTemplateResult(result)) throw new TypeError('hydrate() expects a TemplateResult created by html or svg.');
+  const expectedTemplate = document.createElement('template');
+  expectedTemplate.innerHTML = options.expectedMarkup;
+  const mismatches: HydrationMismatch[] = [];
+  compareHydrationNodes(
+    [...expectedTemplate.content.childNodes],
+    [...container.childNodes],
+    'root',
+    options,
+    mismatches,
+  );
+  if (options.state && stableHydrationValue(options.state.server) !== stableHydrationValue(options.state.client)) {
+    recordHydrationMismatch('state', 'state', options.state.server, options.state.client, options, mismatches);
+  }
+  if (mismatches.length > 0) {
+    if (options.recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
+    render(result, container);
+    return Object.freeze({ mismatches: Object.freeze(mismatches), retained: false, recovered: true });
+  }
+
+  try {
+    const context = createHydrationAdoptionContext(container);
+    const compiled = getCompiledTemplate(result);
+    const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
+    setRootInstance(container, {
+      template: compiled,
+      bindings,
+      nodes: [...container.childNodes],
+      suspended: false,
+      hydrated: true,
+    });
+    return Object.freeze({ mismatches: [], retained: true, recovered: false });
+  } catch (error) {
+    recordHydrationMismatch('structure', 'root', 'valid hydration markers', error, options, mismatches);
+    if (options.recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
+    render(result, container);
+    return Object.freeze({ mismatches: Object.freeze(mismatches), retained: false, recovered: true });
+  }
 }
 
 /** Temporarily releases active listeners, refs, and directive resources. */
@@ -1333,6 +1474,99 @@ function instantiateBindings(
     bindings[descriptorIndex] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
   }
   return bindings;
+}
+
+interface HydrationRange {
+  readonly start: Comment;
+  readonly end: Comment;
+}
+
+interface HydrationAdoptionContext {
+  marker: number;
+  readonly ranges: Map<string, HydrationRange>;
+  readonly attributes: Map<number, Element>;
+}
+
+function createHydrationAdoptionContext(root: Element | DocumentFragment): HydrationAdoptionContext {
+  const ranges = new Map<string, HydrationRange>();
+  const starts = new Map<string, Comment>();
+  const attributes = new Map<number, Element>();
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (node instanceof Comment) {
+      const start = node.data.match(/^gluon:([hik]):(\d+)$/);
+      if (start?.[1] && start[2]) starts.set(`${start[1]}:${start[2]}`, node);
+      const end = node.data.match(/^gluon:\/([hik]):(\d+)$/);
+      if (end?.[1] && end[2]) {
+        const key = `${end[1]}:${end[2]}`;
+        const opening = starts.get(key);
+        if (opening) ranges.set(key, { start: opening, end: node });
+      }
+      continue;
+    }
+    for (const attribute of [...(node as Element).attributes]) {
+      const match = attribute.name.match(/^data-gluon-h-(\d+)$/);
+      if (match?.[1]) attributes.set(Number(match[1]), node as Element);
+    }
+  }
+  return { marker: 0, ranges, attributes };
+}
+
+function instantiateHydratedBindings(
+  descriptors: readonly PartDescriptor[],
+  values: readonly TemplateValue[],
+  context: HydrationAdoptionContext,
+): Binding[] {
+  const bindings: Binding[] = [];
+  for (const descriptor of descriptors) {
+    const marker = context.marker++;
+    const value = descriptor.index < values.length ? values[descriptor.index]! : nothing;
+    let part: Part;
+    if (descriptor.kind === 'node') {
+      const range = context.ranges.get(`h:${marker}`);
+      if (!range) throw new Error(`Missing child hydration marker ${marker}.`);
+      const nodePart = new NodePart(range.start);
+      nodePart.hydrateValue(value, range.end, context);
+      range.end.remove();
+      part = nodePart;
+    } else {
+      const element = context.attributes.get(marker);
+      if (!element) throw new Error(`Missing attribute hydration marker ${marker}.`);
+      element.removeAttribute(`data-gluon-h-${marker}`);
+      part = descriptor.kind === 'spread'
+        ? new SpreadPart(element)
+        : new AttributePart(element, descriptor.name);
+      part.setValue(value, true);
+    }
+    bindings.push({ index: descriptor.index, part, priority: part.commitPriority ?? 0 });
+  }
+  return bindings;
+}
+
+function hydrateChildInstance(
+  result: TemplateResult,
+  start: Comment,
+  end: Comment,
+  context: HydrationAdoptionContext,
+): ChildInstance {
+  const compiled = getCompiledTemplate(result);
+  const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
+  return {
+    template: compiled,
+    bindings,
+    nodes: collectNodesUntil(start, end),
+  };
+}
+
+function takeHydrationRange(
+  context: HydrationAdoptionContext,
+  kind: 'i' | 'k',
+): HydrationRange {
+  const marker = context.marker++;
+  const range = context.ranges.get(`${kind}:${marker}`);
+  if (!range) throw new Error(`Missing ${kind === 'i' ? 'array' : 'keyed'} hydration marker ${marker}.`);
+  return range;
 }
 
 function createChildInstance(
@@ -1882,6 +2116,128 @@ function rootNodesAreInPlace(
     if (container.childNodes.item(index) !== nodes[index]) return false;
   }
   return true;
+}
+
+function compareHydrationNodes(
+  expected: readonly Node[],
+  actual: readonly Node[],
+  path: string,
+  options: HydrationOptions,
+  mismatches: HydrationMismatch[],
+): void {
+  if (expected.length !== actual.length) {
+    recordHydrationMismatch('structure', path, `${expected.length} nodes`, `${actual.length} nodes`, options, mismatches);
+    return;
+  }
+  for (let index = 0; index < expected.length; index += 1) {
+    const expectedNode = expected[index]!;
+    const actualNode = actual[index]!;
+    const nodePath = `${path}/${index}`;
+    if (expectedNode.nodeType !== actualNode.nodeType) {
+      recordHydrationMismatch('structure', nodePath, describeNode(expectedNode), describeNode(actualNode), options, mismatches);
+      continue;
+    }
+    if (expectedNode instanceof Text && actualNode instanceof Text) {
+      if (expectedNode.data !== actualNode.data) {
+        recordHydrationMismatch('text', nodePath, expectedNode.data, actualNode.data, options, mismatches);
+      }
+      continue;
+    }
+    if (expectedNode instanceof Comment && actualNode instanceof Comment) {
+      if (expectedNode.data !== actualNode.data) {
+        recordHydrationMismatch('structure', nodePath, expectedNode.data, actualNode.data, options, mismatches);
+      }
+      continue;
+    }
+    if (expectedNode instanceof Element && actualNode instanceof Element) {
+      if (expectedNode.localName !== actualNode.localName || expectedNode.namespaceURI !== actualNode.namespaceURI) {
+        recordHydrationMismatch('structure', nodePath, describeNode(expectedNode), describeNode(actualNode), options, mismatches);
+        continue;
+      }
+      compareHydrationAttributes(expectedNode, actualNode, nodePath, options, mismatches);
+      compareHydrationNodes(
+        [...expectedNode.childNodes],
+        [...actualNode.childNodes],
+        nodePath,
+        options,
+        mismatches,
+      );
+    }
+  }
+}
+
+function compareHydrationAttributes(
+  expected: Element,
+  actual: Element,
+  path: string,
+  options: HydrationOptions,
+  mismatches: HydrationMismatch[],
+): void {
+  const names = new Set([
+    ...[...expected.attributes].map((attribute) => attribute.name),
+    ...[...actual.attributes].map((attribute) => attribute.name),
+  ]);
+  for (const name of names) {
+    const expectedValue = expected.getAttribute(name);
+    const actualValue = actual.getAttribute(name);
+    if (expectedValue === actualValue) continue;
+    recordHydrationMismatch(
+      name === 'style' ? 'style' : 'attribute',
+      `${path}@${name}`,
+      expectedValue,
+      actualValue,
+      options,
+      mismatches,
+    );
+  }
+}
+
+function recordHydrationMismatch(
+  category: HydrationMismatchCategory,
+  path: string,
+  expected: unknown,
+  actual: unknown,
+  options: HydrationOptions,
+  mismatches: HydrationMismatch[],
+): void {
+  const suppressed = options.suppress === true
+    || (Array.isArray(options.suppress) && options.suppress.includes(category));
+  const mismatch = Object.freeze({
+    code: `GLUON_HYDRATION_${category.toUpperCase()}_MISMATCH` as HydrationMismatch['code'],
+    category,
+    path,
+    expected: formatHydrationValue(expected),
+    actual: formatHydrationValue(actual),
+    recovery: options.recovery === 'throw' ? 'abort' as const : 'replace-root' as const,
+    suppressed,
+  });
+  mismatches.push(mismatch);
+  if (!suppressed) options.onMismatch?.(mismatch);
+}
+
+function formatHydrationValue(value: unknown): string {
+  if (value instanceof Error) return `${value.name}: ${value.message}`;
+  if (value === null) return 'null';
+  if (value === undefined) return 'undefined';
+  return typeof value === 'string' ? value : stableHydrationValue(value);
+}
+
+function stableHydrationValue(value: unknown): string {
+  try {
+    return JSON.stringify(value, (_key, entry) => {
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return entry;
+      return Object.fromEntries(Object.entries(entry).sort(([left], [right]) => left.localeCompare(right)));
+    }) ?? String(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function describeNode(node: Node): string {
+  if (node instanceof Element) return `<${node.localName}>`;
+  if (node instanceof Text) return `text(${JSON.stringify(node.data)})`;
+  if (node instanceof Comment) return `comment(${JSON.stringify(node.data)})`;
+  return `node(${node.nodeType})`;
 }
 
 function isEventListener(value: unknown): value is EventListenerOrEventListenerObject {

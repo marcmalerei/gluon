@@ -1,13 +1,16 @@
 import { GluonElement, createApp, defineElement, html } from '@gluonjs/core';
 import { defineStore } from '@gluonjs/store';
 import {
+  prepareForHydration,
+  renderProgressively,
   renderElement,
   renderRequest,
   renderToString,
   serializeSsrState,
   type SsrRequestResult,
 } from '../packages/ssr/dist/index.js';
-import { renderToReadableStream } from '../packages/ssr/dist/streaming.js';
+import { hydrateApplication, hydrateTemplate } from '../packages/ssr/dist/hydration.js';
+import { renderProgressiveReadableStream, renderToReadableStream } from '../packages/ssr/dist/streaming.js';
 
 class GreetingElement extends GluonElement {
   static override readonly properties = { name: String };
@@ -18,6 +21,13 @@ defineElement('typed-greeting', GreetingElement);
 void renderToString(renderElement(GreetingElement, { properties: { name: 'Ada' } }));
 const stream: ReadableStream<Uint8Array> = renderToReadableStream(html`<p>Stream</p>`);
 void stream;
+const progressive: ReadableStream<Uint8Array> = renderProgressiveReadableStream(html`<p>Stream</p>`);
+void progressive;
+void renderProgressively(html`<p>Async</p>`);
+void prepareForHydration(html`<p>Hydrate</p>`);
+const hydrationRoot = document.createElement('div');
+void hydrateTemplate(html`<p>Hydrate</p>`, hydrationRoot, { recovery: 'throw' });
+void hydrateApplication(createApp(() => html`<p>App</p>`), hydrationRoot);
 
 const counter = defineStore({ id: 'typed-request', state: () => ({ count: 0 }) });
 const request: Promise<SsrRequestResult> = renderRequest<{ path: string }>({

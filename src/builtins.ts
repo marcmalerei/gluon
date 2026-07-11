@@ -40,7 +40,8 @@ export interface SuspenseProps<Value> {
 export type BuiltinServerContract =
   | {
       readonly kind: 'suspense';
-      resolve(): Promise<TemplateValue>;
+      readonly fallback: TemplateValue;
+      resolve(signal?: AbortSignal): Promise<TemplateValue>;
     }
   | {
       readonly kind: 'teleport';
@@ -122,34 +123,51 @@ export function Suspense<Value>(props: SuspenseProps<Value>): TemplateValue {
   const value = suspenseDirective(props as SuspenseProps<unknown>);
   builtinServerContracts.set(value, {
     kind: 'suspense',
-    resolve: () => resolveSuspenseForServer(props),
+    fallback: props.fallback,
+    resolve: (signal) => resolveSuspenseForServer(props, signal),
   });
   return value;
 }
 
-async function resolveSuspenseForServer<Value>(props: SuspenseProps<Value>): Promise<TemplateValue> {
+async function resolveSuspenseForServer<Value>(
+  props: SuspenseProps<Value>,
+  externalSignal?: AbortSignal,
+): Promise<TemplateValue> {
   const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
+  const abort = () => controller.abort(externalSignal?.reason);
+  externalSignal?.addEventListener('abort', abort, { once: true });
   try {
+    if (externalSignal?.aborted) throw externalSignal.reason ?? new DOMException('Aborted', 'AbortError');
     const source = typeof props.source === 'function'
       ? props.source({ signal: controller.signal, attempt: 1 })
       : props.source;
-    const result = props.timeout === undefined
-      ? await source
-      : await Promise.race([
-          source,
+    const candidates: Array<PromiseLike<Value>> = [source];
+    if (props.timeout !== undefined) {
+      candidates.push(
           new Promise<Value>((_resolve, reject) => {
             timer = setTimeout(() => {
               controller.abort();
               reject(new AsyncTimeoutError(props.timeout!));
             }, props.timeout);
           }),
-        ]);
+      );
+    }
+    if (externalSignal) {
+      candidates.push(new Promise<Value>((_resolve, reject) => {
+        externalSignal.addEventListener('abort', () => {
+          reject(externalSignal.reason ?? new DOMException('Aborted', 'AbortError'));
+        }, { once: true });
+      }));
+    }
+    const result = await Promise.race(candidates);
     return props.children(result);
   } catch (error) {
+    if (externalSignal?.aborted) throw error;
     return props.error?.(error, () => undefined) ?? props.fallback;
   } finally {
     if (timer !== undefined) clearTimeout(timer);
+    externalSignal?.removeEventListener('abort', abort);
   }
 }
 

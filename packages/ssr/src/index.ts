@@ -4,11 +4,12 @@ import {
   getTemplateValueServerContract,
   isTemplateResult,
   nothing,
+  repeat,
   renderGluonApplicationForServer,
   renderGluonElementForServer,
+  TemplateResult,
   type GluonApp,
   type GluonElementClass,
-  type TemplateResult,
   type TemplateValue,
 } from '@gluonjs/core';
 import { effectScope, type EffectScope } from '@gluonjs/reactivity';
@@ -77,9 +78,56 @@ export async function renderToString(value: TemplateValue): Promise<string> {
   return html;
 }
 
-/** Emits ordered serialization chunks; incremental async streaming lands in #36. */
+/** Emits ordered hydration-marked serialization chunks. */
 export async function* renderToChunks(value: TemplateValue): AsyncGenerator<string> {
-  yield* serializeValue(value);
+  yield* serializeValue(value, { marker: 0 });
+}
+
+export type ProgressiveRenderChunk =
+  | { readonly kind: 'shell'; readonly html: string }
+  | { readonly kind: 'boundary'; readonly id: number; readonly html: string };
+
+export interface ProgressiveRenderOptions {
+  readonly signal?: AbortSignal;
+}
+
+/** Emits fallbacks in the shell and resolved async boundaries as ordered patch records. */
+export async function* renderProgressively(
+  value: TemplateValue,
+  options: ProgressiveRenderOptions = {},
+): AsyncGenerator<ProgressiveRenderChunk> {
+  throwIfAborted(options.signal);
+  const progressive: ProgressiveCoordinator = {
+    boundary: 0,
+    tasks: [],
+    signal: options.signal,
+  };
+  const context: SerializationContext = { marker: 0, progressive };
+  let shell = '';
+  for await (const chunk of serializeValue(value, context)) shell += chunk;
+  yield Object.freeze({ kind: 'shell', html: shell });
+
+  while (progressive.tasks.length > 0) {
+    throwIfAborted(options.signal);
+    const settled = await Promise.race(progressive.tasks.map((task) => task.promise));
+    const index = progressive.tasks.findIndex((task) => task.id === settled.id);
+    if (index >= 0) progressive.tasks.splice(index, 1);
+    if ('error' in settled) throw settled.error;
+    let html = '';
+    for await (const chunk of serializeValue(settled.value as TemplateValue, context)) html += chunk;
+    yield Object.freeze({ kind: 'boundary', id: settled.id, html });
+  }
+}
+
+export interface PreparedHydration {
+  readonly value: TemplateValue;
+  readonly html: string;
+}
+
+/** Resolves server async contracts once and returns the matching marker HTML and value tree. */
+export async function prepareForHydration(value: TemplateValue): Promise<PreparedHydration> {
+  const prepared = await resolveHydrationValue(value);
+  return Object.freeze({ value: prepared, html: await renderToString(prepared) });
 }
 
 export interface SsrRequestContext<Data = undefined> {
@@ -169,7 +217,27 @@ export function serializeSsrState(value: unknown): string {
     .replaceAll('\u2029', '\\u2029');
 }
 
-async function* serializeValue(value: unknown): AsyncGenerator<string> {
+interface SerializationContext {
+  marker: number;
+  readonly progressive?: ProgressiveCoordinator;
+}
+
+interface ProgressiveCoordinator {
+  boundary: number;
+  readonly tasks: ProgressiveTask[];
+  readonly signal?: AbortSignal;
+}
+
+interface ProgressiveTask {
+  readonly id: number;
+  readonly promise: Promise<{
+    readonly id: number;
+    readonly value?: TemplateValue;
+    readonly error?: unknown;
+  }>;
+}
+
+async function* serializeValue(value: unknown, context: SerializationContext): AsyncGenerator<string> {
   if (value == null || value === false || value === nothing) return;
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint' || value === true) {
     yield escapeText(String(value));
@@ -180,31 +248,52 @@ async function* serializeValue(value: unknown): AsyncGenerator<string> {
     return;
   }
   if (Array.isArray(value)) {
-    for (const child of value) yield* serializeValue(child);
+    for (const child of value) {
+      const marker = context.marker++;
+      yield `<!--gluon:i:${marker}-->`;
+      yield* serializeValue(child, context);
+      yield `<!--gluon:/i:${marker}-->`;
+    }
     return;
   }
   if (isTemplateResult(value)) {
-    yield* serializeTemplate(value);
+    yield* serializeTemplate(value, context);
     return;
   }
   if (isServerElementValue(value)) {
     yield `<${value.tagName}${serializeSpread(value.properties)}>`;
     yield '<template shadowrootmode="open">';
-    yield* serializeTemplate(value.shadow);
+    yield* serializeTemplate(value.shadow, context);
     yield '</template>';
-    yield* serializeValue(value.children);
+    yield* serializeValue(value.children, context);
     yield `</${value.tagName}>`;
     return;
   }
   const builtin = getBuiltinServerContract(value);
   if (builtin) {
-    if (builtin.kind === 'suspense') yield* serializeValue(await builtin.resolve());
-    else yield* serializeValue(builtin.content);
+    if (builtin.kind === 'suspense' && context.progressive) {
+      const id = context.progressive.boundary++;
+      const promise = builtin.resolve(context.progressive.signal).then(
+        (resolved) => ({ id, value: resolved as TemplateValue }),
+        (error: unknown) => ({ id, error }),
+      );
+      context.progressive.tasks.push({ id, promise });
+      yield `<!--gluon:async:${id}-->`;
+      yield* serializeValue(builtin.fallback, context);
+      yield `<!--gluon:/async:${id}-->`;
+    } else if (builtin.kind === 'suspense') {
+      yield* serializeValue(await builtin.resolve(), context);
+    } else yield* serializeValue(builtin.content, context);
     return;
   }
   const contract = getTemplateValueServerContract(value);
   if (contract?.kind === 'repeat') {
-    for (const item of contract.items) yield* serializeValue(item.value);
+    for (const item of contract.items) {
+      const marker = context.marker++;
+      yield `<!--gluon:k:${marker}-->`;
+      yield* serializeValue(item.value, context);
+      yield `<!--gluon:/k:${marker}-->`;
+    }
     return;
   }
   if (contract?.kind === 'unsafe-html') {
@@ -228,7 +317,10 @@ async function* serializeValue(value: unknown): AsyncGenerator<string> {
   );
 }
 
-async function* serializeTemplate(result: TemplateResult): AsyncGenerator<string> {
+async function* serializeTemplate(
+  result: TemplateResult,
+  context: SerializationContext,
+): AsyncGenerator<string> {
   const state = { inTag: false, quote: '' };
   let skipQuote = '';
   for (let index = 0; index < result.strings.length; index += 1) {
@@ -243,8 +335,11 @@ async function* serializeTemplate(result: TemplateResult): AsyncGenerator<string
       continue;
     }
     if (!state.inTag) {
+      const marker = context.marker++;
       yield chunk;
-      yield* serializeValue(result.values[index]);
+      yield `<!--gluon:h:${marker}-->`;
+      yield* serializeValue(result.values[index], context);
+      yield `<!--gluon:/h:${marker}-->`;
       continue;
     }
     const match = originalChunk.match(/(?:^|[\s<])([^\s"'<>/=]+)=\s*(["']?)$/);
@@ -257,10 +352,37 @@ async function* serializeTemplate(result: TemplateResult): AsyncGenerator<string
     const name = match[1];
     const nameOffset = chunk.lastIndexOf(name);
     const prefix = chunk.slice(0, nameOffset);
+    const marker = context.marker++;
     yield /\s$/.test(prefix) ? prefix.slice(0, -1) : prefix;
     yield serializeBinding(name, result.values[index]);
+    yield ` data-gluon-h-${marker}=""`;
     skipQuote = match[2] ?? '';
   }
+}
+
+async function resolveHydrationValue(value: TemplateValue): Promise<TemplateValue> {
+  if (Array.isArray(value)) {
+    return Promise.all(value.map((child) => resolveHydrationValue(child)));
+  }
+  if (isTemplateResult(value)) {
+    const values = await Promise.all(value.values.map((child) => resolveHydrationValue(child)));
+    return new TemplateResult(value.strings, values, value.type);
+  }
+  const builtin = getBuiltinServerContract(value);
+  if (builtin) {
+    return resolveHydrationValue(
+      builtin.kind === 'suspense' ? await builtin.resolve() : builtin.content,
+    );
+  }
+  const contract = getTemplateValueServerContract(value);
+  if (contract?.kind === 'repeat') {
+    const items = await Promise.all(contract.items.map(async (item) => ({
+      key: item.key,
+      value: await resolveHydrationValue(item.value),
+    })));
+    return repeat(items, (item) => item.key, (item) => item.value as TemplateValue);
+  }
+  return value;
 }
 
 function serializeBinding(name: string, value: unknown): string {
@@ -409,4 +531,8 @@ function updateMarkupState(state: { inTag: boolean; quote: string }, chunk: stri
     if (character === '"' || character === "'") state.quote = character;
     else if (character === '>') state.inTag = false;
   }
+}
+
+function throwIfAborted(signal: AbortSignal | undefined): void {
+  if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
 }

@@ -22,7 +22,11 @@ export default defineConfig({
     alias: {
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
+      '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),
       '@gluonjs/router': resolve(import.meta.dirname, 'packages/router/src/index.ts'),
+      '@gluonjs/ssr/hydration': resolve(import.meta.dirname, 'packages/ssr/src/hydration.ts'),
+      '@gluonjs/ssr/streaming': resolve(import.meta.dirname, 'packages/ssr/src/streaming.ts'),
+      '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
     },
   },
@@ -50,7 +54,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      include: ['src/**/*.ts'],
+      include: ['src/**/*.ts', 'packages/ssr/src/hydration.ts'],
       exclude: ['packages/**'],
       reporter: ['text', 'html'],
       thresholds: {

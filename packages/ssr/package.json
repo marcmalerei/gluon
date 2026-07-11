@@ -22,6 +22,10 @@
     "./streaming": {
       "types": "./dist/streaming.d.ts",
       "import": "./dist/streaming.js"
+    },
+    "./hydration": {
+      "types": "./dist/hydration.d.ts",
+      "import": "./dist/hydration.js"
     }
   },
   "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
