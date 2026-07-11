@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {
+      "@gluonjs/core": ["dist/types/index.d.ts"],
+      "@gluonjs/devtools-api": ["packages/devtools-api/dist/index.d.ts"]
+    },
+    "sourceMap": true
+  }
+}

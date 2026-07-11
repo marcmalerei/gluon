@@ -72,6 +72,12 @@ packages/language-server/
 editors/vscode/
 └── extension.cjs       Maintained client for the lockstep language server
 
+packages/devtools-api/
+└── src/index.ts        Environment-neutral versioned snapshots and event protocol
+
+packages/devtools/
+└── src/index.ts        Opt-in Core/Router/Store bridge, Vite module, browser inspector
+
 examples/shop/
 ├── src/app.ts          Public-package application composition and routes
 ├── src/server.ts       Public SSR request entry reusing the shop application
