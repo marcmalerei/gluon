@@ -6,10 +6,11 @@ produce inspectable evidence, not to guarantee that one renderer wins.
 
 The runtime's measured hot paths include direct string-binding updates,
 direct insertion when a new part contains one node, fragment batching when it
-contains multiple nodes, precomputed binding priorities, parallel key/value
-storage for keyed repeats, detached keyed-child anchors, and keyed-list fast
-paths for unchanged and reversed order. These shortcuts retain the external-DOM
-recovery and keyed-identity contracts covered by the browser suite.
+contains multiple nodes, one shared DOM traversal when cloned template bindings
+are instantiated, precomputed binding priorities, parallel key/value storage for
+keyed repeats, detached keyed-child anchors, and keyed-list fast paths for
+unchanged and reversed order. These shortcuts retain the external-DOM recovery
+and keyed-identity contracts covered by the browser suite.
 
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
@@ -87,15 +88,15 @@ above 1 means Gluon was faster for only that browser and workload.
 
 ## Current committed matrix
 
-The retained matrix for commit `55206f4` uses 20 measured samples, eight warm-up
+The retained matrix for commit `5309218` uses 40 measured samples, 12 warm-up
 rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit 26.5
 engines on the recorded Apple M4 environment. The paired
-[`rendering-comparison-55206f4.md`](../benchmarks/results/rendering-comparison-55206f4.md)
+[`rendering-comparison-5309218.md`](../benchmarks/results/rendering-comparison-5309218.md)
 file contains the medians and p95 values; its JSON file retains every sample.
 
 Gluon is faster than Lit for keyed `update` and `reverse` in all three engines:
-1.22×/1.74× in Chromium, 1.23×/1.94× in Firefox, and 1.21×/2.00× in WebKit.
-Text is at parity in Firefox and WebKit; Lit is faster in Chromium. Fresh
+1.25×/1.74× in Chromium, 1.15×/1.89× in Firefox, and 1.14×/2.00× in WebKit.
+Lit is faster for the single-text update in all three engines. Fresh
 1,000-row `create` remains faster in Lit in this matrix, so the evidence does
 not support a universal “Gluon is faster” claim or the historical 6× claim.
 
@@ -130,6 +131,16 @@ nodes, so they do not enter the new empty-part insertion branch. A second
 the 1.1333 ms/op baseline. These run-specific observations are not extrapolated
 beyond the recorded environment.
 
+The binding-instantiation fast path prepares descriptors in DOM traversal order
+and locates all parts in a cloned template with one reused `TreeWalker`. The
+post-change Chromium CPU profile no longer contains `walkPath()` or repeated
+`childNodes.item()` calls. Compared with the preceding retained `55206f4`
+matrix, the `create` median is lower by 18% in Chromium (1.1472 to 0.9405
+ms/op), 9% in Firefox (1.9167 to 1.7500 ms/op), and 11% in WebKit (1.4583 to
+1.2917 ms/op). Lit remains 12%, 10%, and 10% faster, respectively, for this
+fresh-create workload. As above, these percentages compare separate retained
+runs and are not a general renderer claim.
+
 ## Interpretation and limits
 
 The benchmark measures synchronous template creation, renderer reconciliation,
@@ -151,28 +162,3 @@ The shop flow has its own non-comparative p95 budgets in
 navigation, bag opening, and checkout navigation in the production build and
 preserves all raw samples. The thresholds are regression ceilings, not user
 experience guarantees across networks or devices.
-
-## Legacy Tiny-Lit benchmark
-
-The local Downloads folder contains a separate historical test at
-`~/Downloads/tiny-lit-main/public/benchmark.html`. It loads the old
-`gluon@0.1.0` build from that project and `lit-html@3` from `esm.sh`; it is not a
-benchmark of the current `@gluonjs/core@0.0.0` source. Its six scenarios use a
-20 ms warm-up, a 200 ms time window, sequential renderer runs, and averaged
-results without retained raw samples.
-
-I reran that page from its production preview in the current Chromium session.
-At 10 runs and 500 list items, Gluon won 4 of 6 scenarios; the largest observed
-advantage was 1.89× for four-attribute updates. At 3 runs and 5,000 list items,
-Gluon won 3 of 6; the largest observed advantage was 2.73× for the same
-attribute scenario. Lit won the simple update and 500-item initial-render
-scenarios in the 500-item run. These reruns did not reproduce a 6× result.
-
-In the same rerun under Playwright Firefox 152.0.4, the 10-run/500-item case
-also won 3 of 6 for each renderer and peaked at 1.82× for Gluon; the 3-run/
-5,000-item case won 4 of 6 for Gluon and peaked at 1.79×. Those values are
-retained here as a traceable historical comparison, not as the current release
-baseline. The current benchmark command above is the authoritative evidence
-because it runs the repository source, includes Vue and Vanilla DOM controls,
-validates identical output, records every sample, and captures exact source and
-environment metadata.
