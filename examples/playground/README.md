@@ -22,6 +22,11 @@ reproduction. Download creates an uncompressed, runnable Vite project with an
 HTML entry, typed Gluon mount, constructable stylesheet adoption, TypeScript
 configuration, aligned `0.0.0` Gluon dependencies, and the template checker.
 
+The GitHub Pages job starts from `npm ci --ignore-scripts`, builds Core (including
+Reactivity), Compiler, and Vite in dependency order, and then runs
+`npm run build:playground`. This matches a clean runner where package `dist`
+directories do not exist before the workflow starts.
+
 Config opens the searchable versioned diagnostic catalog. Diagnostic rows link
 directly into that state. The GitHub Pages workflow deploys the production build
 at `https://marcmalerei.github.io/gluon/playground/`; the bug-report template
