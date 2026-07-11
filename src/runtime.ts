@@ -305,7 +305,7 @@ interface PartChild {
 interface KeyedChild {
   readonly key: Key;
   readonly part: NodePart;
-  readonly binding: Binding;
+  binding?: Binding;
 }
 
 const emptyPartChildren: Array<PartChild | undefined> = [];
@@ -416,7 +416,10 @@ class NodePart implements Part {
     for (const child of this.arrayChildren) {
       if (child) suspendBindings([child.binding]);
     }
-    for (const child of this.keyedChildren) suspendBindings([child.binding]);
+    for (const child of this.keyedChildren) {
+      if (child.binding) suspendBindings([child.binding]);
+      else child.part.suspend();
+    }
   }
 
   private setTemplate(result: TemplateResult, assumeInPlace = false): void {
@@ -542,9 +545,7 @@ class NodePart implements Part {
       for (let index = 0; index < keys.length; index += 1) {
         const child = this.keyedChildren[keys.length - index - 1]!;
         const value = values[index]!;
-        if (!(value instanceof TemplateResult && child.part.updateTemplateResult(value))) {
-          applyBinding(child.binding, value, true);
-        }
+        this.updateKeyedChild(child, value, true);
         if (child.part.nodes[0] !== reference) moveNodesBefore(parent, child.part.nodes, reference);
         nextChildren.push(child);
         nextNodes.push(...child.part.nodes);
@@ -582,7 +583,8 @@ class NodePart implements Part {
 
     for (const [key, removed] of previousByKey) {
       if (!nextKeys.has(key)) {
-        disconnectBindings([removed.binding]);
+        if (removed.binding) disconnectBindings([removed.binding]);
+        else removed.part.disconnect();
         previousByKey.delete(key);
       }
     }
@@ -595,9 +597,7 @@ class NodePart implements Part {
 
       if (previous) {
         previousByKey.delete(key);
-        if (!(value instanceof TemplateResult && child.part.updateTemplateResult(value))) {
-          applyBinding(child.binding, value, true);
-        }
+        this.updateKeyedChild(child, value, true);
       }
 
       nextChildren.push(child);
@@ -614,13 +614,37 @@ class NodePart implements Part {
     for (let index = 0; index < keys.length; index += 1) {
       const child = this.keyedChildren[index]!;
       const value = values[index]!;
-      if (!(value instanceof TemplateResult && child.part.updateTemplateResult(value))) {
-        applyBinding(child.binding, value, true);
-      }
+      this.updateKeyedChild(child, value, true);
     }
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
     if (!nodesAreInPlace(this.marker, this.nodes)) this.replaceNodes([...this.nodes]);
+  }
+
+  private updateKeyedChild(child: KeyedChild, value: TemplateValue, assumeInPlace: boolean): void {
+    if (child.binding) {
+      applyBinding(child.binding, value, assumeInPlace);
+      return;
+    }
+    if (value instanceof TemplateResult) {
+      child.part.setTemplateResult(value, assumeInPlace);
+      return;
+    }
+    if (typeof value === 'string') {
+      child.part.setStringValue(value, assumeInPlace);
+      return;
+    }
+    if (isRepeatResult(value)) {
+      child.part.setRepeatResult(value);
+      return;
+    }
+    if (isDirectiveValue(value)) {
+      const binding: Binding = { index: 0, part: child.part, priority: 0 };
+      child.binding = binding;
+      applyDirective(binding, value);
+      return;
+    }
+    child.part.setValue(value, assumeInPlace);
   }
 
   setRepeatResult(result: InternalRepeatResult): void {
@@ -630,9 +654,9 @@ class NodePart implements Part {
   private createKeyedChild(key: Key, value: TemplateValue): KeyedChild {
     const marker = this.detachedKeyMarker ??= document.createComment('gluon:key');
     const part = new NodePart(marker, this.contextMarker);
-    const binding: Binding = { index: 0, part, priority: 0 };
-    applyBinding(binding, value);
-    return { key, part, binding };
+    const child = { key, part };
+    this.updateKeyedChild(child, value, false);
+    return child;
   }
 
   private createPartChild(value: TemplateValue, markerData = 'gluon:item'): PartChild {
@@ -722,7 +746,10 @@ class NodePart implements Part {
 
   private disconnectKeyedChildren(): void {
     if (this.keyedChildren.length === 0) return;
-    for (const child of this.keyedChildren) disconnectBindings([child.binding]);
+    for (const child of this.keyedChildren) {
+      if (child.binding) disconnectBindings([child.binding]);
+      else child.part.disconnect();
+    }
     this.keyedChildren = emptyKeyedChildren;
   }
 }
