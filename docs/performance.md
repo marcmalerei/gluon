@@ -107,6 +107,29 @@ lower by 5% in Chromium (1.2083 to 1.1472 ms/op), 6% in Firefox (2.0417 to
 benchmark runs, so the distributions remain the evidence; the percentages are
 not a browser-independent speedup claim.
 
+Issue #81 also retained a controlled Chromium confirmation with 40 interleaved
+samples and 12 warm-up rounds. Both runs used the production build, Chromium
+149.0.7827.55, Node 22.22.0, and the same recorded Apple M4 environment. The
+[clean `main` baseline at `09e921a`](../benchmarks/results/rendering-comparison-09e921a-chromium.md)
+and [clean optimized run at `3c17ec4`](../benchmarks/results/rendering-comparison-3c17ec4-chromium.md)
+retain their complete samples in the paired JSON files.
+
+| Scenario | Baseline median / p95 ms/op | Optimized median / p95 ms/op |
+| --- | ---: | ---: |
+| `text` | 0.000054583 / 0.000059167 | 0.000054074 / 0.000059259 |
+| `create` | 1.1333 / 1.5611 | 0.9833 / 1.2917 |
+| `update` | 0.077500 / 0.093750 | 0.076875 / 0.088125 |
+| `reverse` | 0.158571 / 0.180000 | 0.152857 / 0.180000 |
+
+The optimized `create` median was 13.2% lower and its p95 was 17.3% lower in
+that confirmation. The steady-state text, update, and reverse medians were also
+lower; update p95 was lower, reverse p95 was unchanged, and text p95 differed
+by 0.000000093 ms/op. Those timed steady-state operations update existing
+nodes, so they do not enter the new empty-part insertion branch. A second
+40-sample optimized run measured `create` at 1.0458 ms/op, independently below
+the 1.1333 ms/op baseline. These run-specific observations are not extrapolated
+beyond the recorded environment.
+
 ## Interpretation and limits
 
 The benchmark measures synchronous template creation, renderer reconciliation,
