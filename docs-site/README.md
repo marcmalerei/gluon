@@ -10,6 +10,10 @@ The site uses the same Swiss-editorial visual system as the Playground: true
 white, near-black type, chartreuse primary actions, cobalt technical details,
 thin rules, open rails, and square geometry. The accepted full desktop/mobile
 concept is [`design/docs-concept.png`](design/docs-concept.png).
+The verified browser renders are
+[`design/rendered-docs-desktop.png`](design/rendered-docs-desktop.png) at
+1536×1024 and [`design/rendered-docs-mobile.png`](design/rendered-docs-mobile.png)
+at 390×844.
 
 ## Commands
 
