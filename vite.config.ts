@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
+import { browserTarget } from './vitest.browser-target.js';
 
 const entry = {
   index: resolve(import.meta.dirname, 'src/index.ts'),
@@ -51,7 +52,7 @@ export default defineConfig({
       enabled: true,
       headless: true,
       provider: playwright(),
-      instances: [{ browser: 'chromium' }],
+      instances: [{ browser: browserTarget }],
     },
     coverage: {
       provider: 'v8',
