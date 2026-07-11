@@ -47,6 +47,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - The official `@gluonjs/test-utils` package with public black-box component,
   Custom Element, context, plugin, Router, Store, scheduler, leak-detection, and
   automatic-cleanup fixtures.
+- The shared `@gluonjs/compiler` template-location/source-map transform and the
+  official `@gluonjs/vite` plugin with compatible functional component, Custom
+  Element, Store, and constructable stylesheet HMR.
 - The living mobile-first GLUON GOODS reference shop with responsive
   navigation, catalog and product routes, configurable products, search, a
   reactive bag, generated product imagery, adopted stylesheet-only design, and

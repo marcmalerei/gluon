@@ -18,6 +18,18 @@ import {
   type ApplicationContext,
 } from './application-context.js';
 
+declare const __GLUON_DEV__: boolean;
+
+const compiledDevelopment = typeof __GLUON_DEV__ === 'undefined'
+  ? undefined
+  : __GLUON_DEV__;
+
+function isDevelopmentEnabled(): boolean {
+  return compiledDevelopment ?? (
+    globalThis as { process?: { env?: { NODE_ENV?: string } } }
+  ).process?.env?.NODE_ENV !== 'production';
+}
+
 export type GluonRenderCause =
   | { readonly type: 'connection' }
   | { readonly type: 'request' }
@@ -129,6 +141,8 @@ const declarationCache = new WeakMap<Function, PropertyDeclarations>();
 const styleCache = new WeakMap<Function, readonly CSSStyleSheet[]>();
 const eventDeclarationCache = new WeakMap<Function, EventDeclarations>();
 const slotDeclarationCache = new WeakMap<Function, SlotDeclarations>();
+const connectedElements = new Set<GluonElement<any>>();
+const hotElementDefinitions = new Map<string, GluonElementConstructor>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
 const publicInstance = Symbol('gluon.public-instance');
@@ -145,6 +159,15 @@ interface CapturedComponentBoundary {
   readonly context?: ApplicationContext;
   readonly callbacks: readonly ComponentErrorBoundary[];
 }
+
+interface ElementRenderDebugState {
+  readonly causes: GluonRenderCause[];
+  dependencies?: EffectDebuggerEvent[];
+}
+
+const elementRenderDebugStates = compiledDevelopment === false
+  ? undefined
+  : new WeakMap<GluonElement<any>, ElementRenderDebugState>();
 
 export abstract class GluonElement<
   Events extends object = Record<string, unknown>,
@@ -165,8 +188,6 @@ export abstract class GluonElement<
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
   private pendingUpdate?: UpdateDeferred;
-  private readonly pendingRenderCauses: GluonRenderCause[] = [];
-  private activeRenderDependencies?: EffectDebuggerEvent[];
   private connectionRendered = false;
   private readonly connectedHooks: ComponentLifecycleCallback[] = [];
   private readonly beforeUpdateHooks: ComponentLifecycleCallback[] = [];
@@ -205,12 +226,14 @@ export abstract class GluonElement<
     adoptStyles(this.renderRoot, ...getStyles(this.constructor as GluonElementConstructor));
     this.reflectCurrentProperties();
     this.createRenderEffect();
+    connectedElements.add(this);
     void this.queueUpdate({ type: 'connection' });
   }
 
   disconnectedCallback(): void {
     if (!this.connected) return;
     this.connected = false;
+    connectedElements.delete(this);
     const scope = this.renderScope;
     this.renderScope = undefined;
     this.renderEffect = undefined;
@@ -218,8 +241,9 @@ export abstract class GluonElement<
       scope?.stop();
     } finally {
       this.resolvePendingUpdate();
-      this.pendingRenderCauses.length = 0;
-      this.activeRenderDependencies = undefined;
+      if (compiledDevelopment !== false && isDevelopmentEnabled()) {
+        elementRenderDebugStates?.delete(this);
+      }
       try {
         suspendRender(this.renderRoot);
       } finally {
@@ -264,6 +288,11 @@ export abstract class GluonElement<
 
   protected requestUpdate(): Promise<void> {
     return this.queueUpdate({ type: 'request' });
+  }
+
+  /** Requests a render pass after the official Vite runtime patches compatible logic. */
+  requestHotUpdate(): Promise<void> {
+    return this.requestUpdate();
   }
 
   protected onConnected(callback: ComponentLifecycleCallback): void {
@@ -369,12 +398,14 @@ export abstract class GluonElement<
         onSchedule: () => {
           if (this.connected) this.ensurePendingUpdate();
         },
-        onTrack: (dependency) => {
-          this.activeRenderDependencies?.push(dependency);
-        },
-        onTrigger: (dependency) => {
-          this.recordRenderCause({ type: 'reactive', dependency });
-        },
+        ...(compiledDevelopment !== false && isDevelopmentEnabled() ? {
+          onTrack: (dependency: EffectDebuggerEvent) => {
+            getElementRenderDebugState(this).dependencies?.push(dependency);
+          },
+          onTrigger: (dependency: EffectDebuggerEvent) => {
+            recordElementRenderCause(this, { type: 'reactive', dependency });
+          },
+        } : {}),
       },
     ))!;
     this.renderScope = scope;
@@ -384,7 +415,9 @@ export abstract class GluonElement<
   private queueUpdate(cause: GluonRenderCause): Promise<void> {
     const runner = this.renderEffect;
     if (!this.connected || !runner) return this.updatePromise;
-    this.recordRenderCause(cause);
+    if (compiledDevelopment !== false && isDevelopmentEnabled()) {
+      recordElementRenderCause(this, cause);
+    }
     const promise = this.ensurePendingUpdate();
     queueJob(runner, { phase: 'update', id: this.updateId });
     return promise;
@@ -395,14 +428,14 @@ export abstract class GluonElement<
     if (!this.pendingUpdate) this.updatePromise = deferred.promise;
     this.pendingUpdate = undefined;
 
-    const causes = Object.freeze([...this.pendingRenderCauses]);
-    this.pendingRenderCauses.length = 0;
-    const dependencies: EffectDebuggerEvent[] = [];
-    this.activeRenderDependencies = dependencies;
-    const startedAt = performance.now();
-    let failed = false;
-    let renderError: unknown;
+    if (compiledDevelopment !== false && isDevelopmentEnabled()) {
+      performElementUpdateWithDiagnostics(this, () => this.commitUpdate(deferred));
+      return;
+    }
+    this.commitUpdate(deferred);
+  }
 
+  private commitUpdate(deferred: UpdateDeferred): void {
     try {
       if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
       this.runOwned(() => this.update());
@@ -414,23 +447,8 @@ export abstract class GluonElement<
       this.invokeLifecycle(this.updatedHooks);
       deferred.resolve();
     } catch (error) {
-      failed = true;
-      renderError = error;
       deferred.reject(error);
       throw error;
-    } finally {
-      const endedAt = performance.now();
-      this.activeRenderDependencies = undefined;
-      emitRenderDebugEvent({
-        element: this,
-        causes,
-        dependencies: Object.freeze([...dependencies]),
-        startedAt,
-        endedAt,
-        duration: endedAt - startedAt,
-        failed,
-        ...(failed ? { error: renderError } : {}),
-      });
     }
   }
 
@@ -446,10 +464,6 @@ export abstract class GluonElement<
     this.pendingUpdate?.resolve();
     this.pendingUpdate = undefined;
     this.updatePromise = Promise.resolve();
-  }
-
-  private recordRenderCause(cause: GluonRenderCause): void {
-    if (isDevelopment() && renderDebugHook) this.pendingRenderCauses.push(cause);
   }
 
   private runOwned<Result>(callback: () => Result): Result {
@@ -686,9 +700,57 @@ function createUpdateDeferred(): UpdateDeferred {
   return { promise, resolve, reject };
 }
 
+function getElementRenderDebugState(element: GluonElement<any>): ElementRenderDebugState {
+  const states = elementRenderDebugStates!;
+  let state = states.get(element);
+  if (!state) {
+    state = { causes: [] };
+    states.set(element, state);
+  }
+  return state;
+}
+
+function recordElementRenderCause(element: GluonElement<any>, cause: GluonRenderCause): void {
+  if (renderDebugHook) getElementRenderDebugState(element).causes.push(cause);
+}
+
+function performElementUpdateWithDiagnostics(
+  element: GluonElement<any>,
+  update: () => void,
+): void {
+  const state = getElementRenderDebugState(element);
+  const causes = Object.freeze([...state.causes]);
+  state.causes.length = 0;
+  const dependencies: EffectDebuggerEvent[] = [];
+  state.dependencies = dependencies;
+  const startedAt = performance.now();
+  let failed = false;
+  let renderError: unknown;
+  try {
+    update();
+  } catch (error) {
+    failed = true;
+    renderError = error;
+    throw error;
+  } finally {
+    const endedAt = performance.now();
+    state.dependencies = undefined;
+    emitRenderDebugEvent({
+      element,
+      causes,
+      dependencies: Object.freeze([...dependencies]),
+      startedAt,
+      endedAt,
+      duration: endedAt - startedAt,
+      failed,
+      ...(failed ? { error: renderError } : {}),
+    });
+  }
+}
+
 function emitRenderDebugEvent(event: GluonRenderDebugEvent): void {
   const hook = renderDebugHook;
-  if (!hook || !isDevelopment()) return;
+  if (!isDevelopmentEnabled() || !hook) return;
   try {
     hook(Object.freeze(event));
   } catch (error) {
@@ -707,12 +769,6 @@ function reportDebugHookError(error: unknown): void {
   } catch {
     // A development observer cannot turn a completed render into an application failure.
   }
-}
-
-function isDevelopment(): boolean {
-  return (
-    globalThis as { process?: { env?: { NODE_ENV?: string } } }
-  ).process?.env?.NODE_ENV !== 'production';
 }
 
 function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
@@ -785,6 +841,154 @@ export function defineElement<Constructor extends GluonElementClass>(
   }
   if (!existing) customElements.define(tagName, constructor);
   return constructor;
+}
+
+export interface GluonElementHotUpdateResult<Constructor extends GluonElementClass> {
+  readonly compatible: boolean;
+  readonly constructor: Constructor;
+  readonly reason?: string;
+}
+
+/**
+ * Registers the first Custom Element constructor and patches its compatible
+ * prototype on later Vite evaluations. Application code should use
+ * `defineElement()`; this entry point belongs to the official Vite integration.
+ */
+export function applyGluonElementHotUpdate<Constructor extends GluonElementClass>(
+  tagName: `${string}-${string}`,
+  next: Constructor,
+): GluonElementHotUpdateResult<Constructor> {
+  const recorded = hotElementDefinitions.get(tagName);
+  if (!recorded) {
+    const registered = customElements.get(tagName);
+    if (registered && registered !== next) {
+      throw new Error(`Custom element "${tagName}" is already defined outside Gluon HMR.`);
+    }
+    if (!registered) customElements.define(tagName, next);
+    hotElementDefinitions.set(tagName, next as GluonElementConstructor);
+    return Object.freeze({ compatible: true, constructor: next });
+  }
+
+  const reason = getHotUpdateIncompatibility(recorded, next as GluonElementConstructor);
+  if (reason) {
+    return Object.freeze({
+      compatible: false,
+      constructor: recorded as Constructor,
+      reason,
+    });
+  }
+
+  patchHotElementConstructor(recorded, next as GluonElementConstructor);
+  for (const element of connectedElements) {
+    if (element.localName === tagName) void element.requestHotUpdate();
+  }
+  return Object.freeze({ compatible: true, constructor: recorded as Constructor });
+}
+
+/** Requests a render pass for all currently connected Gluon elements. */
+export function refreshGluonElements(): void {
+  for (const element of connectedElements) void element.requestHotUpdate();
+}
+
+function getHotUpdateIncompatibility(
+  current: GluonElementConstructor,
+  next: GluonElementConstructor,
+): string | undefined {
+  if (Object.getPrototypeOf(current) !== Object.getPrototypeOf(next)) {
+    return 'the Custom Element superclass changed';
+  }
+  const currentFormAssociated = Reflect.get(current, 'formAssociated');
+  const nextFormAssociated = Reflect.get(next, 'formAssociated');
+  if (currentFormAssociated !== nextFormAssociated) {
+    return 'the form-associated contract changed';
+  }
+  if (hotPropertySchema(current) !== hotPropertySchema(next)) {
+    return 'the public property or attribute schema changed';
+  }
+  if (normalizeStyleList(current.styles).length !== normalizeStyleList(next.styles).length) {
+    return 'the number of adopted component stylesheets changed';
+  }
+  return undefined;
+}
+
+function hotPropertySchema(constructor: GluonElementConstructor): string {
+  return JSON.stringify(Object.entries(getDeclarations(constructor))
+    .map(([name, definition]) => {
+      const declaration = normalizeDeclaration(definition);
+      return [
+        name,
+        getAttributeName(name, declaration) ?? null,
+        declaration.type?.name ?? null,
+        declaration.reflect ?? false,
+        declaration.required ?? false,
+      ];
+    })
+    .sort(([left], [right]) => String(left).localeCompare(String(right))));
+}
+
+function patchHotElementConstructor(
+  current: GluonElementConstructor,
+  next: GluonElementConstructor,
+): void {
+  const declarationNames = new Set(Object.keys(getDeclarations(current)));
+  const nextPrototypeKeys = new Set(Reflect.ownKeys(next.prototype));
+  for (const key of Reflect.ownKeys(current.prototype)) {
+    if (key === 'constructor' || declarationNames.has(String(key))) continue;
+    if (!nextPrototypeKeys.has(key)) Reflect.deleteProperty(current.prototype, key);
+  }
+  for (const key of nextPrototypeKeys) {
+    if (key === 'constructor') continue;
+    const descriptor = Object.getOwnPropertyDescriptor(next.prototype, key);
+    if (descriptor) Object.defineProperty(current.prototype, key, descriptor);
+  }
+
+  const stableStyles = synchronizeHotStyles(
+    normalizeStyleList(current.styles),
+    normalizeStyleList(next.styles),
+  );
+  for (const key of Reflect.ownKeys(next)) {
+    if (key === 'length' || key === 'name' || key === 'prototype' || key === 'styles') continue;
+    const descriptor = Object.getOwnPropertyDescriptor(next, key);
+    if (descriptor) Object.defineProperty(current, key, descriptor);
+  }
+  Object.defineProperty(current, 'styles', {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    value: stableStyles,
+  });
+
+  for (const name of declarationNames) {
+    const descriptor = Object.getOwnPropertyDescriptor(current.prototype, name);
+    if (descriptor?.get && descriptor.set) Reflect.deleteProperty(current.prototype, name);
+  }
+  finalizedConstructors.delete(current);
+  declarationCache.delete(current);
+  styleCache.delete(current);
+  eventDeclarationCache.delete(current);
+  slotDeclarationCache.delete(current);
+  finalizeProperties(current);
+}
+
+function normalizeStyleList(
+  styles: CSSStyleSheet | readonly CSSStyleSheet[] | undefined,
+): readonly CSSStyleSheet[] {
+  if (!styles) return [];
+  return styles instanceof CSSStyleSheet ? [styles] : styles;
+}
+
+function synchronizeHotStyles(
+  current: readonly CSSStyleSheet[],
+  next: readonly CSSStyleSheet[],
+): CSSStyleSheet | readonly CSSStyleSheet[] {
+  if (current.length !== next.length) return next;
+  for (let index = 0; index < current.length; index += 1) {
+    const stable = current[index]!;
+    const replacement = next[index]!;
+    if (stable === replacement) continue;
+    stable.replaceSync([...replacement.cssRules].map((rule) => rule.cssText).join('\n'));
+  }
+  return current.length === 1 ? current[0]! : current;
 }
 
 function finalizeProperties(constructor: GluonElementConstructor): void {

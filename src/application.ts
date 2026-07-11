@@ -1,6 +1,7 @@
 import {
   effect,
   effectScope,
+  queueJob,
   type EffectScope,
   type ReactiveEffectRunner,
   type ReactivityErrorContext,
@@ -39,7 +40,13 @@ import {
 } from './runtime.js';
 
 const mountedContainers = new WeakMap<Node, GluonAppImpl<unknown>>();
+const mountedApplications = new Set<GluonAppImpl<unknown>>();
 let applicationSequence = 1_000_000;
+
+/** Requests a render pass for every mounted application after a compatible HMR update. */
+export function refreshGluonApplications(): void {
+  for (const application of mountedApplications) application.requestHotUpdate();
+}
 
 export {
   createInjectionKey,
@@ -202,6 +209,7 @@ class GluonAppImpl<Public> implements GluonApp<Public> {
     ))!;
     this.scope = scope;
     this.runner = runner;
+    mountedApplications.add(this as GluonAppImpl<unknown>);
     runner();
 
     const app = this;
@@ -244,12 +252,18 @@ class GluonAppImpl<Public> implements GluonApp<Public> {
     } finally {
       unregisterApplicationRoot(container, this.context);
       mountedContainers.delete(container);
+      mountedApplications.delete(this as GluonAppImpl<unknown>);
       this.container = undefined;
       this.publicExposure = undefined;
       this.context.provides.clear();
       this.context.components.clear();
       this.pluginCleanups.length = 0;
     }
+  }
+
+  requestHotUpdate(): void {
+    if (this.state !== 'mounted' || !this.runner) return;
+    queueJob(this.runner, { phase: 'update', id: this.updateId });
   }
 
   run<Result>(
