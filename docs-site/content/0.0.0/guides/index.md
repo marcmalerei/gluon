@@ -11,3 +11,4 @@ contracts exercised by GLUON GOODS.
 - [Tooling workflow](tooling/): Vite, diagnostics, Devtools, testing, and Playground.
 - [Quality and security](quality/): accessibility, CSP, dependency, and browser gates.
 - [Deployment](deployment/): static and server output from the reference shop.
+- [Release readiness](releasing/): lockstep evidence, protected publication, and external prerequisites.

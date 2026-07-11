@@ -28,6 +28,13 @@ verified. Provenance-bearing public publication additionally requires this
 repository to be public. The current repository is private, so publication
 remains blocked.
 
+The repository-internal implementation of this decision is defined by the
+machine-readable [`release/release-contract.json`](../../release/release-contract.json),
+the [release operations runbook](../releasing.md), and the protected
+`.github/workflows/release.yml` workflow. These controls prepare and validate
+release evidence but do not override the verified external publication
+prerequisites below.
+
 ## Verified registry and repository state
 
 The following observations were made against the public npm registry and the
@@ -199,12 +206,16 @@ moving a dist-tag may limit discovery but does not rewrite history.
    compatibility evidence, SBOMs, and attestations
 7. obtains required approval through a protected GitHub release environment
 8. publishes through npm trusted publishing with public access and provenance
-9. verifies registry installation, exports, types, provenance, and dist-tags
+   under a release-specific staging dist-tag
+9. requires interactive-2FA owner promotion of the complete train to `latest`
+10. verifies registry installation, exports, types, provenance, and dist-tags
    from an empty consumer project
 
 The first public release additionally verifies the npm organization, package
-names, public repository state, trusted-publisher bindings, recovery owners,
-and account multi-factor authentication.
+names, existing owner-controlled package records, public repository state,
+trusted-publisher bindings, recovery owners, and account multi-factor
+authentication. Existing package records are mandatory because npm does not
+allow trusted publishers to bootstrap brand-new package names.
 
 ## Supply-chain evidence
 
@@ -212,6 +223,11 @@ Public release jobs use GitHub-hosted runners, minimal job permissions, and
 `id-token: write` only where OIDC or attestations require it. npm trusted
 publishing is the only authorized publication identity; repository or
 organization secrets must not contain a long-lived npm publication token.
+Trusted publishing authorizes publication but not dist-tag mutation, so the
+reviewed release train is first published under a non-`latest` tag and an
+authorized owner performs the final `latest` promotion with interactive 2FA.
+The immutable GitHub release remains a draft until the complete registry train
+passes clean-room verification.
 
 Each package and the aggregate release receive:
 

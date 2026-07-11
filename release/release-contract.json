@@ -1,0 +1,47 @@
+{
+  "$schema": "./release-contract.schema.json",
+  "schemaVersion": 1,
+  "releaseGroup": "gluon-framework",
+  "targetVersion": "1.0.0",
+  "tagPrefix": "v",
+  "environment": "npm",
+  "artifactDirectory": ".tmp/release",
+  "manualEvidencePath": "release/evidence/{version}.json",
+  "compatibilityManifestPath": "release/compatibility/{version}.json",
+  "spdxSchema": {
+    "path": "release/spdx-2.3.schema.json",
+    "source": "https://raw.githubusercontent.com/spdx/spdx-spec/44ab76293754df4af5af700fd4abd5453b866c86/schemas/spdx-schema.json",
+    "sourceCommit": "44ab76293754df4af5af700fd4abd5453b866c86",
+    "sha256": "ca7fd7cc2c8107c3b6b5976058bb72363e8c072f0e446609d4fe7234860c2894"
+  },
+  "artifacts": {
+    "packageArchives": true,
+    "canonicalPackageDigests": true,
+    "aggregateSbomFormats": ["spdx-2.3", "cyclonedx-1.7"],
+    "perPackageSbomFormats": ["spdx-2.3", "cyclonedx-1.7"],
+    "checksums": "sha256",
+    "releaseEvidence": true
+  },
+  "publication": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "provenance": true,
+    "distTag": "latest",
+    "stagingDistTagPrefix": "gluon-staging-v",
+    "promotion": "interactive-2fa",
+    "identity": "npm-trusted-publishing",
+    "longLivedTokenAllowed": false
+  },
+  "externalPrerequisites": [
+    "public-repository",
+    "verified-npm-scope-control",
+    "existing-npm-package-records",
+    "npm-recovery-owners-and-mfa",
+    "verified-npm-trusted-publisher",
+    "protected-npm-environment",
+    "protected-release-tags",
+    "immutable-github-releases",
+    "release-cut-browser-device-evidence",
+    "release-cut-assistive-technology-evidence"
+  ]
+}
