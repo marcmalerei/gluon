@@ -22,6 +22,7 @@ for (const version of versions.supported) {
     'cookbook/index.html',
     'migration/index.html',
     'examples/plain.html',
+    'examples/ui.html',
     'examples/vue.html',
   ]) await access(resolve(outputRoot, version, page));
 }
@@ -71,7 +72,7 @@ if (missingLinks.length > 0) throw new Error(`documentation has broken internal 
 
 const exampleSources = (await filesWithExtension(resolve(siteRoot, 'examples'), '.ts'))
   .filter((file) => !file.endsWith('vite.config.ts'));
-if (exampleSources.length < 7) throw new Error(`expected at least 7 compiled TypeScript examples, found ${exampleSources.length}`);
+if (exampleSources.length < 8) throw new Error(`expected at least 8 compiled TypeScript examples, found ${exampleSources.length}`);
 
 console.log(`documentation valid: ${htmlFiles.length} pages, ${documentedEntryPoints} public entry points, ${exampleSources.length} compiled examples, ${versions.supported.length} supported version`);
 

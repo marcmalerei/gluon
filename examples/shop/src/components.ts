@@ -8,6 +8,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
+import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
 import type { ShopStore } from './state.js';
@@ -27,7 +28,7 @@ const dialogSelectors: Record<ShopDialog, string> = {
   menu: '.mobile-menu',
   search: '.search-panel',
 };
-const dialogReturnFocus = new Map<ShopDialog, HTMLElement>();
+const dialogFocusScopes = new Map<ShopDialog, FocusScope>();
 
 export function SiteHeader(store: ShopStore): TemplateValue {
   return html`
@@ -265,19 +266,23 @@ function MobileMenu(store: ShopStore): TemplateValue {
 }
 
 export function focusOpenedDialog(dialog: ShopDialog, trigger: HTMLElement): void {
-  dialogReturnFocus.set(dialog, trigger);
   void nextTick(() => {
-    document.querySelector<HTMLElement>(`${dialogSelectors[dialog]} [data-dialog-initial-focus]`)?.focus();
+    const container = document.querySelector<HTMLElement>(dialogSelectors[dialog]);
+    if (!container) return;
+    dialogFocusScopes.get(dialog)?.deactivate();
+    const scope = createFocusScope(container, {
+      initialFocus: '[data-dialog-initial-focus]',
+      returnFocus: trigger,
+    });
+    dialogFocusScopes.set(dialog, scope);
+    scope.activate();
   });
 }
 
 function dismissDialog(dialog: ShopDialog, close: () => void): void {
   close();
-  const returnTarget = dialogReturnFocus.get(dialog);
-  dialogReturnFocus.delete(dialog);
-  void nextTick(() => {
-    if (returnTarget?.isConnected) returnTarget.focus();
-  });
+  dialogFocusScopes.get(dialog)?.deactivate();
+  dialogFocusScopes.delete(dialog);
 }
 
 function handleDialogKeydown(
@@ -290,21 +295,5 @@ function handleDialogKeydown(
     close();
     return;
   }
-  if (event.key !== 'Tab' || !(event.currentTarget instanceof HTMLElement)) return;
-  const focusable = [...event.currentTarget.querySelectorAll<HTMLElement>(
-    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-  )];
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  if (!first || !last) return;
-  if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first.focus();
-  } else if (!event.currentTarget.contains(document.activeElement)) {
-    event.preventDefault();
-    first.focus();
-  }
+  dialogFocusScopes.get(dialog)?.handleKeydown(event);
 }

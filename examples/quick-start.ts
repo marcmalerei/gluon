@@ -4,10 +4,10 @@ import {
   layerOrderStyles,
   render,
 } from '../src/index.js';
-import { Button, atomStyles } from '../src/atoms/index.js';
-import { Card, moleculeStyles } from '../src/molecules/index.js';
-import { AppShell, organismStyles } from '../src/organisms/index.js';
-import { q } from '../src/quarks/index.js';
+import { Button, atomStyles } from '@gluonjs/atoms';
+import { Card, moleculeStyles } from '@gluonjs/molecules';
+import { AppShell, organismStyles } from '@gluonjs/organisms';
+import { q } from '@gluonjs/quarks';
 
 adoptStyles(
   document,

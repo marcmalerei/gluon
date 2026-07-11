@@ -112,14 +112,12 @@ Third-party build dependencies are not part of this architectural graph.
    adapters belong in their consuming packages, preventing a protocol-to-core
    dependency cycle.
 
-### Transitional root exports
+### UI package boundary
 
-The current root build exposes `.`, `./styles`, `./quarks`, `./atoms`,
-`./molecules`, and `./organisms`. The final Core contract exposes only `.` and
-`./styles`; issue [#39](https://github.com/marcmalerei/gluon/issues/39) moves the
-four UI layers to their named packages. Until that issue is complete, README
-examples use the real current `@gluonjs/core/*` subpaths and do not claim that
-the separate UI packages are already implemented.
+Core exposes only `.` and `./styles`. Quarks, Atoms, Molecules, and Organisms
+are current named packages with one root export each. Their implementation and
+manifest metadata live under `packages/`; Core contains only the generic
+component-definition helpers required by those optional consumers.
 
 ## Public API boundary
 

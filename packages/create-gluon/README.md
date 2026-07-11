@@ -15,7 +15,7 @@ Router and Store; explicitly combining `--ssr` with `--no-router` or
 
 Every selection includes TypeScript, Vite, typecheck, template-check, test, and build scripts.
 `npm run check:templates` runs the same diagnostics exposed by the Gluon editor service.
-`--ui` uses the current public `@gluonjs/core/atoms` boundary. `--testing` adds
+`--ui` uses the separately consumable public `@gluonjs/atoms` package. `--testing` adds
 the official browser fixture utilities and a Playwright-backed Vitest test.
 `--ssr` adds one request-isolated server entry plus hydration. All Gluon
 dependencies use the exact `create-gluon` release version; framework packages
@@ -24,7 +24,9 @@ and this CLI are released as one lockstep group.
 The supported matrix is every independent Router, Store, testing, and UI
 selection, plus SSR with its required Router and Store selections. Repository
 fixture verification generates all 20 combinations. Each fixture is installed,
-typechecked, tested, and built against packed workspace artifacts.
+typechecked, tested, and built against packed workspace artifacts. UI fixtures
+install packed `@gluonjs/quarks` and `@gluonjs/atoms` archives rather than
+resolving unpublished workspace versions from the registry.
 
 ## License
 

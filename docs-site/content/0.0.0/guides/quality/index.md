@@ -21,6 +21,12 @@ The browser assertions verify the maintained keyboard, dialog, alternative-text,
 and mobile interaction contracts. They are regression evidence, not a substitute
 for reviewing a visible change in the supported browsers.
 
+The stable UI composition also has per-engine screenshot references. When a
+browser-matrix job fails that comparison, CI retains the Vitest actual and diff
+images for seven days in a `browser-differences-<engine>-<commit>` artifact.
+Review those images before accepting a new reference or changing the allowed
+pixel difference.
+
 ## Security workflow
 
 Universal rendering never invents a Content Security Policy nonce. A server may

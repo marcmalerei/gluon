@@ -16,6 +16,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   request-nonce style carriers, and transactional adopted-sheet hydration.
 - A complete GLUON GOODS bag-to-checkout journey with typed delivery state,
   order placement, and URL-addressable confirmation.
+- Separately consumable `@gluonjs/quarks`, `@gluonjs/atoms`,
+  `@gluonjs/molecules`, and `@gluonjs/organisms` packages with stable contract
+  manifests, headless focus/dialog/popover/listbox/form primitives, reusable
+  light/dark theme sheets, compiled examples, and browser accessibility evidence.
 
 - A standalone, DOM-free `@gluonjs/reactivity` package with refs, deep and
   shallow object and collection proxies, effects, computed values, dependency

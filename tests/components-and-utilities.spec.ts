@@ -9,10 +9,10 @@ import {
   mergeProps,
   render,
 } from '../src/index.js';
-import { Button, Icon } from '../src/atoms/index.js';
-import { Card, FormField } from '../src/molecules/index.js';
-import { AppShell } from '../src/organisms/index.js';
-import { fragment, q, quark } from '../src/quarks/index.js';
+import { Button, Icon } from '@gluonjs/atoms';
+import { Card, FormField } from '@gluonjs/molecules';
+import { AppShell } from '@gluonjs/organisms';
+import { fragment, q, quark } from '@gluonjs/quarks';
 
 describe('component variants and utilities', () => {
   beforeEach(() => {

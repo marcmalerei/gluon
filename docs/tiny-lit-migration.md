@@ -26,9 +26,9 @@ The following Tiny-Lit code directly supported the Gluon vision and informed the
 | `src/gluon-element.ts` | `src/element.ts` | Custom Element render base, declared properties, attribute conversion, reflection, and scheduled updates. |
 | `src/styles.ts`, `src/global-styles.ts` | `src/styles/index.ts` | Constructable stylesheet creation and adoption. |
 | `src/merge.ts` | `src/props.ts` | Additive class/style prop merging. |
-| `src/ui/quarks/*` | `src/quarks/index.ts` | Native-element Quark factories and shared baseline classes. |
-| `src/ui/atoms/icon.ts`, `button.ts`, `input.ts`, `label.ts` | `src/atoms/*` | Representative Atom APIs and templates. |
-| `src/ui/molecules/card.ts`, `formField.ts` | `src/molecules/*` | Representative Molecule compositions. |
+| `src/ui/quarks/*` | `packages/quarks/src/*` | Native-element factories and headless interaction primitives. |
+| `src/ui/atoms/icon.ts`, `button.ts`, `input.ts`, `label.ts` | `packages/atoms/src/*` | Separately consumable Atom APIs, tokens, and themes. |
+| `src/ui/molecules/card.ts`, `formField.ts` | `packages/molecules/src/*` | Separately consumable Molecule compositions. |
 
 ## Structural and behavioral changes
 
