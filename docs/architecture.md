@@ -63,6 +63,15 @@ packages/test-utils/
 └── src/index.ts        Public component fixtures, cleanup, Router/Store isolation,
                         scheduler controls, and leak diagnostics
 
+packages/language-server/
+├── src/index.ts        Shared HTML/SVG/CSS analysis and editor operations
+├── src/protocol.ts     VS Code-independent LSP request and notification handling
+├── src/server-cli.ts   Content-Length framed stdio server
+└── src/check-cli.ts    Project-level CI diagnostic command
+
+editors/vscode/
+└── extension.cjs       Maintained client for the lockstep language server
+
 examples/shop/
 ├── src/app.ts          Public-package application composition and routes
 ├── src/server.ts       Public SSR request entry reusing the shop application

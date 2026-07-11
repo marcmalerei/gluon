@@ -1,0 +1,25 @@
+{
+  "name": "gluon-vscode",
+  "displayName": "Gluon",
+  "description": "Language support for Gluon tagged templates.",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": { "vscode": "^1.96.0" },
+  "categories": ["Programming Languages", "Linters"],
+  "activationEvents": ["onLanguage:typescript", "onLanguage:javascript"],
+  "main": "./extension.cjs",
+  "contributes": {
+    "configuration": {
+      "title": "Gluon",
+      "properties": {
+        "gluon.languageServerPath": {
+          "type": "string",
+          "default": "gluon-language-server",
+          "description": "Path to the lockstep gluon-language-server executable."
+        }
+      }
+    }
+  },
+  "dependencies": { "vscode-languageclient": "^9.0.1" }
+}

@@ -18,6 +18,7 @@ const packageSources = new Map([
   ['@gluonjs/ssr', 'packages/ssr'],
   ['@gluonjs/vite', 'packages/vite'],
   ['@gluonjs/test-utils', 'packages/test-utils'],
+  ['@gluonjs/language-server', 'packages/language-server'],
 ]);
 
 try {
@@ -33,6 +34,7 @@ try {
     await pointOfficialDependenciesAtArchives(result.directory, archives, features);
     run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], result.directory);
     run('npm', ['run', 'typecheck'], result.directory);
+    run('npm', ['run', 'check:templates'], result.directory);
     run('npm', ['test'], result.directory);
     run('npm', ['run', 'build'], result.directory);
     process.stdout.write(`validated starter ${index + 1}/${matrix.length}: ${name}\n`);
@@ -87,7 +89,7 @@ function matrixName(index, features) {
 async function pointOfficialDependenciesAtArchives(directory, archives, features) {
   const path = join(directory, 'package.json');
   const manifest = JSON.parse(await readFile(path, 'utf8'));
-  const required = new Set(['@gluonjs/reactivity', '@gluonjs/compiler', '@gluonjs/core', '@gluonjs/vite']);
+  const required = new Set(['@gluonjs/reactivity', '@gluonjs/compiler', '@gluonjs/core', '@gluonjs/language-server', '@gluonjs/vite']);
   if (features.router || features.ssr || features.testing) required.add('@gluonjs/router');
   if (features.store || features.ssr || features.testing) required.add('@gluonjs/store');
   if (features.ssr) required.add('@gluonjs/ssr');

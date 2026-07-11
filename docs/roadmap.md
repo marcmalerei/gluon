@@ -220,7 +220,7 @@ editing, testing, debugging, and production building.
 | --- | --- |
 | [#29](https://github.com/marcmalerei/gluon/issues/29) | `create-gluon` and its 20-combination maintained starter matrix are implemented and verified. |
 | [#30](https://github.com/marcmalerei/gluon/issues/30) | Build the Gluon Vite plugin and state-preserving HMR. |
-| [#31](https://github.com/marcmalerei/gluon/issues/31) | Build the Gluon language server and editor extension. |
+| [#31](https://github.com/marcmalerei/gluon/issues/31) | Shared template analyzer, LSP server, CI checker, and VS Code client are implemented. |
 | [#32](https://github.com/marcmalerei/gluon/issues/32) | Build Gluon Devtools. |
 | [#33](https://github.com/marcmalerei/gluon/issues/33) | Build `@gluonjs/test-utils`. |
 | [#34](https://github.com/marcmalerei/gluon/issues/34) | Build the Gluon playground and diagnostic reference. |
