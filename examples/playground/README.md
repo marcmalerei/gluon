@@ -27,7 +27,9 @@ Reactivity), Compiler, and Vite in dependency order, and then builds the
 Playground and versioned documentation. It typechecks every documentation
 example and validates the release tree before publishing both outputs as one
 Pages artifact. This matches a clean runner where package `dist` directories do
-not exist before the workflow starts.
+not exist before the workflow starts. The checkout, Node setup, Pages
+configuration, artifact upload, and deployment steps use their current Node 24
+action majors.
 
 Config opens the searchable versioned diagnostic catalog. Diagnostic rows link
 directly into that state. The GitHub Pages workflow deploys the production build
