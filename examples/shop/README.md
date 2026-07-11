@@ -31,14 +31,20 @@ ownership directly. The shop now exposes `renderShopRequest(url)` through
 `src/server.ts`; it reuses the same route records, Store definition, page
 functions, async inventory boundary, and application shell without browser DOM
 globals. `src/hydrate.ts` restores the request Router and Store snapshots,
-retains matching nodes, and activates the product flow. Production SSR style
-and asset delivery remains pending in #37.
+retains matching nodes, adopts validated server style carriers, and activates
+the product flow.
+
+The production pipeline emits hashed client assets and `gluon-assets.json`, a
+Vite SSR request bundle, and five route-aware static documents with one recorded
+dynamic product fallback. See [static and server deployment](../../docs/deployment.md).
 
 ## Run
 
 ```bash
 npm run dev:shop
 npm run build:shop
+npm run build:shop:server
+npm run build:shop:static
 npm run measure:shop
 ```
 

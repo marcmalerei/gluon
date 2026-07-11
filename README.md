@@ -282,7 +282,10 @@ lifecycle do not run. See the [`@gluonjs/ssr` guide](packages/ssr/README.md).
 context, Router, and Store state; categorized mismatches either recover with one
 root render or abort before mutation. `@gluonjs/ssr/streaming` emits fallback
 shells and nested abortable boundary patches. See [the hydration and streaming
-contract](docs/hydration.md). Production style and asset manifests remain #37.
+contract](docs/hydration.md). `@gluonjs/ssr/static` and the universal Vite
+manifest generate route-aware
+static output, mixed dynamic fallbacks, resource hints, and initial style
+carriers with adopted-sheet handoff. See [deployment](docs/deployment.md).
 
 ## Bindings and spreading
 

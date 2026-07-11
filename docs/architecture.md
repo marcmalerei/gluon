@@ -48,7 +48,8 @@ packages/ssr/
 ├── src/index.ts        DOM-free serialization, DSD elements, request ownership,
 │                       Router/Store snapshots, and safe embedded state
 ├── src/streaming.ts    Ordered and progressive async chunks plus stream adapters
-└── src/hydration.ts    Browser binding reconstruction and request-state handoff
+├── src/hydration.ts    Browser binding reconstruction and style/state handoff
+└── src/static.ts       Route-aware static output and mixed deployment manifest
 
 packages/compiler/
 └── src/index.ts        Template/part locations, diagnostics, source maps, and
@@ -103,8 +104,9 @@ them in `finally`. The public serializer owns escaping, URL validation, async
 built-in resolution, deterministic binding markers, DSD output, and JSON-safe
 state embedding. The browser hydration entry independently validates parsed DOM,
 adopts matching Core Parts, restores public Router/Store snapshots, and reports
-categorized recovery evidence. Style transport does not share hidden state with
-this request pipeline.
+categorized recovery evidence. Vite emits the immutable client asset manifest;
+static generation consumes it with the same request renderer. Style carriers
+are request-local and become document-local adopted sheets only after validation.
 
 `@gluonjs/test-utils` composes only public Core, Reactivity, Router, and Store
 exports. Each fixture owns a real application root and records its cleanup
