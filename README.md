@@ -552,8 +552,11 @@ The following points describe architectural advantages and design goals. Outcome
 - [Release operations and protected publication runbook](docs/releasing.md)
 - [Machine-readable package contract](package-contract.json)
 - [Gluon 1.0 roadmap](docs/roadmap.md)
+- [Tiny-Lit transfer record](docs/tiny-lit-migration.md)
 - [Runnable source example](examples/quick-start.ts)
 - [Living GLUON GOODS reference shop](examples/shop/README.md)
+
+The initial implementation was transferred and restructured from the local `tiny-lit-main` snapshot named in the transfer record. Features outside the current Gluon vision were intentionally not copied.
 
 ## Current scope
 
@@ -610,7 +613,9 @@ interleaved samples in Chromium, Firefox, and WebKit. Install the managed
 engines with `npx playwright install chromium firefox webkit`. The methodology,
 result format, limits, and interactive `dev:benchmark` page are documented in
 [Rendering performance evidence](docs/performance.md). Current evidence must
-not be generalized into an unsupported superiority claim.
+not be generalized into an unsupported superiority claim. The historical
+`~/Downloads/tiny-lit-main/public/benchmark.html` test is also documented there;
+it measures the old `gluon@0.1.0` build and is not evidence for this package.
 
 ## Contributing
 

@@ -1480,6 +1480,7 @@ function instantiateBindings(
   walker.currentNode = root;
   let node = walker.nextNode();
   let traversalIndex = 0;
+
   try {
     for (const descriptor of descriptors) {
       while (node && traversalIndex < descriptor.traversalIndex) {
