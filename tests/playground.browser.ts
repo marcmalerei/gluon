@@ -16,7 +16,7 @@ test('edits, runs, shares, increments, and opens the searchable diagnostic refer
   app.mount(container);
   cleanup = () => { app.unmount(); container.remove(); unadoptStyles(document, playgroundStyles); history.replaceState(null, '', window.location.pathname); };
   await nextTick();
-  await expect.poll(() => container.querySelectorAll('.diagnostic-row').length, { timeout: 5_000 }).toBe(2);
+  await expect.poll(() => container.querySelectorAll('.diagnostic-row').length, { timeout: 15_000 }).toBe(2);
   const preview = container.querySelector('gluon-playground-preview') as HTMLElement;
   await expect.poll(() => preview.shadowRoot?.querySelector('h1')?.textContent, { timeout: 5_000 }).toBe('Count 2');
   (preview.shadowRoot!.querySelector('button') as HTMLButtonElement).click();

@@ -108,6 +108,7 @@
     "typecheck:devtools-api-contract": "tsc -p tests-node/tsconfig.devtools-types.json",
     "test": "npm run test:browser && npm run test:reactivity && npm run test:router && npm run test:store && npm run test:ssr && npm run test:vite && npm run test:test-utils && npm run test:devtools-api && npm run test:devtools && npm run test:language-server && npm run test:create-gluon && npm run test:playground",
     "test:browser": "vitest run",
+    "test:router-browser": "vitest run --config vitest.router-browser.config.ts",
     "test:reactivity": "vitest run --config vitest.reactivity.config.ts",
     "test:router": "vitest run --config vitest.router.config.ts",
     "test:store": "vitest run --config vitest.store.config.ts",
@@ -119,6 +120,7 @@
     "test:devtools-api": "vitest run --config vitest.devtools-api.config.ts",
     "test:devtools": "vitest run --config vitest.devtools.config.ts",
     "test:playground": "vitest run --config vitest.playground-node.config.ts && vitest run --config vitest.playground.config.ts",
+    "test:browser-matrix": "npm run test:browser && npm run test:router-browser && npm run test:test-utils && npm run test:devtools && vitest run --config vitest.playground.config.ts",
     "test:coverage": "npm run test:browser:coverage && npm run test:reactivity:coverage && npm run test:router:coverage && npm run test:router-browser:coverage && npm run test:store:coverage && npm run test:ssr:coverage && npm run test:vite:coverage && npm run test:test-utils:coverage && npm run test:devtools-api:coverage && npm run test:devtools:coverage && npm run test:language-server:coverage && npm run test:create-gluon:coverage",
     "test:browser:coverage": "vitest run --coverage",
     "test:reactivity:coverage": "vitest run --config vitest.reactivity.config.ts --coverage",
@@ -142,7 +144,9 @@
     "check:vscode-client": "node --check editors/vscode/extension.cjs",
     "check:language-server-cli": "node scripts/validate-language-server-cli.mjs",
     "check:diagnostics": "node scripts/validate-diagnostic-catalog.mjs",
-    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run build && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures"
+    "check:quality-budgets": "node scripts/validate-quality-budgets.mjs",
+    "check:budgets": "npm run build:shop && npm run check:quality-budgets",
+    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run build && npm run check:quality-budgets && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures"
   },
   "devDependencies": {
     "@jridgewell/trace-mapping": "^0.3.31",

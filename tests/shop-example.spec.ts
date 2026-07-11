@@ -145,8 +145,7 @@ describe('GLUON GOODS reference shop', () => {
     document.querySelector<HTMLAnchorElement>('.empty-bag a')!.click();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/shop');
-    await new Promise((resolve) => setTimeout(resolve, 180));
-    expect(document.querySelector('.bag-drawer')).toBeNull();
+    await expect.poll(() => document.querySelector('.bag-drawer'), { timeout: 5_000 }).toBeNull();
     app.unmount();
   });
 

@@ -1,0 +1,9 @@
+{
+  "shop": {
+    "htmlBytes": 1000,
+    "entryBytes": 150000,
+    "entryGzipBytes": 45000,
+    "imageBytes": 175000,
+    "imageCount": 5
+  }
+}
