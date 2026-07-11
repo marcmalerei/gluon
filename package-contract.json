@@ -140,7 +140,7 @@
     {
       "name": "create-gluon",
       "directory": "packages/create-gluon",
-      "state": "planned",
+      "state": "current",
       "environment": "node",
       "exports": ["."],
       "bins": ["create-gluon"],

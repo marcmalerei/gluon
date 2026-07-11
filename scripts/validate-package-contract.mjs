@@ -105,6 +105,10 @@ async function validateCurrentPackage(entry) {
   if (JSON.stringify(exportNames.sort()) !== JSON.stringify([...entry.exports].sort())) {
     throw new Error(`${entry.name} package.json exports do not match its package contract.`);
   }
+  const binNames = Object.keys(packageJson.bin ?? {});
+  if (JSON.stringify(binNames.sort()) !== JSON.stringify([...(entry.bins ?? [])].sort())) {
+    throw new Error(`${entry.name} package.json executables do not match its package contract.`);
+  }
 
   const requiredPackFiles = ['package.json', 'README.md', 'LICENSE', 'CHANGELOG.md'];
   for (const required of ['LICENSE', 'CHANGELOG.md']) {
@@ -124,6 +128,17 @@ async function validateCurrentPackage(entry) {
       await access(resolve(directory, relativeTarget));
       exportTargets.push(relativeTarget);
     }
+  }
+  for (const [binName, target] of Object.entries(packageJson.bin ?? {})) {
+    if (typeof target !== 'string' || !target.startsWith('./')) {
+      throw new Error(`${entry.name} executable ${binName} requires a relative target.`);
+    }
+    const relativeTarget = target.slice(2);
+    const source = await readFile(resolve(directory, relativeTarget), 'utf8');
+    if (!source.startsWith('#!/usr/bin/env node\n')) {
+      throw new Error(`${entry.name} executable ${binName} requires a Node shebang.`);
+    }
+    exportTargets.push(relativeTarget);
   }
 
   const packOutput = execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {

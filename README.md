@@ -23,6 +23,7 @@
 - official Vite transforms with template source maps and state-preserving HMR
 - DOM-independent SSR with isolated requests and safe serialized state
 - public black-box component, Router, Store, and scheduler test utilities
+- `create-gluon` scaffolding with verified Router, Store, testing, UI, and SSR combinations
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
@@ -52,8 +53,22 @@ npm run check
 `npm run check` runs DOM-free Reactivity, Router, and Store Node tests, strict type
 checking, the instrumented Chromium browser suite, all production builds,
 public declaration contract tests, the lazy-route chunk check, and package
-archive validation. Each coverage gate requires at least 95% statement,
-function, and line coverage plus 90% branch coverage.
+archive validation. It also installs, typechecks, tests, and builds all 20
+supported `create-gluon` starter combinations from packed workspace artifacts.
+
+## Create an application
+
+After publication, interactive project creation uses the lockstep generator:
+
+```bash
+npm create gluon@latest my-app
+```
+
+Repository development can run `node packages/create-gluon/dist/cli.js my-app`
+after `npm run build:create-gluon`. Stable automation uses `--yes` and any of
+`--router`, `--store`, `--testing`, `--ui`, or `--ssr`. SSR enables Router and
+Store; explicit `--ssr --no-router` and `--ssr --no-store` combinations fail
+before generation. See [the generator contract](packages/create-gluon/README.md).
 
 ## Quick start
 
