@@ -44,6 +44,14 @@ jobs:
       - run: npm run test:browser-matrix
         env:
           GLUON_BROWSER: ${{ matrix.browser }}
+      - name: Retain browser screenshot differences
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-differences-${{ matrix.browser }}-${{ github.sha }}
+          path: .vitest-attachments
+          retention-days: 7
+          if-no-files-found: ignore
 
   node-runtime:
     runs-on: ubuntu-latest
