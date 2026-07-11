@@ -237,6 +237,24 @@ export interface DirectiveValue {
   readonly args: readonly unknown[];
 }
 
+export type TemplateValueServerContract =
+  | { readonly kind: 'repeat'; readonly items: readonly KeyedItem[] }
+  | { readonly kind: 'unsafe-html'; readonly markup: string }
+  | { readonly kind: 'unsafe-url'; readonly value: string }
+  | { readonly kind: 'event' | 'directive' };
+
+/** Exposes only the DOM-free value information required by the server renderer. */
+export function getTemplateValueServerContract(
+  value: unknown,
+): TemplateValueServerContract | undefined {
+  if (isRepeatResult(value)) return { kind: 'repeat', items: value.items };
+  if (isUnsafeHtmlResult(value)) return { kind: 'unsafe-html', markup: value.markup };
+  if (isUnsafeUrlResult(value)) return { kind: 'unsafe-url', value: value.value };
+  if (isEventBinding(value)) return { kind: 'event' };
+  if (isDirectiveValue(value)) return { kind: 'directive' };
+  return undefined;
+}
+
 export function directive<Args extends readonly unknown[]>(
   definition: DirectiveDefinition<Args>,
 ): (...args: Args) => DirectiveValue {

@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@gluonjs/core": ["src/index.ts"],
+      "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
+      "@gluonjs/router/memory": ["packages/router/src/memory.ts"],
+      "@gluonjs/store": ["packages/store/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

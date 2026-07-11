@@ -23,11 +23,13 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
 - official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR
+- an isolated server-rendered deep-product response through `@gluonjs/ssr`
 
 Async UI is part of Core because it composes renderer Parts and application
-ownership directly. Universal HTML rendering and hydration remain pending in
-issues #35–#37; Core already exposes the DOM-free descriptors those packages
-will consume.
+ownership directly. The shop now exposes `renderShopRequest(url)` through
+`src/server.ts`; it reuses the same route records, Store definition, page
+functions, async inventory boundary, and application shell without browser DOM
+globals. Hydration and SSR style delivery remain pending in #36–#37.
 
 ## Run
 

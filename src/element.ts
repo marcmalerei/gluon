@@ -30,6 +30,10 @@ function isDevelopmentEnabled(): boolean {
   ).process?.env?.NODE_ENV !== 'production';
 }
 
+const HTMLElementBase = (
+  globalThis as { HTMLElement?: typeof HTMLElement }
+).HTMLElement ?? class {} as unknown as typeof HTMLElement;
+
 export type GluonRenderCause =
   | { readonly type: 'connection' }
   | { readonly type: 'request' }
@@ -143,6 +147,8 @@ const eventDeclarationCache = new WeakMap<Function, EventDeclarations>();
 const slotDeclarationCache = new WeakMap<Function, SlotDeclarations>();
 const connectedElements = new Set<GluonElement<any>>();
 const hotElementDefinitions = new Map<string, GluonElementConstructor>();
+const definedElementNames = new WeakMap<GluonElementClass, `${string}-${string}`>();
+const serverElementDefinitions = new Map<`${string}-${string}`, GluonElementClass>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
 const publicInstance = Symbol('gluon.public-instance');
@@ -171,7 +177,7 @@ const elementRenderDebugStates = compiledDevelopment === false
 
 export abstract class GluonElement<
   Events extends object = Record<string, unknown>,
-> extends HTMLElement {
+> extends HTMLElementBase {
   static readonly properties: Readonly<Record<string, PropertyDefinition<any>>> = {};
   static readonly events: Readonly<Record<string, EventDeclaration<any>>> = {};
   static readonly slots: SlotDeclarations = {};
@@ -200,7 +206,9 @@ export abstract class GluonElement<
   constructor() {
     super();
     elementUpdateSequence += 1;
-    this.renderRoot = this.createRenderRoot();
+    this.renderRoot = typeof this.attachShadow === 'function'
+      ? this.createRenderRoot()
+      : undefined as unknown as ShadowRoot;
     const constructor = this.constructor as GluonElementConstructor;
     finalizeProperties(constructor);
     this.capturePreUpgradeProperties(constructor);
@@ -293,6 +301,11 @@ export abstract class GluonElement<
   /** Requests a render pass after the official Vite runtime patches compatible logic. */
   requestHotUpdate(): Promise<void> {
     return this.requestUpdate();
+  }
+
+  /** Returns the component template without running browser connection lifecycle. */
+  renderForServer(): TemplateResult {
+    return this.render();
   }
 
   protected onConnected(callback: ComponentLifecycleCallback): void {
@@ -835,12 +848,38 @@ export function defineElement<Constructor extends GluonElementClass>(
   tagName: `${string}-${string}`,
   constructor: Constructor,
 ): Constructor {
-  const existing = customElements.get(tagName);
+  const constructorTag = definedElementNames.get(constructor);
+  if (constructorTag && constructorTag !== tagName) {
+    throw new Error(`Custom element constructor is already registered as "${constructorTag}".`);
+  }
+  const registry = (globalThis as { customElements?: CustomElementRegistry }).customElements;
+  const existing = registry?.get(tagName) ?? serverElementDefinitions.get(tagName);
   if (existing && existing !== constructor) {
     throw new Error(`Custom element "${tagName}" is already defined with another constructor.`);
   }
-  if (!existing) customElements.define(tagName, constructor);
+  if (!existing) {
+    if (registry) registry.define(tagName, constructor);
+    else serverElementDefinitions.set(tagName, constructor);
+  }
+  definedElementNames.set(constructor, tagName);
   return constructor;
+}
+
+export interface GluonElementServerRender {
+  readonly tagName: `${string}-${string}`;
+  readonly template: TemplateResult;
+}
+
+/** Instantiates one registered element definition without connecting it to a DOM. */
+export function renderGluonElementForServer<Constructor extends GluonElementClass>(
+  constructor: Constructor,
+  properties: Readonly<Record<string, unknown>> = {},
+): GluonElementServerRender {
+  const tagName = definedElementNames.get(constructor);
+  if (!tagName) throw new Error('Server-rendered Gluon elements must be registered with defineElement().');
+  const element = new constructor();
+  Object.assign(element, properties);
+  return Object.freeze({ tagName, template: element.renderForServer() });
 }
 
 export interface GluonElementHotUpdateResult<Constructor extends GluonElementClass> {

@@ -50,6 +50,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - The shared `@gluonjs/compiler` template-location/source-map transform and the
   official `@gluonjs/vite` plugin with compatible functional component, Custom
   Element, Store, and constructable stylesheet HMR.
+- The DOM-independent `@gluonjs/ssr` renderer with safe template/state
+  serialization, async built-ins, Declarative Shadow DOM elements, isolated
+  application/Router/Store/effect-scope requests, and ordered stream adapters.
 - The living mobile-first GLUON GOODS reference shop with responsive
   navigation, catalog and product routes, configurable products, search, a
   reactive bag, generated product imagery, adopted stylesheet-only design, and

@@ -1,0 +1,44 @@
+{
+  "name": "@gluonjs/ssr",
+  "version": "0.0.0",
+  "description": "DOM-independent server rendering and request isolation for Gluon.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/ssr"
+  },
+  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/ssr#readme",
+  "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
+  "engines": { "node": "^22.12.0 || ^24.0.0" },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./streaming": {
+      "types": "./dist/streaming.d.ts",
+      "import": "./dist/streaming.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
+  "publishConfig": { "access": "public", "provenance": true },
+  "dependencies": {
+    "@gluonjs/reactivity": "0.0.0",
+    "@gluonjs/router": "0.0.0",
+    "@gluonjs/store": "0.0.0"
+  },
+  "peerDependencies": {
+    "@gluonjs/core": "0.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@gluonjs/core": { "optional": true }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

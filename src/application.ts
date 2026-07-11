@@ -106,6 +106,18 @@ export function createApp<Public = unknown>(root: AppRoot<Public>): GluonApp<Pub
   return new GluonAppImpl(root);
 }
 
+/** Evaluates an application root with context but without browser mount hooks. */
+export function renderGluonApplicationForServer(app: GluonApp): TemplateResult {
+  if (!(app instanceof GluonAppImpl)) throw new TypeError('Expected an application created by createApp().');
+  return app.renderForServer();
+}
+
+/** Releases providers and plugin resources owned by a server application. */
+export async function disposeGluonApplicationForServer(app: GluonApp): Promise<void> {
+  if (!(app instanceof GluonAppImpl)) throw new TypeError('Expected an application created by createApp().');
+  await app.disposeForServer();
+}
+
 class GluonAppImpl<Public> implements GluonApp<Public> {
   readonly config: AppConfig = { globalProperties: {} };
   readonly context: ApplicationContext;
@@ -264,6 +276,39 @@ class GluonAppImpl<Public> implements GluonApp<Public> {
   requestHotUpdate(): void {
     if (this.state !== 'mounted' || !this.runner) return;
     queueJob(this.runner, { phase: 'update', id: this.updateId });
+  }
+
+  renderForServer(): TemplateResult {
+    if (this.state !== 'created') throw new Error('A server application can only render before browser mount.');
+    return runWithApplicationContext(
+      this.context,
+      undefined,
+      (error, source) => reportApplicationError(this.context, error, source),
+      () => {
+        const result = typeof this.root === 'function'
+          ? this.root(this.createRootRenderContext())
+          : this.root;
+        if (!isTemplateResult(result)) {
+          throw new TypeError('A Gluon application root must return a TemplateResult.');
+        }
+        return result;
+      },
+    );
+  }
+
+  async disposeForServer(): Promise<void> {
+    if (this.state !== 'created') return;
+    this.state = 'unmounted';
+    for (let index = this.pluginCleanups.length - 1; index >= 0; index -= 1) {
+      try {
+        await this.pluginCleanups[index]?.();
+      } catch (error) {
+        reportApplicationError(this.context, error, 'plugin');
+      }
+    }
+    this.context.provides.clear();
+    this.context.components.clear();
+    this.pluginCleanups.length = 0;
   }
 
   run<Result>(

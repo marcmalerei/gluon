@@ -73,6 +73,8 @@ Gluon currently provides:
   isolated Router/Store factories, and deterministic scheduler controls
 - template/part source maps and official Vite integration with compatible
   component, Custom Element, Store, and constructable stylesheet HMR
+- DOM-independent string/chunk rendering, DSD element output, safe embedded
+  state, and isolated per-request application/Router/Store/effect-scope ownership
 - the first living GLUON GOODS reference-shop slice with public-package routes,
   responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management
@@ -80,8 +82,8 @@ Gluon currently provides:
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide SSR, DOM hydration, SSG, language
-tooling, Devtools, or a public release.
+The current repository does not provide DOM hydration, incremental async
+streaming, SSG/style manifests, language tooling, Devtools, or a public release.
 
 ## Product principles
 
