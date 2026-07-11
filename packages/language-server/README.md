@@ -11,6 +11,8 @@ static `properties`, `events`, and `slots` metadata to completion, hover,
 definition, and workspace rename operations.
 `declarationsFromCustomElementsManifest()` accepts standard manifest module
 declarations and exposes their fields, events, and slots to the same analyzer.
+Every emitted code is required to exist in the public `@gluonjs/compiler`
+diagnostic catalog shared with the Playground and Devtools reference.
 
 ```sh
 gluon-template-check src

@@ -1,6 +1,16 @@
 import MagicString from 'magic-string';
 import ts from 'typescript';
 
+export {
+  GLUON_DIAGNOSTIC_CATALOG_VERSION,
+  formatGluonDiagnostic,
+  getGluonDiagnostic,
+  gluonDiagnosticCatalog,
+  gluonDiagnosticReferenceUrl,
+  type GluonDiagnosticDefinition,
+  type GluonDiagnosticSource,
+} from './diagnostics.js';
+
 export type GluonTemplateTag = 'html' | 'css';
 
 export interface SourceLocation {

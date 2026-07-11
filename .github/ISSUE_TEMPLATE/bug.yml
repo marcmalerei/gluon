@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible Gluon defect.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create the smallest reproduction in the [Gluon Playground](https://marcmalerei.github.io/gluon/playground/), choose Share, and paste the stable URL below.
+  - type: input
+    id: reproduction
+    attributes:
+      label: Playground reproduction URL
+      placeholder: https://marcmalerei.github.io/gluon/playground/#p=...
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and Node versions
+    validations:
+      required: true

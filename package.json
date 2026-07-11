@@ -62,7 +62,7 @@
     "@gluonjs/reactivity": "0.0.0"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static",
+    "build": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:playground",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:reactivity": "npm run build --workspace @gluonjs/reactivity",
     "build:router": "npm run build --workspace @gluonjs/router",
@@ -78,7 +78,9 @@
     "build:shop": "vite build --config examples/shop/vite.config.ts",
     "build:shop:server": "vite build --config examples/shop/vite.config.ts --ssr src/server.ts --outDir dist-server",
     "build:shop:static": "node scripts/generate-shop-static.mjs",
+    "build:playground": "vite build --config examples/playground/vite.config.ts",
     "dev:shop": "vite --config examples/shop/vite.config.ts",
+    "dev:playground": "vite --config examples/playground/vite.config.ts",
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
     "typecheck": "npm run typecheck:core && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:create-gluon",
@@ -104,7 +106,7 @@
     "typecheck:create-gluon-api": "tsc -p tests-node/tsconfig.create-gluon-types.json",
     "typecheck:language-server-api": "tsc -p tests-node/tsconfig.language-server-types.json",
     "typecheck:devtools-api-contract": "tsc -p tests-node/tsconfig.devtools-types.json",
-    "test": "npm run test:browser && npm run test:reactivity && npm run test:router && npm run test:store && npm run test:ssr && npm run test:vite && npm run test:test-utils && npm run test:devtools-api && npm run test:devtools && npm run test:language-server && npm run test:create-gluon",
+    "test": "npm run test:browser && npm run test:reactivity && npm run test:router && npm run test:store && npm run test:ssr && npm run test:vite && npm run test:test-utils && npm run test:devtools-api && npm run test:devtools && npm run test:language-server && npm run test:create-gluon && npm run test:playground",
     "test:browser": "vitest run",
     "test:reactivity": "vitest run --config vitest.reactivity.config.ts",
     "test:router": "vitest run --config vitest.router.config.ts",
@@ -116,6 +118,7 @@
     "test:language-server": "vitest run --config vitest.language-server.config.ts",
     "test:devtools-api": "vitest run --config vitest.devtools-api.config.ts",
     "test:devtools": "vitest run --config vitest.devtools.config.ts",
+    "test:playground": "vitest run --config vitest.playground-node.config.ts && vitest run --config vitest.playground.config.ts",
     "test:coverage": "npm run test:browser:coverage && npm run test:reactivity:coverage && npm run test:router:coverage && npm run test:router-browser:coverage && npm run test:store:coverage && npm run test:ssr:coverage && npm run test:vite:coverage && npm run test:test-utils:coverage && npm run test:devtools-api:coverage && npm run test:devtools:coverage && npm run test:language-server:coverage && npm run test:create-gluon:coverage",
     "test:browser:coverage": "vitest run --coverage",
     "test:reactivity:coverage": "vitest run --config vitest.reactivity.config.ts --coverage",
@@ -138,7 +141,8 @@
     "check:create-gluon-fixtures": "node scripts/validate-create-gluon-fixtures.mjs",
     "check:vscode-client": "node --check editors/vscode/extension.cjs",
     "check:language-server-cli": "node scripts/validate-language-server-cli.mjs",
-    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run build && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:create-gluon-fixtures"
+    "check:diagnostics": "node scripts/validate-diagnostic-catalog.mjs",
+    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run build && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures"
   },
   "devDependencies": {
     "@jridgewell/trace-mapping": "^0.3.31",

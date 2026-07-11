@@ -1,0 +1,327 @@
+{
+  "version": "0.0.0",
+  "diagnostics": [
+    {
+      "id": 1001,
+      "code": "GLUON_COMPONENT_MISSING",
+      "compactCode": "G1001",
+      "title": "Component is not registered",
+      "summary": "A named component cannot be resolved in the active application.",
+      "why": "The component was not registered on this application instance.",
+      "remediation": "Register it with app.component() before rendering.",
+      "source": "runtime"
+    },
+    {
+      "id": 1002,
+      "code": "GLUON_PLUGIN_DUPLICATE",
+      "compactCode": "G1002",
+      "title": "Plugin is already installed",
+      "summary": "An application received the same plugin more than once.",
+      "why": "Plugin identity is application-scoped and duplicate installation would duplicate resources.",
+      "remediation": "Install each plugin once or guard conditional setup.",
+      "source": "runtime"
+    },
+    {
+      "id": 1003,
+      "code": "GLUON_PROP_INVALID",
+      "compactCode": "G1003",
+      "title": "Property validation failed",
+      "summary": "A Custom Element property value did not satisfy its validator.",
+      "why": "The declared validator returned false, a message, or threw.",
+      "remediation": "Pass a value accepted by the public property declaration.",
+      "source": "runtime"
+    },
+    {
+      "id": 1004,
+      "code": "GLUON_PROP_REQUIRED",
+      "compactCode": "G1004",
+      "title": "Required property is missing",
+      "summary": "A required Custom Element property has no value.",
+      "why": "The element connected or rendered before the required input was set.",
+      "remediation": "Set the property before connection or make the declaration optional.",
+      "source": "runtime"
+    },
+    {
+      "id": 1005,
+      "code": "GLUON_EVENT_INVALID",
+      "compactCode": "G1005",
+      "title": "Event detail validation failed",
+      "summary": "Emitted event detail did not satisfy the declared validator.",
+      "why": "The event contract and emitted detail disagree.",
+      "remediation": "Emit detail matching the public event declaration.",
+      "source": "runtime"
+    },
+    {
+      "id": 1006,
+      "code": "GLUON_EVENT_UNDECLARED",
+      "compactCode": "G1006",
+      "title": "Event is not declared",
+      "summary": "A Custom Element emitted an event absent from its public declarations.",
+      "why": "Strict development diagnostics require public event metadata.",
+      "remediation": "Add the event declaration or emit a declared event name.",
+      "source": "runtime"
+    },
+    {
+      "id": 1007,
+      "code": "GLUON_SLOT_REQUIRED",
+      "compactCode": "G1007",
+      "title": "Required slot is empty",
+      "summary": "A required named or default slot has no assigned content.",
+      "why": "The host omitted content required by the element contract.",
+      "remediation": "Provide assigned content or make the slot optional.",
+      "source": "runtime"
+    },
+    {
+      "id": 1101,
+      "code": "GLUON_TEMPLATE_STYLE_ELEMENT",
+      "compactCode": "G1101",
+      "title": "Inline style element is unsupported",
+      "summary": "Browser templates cannot contain style elements.",
+      "why": "Gluon owns styles through constructable stylesheets and adoptedStyleSheets.",
+      "remediation": "Move CSS into a css tagged template and adopt the resulting sheet.",
+      "source": "compiler"
+    },
+    {
+      "id": 1102,
+      "code": "GLUON_TEMPLATE_ARIA_UNKNOWN",
+      "compactCode": "G1102",
+      "title": "ARIA attribute is unknown",
+      "summary": "The template contains an unrecognized aria-* attribute.",
+      "why": "The attribute is misspelled or is not part of the supported ARIA vocabulary.",
+      "remediation": "Use the correct ARIA attribute or remove it.",
+      "source": "language-server"
+    },
+    {
+      "id": 1103,
+      "code": "GLUON_TEMPLATE_BINDING_POSITION",
+      "compactCode": "G1103",
+      "title": "Binding position is invalid",
+      "summary": "A template binding appears in a tag or attribute name.",
+      "why": "Dynamic values are supported only in child and attribute-value positions.",
+      "remediation": "Move the binding into content or a complete attribute value.",
+      "source": "language-server"
+    },
+    {
+      "id": 1104,
+      "code": "GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN",
+      "compactCode": "G1104",
+      "title": "Custom Element is unknown",
+      "summary": "A hyphenated tag has no declaration or manifest entry.",
+      "why": "The editor cannot find defineElement() metadata or a Custom Elements Manifest declaration.",
+      "remediation": "Declare the element or supply its public manifest.",
+      "source": "language-server"
+    },
+    {
+      "id": 1105,
+      "code": "GLUON_TEMPLATE_EVENT_UNKNOWN",
+      "compactCode": "G1105",
+      "title": "Custom Element event is unknown",
+      "summary": "An @event binding is absent from the element declaration.",
+      "why": "The event name and public element contract disagree.",
+      "remediation": "Bind a declared event or update the declaration.",
+      "source": "language-server"
+    },
+    {
+      "id": 1106,
+      "code": "GLUON_TEMPLATE_PROP_UNKNOWN",
+      "compactCode": "G1106",
+      "title": "Custom Element property is unknown",
+      "summary": "A .property binding is absent from the element declaration.",
+      "why": "The property name and public element contract disagree.",
+      "remediation": "Bind a declared property or update the declaration.",
+      "source": "language-server"
+    },
+    {
+      "id": 1107,
+      "code": "GLUON_TEMPLATE_VOID_CHILDREN",
+      "compactCode": "G1107",
+      "title": "Void element has children",
+      "summary": "A void HTML element contains children or a closing tag.",
+      "why": "HTML void elements cannot own content.",
+      "remediation": "Remove the children and closing tag.",
+      "source": "language-server",
+      "before": "<img>Preview</img>",
+      "after": "<img alt=\"Preview\">"
+    },
+    {
+      "id": 1201,
+      "code": "GLUON_HYDRATION_TEXT_MISMATCH",
+      "compactCode": "G1201",
+      "title": "Hydration text mismatch",
+      "summary": "Server and client text content differ.",
+      "why": "The initial render inputs are not deterministic across server and browser.",
+      "remediation": "Align request data and initial client state before hydration.",
+      "source": "hydration"
+    },
+    {
+      "id": 1202,
+      "code": "GLUON_HYDRATION_ATTRIBUTE_MISMATCH",
+      "compactCode": "G1202",
+      "title": "Hydration attribute mismatch",
+      "summary": "Server and client attributes differ.",
+      "why": "A bound attribute produced different initial values.",
+      "remediation": "Use identical serialized inputs for the first client render.",
+      "source": "hydration"
+    },
+    {
+      "id": 1203,
+      "code": "GLUON_HYDRATION_STRUCTURE_MISMATCH",
+      "compactCode": "G1203",
+      "title": "Hydration structure mismatch",
+      "summary": "Server and client node structure differs.",
+      "why": "Conditional or list rendering produced a different template shape.",
+      "remediation": "Make the initial template structure deterministic.",
+      "source": "hydration"
+    },
+    {
+      "id": 1204,
+      "code": "GLUON_HYDRATION_STATE_MISMATCH",
+      "compactCode": "G1204",
+      "title": "Hydration state mismatch",
+      "summary": "Serialized server and client Store snapshots differ.",
+      "why": "Client state changed before hydration or used another schema.",
+      "remediation": "Restore the request snapshot before creating the client application.",
+      "source": "hydration"
+    },
+    {
+      "id": 1205,
+      "code": "GLUON_HYDRATION_STYLE_MISMATCH",
+      "compactCode": "G1205",
+      "title": "Hydration style mismatch",
+      "summary": "Server style carriers and client style manifest differ.",
+      "why": "The server and browser did not use the same ordered stylesheet set.",
+      "remediation": "Build both entries from the same public style modules.",
+      "source": "hydration"
+    },
+    {
+      "id": 1206,
+      "code": "GLUON_UNSUPPORTED_SSR_TRANSPORT",
+      "compactCode": "G1206",
+      "title": "SSR style transport is unsupported",
+      "summary": "The browser cannot complete the required style handoff.",
+      "why": "Constructable stylesheet or carrier requirements are not available.",
+      "remediation": "Use a supported browser and preserve server style carriers until hydration.",
+      "source": "hydration"
+    },
+    {
+      "id": 1301,
+      "code": "GLUON_SSR_INVALID_VALUE",
+      "compactCode": "G1301",
+      "title": "SSR value is invalid",
+      "summary": "The server renderer received a value it cannot serialize safely.",
+      "why": "The value is not part of the supported template value contract.",
+      "remediation": "Convert it to a supported primitive, template, iterable, or explicit trusted value.",
+      "source": "ssr"
+    },
+    {
+      "id": 1302,
+      "code": "GLUON_SSR_UNSUPPORTED_DIRECTIVE",
+      "compactCode": "G1302",
+      "title": "SSR directive is unsupported",
+      "summary": "A browser-only directive reached the server renderer.",
+      "why": "The directive has no deterministic server contract.",
+      "remediation": "Provide a server implementation or keep the directive in the browser path.",
+      "source": "ssr"
+    },
+    {
+      "id": 1401,
+      "code": "GLUON_UNIVERSAL_ENTRY_MISSING",
+      "compactCode": "G1401",
+      "title": "Universal client entry is missing",
+      "summary": "The Vite universal build emitted no client entry chunk.",
+      "why": "The build input does not define an application entry.",
+      "remediation": "Configure a client entry before enabling the universal manifest.",
+      "source": "tooling"
+    },
+    {
+      "id": 1402,
+      "code": "GLUON_CHECK_INPUT_MISSING",
+      "compactCode": "G1402",
+      "title": "Template checker input is missing",
+      "summary": "gluon-template-check received no files or directories.",
+      "why": "The command requires an explicit project input.",
+      "remediation": "Pass one or more source files or directories.",
+      "source": "tooling"
+    },
+    {
+      "id": 1403,
+      "code": "GLUON_PLAYGROUND_PAYLOAD_INVALID",
+      "compactCode": "G1403",
+      "title": "Playground payload is invalid",
+      "summary": "A shared Playground URL does not contain a valid two-file project.",
+      "why": "The payload is malformed, truncated, or was not created by a compatible Playground version.",
+      "remediation": "Open a new reproduction and share it again from the supported Playground.",
+      "source": "tooling"
+    },
+    {
+      "id": 1404,
+      "code": "GLUON_PLAYGROUND_RENDER_EXPORT_MISSING",
+      "compactCode": "G1404",
+      "title": "Playground render export is missing",
+      "summary": "The application module exports no supported render function.",
+      "why": "The Playground requires a default, App, Counter, render, or other function export to produce a Gluon template.",
+      "remediation": "Export the component or render function that the Playground should mount.",
+      "source": "tooling"
+    },
+    {
+      "id": 1405,
+      "code": "GLUON_PLAYGROUND_COMPILE_FAILED",
+      "compactCode": "G1405",
+      "title": "Playground compilation failed",
+      "summary": "The edited TypeScript project could not be transpiled.",
+      "why": "The application or stylesheet module contains invalid TypeScript syntax.",
+      "remediation": "Correct the reported syntax error and run the reproduction again.",
+      "source": "tooling"
+    },
+    {
+      "id": 1406,
+      "code": "GLUON_PLAYGROUND_IMPORT_UNSUPPORTED",
+      "compactCode": "G1406",
+      "title": "Playground import is unsupported",
+      "summary": "A reproduction imports a package unavailable in the browser execution environment.",
+      "why": "The online Playground intentionally exposes only its supported public Gluon runtime modules.",
+      "remediation": "Use @gluonjs/core or @gluonjs/reactivity, or download the starter to add other dependencies locally.",
+      "source": "tooling"
+    },
+    {
+      "id": 1501,
+      "code": "GLUON_DEVTOOLS_APPLICATION_ID_EMPTY",
+      "compactCode": "G1501",
+      "title": "Devtools application ID is empty",
+      "summary": "A Devtools application registration has no stable ID.",
+      "why": "Independent application snapshots require a non-empty identity.",
+      "remediation": "Provide a stable application ID.",
+      "source": "devtools"
+    },
+    {
+      "id": 1502,
+      "code": "GLUON_DEVTOOLS_APPLICATION_DUPLICATE",
+      "compactCode": "G1502",
+      "title": "Devtools application ID is duplicated",
+      "summary": "Two registered applications use the same ID.",
+      "why": "Protocol snapshots cannot distinguish duplicate identities.",
+      "remediation": "Use a unique ID or unregister the previous application.",
+      "source": "devtools"
+    },
+    {
+      "id": 1503,
+      "code": "GLUON_DEVTOOLS_APPLICATION_UNKNOWN",
+      "compactCode": "G1503",
+      "title": "Devtools application is unknown",
+      "summary": "An operation targets an unregistered application.",
+      "why": "The application was never registered or was already disposed.",
+      "remediation": "Register it before recording or selecting it.",
+      "source": "devtools"
+    },
+    {
+      "id": 1504,
+      "code": "GLUON_DEVTOOLS_DISABLED",
+      "compactCode": "G1504",
+      "title": "Devtools bridge is disabled",
+      "summary": "A browser inspector mount was requested for an inert bridge.",
+      "why": "Production-safe bridges are disabled by default.",
+      "remediation": "Enable the bridge only in a development entry.",
+      "source": "devtools"
+    }
+  ]
+}
