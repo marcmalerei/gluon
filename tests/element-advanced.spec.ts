@@ -87,7 +87,9 @@ describe('advanced GluonElement behavior', () => {
     document.body.append(element);
     await element.updateComplete;
 
-    expect(element.shadowRoot?.adoptedStyleSheets).toEqual([baseStyle, childStyle]);
+    expect(element.shadowRoot?.adoptedStyleSheets).toHaveLength(2);
+    expect(element.shadowRoot?.adoptedStyleSheets[0]).toBe(baseStyle);
+    expect(element.shadowRoot?.adoptedStyleSheets[1]).toBe(childStyle);
     expect(element.settings).toEqual({ ready: true });
     expect(element.items).toEqual(['first']);
     expect(element.getAttribute('settings')).toBe('{"ready":true}');

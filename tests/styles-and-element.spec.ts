@@ -21,10 +21,13 @@ describe('adopted stylesheets', () => {
     const second = css`:root { --second: 2; }`;
 
     adoptStyles(document, first, first, second);
-    expect(document.adoptedStyleSheets).toEqual([first, second]);
+    expect(document.adoptedStyleSheets).toHaveLength(2);
+    expect(document.adoptedStyleSheets[0]).toBe(first);
+    expect(document.adoptedStyleSheets[1]).toBe(second);
 
     unadoptStyles(document, first);
-    expect(document.adoptedStyleSheets).toEqual([second]);
+    expect(document.adoptedStyleSheets).toHaveLength(1);
+    expect(document.adoptedStyleSheets[0]).toBe(second);
     expect(document.querySelector('style[data-gluon]')).toBeNull();
   });
 

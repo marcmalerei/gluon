@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
+import { browserTarget } from './vitest.browser-target.js';
 
 export default defineConfig({
   resolve: { alias: {
@@ -9,7 +10,7 @@ export default defineConfig({
     '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
   } },
   test: {
-    browser: { enabled: true, provider: playwright(), instances: [{ browser: 'chromium' }] },
+    browser: { enabled: true, provider: playwright(), instances: [{ browser: browserTarget }] },
     include: ['tests/devtools.spec.ts'],
     coverage: {
       provider: 'v8',

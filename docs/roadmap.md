@@ -279,8 +279,11 @@ licensed, and publicly consumable Gluon 1.0 release.
 
 The first #38 performance slice provides the production Gluon/Lit/Vue/Vanilla
 DOM comparison harness, cross-browser runner, output-equivalence tests, and
-retained raw baseline. Browser-matrix CI, accessibility, security, memory, and
-regression-budget gates remain open acceptance work.
+retained raw baseline. The next slice adds blocking Chromium/Firefox/WebKit
+engine lanes, Node 22/24 build and SSR lanes, the full repository check, and a
+GLUON GOODS bundle budget. Branded-browser/device evidence, accessibility,
+security, broad memory, customer-flow performance, and benchmark-artifact gates
+remain open acceptance work.
 
 ### Exit gate
 
