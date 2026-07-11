@@ -9,8 +9,10 @@ direct insertion when a new part contains one node, fragment batching when it
 contains multiple nodes, one element/comment traversal for every cloned
 template's bindings, precomputed binding priorities, parallel key/value storage
 for keyed repeats, detached keyed-child anchors, and keyed-list fast paths for
-unchanged and reversed order. These shortcuts retain the external-DOM recovery
-and keyed-identity contracts covered by the browser suite.
+unchanged and reversed order. Generic keyed changes trim stable heads and tails,
+retain their longest unchanged contiguous run, and move only the surrounding
+groups. These shortcuts retain the external-DOM recovery and keyed-identity
+contracts covered by the browser suite.
 
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
@@ -149,6 +151,28 @@ rounds, and ten measured samples. The clean `34cd49a` run records zero
 `TreeWalker.nextNode()` accounts for 402 self samples. The profile covers all
 four benchmark workloads and records Chromium 149.0.7827.55 and the exact
 source commit.
+
+## Keyed reconciliation comparison
+
+Issue #95 compares the existing generic keyed path at baseline commit `4095745`
+with implementation commit `5d19308`. Both consecutive Chromium 149 runs used
+the 1,000-row `npm run benchmark:keyed` harness, Vitest 4.1.10, Node 22.22.0,
+and the same recorded Apple M4 environment. Vitest ran every case for 500 ms
+and retained aggregate distribution statistics in
+[`keyed-reconciliation-5d19308.json`](../benchmarks/results/keyed-reconciliation-5d19308.json).
+
+| Scenario | Baseline mean ms/op | Candidate mean ms/op | Throughput ratio |
+| --- | ---: | ---: | ---: |
+| Reverse all rows | 0.1375 | 0.1331 | 1.03× |
+| Move first 100 rows to the end | 0.2286 | 0.1821 | 1.26× |
+| Remove and append 100 rows | 0.3617 | 0.3206 | 1.13× |
+
+The block-move and replacement-window runs support the intended optimization
+on this environment. Full reverse remains on its pre-existing dedicated path;
+its close result is a regression check, not evidence that the new generic path
+made reverse faster. The runs are separate and Vitest retains aggregate
+statistics rather than individual samples, so these ratios are not generalized
+beyond the recorded commits, machine, browser, and workloads.
 
 ## Interpretation and limits
 

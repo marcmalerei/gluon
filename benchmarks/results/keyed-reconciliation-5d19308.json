@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-11T20:07:02Z",
+  "issue": 95,
+  "source": {
+    "baselineCommit": "4095745194c2a6ab0281b120de72f8df511ef7f3",
+    "candidateCommit": "5d19308e37b63ee92eb5283cb5035f5916a4912e",
+    "branch": "codex/keyed-head-tail-diff",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v22.22.0",
+    "npm": "10.9.4",
+    "vitest": "4.1.10",
+    "playwright": "1.61.1",
+    "browser": "chromium",
+    "browserVersion": "149.0.7827.55"
+  },
+  "methodology": {
+    "command": "npm run benchmark:keyed -- --reporter=verbose --compare=.tmp/keyed-baseline-4095745.json --outputJson=.tmp/keyed-optimized-5d19308.json",
+    "rowCount": 1000,
+    "timePerCaseMs": 500,
+    "unit": "milliseconds per operation; lower is faster",
+    "comparison": "candidate throughput divided by baseline throughput",
+    "limitations": "Vitest records aggregate statistics rather than individual samples. Baseline and candidate are consecutive separate browser runs on the same machine, so their distributions remain run-specific.",
+    "workloads": {
+      "reverse": "reverse all 1,000 surviving keyed rows",
+      "blockMove": "move the first 100 surviving keyed rows to the end",
+      "replacementWindow": "remove the first 100 keyed rows and append 100 new keyed rows"
+    }
+  },
+  "results": [
+    {
+      "scenario": "reverse",
+      "baseline": {
+        "hz": 7273.999996531487,
+        "meanMs": 0.13747594177575434,
+        "medianMs": 0.10000002384185791,
+        "p75Ms": 0.19999992847442627,
+        "p99Ms": 0.2999999523162842,
+        "rmePercent": 4.621948536979215,
+        "sampleCount": 3637
+      },
+      "candidate": {
+        "hz": 7514.497098430399,
+        "meanMs": 0.13307610434886938,
+        "medianMs": 0.10000002384185791,
+        "p75Ms": 0.19999992847442627,
+        "p99Ms": 0.20000004768371582,
+        "rmePercent": 4.606294609085653,
+        "sampleCount": 3758
+      },
+      "throughputRatio": 1.033064
+    },
+    {
+      "scenario": "blockMove",
+      "baseline": {
+        "hz": 4374.250301548025,
+        "meanMs": 0.22861060320350327,
+        "medianMs": 0.20000004768371582,
+        "p75Ms": 0.2999999523162842,
+        "p99Ms": 1.3000000715255737,
+        "rmePercent": 2.795912062372204,
+        "sampleCount": 2188
+      },
+      "candidate": {
+        "hz": 5489.9999986910825,
+        "meanMs": 0.1821493625206591,
+        "medianMs": 0.19999992847442627,
+        "p75Ms": 0.20000004768371582,
+        "p99Ms": 1.2999999523162842,
+        "rmePercent": 3.091783825908614,
+        "sampleCount": 2745
+      },
+      "throughputRatio": 1.255072
+    },
+    {
+      "scenario": "replacementWindow",
+      "baseline": {
+        "hz": 2764.8940421194716,
+        "meanMs": 0.3616775126881299,
+        "medianMs": 0.30000007152557373,
+        "p75Ms": 0.3999999761581421,
+        "p99Ms": 2,
+        "rmePercent": 3.1551483554219897,
+        "sampleCount": 1383
+      },
+      "candidate": {
+        "hz": 3119.3761253699,
+        "meanMs": 0.3205769230157901,
+        "medianMs": 0.2999999523162842,
+        "p75Ms": 0.30000007152557373,
+        "p99Ms": 1.899999976158142,
+        "rmePercent": 3.4878876925241844,
+        "sampleCount": 1560
+      },
+      "throughputRatio": 1.128209
+    }
+  ]
+}
