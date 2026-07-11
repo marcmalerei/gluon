@@ -90,6 +90,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Empty Core node parts insert a single new node directly while preserving
+  fragment batching for multi-node commits, with DOM regression coverage and
+  retained before/after rendering evidence.
 - Renamed the private root package from the occupied unscoped name `gluon` to
   the planned scoped name `@gluonjs/core`.
 - Renderer hot paths now specialize stable string bindings, precompute binding
