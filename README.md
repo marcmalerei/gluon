@@ -20,6 +20,7 @@
 - official browser, hash, and memory routing with typed locations and guards
 - typed application-scoped stores with transactions, persistence, HMR, and SSR snapshots
 - async boundaries/components, application-owned teleports, cached views, and transitions
+- official Vite transforms with template source maps and state-preserving HMR
 - public black-box component, Router, Store, and scheduler test utilities
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
@@ -231,6 +232,26 @@ await cleanupFixtures();
 ```
 
 See the [`@gluonjs/test-utils` guide](packages/test-utils/README.md).
+
+## Vite and state-preserving HMR
+
+`@gluonjs/vite` records `html` and `css` template and interpolation locations,
+reports adopted-stylesheet violations, and supplies high-resolution source maps.
+During development it gives exported functions, Store definitions, registered
+Custom Elements, and constructable stylesheets stable identities. Compatible
+edits rerender mounted applications and elements without replacing their DOM or
+compatible state.
+
+```ts
+import { defineConfig } from 'vite';
+import gluon from '@gluonjs/vite';
+
+export default defineConfig({ plugins: [gluon()] });
+```
+
+Production builds do not receive the virtual HMR client or `import.meta.hot`
+handlers. See the [`@gluonjs/vite` guide](packages/vite/README.md) and the
+[tooling architecture](docs/architecture.md#vite-transform-and-hmr-boundary).
 
 ## Bindings and spreading
 

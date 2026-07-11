@@ -23,7 +23,7 @@
     {
       "name": "@gluonjs/compiler",
       "directory": "packages/compiler",
-      "state": "planned",
+      "state": "current",
       "environment": "universal",
       "exports": ["."],
       "dependencies": []
@@ -67,9 +67,10 @@
     {
       "name": "@gluonjs/vite",
       "directory": "packages/vite",
-      "state": "planned",
+      "state": "current",
       "environment": "node",
       "exports": ["."],
+      "currentDependencies": ["@gluonjs/compiler", "@gluonjs/core"],
       "dependencies": ["@gluonjs/compiler"]
     },
     {
