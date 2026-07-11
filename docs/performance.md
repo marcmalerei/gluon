@@ -88,15 +88,15 @@ above 1 means Gluon was faster for only that browser and workload.
 
 ## Current committed matrix
 
-The retained matrix for commit `55206f4` uses 20 measured samples, eight warm-up
+The retained matrix for commit `5309218` uses 40 measured samples, 12 warm-up
 rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit 26.5
 engines on the recorded Apple M4 environment. The paired
-[`rendering-comparison-55206f4.md`](../benchmarks/results/rendering-comparison-55206f4.md)
+[`rendering-comparison-5309218.md`](../benchmarks/results/rendering-comparison-5309218.md)
 file contains the medians and p95 values; its JSON file retains every sample.
 
 Gluon is faster than Lit for keyed `update` and `reverse` in all three engines:
-1.22×/1.74× in Chromium, 1.23×/1.94× in Firefox, and 1.21×/2.00× in WebKit.
-Text is at parity in Firefox and WebKit; Lit is faster in Chromium. Fresh
+1.25×/1.74× in Chromium, 1.15×/1.89× in Firefox, and 1.14×/2.00× in WebKit.
+Lit is faster for the single-text update in all three engines. Fresh
 1,000-row `create` remains faster in Lit in this matrix, so the evidence does
 not support a universal “Gluon is faster” claim or the historical 6× claim.
 
@@ -130,6 +130,16 @@ nodes, so they do not enter the new empty-part insertion branch. A second
 40-sample optimized run measured `create` at 1.0458 ms/op, independently below
 the 1.1333 ms/op baseline. These run-specific observations are not extrapolated
 beyond the recorded environment.
+
+The binding-instantiation fast path prepares descriptors in DOM traversal order
+and locates all parts in a cloned template with one reused `TreeWalker`. The
+post-change Chromium CPU profile no longer contains `walkPath()` or repeated
+`childNodes.item()` calls. Compared with the preceding retained `55206f4`
+matrix, the `create` median is lower by 18% in Chromium (1.1472 to 0.9405
+ms/op), 9% in Firefox (1.9167 to 1.7500 ms/op), and 11% in WebKit (1.4583 to
+1.2917 ms/op). Lit remains 12%, 10%, and 10% faster, respectively, for this
+fresh-create workload. As above, these percentages compare separate retained
+runs and are not a general renderer claim.
 
 ## Interpretation and limits
 
