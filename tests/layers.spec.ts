@@ -5,10 +5,10 @@ import {
   layerOrderStyles,
   render,
 } from '../src/index.js';
-import { Button, Icon, Input, Label, atomStyles } from '../src/atoms/index.js';
-import { Card, FormField, moleculeStyles } from '../src/molecules/index.js';
-import { AppShell, organismStyles } from '../src/organisms/index.js';
-import { q } from '../src/quarks/index.js';
+import { Button, Icon, Input, Label, atomStyles } from '@gluonjs/atoms';
+import { Card, FormField, moleculeStyles } from '@gluonjs/molecules';
+import { AppShell, organismStyles } from '@gluonjs/organisms';
+import { q } from '@gluonjs/quarks';
 
 describe('component layers', () => {
   beforeEach(() => {

@@ -294,7 +294,14 @@ plain-HTML, and Vue-host examples. The Pages workflow validates the same version
 manifest, links, API coverage, and examples before deploying the documentation
 and Playground as one public site.
 
-The current #38 evidence slice adds blocking axe WCAG checks, deterministic
+Issue #39 makes Quarks, Atoms, Molecules, and Organisms current optional
+workspaces and removes their transitional Core subpaths. Stable manifest
+inventories link every component to accessibility documentation, a compiled
+interactive example, browser tests, and screenshot evidence. Core-only bundle,
+generated-declaration, package-archive, theme-ownership, axe, focus, keyboard,
+RTL-logical-style, and Chromium/Firefox/WebKit gates enforce the boundary.
+
+#38 adds blocking axe WCAG checks, deterministic
 property/fuzz cases for Router, compiler, and SSR serialization, repeated
 customer-flow retention checks, a validated machine-readable threat model,
 production customer-flow p95 budgets, and retained CI benchmark artifacts.

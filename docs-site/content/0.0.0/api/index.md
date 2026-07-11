@@ -32,12 +32,13 @@ when an internal link is broken.
 - [`@gluonjs/language-server`](generated/packages/language-server/src/)
 - [`create-gluon`](generated/packages/create-gluon/src/)
 
-## Transitional UI entry points
+## Optional UI packages
 
-- [`@gluonjs/core/quarks`](generated/src/quarks/)
-- [`@gluonjs/core/atoms`](generated/src/atoms/)
-- [`@gluonjs/core/molecules`](generated/src/molecules/)
-- [`@gluonjs/core/organisms`](generated/src/organisms/)
+- [`@gluonjs/quarks`](generated/packages/quarks/src/)
+- [`@gluonjs/atoms`](generated/packages/atoms/src/)
+- [`@gluonjs/molecules`](generated/packages/molecules/src/)
+- [`@gluonjs/organisms`](generated/packages/organisms/src/)
 
-Issue #39 moves these four transitional subpaths into their separately
-versioned final packages before 1.0.
+Each package exports a machine-readable stable-contract manifest. The compiled
+[interactive UI example](../examples/ui.html) exercises themes, controls,
+compositions, and headless listbox keyboard behavior.

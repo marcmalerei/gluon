@@ -33,8 +33,7 @@
       "directory": ".",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./styles", "./quarks", "./atoms", "./molecules", "./organisms"],
-      "finalExports": [".", "./styles"],
+      "exports": [".", "./styles"],
       "currentDependencies": [
         "@gluonjs/reactivity"
       ],
@@ -109,7 +108,7 @@
     {
       "name": "@gluonjs/quarks",
       "directory": "packages/quarks",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
       "exports": ["."],
       "dependencies": ["@gluonjs/core"]
@@ -117,7 +116,7 @@
     {
       "name": "@gluonjs/atoms",
       "directory": "packages/atoms",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
       "exports": ["."],
       "dependencies": ["@gluonjs/core", "@gluonjs/quarks"]
@@ -125,7 +124,7 @@
     {
       "name": "@gluonjs/molecules",
       "directory": "packages/molecules",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
       "exports": ["."],
       "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms"]
@@ -133,7 +132,7 @@
     {
       "name": "@gluonjs/organisms",
       "directory": "packages/organisms",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
       "exports": ["."],
       "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms", "@gluonjs/molecules"]

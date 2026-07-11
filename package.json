@@ -30,22 +30,6 @@
     "./styles": {
       "types": "./dist/types/styles/index.d.ts",
       "import": "./dist/styles.js"
-    },
-    "./quarks": {
-      "types": "./dist/types/quarks/index.d.ts",
-      "import": "./dist/quarks.js"
-    },
-    "./atoms": {
-      "types": "./dist/types/atoms/index.d.ts",
-      "import": "./dist/atoms.js"
-    },
-    "./molecules": {
-      "types": "./dist/types/molecules/index.d.ts",
-      "import": "./dist/molecules.js"
-    },
-    "./organisms": {
-      "types": "./dist/types/organisms/index.d.ts",
-      "import": "./dist/organisms.js"
     }
   },
   "files": [
@@ -62,8 +46,13 @@
     "@gluonjs/reactivity": "0.0.0"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:playground && npm run build:docs",
+    "build": "npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:playground && npm run build:docs",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
+    "build:ui": "npm run build:quarks && npm run build:atoms && npm run build:molecules && npm run build:organisms",
+    "build:quarks": "npm run build --workspace @gluonjs/quarks",
+    "build:atoms": "npm run build --workspace @gluonjs/atoms",
+    "build:molecules": "npm run build --workspace @gluonjs/molecules",
+    "build:organisms": "npm run build --workspace @gluonjs/organisms",
     "build:reactivity": "npm run build --workspace @gluonjs/reactivity",
     "build:router": "npm run build --workspace @gluonjs/router",
     "build:store": "npm run build --workspace @gluonjs/store",
@@ -86,8 +75,9 @@
     "dev:playground": "vite --config examples/playground/vite.config.ts",
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
-    "typecheck": "npm run typecheck:core && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:create-gluon && npm run typecheck:docs",
+    "typecheck": "npm run typecheck:core && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:create-gluon && npm run typecheck:docs",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
+    "typecheck:ui": "npm run typecheck --workspace @gluonjs/quarks && npm run typecheck --workspace @gluonjs/atoms && npm run typecheck --workspace @gluonjs/molecules && npm run typecheck --workspace @gluonjs/organisms",
     "typecheck:reactivity": "npm run typecheck --workspace @gluonjs/reactivity",
     "typecheck:router": "npm run typecheck --workspace @gluonjs/router",
     "typecheck:store": "npm run typecheck --workspace @gluonjs/store",
@@ -102,6 +92,7 @@
     "typecheck:docs": "tsc -p docs-site/examples/tsconfig.json --noEmit",
     "typecheck:reactivity-api": "tsc -p tests-node/tsconfig.reactivity-types.json",
     "typecheck:core-api": "tsc -p tests-node/tsconfig.core-types.json",
+    "typecheck:ui-api": "tsc -p tests-node/tsconfig.ui-types.json",
     "typecheck:router-api": "tsc -p tests-node/tsconfig.router-types.json",
     "typecheck:store-api": "tsc -p tests-node/tsconfig.store-types.json",
     "typecheck:test-utils-api": "tsc -p tests-node/tsconfig.test-utils-types.json",
@@ -152,10 +143,11 @@
     "check:quality-budgets": "node scripts/validate-quality-budgets.mjs",
     "test:property-fuzz": "vitest run --config vitest.quality.config.ts",
     "check:security": "node scripts/validate-security-evidence.mjs",
+    "check:ui-contract": "node scripts/validate-ui-contract.mjs",
     "check:shop-performance": "npm run build:core && npm run build:compiler && npm run build:vite && npm run benchmark:shop-flow",
     "check:budgets": "npm run build:shop && npm run check:quality-budgets",
     "check:docs": "npm run typecheck:docs && npm run build:docs && node scripts/validate-docs.mjs",
-    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run build && npm run check:quality-budgets && npm run check:security && npm run typecheck:core-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures && npm run check:docs"
+    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run build && npm run check:quality-budgets && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures && npm run check:docs"
   },
   "devDependencies": {
     "@jridgewell/trace-mapping": "^0.3.31",

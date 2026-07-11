@@ -16,11 +16,12 @@ src/
 ├── element.ts          Reactive Custom Element base and definition helper
 ├── component.ts        Atom, Molecule, and Organism metadata helpers
 ├── props.ts            Class/style-aware prop merging
-├── styles/             Constructable stylesheet creation and adoption
-├── quarks/             Typed q.<tag>() native-element factories
-├── atoms/              Icon, Button, Input, Label
-├── molecules/          Card, FormField
-└── organisms/          AppShell
+└── styles/             Constructable stylesheet creation and adoption
+
+packages/quarks/        Typed native factories and headless interactions
+packages/atoms/         Icon, Button, Input, Label, tokens, and themes
+packages/molecules/     Card and FormField compositions
+packages/organisms/     AppShell structure
 
 packages/reactivity/
 ├── src/effect.ts       Dependency graph, effects, cleanup, debug hooks
@@ -96,12 +97,11 @@ examples/playground/
 └── design/             Accepted editor and diagnostic-reference concepts
 ```
 
-The current private package builds separate ESM entry points for `@gluonjs/core`,
-`@gluonjs/core/styles`, `@gluonjs/core/quarks`, `@gluonjs/core/atoms`,
-`@gluonjs/core/molecules`, and `@gluonjs/core/organisms`. The accepted
-[package governance ADR](adrs/0002-package-release-and-supply-chain-governance.md)
-makes the four UI-layer subpaths transitional and defines their final optional
-packages.
+Core builds only `@gluonjs/core` and `@gluonjs/core/styles`. The optional UI
+graph is separately consumable as `@gluonjs/quarks`, `@gluonjs/atoms`,
+`@gluonjs/molecules`, and `@gluonjs/organisms`, with dependencies pointing only
+downward as defined by the
+[package governance ADR](adrs/0002-package-release-and-supply-chain-governance.md).
 
 The separate `@gluonjs/router` package owns application routing and depends on
 Core and Reactivity. Its `./memory` entry excludes browser histories and Gluon

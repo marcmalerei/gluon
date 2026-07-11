@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '../src/index.js';
-import { fragment, htmlTagNames, q, quark } from '../src/quarks/index.js';
+import { fragment, htmlTagNames, q, quark } from '@gluonjs/quarks';
 
 describe('quarks', () => {
   beforeEach(() => {

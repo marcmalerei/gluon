@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@gluonjs/core": [
+        "src/index.ts"
+      ],
+      "@gluonjs/quarks": [
+        "packages/quarks/src/index.ts"
+      ],
+      "@gluonjs/atoms": [
+        "packages/atoms/src/index.ts"
+      ]
+    },
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

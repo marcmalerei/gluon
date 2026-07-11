@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "types": [],
+    "paths": {
+      "@gluonjs/core": ["dist/types/index.d.ts"],
+      "@gluonjs/quarks": ["packages/quarks/dist/index.d.ts"],
+      "@gluonjs/atoms": ["packages/atoms/dist/index.d.ts"],
+      "@gluonjs/molecules": ["packages/molecules/dist/index.d.ts"],
+      "@gluonjs/organisms": ["packages/organisms/dist/index.d.ts"]
+    }
+  },
+  "include": ["ui.types.ts"]
+}
