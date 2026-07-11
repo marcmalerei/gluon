@@ -43,11 +43,19 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.
+- A production-built Gluon, Lit, Vue, and optimized Vanilla DOM rendering
+  comparison with identical-output tests, calibrated interleaved samples,
+  Chromium/Firefox/WebKit evidence, exact environment metadata, raw results,
+  and an interactive browser demonstration.
 
 ### Changed
 
 - Renamed the private root package from the occupied unscoped name `gluon` to
   the planned scoped name `@gluonjs/core`.
+- Renderer hot paths now specialize stable string bindings, precompute binding
+  commit priorities, and update unchanged keyed order without rebuilding lookup
+  maps; external DOM recovery and keyed identity contracts remain covered by
+  browser tests.
 
 ### Fixed
 

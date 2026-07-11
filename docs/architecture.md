@@ -292,5 +292,11 @@ and stylesheet adoption.
 `npm run benchmark:keyed` provides three Gluon-only Chromium scenarios with
 1,000 rows: full reverse, a 100-row block move, and a 100-row replacement
 window. It is a repeatable regression harness, not a comparative benchmark.
-Performance claims require a separate reproducible benchmark design and
-baseline implementations.
+
+`npm run benchmark:rendering` production-builds a separate comparison surface
+with Gluon, Lit, Vue, and optimized Vanilla DOM implementations. It validates
+identical output, calibrates shared per-scenario batches, rotates execution
+order, runs in Chromium, Firefox, and WebKit, and retains raw samples plus exact
+environment metadata. [`performance.md`](performance.md) defines the workloads,
+interpretation rules, and measurement limits. The benchmark has no application
+runtime dependency and is intentionally not a GLUON GOODS customer route.
