@@ -20,6 +20,7 @@
 - official browser, hash, and memory routing with typed locations and guards
 - typed application-scoped stores with transactions, persistence, HMR, and SSR snapshots
 - async boundaries/components, application-owned teleports, cached views, and transitions
+- public black-box component, Router, Store, and scheduler test utilities
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
@@ -211,6 +212,25 @@ KeepAlive suspends cached renderer resources and evicts least-recently-used
 entries. Transition and TransitionGroup cancel stale Web Animations and honor
 reduced-motion preferences. A public DOM-free descriptor is available to the
 future server renderer. See [Async UI and rendering built-ins](docs/async-ui.md).
+
+## Black-box test utilities
+
+`@gluonjs/test-utils` mounts functional components, Custom Elements, or complete
+application templates through public Gluon APIs. Fixtures support typed props,
+light-DOM slots, native events, providers, plugins, isolated memory Routers,
+isolated Store managers, scheduler settling, owned external cleanup, and named
+fixture-leak diagnostics.
+
+```ts
+import { cleanupFixtures, mountComponent } from '@gluonjs/test-utils';
+
+const fixture = mountComponent(Counter, { props: { count: 1 } });
+await fixture.setProps({ count: 2 });
+expect(fixture.get('output').textContent).toBe('2');
+await cleanupFixtures();
+```
+
+See the [`@gluonjs/test-utils` guide](packages/test-utils/README.md).
 
 ## Bindings and spreading
 

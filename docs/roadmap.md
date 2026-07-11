@@ -69,6 +69,8 @@ Gluon currently provides:
   plugins, compatible-state HMR, safe snapshots, persistence, and test isolation
 - async boundaries/components, application-owned teleports, LRU cached views,
   cancellable transitions, keyed transition groups, and server descriptors
+- public black-box test fixtures with automatic cleanup, ownership diagnostics,
+  isolated Router/Store factories, and deterministic scheduler controls
 - the first living GLUON GOODS reference-shop slice with public-package routes,
   responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management

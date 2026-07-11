@@ -44,6 +44,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Application-owned Teleport hosts, LRU KeepAlive view caching, cancellable
   element/component transitions, and keyed FLIP transition groups with
   reduced-motion behavior.
+- The official `@gluonjs/test-utils` package with public black-box component,
+  Custom Element, context, plugin, Router, Store, scheduler, leak-detection, and
+  automatic-cleanup fixtures.
 - The living mobile-first GLUON GOODS reference shop with responsive
   navigation, catalog and product routes, configurable products, search, a
   reactive bag, generated product imagery, adopted stylesheet-only design, and
