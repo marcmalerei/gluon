@@ -42,6 +42,10 @@ catalogue because the first engine run dynamically loads and optimizes the
 language-server dependency graph. Subsequent interactions retain their
 five-second limits.
 
+Browser assertions that cross a reactive transition poll for the resulting DOM
+state with a bounded timeout. They do not assume that the render and a 140-ms
+transition always finish within one fixed wall-clock delay on every engine.
+
 The current ceilings allow limited implementation movement above the measured
 137,169-byte raw / 40,088-byte gzip shop entry while preventing unreviewed large
 regressions. Changing a ceiling requires an evidence-backed documentation update
