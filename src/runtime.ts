@@ -1070,7 +1070,7 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
     element,
     strings: result.strings,
     descriptors,
-    rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 0),
+    rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 1),
   };
   templateCache.set(result.strings, compiled);
   return compiled;

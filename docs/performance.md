@@ -109,8 +109,11 @@ Gluon won 3 of 6; the largest observed advantage was 2.73× for the same
 attribute scenario. Lit won the simple update and 500-item initial-render
 scenarios in the 500-item run. These reruns did not reproduce a 6× result.
 
-Those values are retained here as a traceable historical comparison, not as the
-current release baseline. The current benchmark command above is the
-authoritative evidence because it runs the repository source, includes Vue and
-Vanilla DOM controls, validates identical output, records every sample, and
-captures exact source and environment metadata.
+In the same rerun under Playwright Firefox 152.0.4, the 10-run/500-item case
+also won 3 of 6 for each renderer and peaked at 1.82× for Gluon; the 3-run/
+5,000-item case won 4 of 6 for Gluon and peaked at 1.79×. Those values are
+retained here as a traceable historical comparison, not as the current release
+baseline. The current benchmark command above is the authoritative evidence
+because it runs the repository source, includes Vue and Vanilla DOM controls,
+validates identical output, records every sample, and captures exact source and
+environment metadata.
