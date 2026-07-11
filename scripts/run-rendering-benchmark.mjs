@@ -71,7 +71,7 @@ const evidence = {
   generatedAt: new Date().toISOString(),
   source: {
     commit: git('rev-parse', 'HEAD'),
-    branch: git('branch', '--show-current'),
+    branch: sourceRef(),
     workingTreeDirty: git('status', '--porcelain').length > 0,
   },
   environment: {
@@ -140,6 +140,10 @@ function positiveInteger(value, name) {
 
 function git(...args) {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
+}
+
+function sourceRef() {
+  return process.env.GITHUB_REF_NAME || git('branch', '--show-current') || 'detached';
 }
 
 function installedVersion(packageName) {

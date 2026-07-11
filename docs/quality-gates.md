@@ -15,7 +15,15 @@ dispatch. It uses the current Node 24-based `actions/checkout@v7` and
 - the browser, Router, test-utils, Devtools, Playground, and GLUON GOODS suites
   with Playwright Chromium, Firefox, and WebKit;
 - production builds plus SSR tests on Node 22.12 and Node 24;
-- the production GLUON GOODS bundle budget.
+- the production GLUON GOODS bundle budget;
+- axe-core WCAG A/AA checks for the maintained home-to-checkout journey;
+- deterministic Router/compiler/SSR property and fuzz checks plus repeated
+  customer-flow resource-retention checks;
+- validation of the machine-readable HTML/URL/style/SSR-state/CSP/Trusted-Types
+  threat model;
+- a production Chromium GLUON GOODS flow budget and a ten-sample comparative
+  Chromium/Firefox/WebKit rendering run retained for 30 days as JSON and
+  Markdown workflow artifacts.
 
 Set `GLUON_BROWSER` to `chromium`, `firefox`, or `webkit` to reproduce one engine
 lane locally. An unknown value fails configuration before tests start.
@@ -23,6 +31,12 @@ lane locally. An unknown value fails configuration before tests start.
 These Playwright projects are engine-level automation. They do not replace the
 branded Chrome, Edge, Firefox ESR, Safari, iOS, or Android release evidence
 required by the accepted support contract in ADR 0001.
+
+The exact release-candidate procedure is documented in
+[`browser-device-evidence.md`](browser-device-evidence.md). Automated and manual
+accessibility responsibilities are separated in
+[`accessibility.md`](accessibility.md), and deterministic retention evidence is
+defined in [`memory-retention.md`](memory-retention.md).
 
 ## Bundle budgets
 
@@ -51,10 +65,23 @@ The current ceilings allow limited implementation movement above the measured
 regressions. Changing a ceiling requires an evidence-backed documentation update
 in the same pull request.
 
-## Remaining issue #38 work
+## Customer-flow performance and retained evidence
 
-This slice does not claim completion of branded-browser/device evidence,
-automated accessibility and manual keyboard/assistive-technology protocols,
-the complete HTML/URL/style/SSR-state/CSP/Trusted-Types threat model, property
-and fuzz suites, broad memory-retention evidence, customer-flow performance
-budgets, or retained CI benchmark artifacts.
+`quality/shop-performance-budgets.json` is the reviewed p95 source for the
+production home-ready, product-navigation, bag-open, and checkout-navigation
+measurements. `npm run check:shop-performance` performs two warm-ups and ten
+measured desktop Chromium flows, preserves every raw duration, and fails with
+the exact metric, actual p95, limit, and overage. The command builds Core,
+Compiler, and the Gluon Vite plugin first, so it works from a clean checkout.
+
+The `performance-evidence` job also runs the Gluon/Lit/Vue/Vanilla comparison
+with four warm-ups and ten samples in Chromium, Firefox, and WebKit. It uploads
+both benchmarks' JSON and Markdown output as a commit-named artifact retained
+for 30 days. These CI samples are regression and review evidence; the larger
+committed baseline remains the evidence used for comparative prose.
+
+## Release-cut evidence boundary
+
+Branded-browser/device and assistive-technology results remain release-cut
+evidence rather than claims for the private `0.0.0` line. Issue #41 freezes and
+executes that product/version manifest before Gluon 1.0 publication.

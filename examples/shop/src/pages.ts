@@ -187,7 +187,7 @@ export function OrderConfirmationPage(store: ShopStore): TemplateValue {
 
 function ProductGallery(product: Product): TemplateValue {
   return html`
-    <section class="product-gallery" aria-label=${`${product.name} gallery`}>
+    <section class="product-gallery" aria-label=${`${product.name} gallery`} tabindex="0">
       <figure class="gallery-primary"><img src=${product.image} alt=${product.alt}></figure>
       <figure><img src=${product.image} alt="" class="detail-crop detail-top"></figure>
       <figure><img src=${product.image} alt="" class="detail-crop detail-base"></figure>

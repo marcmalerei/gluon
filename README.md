@@ -541,6 +541,9 @@ The following points describe architectural advantages and design goals. Outcome
 ## Architecture and provenance
 
 - [Public versioned documentation](https://marcmalerei.github.io/gluon/)
+- [Quality gates](docs/quality-gates.md)
+- [Security threat model](docs/security.md)
+- [Accessibility evidence](docs/accessibility.md)
 - [Architecture](docs/architecture.md)
 - [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)

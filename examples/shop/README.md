@@ -80,6 +80,8 @@ The latest verified renders are:
 - [desktop home](design/rendered-home-desktop.png)
 - [mobile home](design/rendered-home-mobile.png)
 - [mobile product configuration](design/rendered-product-mobile.png)
+- [desktop keyboard focus on the product gallery](design/rendered-product-focus-desktop.png)
+- [mobile keyboard focus on the product gallery](design/rendered-product-focus-mobile.png)
 
 ## Verification contract
 
@@ -95,6 +97,13 @@ labeled delivery fields, order submission, and confirmation. At 320px the
 confirmation has no horizontal overflow and every visible link/button remains
 at least 44px high. This frontend confirmation does not claim payment-provider
 or fulfillment integration.
+
+`npm run check:shop-performance` builds the same production shop and measures
+home readiness, product navigation, bag opening, and checkout navigation over
+two warm-ups and ten Chromium samples. The reviewed p95 ceilings live in
+`quality/shop-performance-budgets.json`; JSON and Markdown preserve every raw
+sample. These local production timings are regression ceilings, not network,
+device, or general framework-speed claims.
 
 ## Reproducible bundle evidence
 
