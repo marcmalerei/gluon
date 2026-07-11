@@ -9,6 +9,11 @@ opacity cannot change the computed contrast result. The customer-flow suite
 separately asserts initial dialog focus, focus containment, Escape behavior,
 focus return, native labels, and mobile navigation.
 
+`tests/ui-system.spec.ts` applies the same WCAG A/AA rule set to the stable
+Quark, Atom, Molecule, and Organism composition. It also verifies focus-scope
+entry, Tab containment, focus return, listbox keyboard selection, dialog naming,
+validation alerts, and manifest evidence links in every browser engine lane.
+
 Automated rules cannot establish reading order quality, useful announcements,
 zoom usability, speech output, or whether a keyboard sequence is understandable.
 The following protocol is therefore release-blocking for changed customer flows.

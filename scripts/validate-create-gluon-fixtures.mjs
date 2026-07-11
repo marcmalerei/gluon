@@ -19,6 +19,10 @@ const packageSources = new Map([
   ['@gluonjs/vite', 'packages/vite'],
   ['@gluonjs/test-utils', 'packages/test-utils'],
   ['@gluonjs/language-server', 'packages/language-server'],
+  ['@gluonjs/quarks', 'packages/quarks'],
+  ['@gluonjs/atoms', 'packages/atoms'],
+  ['@gluonjs/molecules', 'packages/molecules'],
+  ['@gluonjs/organisms', 'packages/organisms'],
 ]);
 
 try {
@@ -94,6 +98,10 @@ async function pointOfficialDependenciesAtArchives(directory, archives, features
   if (features.store || features.ssr || features.testing) required.add('@gluonjs/store');
   if (features.ssr) required.add('@gluonjs/ssr');
   if (features.testing) required.add('@gluonjs/test-utils');
+  if (features.ui) {
+    required.add('@gluonjs/quarks');
+    required.add('@gluonjs/atoms');
+  }
 
   for (const name of required) {
     const archive = archives.get(name);

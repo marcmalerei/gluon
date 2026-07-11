@@ -46,6 +46,7 @@ function packageJson(name: string, features: GluonFeatures): string {
   if (features.router) dependencies['@gluonjs/router'] = versions.gluon;
   if (features.store) dependencies['@gluonjs/store'] = versions.gluon;
   if (features.ssr) dependencies['@gluonjs/ssr'] = versions.gluon;
+  if (features.ui) dependencies['@gluonjs/atoms'] = versions.gluon;
   if (features.testing) {
     devDependencies['@gluonjs/test-utils'] = versions.gluon;
     devDependencies['@vitest/browser-playwright'] = versions.vitestBrowser;
@@ -125,7 +126,7 @@ function indexHtml(name: string): string {
 function appSource(features: GluonFeatures): string {
   const imports = [
     "import { createApp, html, type GluonApp } from '@gluonjs/core';",
-    features.ui ? "import { Button } from '@gluonjs/core/atoms';" : '',
+    features.ui ? "import { Button } from '@gluonjs/atoms';" : '',
     features.router
       ? "import { RouterLink, RouterView, createRouterPlugin, type Router } from '@gluonjs/router';"
       : '',
@@ -340,7 +341,7 @@ export default defineConfig({
 }
 
 function testSource(features: GluonFeatures): string {
-  const uiImport = features.ui ? "import { Button } from '@gluonjs/core/atoms';\n" : '';
+  const uiImport = features.ui ? "import { Button } from '@gluonjs/atoms';\n" : '';
   const render = features.ui
     ? "Button({ label: 'Ready' })"
     : "html`<button type=\"button\">Ready</button>`";

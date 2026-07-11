@@ -1,8 +1,7 @@
 # Quality gates
 
-Issue #38 is delivered in vertical slices. This slice makes the existing
-repository checks, Playwright engine lanes, Node runtime lanes, and shop bundle
-budgets blocking GitHub Actions jobs.
+Issue #38 established blocking repository, Playwright engine, Node runtime,
+security, accessibility, retention, performance-evidence, and shop-budget jobs.
 
 ## Automated matrix
 
@@ -37,6 +36,17 @@ The exact release-candidate procedure is documented in
 accessibility responsibilities are separated in
 [`accessibility.md`](accessibility.md), and deterministic retention evidence is
 defined in [`memory-retention.md`](memory-retention.md).
+
+## Optional UI package gate
+
+`npm run check:ui-contract` validates the four optional package manifests,
+their stable inventories and evidence paths, and a production Core-only bundle
+that must contain none of the UI markers. `npm run typecheck:ui-api` consumes
+the generated declarations through the four public package names. The browser matrix runs UI keyboard,
+focus, axe, theme-ownership, and screenshot-regression suites in Chromium,
+Firefox, and WebKit. The root browser coverage gate includes every source file
+owned by the four UI packages. The compiled interactive example is published at
+`/0.0.0/examples/ui.html` with the other versioned documentation examples.
 
 ## Bundle budgets
 

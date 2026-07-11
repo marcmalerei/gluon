@@ -9,6 +9,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
+      '@gluonjs/quarks': resolve(repositoryRoot, 'packages/quarks/src/index.ts'),
+      '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),
+      '@gluonjs/molecules': resolve(repositoryRoot, 'packages/molecules/src/index.ts'),
+      '@gluonjs/organisms': resolve(repositoryRoot, 'packages/organisms/src/index.ts'),
       '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
     },
   },
@@ -18,6 +22,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         plain: resolve(import.meta.dirname, 'plain.html'),
+        ui: resolve(import.meta.dirname, 'ui.html'),
         vue: resolve(import.meta.dirname, 'vue.html'),
       },
     },

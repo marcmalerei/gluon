@@ -6,6 +6,7 @@ const shopRoot = resolve(root, 'examples/shop');
 const sourceRoot = resolve(shopRoot, 'src');
 const allowedPackages = new Set([
   '@gluonjs/core',
+  '@gluonjs/quarks',
   '@gluonjs/reactivity',
   '@gluonjs/router',
   '@gluonjs/ssr',

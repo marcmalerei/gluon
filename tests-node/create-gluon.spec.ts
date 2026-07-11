@@ -96,11 +96,12 @@ describe('create-gluon scaffolding', () => {
     });
     expect(manifest.dependencies).toMatchObject({
       '@gluonjs/core': '0.0.0',
+      '@gluonjs/atoms': '0.0.0',
       '@gluonjs/router': '0.0.0',
       '@gluonjs/store': '0.0.0',
       '@gluonjs/ssr': '0.0.0',
     });
-    expect(app).toContain("from '@gluonjs/core/atoms'");
+    expect(app).toContain("from '@gluonjs/atoms'");
     expect(server).toContain("from '@gluonjs/ssr'");
     expect(result.files).toContain('vitest.config.ts');
   });

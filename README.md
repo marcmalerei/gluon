@@ -82,9 +82,9 @@ import {
   layerOrderStyles,
   render,
 } from '@gluonjs/core';
-import { q } from '@gluonjs/core/quarks';
-import { Button, atomStyles } from '@gluonjs/core/atoms';
-import { Card, moleculeStyles } from '@gluonjs/core/molecules';
+import { q } from '@gluonjs/quarks';
+import { Button, atomStyles } from '@gluonjs/atoms';
+import { Card, moleculeStyles } from '@gluonjs/molecules';
 
 adoptStyles(
   document,
@@ -499,10 +499,10 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 | Layer | Current role and entry point |
 | --- | --- |
 | **Gluon** | Template runtime, Custom Element base, prop merging, and stylesheet adoption from `@gluonjs/core`. |
-| **Quarks** | Typed factories for native HTML elements through the transitional `@gluonjs/core/quarks` subpath and `q.<tag>()`. |
-| **Atoms** | Focused primitives such as `Icon`, `Button`, `Input`, and `Label` through the transitional `@gluonjs/core/atoms` subpath. |
-| **Molecules** | Reusable compositions such as `Card` and `FormField` through the transitional `@gluonjs/core/molecules` subpath. |
-| **Organisms** | Larger interface structures such as `AppShell` through the transitional `@gluonjs/core/organisms` subpath. |
+| **Quarks** | Typed native factories and headless interaction primitives from optional `@gluonjs/quarks`. |
+| **Atoms** | Focused controls, tokens, and themes from optional `@gluonjs/atoms`. |
+| **Molecules** | Reusable compositions such as `Card` and `FormField` from optional `@gluonjs/molecules`. |
+| **Organisms** | Larger interface structures such as `AppShell` from optional `@gluonjs/organisms`. |
 
 ```text
                          increasing UI scope
@@ -514,9 +514,9 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 
 Every component created with `defineAtom`, `defineMolecule`, or `defineOrganism` carries explicit `layer` and `displayName` metadata.
 
-The accepted package graph moves Quarks, Atoms, Molecules, and Organisms into
-optional `@gluonjs/*` packages before 1.0. The current subpaths remain documented
-as transitional because those separate packages are not implemented yet.
+Quarks, Atoms, Molecules, and Organisms are optional `@gluonjs/*` packages.
+Core exposes no UI subpath and a production tree-shaking fixture verifies that a
+Core-only consumer contains none of the stable UI markers.
 
 ## Why Gluon?
 

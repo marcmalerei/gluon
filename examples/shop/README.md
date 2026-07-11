@@ -21,6 +21,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - an application-owned teleported bag with cancellable enter/leave transitions
 - keyed bag-line transitions with system reduced-motion handling
 - modal initial focus, keyboard focus containment, and focus restoration
+- shared `@gluonjs/quarks` focus-scope ownership for search, menu, and bag dialogs
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
 - official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR

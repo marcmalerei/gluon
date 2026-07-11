@@ -108,6 +108,7 @@ function pageShell({ title, description, content, relativePath, headings }) {
     ['Reactivity', `${base}${version}/api/generated/packages/reactivity/src/`],
     ['Router', `${base}${version}/api/generated/packages/router/src/`],
     ['Store', `${base}${version}/api/generated/packages/store/src/`],
+    ['UI packages', `${base}${version}/api/generated/packages/quarks/src/`],
     ['Universal rendering', `${base}${version}/guides/universal-rendering/`],
     ['Tooling', `${base}${version}/guides/tooling/`],
     ['Quality', `${base}${version}/guides/quality/`],
@@ -157,6 +158,8 @@ function sidebarCurrent(index, label, currentUrl, version) {
   if (label === 'Reactivity') return currentUrl.includes('/api/generated/packages/reactivity/');
   if (label === 'Router') return currentUrl.includes('/api/generated/packages/router/');
   if (label === 'Store') return currentUrl.includes('/api/generated/packages/store/');
+  if (label === 'UI packages') return ['/quarks/', '/atoms/', '/molecules/', '/organisms/']
+    .some((part) => currentUrl.includes(`/api/generated/packages${part}`));
   if (label === 'Universal rendering') return currentUrl.includes('/universal-rendering/') || currentUrl.includes('/api/generated/packages/ssr/');
   if (label === 'Quality') return currentUrl.includes('/guides/quality/');
   return currentUrl.includes('/tooling/') || ['/compiler/', '/vite/', '/devtools', '/language-server/', '/test-utils/', '/create-gluon/'].some((part) => currentUrl.includes(part));
