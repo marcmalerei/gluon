@@ -24,6 +24,7 @@
 - DOM-independent SSR with isolated requests and safe serialized state
 - public black-box component, Router, Store, and scheduler test utilities
 - `create-gluon` scaffolding with verified Router, Store, testing, UI, and SSR combinations
+- shared HTML/SVG/CSS template diagnostics through an LSP, CI checker, and VS Code client
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values

@@ -100,9 +100,10 @@
     {
       "name": "@gluonjs/language-server",
       "directory": "packages/language-server",
-      "state": "planned",
+      "state": "current",
       "environment": "node",
       "exports": ["."],
+      "bins": ["gluon-language-server", "gluon-template-check"],
       "dependencies": ["@gluonjs/compiler"]
     },
     {

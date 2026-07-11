@@ -6,3 +6,4 @@
 - Add Router, Store, browser testing, UI atoms, SSR, and hydration selections.
 - Validate paths, npm package names, non-empty targets, conflicting flags, and
   SSR compatibility before generation.
+- Add the lockstep `gluon-template-check` command to every maintained starter.

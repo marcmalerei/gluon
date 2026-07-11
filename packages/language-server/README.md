@@ -1,0 +1,28 @@
+# `@gluonjs/language-server`
+
+The Gluon language server analyzes imported `html`, `svg`, and `css` tagged
+templates without evaluating application code. The public service and the
+`gluon-template-check` CI command share the same two-pass project analyzer.
+
+Diagnostics cover unknown Custom Elements, declared Custom Element properties
+and events, ARIA names, invalid binding positions, void-element children, and
+inline style elements. `defineElement()` declarations expose tag definitions,
+static `properties`, `events`, and `slots` metadata to completion, hover,
+definition, and workspace rename operations.
+`declarationsFromCustomElementsManifest()` accepts standard manifest module
+declarations and exposes their fields, events, and slots to the same analyzer.
+
+```sh
+gluon-template-check src
+gluon-language-server --stdio
+```
+
+The LSP uses standard `Content-Length` framing and supports full-document sync,
+diagnostics, completion, hover, go-to-definition, rename, and semantic tokens.
+Protocol behavior is tested through `GluonProtocolServer` without VS Code. The
+maintained VS Code client is in `editors/vscode` and starts the lockstep server
+from the workspace or extension configuration.
+
+## License
+
+MIT License, Copyright © 2026 Marc Malerei.
