@@ -141,6 +141,15 @@ reverse operations update existing instances and do not run template-binding
 instantiation; their run-to-run medians ranged from 4.8% lower to 3.4% higher,
 with every distribution retained rather than selected by outcome.
 
+A separate [Chromium CPU-profile summary](../benchmarks/results/template-binding-instantiation-34cd49a.json)
+and its [raw `.cpuprofile`](../benchmarks/results/template-binding-instantiation-34cd49a.cpuprofile)
+cover the production comparison at a 100 µs sampling interval, four warm-up
+rounds, and ten measured samples. The clean `34cd49a` run records zero
+`walkPath()` self samples and zero native `childNodes.item()` self samples;
+`TreeWalker.nextNode()` accounts for 402 self samples. The profile covers all
+four benchmark workloads and records Chromium 149.0.7827.55 and the exact
+source commit.
+
 ## Interpretation and limits
 
 The benchmark measures synchronous template creation, renderer reconciliation,
