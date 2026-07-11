@@ -23,14 +23,18 @@ HTML entry, typed Gluon mount, constructable stylesheet adoption, TypeScript
 configuration, aligned `0.0.0` Gluon dependencies, and the template checker.
 
 The GitHub Pages job starts from `npm ci --ignore-scripts`, builds Core (including
-Reactivity), Compiler, and Vite in dependency order, and then runs
-`npm run build:playground`. This matches a clean runner where package `dist`
-directories do not exist before the workflow starts.
+Reactivity), Compiler, and Vite in dependency order, and then builds the
+Playground and versioned documentation. It typechecks every documentation
+example and validates the release tree before publishing both outputs as one
+Pages artifact. This matches a clean runner where package `dist` directories do
+not exist before the workflow starts.
 
 Config opens the searchable versioned diagnostic catalog. Diagnostic rows link
 directly into that state. The GitHub Pages workflow deploys the production build
 at `https://marcmalerei.github.io/gluon/playground/`; the bug-report template
-requires a shared Playground URL.
+requires a shared Playground URL. The documentation root is
+`https://marcmalerei.github.io/gluon/`; the Playground remains at
+`https://marcmalerei.github.io/gluon/playground/`.
 
 Design references are in `design/`. The application uses true white, near-black
 chrome, cobalt selection and diagnostics, chartreuse primary actions, thin
