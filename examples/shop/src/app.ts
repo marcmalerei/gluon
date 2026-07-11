@@ -24,6 +24,8 @@ import {
   NotFoundPage,
   ProductPage,
   ReturnsPage,
+  CheckoutPage,
+  OrderConfirmationPage,
   ShippingPage,
 } from './pages.js';
 import { createShopStore, type ShopStore } from './state.js';
@@ -91,6 +93,8 @@ export function createShopRoutes(store: ShopStore): readonly RouteRecordRaw[] {
     { path: '/products/:slug', name: 'product', component: () => ProductPage(store) },
     { path: '/shipping', name: 'shipping', component: () => ShippingPage(store) },
     { path: '/returns', name: 'returns', component: () => ReturnsPage(store) },
+    { path: '/checkout', name: 'checkout', component: () => CheckoutPage(store) },
+    { path: '/orders/:id', name: 'order', component: () => OrderConfirmationPage(store) },
     { path: '/:path*', name: 'not-found', component: () => NotFoundPage(store) },
   ];
 }
