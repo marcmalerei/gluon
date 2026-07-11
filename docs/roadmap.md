@@ -67,6 +67,8 @@ Gluon currently provides:
   failures, scroll restoration, and server snapshots
 - an official DOM-free store with inferred state/getters/actions, transactions,
   plugins, compatible-state HMR, safe snapshots, persistence, and test isolation
+- async boundaries/components, application-owned teleports, LRU cached views,
+  cancellable transitions, keyed transition groups, and server descriptors
 - the first living GLUON GOODS reference-shop slice with public-package routes,
   responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management

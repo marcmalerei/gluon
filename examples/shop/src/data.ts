@@ -8,6 +8,8 @@ export interface Product {
   readonly description: string;
   readonly image: string;
   readonly alt: string;
+  readonly availability: 'in-stock' | 'low-stock';
+  readonly dispatch: '1–2 days' | '2–3 days';
 }
 
 export const products: readonly Product[] = Object.freeze([
@@ -19,6 +21,8 @@ export const products: readonly Product[] = Object.freeze([
     description: 'Focused light, tuned to your space.',
     image: new URL('../assets/orbit-lamp.webp', import.meta.url).href,
     alt: 'Black Orbit desk lamp with an opal shade and cobalt control',
+    availability: 'in-stock',
+    dispatch: '2–3 days',
   },
   {
     slug: 'field-tote',
@@ -28,6 +32,8 @@ export const products: readonly Product[] = Object.freeze([
     description: 'Structured carry with a place for every module.',
     image: new URL('../assets/field-tote.webp', import.meta.url).href,
     alt: 'Cobalt Field Tote with black leather handles and base',
+    availability: 'low-stock',
+    dispatch: '1–2 days',
   },
   {
     slug: 'stack-tray',
@@ -37,6 +43,8 @@ export const products: readonly Product[] = Object.freeze([
     description: 'A two-level organizer that changes with your desk.',
     image: new URL('../assets/stack-tray.webp', import.meta.url).href,
     alt: 'Cobalt two-tier Stack Tray desktop organizer',
+    availability: 'in-stock',
+    dispatch: '2–3 days',
   },
   {
     slug: 'fold-stool',
@@ -46,6 +54,8 @@ export const products: readonly Product[] = Object.freeze([
     description: 'A compact seat that folds when the room needs to change.',
     image: new URL('../assets/fold-stool.webp', import.meta.url).href,
     alt: 'Black folding stool with a woven seat and tubular frame',
+    availability: 'low-stock',
+    dispatch: '2–3 days',
   },
 ]);
 

@@ -10,6 +10,7 @@ tree-shakable.
 src/
 ├── application.ts      App instances, plugins, providers, registries, mount
 ├── application-context.ts  Context propagation, event guards, errors, warnings
+├── builtins.ts         Suspense, async components, Teleport, KeepAlive, transitions
 ├── model.ts            Controlled native and Custom Element model bindings
 ├── runtime.ts          Template results, compiler plans, Parts, spreading, render
 ├── element.ts          Reactive Custom Element base and definition helper

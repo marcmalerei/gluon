@@ -1,6 +1,6 @@
-import { createApp, html, type GluonApp } from '@gluonjs/core';
+import { KeepAlive, createApp, html, type GluonApp } from '@gluonjs/core';
 import {
-  BagDrawer,
+  BagOverlay,
   SiteFooter,
   SiteHeader,
 } from './components.js';
@@ -68,12 +68,19 @@ export function createShopApplication(
     store.searchOpen = false;
     store.bagOpen = false;
   });
-  const app = createApp(() => html`
-    ${SiteHeader(store)}
-    <main id="main-content">${RouterView()}</main>
-    ${SiteFooter()}
-    ${BagDrawer(store)}
-  `);
+  const app = createApp(() => {
+    const route = router.currentRoute.value;
+    return html`
+      ${SiteHeader(store)}
+      <main id="main-content">${KeepAlive({
+        cacheKey: route.fullPath,
+        max: 4,
+        children: RouterView(),
+      })}</main>
+      ${SiteFooter()}
+      ${BagOverlay(store)}
+    `;
+  });
   app.use(createRouterPlugin(router));
   app.onUnmounted(() => storeManager.dispose());
   return { app, router, storeManager, store };

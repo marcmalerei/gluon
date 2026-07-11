@@ -15,12 +15,18 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - keyboard-operable product configuration
 - a reactive bag with configured line items and quantities
 - one isolated Store manager per shop application and persisted configured bag lines
+- abortable product availability with explicit loading, error, timeout, and retry UI
+- cached route views across back/forward traversal
+- an application-owned teleported bag with cancellable enter/leave transitions
+- keyed bag-line transitions with system reduced-motion handling
 - modal initial focus, keyboard focus containment, and focus restoration
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
 
-The async UI package does not exist yet. Issue #27 will add inventory, media,
-loading, and transition behavior to the same customer journey.
+Async UI is part of Core because it composes renderer Parts and application
+ownership directly. Universal HTML rendering and hydration remain pending in
+issues #35–#37; Core already exposes the DOM-free descriptors those packages
+will consume.
 
 ## Run
 
@@ -71,8 +77,8 @@ shop source.
 
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
-entry that contains Core, Reactivity, Router, Store, and the shop is 106,159 bytes
-raw and 29,921 bytes gzip. The five WebP product/editorial assets total 155,126
+entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
+is 116,909 bytes raw and 33,371 bytes gzip. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

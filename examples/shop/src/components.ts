@@ -1,4 +1,12 @@
-import { html, nothing, repeat, type TemplateValue } from '@gluonjs/core';
+import {
+  Teleport,
+  Transition,
+  TransitionGroup,
+  html,
+  nothing,
+  repeat,
+  type TemplateValue,
+} from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
 import { RouterLink } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -102,8 +110,18 @@ export function CategoryLinks(): TemplateValue {
   `;
 }
 
-export function BagDrawer(store: ShopStore): TemplateValue {
-  if (!store.bagOpen) return nothing;
+export function BagOverlay(store: ShopStore): TemplateValue {
+  return Teleport({
+    to: document.body,
+    children: Transition({
+      duration: 140,
+      transitionKey: store.bagOpen ? 'open' : 'closed',
+      children: store.bagOpen ? BagDrawer(store) : nothing,
+    }),
+  });
+}
+
+function BagDrawer(store: ShopStore): TemplateValue {
   const close = (): void => dismissDialog('bag', () => { store.bagOpen = false; });
   return html`
     <div class="drawer-layer" @click=${(event: Event) => {
@@ -127,7 +145,11 @@ export function BagDrawer(store: ShopStore): TemplateValue {
           </div>
         ` : html`
           <div class="bag-lines">
-            ${repeat(store.bag, (line) => line.key, (line) => html`
+            ${TransitionGroup({
+              items: store.bag,
+              key: (line) => line.key,
+              duration: 140,
+              children: (line) => html`
               <article class="bag-line">
                 <img src=${line.product.image} alt="">
                 <div class="bag-line-copy">
@@ -150,7 +172,8 @@ export function BagDrawer(store: ShopStore): TemplateValue {
                   </div>
                 </div>
               </article>
-            `)}
+              `,
+            })}
           </div>
           <footer class="bag-summary">
             <div><span>Subtotal</span><strong>${formatPrice(store.bagTotal)}</strong></div>
