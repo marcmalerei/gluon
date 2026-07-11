@@ -35,6 +35,9 @@ jobs:
           node-version: 22.12.0
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npm run build:core
+      - run: npm run build:compiler
+      - run: npm run build:vite
       - run: npm run build:playground
       - run: mkdir -p .pages/playground && cp -R examples/playground/dist/. .pages/playground/
       - uses: actions/configure-pages@v5
