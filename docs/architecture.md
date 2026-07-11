@@ -47,7 +47,8 @@ packages/store/
 packages/ssr/
 ├── src/index.ts        DOM-free serialization, DSD elements, request ownership,
 │                       Router/Store snapshots, and safe embedded state
-└── src/streaming.ts    Ordered async chunks and ReadableStream byte adapter
+├── src/streaming.ts    Ordered and progressive async chunks plus stream adapters
+└── src/hydration.ts    Browser binding reconstruction and request-state handoff
 
 packages/compiler/
 └── src/index.ts        Template/part locations, diagnostics, source maps, and
@@ -99,8 +100,11 @@ descriptors when `CSSStyleSheet` is absent; `GluonElement` uses a DOM-free base
 and server render entry without running connection lifecycle. A request creates
 one detached scope, memory Router, Store manager, and application, then releases
 them in `finally`. The public serializer owns escaping, URL validation, async
-built-in resolution, DSD output, and JSON-safe state embedding. Hydration and
-style transport do not share hidden state with this request pipeline.
+built-in resolution, deterministic binding markers, DSD output, and JSON-safe
+state embedding. The browser hydration entry independently validates parsed DOM,
+adopts matching Core Parts, restores public Router/Store snapshots, and reports
+categorized recovery evidence. Style transport does not share hidden state with
+this request pipeline.
 
 `@gluonjs/test-utils` composes only public Core, Reactivity, Router, and Store
 exports. Each fixture owns a real application root and records its cleanup

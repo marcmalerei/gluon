@@ -195,6 +195,7 @@ export abstract class GluonElement<
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
   private pendingUpdate?: UpdateDeferred;
   private connectionRendered = false;
+  private hydrationPending = false;
   private readonly connectedHooks: ComponentLifecycleCallback[] = [];
   private readonly beforeUpdateHooks: ComponentLifecycleCallback[] = [];
   private readonly updatedHooks: ComponentLifecycleCallback[] = [];
@@ -291,7 +292,7 @@ export abstract class GluonElement<
   }
 
   protected createRenderRoot(): ShadowRoot {
-    return this.attachShadow({ mode: 'open' });
+    return this.shadowRoot ?? this.attachShadow({ mode: 'open' });
   }
 
   protected requestUpdate(): Promise<void> {
@@ -306,6 +307,18 @@ export abstract class GluonElement<
   /** Returns the component template without running browser connection lifecycle. */
   renderForServer(): TemplateResult {
     return this.render();
+  }
+
+  /** Defers the first connection render while declarative shadow DOM is bound. */
+  beginHydration(): void {
+    this.hydrationPending = true;
+  }
+
+  /** Resumes connection rendering after the hydrated root instance is installed. */
+  endHydration(): void {
+    if (!this.hydrationPending) return;
+    this.hydrationPending = false;
+    void this.queueUpdate({ type: 'request' });
   }
 
   protected onConnected(callback: ComponentLifecycleCallback): void {
@@ -450,6 +463,10 @@ export abstract class GluonElement<
 
   private commitUpdate(deferred: UpdateDeferred): void {
     try {
+      if (this.hydrationPending) {
+        deferred.resolve();
+        return;
+      }
       if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
       this.runOwned(() => this.update());
       if (!this.connectionRendered) {
