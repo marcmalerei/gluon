@@ -26,24 +26,31 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');
     expect(root.querySelector('#product-title')?.textContent).toBe('Orbit Lamp');
+    const productPage = root.querySelector('.product-page');
+    await new Promise((resolve) => setTimeout(resolve, 70));
+    expect(root.querySelector('.inventory-status')?.textContent).toContain('Checking workshop availability');
+    await new Promise((resolve) => setTimeout(resolve, 280));
+    expect(root.querySelector('.inventory-status')?.textContent).toContain('In stock · dispatches in 2–3 days');
 
     root.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
     root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
-    expect(root.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 1');
-    expect(root.querySelector('.bag-line p')?.textContent).toContain('Graphite');
-    root.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
+    expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 1');
+    expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
+    document.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
     await settleShop();
-    expect(root.querySelector('#bag-title')?.textContent).toBe('Bag 2');
+    expect(document.querySelector('#bag-title')?.textContent).toBe('Bag 2');
 
-    root.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
+    document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
     router.back();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/');
     router.forward();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');
+    expect(root.querySelector('.product-page')).toBe(productPage);
     app.unmount();
+    expect(document.querySelector('gluon-teleport')).toBeNull();
   });
 
   it('exposes functional mobile navigation and catalog filters', async () => {
@@ -103,11 +110,12 @@ describe('GLUON GOODS reference shop', () => {
 
     root.querySelector<HTMLButtonElement>('.bag-action')!.click();
     await settleShop();
-    expect(root.querySelector('.empty-bag')?.textContent).toContain('ready for something useful');
-    root.querySelector<HTMLAnchorElement>('.empty-bag a')!.click();
+    expect(document.querySelector('.empty-bag')?.textContent).toContain('ready for something useful');
+    document.querySelector<HTMLAnchorElement>('.empty-bag a')!.click();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/shop');
-    expect(root.querySelector('.bag-drawer')).toBeNull();
+    await new Promise((resolve) => setTimeout(resolve, 180));
+    expect(document.querySelector('.bag-drawer')).toBeNull();
     app.unmount();
   });
 
@@ -124,16 +132,16 @@ describe('GLUON GOODS reference shop', () => {
     root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Close bag');
-    root.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
+    document.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
     await settleShop();
-    expect(root.querySelector('.empty-bag')).not.toBeNull();
+    expect(document.querySelector('.empty-bag')).not.toBeNull();
 
-    root.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
+    document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
     root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
-    root.querySelector<HTMLButtonElement>('.remove-line')!.click();
+    document.querySelector<HTMLButtonElement>('.remove-line')!.click();
     await settleShop();
-    expect(root.querySelector('.empty-bag')).not.toBeNull();
+    expect(document.querySelector('.empty-bag')).not.toBeNull();
 
     await router.push('/shipping');
     await settleShop();
@@ -173,8 +181,8 @@ describe('GLUON GOODS reference shop', () => {
     second.app.mount(secondRoot);
     secondRoot.querySelector<HTMLButtonElement>('.bag-action')!.click();
     await settleShop();
-    expect(secondRoot.querySelector('.bag-line h3')?.textContent).toBe('Stack Tray');
-    expect(secondRoot.querySelector('.bag-line p')?.textContent).toContain('Cobalt');
+    expect(document.querySelector('.bag-line h3')?.textContent).toBe('Stack Tray');
+    expect(document.querySelector('.bag-line p')?.textContent).toContain('Cobalt');
     isolatedA.storeManager.dispose();
     isolatedB.storeManager.dispose();
     second.app.unmount();

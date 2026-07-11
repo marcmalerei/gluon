@@ -75,6 +75,11 @@ the update error; it does not promote the failed arguments to active state.
 The legacy factory form remains supported and runs its returned function on
 each application. It has no lifecycle hooks.
 
+Core async, teleport, cache, and transition built-ins use this lifecycle
+contract. Their update cancellation, application ownership, LRU eviction,
+reduced-motion, and server-descriptor behavior is defined in
+[Async UI and rendering built-ins](async-ui.md).
+
 ## Event options
 
 Plain `@event=${listener}` and spread `onEvent`/`@event` values use native

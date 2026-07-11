@@ -19,6 +19,7 @@
 - child, attribute, property, boolean, event, and first-class spread bindings
 - official browser, hash, and memory routing with typed locations and guards
 - typed application-scoped stores with transactions, persistence, HMR, and SSR snapshots
+- async boundaries/components, application-owned teleports, cached views, and transitions
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
@@ -183,6 +184,33 @@ patches publish inspectable before/after transactions; plugins can add
 extensions and cleanup; versioned snapshots support safe serialization and
 hydration; and compatible top-level state survives `hotUpdate()`. Persistence
 requires an explicit storage adapter. See the [Store contract](docs/store.md).
+
+## Async UI and rendering built-ins
+
+Core provides deterministic asynchronous and cross-tree composition without a
+second component model:
+
+```ts
+import { KeepAlive, Suspense, Teleport, Transition, html, nothing } from '@gluonjs/core';
+
+const availability = Suspense({
+  source: ({ signal }) => loadAvailability(productId, signal),
+  fallback: html`<p>Checking availability…</p>`,
+  children: (result) => html`<p>${result.label}</p>`,
+  error: (_error, retry) => html`<button @click=${retry}>Retry</button>`,
+});
+
+Teleport({ to: document.body, children: dialog });
+KeepAlive({ cacheKey: route.fullPath, max: 4, children: RouterView() });
+Transition({ transitionKey: open, children: open ? dialog : nothing });
+```
+
+Async components add cached loading, failure, timeout, retry, and `preload()`
+behavior. Teleport retains application context and cleans its external host.
+KeepAlive suspends cached renderer resources and evicts least-recently-used
+entries. Transition and TransitionGroup cancel stale Web Animations and honor
+reduced-motion preferences. A public DOM-free descriptor is available to the
+future server renderer. See [Async UI and rendering built-ins](docs/async-ui.md).
 
 ## Bindings and spreading
 

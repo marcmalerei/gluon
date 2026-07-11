@@ -344,6 +344,11 @@ export const shopStyles = css`
     .product-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 19px 0; margin: 0; border-bottom: 1px solid var(--shop-rule); list-style: none; font-size: 11px; }
     .product-facts li { padding-right: 8px; border-right: 1px solid var(--shop-rule); }
     .product-facts li:last-child { border-right: 0; }
+    .inventory-status { min-height: 44px; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--shop-rule); border-bottom: 1px solid var(--shop-rule); font-size: 12px; }
+    .inventory-dot { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: var(--shop-action); box-shadow: 0 0 0 1px rgb(17 17 17 / 28%); }
+    .inventory-low-stock { background: #ffb347; }
+    .inventory-pending { color: var(--shop-muted); }
+    .inventory-retry { min-height: 44px; border: 0; background: transparent; color: inherit; }
     .product-story { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: clamp(30px, 5vw, 90px); margin-top: 70px; padding-top: 34px; border-top: 1px solid var(--shop-black); }
     .product-story h2 { font-size: 19px; font-weight: 560; }
     .product-story p { max-width: 540px; line-height: 1.7; }
