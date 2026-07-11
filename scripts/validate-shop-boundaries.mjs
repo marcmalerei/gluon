@@ -8,6 +8,7 @@ const allowedPackages = new Set([
   '@gluonjs/core',
   '@gluonjs/reactivity',
   '@gluonjs/router',
+  '@gluonjs/store',
 ]);
 const sourceFiles = await collectFiles(sourceRoot);
 

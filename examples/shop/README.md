@@ -7,19 +7,20 @@ repository [working agreement](../../AGENTS.md).
 
 ## Current slice
 
-This first slice uses the public Core, Reactivity, and Router APIs to provide:
+The current slice uses the public Core, Reactivity, Router, and Store APIs to provide:
 
 - home, catalog, and deep-linkable product routes
 - desktop and mobile navigation
 - a realistic product catalog and product-detail surface
 - keyboard-operable product configuration
 - a reactive bag with configured line items and quantities
+- one isolated Store manager per shop application and persisted configured bag lines
 - modal initial focus, keyboard focus containment, and focus restoration
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
 
-The official Store and async UI packages do not exist yet. The smallest local
-domain state is used until issues #26 and #27 replace it with their public APIs.
+The async UI package does not exist yet. Issue #27 will add inventory, media,
+loading, and transition behavior to the same customer journey.
 
 ## Run
 
@@ -70,8 +71,8 @@ shop source.
 
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
-entry that contains Core, Reactivity, Router, and the shop is 91,114 bytes raw
-and 25,959 bytes gzip. The five WebP product/editorial assets total 155,126
+entry that contains Core, Reactivity, Router, Store, and the shop is 106,159 bytes
+raw and 29,921 bytes gzip. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results
