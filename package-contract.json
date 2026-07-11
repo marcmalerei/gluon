@@ -75,10 +75,10 @@
     {
       "name": "@gluonjs/test-utils",
       "directory": "packages/test-utils",
-      "state": "planned",
+      "state": "current",
       "environment": "browser",
       "exports": ["."],
-      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
+      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/store"]
     },
     {
       "name": "@gluonjs/devtools-api",

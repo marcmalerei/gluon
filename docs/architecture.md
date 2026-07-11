@@ -44,6 +44,10 @@ packages/store/
 └── src/index.ts        Definitions, managers, transactions, plugins, snapshots,
                         HMR, persistence, and testing isolation
 
+packages/test-utils/
+└── src/index.ts        Public component fixtures, cleanup, Router/Store isolation,
+                        scheduler controls, and leak diagnostics
+
 examples/shop/
 ├── src/app.ts          Public-package application composition and routes
 ├── src/pages.ts        Home, catalog, product, policy, and fallback pages
@@ -74,6 +78,12 @@ application, request, or test manager owns its live state, computed scope,
 transactions, plugins, persistence adapter, and teardown. Its snapshot,
 security, HMR compatibility, and inspection rules are documented in the
 [Store contract](store.md).
+
+`@gluonjs/test-utils` composes only public Core, Reactivity, Router, and Store
+exports. Each fixture owns a real application root and records its cleanup
+boundary; Router histories and Store managers are factory-created per test.
+The package's black-box and ownership rules are documented in its
+[package guide](../packages/test-utils/README.md).
 
 The GLUON GOODS reference shop consumes only public package names in
 application source. Its monorepo Vite and test aliases resolve those names to
