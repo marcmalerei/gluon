@@ -22,6 +22,22 @@ describe('DOM runtime contract', () => {
     document.body.replaceChildren();
   });
 
+  it('inserts one new node directly and batches multiple new nodes in a fragment', () => {
+    const createFragment = vi.spyOn(document, 'createDocumentFragment');
+    const singleRoot = document.createElement('div');
+
+    render(html`<p>${'single'}</p>`, singleRoot);
+
+    expect(singleRoot.innerHTML).toBe('<p><!--gluon:0-->single</p>');
+    expect(createFragment).not.toHaveBeenCalled();
+
+    const multipleRoot = document.createElement('div');
+    render(html`<p>${['first', 'second']}</p>`, multipleRoot);
+
+    expect(multipleRoot.textContent).toBe('firstsecond');
+    expect(createFragment).toHaveBeenCalledOnce();
+  });
+
   it('runs lifecycle directives through mount, update, cleanup, and disconnect', () => {
     const root = document.createElement('div');
     const calls: string[] = [];
