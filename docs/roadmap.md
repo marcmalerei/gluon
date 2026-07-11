@@ -285,6 +285,13 @@ GLUON GOODS bundle budget. Branded-browser/device evidence, accessibility,
 security, broad memory, customer-flow performance, and benchmark-artifact gates
 remain open acceptance work.
 
+Issue #40 publishes a versioned documentation tree and release archive, generates
+reference pages from every current public package entry point, and compiles the
+maintained SPA, Custom Element, Router/Store, universal-rendering, testing,
+plain-HTML, and Vue-host examples. The Pages workflow validates the same version
+manifest, links, API coverage, and examples before deploying the documentation
+and Playground as one public site.
+
 ### Exit gate
 
 - The accepted browser and runtime matrix is enforced in CI.

@@ -1,0 +1,50 @@
+# Migration
+
+Gluon is an alternative application platform, not a Vue compatibility layer.
+There is no automatic Vue-to-Gluon source converter, `.vue` parser, SFC
+compiler, compatibility runtime, or migration codemod in version `0.0.0`.
+
+## Automation boundary
+
+Supported automation starts after Gluon source exists:
+
+- `create-gluon` scaffolds maintained Gluon applications;
+- `gluon-template-check` and the Language Server validate Gluon templates;
+- TypeScript validates public package and component types;
+- `@gluonjs/vite` builds and hot-updates supported Gluon modules;
+- the Playground packages stable Gluon reproductions.
+
+None of those tools reads Vue source or performs a semantic conversion. A Vue
+migration is a manual redesign against Gluon's public contracts.
+
+## Vue-to-Gluon concept map
+
+| Vue concept | Gluon contract | Migration work |
+| --- | --- | --- |
+| `.vue` Single-File Component | TypeScript module plus `html`/`svg` templates | Split script, template, and constructed styles into explicit modules. |
+| Vue component instance | `GluonElement` Custom Element or functional render function | Choose a native stateful boundary only where lifecycle and host identity are needed. |
+| Props and emits | Declared properties and native `CustomEvent` outputs | Map transport explicitly; structured values use properties. |
+| Slots | Native Shadow DOM slots or typed scoped-slot functions | Preserve native light-DOM ownership and fallback behavior. |
+| `ref`/`computed`/watchers | `@gluonjs/reactivity` | Rewrite imports and verify scheduling and cleanup ownership. |
+| Vue Router | `@gluonjs/router` | Redesign records, guards, lazy routes, and deployment fallback through Gluon APIs. |
+| Pinia/Vuex | application-scoped `@gluonjs/store` managers | Replace process-wide live stores with per-app/request managers. |
+| `<Teleport>`, `<KeepAlive>`, `<Suspense>` | Gluon rendering built-ins | Re-check cancellation, ownership, cache keys, and server behavior. |
+| scoped CSS / `<style>` | `CSSStyleSheet` plus `adoptedStyleSheets` | Remove style-tag fallbacks and define explicit sheet ownership. |
+
+## Interoperability first
+
+Incremental adoption can start by publishing a Gluon Custom Element and hosting
+it inside Vue:
+
+<<< ../../../examples/vue-host.ts
+
+This preserves the native element boundary while surrounding routes and state
+remain in the existing host. A later application rewrite is a separate decision.
+
+## Gluon release upgrades
+
+Starting with 1.0, an incompatible public API change requires a major release.
+A deprecated API remains for at least the next stable minor and includes an
+alternative, migration instructions, changelog entry, and TypeScript metadata
+where applicable. Use the [release archive](/gluon/archive/) to select the
+documentation matching an installed version.

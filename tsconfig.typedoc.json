@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "packages/*/src/**/*.ts"
+  ],
+  "exclude": [
+    "packages/language-server/src/check-cli.ts",
+    "packages/language-server/src/server-cli.ts"
+  ]
+}
