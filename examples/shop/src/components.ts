@@ -2,13 +2,7 @@ import { html, nothing, repeat, type TemplateValue } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
 import { RouterLink } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
-import {
-  bagCount,
-  bagTotal,
-  changeQuantity,
-  removeFromBag,
-  shopState,
-} from './state.js';
+import type { ShopStore } from './state.js';
 import {
   ArrowIcon,
   CloseIcon,
@@ -27,7 +21,7 @@ const dialogSelectors: Record<ShopDialog, string> = {
 };
 const dialogReturnFocus = new Map<ShopDialog, HTMLElement>();
 
-export function SiteHeader(): TemplateValue {
+export function SiteHeader(store: ShopStore): TemplateValue {
   return html`
     <header class="site-header">
       ${RouterLink({
@@ -45,32 +39,32 @@ export function SiteHeader(): TemplateValue {
           class="text-action search-action"
           type="button"
           @click=${(event: Event) => {
-            shopState.searchOpen = true;
+            store.searchOpen = true;
             focusOpenedDialog('search', event.currentTarget as HTMLElement);
           }}
         >${SearchIcon()}<span>Search</span></button>
         <button
           class="text-action bag-action"
           type="button"
-          aria-label=${`Open bag with ${bagCount.value} ${bagCount.value === 1 ? 'item' : 'items'}`}
+          aria-label=${`Open bag with ${store.bagCount} ${store.bagCount === 1 ? 'item' : 'items'}`}
           @click=${(event: Event) => {
-            shopState.bagOpen = true;
+            store.bagOpen = true;
             focusOpenedDialog('bag', event.currentTarget as HTMLElement);
           }}
-        >Bag ${bagCount.value}</button>
+        >Bag ${store.bagCount}</button>
         <button
           class="icon-button mobile-menu-button"
           type="button"
           aria-label="Open menu"
           @click=${(event: Event) => {
-            shopState.menuOpen = true;
+            store.menuOpen = true;
             focusOpenedDialog('menu', event.currentTarget as HTMLElement);
           }}
         ><span>Menu</span>${MenuIcon()}</button>
       </div>
     </header>
-    ${SearchPanel()}
-    ${MobileMenu()}
+    ${SearchPanel(store)}
+    ${MobileMenu(store)}
   `;
 }
 
@@ -108,9 +102,9 @@ export function CategoryLinks(): TemplateValue {
   `;
 }
 
-export function BagDrawer(): TemplateValue {
-  if (!shopState.bagOpen) return nothing;
-  const close = (): void => dismissDialog('bag', () => { shopState.bagOpen = false; });
+export function BagDrawer(store: ShopStore): TemplateValue {
+  if (!store.bagOpen) return nothing;
+  const close = (): void => dismissDialog('bag', () => { store.bagOpen = false; });
   return html`
     <div class="drawer-layer" @click=${(event: Event) => {
       if (event.target === event.currentTarget) close();
@@ -119,10 +113,10 @@ export function BagDrawer(): TemplateValue {
         handleDialogKeydown(event as KeyboardEvent, 'bag', close);
       }}>
         <header class="drawer-header">
-          <h2 id="bag-title">Bag ${bagCount.value}</h2>
+          <h2 id="bag-title">Bag ${store.bagCount}</h2>
           <button class="icon-button" type="button" aria-label="Close bag" data-dialog-initial-focus @click=${close}>${CloseIcon()}</button>
         </header>
-        ${shopState.bag.length === 0 ? html`
+        ${store.bag.length === 0 ? html`
           <div class="empty-bag">
             <p>Your bag is ready for something useful.</p>
             ${RouterLink({
@@ -133,7 +127,7 @@ export function BagDrawer(): TemplateValue {
           </div>
         ` : html`
           <div class="bag-lines">
-            ${repeat(shopState.bag, (line) => line.key, (line) => html`
+            ${repeat(store.bag, (line) => line.key, (line) => html`
               <article class="bag-line">
                 <img src=${line.product.image} alt="">
                 <div class="bag-line-copy">
@@ -144,14 +138,14 @@ export function BagDrawer(): TemplateValue {
                   <p>${line.configuration.finish} · ${line.configuration.temperature} · ${line.configuration.cable}</p>
                   <div class="quantity-control" aria-label=${`Quantity for ${line.product.name}`}>
                     <button type="button" aria-label="Decrease quantity" @click=${() => {
-                      changeQuantity(line.key, -1);
+                      store.changeQuantity(line.key, -1);
                     }}>${MinusIcon()}</button>
                     <span>${line.quantity}</span>
                     <button type="button" aria-label="Increase quantity" @click=${() => {
-                      changeQuantity(line.key, 1);
+                      store.changeQuantity(line.key, 1);
                     }}>${PlusIcon()}</button>
                     <button class="remove-line" type="button" @click=${() => {
-                      removeFromBag(line.key);
+                      store.removeFromBag(line.key);
                     }}>Remove</button>
                   </div>
                 </div>
@@ -159,7 +153,7 @@ export function BagDrawer(): TemplateValue {
             `)}
           </div>
           <footer class="bag-summary">
-            <div><span>Subtotal</span><strong>${formatPrice(bagTotal.value)}</strong></div>
+            <div><span>Subtotal</span><strong>${formatPrice(store.bagTotal)}</strong></div>
             <p>Shipping calculated at checkout.</p>
             ${RouterLink({ to: '/shop', children: 'Continue shopping', attributes: { class: 'primary-button' } })}
           </footer>
@@ -183,10 +177,10 @@ export function SiteFooter(): TemplateValue {
   `;
 }
 
-function SearchPanel(): TemplateValue {
-  if (!shopState.searchOpen) return nothing;
-  const close = (): void => dismissDialog('search', () => { shopState.searchOpen = false; });
-  const query = shopState.searchQuery.trim().toLocaleLowerCase();
+function SearchPanel(store: ShopStore): TemplateValue {
+  if (!store.searchOpen) return nothing;
+  const close = (): void => dismissDialog('search', () => { store.searchOpen = false; });
+  const query = store.searchQuery.trim().toLocaleLowerCase();
   const matches = query
     ? products.filter((product) => `${product.name} ${product.category}`.toLocaleLowerCase().includes(query))
     : products;
@@ -200,9 +194,9 @@ function SearchPanel(): TemplateValue {
           id="shop-search"
           type="search"
           placeholder="Lamp, carry, workspace…"
-          .value=${shopState.searchQuery}
+          .value=${store.searchQuery}
           @input=${(event: Event) => {
-            shopState.searchQuery = (event.currentTarget as HTMLInputElement).value;
+            store.searchQuery = (event.currentTarget as HTMLInputElement).value;
           }}
           data-dialog-initial-focus
         ></div>
@@ -216,9 +210,9 @@ function SearchPanel(): TemplateValue {
   `;
 }
 
-function MobileMenu(): TemplateValue {
-  if (!shopState.menuOpen) return nothing;
-  const close = (): void => dismissDialog('menu', () => { shopState.menuOpen = false; });
+function MobileMenu(store: ShopStore): TemplateValue {
+  if (!store.menuOpen) return nothing;
+  const close = (): void => dismissDialog('menu', () => { store.menuOpen = false; });
   return html`
     <div class="drawer-layer menu-layer" @click=${(event: Event) => {
       if (event.target === event.currentTarget) close();
@@ -232,8 +226,8 @@ function MobileMenu(): TemplateValue {
         </header>
         <nav aria-label="Mobile navigation">
           <button class="menu-search-action" type="button" @click=${() => {
-            shopState.menuOpen = false;
-            shopState.searchOpen = true;
+            store.menuOpen = false;
+            store.searchOpen = true;
             const returnTarget = document.querySelector<HTMLElement>('.mobile-menu-button');
             if (returnTarget) focusOpenedDialog('search', returnTarget);
           }}><span>Search</span>${SearchIcon()}</button>

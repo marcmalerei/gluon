@@ -36,10 +36,15 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   histories; typed route matching and queries; nested, aliased, redirected, and
   lazy routes; guards, navigation failures, scroll restoration, Gluon app
   bindings, and server location snapshots.
+- The DOM-free `@gluonjs/store` package with inferred state, computed getters,
+  actions, inspectable transactions, plugins, safe server snapshots,
+  compatible-state HMR, persistence adapters, and isolated testing managers.
 - The living mobile-first GLUON GOODS reference shop with responsive
   navigation, catalog and product routes, configurable products, search, a
   reactive bag, generated product imagery, adopted stylesheet-only design, and
   a repository rule requiring applicable Gluon features to grow the same app.
+- GLUON GOODS now owns one official Store instance per application and persists
+  configured bag lines without sharing transient UI state between applications.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.

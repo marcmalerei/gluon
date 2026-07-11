@@ -51,7 +51,7 @@
     {
       "name": "@gluonjs/store",
       "directory": "packages/store",
-      "state": "planned",
+      "state": "current",
       "environment": "universal",
       "exports": ["."],
       "dependencies": ["@gluonjs/reactivity"]

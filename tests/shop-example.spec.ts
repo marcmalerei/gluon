@@ -3,18 +3,18 @@ import { adoptStyles } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
-import { resetShopState, shopState } from '../examples/shop/src/state.js';
+import { products } from '../examples/shop/src/data.js';
 import { shopStyles } from '../examples/shop/src/styles.js';
 
 describe('GLUON GOODS reference shop', () => {
   beforeEach(() => {
     document.body.replaceChildren();
-    resetShopState();
+    localStorage.clear();
     adoptStyles(document, shopStyles);
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {
-    const { app, router } = createShopApplication(createMemoryHistory(['/']));
+    const { app, router } = createShopApplication(createMemoryHistory(['/']), { storage: null });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -47,7 +47,7 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('exposes functional mobile navigation and catalog filters', async () => {
-    const { app, router } = createShopApplication(createMemoryHistory(['/shop']));
+    const { app, router, store } = createShopApplication(createMemoryHistory(['/shop']), { storage: null });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -62,7 +62,7 @@ describe('GLUON GOODS reference shop', () => {
     newLink.click();
     await settleShop();
     expect(router.currentRoute.value.fullPath).toBe('/shop?sort=new');
-    expect(shopState.menuOpen).toBe(false);
+    expect(store.menuOpen).toBe(false);
     expect(root.querySelector('.mobile-menu[role="dialog"]')).toBeNull();
     const lighting = [...root.querySelectorAll<HTMLAnchorElement>('.catalog-filters a')]
       .find((link) => link.textContent === 'Lighting')!;
@@ -74,7 +74,7 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('searches the catalog and exposes a useful empty bag path', async () => {
-    const { app, router } = createShopApplication(createMemoryHistory(['/']));
+    const { app, router, store } = createShopApplication(createMemoryHistory(['/']), { storage: null });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -97,7 +97,7 @@ describe('GLUON GOODS reference shop', () => {
       bubbles: true,
     }));
     await settleShop();
-    expect(shopState.searchOpen).toBe(false);
+    expect(store.searchOpen).toBe(false);
     expect(root.querySelector('.search-panel')).toBeNull();
     expect(document.activeElement).toBe(searchReturnTarget);
 
@@ -112,7 +112,10 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('removes bag lines and renders policy and fallback routes', async () => {
-    const { app, router } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']));
+    const { app, router } = createShopApplication(
+      createMemoryHistory(['/products/orbit-lamp']),
+      { storage: null },
+    );
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -145,6 +148,36 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(root.querySelector('.not-found h1')?.textContent).toBe('That object moved.');
     app.unmount();
+  });
+
+  it('isolates application stores and restores persisted bag state in the customer flow', async () => {
+    const isolatedA = createShopApplication(createMemoryHistory(['/']), { storage: null });
+    const isolatedB = createShopApplication(createMemoryHistory(['/']), { storage: null });
+    isolatedA.store.addToBag(products[0]!);
+    expect(isolatedA.store.bagCount).toBe(1);
+    expect(isolatedB.store.bagCount).toBe(0);
+
+    const first = createShopApplication(createMemoryHistory(['/products/stack-tray']));
+    await first.router.isReady();
+    const firstRoot = document.createElement('div');
+    document.body.append(firstRoot);
+    first.app.mount(firstRoot);
+    firstRoot.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    await settleShop();
+    first.app.unmount();
+
+    const second = createShopApplication(createMemoryHistory(['/']));
+    await second.router.isReady();
+    const secondRoot = document.createElement('div');
+    document.body.append(secondRoot);
+    second.app.mount(secondRoot);
+    secondRoot.querySelector<HTMLButtonElement>('.bag-action')!.click();
+    await settleShop();
+    expect(secondRoot.querySelector('.bag-line h3')?.textContent).toBe('Stack Tray');
+    expect(secondRoot.querySelector('.bag-line p')?.textContent).toContain('Cobalt');
+    isolatedA.storeManager.dispose();
+    isolatedB.storeManager.dispose();
+    second.app.unmount();
   });
 });
 

@@ -8,7 +8,7 @@ import {
   products,
   type Product,
 } from './data.js';
-import { addToBag, configure, shopState, type ProductConfiguration } from './state.js';
+import type { ProductConfiguration, ShopStore } from './state.js';
 import { ArrowIcon } from './icons.js';
 import {
   CategoryLinks,
@@ -17,7 +17,7 @@ import {
   focusOpenedDialog,
 } from './components.js';
 
-export function HomePage(): TemplateValue {
+export function HomePage(_store: ShopStore): TemplateValue {
   return html`
     <section class="home-hero">
       <div class="hero-copy">
@@ -49,7 +49,7 @@ export function HomePage(): TemplateValue {
   `;
 }
 
-export function CatalogPage(): TemplateValue {
+export function CatalogPage(_store: ShopStore): TemplateValue {
   const route = useRoute();
   const selected = typeof route.query.category === 'string' ? route.query.category : 'All';
   const visible = selected === 'All'
@@ -80,10 +80,10 @@ export function CatalogPage(): TemplateValue {
   `;
 }
 
-export function ProductPage(): TemplateValue {
+export function ProductPage(store: ShopStore): TemplateValue {
   const route = useRoute();
   const product = findProduct(route.params.slug);
-  if (!product) return NotFoundPage();
+  if (!product) return NotFoundPage(store);
   return html`
     <article class="product-page">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -101,7 +101,7 @@ export function ProductPage(): TemplateValue {
       </div>
       <div class="product-layout">
         ${ProductGallery(product)}
-        ${ProductConfigurator(product)}
+        ${ProductConfigurator(product, store)}
       </div>
       <section class="product-story">
         <div>
@@ -122,7 +122,7 @@ export function ProductPage(): TemplateValue {
   `;
 }
 
-export function NotFoundPage(): TemplateValue {
+export function NotFoundPage(_store: ShopStore): TemplateValue {
   return html`
     <section class="not-found">
       <h1>That object moved.</h1>
@@ -132,14 +132,14 @@ export function NotFoundPage(): TemplateValue {
   `;
 }
 
-export function ShippingPage(): TemplateValue {
+export function ShippingPage(_store: ShopStore): TemplateValue {
   return PolicyPage(
     'Shipping',
     'In-stock objects leave our workshop in 2–3 working days. Every order includes tracked delivery and repair guidance for the objects inside.',
   );
 }
 
-export function ReturnsPage(): TemplateValue {
+export function ReturnsPage(_store: ShopStore): TemplateValue {
   return PolicyPage(
     'Returns',
     'Unused objects can be returned within 30 days. Start with a message to hello@example.com and we will provide the closest return route.',
@@ -157,18 +157,18 @@ function ProductGallery(product: Product): TemplateValue {
   `;
 }
 
-function ProductConfigurator(product: Product): TemplateValue {
+function ProductConfigurator(product: Product, store: ShopStore): TemplateValue {
   return html`
     <section class="product-configurator" aria-labelledby="product-title">
       <div class="product-title-row">
         <div><h1 id="product-title">${product.name}</h1><p>${product.description}</p></div>
         <strong>${formatPrice(product.price)}</strong>
       </div>
-      ${ChoiceGroup('Finish', 'finish', ['Graphite', 'Cobalt', 'Bone'])}
-      ${ChoiceGroup('Light temperature', 'temperature', ['Warm 2700K', 'Clear 3200K'])}
-      ${ChoiceGroup('Cable length', 'cable', ['1.5 m', '2.5 m'])}
+      ${ChoiceGroup(store, 'Finish', 'finish', ['Graphite', 'Cobalt', 'Bone'])}
+      ${ChoiceGroup(store, 'Light temperature', 'temperature', ['Warm 2700K', 'Clear 3200K'])}
+      ${ChoiceGroup(store, 'Cable length', 'cable', ['1.5 m', '2.5 m'])}
       <button class="primary-button add-to-bag" type="button" @click=${(event: Event) => {
-        addToBag(product);
+        store.addToBag(product);
         focusOpenedDialog('bag', event.currentTarget as HTMLElement);
       }}>
         Add to bag — ${formatPrice(product.price)}
@@ -183,6 +183,7 @@ function ProductConfigurator(product: Product): TemplateValue {
 }
 
 function ChoiceGroup<Key extends keyof ProductConfiguration>(
+  store: ShopStore,
   label: string,
   key: Key,
   choices: readonly ProductConfiguration[Key][],
@@ -192,12 +193,12 @@ function ChoiceGroup<Key extends keyof ProductConfiguration>(
       <legend>${label}</legend>
       <div>
         ${repeat(choices, (choice) => String(choice), (choice) => html`
-          <label class=${shopState.configuration[key] === choice ? 'is-selected' : ''}>
+          <label class=${store.configuration[key] === choice ? 'is-selected' : ''}>
             <input
               type="radio"
               name=${key}
-              .checked=${shopState.configuration[key] === choice}
-              @change=${() => configure(key, choice)}
+              .checked=${store.configuration[key] === choice}
+              @change=${() => store.configure(key, choice)}
             >
             ${key === 'finish' ? html`<span class=${`finish-swatch swatch-${String(choice).toLowerCase()}`}></span>` : ''}
             <span>${choice}</span>

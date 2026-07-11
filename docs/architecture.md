@@ -39,11 +39,15 @@ packages/router/
 ├── src/ui.ts           Gluon plugin, RouterLink, RouterView, injection helpers
 └── src/memory.ts       DOM-free Node/server entry point
 
+packages/store/
+└── src/index.ts        Definitions, managers, transactions, plugins, snapshots,
+                        HMR, persistence, and testing isolation
+
 examples/shop/
 ├── src/app.ts          Public-package application composition and routes
 ├── src/pages.ts        Home, catalog, product, policy, and fallback pages
 ├── src/components.ts   Navigation, product rail, search, menu, and bag
-├── src/state.ts        Temporary local shop domain state pending Store
+├── src/state.ts        Official per-application Store definition and bag actions
 ├── src/styles.ts       Document-level constructable stylesheet design system
 ├── assets/             Production product and editorial imagery
 └── design/             Accepted concepts and verified browser renders
@@ -62,6 +66,13 @@ UI bindings, so Node resolution and server snapshots do not evaluate a DOM
 global. Browser and hash adapters access `window` only when their factory is
 called. The complete navigation and ownership rules are documented in the
 [Router contract](router.md).
+
+The separate `@gluonjs/store` package depends only on Reactivity and compiles
+without DOM or Node ambient types. Definitions are reusable factories; each
+application, request, or test manager owns its live state, computed scope,
+transactions, plugins, persistence adapter, and teardown. Its snapshot,
+security, HMR compatibility, and inspection rules are documented in the
+[Store contract](store.md).
 
 The GLUON GOODS reference shop consumes only public package names in
 application source. Its monorepo Vite and test aliases resolve those names to
