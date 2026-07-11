@@ -17,6 +17,12 @@ medians and p95 values; the paired JSON file preserves every sample, invariant
 snapshot, calibrated batch size, source commit, working-tree state, package and
 browser versions, Node and npm versions, operating system, CPU, and memory.
 
+Every pull request and `main` run additionally retains a ten-sample
+Chromium/Firefox/WebKit comparison plus the production GLUON GOODS customer-flow
+budget output for 30 days in the `quality-evidence-<commit>` workflow artifact.
+Those shorter CI runs detect regressions but do not replace the larger committed
+matrix used by the comparative text below.
+
 ## Run the benchmark
 
 Install the three Playwright-managed browser engines once, then run the
@@ -108,6 +114,12 @@ versions, and workloads. It must not be generalized into an unqualified claim
 that Gluon is faster than Lit, Vue, or Vanilla DOM. The living shop remains the
 customer-flow and bundle-composition acceptance surface; a benchmark panel is
 kept separate because it is not an honest commerce feature.
+
+The shop flow has its own non-comparative p95 budgets in
+`quality/shop-performance-budgets.json`. It measures home readiness, product
+navigation, bag opening, and checkout navigation in the production build and
+preserves all raw samples. The thresholds are regression ceilings, not user
+experience guarantees across networks or devices.
 
 ## Legacy Tiny-Lit benchmark
 

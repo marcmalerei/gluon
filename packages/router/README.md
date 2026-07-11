@@ -62,6 +62,8 @@ await typedRouter.push({ name: 'report', params: { id: 42 } });
 
 Path params are encoded on generation and decoded on matching. Query keys are
 sorted during serialization; repeated values retain their input order.
+Prototype-like decoded keys remain frozen own data and never participate in
+the parser accumulator's prototype chain.
 
 ## Navigation control
 

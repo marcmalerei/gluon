@@ -315,6 +315,15 @@ export const shopStyles = css`
     .mobile-product-back { display: none; }
     .product-layout { display: grid; grid-template-columns: minmax(0, 2.15fr) minmax(340px, 1fr); gap: clamp(28px, 3vw, 60px); align-items: start; }
     .product-gallery { position: relative; display: grid; grid-template-columns: 1.6fr 0.8fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+    .product-gallery:focus { outline: 3px solid transparent; outline-offset: -3px; }
+    .product-gallery:focus::after {
+      position: absolute;
+      z-index: 5;
+      inset: 0;
+      border: var(--shop-focus);
+      pointer-events: none;
+      content: '';
+    }
     .product-gallery figure { min-width: 0; margin: 0; overflow: hidden; background: #f6f6f4; }
     .product-gallery img { width: 100%; height: 100%; object-fit: contain; }
     .gallery-primary { grid-row: 1 / 3; aspect-ratio: 1.05 / 1; }

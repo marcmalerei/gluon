@@ -40,6 +40,17 @@ describe('@gluonjs/router query codec', () => {
       special: "!'()*",
     })).toBe('?active=true&count=2&flag&special=%21%27%28%29%2A&tag=b&tag&tag=a');
   });
+
+  it('treats prototype-like names as ordinary own query keys', () => {
+    const parsed = parseQuery('?valueOf&constructor=ctor&__proto__=safe');
+    expect(Object.hasOwn(parsed, 'valueOf')).toBe(true);
+    expect(Object.hasOwn(parsed, 'constructor')).toBe(true);
+    expect(Object.hasOwn(parsed, '__proto__')).toBe(true);
+    expect(parsed.valueOf).toBeNull();
+    expect(parsed.constructor).toBe('ctor');
+    expect(parsed.__proto__).toBe('safe');
+    expect(stringifyQuery(parsed)).toBe('?__proto__=safe&constructor=ctor&valueOf');
+  });
 });
 
 describe('@gluonjs/router matcher', () => {

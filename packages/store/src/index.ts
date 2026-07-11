@@ -378,6 +378,7 @@ export class StoreManager {
       $subscribe: {
         enumerable: false,
         value: (callback: StoreSubscription) => {
+          this.assertRuntimeActive(runtime);
           runtime.subscribers.add(callback);
           return () => runtime.subscribers.delete(callback);
         },
@@ -385,6 +386,7 @@ export class StoreManager {
       $onAction: {
         enumerable: false,
         value: (callback: StoreActionSubscription) => {
+          this.assertRuntimeActive(runtime);
           runtime.actionSubscribers.add(callback);
           return () => runtime.actionSubscribers.delete(callback);
         },
@@ -410,7 +412,10 @@ export class StoreManager {
         enumerable: true,
         configurable: true,
         get: () => runtime.state[key],
-        set: (value) => { runtime.state[key] = value; },
+        set: (value) => {
+          this.assertRuntimeActive(runtime);
+          runtime.state[key] = value;
+        },
       });
     }
 
@@ -452,6 +457,7 @@ export class StoreManager {
     action: (...args: never[]) => unknown,
     args: unknown[],
   ): unknown {
+    this.assertRuntimeActive(runtime);
     const before = snapshotState(runtime.state);
     const metadata = this.resolveMetadata();
     const afterCallbacks: Array<(result: unknown) => void> = [];

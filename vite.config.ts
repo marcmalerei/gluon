@@ -13,6 +13,9 @@ const entry = {
 };
 
 export default defineConfig({
+  optimizeDeps: {
+    include: ['axe-core'],
+  },
   define: {
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,
@@ -30,6 +33,7 @@ export default defineConfig({
       '@gluonjs/ssr/streaming': resolve(import.meta.dirname, 'packages/ssr/src/streaming.ts'),
       '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
+      '@gluonjs/test-utils': resolve(import.meta.dirname, 'packages/test-utils/src/index.ts'),
     },
   },
   build: {

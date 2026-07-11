@@ -33,6 +33,9 @@ console.log(counter.doubled); // 4
 A manager owns one instance per definition id. Create one manager per browser
 application, test, or server request; do not export a process-wide manager.
 Call `manager.dispose()` with the owning application or request lifecycle.
+Disposed stores reject actions, direct state writes, patches, resets, and new
+subscription hooks so an external stale reference cannot reactivate a released
+runtime.
 
 ## Transactions and plugins
 

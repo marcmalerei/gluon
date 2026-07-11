@@ -74,3 +74,24 @@ jobs:
       - run: npm run build:compiler
       - run: npm run build:vite
       - run: npm run check:budgets
+
+  performance-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
+      - run: npm run check:shop-performance
+      - name: Retain quality evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-evidence-${{ github.sha }}
+          path: .tmp/quality-evidence
+          retention-days: 30
+          if-no-files-found: error
