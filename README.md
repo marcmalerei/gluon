@@ -18,6 +18,7 @@
 - cached `html` and `svg` template results with part-level DOM updates
 - child, attribute, property, boolean, event, and first-class spread bindings
 - official browser, hash, and memory routing with typed locations and guards
+- typed application-scoped stores with transactions, persistence, HMR, and SSR snapshots
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
@@ -44,7 +45,7 @@ npm install
 npm run check
 ```
 
-`npm run check` runs DOM-free Reactivity and Router Node tests, strict type
+`npm run check` runs DOM-free Reactivity, Router, and Store Node tests, strict type
 checking, the instrumented Chromium browser suite, all production builds,
 public declaration contract tests, the lazy-route chunk check, and package
 archive validation. Each coverage gate requires at least 95% statement,
@@ -153,6 +154,35 @@ they read; computed values remain lazy and cached until a dependency changes.
 The package also provides deduplicated pre/update/post scheduling, `batch`,
 `nextTick`, untracked reads, effect scopes, scheduled watchers, deterministic
 cleanup, and a contained error channel.
+
+## Application-scoped stores
+
+`@gluonjs/store` defines typed state, computed getter values, and actions without
+a DOM dependency:
+
+```ts
+import { createStoreManager, defineStore } from '@gluonjs/store';
+
+const counterDefinition = defineStore('counter', () => ({ count: 0 }), {
+  getters: (state) => ({ doubled: state.count * 2 }),
+  actions: (store) => ({
+    increment(amount = 1) {
+      store.count += amount;
+      return store.count;
+    },
+  }),
+});
+
+const manager = createStoreManager();
+const counter = counterDefinition.use(manager);
+counter.increment();
+```
+
+Managers isolate browser applications, tests, and server requests. Actions and
+patches publish inspectable before/after transactions; plugins can add
+extensions and cleanup; versioned snapshots support safe serialization and
+hydration; and compatible top-level state survives `hotUpdate()`. Persistence
+requires an explicit storage adapter. See the [Store contract](docs/store.md).
 
 ## Bindings and spreading
 
@@ -409,6 +439,7 @@ Included now:
 - browser-side rendering and updates
 - standalone DOM-free reactive state
 - application routing with browser, hash, and memory histories
+- application-scoped stores with transactions, persistence, HMR, and snapshots
 - a responsive living reference shop using public package APIs
 - Custom Element authoring
 - adopted stylesheet management

@@ -11,6 +11,7 @@ export default defineConfig({
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
       '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router': resolve(repositoryRoot, 'packages/router/src/index.ts'),
+      '@gluonjs/store': resolve(repositoryRoot, 'packages/store/src/index.ts'),
     },
   },
   build: {

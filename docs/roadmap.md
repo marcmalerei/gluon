@@ -65,6 +65,8 @@ Gluon currently provides:
 - an official router with typed static, dynamic, named, nested, redirected,
   aliased, and lazy routes; browser, hash, and memory histories; guards,
   failures, scroll restoration, and server snapshots
+- an official DOM-free store with inferred state/getters/actions, transactions,
+  plugins, compatible-state HMR, safe snapshots, persistence, and test isolation
 - the first living GLUON GOODS reference-shop slice with public-package routes,
   responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management
@@ -72,8 +74,7 @@ Gluon currently provides:
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide an official shared-state package, SSR,
-DOM hydration, SSG, Gluon-specific
+The current repository does not provide SSR, DOM hydration, SSG, Gluon-specific
 HMR, language tooling, Devtools, consumer test utilities, or a public release.
 
 ## Product principles

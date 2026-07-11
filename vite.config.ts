@@ -23,6 +23,7 @@ export default defineConfig({
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router': resolve(import.meta.dirname, 'packages/router/src/index.ts'),
+      '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
     },
   },
   build: {
