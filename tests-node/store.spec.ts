@@ -117,6 +117,10 @@ describe('@gluonjs/store definitions and transactions', () => {
     store.$dispose();
     expect(cleanup).toHaveBeenCalledOnce();
     expect(() => store.$patch({ count: 2 })).toThrow('disposed');
+    expect(() => store.increment()).toThrow('disposed');
+    expect(() => { store.count = 2; }).toThrow('disposed');
+    expect(() => store.$subscribe(() => undefined)).toThrow('disposed');
+    expect(() => store.$onAction(() => undefined)).toThrow('disposed');
     expect(manager.use(counterDefinition)).not.toBe(store);
     manager.dispose();
     expect(() => manager.use(counterDefinition)).toThrow('disposed');

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "samples": 10,
+  "warmupRounds": 2,
+  "metrics": {
+    "initialRouteReadyMs": { "maxP95": 1500 },
+    "productNavigationMs": { "maxP95": 750 },
+    "bagOpenMs": { "maxP95": 500 },
+    "checkoutNavigationMs": { "maxP95": 750 }
+  }
+}

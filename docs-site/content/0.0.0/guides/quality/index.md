@@ -25,7 +25,8 @@ for reviewing a visible change in the supported browsers.
 
 Universal rendering never invents a Content Security Policy nonce. A server may
 provide a request nonce; the renderer transports it into the exact initial style
-and script carriers described by the deployment contract. Request-local apps,
+carriers described by the deployment contract. Module scripts remain external
+asset URLs under the application's policy. Request-local apps,
 stores, routers, effects, and snapshots are isolated between concurrent renders.
 
 Run the repository security and dependency checks from a clean checkout:
@@ -34,9 +35,17 @@ Run the repository security and dependency checks from a clean checkout:
 npm audit --audit-level=moderate
 npm run test:ssr
 npm run check:packages
+npm run test:property-fuzz
+npm run check:security
+npm run check:shop-performance
 ```
 
 Review the [deployment reference](/gluon/0.0.0/reference/deployment/) before
 changing CSP, asset, or server behavior. Diagnostics and runtime failures remain
 visible; production code does not report a successful state after a failed
 compile, import, hydration, or render step.
+
+The repository [security threat model](https://github.com/marcmalerei/gluon/blob/main/docs/security.md),
+[accessibility protocol](https://github.com/marcmalerei/gluon/blob/main/docs/accessibility.md),
+and [browser/device protocol](https://github.com/marcmalerei/gluon/blob/main/docs/browser-device-evidence.md)
+define the reviewed automated and release-cut boundaries.

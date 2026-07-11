@@ -4,7 +4,7 @@ export type LocationQueryRaw = Readonly<Record<string, LocationQueryValue>>;
 export type LocationQuery = Readonly<Record<string, string | null | readonly (string | null)[]>>;
 
 export function parseQuery(search: string): LocationQuery {
-  const query: Record<string, string | null | Array<string | null>> = {};
+  const query: Record<string, string | null | Array<string | null>> = Object.create(null);
   const source = search.startsWith('?') ? search.slice(1) : search;
   if (!source) return Object.freeze(query);
 
@@ -21,11 +21,11 @@ export function parseQuery(search: string): LocationQuery {
     else query[key] = [current, value];
   }
 
-  const normalized: Record<string, string | null | readonly (string | null)[]> = {};
+  const normalized: Record<string, string | null | readonly (string | null)[]> = Object.create(null);
   for (const [key, value] of Object.entries(query)) {
     normalized[key] = Array.isArray(value) ? Object.freeze([...value]) : value;
   }
-  return Object.freeze(normalized);
+  return Object.freeze({ ...normalized });
 }
 
 export function stringifyQuery(query: LocationQueryRaw = {}): string {

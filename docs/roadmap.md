@@ -281,9 +281,11 @@ The first #38 performance slice provides the production Gluon/Lit/Vue/Vanilla
 DOM comparison harness, cross-browser runner, output-equivalence tests, and
 retained raw baseline. The next slice adds blocking Chromium/Firefox/WebKit
 engine lanes, Node 22/24 build and SSR lanes, the full repository check, and a
-GLUON GOODS bundle budget. Branded-browser/device evidence, accessibility,
-security, broad memory, customer-flow performance, and benchmark-artifact gates
-remain open acceptance work.
+GLUON GOODS bundle budget. The following evidence slice adds accessibility,
+security, property/fuzz, retention, customer-flow performance, and retained
+benchmark-artifact gates. Branded-browser/device and assistive-technology
+results are release-cut evidence and are not claimed for the private `0.0.0`
+line.
 
 Issue #40 publishes a versioned documentation tree and release archive, generates
 reference pages from every current public package entry point, and compiles the
@@ -291,6 +293,13 @@ maintained SPA, Custom Element, Router/Store, universal-rendering, testing,
 plain-HTML, and Vue-host examples. The Pages workflow validates the same version
 manifest, links, API coverage, and examples before deploying the documentation
 and Playground as one public site.
+
+The current #38 evidence slice adds blocking axe WCAG checks, deterministic
+property/fuzz cases for Router, compiler, and SSR serialization, repeated
+customer-flow retention checks, a validated machine-readable threat model,
+production customer-flow p95 budgets, and retained CI benchmark artifacts.
+Manual keyboard, assistive-technology, and branded-device evidence is defined as
+a release-cut protocol without making a `0.0.0` product-support claim.
 
 ### Exit gate
 

@@ -25,7 +25,9 @@ A location is a URL string, a `{ path, query, hash, state }` object, or a named
 location with params. `RouteNamedMap` constrains names and params at compile
 time. Query serialization sorts keys, retains array order, omits `undefined`,
 and represents `null` as a bare key. Parsing preserves repeated and empty
-values and treats `+` as a space.
+values and treats `+` as a space. Prototype-like external keys such as
+`__proto__`, `constructor`, and `valueOf` remain ordinary frozen own data; they
+cannot read or mutate the query accumulator's prototype.
 
 `resolve()` is side-effect free. `push()` adds an entry and `replace()` updates
 the current entry only after guards and lazy components succeed.
