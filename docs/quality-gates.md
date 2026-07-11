@@ -7,7 +7,8 @@ budgets blocking GitHub Actions jobs.
 ## Automated matrix
 
 `.github/workflows/quality-gates.yml` runs on pull requests, `main`, and manual
-dispatch:
+dispatch. It uses the current Node 24-based `actions/checkout@v7` and
+`actions/setup-node@v6` action majors:
 
 - a clean production build followed by the full `npm run check` gate on Node
   22.12 with Chromium, so workspace package exports exist before typechecking;
