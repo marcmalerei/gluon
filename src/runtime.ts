@@ -3,6 +3,8 @@ import { guardEventListener } from './application-context.js';
 const templateResultBrand = Symbol('gluon.template-result');
 const directiveBrand = Symbol('gluon.directive');
 const repeatResultBrand = Symbol('gluon.repeat-result');
+const repeatKeys = Symbol('gluon.repeat-keys');
+const repeatValues = Symbol('gluon.repeat-values');
 const eventBindingBrand = Symbol('gluon.event-binding');
 const unsafeHtmlBrand = Symbol('gluon.unsafe-html');
 const unsafeUrlBrand = Symbol('gluon.unsafe-url');
@@ -42,9 +44,12 @@ export interface RepeatResult {
   readonly items: readonly KeyedItem[];
 }
 
-export class TemplateResult {
-  readonly [templateResultBrand] = true;
+type InternalRepeatResult = RepeatResult & {
+  readonly [repeatKeys]: readonly Key[];
+  readonly [repeatValues]: readonly TemplateValue[];
+};
 
+export class TemplateResult {
   constructor(
     readonly strings: TemplateStringsArray,
     readonly values: readonly TemplateValue[],
@@ -53,6 +58,7 @@ export class TemplateResult {
 }
 
 export function isTemplateResult(value: unknown): value is TemplateResult {
+  if (value instanceof TemplateResult) return true;
   return Boolean(
     value
       && typeof value === 'object'
@@ -90,8 +96,10 @@ export function repeat<Item>(
   key: (item: Item, index: number) => Key,
   renderItem: (item: Item, index: number) => TemplateValue,
 ): RepeatResult {
-  const keyedItems: KeyedItem[] = [];
-  const keys = new Set<Key>();
+  const itemKeys: Key[] = [];
+  const itemValues: TemplateValue[] = [];
+  let seenKeys: Set<Key> | undefined;
+  let sequentialNumericKeys = true;
   let index = 0;
 
   for (const item of items) {
@@ -99,22 +107,40 @@ export function repeat<Item>(
     if (!isKey(itemKey)) {
       throw new TypeError(`repeat() received a missing key at index ${index}.`);
     }
-    if (keys.has(itemKey)) {
-      throw new Error(`repeat() received the duplicate key ${formatKey(itemKey)} at index ${index}.`);
+    if (sequentialNumericKeys && typeof itemKey === 'number' && itemKey === index) {
+      // The common index-keyed case is inherently unique and needs no Set.
+    } else {
+      if (sequentialNumericKeys) {
+        seenKeys = new Set(itemKeys);
+        sequentialNumericKeys = false;
+      }
+      if (seenKeys!.has(itemKey)) {
+        throw new Error(`repeat() received the duplicate key ${formatKey(itemKey)} at index ${index}.`);
+      }
+      seenKeys!.add(itemKey);
     }
 
-    keys.add(itemKey);
-    keyedItems.push(Object.freeze({
-      key: itemKey,
-      value: renderItem(item, index),
-    }));
+    itemKeys.push(itemKey);
+    itemValues.push(renderItem(item, index));
     index += 1;
   }
 
-  return Object.freeze({
+  let exposedItems: readonly KeyedItem[] | undefined;
+  const result = {
     [repeatResultBrand]: true as const,
-    items: Object.freeze(keyedItems),
-  });
+    [repeatKeys]: itemKeys,
+    [repeatValues]: itemValues,
+    get items(): readonly KeyedItem[] {
+      if (!exposedItems) {
+        exposedItems = Object.freeze(itemKeys.map((itemKey, itemIndex) => Object.freeze({
+          key: itemKey,
+          value: itemValues[itemIndex]!,
+        })));
+      }
+      return exposedItems;
+    },
+  };
+  return Object.freeze(result);
 }
 
 export interface EventBinding {
@@ -171,7 +197,7 @@ export function unsafeURL(value: string | URL): UnsafeUrlResult {
   });
 }
 
-function isRepeatResult(value: unknown): value is RepeatResult {
+function isRepeatResult(value: unknown): value is InternalRepeatResult {
   return Boolean(
     value
       && typeof value === 'object'
@@ -185,6 +211,7 @@ export interface PartController {
 
 interface Part extends PartController {
   readonly commitPriority?: number;
+  setValue(value: TemplateValue, assumeInPlace?: boolean): void;
   disconnect(): void;
   suspend(): void;
 }
@@ -246,6 +273,7 @@ type PartDescriptor =
 interface Binding {
   readonly index: number;
   readonly part: Part;
+  readonly priority: number;
   directive?: ActiveDirective;
 }
 
@@ -259,6 +287,7 @@ interface CompiledTemplate {
   readonly element: HTMLTemplateElement;
   readonly strings: TemplateStringsArray;
   readonly descriptors: readonly PartDescriptor[];
+  readonly rootNodesStable: boolean;
 }
 
 interface ChildInstance {
@@ -273,17 +302,23 @@ interface PartChild {
   readonly binding: Binding;
 }
 
-interface KeyedChild extends PartChild {
+interface KeyedChild {
   readonly key: Key;
+  readonly part: NodePart;
+  binding?: Binding;
 }
+
+const emptyPartChildren: Array<PartChild | undefined> = [];
+const emptyKeyedChildren: KeyedChild[] = [];
 
 class NodePart implements Part {
   private nodes: Node[] = [];
   private textNode?: Text;
   private lastPrimitive: PrimitiveValue | typeof unsetValue = unsetValue;
   private child?: ChildInstance;
-  private arrayChildren: Array<PartChild | undefined> = [];
-  private keyedChildren: KeyedChild[] = [];
+  private arrayChildren: Array<PartChild | undefined> = emptyPartChildren;
+  private keyedChildren: KeyedChild[] = emptyKeyedChildren;
+  private detachedKeyMarker?: Comment;
   private unsafeMarkup?: string;
 
   constructor(
@@ -291,19 +326,52 @@ class NodePart implements Part {
     private readonly contextMarker: Comment = marker,
   ) {}
 
-  setValue(value: TemplateValue): void {
+  setStringValue(value: string, assumeInPlace = false): void {
+    if (!this.textNode) {
+      this.setValue(value, assumeInPlace);
+      return;
+    }
+    if (value !== this.lastPrimitive) {
+      this.textNode.data = value;
+      this.lastPrimitive = value;
+    }
+    if (!assumeInPlace && this.textNode.previousSibling !== this.marker) {
+      this.replaceNodes([this.textNode]);
+    }
+  }
+
+  setValue(value: TemplateValue, assumeInPlace = false): void {
+    if (isTemplateResult(value)) {
+      this.setTemplate(value, assumeInPlace);
+      return;
+    }
+
+    if (isRepeatResult(value)) {
+      this.setKeyed(value);
+      return;
+    }
+
     if (isEmptyValue(value)) {
       this.resetChildren();
       this.replaceNodes([]);
       return;
     }
 
-    if (isRenderablePrimitive(value) && this.textNode) {
-      if (!Object.is(value, this.lastPrimitive)) {
-        this.textNode.data = String(value);
+    if (isRenderablePrimitive(value)) {
+      if (this.textNode) {
+        if (!Object.is(value, this.lastPrimitive)) {
+          this.textNode.data = String(value);
+          this.lastPrimitive = value;
+        }
+        if (!assumeInPlace && this.textNode.previousSibling !== this.marker) {
+          this.replaceNodes([this.textNode]);
+        }
+      } else {
+        const text = document.createTextNode(String(value));
+        this.textNode = text;
         this.lastPrimitive = value;
+        this.replaceNodes([text]);
       }
-      this.replaceNodes([this.textNode]);
       return;
     }
 
@@ -321,16 +389,6 @@ class NodePart implements Part {
       return;
     }
 
-    if (isRepeatResult(value)) {
-      this.setKeyed(value);
-      return;
-    }
-
-    if (isTemplateResult(value)) {
-      this.setTemplate(value);
-      return;
-    }
-
     this.resetChildren();
 
     if (value instanceof Node) {
@@ -342,7 +400,7 @@ class NodePart implements Part {
 
     const text = document.createTextNode(String(value));
     this.textNode = text;
-    this.lastPrimitive = value as PrimitiveValue;
+    this.lastPrimitive = value as unknown as PrimitiveValue;
     this.replaceNodes([text]);
   }
 
@@ -358,36 +416,56 @@ class NodePart implements Part {
     for (const child of this.arrayChildren) {
       if (child) suspendBindings([child.binding]);
     }
-    for (const child of this.keyedChildren) suspendBindings([child.binding]);
+    for (const child of this.keyedChildren) {
+      if (child.binding) suspendBindings([child.binding]);
+      else child.part.suspend();
+    }
   }
 
-  private setTemplate(result: TemplateResult): void {
-    this.disconnectArrayChildren();
-    this.disconnectKeyedChildren();
-    this.unsafeMarkup = undefined;
-    const compiled = getCompiledTemplate(result);
-
-    if (
-      this.child?.template === compiled
-      && nodesAreInPlace(this.marker, this.nodes)
-    ) {
-      const boundary = this.nodes.length > 0
-        ? this.nodes[this.nodes.length - 1]!.nextSibling
-        : this.marker.nextSibling;
-      applyBindings(this.child.bindings, result.values);
-      const nodes = collectNodesUntil(this.marker, boundary);
-      this.child.nodes = nodes;
-      this.nodes = nodes;
+  private setTemplate(result: TemplateResult, assumeInPlace = false): void {
+    const currentChild = this.child;
+    if (assumeInPlace && currentChild?.template.strings === result.strings) {
+      applyBindings(currentChild.bindings, result.values, true);
+      this.nodes = currentChild.nodes;
       this.textNode = undefined;
       this.lastPrimitive = unsetValue;
       return;
     }
 
+    const compiled = getCompiledTemplate(result);
+
+    if (
+      this.child?.template === compiled
+      && (assumeInPlace || nodesAreInPlace(this.marker, this.nodes))
+    ) {
+      const boundary = this.nodes.length > 0
+        ? this.nodes[this.nodes.length - 1]!.nextSibling
+        : this.marker.nextSibling;
+      applyBindings(this.child.bindings, result.values, assumeInPlace);
+      if (compiled.rootNodesStable) {
+        this.nodes = this.child.nodes;
+      } else {
+        const nodes = collectNodesUntil(this.marker, boundary);
+        this.child.nodes = nodes;
+        this.nodes = nodes;
+      }
+      this.textNode = undefined;
+      this.lastPrimitive = unsetValue;
+      return;
+    }
+
+    this.disconnectArrayChildren();
+    this.disconnectKeyedChildren();
+    this.unsafeMarkup = undefined;
     if (this.child) disconnectBindings(this.child.bindings);
     this.child = createChildInstance(result, compiled);
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
-    this.replaceNodes([...this.child.nodes]);
+    this.replaceNodes(this.child.nodes);
+  }
+
+  setTemplateResult(result: TemplateResult, assumeInPlace = false): void {
+    this.setTemplate(result, assumeInPlace);
   }
 
   private setArray(values: readonly TemplateValue[]): void {
@@ -424,39 +502,96 @@ class NodePart implements Part {
     this.replaceNodes(nextNodes);
   }
 
-  private setKeyed(result: RepeatResult): void {
+  private setKeyed(result: InternalRepeatResult): void {
+    const keys = result[repeatKeys];
+    const values = result[repeatValues];
+
     if (this.child) {
       disconnectBindings(this.child.bindings);
       this.child = undefined;
     }
-    this.disconnectArrayChildren();
+    if (this.arrayChildren.length > 0) this.disconnectArrayChildren();
     this.unsafeMarkup = undefined;
+
+    let sameOrder = this.keyedChildren.length === keys.length;
+    for (let index = 0; sameOrder && index < keys.length; index += 1) {
+      sameOrder = this.keyedChildren[index]!.key === keys[index];
+    }
+    if (sameOrder) {
+      this.updateKeyedInOrder(keys, values);
+      return;
+    }
+
+    let reverseOrder = this.keyedChildren.length === keys.length && keys.length > 1;
+    for (let index = 0; reverseOrder && index < keys.length; index += 1) {
+      reverseOrder = this.keyedChildren[index]!.key === keys[keys.length - index - 1];
+    }
+    if (reverseOrder && this.marker.parentNode) {
+      const parent = this.marker.parentNode;
+      const reference = this.marker.nextSibling;
+      const nextChildren: KeyedChild[] = [];
+      const nextNodes: Node[] = [];
+
+      for (let index = 0; index < keys.length; index += 1) {
+        const child = this.keyedChildren[keys.length - index - 1]!;
+        const value = values[index]!;
+        this.updateKeyedChild(child, value, true);
+        if (child.part.nodes[0] !== reference) moveNodesBefore(parent, child.part.nodes, reference);
+        nextChildren.push(child);
+        nextNodes.push(...child.part.nodes);
+      }
+
+      this.keyedChildren = nextChildren;
+      this.nodes = nextNodes;
+      this.textNode = undefined;
+      this.lastPrimitive = unsetValue;
+      return;
+    }
+
+    if (this.keyedChildren.length === 0) {
+      const nextChildren: KeyedChild[] = new Array(keys.length);
+      const nextNodes: Node[] = [];
+      for (let index = 0; index < keys.length; index += 1) {
+        const child = this.createKeyedChild(keys[index]!, values[index]!);
+        nextChildren[index] = child;
+        nextNodes.push(...child.part.nodes);
+      }
+      this.keyedChildren = nextChildren;
+      this.textNode = undefined;
+      this.lastPrimitive = unsetValue;
+      this.nodes = [];
+      this.replaceNodes(nextNodes);
+      return;
+    }
 
     const previousByKey = new Map(
       this.keyedChildren.map((child) => [child.key, child] as const),
     );
-    const nextKeys = new Set(result.items.map((item) => item.key));
+    const nextKeys = new Set(keys);
     const nextChildren: KeyedChild[] = [];
     const nextNodes: Node[] = [];
 
     for (const [key, removed] of previousByKey) {
       if (!nextKeys.has(key)) {
-        disconnectBindings([removed.binding]);
+        if (removed.binding) disconnectBindings([removed.binding]);
+        else removed.part.disconnect();
         previousByKey.delete(key);
       }
     }
 
-    for (const item of result.items) {
-      const previous = previousByKey.get(item.key);
-      const child = previous ?? this.createKeyedChild(item);
+    for (let index = 0; index < keys.length; index += 1) {
+      const key = keys[index]!;
+      const value = values[index]!;
+      const previous = previousByKey.get(key);
+      const child = previous ?? this.createKeyedChild(key, value);
 
       if (previous) {
-        previousByKey.delete(item.key);
-        applyBindings([child.binding], [item.value]);
+        previousByKey.delete(key);
+        this.updateKeyedChild(child, value, true);
       }
 
       nextChildren.push(child);
-      nextNodes.push(child.marker, ...child.part.nodes);
+      nextNodes.push(...child.part.nodes);
     }
 
     this.keyedChildren = nextChildren;
@@ -465,17 +600,60 @@ class NodePart implements Part {
     this.replaceNodes(nextNodes);
   }
 
-  private createKeyedChild(item: KeyedItem): KeyedChild {
-    return { key: item.key, ...this.createPartChild(item.value, 'gluon:key') };
+  private updateKeyedInOrder(keys: readonly Key[], values: readonly TemplateValue[]): void {
+    for (let index = 0; index < keys.length; index += 1) {
+      const child = this.keyedChildren[index]!;
+      const value = values[index]!;
+      this.updateKeyedChild(child, value, true);
+    }
+    this.textNode = undefined;
+    this.lastPrimitive = unsetValue;
+    if (!nodesAreInPlace(this.marker, this.nodes)) this.replaceNodes([...this.nodes]);
+  }
+
+  private updateKeyedChild(child: KeyedChild, value: TemplateValue, assumeInPlace: boolean): void {
+    if (child.binding) {
+      applyBinding(child.binding, value, assumeInPlace);
+      return;
+    }
+    if (value instanceof TemplateResult) {
+      child.part.setTemplateResult(value, assumeInPlace);
+      return;
+    }
+    if (typeof value === 'string') {
+      child.part.setStringValue(value, assumeInPlace);
+      return;
+    }
+    if (isRepeatResult(value)) {
+      child.part.setRepeatResult(value);
+      return;
+    }
+    if (isDirectiveValue(value)) {
+      const binding: Binding = { index: 0, part: child.part, priority: 0 };
+      child.binding = binding;
+      applyDirective(binding, value);
+      return;
+    }
+    child.part.setValue(value, assumeInPlace);
+  }
+
+  setRepeatResult(result: InternalRepeatResult): void {
+    this.setKeyed(result);
+  }
+
+  private createKeyedChild(key: Key, value: TemplateValue): KeyedChild {
+    const marker = this.detachedKeyMarker ??= document.createComment('gluon:key');
+    const part = new NodePart(marker, this.contextMarker);
+    const child = { key, part };
+    this.updateKeyedChild(child, value, false);
+    return child;
   }
 
   private createPartChild(value: TemplateValue, markerData = 'gluon:item'): PartChild {
-    const fragment = document.createDocumentFragment();
     const marker = document.createComment(markerData);
-    fragment.append(marker);
     const part = new NodePart(marker, this.contextMarker);
-    const binding: Binding = { index: 0, part };
-    applyBindings([binding], [value]);
+    const binding: Binding = { index: 0, part, priority: 0 };
+    applyBinding(binding, value);
     return { marker, part, binding };
   }
 
@@ -499,12 +677,23 @@ class NodePart implements Part {
       return;
     }
 
-    if (
-      nextNodes.length === this.nodes.length
-      && nextNodes.every((node, index) => node === this.nodes[index])
-      && nodesAreInPlace(this.marker, nextNodes)
-    ) {
+    if (this.nodes.length === 0) {
+      const fragment = document.createDocumentFragment();
+      fragment.append(...nextNodes);
+      parent.insertBefore(fragment, this.marker.nextSibling);
+      this.nodes = nextNodes;
       return;
+    }
+
+    if (nextNodes.length === this.nodes.length) {
+      let sameNodes = true;
+      for (let index = 0; index < nextNodes.length; index += 1) {
+        if (nextNodes[index] !== this.nodes[index]) {
+          sameNodes = false;
+          break;
+        }
+      }
+      if (sameNodes && nodesAreInPlace(this.marker, nextNodes)) return;
     }
 
     const keep = new Set(nextNodes);
@@ -538,15 +727,20 @@ class NodePart implements Part {
   }
 
   private disconnectArrayChildren(): void {
+    if (this.arrayChildren.length === 0) return;
     for (const child of this.arrayChildren) {
       if (child) disconnectBindings([child.binding]);
     }
-    this.arrayChildren = [];
+    this.arrayChildren = emptyPartChildren;
   }
 
   private disconnectKeyedChildren(): void {
-    for (const child of this.keyedChildren) disconnectBindings([child.binding]);
-    this.keyedChildren = [];
+    if (this.keyedChildren.length === 0) return;
+    for (const child of this.keyedChildren) {
+      if (child.binding) disconnectBindings([child.binding]);
+      else child.part.disconnect();
+    }
+    this.keyedChildren = emptyKeyedChildren;
   }
 }
 
@@ -563,7 +757,9 @@ class AttributePart implements Part {
     return this.name.startsWith('.') && isNativeFormControl(this.element) ? 1 : 0;
   }
 
-  setValue(value: TemplateValue): void {
+  setValue(value: TemplateValue, assumeInPlace = false): void {
+    if (assumeInPlace && value === this.lastValue) return;
+
     if (this.name.startsWith('.')) {
       setElementProperty(this.element, this.name.slice(1), value);
       this.lastValue = value;
@@ -589,12 +785,12 @@ class AttributePart implements Part {
     }
 
     if (isEmptyValue(value)) {
-      if (getOwnedAttribute(this.element, this.name) !== null) {
+      if (assumeInPlace || this.lastValue === unsetValue || getOwnedAttribute(this.element, this.name) !== null) {
         removeOwnedAttribute(this.element, this.name);
       }
     } else {
       const serialized = serializeAttributeValue(this.name, value);
-      if (getOwnedAttribute(this.element, this.name) !== serialized) {
+      if (assumeInPlace || this.lastValue === unsetValue || getOwnedAttribute(this.element, this.name) !== serialized) {
         setOwnedAttribute(this.element, this.name, serialized);
       }
     }
@@ -906,7 +1102,22 @@ interface RootInstance {
 }
 
 const templateCache = new WeakMap<TemplateStringsArray, CompiledTemplate>();
-const containerInstances = new WeakMap<Element | DocumentFragment, RootInstance>();
+let lastTemplateStrings: TemplateStringsArray | undefined;
+let lastCompiledTemplate: CompiledTemplate | undefined;
+const rootInstanceProperty = Symbol('gluon.root-instance');
+type OwnedRoot = (Element | DocumentFragment) & { [rootInstanceProperty]?: RootInstance };
+
+function getRootInstance(container: Element | DocumentFragment): RootInstance | undefined {
+  return (container as OwnedRoot)[rootInstanceProperty];
+}
+
+function setRootInstance(container: Element | DocumentFragment, instance: RootInstance): void {
+  (container as OwnedRoot)[rootInstanceProperty] = instance;
+}
+
+function clearRootInstance(container: Element | DocumentFragment): void {
+  delete (container as OwnedRoot)[rootInstanceProperty];
+}
 
 export function render(
   result: TemplateResult,
@@ -918,29 +1129,39 @@ export function render(
   }
 
   const compiled = getCompiledTemplate(result);
-  const current = containerInstances.get(container);
+  const current = getRootInstance(container);
 
   if (
     current?.template === compiled
     && rootNodesAreInPlace(container, current.nodes)
   ) {
-    applyBindings(current.bindings, result.values);
-    current.nodes = [...container.childNodes];
+    const binding = current.bindings.length === 1 ? current.bindings[0] : undefined;
+    const value = binding && binding.index < result.values.length
+      ? result.values[binding.index]
+      : undefined;
+    if (binding && typeof value === 'string' && binding.part instanceof NodePart && !binding.directive) {
+      binding.part.setStringValue(value, true);
+    } else {
+      applyBindings(current.bindings, result.values);
+    }
+    if (!current.template.rootNodesStable && !rootNodesAreInPlace(container, current.nodes)) {
+      current.nodes = [...container.childNodes];
+    }
     current.suspended = false;
     return;
   }
 
   if (current) {
-    containerInstances.delete(container);
+    clearRootInstance(container);
     disconnectBindings(current.bindings);
   }
 
-  const fragment = compiled.element.content.cloneNode(true) as DocumentFragment;
+  const fragment = document.importNode(compiled.element.content, true);
   const bindings = instantiateBindings(fragment, compiled.descriptors);
   applyBindings(bindings, result.values);
   const nodes = [...fragment.childNodes];
   container.replaceChildren(fragment);
-  containerInstances.set(container, {
+  setRootInstance(container, {
     template: compiled,
     bindings,
     nodes,
@@ -951,7 +1172,7 @@ export function render(
 /** Temporarily releases active listeners, refs, and directive resources. */
 export function suspendRender(container: Element | DocumentFragment | null): void {
   if (!container) return;
-  const current = containerInstances.get(container);
+  const current = getRootInstance(container);
   if (!current || current.suspended) return;
   current.suspended = true;
   suspendBindings(current.bindings);
@@ -960,10 +1181,10 @@ export function suspendRender(container: Element | DocumentFragment | null): voi
 /** Permanently releases a render root and removes its renderer-owned DOM. */
 export function unmount(container: Element | DocumentFragment | null): void {
   if (!container) return;
-  const current = containerInstances.get(container);
+  const current = getRootInstance(container);
   try {
     if (current) {
-      containerInstances.delete(container);
+      clearRootInstance(container);
       disconnectBindings(current.bindings);
     }
   } finally {
@@ -972,8 +1193,14 @@ export function unmount(container: Element | DocumentFragment | null): void {
 }
 
 function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
+  if (result.strings === lastTemplateStrings && lastCompiledTemplate) return lastCompiledTemplate;
+
   const cached = templateCache.get(result.strings);
-  if (cached) return cached;
+  if (cached) {
+    lastTemplateStrings = result.strings;
+    lastCompiledTemplate = cached;
+    return cached;
+  }
 
   const element = document.createElement('template');
   const attributeNames = new Map<number, string>();
@@ -1018,8 +1245,11 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
     element,
     strings: result.strings,
     descriptors,
+    rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 1),
   };
   templateCache.set(result.strings, compiled);
+  lastTemplateStrings = result.strings;
+  lastCompiledTemplate = compiled;
   return compiled;
 }
 
@@ -1072,7 +1302,9 @@ function instantiateBindings(
   root: DocumentFragment,
   descriptors: readonly PartDescriptor[],
 ): Binding[] {
-  return descriptors.map((descriptor) => {
+  const bindings = new Array<Binding>(descriptors.length);
+  for (let descriptorIndex = 0; descriptorIndex < descriptors.length; descriptorIndex += 1) {
+    const descriptor = descriptors[descriptorIndex]!;
     const node = walkPath(root, descriptor.path);
     let part: Part;
 
@@ -1080,15 +1312,16 @@ function instantiateBindings(
     else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
     else part = new AttributePart(node as Element, descriptor.name);
 
-    return { index: descriptor.index, part };
-  });
+    bindings[descriptorIndex] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
+  }
+  return bindings;
 }
 
 function createChildInstance(
   result: TemplateResult,
   compiled = getCompiledTemplate(result),
 ): ChildInstance {
-  const fragment = compiled.element.content.cloneNode(true) as DocumentFragment;
+  const fragment = document.importNode(compiled.element.content, true);
   const bindings = instantiateBindings(fragment, compiled.descriptors);
   applyBindings(bindings, result.values);
   const nodes = [...fragment.childNodes];
@@ -1098,20 +1331,84 @@ function createChildInstance(
 function applyBindings(
   bindings: readonly Binding[],
   values: readonly TemplateValue[],
+  assumeInPlace = false,
 ): void {
+  if (bindings.length === 1 && bindings[0]!.priority === 0) {
+    applyBinding(bindings[0]!, bindings[0]!.index < values.length
+      ? values[bindings[0]!.index]!
+      : nothing, assumeInPlace);
+    return;
+  }
+
+  if (bindings.length === 2 && bindings[0]!.priority === 0 && bindings[1]!.priority === 0) {
+    const first = bindings[0]!;
+    const second = bindings[1]!;
+    const firstValue = first.index < values.length ? values[first.index]! : nothing;
+    const secondValue = second.index < values.length ? values[second.index]! : nothing;
+    if (
+      first.part instanceof AttributePart
+      && second.part instanceof NodePart
+      && !first.directive
+      && !second.directive
+      && !isDirectiveValue(firstValue)
+      && typeof secondValue === 'string'
+    ) {
+      first.part.setValue(firstValue, assumeInPlace);
+      second.part.setStringValue(secondValue, assumeInPlace);
+      return;
+    }
+    applyBinding(bindings[0]!, bindings[0]!.index < values.length
+      ? values[bindings[0]!.index]!
+      : nothing, assumeInPlace);
+    applyBinding(bindings[1]!, bindings[1]!.index < values.length
+      ? values[bindings[1]!.index]!
+      : nothing, assumeInPlace);
+    return;
+  }
+
+  let hasPriorityOne = false;
+  for (const binding of bindings) {
+    if (binding.priority === 1) {
+      hasPriorityOne = true;
+      break;
+    }
+  }
+
+  if (!hasPriorityOne) {
+    for (const binding of bindings) {
+      applyBinding(binding, binding.index < values.length ? values[binding.index]! : nothing, assumeInPlace);
+    }
+    return;
+  }
+
   for (const priority of [0, 1]) {
     for (const binding of bindings) {
-      if ((binding.part.commitPriority ?? 0) !== priority) continue;
-      const value = binding.index < values.length
-        ? values[binding.index]!
-        : nothing;
-      if (isDirectiveValue(value)) {
-        applyDirective(binding, value);
-      } else {
-        deactivateDirective(binding);
-        binding.part.setValue(value);
-      }
+      if (binding.priority !== priority) continue;
+      applyBinding(binding, binding.index < values.length ? values[binding.index]! : nothing, assumeInPlace);
     }
+  }
+}
+
+function applyBinding(binding: Binding, value: TemplateValue, assumeInPlace = false): void {
+  if (binding.part instanceof NodePart && !binding.directive) {
+    if (typeof value === 'string') {
+      binding.part.setStringValue(value, assumeInPlace);
+      return;
+    }
+    if (isTemplateResult(value)) {
+      binding.part.setTemplateResult(value, assumeInPlace);
+      return;
+    }
+    if (isRepeatResult(value)) {
+      binding.part.setRepeatResult(value);
+      return;
+    }
+  }
+  if (isDirectiveValue(value)) {
+    applyDirective(binding, value);
+  } else {
+    if (binding.directive) deactivateDirective(binding);
+    binding.part.setValue(value, assumeInPlace);
   }
 }
 
@@ -1254,6 +1551,18 @@ function pathFromRoot(root: Node, descendant: Node): number[] {
 }
 
 function walkPath(root: Node, path: readonly number[]): Node {
+  if (path.length === 1) {
+    const node = root.childNodes.item(path[0]!);
+    if (!node) throw new Error('A cached Gluon template path is no longer valid.');
+    return node;
+  }
+  if (path.length === 2) {
+    const parent = root.childNodes.item(path[0]!);
+    const node = parent?.childNodes.item(path[1]!);
+    if (!node) throw new Error('A cached Gluon template path is no longer valid.');
+    return node;
+  }
+
   let current = root;
   for (const index of path) {
     const next = current.childNodes.item(index);
@@ -1521,11 +1830,16 @@ function createContextualFragment(marker: Comment, markup: string): DocumentFrag
 
 function nodesAreInPlace(marker: Comment, nodes: readonly Node[]): boolean {
   let cursor = marker.nextSibling;
-  for (const node of nodes) {
+  for (let index = 0; index < nodes.length; index += 1) {
+    const node = nodes[index]!;
     if (node !== cursor) return false;
     cursor = cursor.nextSibling;
   }
   return true;
+}
+
+function moveNodesBefore(parent: Node, nodes: readonly Node[], reference: Node | null): void {
+  for (const node of nodes) parent.insertBefore(node, reference);
 }
 
 function collectNodesUntil(marker: Comment, boundary: Node | null): Node[] {
@@ -1542,8 +1856,14 @@ function rootNodesAreInPlace(
   container: Element | DocumentFragment,
   nodes: readonly Node[],
 ): boolean {
-  return container.childNodes.length === nodes.length
-    && nodes.every((node, index) => container.childNodes.item(index) === node);
+  if (nodes.length === 1) {
+    return container.childNodes.length === 1 && container.firstChild === nodes[0];
+  }
+  if (container.childNodes.length !== nodes.length) return false;
+  for (let index = 0; index < nodes.length; index += 1) {
+    if (container.childNodes.item(index) !== nodes[index]) return false;
+  }
+  return true;
 }
 
 function isEventListener(value: unknown): value is EventListenerOrEventListenerObject {
