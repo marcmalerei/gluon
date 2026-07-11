@@ -6,9 +6,9 @@ produce inspectable evidence, not to guarantee that one renderer wins.
 
 The runtime's measured hot paths include direct string-binding updates,
 direct insertion when a new part contains one node, fragment batching when it
-contains multiple nodes, one shared DOM traversal when cloned template bindings
-are instantiated, precomputed binding priorities, parallel key/value storage for
-keyed repeats, detached keyed-child anchors, and keyed-list fast paths for
+contains multiple nodes, one element/comment traversal for every cloned
+template's bindings, precomputed binding priorities, parallel key/value storage
+for keyed repeats, detached keyed-child anchors, and keyed-list fast paths for
 unchanged and reversed order. These shortcuts retain the external-DOM recovery
 and keyed-identity contracts covered by the browser suite.
 

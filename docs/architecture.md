@@ -221,7 +221,11 @@ documented in [Reactive Custom Elements](reactive-elements.md).
 
 `html` and `svg` return immutable-shape `TemplateResult` objects. A template is compiled once per `TemplateStringsArray` and cached in a `WeakMap`.
 
-Compilation stores direct child-node paths for every dynamic Part. Cloned templates instantiate Parts from those cached paths instead of walking the complete clone. Each descriptor also stores its original expression index, so DOM attribute ordering does not control value ordering.
+Compilation stores each dynamic Part's original expression index, direct
+child-node path, and element/comment traversal index. Cloned templates resolve
+all Parts in one `TreeWalker` pass ordered by traversal index, then place the
+resulting bindings back into expression-index order. DOM parser reparenting and
+attribute traversal therefore do not control value or hydration-marker order.
 
 The runtime currently has three Part types:
 

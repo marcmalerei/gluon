@@ -42,7 +42,29 @@ describe('DOM runtime contract', () => {
     }
   });
 
-  it('instantiates multiple element bindings and nested child parts in traversal order', () => {
+  it('instantiates bindings in DOM traversal order while retaining expression order', () => {
+    const root = document.createElement('div');
+    const view = (child: string, fostered: string) => html`
+      <table>${child}<div data-fostered=${fostered}></div></table>
+    `;
+
+    render(view('child-a', 'attribute-a'), root);
+    const table = root.querySelector('table')!;
+    const movedElement = root.querySelector('[data-fostered]') as HTMLElement;
+
+    expect([...root.children].map((element) => element.tagName)).toEqual(['DIV', 'TABLE']);
+    expect(table.textContent).toBe('child-a');
+    expect(movedElement.dataset.fostered).toBe('attribute-a');
+
+    render(view('child-b', 'attribute-b'), root);
+
+    expect(root.querySelector('table')).toBe(table);
+    expect(root.querySelector('[data-fostered]')).toBe(movedElement);
+    expect(table.textContent).toBe('child-b');
+    expect(movedElement.dataset.fostered).toBe('attribute-b');
+  });
+
+  it('instantiates multiple attributes on one element and nested child parts', () => {
     const root = document.createElement('div');
     const view = (first: string, second: string, child: string, value: string) => html`
       <section data-first=${first} aria-label=${second}>
