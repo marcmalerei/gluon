@@ -87,6 +87,13 @@ examples/shop/
 ├── src/styles.ts       Document-level constructable stylesheet design system
 ├── assets/             Production product and editorial imagery
 └── design/             Accepted concepts and verified browser renders
+
+examples/playground/
+├── src/app.ts          Editor, live preview, diagnostics, share, and reference UI
+├── src/project.ts      Stable URL-safe two-file reproduction transport
+├── src/archive.ts      Downloadable maintained starter tar generation
+├── src/styles.ts       Constructable Swiss-editorial developer-tool system
+└── design/             Accepted editor and diagnostic-reference concepts
 ```
 
 The current private package builds separate ESM entry points for `@gluonjs/core`,
