@@ -71,6 +71,8 @@ Gluon currently provides:
   cancellable transitions, keyed transition groups, and server descriptors
 - public black-box test fixtures with automatic cleanup, ownership diagnostics,
   isolated Router/Store factories, and deterministic scheduler controls
+- template/part source maps and official Vite integration with compatible
+  component, Custom Element, Store, and constructable stylesheet HMR
 - the first living GLUON GOODS reference-shop slice with public-package routes,
   responsive navigation, catalog, product configuration, search, and bag flows
 - constructable stylesheet creation and adopted stylesheet management
@@ -78,8 +80,8 @@ Gluon currently provides:
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide SSR, DOM hydration, SSG, Gluon-specific
-HMR, language tooling, Devtools, consumer test utilities, or a public release.
+The current repository does not provide SSR, DOM hydration, SSG, language
+tooling, Devtools, or a public release.
 
 ## Product principles
 

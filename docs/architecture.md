@@ -44,6 +44,14 @@ packages/store/
 └── src/index.ts        Definitions, managers, transactions, plugins, snapshots,
                         HMR, persistence, and testing isolation
 
+packages/compiler/
+└── src/index.ts        Template/part locations, diagnostics, source maps, and
+                        development transform insertion
+
+packages/vite/
+├── src/index.ts        Vite project boundary, compiler integration, virtual client
+└── src/client.ts       Stable development identities and runtime refresh bridge
+
 packages/test-utils/
 └── src/index.ts        Public component fixtures, cleanup, Router/Store isolation,
                         scheduler controls, and leak diagnostics
@@ -84,6 +92,29 @@ exports. Each fixture owns a real application root and records its cleanup
 boundary; Router histories and Store managers are factory-created per test.
 The package's black-box and ownership rules are documented in its
 [package guide](../packages/test-utils/README.md).
+
+## Vite transform and HMR boundary
+
+`@gluonjs/compiler` parses application TypeScript or JavaScript and records the
+original `html`/`css` template boundaries and expression offsets. Its
+high-resolution map remains chained through Vite, so a generated runtime
+location resolves to the author module and expression. The compiler does not
+replace Gluon's public runtime template format.
+
+`@gluonjs/vite` transforms application modules inside the resolved Vite root.
+Development transforms route exported functions, Store definitions,
+`defineElement()` registration, and `css` results through one virtual client.
+That client keeps identities by normalized module URL and transform key. Store
+managers receive their public `hotUpdate()` path; adopted sheets retain their
+object identity while `replaceSync()` changes CSSOM contents; mounted
+applications and connected elements receive scheduler-owned render requests.
+
+The first registered Custom Element constructor remains the registry value.
+Compatible edits patch its prototype and static contracts. Tag, superclass,
+form association, constructor/instance-field initialization, property/attribute
+schema, and component stylesheet-count changes invalidate the boundary and
+require a reload. Production transforms omit the virtual client, hot handlers,
+and module keys and define Core's render-debug flag as false.
 
 The GLUON GOODS reference shop consumes only public package names in
 application source. Its monorepo Vite and test aliases resolve those names to

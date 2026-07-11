@@ -22,6 +22,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - modal initial focus, keyboard focus containment, and focus restoration
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
+- official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR
 
 Async UI is part of Core because it composes renderer Parts and application
 ownership directly. Universal HTML rendering and hydration remain pending in
@@ -39,7 +40,10 @@ npm run measure:shop
 `dev:shop` starts the Vite development server on `0.0.0.0:4173`; Vite prints the
 available local and LAN URLs. The monorepo Vite configuration maps official
 package names to workspace sources; shop application files import public
-package entry points only.
+package entry points only. The same configuration installs `@gluonjs/vite`.
+Compatible edits to exported page/components, the shop Store definition, and
+`shopStyles` update without a full reload; public-schema or constructor changes
+use the documented reload boundary.
 
 ## Design system
 
