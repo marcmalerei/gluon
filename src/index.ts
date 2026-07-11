@@ -114,6 +114,28 @@ export {
 } from './props.js';
 
 export {
+  AsyncTimeoutError,
+  KeepAlive,
+  Suspense,
+  Teleport,
+  Transition,
+  TransitionGroup,
+  defineAsyncComponent,
+  getBuiltinServerContract,
+  type AsyncComponent,
+  type AsyncComponentOptions,
+  type AsyncLoadContext,
+  type AsyncSource,
+  type BuiltinServerContract,
+  type KeepAliveProps,
+  type SuspenseProps,
+  type TeleportProps,
+  type TransitionGroupProps,
+  type TransitionOptions,
+  type TransitionProps,
+} from './builtins.js';
+
+export {
   adoptStyles,
   createStyleSheet,
   css,

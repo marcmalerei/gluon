@@ -1,12 +1,19 @@
 import {
   GluonElement,
+  KeepAlive,
+  Suspense,
+  Teleport,
+  Transition,
+  TransitionGroup,
   createApp,
   createInjectionKey,
   directive,
+  defineAsyncComponent,
   dynamicComponent,
   elementRef,
   event,
   exposedRef,
+  getBuiltinServerContract,
   getPublicInstance,
   html,
   model,
@@ -44,6 +51,36 @@ const keyed: RepeatResult = repeat(
 );
 
 html`<section>${keyed}</section>`;
+
+const asyncGreeting = defineAsyncComponent<{ name: string }>({
+  loader: async ({ signal, attempt }) => {
+    signal.aborted;
+    attempt.toFixed();
+    return ({ name }) => html`<p>Hello ${name}</p>`;
+  },
+  loading: ({ name }) => html`<p>Loading ${name}</p>`,
+  error: (error, retry, { name }) => html`<button @click=${retry}>${name}${String(error)}</button>`,
+  delay: 10,
+  timeout: 1_000,
+});
+const asyncView: TemplateValue = asyncGreeting({ name: 'Ada' });
+const serverContract = getBuiltinServerContract(asyncView);
+if (serverContract?.kind === 'suspense') void serverContract.resolve();
+void asyncGreeting.preload();
+asyncGreeting.reset();
+Suspense({
+  source: async ({ signal }) => signal.aborted ? 'stopped' : 'ready',
+  fallback: 'Loading',
+  children: (value) => html`<p>${value.toUpperCase()}</p>`,
+});
+Teleport({ to: document.body, children: asyncView });
+KeepAlive({ cacheKey: 'route:/', max: 4, children: asyncView });
+Transition({ transitionKey: 'open', children: asyncView, reducedMotion: 'system' });
+TransitionGroup({
+  items: rows,
+  key: (row) => row.id,
+  children: (row) => html`<p>${row.label}</p>`,
+});
 
 const lifecycleDefinition: DirectiveLifecycle<[string]> = {
   mount(part, [value]) {
@@ -191,5 +228,9 @@ event(() => undefined, { capture: 'yes' });
 
 // @ts-expect-error unsafe URLs accept strings or URL objects
 unsafeURL(42);
+// @ts-expect-error async component props retain their declared type
+asyncGreeting({ name: 42 });
+// @ts-expect-error KeepAlive cache sizes are numeric
+KeepAlive({ cacheKey: 'route', max: 'four', children: '' });
 // @ts-expect-error injection keys retain their value type
 application.provide(counterKey, { count: 'invalid' });

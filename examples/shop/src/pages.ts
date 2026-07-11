@@ -1,4 +1,4 @@
-import { html, repeat, type TemplateValue } from '@gluonjs/core';
+import { Suspense, html, repeat, type AsyncLoadContext, type TemplateValue } from '@gluonjs/core';
 import { RouterLink, useRoute } from '@gluonjs/router';
 import {
   categories,
@@ -164,6 +164,7 @@ function ProductConfigurator(product: Product, store: ShopStore): TemplateValue 
         <div><h1 id="product-title">${product.name}</h1><p>${product.description}</p></div>
         <strong>${formatPrice(product.price)}</strong>
       </div>
+      ${InventoryStatus(product)}
       ${ChoiceGroup(store, 'Finish', 'finish', ['Graphite', 'Cobalt', 'Bone'])}
       ${ChoiceGroup(store, 'Light temperature', 'temperature', ['Warm 2700K', 'Clear 3200K'])}
       ${ChoiceGroup(store, 'Cable length', 'cable', ['1.5 m', '2.5 m'])}
@@ -180,6 +181,50 @@ function ProductConfigurator(product: Product, store: ShopStore): TemplateValue 
       </ul>
     </section>
   `;
+}
+
+interface InventoryResult {
+  readonly label: string;
+  readonly dispatch: string;
+}
+
+const inventoryCache = new Map<string, InventoryResult>();
+
+function InventoryStatus(product: Product): TemplateValue {
+  return html`<div class="inventory-status" role="status" aria-live="polite">${Suspense({
+    source: (context) => loadInventory(product, context),
+    sourceKey: product.slug,
+    fallback: html`<span class="inventory-pending">Checking workshop availability…</span>`,
+    delay: 50,
+    timeout: 2_000,
+    children: (inventory) => html`
+      <span class=${`inventory-dot inventory-${product.availability}`} aria-hidden="true"></span>
+      <span>${inventory.label} · dispatches in ${inventory.dispatch}</span>
+    `,
+    error: (_error, retry) => html`
+      <span>Availability could not be checked.</span>
+      <button class="inline-link inventory-retry" type="button" @click=${retry}>Retry</button>
+    `,
+  })}</div>`;
+}
+
+function loadInventory(product: Product, { signal }: AsyncLoadContext): Promise<InventoryResult> {
+  const cached = inventoryCache.get(product.slug);
+  if (cached) return Promise.resolve(cached);
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      const result = {
+        label: product.availability === 'in-stock' ? 'In stock' : 'Low stock',
+        dispatch: product.dispatch,
+      };
+      inventoryCache.set(product.slug, result);
+      resolve(result);
+    }, 320);
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(new DOMException('Inventory request aborted.', 'AbortError'));
+    }, { once: true });
+  });
 }
 
 function ChoiceGroup<Key extends keyof ProductConfiguration>(

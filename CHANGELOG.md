@@ -39,12 +39,20 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - The DOM-free `@gluonjs/store` package with inferred state, computed getters,
   actions, inspectable transactions, plugins, safe server snapshots,
   compatible-state HMR, persistence adapters, and isolated testing managers.
+- Core async boundaries and components with loading, nested fallback, timeout,
+  retry, abort, router preload, and explicit server-renderer descriptors.
+- Application-owned Teleport hosts, LRU KeepAlive view caching, cancellable
+  element/component transitions, and keyed FLIP transition groups with
+  reduced-motion behavior.
 - The living mobile-first GLUON GOODS reference shop with responsive
   navigation, catalog and product routes, configurable products, search, a
   reactive bag, generated product imagery, adopted stylesheet-only design, and
   a repository rule requiring applicable Gluon features to grow the same app.
 - GLUON GOODS now owns one official Store instance per application and persists
   configured bag lines without sharing transient UI state between applications.
+- GLUON GOODS now checks typed product availability asynchronously, caches route
+  views, teleports and transitions its accessible bag, and animates keyed bag
+  line changes through public Core APIs.
 - MIT licensing authorized by Marc Malerei.
 - Package topology, release governance, and supply-chain requirements.
 - A machine-readable package contract with independent export validation.
