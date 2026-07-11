@@ -350,7 +350,8 @@ must be removed after successful adoption; they are not a client runtime fallbac
 
 ## Quark DX
 
-The Tiny-Lit snapshot contained more than one hundred nearly identical per-tag Quark modules. Gluon replaces them with one typed proxy:
+Gluon exposes native HTML tags through one typed Quark proxy instead of
+maintaining a separate module for every tag:
 
 ```ts
 q.button({ children: 'Save' });
