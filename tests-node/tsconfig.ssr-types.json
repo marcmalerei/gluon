@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@gluonjs/core": ["dist/types/index.d.ts"],
+      "@gluonjs/reactivity": ["packages/reactivity/dist/index.d.ts"],
+      "@gluonjs/router": ["packages/router/dist/index.d.ts"],
+      "@gluonjs/router/memory": ["packages/router/dist/memory.d.ts"],
+      "@gluonjs/store": ["packages/store/dist/index.d.ts"]
+    }
+  },
+  "include": ["ssr.types.ts"]
+}

@@ -1,0 +1,31 @@
+import { resolve } from 'node:path';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
+      '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
+      '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),
+      '@gluonjs/ssr/streaming': resolve(import.meta.dirname, 'packages/ssr/src/streaming.ts'),
+      '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
+      '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
+    },
+  },
+  test: {
+    environment: 'node',
+    include: ['tests-node/ssr.spec.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['packages/ssr/src/**/*.ts'],
+      reportsDirectory: 'coverage/ssr',
+      reporter: ['text', 'html'],
+      thresholds: {
+        statements: 90,
+        branches: 85,
+        functions: 90,
+        lines: 90,
+      },
+    },
+  },
+});

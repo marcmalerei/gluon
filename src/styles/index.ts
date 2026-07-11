@@ -1,18 +1,38 @@
 export type StyleTarget = Document | ShadowRoot;
 export type CssValue = string | number;
 
+const serverStyleSheetBrand = Symbol('gluon.server-style-sheet');
+
+interface ServerStyleSheet {
+  readonly [serverStyleSheetBrand]: true;
+  readonly cssText: string;
+}
+
 /** Creates a constructable stylesheet. Gluon intentionally has no `<style>` fallback. */
 export function createStyleSheet(cssText: string): CSSStyleSheet {
   if (typeof CSSStyleSheet === 'undefined' || !('replaceSync' in CSSStyleSheet.prototype)) {
-    throw new Error(
-      'Gluon requires constructable CSSStyleSheet support. '
-      + 'No <style> fallback is provided by design.',
-    );
+    if (typeof document !== 'undefined') {
+      throw new Error(
+        'Gluon requires constructable CSSStyleSheet support. '
+        + 'No <style> fallback is provided by design.',
+      );
+    }
+    return Object.freeze({
+      [serverStyleSheetBrand]: true as const,
+      cssText,
+    }) as unknown as CSSStyleSheet;
   }
 
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(cssText);
   return sheet;
+}
+
+/** Returns serializable CSS for server-created descriptors or browser sheets. */
+export function getStyleSheetText(sheet: CSSStyleSheet): string {
+  const serverSheet = sheet as unknown as Partial<ServerStyleSheet>;
+  if (serverSheet[serverStyleSheetBrand]) return serverSheet.cssText ?? '';
+  return [...sheet.cssRules].map((rule) => rule.cssText).join('\n');
 }
 
 /** Tagged-template helper that returns a constructable stylesheet. */

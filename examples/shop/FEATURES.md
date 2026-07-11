@@ -15,4 +15,4 @@
 | `TransitionGroup` | Keyed bag line insertion/removal/movement | Built-ins identity/reduced-motion suite + shop bag flow | Integrated |
 | `@gluonjs/test-utils` | Acceptance infrastructure only; it has no honest customer-facing shop surface | Package browser/type contracts; shop remains on its production app API | Integrated as test infrastructure |
 | `@gluonjs/vite` | Shop development/build pipeline; compatible page, Store, Custom Element, and adopted stylesheet edits retain live state | Compiler contracts + real Vite/Chromium HMR flow + production-bundle scan | Integrated as build infrastructure |
-| SSR and hydration | Deep product URL server response and hydration | Issues #35–#37 | Pending packages |
+| `@gluonjs/ssr` | Isolated deep product URL server response using the same routes, Store, pages, and async inventory | DOM-free SSR contract + GLUON GOODS deep-product Node assertion | Integrated server rendering; hydration/styles pending #36–#37 |

@@ -112,7 +112,7 @@ export function CategoryLinks(): TemplateValue {
 
 export function BagOverlay(store: ShopStore): TemplateValue {
   return Teleport({
-    to: document.body,
+    to: 'body',
     children: Transition({
       duration: 140,
       transitionKey: store.bagOpen ? 'open' : 'closed',
