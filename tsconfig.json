@@ -10,7 +10,8 @@
       "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
       "@gluonjs/router": ["packages/router/src/index.ts"],
       "@gluonjs/router/memory": ["packages/router/src/memory.ts"],
-      "@gluonjs/store": ["packages/store/src/index.ts"]
+      "@gluonjs/store": ["packages/store/src/index.ts"],
+      "@gluonjs/test-utils": ["packages/test-utils/src/index.ts"]
     },
     "types": ["node"],
     "strict": true,
@@ -27,6 +28,7 @@
     "examples/**/*.ts",
     "vite.config.ts",
     "vitest.reactivity.config.ts",
-    "vitest.store.config.ts"
+    "vitest.store.config.ts",
+    "vitest.test-utils.config.ts"
   ]
 }
