@@ -25,7 +25,7 @@
       "directory": "packages/compiler",
       "state": "current",
       "environment": "universal",
-      "exports": ["."],
+      "exports": [".", "./diagnostics"],
       "dependencies": []
     },
     {

@@ -223,7 +223,7 @@ editing, testing, debugging, and production building.
 | [#31](https://github.com/marcmalerei/gluon/issues/31) | Shared template analyzer, LSP server, CI checker, and VS Code client are implemented. |
 | [#32](https://github.com/marcmalerei/gluon/issues/32) | Versioned Devtools protocol, opt-in runtime bridge, Vite integration, and browser inspector are implemented. |
 | [#33](https://github.com/marcmalerei/gluon/issues/33) | Build `@gluonjs/test-utils`. |
-| [#34](https://github.com/marcmalerei/gluon/issues/34) | Build the Gluon playground and diagnostic reference. |
+| [#34](https://github.com/marcmalerei/gluon/issues/34) | Shareable Playground, downloadable starters, and versioned searchable diagnostic reference are implemented. |
 
 ### Exit gate
 

@@ -7,9 +7,11 @@
     "baseUrl": ".",
     "paths": {
       "@gluonjs/compiler": ["packages/compiler/src/index.ts"],
+      "@gluonjs/compiler/diagnostics": ["packages/compiler/src/diagnostics.ts"],
       "@gluonjs/core": ["src/index.ts"],
       "@gluonjs/devtools": ["packages/devtools/src/index.ts"],
       "@gluonjs/devtools-api": ["packages/devtools-api/src/index.ts"],
+      "@gluonjs/language-server": ["packages/language-server/src/index.ts"],
       "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
       "@gluonjs/router": ["packages/router/src/index.ts"],
       "@gluonjs/router/memory": ["packages/router/src/memory.ts"],

@@ -9,6 +9,10 @@ The compiler does not turn templates into a private renderer format. Runtime
 templates continue to use the public `html` and `css` APIs. Production
 transforms retain source mappings and diagnostics without adding HMR imports.
 
+The public `@gluonjs/compiler/diagnostics` entry contains the versioned,
+environment-neutral catalog used by the Language Server, Playground, Devtools
+reference, compact production codes, and generated JSON documentation.
+
 Inline `<style>` elements in `html` templates produce
 `GLUON_TEMPLATE_STYLE_ELEMENT`; Gluon browser styling uses constructable
 stylesheets and `adoptedStyleSheets` only.

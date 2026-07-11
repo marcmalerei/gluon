@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { transformGluonModule } from '@gluonjs/compiler';
+import { getGluonDiagnostic, transformGluonModule } from '@gluonjs/compiler';
 
 export type TemplateDiagnosticCode =
   | 'GLUON_TEMPLATE_ARIA_UNKNOWN'
@@ -374,6 +374,7 @@ function staticKeys(declaration: ts.ClassLikeDeclaration | undefined, name: stri
 }
 
 function diagnostic(code: TemplateDiagnosticCode, message: string, start: number, end: number, source: ts.SourceFile): TemplateDiagnostic {
+  if (!getGluonDiagnostic(code)) throw new Error(`GLUON_DIAGNOSTIC_CATALOG_MISSING: ${code}`);
   return Object.freeze({ code, message, range: rangeAt(source, start, end), severity: 1, source: 'gluon' });
 }
 

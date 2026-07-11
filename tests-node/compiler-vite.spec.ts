@@ -5,7 +5,13 @@ import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
 import { chromium, type Browser } from 'playwright';
 import { afterEach, describe, expect, it } from 'vitest';
 import { build, createServer, type Rollup } from 'vite';
-import { transformGluonModule } from '@gluonjs/compiler';
+import {
+  formatGluonDiagnostic,
+  getGluonDiagnostic,
+  gluonDiagnosticCatalog,
+  gluonDiagnosticReferenceUrl,
+  transformGluonModule,
+} from '@gluonjs/compiler';
 import gluon from '@gluonjs/vite';
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -21,6 +27,21 @@ afterEach(async () => {
 });
 
 describe('@gluonjs/compiler', () => {
+  it('resolves, formats, and links the public diagnostic catalog', () => {
+    const definition = gluonDiagnosticCatalog[0]!;
+    expect(getGluonDiagnostic(definition.code)).toBe(definition);
+    expect(getGluonDiagnostic(definition.compactCode)).toBe(definition);
+    expect(getGluonDiagnostic('GLUON_UNKNOWN')).toBeUndefined();
+    expect(formatGluonDiagnostic(definition.code)).toContain(definition.summary);
+    expect(formatGluonDiagnostic(definition.code, 'detail')).toBe(`${definition.code}: detail`);
+    expect(formatGluonDiagnostic(definition.code, '', { production: true })).toBe(definition.compactCode);
+    expect(formatGluonDiagnostic(definition.code, 'detail', { production: true })).toBe(`${definition.compactCode}: detail`);
+    expect(formatGluonDiagnostic('GLUON_UNKNOWN')).toBe('GLUON_UNKNOWN');
+    expect(formatGluonDiagnostic('GLUON_UNKNOWN', 'detail')).toBe('GLUON_UNKNOWN: detail');
+    expect(gluonDiagnosticReferenceUrl(definition.compactCode, '/reference/')).toContain(`/0.0.0/${definition.code}`);
+    expect(gluonDiagnosticReferenceUrl('GLUON UNKNOWN')).toMatch(/\/GLUON%20UNKNOWN$/);
+  });
+
   it('maps template expressions and adds development-only stable identities', () => {
     const id = '/app/product-card.ts';
     const source = [
