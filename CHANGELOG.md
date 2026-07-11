@@ -81,6 +81,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   comparison with identical-output tests, calibrated interleaved samples,
   Chromium/Firefox/WebKit evidence, exact environment metadata, raw results,
   and an interactive browser demonstration.
+- A machine-readable release contract, lockstep candidate validator,
+  reproducible package-content digests, SPDX 2.3 and CycloneDX 1.7 SBOMs,
+  pinned-schema validation, immutable compatibility manifests, SHA-256
+  manifests, SHA-pinned workflow actions, OIDC artifact attestation,
+  recoverable staged-tag npm trusted publication, interactive-2FA `latest`
+  promotion, and clean-room registry verification.
 
 ### Changed
 
