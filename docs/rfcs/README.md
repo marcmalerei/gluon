@@ -9,6 +9,7 @@ accepted RFC without a superseding RFC.
 | [0001](0001-gluon-1.0-product-scope.md) | Accepted | Gluon 1.0 product scope and non-goals |
 | [0002](0002-unified-component-model.md) | Accepted | Unified component and Custom Element model |
 | [0003](0003-report-only-vue-migration-analyzer.md) | Accepted | Bounded, static, report-only Vue migration analysis |
+| [0004](0004-template-native-functional-composition.md) | Accepted | Template-native functional-component composition through `compose()` |
 
 ## Process
 

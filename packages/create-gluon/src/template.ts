@@ -125,7 +125,7 @@ function indexHtml(name: string): string {
 
 function appSource(features: GluonFeatures): string {
   const imports = [
-    "import { createApp, html, type GluonApp } from '@gluonjs/core';",
+    "import { compose, createApp, html, type GluonApp } from '@gluonjs/core';",
     features.ui ? "import { Button } from '@gluonjs/atoms';" : '',
     features.router
       ? "import { RouterLink, RouterView, createRouterPlugin, type Router } from '@gluonjs/router';"
@@ -150,8 +150,8 @@ function appSource(features: GluonFeatures): string {
     : '';
   const navigation = features.router
     ? `      <nav aria-label="Primary">
-        \${RouterLink({ to: '/', children: 'Home' })}
-        \${RouterLink({ to: '/about', children: 'About' })}
+        \${compose(RouterLink, { to: '/' })\`Home\`}
+        \${compose(RouterLink, { to: '/about' })\`About\`}
       </nav>`
     : '';
   const content = features.router

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  compose,
   createApp,
   createInjectionKey,
   defineElement,
@@ -26,6 +27,20 @@ import { hydrateShop } from '../examples/shop/src/hydrate.js';
 import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
 
 describe('SSR hydration', () => {
+  it('retains the server DOM produced by a composed functional template', async () => {
+    const Panel = (props: { readonly title: string; readonly children: import('@gluonjs/core').TemplateValue }) => html`
+      <section><h2>${props.title}</h2>${props.children}</section>
+    `;
+    const value = html`${compose(Panel, { title: 'Checkout' })`<button>Pay</button>`}`;
+    const prepared = await prepareForHydration(value);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const section = root.querySelector('section');
+    const result = await hydrateTemplate(value, root);
+    expect(result.retained).toBe(true);
+    expect(root.querySelector('section')).toBe(section);
+  });
+
   it('retains matching nodes while activating refs, events, context, and reactive updates', async () => {
     const label = ref('Server');
     const key = createInjectionKey<string>('hydration-context');

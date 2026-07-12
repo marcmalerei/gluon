@@ -1,14 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   adoptStyles,
+  Suspense,
   createStyleSheet,
   css,
+  compose,
   defineAtom,
+  elementRef,
   html,
   installGluonStyles,
   mergeProps,
+  model,
+  repeat,
   render,
 } from '../src/index.js';
+import { ref } from '@gluonjs/reactivity';
 import { Button, Icon } from '@gluonjs/atoms';
 import { Card, FormField } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
@@ -102,6 +108,50 @@ describe('component variants and utilities', () => {
     expect(root.querySelector('.gluon-app-shell-navigation')).toBeNull();
     expect(root.querySelector('.gluon-app-shell-footer')).toBeNull();
     expect(unnamed.displayName).toBe('AnonymousComponent');
+  });
+
+  it('composes typed functional components with an HTML template body and no host boundary', () => {
+    const root = document.createElement('div');
+    const direct = AppShell({
+      header: 'GLUON GOODS',
+      children: Card({ title: 'Checkout', children: html`<button>Pay</button>` }),
+    });
+    const composed = compose(AppShell, { header: 'GLUON GOODS' })`${compose(Card, { title: 'Checkout' })`<button>Pay</button>`}`;
+
+    render(html`<section id="direct">${direct}</section><section id="composed">${composed}</section>`, root);
+
+    expect(root.querySelector('#composed')?.textContent).toBe(root.querySelector('#direct')?.textContent);
+    expect(root.querySelector('#composed')?.querySelectorAll('.gluon-app-shell')).toHaveLength(1);
+    expect(root.querySelector('#composed')?.querySelectorAll('.gluon-card')).toHaveLength(1);
+  });
+
+  it('keeps named/scoped content, callbacks, spreads, models, refs, conditions, keys, and async bodies on public contracts', async () => {
+    const input = ref('Ada');
+    const inputRef = elementRef<HTMLInputElement>();
+    const save = vi.fn();
+    const Panel = (props: {
+      readonly actions: import('../src/index.js').TemplateValue;
+      readonly row: import('../src/index.js').ScopedSlot<{ label: string }>;
+      readonly children: import('../src/index.js').TemplateValue;
+    }) => html`<section>${props.children}${props.row({ label: 'Scoped' })}${props.actions}</section>`;
+    const view = compose(Panel, {
+      actions: html`<button @click=${save}>Save</button>`,
+      row: ({ label }) => html`<strong>${label}</strong>`,
+    })`
+      <input ...=${{ ...model(input), ref: inputRef }}>
+      ${true ? html`<span>Conditional</span>` : null}
+      ${repeat([{ id: 'one', label: 'Keyed' }], (item) => item.id, (item) => html`<i>${item.label}</i>`)}
+      ${Suspense({ source: Promise.resolve('Async'), fallback: 'Loading', children: (value) => html`<em>${value}</em>` })}
+    `;
+    const root = document.createElement('div');
+    render(html`${view}`, root);
+    expect(inputRef.value?.value).toBe('Ada');
+    expect(root.textContent).toContain('Conditional');
+    expect(root.textContent).toContain('Keyed');
+    expect(root.textContent).toContain('ScopedSave');
+    root.querySelector<HTMLButtonElement>('button')?.click();
+    expect(save).toHaveBeenCalledOnce();
+    await vi.waitFor(() => expect(root.querySelector('em')?.textContent).toBe('Async'));
   });
 
   it('validates quark names and caches fragment templates', () => {

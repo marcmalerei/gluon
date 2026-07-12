@@ -4,6 +4,7 @@
 | --- | --- | --- | --- |
 | Application runtime and plugin context | Isolated shop mount and Router plugin | `tests/shop-example.spec.ts` | Integrated |
 | HTML templates and attribute spreading | Every page and reusable control | Core renderer suite + shop browser test | Integrated |
+| Core `compose()` template-native functional composition | Wordmark, desktop/mobile navigation, product cards, category discovery, bag actions, and home call-to-action use typed `RouterLink` props with native HTML bodies | Core type/browser + compiler/Vite + language-server + SSR + `tests/shop-example.spec.ts` + retained DX comparison | Integrated into existing customer flows |
 | Core `render()` single-node insertion and single-pass binding instantiation | Dynamic product, bag, delivery, and order templates throughout the existing customer journey | Direct-vs-fragment and parser-reordered traversal regressions + retained rendering comparison + shop performance budgets | Integrated renderer optimization |
 | Standalone reactivity | Bag, configuration, search, and navigation UI state | `tests/shop-example.spec.ts` | Integrated |
 | Router histories and links | Home, catalog, product deep links, active navigation | Router suite + shop browser test | Integrated |

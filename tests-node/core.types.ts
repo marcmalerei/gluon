@@ -7,6 +7,7 @@ import {
   TransitionGroup,
   createApp,
   createInjectionKey,
+  compose,
   directive,
   defineAsyncComponent,
   dynamicComponent,
@@ -42,6 +43,32 @@ interface Row {
   readonly id: string;
   readonly label: string;
 }
+
+interface PanelProps {
+  readonly title: string;
+  readonly onClose: (event: MouseEvent) => void;
+  readonly actions?: TemplateValue;
+  readonly children: TemplateValue;
+}
+
+function Panel(props: PanelProps): TemplateValue {
+  return html`<section><h2>${props.title}</h2>${props.children}</section>`;
+}
+
+compose(Panel, {
+  title: 'Checkout',
+  onClose: (event) => event.preventDefault(),
+  actions: html`<button>Save</button>`,
+})`<p>Delivery</p>`;
+Panel({ title: 'Direct', onClose: () => undefined, children: 'Still callable' });
+// @ts-expect-error required title remains required at the author call
+compose(Panel, { onClose: () => undefined })`missing title`;
+// @ts-expect-error callback types remain checked at the author call
+compose(Panel, { title: 'Invalid', onClose: (value: string) => value })`bad callback`;
+// @ts-expect-error unknown props remain checked at the author call
+compose(Panel, { title: 'Invalid', onClose: () => undefined, unknown: true })`bad prop`;
+// @ts-expect-error only components with TemplateValue children accept a template body
+compose((props: { readonly label: string }) => html`<p>${props.label}</p>`, { label: 'No children' })`invalid content`;
 
 const rows: readonly Row[] = [{ id: 'first', label: 'First' }];
 const keyed: RepeatResult = repeat(

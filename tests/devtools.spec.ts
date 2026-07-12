@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { GluonElement, defineElement, html } from '../src/index.js';
+import { GluonElement, compose, defineElement, html, render, type TemplateValue } from '../src/index.js';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   GLUON_DEVTOOLS_GLOBAL,
@@ -12,6 +12,27 @@ const cleanups: Array<() => void> = [];
 afterEach(() => { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); });
 
 describe('Gluon Devtools browser bridge', () => {
+  test('observes the same component tree for direct and composed functional output', async () => {
+    class ComposeLeaf extends GluonElement {
+      protected override render() { return html`<span>Leaf</span>`; }
+    }
+    if (!customElements.get('devtools-compose-leaf')) defineElement('devtools-compose-leaf', ComposeLeaf);
+    const Panel = (props: { readonly children: TemplateValue }) => html`<section>${props.children}</section>`;
+    const direct = document.createElement('div');
+    const composed = document.createElement('div');
+    document.body.append(direct, composed);
+    cleanups.push(() => { direct.remove(); composed.remove(); });
+    render(html`${Panel({ children: html`<devtools-compose-leaf></devtools-compose-leaf>` })}`, direct);
+    render(html`${compose(Panel, {})`<devtools-compose-leaf></devtools-compose-leaf>`}`, composed);
+    await nextTick();
+    const bridge = createDevtoolsBridge({ enabled: true });
+    cleanups.push(() => bridge.dispose());
+    bridge.registerApplication({ id: 'direct', app: { mounted: true }, root: direct });
+    bridge.registerApplication({ id: 'composed', app: { mounted: true }, root: composed });
+    const trees = bridge.snapshot().applications.map((application) => application.components.map((component) => component.name));
+    expect(trees).toEqual([['devtools-compose-leaf'], ['devtools-compose-leaf']]);
+  });
+
   test('is inert by default and never exposes a production global', () => {
     const globalObject: Record<string, unknown> = {};
     const bridge = createDevtoolsBridge({ exposeGlobal: true, globalObject });

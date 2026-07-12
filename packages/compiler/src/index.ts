@@ -11,7 +11,7 @@ export {
   type GluonDiagnosticSource,
 } from './diagnostics.js';
 
-export type GluonTemplateTag = 'html' | 'css';
+export type GluonTemplateTag = 'html' | 'css' | 'compose';
 
 export interface SourceLocation {
   readonly offset: number;
@@ -84,6 +84,7 @@ export function transformGluonModule(
   );
   const transforms = collectImportedTransforms(sourceFile);
   const htmlTags = collectImportedNames(sourceFile, '@gluonjs/core', 'html');
+  const composeTags = collectImportedNames(sourceFile, '@gluonjs/core', 'compose');
   const magic = new MagicString(code);
   const templates: GluonTemplateLocation[] = [];
   const diagnostics: GluonCompilerDiagnostic[] = [];
@@ -92,12 +93,16 @@ export function transformGluonModule(
   let changed = false;
 
   const visit = (node: ts.Node): void => {
-    if (ts.isTaggedTemplateExpression(node) && ts.isIdentifier(node.tag)) {
-      const kind = transforms.get(node.tag.text);
-      if (kind === 'style' || htmlTags.has(node.tag.text)) {
-        const tag: GluonTemplateTag = kind === 'style' ? 'css' : 'html';
+    if (ts.isTaggedTemplateExpression(node)) {
+      const identifierTag = ts.isIdentifier(node.tag) ? node.tag : undefined;
+      const compositionTag = ts.isCallExpression(node.tag)
+        && ts.isIdentifier(node.tag.expression)
+        && composeTags.has(node.tag.expression.text);
+      const kind = identifierTag ? transforms.get(identifierTag.text) : undefined;
+      if (kind === 'style' || (identifierTag && htmlTags.has(identifierTag.text)) || compositionTag) {
+        const tag: GluonTemplateTag = kind === 'style' ? 'css' : compositionTag ? 'compose' : 'html';
         templates.push(templateLocation(sourceFile, node, tag));
-        if (tag === 'html') {
+        if (tag !== 'css') {
           const templateText = node.template.getText(sourceFile);
           const styleOffset = templateText.search(/<style(?:\s|>)/i);
           if (styleOffset >= 0) {

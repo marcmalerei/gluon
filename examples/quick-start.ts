@@ -1,5 +1,6 @@
 import {
   adoptStyles,
+  compose,
   foundationStyles,
   layerOrderStyles,
   render,
@@ -18,18 +19,15 @@ adoptStyles(
   organismStyles,
 );
 
-render(AppShell({
+render(compose(AppShell, {
   header: q.h1({ children: 'Gluon' }),
   navigation: q.a({ href: '#welcome', children: 'Welcome' }),
-  children: Card({
+})`
+  ${compose(Card, {
     title: 'Native interface layers',
-    children: q.p({
-      id: 'welcome',
-      children: 'Quarks compose into Atoms, Molecules, and Organisms.',
-    }),
     actions: Button({
       label: 'Continue',
       onClick: () => console.log('Continue'),
     }),
-  }),
-}), document.body);
+  })`<p id="welcome">Quarks compose into Atoms, Molecules, and Organisms.</p>`}
+`, document.body);

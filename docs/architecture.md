@@ -147,10 +147,17 @@ The package's black-box and ownership rules are documented in its
 ## Vite transform and HMR boundary
 
 `@gluonjs/compiler` parses application TypeScript or JavaScript and records the
-original `html`/`css` template boundaries and expression offsets. Its
+original `html`/`css` template boundaries, `compose()` template bodies, and
+expression offsets. Its
 high-resolution map remains chained through Vite, so a generated runtime
 location resolves to the author module and expression. The compiler does not
 replace Gluon's public runtime template format.
+
+`compose(component, props)\`body\`` is a Core helper, not a second renderer.
+It builds `body` with `html` and calls the supplied function once with that
+result as `children`. Functional ownership, DOM identity, SSR/hydration,
+Devtools, test utilities, and HMR therefore observe the same result as a direct
+call. RFC 0004 fixes this boundary.
 
 `@gluonjs/vite` transforms application modules inside the resolved Vite root.
 Development transforms route exported functions, Store definitions,

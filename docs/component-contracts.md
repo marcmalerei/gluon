@@ -6,6 +6,28 @@ native `CustomEvent` instances, projected content uses native slots, and refs
 resolve to real DOM or Custom Element hosts. Functional components remain typed
 functions without a second instance or lifecycle model.
 
+## Template-native functional composition
+
+`compose(component, props)\`body\`` is the optional nested authoring path for a
+functional component whose props accept `children`. It invokes the same
+function directly and passes an ordinary `html` result as `children`:
+
+```ts
+compose(AppShell, { header, navigation })`
+  ${compose(Card, { title: 'Delivery', actions })`
+    <label>Email <input name="email" type="email" required></label>
+  `}
+`;
+```
+
+TypeScript checks required, optional, callback, and excess props at the
+`compose()` call. Named or scoped content remains a typed prop. The HTML body
+may use native elements, bindings, spreads, models, refs, conditionals,
+`repeat()`, or `Suspense()` exactly as any `html` template. Direct calls remain
+supported. The accepted contract and measured limitations are in
+[RFC 0004](rfcs/0004-template-native-functional-composition.md) and the
+[comparison evidence](template-composition-evidence.md).
+
 ## Typed properties
 
 Use `PropertyDeclarations<Props>` to check a component's declaration against its
