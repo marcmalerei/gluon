@@ -826,11 +826,11 @@
         "} from '@gluonjs/compiler/diagnostics';",
         "",
         "const definition: GluonDiagnosticDefinition | undefined =",
-        "  getGluonDiagnostic('GLUON_TEMPLATE_STYLE_ELEMENT');",
+        "  getGluonDiagnostic('GLUON_TEMPLATE_SLOT_UNKNOWN');",
         "const source: GluonDiagnosticSource | undefined = definition?.source;",
-        "const message = formatGluonDiagnostic('GLUON_TEMPLATE_STYLE_ELEMENT', 'product-card.ts:12');",
-        "const productionMessage = formatGluonDiagnostic('GLUON_TEMPLATE_STYLE_ELEMENT', '', { production: true });",
-        "const url = gluonDiagnosticReferenceUrl('G1101', '/gluon/diagnostics');",
+        "const message = formatGluonDiagnostic('GLUON_TEMPLATE_SLOT_UNKNOWN', 'product-card.ts:12');",
+        "const productionMessage = formatGluonDiagnostic('GLUON_TEMPLATE_SLOT_UNKNOWN', '', { production: true });",
+        "const url = gluonDiagnosticReferenceUrl('G1111', '/gluon/diagnostics');",
         "console.log(GLUON_DIAGNOSTIC_CATALOG_VERSION, gluonDiagnosticCatalog.length, source, message, productionMessage, url);"
       ]
     },

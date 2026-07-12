@@ -21,6 +21,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   comparison with separate component/boundary metrics, browser and SSR evidence,
   generator and Playground examples, explicit limitations, and every verified
   Gluon disadvantage recorded without a general ranking claim.
+- Source-located editor and `gluon-template-check` diagnostics for unknown named
+  light-DOM slot assignments against literal functional-element declarations.
 - A versioned seven-task Gluon/Vue/React developer-experience benchmark
   contract, strict raw-run evidence schema, official comparator-selection
   record, and blocking validator that reports the current zero-run boundary

@@ -10,6 +10,7 @@ export type TemplateDiagnosticCode =
   | 'GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN'
   | 'GLUON_TEMPLATE_EVENT_UNKNOWN'
   | 'GLUON_TEMPLATE_PROP_UNKNOWN'
+  | 'GLUON_TEMPLATE_SLOT_UNKNOWN'
   | 'GLUON_TEMPLATE_STYLE_ELEMENT'
   | 'GLUON_TEMPLATE_VOID_CHILDREN';
 
@@ -182,6 +183,7 @@ export function analyzeGluonDocument(
         }
       }
     }
+    diagnoseSlotAssignments(markup, contentStart, declarationMap, source, diagnostics);
   }
   return Object.freeze({ uri, diagnostics: Object.freeze(diagnostics), declarations: Object.freeze(declarations) });
 }
@@ -435,6 +437,45 @@ function offsetAt(text: string, position: Position): number {
 
 function scriptKind(uri: string): ts.ScriptKind { return /\.tsx?$/.test(uri) ? (uri.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS) : ts.ScriptKind.JS; }
 function escapeRegExp(value: string): string { return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function diagnoseSlotAssignments(
+  markup: string,
+  contentStart: number,
+  declarations: ReadonlyMap<string, CustomElementDeclaration>,
+  source: ts.SourceFile,
+  diagnostics: TemplateDiagnostic[],
+): void {
+  const elementStack: string[] = [];
+  for (const match of markup.matchAll(/<\s*(\/?)\s*([A-Za-z][\w-]*)\b([^>]*)>/g)) {
+    const closing = match[1] === '/';
+    const tagName = match[2]!.toLowerCase();
+    if (closing) {
+      const openIndex = elementStack.lastIndexOf(tagName);
+      if (openIndex >= 0) elementStack.length = openIndex;
+      continue;
+    }
+
+    const parentDeclaration = declarations.get(elementStack.at(-1) ?? '');
+    if (parentDeclaration) {
+      const attributes = match[3]!;
+      const attributesOffset = contentStart + match.index + match[0].indexOf(attributes);
+      for (const slotMatch of attributes.matchAll(/\bslot\s*=\s*(["'])([^"']+)\1/g)) {
+        const name = slotMatch[2]!;
+        if (parentDeclaration.slots.includes(name)) continue;
+        const start = attributesOffset + slotMatch.index + slotMatch[0].lastIndexOf(name);
+        diagnostics.push(diagnostic(
+          'GLUON_TEMPLATE_SLOT_UNKNOWN',
+          `<${parentDeclaration.tagName}> does not declare slot ${name}.`,
+          start,
+          start + name.length,
+          source,
+        ));
+      }
+    }
+
+    if (!voidTags.includes(tagName) && !/\/\s*>$/.test(match[0])) elementStack.push(tagName);
+  }
+}
 
 function namedEntries(entries: readonly unknown[], accept: (entry: Record<string, unknown>) => boolean = () => true): string[] {
   return entries.flatMap((entry) => entry && typeof entry === 'object'

@@ -9,3 +9,5 @@
   template bodies at their original TypeScript locations.
 - Add literal `defineGluonElement()` property, event, slot, tag, lifecycle, and
   cleanup-owner analysis to the shared editor/CLI contract.
+- Diagnose unknown named light-DOM `slot` attributes against literal
+  `defineGluonElement({ slots: ... })` declarations in editor and CLI output.

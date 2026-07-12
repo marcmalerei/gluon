@@ -20,9 +20,10 @@ Run `npm run check:stateful-control-comparison` to verify the pinned versions,
 public import boundaries, committed authored-line ranges, raw evidence, and
 strict TypeScript compilation. The browser fixture
 `tests/dx-stateful-form-control.spec.ts` executes the common behavior contract,
-retained Vue/React hydration, cleanup, and a Vue host that consumes the Gluon
+exact-tag Gluon/Vue/React retained hydration, cleanup, and a Vue host that consumes the Gluon
 element directly without a wrapper. `tests-node/ssr.spec.ts` verifies the four
-server outputs. Generator and Playground tests retain public
+server outputs, readable-stream serialization, and static generation. Generator
+and Playground tests retain public
 `defineGluonElement` examples.
 
 The raw record is
@@ -34,7 +35,7 @@ findings, and the verified Gluon disadvantages. They do not contain a human
 pass or the other parent benchmark tasks, so they support no readability,
 usability, win, tie, loss, or general DX-superiority claim.
 
-The current language-server fixture diagnoses unknown functional-element
-properties and events. It does not retain a source-located unknown named-slot
-diagnostic; the raw record lists that verified tooling gap as a Gluon
-disadvantage rather than treating it as completed evidence.
+The language-server and `gluon-template-check` fixtures diagnose unknown
+functional-element properties, events, and literal named light-DOM slots at
+their original source ranges. The comparator invalid fixture retains all three
+contract failures.
