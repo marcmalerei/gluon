@@ -79,6 +79,7 @@ describe('separate UI package contracts', () => {
     const first = installUi(document, { theme: 'light' });
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, after];
     const second = installUi(document, { theme: 'dark' });
+    expect(first.disposed).toBe(false);
     const themeSheet = first.themeSheet;
 
     expect(first.theme).toBe('dark');
@@ -100,6 +101,7 @@ describe('separate UI package contracts', () => {
     second.styleOwner.retain(component);
     first.dispose();
     first.dispose();
+    expect(first.disposed).toBe(true);
     expect(document.adoptedStyleSheets).toContain(component);
     expect(document.adoptedStyleSheets).toContain(themeSheet);
     second.dispose();
@@ -109,6 +111,27 @@ describe('separate UI package contracts', () => {
     expect(document.documentElement.dataset.gluonTheme).toBe('system');
     expect(() => first.setTheme('light')).toThrow('disposed');
     document.documentElement.removeAttribute('data-gluon-theme');
+  });
+
+  it('preserves a theme attribute changed by another owner and rejects invalid targets', () => {
+    const owner = installUi(document);
+    document.documentElement.dataset.gluonTheme = 'external';
+    owner.dispose();
+    expect(document.documentElement.dataset.gluonTheme).toBe('external');
+    document.documentElement.removeAttribute('data-gluon-theme');
+
+    expect(() => installUi({ documentElement: null } as unknown as Document))
+      .toThrow('requires a documentElement');
+
+    const host = document.createElement('section');
+    const failingTarget = {
+      host,
+      querySelectorAll: () => [],
+      get adoptedStyleSheets() { return [] as CSSStyleSheet[]; },
+      set adoptedStyleSheets(_sheets: CSSStyleSheet[]) { throw new Error('adoption failed'); },
+    } as unknown as ShadowRoot;
+    expect(() => installUi(failingTarget)).toThrow('adoption failed');
+    expect(host.hasAttribute('data-gluon-theme')).toBe(false);
   });
 
   it('installs independent nested ShadowRoot owners with host-scoped tokens', () => {
@@ -176,6 +199,34 @@ describe('separate UI package contracts', () => {
     );
     expect(root.adoptedStyleSheets).toEqual([]);
     expect(host.hasAttribute('data-gluon-theme')).toBe(false);
+  });
+
+  it('distinguishes extra, unnamed, and CSS-text UI hydration evidence', () => {
+    const manifestHtml = renderStyleCarriers(createStyleManifest(createUiStyleSelection('light')));
+
+    const extraHost = document.createElement('section');
+    const extraRoot = extraHost.attachShadow({ mode: 'open' });
+    extraRoot.innerHTML = `${manifestHtml}<style data-gluon-style="extra" data-gluon-style-scope="gluon-ui" data-gluon-digest="extra"></style>`;
+    expect(() => installUi(extraRoot, { hydrate: true })).toThrowError(
+      expect.objectContaining({ mismatch: 'mismatched' }),
+    );
+
+    const unnamedHost = document.createElement('section');
+    const unnamedRoot = unnamedHost.attachShadow({ mode: 'open' });
+    unnamedRoot.innerHTML = manifestHtml;
+    unnamedRoot.querySelector('style')?.removeAttribute('data-gluon-style');
+    expect(() => installUi(unnamedRoot, { hydrate: true })).toThrowError(
+      expect.objectContaining({ mismatch: 'missing' }),
+    );
+
+    const textHost = document.createElement('section');
+    const textRoot = textHost.attachShadow({ mode: 'open' });
+    textRoot.innerHTML = manifestHtml;
+    const themeCarrier = textRoot.querySelector<HTMLStyleElement>('style[data-gluon-style="gluon-ui-theme"]')!;
+    themeCarrier.textContent = `${themeCarrier.textContent ?? ''}\n:root { --unexpected: 1; }`;
+    expect(() => installUi(textRoot, { hydrate: true })).toThrowError(
+      expect.objectContaining({ mismatch: 'mismatched' }),
+    );
   });
 
   it('publishes stable manifest evidence for every UI layer', () => {
