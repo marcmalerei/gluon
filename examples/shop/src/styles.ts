@@ -338,18 +338,6 @@ export const shopStyles = css`
     .product-title-row h1 { margin-bottom: 16px; font-size: clamp(42px, 4.3vw, 72px); font-weight: 540; line-height: 0.95; letter-spacing: -0.06em; }
     .product-title-row p { margin: 0; }
     .product-title-row > strong { font-size: 22px; font-weight: 520; white-space: nowrap; }
-    .choice-group { padding: 18px 0 20px; border: 0; border-bottom: 1px solid var(--shop-rule); margin: 0; }
-    .choice-group legend { margin-bottom: 12px; font-size: 14px; }
-    .choice-group > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-    .choice-group label { position: relative; display: flex; align-items: center; min-height: 48px; gap: 9px; padding: 8px 10px; border: 1px solid var(--shop-rule); cursor: pointer; font-size: 13px; }
-    .choice-group label:hover, .choice-group label.is-selected { border-color: var(--shop-cobalt); }
-    .choice-group input { width: 17px; height: 17px; margin: 0; accent-color: var(--shop-cobalt); }
-    .choice-temperature > div, .choice-cable > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .finish-swatch { width: 18px; height: 18px; border: 1px solid #888; border-radius: 50%; }
-    .swatch-graphite { background: #313131; }
-    .swatch-cobalt { background: var(--shop-cobalt); }
-    .swatch-bone { background: #ebe8de; }
-    .add-to-bag { width: 100%; margin-top: 20px; }
     .product-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 19px 0; margin: 0; border-bottom: 1px solid var(--shop-rule); list-style: none; font-size: 11px; }
     .product-facts li { padding-right: 8px; border-right: 1px solid var(--shop-rule); }
     .product-facts li:last-child { border-right: 0; }
@@ -465,12 +453,6 @@ export const shopStyles = css`
       .product-configurator { padding: 24px var(--shop-gutter) 0; }
       .product-title-row h1 { font-size: 39px; }
       .product-title-row > strong { font-size: 21px; }
-      .choice-group { padding: 10px 0 12px; }
-      .choice-group legend { margin-bottom: 6px; }
-      .choice-group > div { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .choice-group label { min-height: 44px; }
-      .choice-temperature > div, .choice-cable > div { grid-template-columns: 1fr 1fr; }
-      .add-to-bag { position: sticky; bottom: 0; z-index: 12; min-height: 58px; margin: 12px calc(var(--shop-gutter) * -1) 0; width: calc(100% + var(--shop-gutter) * 2); border-radius: 0; padding-bottom: max(14px, env(safe-area-inset-bottom)); }
       .product-facts { font-size: 10px; }
       .product-story { grid-template-columns: 1fr; margin: 38px var(--shop-gutter) 0; }
       .paired-product { grid-column: auto; }
@@ -492,7 +474,6 @@ export const shopStyles = css`
       .mobile-menu-button { padding-inline: 5px; }
       .mobile-menu-button span { font-size: 12px; }
       .catalog-grid .product-copy strong { font-size: 14px; }
-      .choice-group label { padding-inline: 7px; font-size: 11px; }
     }
 
     @media (prefers-reduced-motion: reduce) {

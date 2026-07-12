@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 import { playwright } from '@vitest/browser-playwright';
+import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vitest/config';
 import { browserTarget } from './vitest.browser-target.js';
 
@@ -9,6 +10,13 @@ const entry = {
 };
 
 export default defineConfig({
+  plugins: [vue({
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === 'gluon-product-configurator',
+      },
+    },
+  })],
   optimizeDeps: {
     include: ['axe-core'],
   },

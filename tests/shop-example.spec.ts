@@ -4,6 +4,7 @@ import { nextTick } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
+import { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
 import { shopStyles } from '../examples/shop/src/styles.js';
 
 describe('GLUON GOODS reference shop', () => {
@@ -27,13 +28,17 @@ describe('GLUON GOODS reference shop', () => {
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');
     expect(root.querySelector('#product-title')?.textContent).toBe('Orbit Lamp');
     const productPage = root.querySelector('.product-page');
+    const configurator = getProductConfigurator(root);
+    await configurator.updateComplete;
     await new Promise((resolve) => setTimeout(resolve, 70));
-    expect(root.querySelector('.inventory-status')?.textContent).toContain('Checking workshop availability');
+    expect(configurator.shadowRoot?.querySelector('.inventory-status')?.textContent)
+      .toContain('Checking workshop availability');
     await new Promise((resolve) => setTimeout(resolve, 280));
-    expect(root.querySelector('.inventory-status')?.textContent).toContain('In stock · dispatches in 2–3 days');
+    expect(configurator.shadowRoot?.querySelector('.inventory-status')?.textContent)
+      .toContain('In stock · dispatches in 2–3 days');
 
-    root.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
-    root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    configurator.shadowRoot?.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
+    configurator.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 1');
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
@@ -87,7 +92,8 @@ describe('GLUON GOODS reference shop', () => {
     document.body.append(root);
     app.mount(root);
     expect(() => store.placeOrder()).toThrow('at least one bag line');
-    root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    await getProductConfigurator(root).updateComplete;
+    getProductConfigurator(root).shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     document.querySelector<HTMLAnchorElement>('.bag-summary a')!.click();
     await settleShop();
@@ -159,7 +165,8 @@ describe('GLUON GOODS reference shop', () => {
     document.body.append(root);
     app.mount(root);
 
-    root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    await getProductConfigurator(root).updateComplete;
+    getProductConfigurator(root).shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Close bag');
     document.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
@@ -167,7 +174,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.querySelector('.empty-bag')).not.toBeNull();
 
     document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
-    root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    getProductConfigurator(root).shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     document.querySelector<HTMLButtonElement>('.remove-line')!.click();
     await settleShop();
@@ -200,7 +207,8 @@ describe('GLUON GOODS reference shop', () => {
     const firstRoot = document.createElement('div');
     document.body.append(firstRoot);
     first.app.mount(firstRoot);
-    firstRoot.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    await getProductConfigurator(firstRoot).updateComplete;
+    getProductConfigurator(firstRoot).shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     first.app.unmount();
 
@@ -224,4 +232,10 @@ async function settleShop(): Promise<void> {
   await nextTick();
   await new Promise((resolve) => setTimeout(resolve, 0));
   await nextTick();
+}
+
+function getProductConfigurator(root: ParentNode): ProductConfiguratorElement {
+  const configurator = root.querySelector<ProductConfiguratorElement>('gluon-product-configurator');
+  if (!configurator) throw new Error('Expected the product configurator to be rendered.');
+  return configurator;
 }

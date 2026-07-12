@@ -23,6 +23,7 @@ import {
 import { createStyleManifest, prepareForHydration, renderProgressively, renderStyleCarriers } from '@gluonjs/ssr';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 import { hydrateShop } from '../examples/shop/src/hydrate.js';
+import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
 
 describe('SSR hydration', () => {
   it('retains matching nodes while activating refs, events, context, and reactive updates', async () => {
@@ -110,7 +111,9 @@ describe('SSR hydration', () => {
     expect(root.querySelector('#product-title')).toBe(heading);
     expect(hydrated.router.currentRoute.value.fullPath).toBe('/products/orbit-lamp');
 
-    root.querySelector<HTMLButtonElement>('.add-to-bag')?.click();
+    const configurator = root.querySelector('gluon-product-configurator');
+    await (configurator as ProductConfiguratorElement | null)?.updateComplete;
+    configurator?.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')?.click();
     await nextTick();
     expect(hydrated.store.bagCount).toBe(1);
     expect(hydrated.store.bagOpen).toBe(true);

@@ -1,16 +1,27 @@
-import { createApp as createVueApp, h, type App } from 'vue';
-import { GluonCounter } from './custom-element.js';
+import { adoptStyles, unadoptStyles } from '@gluonjs/core';
+import { createApp as createVueApp, type App } from 'vue';
+import { shopStyles } from '../../examples/shop/src/styles.js';
+import { registerProductConfigurator } from '../../examples/shop/src/product-configurator.js';
+import VueProductHost from './VueProductHost.vue';
+import { vueHostStyles } from './vue-host-styles.js';
 
-export function mountVueHost(target: string | Element = '#vue-host'): App<Element> {
-  if (!customElements.get('gluon-counter')) customElements.define('gluon-counter', GluonCounter);
-  const app = createVueApp({
-    render: () => h('gluon-counter', {
-      count: 2,
-      onChange: (event: CustomEvent<{ value: number }>) => console.log(event.detail.value),
-    }),
-  });
+export interface VueHostMount {
+  readonly app: App<Element>;
+  unmount(): void;
+}
+
+export function mountVueHost(target: string | Element = '#vue-host'): VueHostMount {
+  registerProductConfigurator();
+  adoptStyles(document, shopStyles, vueHostStyles);
+  const app = createVueApp(VueProductHost);
   app.mount(target);
-  return app;
+  return Object.freeze({
+    app,
+    unmount() {
+      app.unmount();
+      unadoptStyles(document, vueHostStyles, shopStyles);
+    },
+  });
 }
 
 if (document.querySelector('#vue-host')) mountVueHost();

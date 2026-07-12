@@ -30,6 +30,13 @@ reference beside the maintained guides, cookbook, migration material, examples,
 and release archive. `validate-docs.mjs` verifies the version tree, public API
 entry-point count, required pages, examples, and internal links.
 
-All TypeScript examples live in `examples/` and are compiled through
-`examples/tsconfig.json`; Markdown includes those exact files rather than copied
-snippets. `plain.html` and `vue.html` are the runnable interoperability hosts.
+All TypeScript and Vue example sources live in `examples/` and are compiled
+through `examples/tsconfig.json` plus the maintained Vite configurations;
+Markdown includes those exact files rather than copied snippets. `plain.html`
+and `vue.html` are the runnable interoperability hosts. The Vue host consumes
+the production GLUON GOODS product configurator with an explicit
+`isCustomElement` compiler boundary. Its verified renders are
+[`design/rendered-vue-migration-desktop.png`](design/rendered-vue-migration-desktop.png)
+at 1440×1000 and
+[`design/rendered-vue-migration-mobile.png`](design/rendered-vue-migration-mobile.png)
+at 390×844.

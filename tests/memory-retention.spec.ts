@@ -5,6 +5,7 @@ import { createMemoryHistory } from '@gluonjs/router';
 import { activeFixtureNames, assertNoFixtureLeaks, renderFixture } from '@gluonjs/test-utils';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
+import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
 import { shopStyles } from '../examples/shop/src/styles.js';
 
 test('releases repeated customer-flow apps, caches, listeners, refs, Router, and Store ownership', async () => {
@@ -21,7 +22,9 @@ test('releases repeated customer-flow apps, caches, listeners, refs, Router, and
     const root = document.createElement('div');
     document.body.append(root);
     app.mount(root);
-    const addButton = root.querySelector<HTMLButtonElement>('.add-to-bag')!;
+    const configurator = root.querySelector<ProductConfiguratorElement>('gluon-product-configurator')!;
+    await configurator.updateComplete;
+    const addButton = configurator.shadowRoot!.querySelector<HTMLButtonElement>('.add-to-bag')!;
     addButton.click();
     await nextTick();
     expect(store.bagCount).toBe(1);

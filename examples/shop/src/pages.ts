@@ -1,4 +1,4 @@
-import { Suspense, html, repeat, type AsyncLoadContext, type TemplateValue } from '@gluonjs/core';
+import { html, repeat, type TemplateValue } from '@gluonjs/core';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -8,8 +8,12 @@ import {
   products,
   type Product,
 } from './data.js';
-import type { ProductConfiguration, ShopStore } from './state.js';
+import type { ShopStore } from './state.js';
 import { ArrowIcon } from './icons.js';
+import {
+  ProductConfigurator,
+  type ProductConfiguratorRenderer,
+} from './product-configurator.js';
 import {
   CategoryLinks,
   ProductCard,
@@ -80,7 +84,10 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
   `;
 }
 
-export function ProductPage(store: ShopStore): TemplateValue {
+export function ProductPage(
+  store: ShopStore,
+  renderProductConfigurator: ProductConfiguratorRenderer = ProductConfigurator,
+): TemplateValue {
   const route = useRoute();
   const product = findProduct(route.params.slug);
   if (!product) return NotFoundPage(store);
@@ -101,7 +108,22 @@ export function ProductPage(store: ShopStore): TemplateValue {
       </div>
       <div class="product-layout">
         ${ProductGallery(product)}
-        ${ProductConfigurator(product, store)}
+        ${renderProductConfigurator({
+          product,
+          configuration: store.configuration,
+          onConfigurationChange: ({ detail }) => {
+            store.configure('finish', detail.configuration.finish);
+            store.configure('temperature', detail.configuration.temperature);
+            store.configure('cable', detail.configuration.cable);
+          },
+          onAddToBag: (event) => {
+            store.configure('finish', event.detail.configuration.finish);
+            store.configure('temperature', event.detail.configuration.temperature);
+            store.configure('cable', event.detail.configuration.cable);
+            store.addToBag(event.detail.product);
+            focusOpenedDialog('bag', event.currentTarget as HTMLElement);
+          },
+        })}
       </div>
       <section class="product-story">
         <div>
@@ -193,103 +215,6 @@ function ProductGallery(product: Product): TemplateValue {
       <figure><img src=${product.image} alt="" class="detail-crop detail-base"></figure>
       <div class="gallery-dots" aria-hidden="true"><span class="is-active"></span><span></span><span></span></div>
     </section>
-  `;
-}
-
-function ProductConfigurator(product: Product, store: ShopStore): TemplateValue {
-  return html`
-    <section class="product-configurator" aria-labelledby="product-title">
-      <div class="product-title-row">
-        <div><h1 id="product-title">${product.name}</h1><p>${product.description}</p></div>
-        <strong>${formatPrice(product.price)}</strong>
-      </div>
-      ${InventoryStatus(product)}
-      ${ChoiceGroup(store, 'Finish', 'finish', ['Graphite', 'Cobalt', 'Bone'])}
-      ${ChoiceGroup(store, 'Light temperature', 'temperature', ['Warm 2700K', 'Clear 3200K'])}
-      ${ChoiceGroup(store, 'Cable length', 'cable', ['1.5 m', '2.5 m'])}
-      <button class="primary-button add-to-bag" type="button" @click=${(event: Event) => {
-        store.addToBag(product);
-        focusOpenedDialog('bag', event.currentTarget as HTMLElement);
-      }}>
-        Add to bag — ${formatPrice(product.price)}
-      </button>
-      <ul class="product-facts">
-        <li>Ships in 2–3 days</li>
-        <li>Repairable parts</li>
-        <li>5-year warranty</li>
-      </ul>
-    </section>
-  `;
-}
-
-interface InventoryResult {
-  readonly label: string;
-  readonly dispatch: string;
-}
-
-const inventoryCache = new Map<string, InventoryResult>();
-
-function InventoryStatus(product: Product): TemplateValue {
-  return html`<div class="inventory-status" role="status" aria-live="polite">${Suspense({
-    source: (context) => loadInventory(product, context),
-    sourceKey: product.slug,
-    fallback: html`<span class="inventory-pending">Checking workshop availability…</span>`,
-    delay: 50,
-    timeout: 2_000,
-    children: (inventory) => html`
-      <span class=${`inventory-dot inventory-${product.availability}`} aria-hidden="true"></span>
-      <span>${inventory.label} · dispatches in ${inventory.dispatch}</span>
-    `,
-    error: (_error, retry) => html`
-      <span>Availability could not be checked.</span>
-      <button class="inline-link inventory-retry" type="button" @click=${retry}>Retry</button>
-    `,
-  })}</div>`;
-}
-
-function loadInventory(product: Product, { signal }: AsyncLoadContext): Promise<InventoryResult> {
-  const cached = inventoryCache.get(product.slug);
-  if (cached) return Promise.resolve(cached);
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      const result = {
-        label: product.availability === 'in-stock' ? 'In stock' : 'Low stock',
-        dispatch: product.dispatch,
-      };
-      inventoryCache.set(product.slug, result);
-      resolve(result);
-    }, 320);
-    signal.addEventListener('abort', () => {
-      clearTimeout(timer);
-      reject(new DOMException('Inventory request aborted.', 'AbortError'));
-    }, { once: true });
-  });
-}
-
-function ChoiceGroup<Key extends keyof ProductConfiguration>(
-  store: ShopStore,
-  label: string,
-  key: Key,
-  choices: readonly ProductConfiguration[Key][],
-): TemplateValue {
-  return html`
-    <fieldset class=${`choice-group choice-${key}`}>
-      <legend>${label}</legend>
-      <div>
-        ${repeat(choices, (choice) => String(choice), (choice) => html`
-          <label class=${store.configuration[key] === choice ? 'is-selected' : ''}>
-            <input
-              type="radio"
-              name=${key}
-              .checked=${store.configuration[key] === choice}
-              @change=${() => store.configure(key, choice)}
-            >
-            ${key === 'finish' ? html`<span class=${`finish-swatch swatch-${String(choice).toLowerCase()}`}></span>` : ''}
-            <span>${choice}</span>
-          </label>
-        `)}
-      </div>
-    </fieldset>
   `;
 }
 
