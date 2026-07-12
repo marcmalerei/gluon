@@ -6,6 +6,8 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ### Added
 
+- Public API purpose, parameter, failure, ownership, and curated usage
+  documentation for `createMemoryHistory()`.
 - Browser, hash, and DOM-free memory histories with state positions and saved
   scroll coordinates.
 - Static, dynamic, custom-pattern, optional, repeatable, nested, named,

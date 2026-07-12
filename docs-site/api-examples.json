@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "overrides": {
+    "packages/router/src/functions/createMemoryHistory.md": {
+      "module": "@gluonjs/router/memory",
+      "description": "Create request- or test-owned history, observe back/forward traversal, then release both the listener and history when the owner is disposed:",
+      "code": [
+        "import { createMemoryHistory } from '@gluonjs/router/memory';",
+        "",
+        "const history = createMemoryHistory(['/reports/41', '/reports/42']);",
+        "console.log(history.location.location); // '/reports/42'",
+        "",
+        "const stop = history.listen((to, from, navigation) => {",
+        "  console.log(`${navigation.direction}: ${from.location} -> ${to.location}`);",
+        "});",
+        "",
+        "history.push('/reports/43');",
+        "history.go(-1); // back: /reports/43 -> /reports/42",
+        "",
+        "stop();",
+        "history.destroy();"
+      ]
+    }
+  }
+}

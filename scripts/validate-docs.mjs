@@ -32,6 +32,10 @@ for (const version of versions.supported) {
 await access(resolve(outputRoot, 'archive/index.html'));
 await access(resolve(outputRoot, 'assets/docs.css'));
 await access(resolve(outputRoot, 'assets/docs.js'));
+const docsStyles = await readFile(resolve(outputRoot, 'assets/docs.css'), 'utf8');
+if (!docsStyles.includes('.content h1 { overflow-wrap: anywhere;')) {
+  throw new Error('documentation CSS must wrap long generated API titles on mobile');
+}
 
 const expectedEntryPoints = packageContract.packages
   .filter((entry) => entry.state === 'current')
@@ -41,6 +45,46 @@ const documentedEntryPoints = (apiIndex.match(/^- \[[^\]]+\]\([^\)]+README\.md\)
 if (documentedEntryPoints !== expectedEntryPoints) {
   throw new Error(`API reference documents ${documentedEntryPoints} entry points; package contract requires ${expectedEntryPoints}`);
 }
+
+const apiExampleManifest = JSON.parse(await readFile(resolve(root, '.tmp/api-examples/manifest.json'), 'utf8'));
+const apiSymbolPattern = /\/(?:functions|classes|interfaces|type-aliases|variables)\/[^/]+\.md$/;
+const apiSymbolFiles = (await filesWithExtension(resolve(root, '.tmp/docs-api'), '.md'))
+  .map((file) => slash(relative(resolve(root, '.tmp/docs-api'), file)))
+  .filter((file) => apiSymbolPattern.test(`/${file}`))
+  .sort();
+if (apiExampleManifest.symbolPages !== apiSymbolFiles.length
+  || apiExampleManifest.entries.length !== apiSymbolFiles.length) {
+  throw new Error(`API examples cover ${apiExampleManifest.entries.length} pages; generated API has ${apiSymbolFiles.length} symbol pages`);
+}
+const examplePaths = apiExampleManifest.entries.map(({ path }) => path).sort();
+if (JSON.stringify(examplePaths) !== JSON.stringify(apiSymbolFiles)) {
+  throw new Error('API example manifest paths do not match the generated symbol pages');
+}
+for (const entry of apiExampleManifest.entries) {
+  const markdown = await readFile(resolve(root, '.tmp/docs-api', entry.path), 'utf8');
+  if (!markdown.includes('\n## Example\n') || !markdown.includes(`from '${entry.module}'`)) {
+    throw new Error(`Generated API example is missing or uses the wrong public module: ${entry.path}`);
+  }
+  const html = await readFile(resolve(outputRoot, versions.latest, 'api/generated', entry.htmlPath), 'utf8');
+  if (!html.includes('id="example"') || !html.includes('class="language-ts"')) {
+    throw new Error(`Rendered API example is missing from ${entry.htmlPath}`);
+  }
+}
+const memoryHistoryExample = await readFile(resolve(
+  root,
+  '.tmp/docs-api/packages/router/src/functions/createMemoryHistory.md',
+), 'utf8');
+for (const required of [
+  'tests, server requests',
+  'final item in `initialEntries` is the current location',
+  'must contain at least one entry',
+  'until `destroy()` is called',
+  '## Throws',
+  "from '@gluonjs/router/memory'",
+  'history.listen',
+  'history.go(-1)',
+  'history.destroy()',
+]) if (!memoryHistoryExample.includes(required)) throw new Error(`createMemoryHistory API example is missing: ${required}`);
 
 const migration = await readFile(resolve(siteRoot, 'content', versions.latest, 'migration/index.md'), 'utf8');
 for (const required of [
