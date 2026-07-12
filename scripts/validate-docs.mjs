@@ -23,6 +23,7 @@ for (const version of versions.supported) {
     'migration/index.html',
     'migration/vue-to-gluon-cutover/index.html',
     'migration/vue-analyzer/index.html',
+    'migration/vue-codemod-decision/index.html',
     'examples/plain.html',
     'examples/ui.html',
     'examples/vue.html',
@@ -61,6 +62,25 @@ for (const required of [
   'does not write',
   'GVA9002',
 ]) if (!vueAnalyzer.includes(required)) throw new Error(`Vue analyzer guide is missing: ${required}`);
+
+const vueCodemodDecision = await readFile(resolve(
+  siteRoot,
+  'content',
+  versions.latest,
+  'migration/vue-codemod-decision/index.md',
+), 'utf8');
+for (const required of [
+  'no-go',
+  '17 fixture files',
+  '52 inventory',
+  '0/14',
+  'Static component registration',
+  'Native Custom Element transport',
+  'Router and Store',
+  'SSR and hydration',
+  'False positives',
+  'new accepted RFC',
+]) if (!vueCodemodDecision.includes(required)) throw new Error(`Vue codemod decision is missing: ${required}`);
 
 const cutover = await readFile(resolve(
   siteRoot,

@@ -50,10 +50,19 @@ page, its safety boundary, its rollback matrix, and its browser-evidence links.
 The Migration index and analyzer guide document RFC 0003's implemented
 report-only package, CLI, schema, diagnostics, limits, and no-write boundary.
 Documentation validation requires the guide and its public package references.
+The versioned
+[codemod decision](content/0.0.0/migration/vue-codemod-decision/index.md)
+records the issue #92 no-go, corpus-only measurements, explicit candidate
+classifications, counterexamples, and the continuing manual-review boundary.
 The verified analyzer-guide renders are
 [`design/rendered-vue-analyzer-guide-desktop.png`](design/rendered-vue-analyzer-guide-desktop.png)
 at 1440×1000 and
 [`design/rendered-vue-analyzer-guide-mobile.png`](design/rendered-vue-analyzer-guide-mobile.png)
+at 390×1200.
+The verified codemod-decision renders are
+[`design/rendered-vue-codemod-decision-desktop.png`](design/rendered-vue-codemod-decision-desktop.png)
+at 1440×1000 and
+[`design/rendered-vue-codemod-decision-mobile.png`](design/rendered-vue-codemod-decision-mobile.png)
 at 390×1200.
 The verified RFC-boundary renders are
 [`design/rendered-vue-analyzer-rfc-desktop.png`](design/rendered-vue-analyzer-rfc-desktop.png)
