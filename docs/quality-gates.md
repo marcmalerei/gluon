@@ -160,6 +160,12 @@ transforms, and language-service declaration discovery. The filesystem writer
 stages same-directory temporary files and restores already-applied targets if a
 commit step fails.
 
+Invalid-input cases start one operation only after its rejection assertion is
+installed. The reserved `annotation-xml` regression verifies the exact
+`INVALID_CUSTOM_ELEMENT_NAME` diagnostic and no-write result separately;
+`test:create-gluon:coverage` must finish without an unhandled-rejection record
+after all assertions pass.
+
 The optional `--components-only` validator argument is a development shortcut
 for the five generated projects. The blocking repository command uses no
 shortcut and therefore runs both matrices.
