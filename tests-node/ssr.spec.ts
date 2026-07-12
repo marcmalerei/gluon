@@ -13,7 +13,9 @@ import {
   compose,
   css,
   defineElement,
+  defineGluonElement,
   directive,
+  elementProperty,
   event,
   html,
   inject,
@@ -194,6 +196,35 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       protected override render() { return html`No tag`; }
     }
     expect(() => renderElement(Unregistered)).toThrow('must be registered');
+  });
+
+  it('renders functional GluonElement definitions with request-owned setup cleanup', async () => {
+    const connected = vi.fn();
+    const cleanup = vi.fn();
+    const FunctionalGreeting = defineGluonElement({
+      tagName: 'server-functional-greeting',
+      properties: {
+        person: elementProperty<{ name: string }>({ type: Object, required: true }),
+      },
+      setup(context) {
+        const punctuation = context.state('punctuation', '!');
+        const greeting = context.computed(() => `Hello ${context.props.person.name}${punctuation.value}`);
+        context.onConnected(connected);
+        context.onCleanup(cleanup);
+        return { render: () => html`<p>${greeting.value}</p><slot></slot>` };
+      },
+    });
+    const rendered = await renderToString(renderElement(FunctionalGreeting, {
+      properties: { person: { name: 'Ada' } },
+      children: html`<span>Light DOM</span>`,
+    }));
+    expect(withoutHydrationMarkers(rendered)).toBe(
+      '<server-functional-greeting person="[object Object]">'
+      + '<template shadowrootmode="open"><p>Hello Ada!</p><slot></slot></template>'
+      + '<span>Light DOM</span></server-functional-greeting>',
+    );
+    expect(connected).not.toHaveBeenCalled();
+    expect(cleanup).toHaveBeenCalledOnce();
   });
 });
 

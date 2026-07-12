@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest';
 import { atomStyles } from '@gluonjs/atoms';
-import { adoptStyles, html } from '../src/index.js';
-import { nextTick } from '@gluonjs/reactivity';
+import { adoptStyles, defineGluonElement, html } from '../src/index.js';
+import { nextTick, ref } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
 import { activeFixtureNames, assertNoFixtureLeaks, renderFixture } from '@gluonjs/test-utils';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -59,4 +59,45 @@ test('reports and clears test-owned resource retention deterministically', () =>
   expect(click).toHaveBeenCalledOnce();
   expect(activeFixtureNames()).toEqual([]);
   assertNoFixtureLeaks();
+});
+
+test('releases functional element setup watchers, listeners, and callbacks on every disconnect', async () => {
+  document.body.replaceChildren();
+  const source = ref(0);
+  const setup = vi.fn();
+  const cleanup = vi.fn();
+  const watchRuns = vi.fn();
+  const resize = vi.fn();
+  const FunctionalRetentionProbe = defineGluonElement({
+    tagName: 'gluon-functional-retention-probe',
+    setup(context) {
+      setup();
+      context.watch(source, watchRuns);
+      window.addEventListener('resize', resize);
+      context.onCleanup(() => {
+        window.removeEventListener('resize', resize);
+        cleanup();
+      });
+      return { render: () => html`<output>${source.value}</output>` };
+    },
+  });
+
+  for (let cycle = 1; cycle <= 30; cycle += 1) {
+    const element = document.createElement('gluon-functional-retention-probe') as InstanceType<typeof FunctionalRetentionProbe>;
+    document.body.append(element);
+    await element.updateComplete;
+    source.value = cycle;
+    await nextTick();
+    window.dispatchEvent(new Event('resize'));
+    const watchedBeforeDisconnect = watchRuns.mock.calls.length;
+    const resizedBeforeDisconnect = resize.mock.calls.length;
+    element.remove();
+    source.value = cycle + 1_000;
+    await nextTick();
+    window.dispatchEvent(new Event('resize'));
+    expect(watchRuns).toHaveBeenCalledTimes(watchedBeforeDisconnect);
+    expect(resize).toHaveBeenCalledTimes(resizedBeforeDisconnect);
+  }
+  expect(setup).toHaveBeenCalledTimes(30);
+  expect(cleanup).toHaveBeenCalledTimes(30);
 });

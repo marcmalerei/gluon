@@ -71,6 +71,12 @@ export {
 } from './element.js';
 
 export {
+  defineGluonElement,
+  elementEvent,
+  elementProperty,
+} from './functional-element.js';
+
+export {
   createApp,
   createInjectionKey,
   dynamicComponent,

@@ -27,8 +27,9 @@ configured same-version server executable.
 
 ## Declaration inference
 
-The analyzer recognizes `defineElement('tag-name', ElementClass)`. Static
-`properties`, `events`, and `slots` object keys provide manifest-equivalent
+The analyzer recognizes `defineElement('tag-name', ElementClass)` and literal
+`defineGluonElement({ tagName, properties, events, slots, setup })`
+definitions. Static `properties`, `events`, and `slots` object keys provide manifest-equivalent
 metadata for template checks and editor features. External tools can supply
 the same facts through `CustomElementDeclaration` values or convert standard
 Custom Elements Manifest data with `declarationsFromCustomElementsManifest()`.
@@ -46,6 +47,9 @@ virtual proprietary document.
 
 | Code | Condition |
 | --- | --- |
+| `GLUON_ELEMENT_TAG_INVALID` | Functional definition tag is not a valid lowercase autonomous Custom Element name |
+| `GLUON_ELEMENT_SETUP_CLEANUP_MISSING` | Setup creates a directly detectable listener or interval without cleanup/disconnect ownership |
+| `GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED` | Setup lifecycle registration occurs in nested or deferred work |
 | `GLUON_TEMPLATE_ARIA_UNKNOWN` | Unknown `aria-*` attribute name |
 | `GLUON_TEMPLATE_BINDING_POSITION` | Binding used as a tag or attribute name |
 | `GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN` | Hyphenated tag lacks a declaration or manifest entry |
@@ -56,5 +60,8 @@ virtual proprietary document.
 
 These codes are emitted by both the LSP and CLI. They are development and CI
 diagnostics; TypeScript remains responsible for JavaScript expression types.
+For `defineGluonElement()`, TypeScript inference checks structured/primitive
+property values, event names/details, setup context use, form availability, and
+exposed host method calls.
 The repository gate runs a failing fixture through both the built CLI and the
 public project analyzer and requires identical ordered diagnostic codes.
