@@ -45,6 +45,7 @@ try {
     run('npm', ['test'], result.directory);
     run('npm', ['run', 'build'], result.directory);
     process.stdout.write(`validated starter ${index + 1}/${matrix.length}: ${name}\n`);
+    await rm(result.directory, { recursive: true, force: true });
   }
   const componentKinds = [
     ['atom', 'PrimitiveAction'],
@@ -76,6 +77,7 @@ try {
     run('npm', ['run', 'build'], result.directory);
     run('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], result.directory);
     process.stdout.write(`validated component ${index + 1}/${componentKinds.length}: ${kind}\n`);
+    await rm(result.directory, { recursive: true, force: true });
   }
   const retainedDirectory = join(fixtureDirectory, 'retained-dx-scorecard');
   await cp(resolve(root, 'benchmarks/dx/fixtures/gluon'), retainedDirectory, { recursive: true });
