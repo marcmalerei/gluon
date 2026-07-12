@@ -14,6 +14,9 @@ GitHub is the source of truth for delivery status:
 The accepted product and component boundaries are defined by
 [RFC 0001: Gluon 1.0 product scope and non-goals](rfcs/0001-gluon-1.0-product-scope.md)
 and [RFC 0002: Unified component and Custom Element model](rfcs/0002-unified-component-model.md).
+[RFC 0003: Report-only Vue migration analyzer](rfcs/0003-report-only-vue-migration-analyzer.md)
+authorizes a separate, additive migration-tooling initiative without making it
+a Gluon 1.0 completion gate.
 The supported environments and style transport are defined by
 [ADR 0001: Browser, runtime, and style transport contract](adrs/0001-browser-runtime-and-style-transport.md).
 The package graph, authorized license, versioning, release, and supply-chain
@@ -45,6 +48,11 @@ The target includes:
 Vue compatibility syntax, Vue Single-File Component compilation, and automatic
 Vue source migration are not Gluon 1.0 requirements. Any such requirement must
 be added through a superseding RFC.
+
+RFC 0003 now permits one bounded exception outside the 1.0 completion contract:
+static, report-only inventory of enumerated Vue 3.5 source. It does not permit
+runtime/API compatibility, production SFC compilation, source generation, or
+source rewriting.
 
 ## Verified starting point
 
@@ -328,6 +336,24 @@ a release-cut protocol without making a `0.0.0` product-support claim.
 - Clean-room users can build and deploy the reference applications from public docs.
 - Public packages include correct exports, types, license, provenance, signatures,
   changelog, SBOM, support policy, and deprecation policy.
+
+## Additive Vue-to-Gluon migration initiative
+
+This initiative is tracked by [#87](https://github.com/marcmalerei/gluon/issues/87)
+and is ordered independently from the Gluon 1.0 release tracker. It does not add
+a release gate to issue #41.
+
+| Issue | Deliverable |
+| --- | --- |
+| [#88](https://github.com/marcmalerei/gluon/issues/88) | Use one production Gluon Custom Element in GLUON GOODS and a Vue 3 host with browser evidence. |
+| [#89](https://github.com/marcmalerei/gluon/issues/89) | Publish the tested, reversible Vue-to-Gluon cutover playbook. |
+| [#90](https://github.com/marcmalerei/gluon/issues/90) | Accept RFC 0003 for bounded, static, report-only Vue migration analysis. |
+| [#91](https://github.com/marcmalerei/gluon/issues/91) | Implement the accepted Node package, CLI, schema, diagnostics, fixtures, and retained evidence. |
+| [#92](https://github.com/marcmalerei/gluon/issues/92) | Use retained evidence for a bounded codemod go/no-go decision; implement no writer. |
+
+The analyzer package joins the lockstep release group only when #91 implements
+the RFC contract. A write-capable transform remains prohibited unless #92
+produces and accepts another superseding RFC first.
 
 ## Gluon 1.0 release gates
 

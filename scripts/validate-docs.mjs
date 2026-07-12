@@ -46,6 +46,8 @@ for (const required of [
   'manual redesign',
   'Supported automation',
   'Vue-to-Gluon concept map',
+  'RFC 0003',
+  'issue #91',
 ]) if (!migration.includes(required)) throw new Error(`migration documentation is missing: ${required}`);
 
 const cutover = await readFile(resolve(
