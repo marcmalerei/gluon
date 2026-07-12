@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "releaseLine": "0.0.0",
-  "reviewedAt": "2026-07-11",
+  "reviewedAt": "2026-07-12",
   "areas": [
     {
       "id": "html",
@@ -79,6 +79,17 @@
       ],
       "residualRisk": "Static syntax inventory cannot establish arbitrary runtime behavior or semantic migration equivalence; indeterminate and unsupported findings require human review.",
       "evidence": ["tests-node/vue-migration-analyzer.spec.ts", "packages/vue-migration-analyzer/README.md", "docs/rfcs/0003-report-only-vue-migration-analyzer.md"]
+    },
+    {
+      "id": "component-generation",
+      "status": "mitigated",
+      "controls": [
+        "The add-component planner validates the complete mutation set before writes and rejects absolute paths, traversal, NUL bytes, malformed manifests, invalid names and tags, and symbolic-link path segments.",
+        "Generated source and test collisions require an overwrite option plus a separate confirmation; dry-run returns the complete operation inventory without mutation.",
+        "Writes use same-directory temporary files and restore pre-write file contents if the commit phase fails."
+      ],
+      "residualRisk": "The generator updates only documented package fields and its marked barrel region; applications must review generated code and retain ownership of architecture, dependency policy, and deployment security.",
+      "evidence": ["tests-node/create-gluon.spec.ts", "scripts/validate-create-gluon-fixtures.mjs", "docs/component-generator.md"]
     }
   ]
 }

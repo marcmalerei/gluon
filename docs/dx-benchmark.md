@@ -64,6 +64,31 @@ Every framework implements the same seven outcomes:
    where the selected platform lane permits it, or retain the framework's
    limitation as the result.
 
+Issue #113 adds a bounded, identical add-component procedure inside task 3.
+Starting from each lane's recorded clean scaffold, the author must add a named
+`PurchaseAction` that renders a native `type=button` control named `Purchase`,
+owns one application stylesheet, exposes one click callback, is reachable from
+the local component boundary, and has a strict browser test for name, native
+type, interaction, and cleanup.
+
+The Gluon procedure records the scaffold command and
+`create-gluon add-component PurchaseAction --kind atom --root shop --yes`; its
+generated source, test, package update, Vitest config, and barrel update are
+`generatedFiles`, not manual edits. The selected official Vue component guide
+describes authoring and importing a `.vue` component, while the selected React
+guide describes function components; neither selected source documents an
+official add-component generator. Their future task rows must retain each
+created component/style/test and every parent/export or test-configuration edit
+explicitly rather than inventing a command.
+
+The exact lane commands, required manual-edit categories, observable outcomes,
+and evidence fields live in `addComponentTask` in the canonical specification.
+This is a task contract only: no Vue or React project was executed for issue
+#113, there is no human pass, and it supports no win/tie/loss or general DX
+claim. Orientation uses the [Vue component guide](https://vuejs.org/guide/essentials/component-basics.html),
+the [React component quick start](https://react.dev/learn), and the
+[React Router framework installation](https://reactrouter.com/start/framework/installation).
+
 The JSON specification is authoritative for the detailed observable outcomes.
 Syntax and architecture remain framework-specific because those differences are
 part of the measurement.

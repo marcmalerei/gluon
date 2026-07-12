@@ -23,7 +23,8 @@
 - official Vite transforms with template source maps and state-preserving HMR
 - DOM-independent SSR with isolated requests and safe serialized state
 - public black-box component, Router, Store, and scheduler test utilities
-- `create-gluon` scaffolding with verified Router, Store, testing, UI, and SSR combinations
+- `create-gluon` project scaffolding plus deterministic app-local Atom, Molecule,
+  Organism, stateful Custom Element, and headless generation
 - shared HTML/SVG/CSS template diagnostics through an LSP, CI checker, and VS Code client
 - deterministic, report-only Vue 3.5 source inventory through a Node package and CLI
 - opt-in versioned Devtools with multi-application inspection and ordered runtime timelines
@@ -62,6 +63,9 @@ checking, the instrumented Chromium browser suite, all production builds,
 public declaration contract tests, the lazy-route chunk check, and package
 archive validation. It also installs, typechecks, tests, and builds all 20
 supported `create-gluon` starter combinations from packed workspace artifacts.
+The same gate also generates all five component kinds into clean universal
+starters and verifies install, typecheck, template diagnostics, browser tests,
+client/SSR builds, and package dry runs.
 
 ## Create an application
 
@@ -76,6 +80,12 @@ after `npm run build:create-gluon`. Stable automation uses `--yes` and any of
 `--router`, `--store`, `--testing`, `--ui`, or `--ssr`. SSR enables Router and
 Store; explicit `--ssr --no-router` and `--ssr --no-store` combinations fail
 before generation. See [the generator contract](packages/create-gluon/README.md).
+
+Existing projects can run `create-gluon add-component` interactively or use
+stable `--kind`, `--root`, `--path`, `--tag`, and `--dry-run` flags. Generated
+file collisions require both `--overwrite` and the separate
+`--confirm-overwrite`. See the
+[app-local component generator](docs/component-generator.md).
 
 ## Quick start
 

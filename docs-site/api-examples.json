@@ -56,6 +56,53 @@
         "}"
       ]
     },
+    "create-gluon-add-component": {
+      "module": "create-gluon",
+      "code": [
+        "import { PassThrough } from 'node:stream';",
+        "import {",
+        "  AddComponentError,",
+        "  addComponent,",
+        "  addComponentHelpText,",
+        "  componentKindHelpText,",
+        "  componentKinds,",
+        "  parseAddComponentArguments,",
+        "  planComponent,",
+        "  runAddComponentCli,",
+        "  type AddComponentAction,",
+        "  type AddComponentErrorCode,",
+        "  type AddComponentOperation,",
+        "  type AddComponentOptions,",
+        "  type AddComponentResult,",
+        "  type ComponentKind,",
+        "  type ParsedAddComponentArguments,",
+        "} from 'create-gluon';",
+        "",
+        "const parsed: ParsedAddComponentArguments = parseAddComponentArguments([",
+        "  'PurchaseAction', '--kind', 'molecule', '--root', '/tmp/shop', '--dry-run', '--yes',",
+        "]);",
+        "const kind: ComponentKind = parsed.kind ?? componentKinds[0];",
+        "const options = {",
+        "  kind,",
+        "  name: parsed.name!,",
+        "  root: parsed.root,",
+        "  dryRun: true,",
+        "} satisfies AddComponentOptions;",
+        "const planned: Promise<AddComponentResult> = planComponent(options);",
+        "const generated: Promise<AddComponentResult> = addComponent(options);",
+        "const operation = { path: 'src/components/index.ts', action: 'update', bytes: 80 } satisfies AddComponentOperation;",
+        "const action: AddComponentAction = operation.action;",
+        "const output = new PassThrough();",
+        "await runAddComponentCli(['--help'], { output, cwd: '/tmp/shop' });",
+        "console.log(planned, generated, action, addComponentHelpText, componentKindHelpText);",
+        "try { throw new AddComponentError('FILE_COLLISION', 'existing component'); } catch (error) {",
+        "  if (error instanceof AddComponentError) {",
+        "    const code: AddComponentErrorCode = error.code;",
+        "    console.error(code);",
+        "  }",
+        "}"
+      ]
+    },
     "devtools-application": {
       "module": "@gluonjs/devtools",
       "code": [
@@ -2913,6 +2960,66 @@
     "packages/vue-migration-analyzer/src/variables/ANALYZER_LIMITS.md": {
       "recipe": "vue-migration-report",
       "description": "Inspect the fixed discovery, file, byte, AST, nesting, worker-memory, and time budgets that bound static analysis:"
+    },
+    "packages/create-gluon/src/classes/AddComponentError.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Catch a deterministic add-component validation or collision failure and branch on its stable code without parsing text:"
+    },
+    "packages/create-gluon/src/functions/addComponent.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Plan and atomically apply one validated app-local component, its browser test, dependencies, test configuration, and managed barrel export:"
+    },
+    "packages/create-gluon/src/functions/parseAddComponentArguments.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Parse stable component kind, root, path, tag, dry-run, and separately confirmed overwrite flags for scripted CLI use:"
+    },
+    "packages/create-gluon/src/functions/planComponent.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Validate the project and return every planned create, update, or overwrite operation without mutating the filesystem:"
+    },
+    "packages/create-gluon/src/functions/runAddComponentCli.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Run the interactive or non-interactive add-component workflow through caller-owned terminal adapters:"
+    },
+    "packages/create-gluon/src/interfaces/AddComponentOperation.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Inspect one planned relative path, mutation action, and deterministic UTF-8 byte count for dry-run reporting:"
+    },
+    "packages/create-gluon/src/interfaces/AddComponentOptions.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Choose the generated kind, PascalCase name, safe project-relative location, optional element tag, and explicit mutation policy:"
+    },
+    "packages/create-gluon/src/interfaces/AddComponentResult.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Consume the resolved project root, generated identity, dry-run state, and complete sorted operation inventory:"
+    },
+    "packages/create-gluon/src/interfaces/ParsedAddComponentArguments.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Inspect immutable add-component CLI values before interactive defaults or filesystem validation are applied:"
+    },
+    "packages/create-gluon/src/type-aliases/AddComponentAction.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Distinguish new files, managed updates, and explicitly confirmed generated-file overwrites in a plan:"
+    },
+    "packages/create-gluon/src/type-aliases/AddComponentErrorCode.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Handle stable path, name, tag, manifest, symlink, collision, and overwrite-confirmation failures programmatically:"
+    },
+    "packages/create-gluon/src/type-aliases/ComponentKind.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Restrict generation to the maintained Atom, Molecule, Organism, stateful element, and headless ownership templates:"
+    },
+    "packages/create-gluon/src/variables/addComponentHelpText.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Display canonical non-interactive flags, mutation safeguards, and the managed-update boundary from an embedded CLI host:"
+    },
+    "packages/create-gluon/src/variables/componentKindHelpText.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Explain the runtime, stylesheet, markup, and cleanup owner for each supported generated kind before interactive selection:"
+    },
+    "packages/create-gluon/src/variables/componentKinds.md": {
+      "recipe": "create-gluon-add-component",
+      "description": "Enumerate the five maintained component templates for prompts, automation, and validation without duplicating strings:"
     },
     "packages/create-gluon/src/classes/ScaffoldError.md": {
       "recipe": "create-gluon-scaffold",
