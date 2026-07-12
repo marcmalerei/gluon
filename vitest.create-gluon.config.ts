@@ -1,6 +1,13 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@gluonjs/compiler': resolve(import.meta.dirname, 'packages/compiler/src/index.ts'),
+      '@gluonjs/language-server': resolve(import.meta.dirname, 'packages/language-server/src/index.ts'),
+    },
+  },
   test: {
     environment: 'node',
     include: ['tests-node/create-gluon.spec.ts'],

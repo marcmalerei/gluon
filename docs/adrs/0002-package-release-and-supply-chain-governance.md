@@ -102,7 +102,7 @@ remains independently ordered.
 | `@gluonjs/atoms` | Focused UI primitives plus the explicit shared UI style/theme owner | `core`, `quarks` |
 | `@gluonjs/molecules` | Reusable primitive compositions | `core`, `quarks`, `atoms` |
 | `@gluonjs/organisms` | Larger interface structures | `core`, `quarks`, `atoms`, `molecules` |
-| `create-gluon` | Project generator and maintained templates | none at runtime |
+| `create-gluon` | Project generator, transactional app-local component generator, and maintained templates | none at runtime |
 
 Package dependency names in the table omit the common `@gluonjs/` prefix.
 Third-party build dependencies are not part of this architectural graph.

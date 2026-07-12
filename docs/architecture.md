@@ -291,6 +291,14 @@ contract is documented in [Application runtime](application-runtime.md).
 
 ## Public component contracts
 
+App-local component creation is automated by the Node-only
+`create-gluon add-component` workflow. It emits ordinary public-package imports
+and does not add a generator runtime to browser bundles. Stateless Atom,
+Molecule, and Organism output remains metadata-bearing render functions;
+stateful output uses `defineGluonElement`; headless output wraps Quark behavior.
+Visual functional output exports its sheet, named SSR/hydration selection, and
+target owner explicitly. See [App-local component generator](component-generator.md).
+
 `element.ts` keeps property, event, native-slot, lifecycle, and public-exposure
 metadata on the Custom Element class. Runtime validation warns through the
 nearest application but preserves the supplied prop or event value. Native slot

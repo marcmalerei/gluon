@@ -227,6 +227,7 @@ editing, testing, debugging, and production building.
 | Issue | Deliverable |
 | --- | --- |
 | [#29](https://github.com/marcmalerei/gluon/issues/29) | `create-gluon` and its 20-combination maintained starter matrix are implemented and verified. |
+| [#113](https://github.com/marcmalerei/gluon/issues/113) | `create-gluon add-component` generates five verified app-local ownership boundaries with transactional filesystem safety and a clean universal matrix. |
 | [#30](https://github.com/marcmalerei/gluon/issues/30) | Build the Gluon Vite plugin and state-preserving HMR. |
 | [#31](https://github.com/marcmalerei/gluon/issues/31) | Shared template analyzer, LSP server, CI checker, and VS Code client are implemented. |
 | [#32](https://github.com/marcmalerei/gluon/issues/32) | Versioned Devtools protocol, opt-in runtime bridge, Vite integration, and browser inspector are implemented. |
@@ -316,7 +317,7 @@ and Playground as one public site. Issue #102 adds a derived, typechecked public
 import example to every generated symbol page and supports curated behavioral
 examples without allowing private or deep package paths.
 Issue #104 replaces the resulting compiler-contract placeholders with reviewed
-task-oriented examples for all 560 public symbol pages. The catalog gives every
+task-oriented examples for all 575 public symbol pages. The catalog gives every
 page a symbol-specific purpose statement and a compiled concrete scenario;
 shared recipes keep related application lifecycles coherent while the blocking
 gate rejects any new symbol without reviewed coverage.
