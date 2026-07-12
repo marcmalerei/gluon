@@ -65,6 +65,9 @@ for (const entry of apiExampleManifest.entries) {
   if (!markdown.includes('\n## Example\n') || !markdown.includes(`from '${entry.module}'`)) {
     throw new Error(`Generated API example is missing or uses the wrong public module: ${entry.path}`);
   }
+  for (const placeholder of [/\bdeclare const\b/, /\btype Example\s*=/, /\bvoid value\b/]) {
+    if (placeholder.test(markdown)) throw new Error(`Generated API example contains a compiler-only placeholder: ${entry.path}`);
+  }
   const html = await readFile(resolve(outputRoot, versions.latest, 'api/generated', entry.htmlPath), 'utf8');
   if (!html.includes('id="example"') || !html.includes('class="language-ts"')) {
     throw new Error(`Rendered API example is missing from ${entry.htmlPath}`);
@@ -85,6 +88,36 @@ for (const required of [
   'history.go(-1)',
   'history.destroy()',
 ]) if (!memoryHistoryExample.includes(required)) throw new Error(`createMemoryHistory API example is missing: ${required}`);
+
+const routerOptionsExample = await readFile(resolve(
+  root,
+  '.tmp/docs-api/packages/router/src/interfaces/RouterOptions.md',
+), 'utf8');
+for (const required of [
+  "from '@gluonjs/router/memory'",
+  "createMemoryHistory(['/products'])",
+  "routes: [{ path: '/products' }]",
+  'scrollBehavior(_to, _from, savedPosition)',
+  'savedPosition ?? { left: 0, top: 0 }',
+  'satisfies RouterOptions',
+  'router.destroy()',
+]) if (!routerOptionsExample.includes(required)) throw new Error(`RouterOptions API example is missing: ${required}`);
+
+const buttonPropsExample = await readFile(resolve(
+  root,
+  '.tmp/docs-api/packages/atoms/src/interfaces/ButtonProps.md',
+), 'utf8');
+for (const required of ['disabled: true', "label: 'example'", 'onClick: (event)']) {
+  if (!buttonPropsExample.includes(required)) throw new Error(`ButtonProps API example is missing: ${required}`);
+}
+
+const defineStoreExample = await readFile(resolve(
+  root,
+  '.tmp/docs-api/packages/store/src/functions/defineStore.md',
+), 'utf8');
+for (const required of ["id: 'counter'", 'state: () => ({ count: 0 })', 'store.$patch', 'manager.dispose()']) {
+  if (!defineStoreExample.includes(required)) throw new Error(`defineStore API example is missing: ${required}`);
+}
 
 const migration = await readFile(resolve(siteRoot, 'content', versions.latest, 'migration/index.md'), 'utf8');
 for (const required of [
