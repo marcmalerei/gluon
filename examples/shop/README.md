@@ -7,6 +7,12 @@ repository [working agreement](../../AGENTS.md).
 
 ## Current slice
 
+Customer-facing links with nested or text content use the public
+`compose(RouterLink, props)\`body\`` path. It passes the body as typed children
+to the same RouterLink function; direct functional calls remain supported.
+Compiler, SSR, and shop tests verify that this adds no host or renderer
+boundary.
+
 The current slice uses the public Core, Reactivity, Router, and Store APIs to provide:
 
 - home, catalog, and deep-linkable product routes

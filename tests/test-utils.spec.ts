@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   GluonElement,
+  compose,
   createInjectionKey,
   defineElement,
   html,
@@ -31,6 +32,15 @@ afterEach(async () => {
 });
 
 describe('@gluonjs/test-utils component fixtures', () => {
+  it('mounts a composed template body through the same public component fixture', () => {
+    const Panel = (props: Readonly<{ title: string; children: import('@gluonjs/core').TemplateValue }>) => html`
+      <section><h2>${props.title}</h2>${props.children}</section>
+    `;
+    const fixture = renderFixture(() => html`${compose(Panel, { title: 'Checkout' })`<p>Delivery</p>`}`);
+    expect(fixture.get('h2').textContent).toBe('Checkout');
+    expect(fixture.get('p').textContent).toBe('Delivery');
+  });
+
   it('mounts typed functional props and updates through the public scheduler', async () => {
     const onSave = vi.fn();
     const fixture = mountComponent(

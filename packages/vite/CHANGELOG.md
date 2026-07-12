@@ -7,3 +7,5 @@
   template source maps and diagnostics.
 - Added compatible Custom Element, functional component, Store, and
   constructable stylesheet HMR without full page reloads.
+- Preserve `compose()` template locations and the existing compatible
+  functional-component HMR identity through the compiler integration.

@@ -1,0 +1,6 @@
+// Rejected compiler syntax, retained for the checkout/dialog comparison.
+html`<${Shell} heading="Checkout" .actions=${actions} .dialog=${dialog}>
+  <${Panel} title="Delivery" @submit=${submit}>
+    <label>Email <input name="email" type="email" required></label>
+  </${Panel}>
+</${Shell}>`;

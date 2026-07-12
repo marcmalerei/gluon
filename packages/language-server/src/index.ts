@@ -93,7 +93,7 @@ export function declarationsFromCustomElementsManifest(
 export interface Hover { readonly contents: string; readonly range?: Range }
 export interface WorkspaceEdit { readonly changes: Readonly<Record<string, readonly TextEdit[]>> }
 
-interface TemplateSpan { readonly tag: 'css' | 'html' | 'svg'; readonly start: number; readonly end: number }
+interface TemplateSpan { readonly tag: 'compose' | 'css' | 'html' | 'svg'; readonly start: number; readonly end: number }
 interface OpenDocument { readonly uri: string; readonly text: string; readonly analysis: DocumentAnalysis }
 
 const nativeTags = new Set('a article aside button code div footer form h1 h2 h3 h4 h5 h6 header img input label li main nav ol option p section select small span strong textarea ul'.split(' '));
@@ -323,13 +323,17 @@ function collectTemplates(source: ts.SourceFile): TemplateSpan[] {
     if (!bindings || !ts.isNamedImports(bindings)) continue;
     for (const element of bindings.elements) {
       const imported = element.propertyName?.text ?? element.name.text;
-      if (imported === 'html' || imported === 'svg' || imported === 'css') aliases.set(element.name.text, imported);
+      if (imported === 'html' || imported === 'svg' || imported === 'css' || imported === 'compose') aliases.set(element.name.text, imported);
     }
   }
   const templates: TemplateSpan[] = [];
   const visit = (node: ts.Node): void => {
-    if (ts.isTaggedTemplateExpression(node) && ts.isIdentifier(node.tag)) {
-      const tag = aliases.get(node.tag.text);
+    if (ts.isTaggedTemplateExpression(node)) {
+      const tag = ts.isIdentifier(node.tag)
+        ? aliases.get(node.tag.text)
+        : ts.isCallExpression(node.tag) && ts.isIdentifier(node.tag.expression)
+          ? aliases.get(node.tag.expression.text)
+          : undefined;
       if (tag) templates.push({ tag, start: node.template.getStart(source), end: node.template.end });
     }
     ts.forEachChild(node, visit);

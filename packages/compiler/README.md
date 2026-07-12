@@ -4,6 +4,8 @@
 foundation. It records `html` and `css` tagged-template boundaries and
 interpolation locations, produces high-resolution source maps, and supplies the
 development wrappers consumed by `@gluonjs/vite`.
+Aliased `compose(Component, props)\`body\`` calls are recorded as template
+boundaries with the same source-location and inline-style behavior as `html`.
 
 The compiler does not turn templates into a private renderer format. Runtime
 templates continue to use the public `html` and `css` APIs. Production

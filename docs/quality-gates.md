@@ -37,6 +37,16 @@ accessibility responsibilities are separated in
 [`accessibility.md`](accessibility.md), and deterministic retention evidence is
 defined in [`memory-retention.md`](memory-retention.md).
 
+## Template composition gate
+
+`npm run check:template-composition` verifies the retained Gluon current-call,
+Gluon `compose()`, React JSX, and Vue template checkout/dialog fixtures. It
+checks observable parity, committed tokens/lines/indentation/children counts,
+TypeScript and vue-tsc validity, Vue SFC parsing, compiler recognition, and
+unchanged source-map content. The canonical `implementation-slice-only` record
+uses the parent DX evidence format, reports zero human participants, and makes
+no completed-run or general readability claim.
+
 ## Generated API example gate
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry

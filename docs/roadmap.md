@@ -233,6 +233,7 @@ editing, testing, debugging, and production building.
 | [#33](https://github.com/marcmalerei/gluon/issues/33) | Build `@gluonjs/test-utils`. |
 | [#34](https://github.com/marcmalerei/gluon/issues/34) | Shareable Playground, downloadable starters, and versioned searchable diagnostic reference are implemented. |
 | [#107](https://github.com/marcmalerei/gluon/issues/107) | Retain the task-level Gluon, Vue, and React DX comparison and implement the scoped UI-authoring improvements supported by its evidence. |
+| [#111](https://github.com/marcmalerei/gluon/issues/111) | Add `compose(Component, props)\`body\`` as the template-native functional composition path with compiler, editor, universal-rendering, generator, Playground, and GLUON GOODS evidence. |
 
 ### Exit gate
 
@@ -250,8 +251,9 @@ editing, testing, debugging, and production building.
   limitations; no general superiority claim is accepted without that evidence.
 
 The versioned issue #107 benchmark contract is documented in
-[`dx-benchmark.md`](dx-benchmark.md). Its current retained record selects the
-comparator lanes only and supports no task result. Issues #108 through #115 are
+[`dx-benchmark.md`](dx-benchmark.md). Its retained records select the comparator
+lanes and preserve the explicitly partial #111 syntax slice; neither is a
+completed 21-result run. Issues #108 through #115 are
 the planned implementation slices; #107 remains open until those applicable
 slices and a complete comparison run are proven.
 

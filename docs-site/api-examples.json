@@ -1541,12 +1541,15 @@
       "module": "@gluonjs/core",
       "code": [
         "import {",
+        "  compose,",
         "  defineAtom,",
         "  html,",
         "  mergeProps,",
         "  renderScopedSlot,",
         "  type ClassValue,",
+        "  type ComponentTemplateTag,",
         "  type ComponentLayer,",
+        "  type CompositionProps,",
         "  type FunctionalComponent,",
         "  type MergeableProps,",
         "  type ScopedSlot,",
@@ -1561,8 +1564,13 @@
         "const layer: ComponentLayer = 'atom';",
         "const ProductActions: FunctionalComponent<{ productId: string }> = ({ productId }) =>",
         "  html`<div ...=${props}>${renderScopedSlot(actions, { productId })}</div>`;",
+        "interface PanelProps { title: string; children: import('@gluonjs/core').TemplateValue }",
+        "const Panel: FunctionalComponent<PanelProps> = ({ title, children }) => html`<section><h2>${title}</h2>${children}</section>`;",
+        "const panelProps: CompositionProps<PanelProps> = { title: 'Checkout' };",
+        "const panel: ComponentTemplateTag = compose(Panel, panelProps);",
+        "const checkout = panel`<p>Delivery</p>`;",
         "const Actions = defineAtom((props: { productId: string }) => html`${ProductActions(props)}`, 'ProductActions');",
-        "console.log(layer, Actions.layer, Actions({ productId: 'orbit-lamp' }));"
+        "console.log(layer, checkout, Actions.layer, Actions({ productId: 'orbit-lamp' }));"
       ]
     },
     "core-model-binding": {
@@ -2246,6 +2254,10 @@
     "src/type-aliases/ComponentLayer.md": {
       "recipe": "core-component-props",
       "description": "Identify whether a layered UI component is an Atom, Molecule, or Organism:"
+    },
+    "src/type-aliases/CompositionProps.md": {
+      "recipe": "core-component-props",
+      "description": "Derive the typed prop object supplied before a compose template body becomes the component's children:"
     },
     "src/type-aliases/ComponentLifecycleCallback.md": {
       "recipe": "core-element-contract",
@@ -3900,6 +3912,10 @@
       "recipe": "core-application",
       "description": "Create one application owner for providers, plugins, error handling, public API exposure, mounting, and deterministic unmounting:"
     },
+    "src/functions/compose.md": {
+      "recipe": "core-component-props",
+      "description": "Pass a native HTML template body as typed children to one ordinary functional-component call without adding a host or renderer:"
+    },
     "src/functions/defineAtom.md": {
       "recipe": "core-component-layers",
       "description": "Label a small reusable rendering function as an Atom while preserving its exact typed props:"
@@ -3979,6 +3995,10 @@
     "src/interfaces/Component.md": {
       "recipe": "core-component-layers",
       "description": "Call a typed functional component while retaining its architectural layer and stable display name for tooling:"
+    },
+    "src/interfaces/ComponentTemplateTag.md": {
+      "recipe": "core-component-props",
+      "description": "Retain the standard tagged-template call signature returned by compose for typed functional children:"
     },
     "src/interfaces/ComponentErrorInfo.md": {
       "recipe": "core-element-contract",

@@ -1,7 +1,8 @@
 # `@gluonjs/language-server`
 
-The Gluon language server analyzes imported `html`, `svg`, and `css` tagged
-templates without evaluating application code. The public service and the
+The Gluon language server analyzes imported `html`, `svg`, `css`, and aliased
+`compose(Component, props)` tagged templates without evaluating application
+code. The public service and the
 `gluon-template-check` CI command share the same two-pass project analyzer.
 
 Diagnostics cover unknown Custom Elements, declared Custom Element properties

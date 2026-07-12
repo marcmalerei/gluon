@@ -100,12 +100,15 @@ export {
 } from './application.js';
 
 export {
+  compose,
   defineAtom,
   defineMolecule,
   defineOrganism,
   renderScopedSlot,
   type Component,
+  type ComponentTemplateTag,
   type ComponentLayer,
+  type CompositionProps,
   type ScopedSlot,
 } from './component.js';
 

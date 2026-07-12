@@ -4,15 +4,28 @@ export interface PlaygroundProject {
 }
 
 export const defaultProject: PlaygroundProject = Object.freeze({
-  app: `import { html } from '@gluonjs/core';
+  app: `import { compose, html, type TemplateValue } from '@gluonjs/core';
 
-export function Counter(count: number, increment: () => void) {
+interface CounterFrameProps {
+  readonly count: number;
+  readonly increment: () => void;
+  readonly children?: TemplateValue;
+}
+
+function CounterFrame({ count, increment, children }: CounterFrameProps) {
   return html\`
     <div class="counter-card">
       <h1>Count \${count}</h1>
       <button @click=\${increment} type="button" aria-tap="Increment counter">Increment</button>
+      \${children}
       <img>Preview</img>
     </div>
+  \`;
+}
+
+export function Counter(count: number, increment: () => void) {
+  return compose(CounterFrame, { count, increment })\`
+  <p>Template-native functional composition</p>
   \`;
 }
 `,
