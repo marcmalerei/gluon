@@ -415,6 +415,27 @@ The package has no honest GLUON GOODS customer surface. The production
 configurator and Vue host remain input/evidence fixtures, while the analyzer
 itself remains developer tooling.
 
+## Developer-experience evidence boundary
+
+The issue #107 comparison is an evidence system, not a framework runtime or an
+application dependency. Its versioned task contract and completed-run JSON
+schema live under `benchmarks/dx`; they do not enter Core, UI, Router, Store,
+SSR, Compiler, Vite, Devtools, language-server, or GLUON GOODS bundles.
+
+The contract compares one checkout customer flow through seven identical
+observable tasks in Gluon, the official `create-vue` lane, and the React Router
+framework lane selected from React's official application guidance. It retains
+raw commands, files, authored/configuration lines, dependencies, concepts,
+diagnostics, browser results, universal-rendering evidence, cleanup evidence,
+and human observations. Results remain separate per task and dimension; no
+single weighted score is an architectural input or accepted output.
+
+`npm run check:dx-scorecard` currently validates the contract and comparator-
+selection record only. A completed evidence run cannot be inferred from that
+gate: it requires 21 framework-task records, exact run versions and lockfiles,
+all automated evidence, and at least one retained human usability pass. See
+[`dx-benchmark.md`](dx-benchmark.md) for the current verified boundary.
+
 ## Verification boundaries
 
 The machine-readable [`package-contract.json`](../package-contract.json) defines
