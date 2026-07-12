@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0.0",
+  "specification": "benchmarks/dx/specification-v1.json",
+  "customerFlow": "Evidence Tote product to persisted checkout",
+  "frameworks": [
+    {
+      "id": "gluon",
+      "lane": "create-gluon strict TypeScript universal application",
+      "scaffoldCommand": "create-gluon gluon --yes --router --store --testing --ui --ssr",
+      "interactiveAnswers": ["project=gluon", "router=yes", "store=yes", "testing=yes", "ui=yes", "ssr=yes"],
+      "fixture": "benchmarks/dx/fixtures/gluon",
+      "lockfile": "package-lock.json",
+      "cleanInstallCommand": "npm run check:create-gluon-fixtures",
+      "exactVersions": {
+        "@gluonjs/core": "0.0.0", "@gluonjs/router": "0.0.0", "@gluonjs/store": "0.0.0", "@gluonjs/ssr": "0.0.0", "@gluonjs/atoms": "0.0.0",
+        "typescript": "5.9.3", "vite": "8.1.4", "vitest": "4.1.10", "playwright": "1.61.1"
+      },
+      "tasks": {
+        "T1-scaffold": { "status": "covered", "evidence": ["package.json", "src/routes.ts", "src/counter-store.ts", "src/app.spec.ts"] },
+        "T2-themed-controls": { "status": "covered", "evidence": ["src/app.ts", "src/styles.ts", "src/components/purchase-primitive.ts"] },
+        "T3-local-layers": { "status": "covered", "evidence": ["src/components/purchase-primitive.ts", "src/components/delivery-composition.ts", "src/components/checkout-layout.ts"] },
+        "T4-stateful-control": { "status": "covered", "evidence": ["src/quantity-control.ts", "../../stateful-form-control/gluon-functional.ts", "../../stateful-form-control/invalid-contracts.tsx"] },
+        "T5-customer-flow": { "status": "covered", "evidence": ["src/app.spec.ts", "../../../../tests/vite-hmr.spec.ts", "../../../../tests/router.spec.ts"] },
+        "T6-universal-route": { "status": "covered", "evidence": ["src/server.ts", "src/main.ts", "../../../../tests/hydration.spec.ts"] },
+        "T7-plain-html": { "status": "covered", "evidence": ["src/quantity-control.ts", "README.md", "../../../../tests/dx-stateful-form-control.spec.ts"] }
+      },
+      "diagnostics": {
+        "invalidProp": "benchmarks/dx/stateful-form-control/invalid-contracts.tsx",
+        "invalidEvent": "benchmarks/dx/stateful-form-control/invalid-contracts.tsx",
+        "missingCleanup": "tests-node/compiler-vite.spec.ts"
+      },
+      "limitations": ["The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."]
+    },
+    {
+      "id": "vue",
+      "lane": "official create-vue SPA plus the official Vue server renderer required by T6",
+      "scaffoldCommand": "npm create vue@3.22.4 -- vue --ts --router --pinia --playwright --bare",
+      "interactiveAnswers": ["TypeScript=yes", "Router=yes", "Pinia=yes", "Playwright=yes", "bare=yes"],
+      "fixture": "benchmarks/dx/fixtures/vue",
+      "lockfile": "benchmarks/dx/fixtures/vue/package-lock.json",
+      "cleanInstallCommand": "npm ci --ignore-scripts",
+      "exactVersions": {
+        "create-vue": "3.22.4", "vue": "3.5.39", "vue-router": "5.1.0", "pinia": "3.0.4", "@vue/server-renderer": "3.5.39",
+        "typescript": "5.9.3", "vite": "8.1.4", "vue-tsc": "3.3.7", "@playwright/test": "1.61.1"
+      },
+      "tasks": {
+        "T1-scaffold": { "status": "covered", "evidence": ["package.json", "src/router/index.ts", "src/stores/cart.ts", "e2e/flow.spec.ts"] },
+        "T2-themed-controls": { "status": "covered", "evidence": ["src/App.vue", "src/components/PrimitiveButton.vue", "src/views/ProductRoute.vue"] },
+        "T3-local-layers": { "status": "covered", "evidence": ["src/components/PrimitiveButton.vue", "src/components/FieldComposition.vue", "src/components/CheckoutShell.vue"] },
+        "T4-stateful-control": { "status": "covered", "evidence": ["src/components/QuantityControl.vue", "diagnostics/InvalidContracts.vue", "diagnostics/MissingCleanup.vue"] },
+        "T5-customer-flow": { "status": "covered", "evidence": ["e2e/flow.spec.ts", "src/stores/cart.ts", "src/hmr-marker.ts"] },
+        "T6-universal-route": { "status": "covered", "evidence": ["src/entry-server.ts", "src/main.ts", "server.mjs", "e2e/flow.spec.ts"] },
+        "T7-plain-html": { "status": "platform-limitation", "evidence": ["../../stateful-form-control/vue.ts"], "limitation": "The retained Vue SFC is not an autonomous Custom Element; plain HTML requires the measured bridge in the existing T4 fixture." }
+      },
+      "diagnostics": {
+        "invalidProp": "benchmarks/dx/fixtures/vue/diagnostics/InvalidContracts.vue",
+        "invalidEvent": "benchmarks/dx/fixtures/vue/diagnostics/InvalidContracts.vue",
+        "missingCleanup": "No vue-tsc diagnostic is emitted for benchmarks/dx/fixtures/vue/diagnostics/MissingCleanup.vue."
+      },
+      "limitations": ["create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."]
+    },
+    {
+      "id": "react",
+      "lane": "officially recommended React Router framework application",
+      "scaffoldCommand": "npx create-react-router@8.2.0 react --yes --no-install --no-git-init --no-agent-skills --react-router-version 8.2.0",
+      "interactiveAnswers": ["defaults=yes", "install=no", "git-init=no", "agent-skills=no"],
+      "fixture": "benchmarks/dx/fixtures/react",
+      "lockfile": "benchmarks/dx/fixtures/react/package-lock.json",
+      "cleanInstallCommand": "npm ci --ignore-scripts",
+      "exactVersions": {
+        "create-react-router": "8.2.0", "react-router": "8.2.0", "react": "19.2.7", "react-dom": "19.2.7",
+        "typescript": "5.9.3", "vite": "8.1.4", "@playwright/test": "1.61.1"
+      },
+      "tasks": {
+        "T1-scaffold": { "status": "covered", "evidence": ["package.json", "app/routes.ts", "app/cart.ts", "tests/flow.spec.ts"] },
+        "T2-themed-controls": { "status": "covered", "evidence": ["app/app.css", "app/components.tsx", "app/routes/product.tsx"] },
+        "T3-local-layers": { "status": "covered", "evidence": ["app/components.tsx"] },
+        "T4-stateful-control": { "status": "covered", "evidence": ["app/components.tsx", "diagnostics/invalid.tsx", "diagnostics/missing-cleanup.tsx"] },
+        "T5-customer-flow": { "status": "covered", "evidence": ["tests/flow.spec.ts", "app/cart.ts", "app/hmr-marker.ts"] },
+        "T6-universal-route": { "status": "covered", "evidence": ["react-router.config.ts", "app/root.tsx", "tests/flow.spec.ts"] },
+        "T7-plain-html": { "status": "platform-limitation", "evidence": ["../../stateful-form-control/react.tsx"], "limitation": "The retained React function component is not an autonomous Custom Element; plain HTML requires the measured bridge in the existing T4 fixture." }
+      },
+      "diagnostics": {
+        "invalidProp": "benchmarks/dx/fixtures/react/diagnostics/invalid.tsx",
+        "invalidEvent": "benchmarks/dx/fixtures/react/diagnostics/invalid.tsx",
+        "missingCleanup": "TypeScript emits no diagnostic for benchmarks/dx/fixtures/react/diagnostics/missing-cleanup.tsx."
+      },
+      "limitations": ["create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."]
+    }
+  ]
+}

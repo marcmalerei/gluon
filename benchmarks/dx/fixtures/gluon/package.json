@@ -1,0 +1,38 @@
+{
+  "name": "gluon",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && vite build --ssr src/server.ts --outDir dist-server",
+    "check:templates": "gluon-template-check src",
+    "dev": "vite",
+    "test": "vitest run",
+    "test:components": "vitest run src/components",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gluonjs/atoms": "0.0.0",
+    "@gluonjs/core": "0.0.0",
+    "@gluonjs/molecules": "0.0.0",
+    "@gluonjs/organisms": "0.0.0",
+    "@gluonjs/quarks": "0.0.0",
+    "@gluonjs/router": "0.0.0",
+    "@gluonjs/ssr": "0.0.0",
+    "@gluonjs/store": "0.0.0"
+  },
+  "devDependencies": {
+    "@gluonjs/language-server": "0.0.0",
+    "@gluonjs/test-utils": "0.0.0",
+    "@gluonjs/vite": "0.0.0",
+    "@types/node": "22.20.1",
+    "@vitest/browser-playwright": "4.1.10",
+    "playwright": "1.61.1",
+    "typescript": "5.9.3",
+    "vite": "8.1.4",
+    "vitest": "4.1.10"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  }
+}
