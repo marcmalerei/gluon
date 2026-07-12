@@ -68,6 +68,10 @@ per connected lifetime in a child effect scope. Explicitly keyed `state()` and
 callbacks, and `onCleanup()` work are connection-owned. Lifecycle or form
 registration after setup throws. The compiler reports detectable deferred
 registration and listener/interval creation with no cleanup owner.
+`context.props` is a readonly reactive view of the element's native declared
+properties: every accepted property or reflected-attribute change invalidates
+that view, so `watch(() => context.props.value, ...)` observes the same writes
+that schedule the host render.
 
 The complete timing, stop order, error, context, form, universal-rendering,
 HMR, and standalone behavior is specified by

@@ -19,6 +19,7 @@ import { inject, type InjectionKey } from './application.js';
 import {
   GluonElement,
   defineElement,
+  functionalElementPropertyChanged,
   type ComponentErrorBoundary,
   type ComponentErrorInfo,
   type ComponentLifecycleCallback,
@@ -254,6 +255,7 @@ export function defineGluonElement<
     private connectionCallbacks = createConnectionCallbacks();
     private connectionRender?: () => TemplateResult;
     private setupScope?: EffectScope;
+    private propsRevision?: Ref<number>;
     private refreshSetupBeforeRender = false;
     private setupRegistrationOpen = false;
     private readonly elementInternals = this.createElementInternals();
@@ -333,7 +335,12 @@ export function defineGluonElement<
       this.setupScope = undefined;
       this.refreshSetupBeforeRender = false;
       this.connectionRender = undefined;
+      this.propsRevision = undefined;
       this.connectionCallbacks = createConnectionCallbacks();
+    }
+
+    [functionalElementPropertyChanged](): void {
+      if (this.propsRevision) this.propsRevision.value += 1;
     }
 
     protected override render(): TemplateResult {
@@ -389,9 +396,18 @@ export function defineGluonElement<
 
     private createSetupContext(): FunctionalElementSetupContext<Props, EventsMap, FormAssociated> {
       const form = definition.formAssociated ? this.createFormContext() : undefined;
+      const propsRevision = ref(0);
+      this.propsRevision = propsRevision;
+      const props = new Proxy(this as unknown as Props, {
+        get: (target, property, receiver) => {
+          void propsRevision.value;
+          return Reflect.get(target, property, receiver);
+        },
+        set: () => false,
+      }) as Readonly<Props>;
       return Object.freeze({
         host: this as unknown as GluonElement<EventsMap> & Props,
-        props: this as unknown as Readonly<Props>,
+        props,
         form,
         state: <Value>(key: string, initial: Value | (() => Value)): Ref<Value> => {
           const retained = this.retainedState.get(`ref:${key}`);

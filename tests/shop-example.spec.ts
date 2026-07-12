@@ -6,7 +6,10 @@ import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
 import { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
-import type { BagQuantityControlElement } from '../examples/shop/src/bag-quantity-control.js';
+import {
+  registerBagQuantityControl,
+  type BagQuantityControlElement,
+} from '../examples/shop/src/bag-quantity-control.js';
 import { shopStyles } from '../examples/shop/src/styles.js';
 
 describe('GLUON GOODS reference shop', () => {
@@ -231,6 +234,36 @@ describe('GLUON GOODS reference shop', () => {
     isolatedA.storeManager.dispose();
     isolatedB.storeManager.dispose();
     second.app.unmount();
+  });
+
+  it('keeps the bag quantity control optimistic state synchronized and cancelable', async () => {
+    const Control = registerBagQuantityControl();
+    const control = document.createElement('gluon-bag-quantity') as InstanceType<typeof Control>;
+    control.lineKey = 'orbit-lamp:cobalt';
+    control.productName = 'Orbit Lamp';
+    control.quantity = 1;
+    control.addEventListener('quantity-change', (event) => event.preventDefault(), { once: true });
+    document.body.append(control);
+    await control.updateComplete;
+
+    control.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
+    await control.updateComplete;
+    expect(control.shadowRoot?.querySelector('output')?.textContent).toBe('1');
+
+    control.quantity = 2;
+    await settleShop();
+    expect(control.shadowRoot?.querySelector('output')?.textContent).toBe('2');
+    control.focus();
+    expect(control.shadowRoot?.activeElement).toBe(
+      control.shadowRoot?.querySelector('[aria-label="Decrease quantity"]'),
+    );
+
+    control.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
+    control.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
+    await control.updateComplete;
+    control.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
+    await control.updateComplete;
+    expect(control.shadowRoot?.querySelector('output')?.textContent).toBe('0');
   });
 });
 

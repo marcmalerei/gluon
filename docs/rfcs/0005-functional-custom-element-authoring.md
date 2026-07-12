@@ -90,6 +90,10 @@ reconnect and compatible HMR.
 `context.computed`, `context.watch`, and `context.watchEffect` execute in the
 active setup scope and are recreated on reconnection. Direct calls to the same
 public Reactivity functions during setup receive the same current scope.
+`context.props` is a readonly reactive proxy over the host's declared native
+properties. A successful native property or reflected-attribute change advances
+an internal connection-local revision, allowing property-source watchers to
+observe the write without replacing the host property/attribute contract.
 
 Cleanup order is the existing `EffectScope.stop()` order:
 
