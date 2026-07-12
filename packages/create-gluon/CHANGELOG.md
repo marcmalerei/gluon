@@ -11,3 +11,12 @@
   preserving the same starter routes and rendered anchors.
 - Generate UI starters that rely on renderer-owned exact Button styles without
   importing or adopting the deprecated aggregate Atom sheet.
+- Add the interactive and flag-stable `add-component` workflow for app-local
+  Atoms, Atom-composed Molecules, downward Organisms, `defineGluonElement`
+  Custom Elements, and headless wrappers.
+- Add validation-first dry runs, traversal/absolute/symlink/tag/name guards,
+  collision refusal, separately confirmed overwrites, staged writes with
+  rollback, deterministic dependency/barrel updates, and generated strict
+  browser tests.
+- Verify every component kind through packed clean installs, type and template
+  checks, Chromium, client/SSR builds, and package dry runs.

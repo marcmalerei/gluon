@@ -32,6 +32,32 @@ assertSet(specification.tasks.map(({ id }) => id), [
 for (const task of specification.tasks) {
   assert(task.observableOutcomes.length >= 3, `${task.id} must define at least three observable outcomes`);
 }
+const addComponentTask = specification.addComponentTask;
+assert(addComponentTask.status === 'task-contract-only', 'add-component evidence must not imply a completed run');
+assert(addComponentTask.taskId === 'T3-local-layers', 'add-component task must remain part of T3');
+assertSet(addComponentTask.lanes.map(({ framework }) => framework), ['gluon', 'react', 'vue'], 'add-component lanes');
+assertSet(addComponentTask.evidenceFields, [
+  'commands',
+  'interactiveAnswers',
+  'generatedFiles',
+  'authorCreatedFiles',
+  'manualEdits',
+  'typecheck',
+  'browserTest',
+  'build',
+], 'add-component evidence fields');
+const gluonAddComponentLane = addComponentTask.lanes.find(({ framework }) => framework === 'gluon');
+assert(gluonAddComponentLane.addCommands.length === 1, 'Gluon add-component task must retain its generator command');
+assert(gluonAddComponentLane.addCommands[0].includes('add-component PurchaseAction --kind atom'), 'Gluon add-component command changed');
+assert(gluonAddComponentLane.requiredManualEditRecords.length === 0, 'Gluon generated output must not be counted as manual edits');
+for (const lane of addComponentTask.lanes.filter(({ framework }) => framework !== 'gluon')) {
+  assert(lane.addCommands.length === 0, `${lane.framework} must not invent an official add-component generator`);
+  assert(lane.requiredManualEditRecords.length >= 3, `${lane.framework} must retain every required manual-edit category`);
+  const source = new URL(lane.source);
+  assert(source.hostname === (lane.framework === 'vue' ? 'vuejs.org' : 'react.dev'), `${lane.framework} add-component source is not official`);
+}
+assert(addComponentTask.limitations.some((value) => value.includes('not a completed 21-result benchmark run')), 'add-component task must retain the incomplete-run boundary');
+assert(addComponentTask.limitations.some((value) => value.includes('No Vue or React project was executed')), 'add-component task must state missing comparator execution');
 assert(validateSliceMeasurement, 'slice measurement schema must be addressable');
 assert(Array.isArray(specification.sliceMeasurements), 'slice measurements must be recorded explicitly');
 const taskIds = new Set(specification.tasks.map(({ id }) => id));

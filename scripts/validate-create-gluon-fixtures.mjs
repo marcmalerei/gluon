@@ -18,6 +18,8 @@ const packageSources = new Map([
   ['@gluonjs/ssr', 'packages/ssr'],
   ['@gluonjs/vite', 'packages/vite'],
   ['@gluonjs/test-utils', 'packages/test-utils'],
+  ['@gluonjs/devtools-api', 'packages/devtools-api'],
+  ['@gluonjs/devtools', 'packages/devtools'],
   ['@gluonjs/language-server', 'packages/language-server'],
   ['@gluonjs/quarks', 'packages/quarks'],
   ['@gluonjs/atoms', 'packages/atoms'],
@@ -28,11 +30,12 @@ const packageSources = new Map([
 try {
   await mkdir(artifactDirectory, { recursive: true });
   const archives = packWorkspacePackages();
-  const { scaffoldProject } = await import(
+  const { addComponent, scaffoldProject } = await import(
     pathToFileURL(resolve(root, 'packages/create-gluon/dist/index.js')).href
   );
   const matrix = supportedMatrix();
-  for (const [index, features] of matrix.entries()) {
+  const componentsOnly = process.argv.includes('--components-only');
+  for (const [index, features] of (componentsOnly ? [] : matrix).entries()) {
     const name = matrixName(index, features);
     const result = await scaffoldProject({ directory: name, cwd: fixtureDirectory, ...features });
     await pointOfficialDependenciesAtArchives(result.directory, archives, features);
@@ -43,7 +46,38 @@ try {
     run('npm', ['run', 'build'], result.directory);
     process.stdout.write(`validated starter ${index + 1}/${matrix.length}: ${name}\n`);
   }
-  process.stdout.write(`create-gluon fixture matrix valid: ${matrix.length} projects\n`);
+  const componentKinds = [
+    ['atom', 'PrimitiveAction'],
+    ['molecule', 'DeliveryPanel'],
+    ['organism', 'CheckoutRegion'],
+    ['element', 'AccountControl'],
+    ['headless', 'DialogFocus'],
+  ];
+  for (const [index, [kind, name]] of componentKinds.entries()) {
+    const directory = `component-${kind}`;
+    const result = await scaffoldProject({
+      directory,
+      cwd: fixtureDirectory,
+      ssr: true,
+      testing: true,
+      ui: true,
+    });
+    await addComponent({
+      root: result.directory,
+      kind,
+      name,
+      ...(kind === 'element' ? { tagName: 'app-account-control' } : {}),
+    });
+    await pointOfficialDependenciesAtArchives(result.directory, archives, result.features);
+    run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], result.directory);
+    run('npm', ['run', 'typecheck'], result.directory);
+    run('npm', ['run', 'check:templates'], result.directory);
+    run('npm', ['run', 'test:components'], result.directory);
+    run('npm', ['run', 'build'], result.directory);
+    run('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], result.directory);
+    process.stdout.write(`validated component ${index + 1}/${componentKinds.length}: ${kind}\n`);
+  }
+  process.stdout.write(`create-gluon fixture matrix valid: ${componentsOnly ? 0 : matrix.length} applications and ${componentKinds.length} component kinds\n`);
 } finally {
   await rm(temporaryRoot, { recursive: true, force: true });
 }
@@ -102,6 +136,13 @@ async function pointOfficialDependenciesAtArchives(directory, archives, features
     required.add('@gluonjs/quarks');
     required.add('@gluonjs/atoms');
   }
+  for (const name of [
+    ...Object.keys(manifest.dependencies ?? {}),
+    ...Object.keys(manifest.devDependencies ?? {}),
+  ]) {
+    if (name.startsWith('@gluonjs/')) required.add(name);
+  }
+  if (required.has('@gluonjs/devtools')) required.add('@gluonjs/devtools-api');
 
   for (const name of required) {
     const archive = archives.get(name);

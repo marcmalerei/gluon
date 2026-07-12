@@ -1,7 +1,7 @@
 {
   "name": "create-gluon",
   "version": "0.0.0",
-  "description": "Scaffold supported Gluon TypeScript applications.",
+  "description": "Scaffold Gluon TypeScript applications and verified app-local components.",
   "private": true,
   "type": "module",
   "license": "MIT",

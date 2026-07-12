@@ -49,6 +49,8 @@
       "observableOutcomes": [
         "The application owns one primitive control, one repeated control composition, and one larger page layout.",
         "Each layer is extended once through its documented public contract.",
+        "From the recorded clean scaffold, the author adds one named PurchaseAction component with native button semantics, an application-owned style, a browser interaction test, and a public local export.",
+        "The retained task evidence records every scaffold/add command, interactive answer, generated file, author-created file, and manual edit for Gluon, Vue, and React without treating generated output as authored edits.",
         "The retained browser output is the same checkout flow in all three fixtures, not a component gallery."
       ]
     },
@@ -89,6 +91,64 @@
       ]
     }
   ],
+  "addComponentTask": {
+    "status": "task-contract-only",
+    "taskId": "T3-local-layers",
+    "title": "Add one tested app-local PurchaseAction from a clean scaffold",
+    "observableOutcomes": [
+      "The component renders a native type=button control named Purchase, owns one application stylesheet, exposes one click callback, and is exported from the application's local component boundary.",
+      "A strict browser test verifies the accessible name, native type, click callback, and cleanup of the framework-lane style or mount owner.",
+      "No lane imports private framework source, substitutes a gallery, or omits a required manual edit from its retained record."
+    ],
+    "evidenceFields": [
+      "commands",
+      "interactiveAnswers",
+      "generatedFiles",
+      "authorCreatedFiles",
+      "manualEdits",
+      "typecheck",
+      "browserTest",
+      "build"
+    ],
+    "lanes": [
+      {
+        "framework": "gluon",
+        "scaffoldCommand": "npm create gluon@latest shop -- --testing --ui --yes",
+        "addCommands": [
+          "create-gluon add-component PurchaseAction --kind atom --root shop --yes"
+        ],
+        "requiredManualEditRecords": [],
+        "source": "packages/create-gluon/README.md"
+      },
+      {
+        "framework": "vue",
+        "scaffoldCommand": "npm create vue@latest",
+        "addCommands": [],
+        "requiredManualEditRecords": [
+          "the new PurchaseAction.vue single-file component",
+          "the component's browser test and test configuration or dependency edits",
+          "the parent import/use or local export edit"
+        ],
+        "source": "https://vuejs.org/guide/essentials/component-basics.html"
+      },
+      {
+        "framework": "react",
+        "scaffoldCommand": "npx create-react-router@latest shop",
+        "addCommands": [],
+        "requiredManualEditRecords": [
+          "the new PurchaseAction function-component module",
+          "the component stylesheet",
+          "the component's browser test and test configuration or dependency edits",
+          "the parent import/use or local export edit"
+        ],
+        "source": "https://react.dev/learn"
+      }
+    ],
+    "limitations": [
+      "This is the identical task and evidence contract for a future scorecard run, not a completed 21-result benchmark run.",
+      "No Vue or React project was executed for issue #113, no human usability pass exists, and no win, tie, loss, or general DX comparison is supported."
+    ]
+  },
   "sliceMeasurements": [
     {
       "issue": 108,

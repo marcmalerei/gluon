@@ -15,6 +15,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   hydration diagnostics, and production tree-shaking evidence.
 - GLUON GOODS search integration and retained raw/gzip/module/sheet plus final
   bounded T2/T3 DX evidence for usage-driven UI styles.
+- A deterministic `create-gluon add-component` workflow with five verified
+  app-local ownership templates, complete dry-run plans, validation-first
+  filesystem safety, separately confirmed overwrites, managed public exports,
+  and packed clean-project evidence across browser, HMR, SSR/hydration,
+  language-tooling, test-utils, and Devtools-compatible boundaries.
 - The public `compose(component, props)\`body\`` functional-component authoring
   path, compiler/language-tooling boundaries, retained Gluon/React/Vue
   checkout-dialog comparison, generated starter and Playground examples, and
@@ -48,7 +53,7 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Rootless `svg` template fragments now compile in the SVG namespace and use a
   template-type-specific cache, enabling app-owned Icon geometry consistently
   in Chromium, Firefox, and WebKit.
-- Reviewed task-oriented examples for all 560 generated public API symbol
+- Reviewed task-oriented examples for all 575 generated public API symbol
   pages, with symbol-specific purpose text and concrete application, lifecycle,
   input/output, ownership, error, and cleanup flows shared through maintained
   package recipes instead of compiler-only type or import demonstrations.
