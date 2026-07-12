@@ -1,6 +1,6 @@
 # Release operations
 
-Gluon uses one lockstep release for the 16 packages in
+Gluon uses one lockstep release for the 17 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
@@ -132,12 +132,12 @@ GitHub release.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance under `gluon-staging-v<version-with-dashes>`, never directly to
-`latest`. Before the first publish it proves that all 16 npm package records
+`latest`. Before the first publish it proves that all 17 npm package records
 already exist. After each publish it compares registry integrity and provenance
 with `release-evidence.json`. A rerun skips an already-existing version only
 when those facts match; a mismatch stops the train.
 
-After all 16 staging publications succeed, an authorized npm owner reviews the
+After all 17 staging publications succeed, an authorized npm owner reviews the
 draft evidence and promotes every exact package version to `latest` with
 interactive 2FA using `npm dist-tag add <name>@<version> latest`. OIDC trusted
 publishing does not authorize dist-tag changes. The owner may remove the
