@@ -303,10 +303,11 @@ manifest, links, API coverage, and examples before deploying the documentation
 and Playground as one public site. Issue #102 adds a derived, typechecked public
 import example to every generated symbol page and supports curated behavioral
 examples without allowing private or deep package paths.
-Issue #104 replaces the resulting compiler-contract placeholders with
-task-oriented concrete configurations and explicit runtime-owner consumption
-examples; curated overrides cover APIs whose lifecycle spans multiple public
-entry points.
+Issue #104 replaces the resulting compiler-contract placeholders with reviewed
+task-oriented examples for all 507 public symbol pages. The catalog gives every
+page a symbol-specific purpose statement and a compiled concrete scenario;
+shared recipes keep related application lifecycles coherent while the blocking
+gate rejects any new symbol without reviewed coverage.
 
 Issue #39 makes Quarks, Atoms, Molecules, and Organisms current optional
 workspaces and removes their transitional Core subpaths. Stable manifest

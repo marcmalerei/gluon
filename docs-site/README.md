@@ -29,27 +29,26 @@ and emits reviewed Markdown into `.tmp/docs-api`.
 `generate-api-examples.mjs` then derives every public function, class,
 interface, type-alias, and variable page, maps it back to an official package
 entry point, appends an `Example` section, and typechecks the complete generated
-snippet corpus. Curated examples live in `api-examples.json`; unknown pages,
-private modules, invalid snippets, duplicate external example sections, or
-missing symbol coverage fail `npm run docs:api`.
+snippet corpus. `api-examples.json` maps all 507 current symbol pages to reviewed
+task-oriented examples. Related symbols may share a maintained application
+recipe, but every page has its own purpose statement and the compiled recipe
+must use that documented symbol. Unknown pages, missing catalog entries, private
+modules, invalid snippets, duplicate external example sections, or incomplete
+symbol coverage fail `npm run docs:api`.
 
 `build-docs.mjs` renders that reference beside the maintained guides, cookbook,
 migration material, examples, and release archive. `validate-docs.mjs` verifies
 the version tree, public API entry-point count, one rendered example per public
 symbol page, required curated content, compiled examples, and internal links.
 
-Generated baselines synthesize representative primitive values, object
-configurations, callbacks, component properties, and function calls from the
-public TypeDoc reflection. They must not contain compiler-only constructs such
-as declared argument tuples, empty type aliases, or bare value reads.
-
-Some APIs consume Router, Store, DOM, server, or test objects that the
-application or framework must already own. For those pages the generator emits
-a typed consumption example instead of fabricating an invalid lifecycle.
-Behavior-oriented examples live in `api-examples.json` when setup, ownership,
-cleanup, errors, or multiple public entry points need to be shown together.
-The catalog currently curates memory history, Router options, Store definition,
-and Gluon Element class/HMR flows.
+The reviewed catalog covers Core rendering and application ownership,
+reactivity, Router, Store, SSR/hydration/streaming/static generation, layered UI,
+test fixtures, compiler/Vite, diagnostics, Devtools, language tooling,
+scaffolding, and Vue migration analysis. Examples show concrete configuration,
+observable results, lifecycle ownership, failure handling, and cleanup where the
+API requires them. The gate rejects compiler-only constructs such as declared
+argument tuples, empty type aliases, or bare value reads, as well as the former
+generic runtime-owner copy.
 
 All TypeScript and Vue example sources live in `examples/` and are compiled
 through `examples/tsconfig.json` plus the maintained Vite configurations;
