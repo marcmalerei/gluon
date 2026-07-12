@@ -16,7 +16,7 @@
         "typescript": "5.9.3", "vite": "8.1.4", "vitest": "4.1.10", "playwright": "1.61.1"
       },
       "tasks": {
-        "T1-scaffold": { "status": "covered", "evidence": ["package.json", "src/routes.ts", "src/counter-store.ts", "src/app.spec.ts"] },
+        "T1-scaffold": { "status": "covered", "evidence": ["package.json", "src/routes.ts", "src/cart-store.ts", "src/app.spec.ts"] },
         "T2-themed-controls": { "status": "covered", "evidence": ["src/app.ts", "src/styles.ts", "src/components/purchase-primitive.ts"] },
         "T3-local-layers": { "status": "covered", "evidence": ["src/components/purchase-primitive.ts", "src/components/delivery-composition.ts", "src/components/checkout-layout.ts"] },
         "T4-stateful-control": { "status": "covered", "evidence": ["src/quantity-control.ts", "../../stateful-form-control/gluon-functional.ts", "../../stateful-form-control/invalid-contracts.tsx"] },

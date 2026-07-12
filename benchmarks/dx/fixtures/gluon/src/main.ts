@@ -16,13 +16,16 @@ if (document.querySelector('script[data-gluon-state]')) {
   const state = readHydrationState();
   const storeManager = createStoreManager();
   await hydrateRequestState(state, router, storeManager);
-  const { app } = createStarterApplication({ router, storeManager });
+  const { app, cart } = createStarterApplication({ router, storeManager });
   await hydrateApplication(app, container, {
     state: { server: state.store, client: storeManager.dehydrate() },
     styles: createStyleManifest([starterStyles]),
     styleRoot: document,
   });
+  cart.hydrate();
 } else {
   adoptStyles(document, starterStyles);
-  createStarterApplication({ router }).app.mount(container);
+  const { app, cart } = createStarterApplication({ router });
+  app.mount(container);
+  cart.hydrate();
 }
