@@ -6,6 +6,8 @@
 - **Roadmap tracker:** [#42](https://github.com/marcmalerei/gluon/issues/42)
 - **Depends on:** [RFC 0001](../rfcs/0001-gluon-1.0-product-scope.md), [RFC 0002](../rfcs/0002-unified-component-model.md), [ADR 0001](0001-browser-runtime-and-style-transport.md)
 - **Supersedes:** Nothing
+- **Amended by:** [RFC 0003](../rfcs/0003-report-only-vue-migration-analyzer.md),
+  which reserves a Node-only analyzer package with no official dependencies
 
 ## Decision summary
 
@@ -76,6 +78,13 @@ Planned packages pass contract validation before their directories exist. When
 implementation starts, changing a package state to `current` makes its package
 manifest, export targets, license, changelog, README, and pack output mandatory.
 
+RFC 0003 reserves `@gluonjs/vue-migration-analyzer`, its `.` and `./schema`
+exports, and the `gluon-vue-analyze` executable. It is intentionally not yet in
+`package-contract.json`: issue #91 must add the package as `current` together
+with its implementation because the current release contract requires every
+declared release-group package to be releasable. Until then, the RFC is the
+authoritative planned-package record and issue #41 remains independent.
+
 | Package | Responsibility | Allowed official dependencies |
 | --- | --- | --- |
 | `@gluonjs/reactivity` | Signals, computed state, effects, scopes, and scheduler-independent reactive primitives | none |
@@ -89,6 +98,7 @@ manifest, export targets, license, changelog, README, and pack output mandatory.
 | `@gluonjs/devtools-api` | Versioned, environment-neutral inspection protocol | none |
 | `@gluonjs/devtools` | Browser Devtools client and integrations | `devtools-api` |
 | `@gluonjs/language-server` | Editor analysis and protocol server | `compiler` |
+| `@gluonjs/vue-migration-analyzer` (planned by RFC 0003) | Static, report-only Vue 3.5 migration inventory and schema | none |
 | `@gluonjs/quarks` | Typed native-element factories | `core` |
 | `@gluonjs/atoms` | Focused UI primitives | `core`, `quarks` |
 | `@gluonjs/molecules` | Reusable primitive compositions | `core`, `quarks`, `atoms` |
