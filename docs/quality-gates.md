@@ -47,6 +47,12 @@ unchanged source-map content. The canonical `implementation-slice-only` record
 uses the parent DX evidence format, reports zero human participants, and makes
 no completed-run or general readability claim.
 
+`npm run check:dx-scorecard` validates both completed-run evidence and bounded
+dependency-slice before/after measurements against the versioned schema. A
+slice must retain setup calls, imports, configuration, cleanup, evidence paths,
+and explicit no-comparison limitations; it cannot satisfy or imitate the
+required 21-result completed run.
+
 ## Generated API example gate
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry
