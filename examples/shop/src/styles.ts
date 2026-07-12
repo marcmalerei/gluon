@@ -1,5 +1,5 @@
 import { createStyleSheetSelection, css } from '@gluonjs/core';
-import { createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';
+import { atomStyles, createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';
 
 export const shopStyles = css`
   @layer shop.reset, shop.base, shop.components, shop.pages, shop.responsive;
@@ -358,6 +358,9 @@ export const shopStyles = css`
     .checkout-page { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: clamp(40px, 8vw, 130px); padding: clamp(42px, 7vw, 100px) var(--shop-gutter); }
     .checkout-page h1, .order-confirmation h1, .checkout-empty h1 { font-size: clamp(42px, 7vw, 92px); line-height: .94; letter-spacing: -.055em; }
     .checkout-page form { display: grid; gap: 18px; max-width: 720px; margin-top: 42px; }
+    .checkout-purchase-region { display: contents; }
+    .shop-purchase-button { --gluon-button-background: var(--shop-black); --gluon-button-color: var(--shop-white); }
+    .shop-purchase-button svg { margin-inline-end: 0.35rem; }
     .checkout-page label { display: grid; gap: 7px; font-size: 12px; }
     .checkout-page input { min-height: 52px; padding: 0 14px; border: 1px solid var(--shop-rule); background: white; }
     .checkout-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px; }
@@ -488,11 +491,13 @@ export function createShopStyleSelection(theme: UiThemeName = 'light') {
   const ui = createUiStyleSelection(theme);
   return createStyleSheetSelection([
     ...ui.entries,
+    { id: 'gluon-atoms-components', scope: 'gluon-atoms', sheet: atomStyles },
     { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
   ]);
 }
 
 /** The app-owned carrier left after installUi() consumes the shared UI carriers. */
 export const shopHydrationStyleSelection = createStyleSheetSelection([
+  { id: 'gluon-atoms-components', scope: 'gluon-atoms', sheet: atomStyles },
   { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
 ]);

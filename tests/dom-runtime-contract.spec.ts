@@ -358,6 +358,16 @@ describe('DOM runtime contract', () => {
     );
     expect(root.querySelector('g')?.getAttribute('custom:value')).toBe('plain');
 
+    const rootless = svg`<path data-rootless d="M0 0h1"></path>`;
+    render(rootless, root);
+    expect(root.querySelector('[data-rootless]')?.namespaceURI).toBe('http://www.w3.org/2000/svg');
+
+    const sharedCallSite = (tag: typeof html | typeof svg) => tag`<circle data-shared></circle>`;
+    render(sharedCallSite(html), root);
+    expect(root.querySelector('[data-shared]')?.namespaceURI).toBe('http://www.w3.org/1999/xhtml');
+    render(sharedCallSite(svg), root);
+    expect(root.querySelector('[data-shared]')?.namespaceURI).toBe('http://www.w3.org/2000/svg');
+
     render(html`<math><mi data-value=${'x'}>x</mi></math>`, root);
     expect(root.querySelector('math')?.namespaceURI).toBe('http://www.w3.org/1998/Math/MathML');
     expect(root.querySelector('mi')?.namespaceURI).toBe('http://www.w3.org/1998/Math/MathML');

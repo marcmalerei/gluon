@@ -29,7 +29,7 @@ and emits reviewed Markdown into `.tmp/docs-api`.
 `generate-api-examples.mjs` then derives every public function, class,
 interface, type-alias, and variable page, maps it back to an official package
 entry point, appends an `Example` section, and typechecks the complete generated
-snippet corpus. `api-examples.json` maps all 523 current symbol pages to reviewed
+snippet corpus. `api-examples.json` maps all 538 current symbol pages to reviewed
 task-oriented examples. Related symbols may share a maintained application
 recipe, but every page has its own purpose statement and the compiled recipe
 must use that documented symbol. Unknown pages, missing catalog entries, private

@@ -12,6 +12,14 @@ import { Dialog, Listbox, createFocusScope, q } from '@gluonjs/quarks';
 factory never invents a role or accessible name; the caller owns every semantic
 requirement of the native element it selects. Void elements reject children.
 
+`QuarkProps<ElementType>` has no general string index signature. It derives
+native scalar values and explicit property/boolean bindings from the target DOM
+interface and types ARIA, data, class, style, event, and ref bindings. Use
+`unsafeQuarkProps()` only for a reviewed platform/vendor key that the typed
+contract does not yet contain. The complete component matrix and TypeScript
+diagnostic boundary are documented in
+[`docs/ui-extensibility.md`](../../docs/ui-extensibility.md).
+
 ## Headless accessibility contracts
 
 - `createFocusScope(container, options)` focuses the requested initial target,

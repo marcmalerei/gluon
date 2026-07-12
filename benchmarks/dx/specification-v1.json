@@ -36,7 +36,10 @@
       "title": "Add themed accessible controls",
       "observableOutcomes": [
         "A labeled text input and named button use the framework lane's supported public styling or component-extension contract.",
+        "A branded purchase button and danger action retain native button semantics, an application-owned class, a data attribute, a typed ref, and an analytics listener without copying the library implementation.",
+        "An application-owned custom icon preserves decorative and informative accessibility states and native SVG attribute/ref forwarding without copying the official icon renderer.",
         "Keyboard activation works and the browser test verifies the accessible names and visible focus.",
+        "The normal diagnostics reject the retained invalid variant, built-in icon name, event value, misspelled attribute, and incompatible native element prop fixtures.",
         "No fixture copies private library implementation or imports private or deep build paths."
       ]
     },

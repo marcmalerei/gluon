@@ -12,3 +12,9 @@
 ### Deprecated
 
 - `installUiTheme()`; use `installUi()` and retain its returned owner.
+
+### Changed
+
+- Typed native `attributes` contracts, app-owned `defineButtonPreset()` brand
+  extensions, `defineIcon()` custom geometry, protected accessibility
+  semantics, and documented Button CSS custom properties.

@@ -11,6 +11,67 @@ export type QuarkRef<ElementType extends Element = Element> =
   | { value?: ElementType }
   | ((element: ElementType | undefined) => void);
 
+export type AriaAttributeName =
+  | 'activedescendant'
+  | 'atomic'
+  | 'autocomplete'
+  | 'braillelabel'
+  | 'brailleroledescription'
+  | 'busy'
+  | 'checked'
+  | 'colcount'
+  | 'colindex'
+  | 'colindextext'
+  | 'colspan'
+  | 'controls'
+  | 'current'
+  | 'describedby'
+  | 'description'
+  | 'details'
+  | 'disabled'
+  | 'dropeffect'
+  | 'errormessage'
+  | 'expanded'
+  | 'flowto'
+  | 'grabbed'
+  | 'haspopup'
+  | 'hidden'
+  | 'invalid'
+  | 'keyshortcuts'
+  | 'label'
+  | 'labelledby'
+  | 'level'
+  | 'live'
+  | 'modal'
+  | 'multiline'
+  | 'multiselectable'
+  | 'orientation'
+  | 'owns'
+  | 'placeholder'
+  | 'posinset'
+  | 'pressed'
+  | 'readonly'
+  | 'relevant'
+  | 'required'
+  | 'roledescription'
+  | 'rowcount'
+  | 'rowindex'
+  | 'rowindextext'
+  | 'rowspan'
+  | 'selected'
+  | 'setsize'
+  | 'sort'
+  | 'valuemax'
+  | 'valuemin'
+  | 'valuenow'
+  | 'valuetext';
+
+export type QuarkAttributeValue = string | number | boolean | null | undefined;
+
+export type QuarkAriaProps = Readonly<Partial<Record<AriaAttributeName, QuarkAttributeValue>>>;
+
+export type QuarkDataProps = Readonly<Record<string, QuarkAttributeValue>>;
+
 export interface QuarkCommonProps<ElementType extends Element = HTMLElement> {
   readonly children?: TemplateValue;
   readonly class?: ClassValue;
@@ -23,26 +84,146 @@ export interface QuarkCommonProps<ElementType extends Element = HTMLElement> {
   readonly part?: string;
   readonly hidden?: boolean;
   readonly tabIndex?: number;
-  readonly aria?: Readonly<Record<string, string | number | boolean | null | undefined>>;
-  readonly data?: Readonly<Record<string, string | number | boolean | null | undefined>>;
-  readonly dataset?: Readonly<Record<string, string | number | boolean | null | undefined>>;
+  readonly aria?: QuarkAriaProps;
+  readonly data?: QuarkDataProps;
+  readonly dataset?: QuarkDataProps;
   readonly ref?: QuarkRef<ElementType>;
 }
 
-type ExplicitBindings = {
-  readonly [name: `.${string}`]: unknown;
-} & {
-  readonly [name: `?${string}`]: boolean | null | undefined;
-} & {
-  readonly [name: `@${string}`]: EventListenerOrEventListenerObject | null | undefined;
-} & {
-  readonly [name: `on${string}`]: EventListenerOrEventListenerObject | null | undefined;
+type ScalarPropertyKey<ElementType extends Element> = {
+  [Key in keyof ElementType]-?: Key extends string
+    ? Exclude<ElementType[Key], null | undefined> extends string | number | boolean
+      ? Key
+      : never
+    : never;
+}[keyof ElementType];
+
+type BooleanPropertyKey<ElementType extends Element> = {
+  [Key in keyof ElementType]-?: Key extends string
+    ? Exclude<ElementType[Key], null | undefined> extends boolean
+      ? Key
+      : never
+    : never;
+}[keyof ElementType];
+
+type NativeScalarProps<ElementType extends Element> = Readonly<Partial<Pick<
+  ElementType,
+  Exclude<ScalarPropertyKey<ElementType>, keyof QuarkCommonProps<ElementType>>
+>>>;
+
+type ExplicitPropertyBindings<ElementType extends Element> = {
+  readonly [Key in Extract<keyof ElementType, string> as `.${Key}`]?: ElementType[Key];
 };
+
+type ExplicitBooleanBindings<ElementType extends Element> = {
+  readonly [Key in BooleanPropertyKey<ElementType> as `?${Key}`]?: boolean | null | undefined;
+};
+
+type QuarkEventListener<EventType extends Event = Event> =
+  | ((event: EventType) => unknown)
+  | { handleEvent(event: EventType): void }
+  | null
+  | undefined;
+
+type ExplicitEventBindings = {
+  readonly [name: `@${string}`]: QuarkEventListener;
+};
+
+interface FriendlyEventBindings {
+  readonly onAnimationCancel?: QuarkEventListener<AnimationEvent>;
+  readonly onAnimationEnd?: QuarkEventListener<AnimationEvent>;
+  readonly onAnimationIteration?: QuarkEventListener<AnimationEvent>;
+  readonly onAnimationStart?: QuarkEventListener<AnimationEvent>;
+  readonly onBeforeInput?: QuarkEventListener<InputEvent>;
+  readonly onBlur?: QuarkEventListener<FocusEvent>;
+  readonly onChange?: QuarkEventListener<Event>;
+  readonly onClick?: QuarkEventListener<MouseEvent>;
+  readonly onContextMenu?: QuarkEventListener<MouseEvent>;
+  readonly onDblClick?: QuarkEventListener<MouseEvent>;
+  readonly onFocus?: QuarkEventListener<FocusEvent>;
+  readonly onFocusIn?: QuarkEventListener<FocusEvent>;
+  readonly onFocusOut?: QuarkEventListener<FocusEvent>;
+  readonly onInput?: QuarkEventListener<InputEvent>;
+  readonly onKeydown?: QuarkEventListener<KeyboardEvent>;
+  readonly onKeyup?: QuarkEventListener<KeyboardEvent>;
+  readonly onPointerCancel?: QuarkEventListener<PointerEvent>;
+  readonly onPointerDown?: QuarkEventListener<PointerEvent>;
+  readonly onPointerEnter?: QuarkEventListener<PointerEvent>;
+  readonly onPointerLeave?: QuarkEventListener<PointerEvent>;
+  readonly onPointerMove?: QuarkEventListener<PointerEvent>;
+  readonly onPointerOut?: QuarkEventListener<PointerEvent>;
+  readonly onPointerOver?: QuarkEventListener<PointerEvent>;
+  readonly onPointerUp?: QuarkEventListener<PointerEvent>;
+  readonly onSubmit?: QuarkEventListener<SubmitEvent>;
+  readonly onTransitionCancel?: QuarkEventListener<TransitionEvent>;
+  readonly onTransitionEnd?: QuarkEventListener<TransitionEvent>;
+  readonly onTransitionRun?: QuarkEventListener<TransitionEvent>;
+  readonly onTransitionStart?: QuarkEventListener<TransitionEvent>;
+}
+
+type DirectAriaBindings = {
+  readonly [Name in AriaAttributeName as `aria-${Name}`]?: QuarkAttributeValue;
+};
+
+type DirectDataBindings = {
+  readonly [name: `data-${string}`]: QuarkAttributeValue;
+};
+
+type NativeAttributeAliases<ElementType extends Element> = {
+  readonly accesskey?: string;
+  readonly contenteditable?: string | boolean;
+  readonly tabindex?: number;
+} & (ElementType extends HTMLButtonElement ? {
+  readonly formaction?: string;
+  readonly formenctype?: string;
+  readonly formmethod?: string;
+  readonly formnovalidate?: boolean;
+  readonly formtarget?: string;
+  readonly popovertarget?: string;
+  readonly popovertargetaction?: 'hide' | 'show' | 'toggle';
+} : {}) & (ElementType extends HTMLInputElement ? {
+  readonly formaction?: string;
+  readonly formenctype?: string;
+  readonly formmethod?: string;
+  readonly formnovalidate?: boolean;
+  readonly formtarget?: string;
+  readonly readonly?: boolean;
+} : {}) & (ElementType extends HTMLLabelElement ? {
+  readonly for?: string;
+} : {}) & (ElementType extends HTMLTextAreaElement ? {
+  readonly readonly?: boolean;
+} : {}) & (ElementType extends HTMLTableCellElement ? {
+  readonly colspan?: number;
+  readonly rowspan?: number;
+} : {});
 
 export type QuarkProps<ElementType extends Element = HTMLElement> =
   & QuarkCommonProps<ElementType>
-  & Partial<ExplicitBindings>
-  & Readonly<Record<string, unknown>>;
+  & NativeScalarProps<ElementType>
+  & ExplicitPropertyBindings<ElementType>
+  & ExplicitBooleanBindings<ElementType>
+  & ExplicitEventBindings
+  & FriendlyEventBindings
+  & DirectAriaBindings
+  & DirectDataBindings
+  & NativeAttributeAliases<ElementType>;
+
+declare const unsafeQuarkPropsBrand: unique symbol;
+
+export type UnsafeQuarkProps<ElementType extends Element = HTMLElement> =
+  & QuarkProps<ElementType>
+  & Readonly<Record<string, unknown>>
+  & { readonly [unsafeQuarkPropsBrand]: true };
+
+/**
+ * Explicitly opts out of native key checking for a reviewed platform or vendor
+ * extension. Values still use the ordinary spread runtime without validation.
+ */
+export function unsafeQuarkProps<ElementType extends Element = HTMLElement>(
+  props: Readonly<Record<string, unknown>>,
+): UnsafeQuarkProps<ElementType> {
+  return props as UnsafeQuarkProps<ElementType>;
+}
 
 export interface QuarkFactory<
   TagName extends string,

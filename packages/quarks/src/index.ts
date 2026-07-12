@@ -3,11 +3,17 @@ export {
   htmlTagNames,
   q,
   quark,
+  unsafeQuarkProps,
+  type AriaAttributeName,
   type QuarkCommonProps,
+  type QuarkAriaProps,
+  type QuarkAttributeValue,
+  type QuarkDataProps,
   type QuarkFactory,
   type QuarkMap,
   type QuarkProps,
   type QuarkRef,
+  type UnsafeQuarkProps,
 } from './quark.js';
 export {
   Dialog,

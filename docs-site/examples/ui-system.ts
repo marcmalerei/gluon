@@ -4,15 +4,18 @@ import {
   Input,
   Label,
   atomStyles,
+  defineButtonPreset,
+  defineIcon,
   installUi,
 } from '@gluonjs/atoms';
 import {
   adoptStyles,
   createApp,
   css,
+  svg,
 } from '@gluonjs/core';
-import { Card, FormField, moleculeStyles } from '@gluonjs/molecules';
-import { AppShell, organismStyles } from '@gluonjs/organisms';
+import { Card, FormField, defineMolecule, moleculeStyles } from '@gluonjs/molecules';
+import { AppShell, defineOrganism, organismStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -28,11 +31,41 @@ import { nextTick, ref } from '@gluonjs/reactivity';
 const theme = ref<'light' | 'dark'>('light');
 const finish = ref('black');
 const dialogOpen = ref(false);
+const purchaseRef: { value?: HTMLButtonElement } = {};
+const analyticsEvents: string[] = [];
 let dialogScope: FocusScope | undefined;
+const customBagIcon = defineIcon({
+  name: 'example-bag',
+  viewBox: '0 0 24 24',
+  body: svg`<path d="M6 8h12l1 13H5L6 8zm3 0a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="2" fill="none"></path>`,
+});
+const PurchaseButton = defineButtonPreset({
+  displayName: 'ExamplePurchaseButton',
+  class: 'example-purchase',
+  attributes: { data: { analyticsAction: 'purchase' } },
+});
+const DangerButton = defineButtonPreset({
+  displayName: 'ExampleDangerButton',
+  class: 'example-danger',
+});
+const PurchaseAction = defineMolecule((props: { total: string }) => PurchaseButton({
+  children: [Icon({ icon: customBagIcon, label: 'Bag' }), ` Buy for ${props.total}`],
+  attributes: {
+    ref: purchaseRef,
+    data: { productAction: 'buy' },
+    onClick: () => analyticsEvents.push('purchase'),
+  },
+}), 'ExamplePurchaseAction');
+const CheckoutActions = defineOrganism((props: { total: string }) => q.footer({
+  class: 'example-actions',
+  children: [PurchaseAction(props), DangerButton({ label: 'Cancel order' })],
+}), 'ExampleCheckoutActions');
 const exampleStyles = css`
   @layer gluon {
     body { margin: 0; background: var(--gluon-color-canvas); }
     .example-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .example-purchase { --gluon-button-background: #171717; --gluon-button-color: #fff; }
+    .example-danger { --gluon-button-background: #a52222; --gluon-button-color: #fff; }
     [role="listbox"] { display: grid; gap: 4px; margin-block: 20px; padding: 4px; border: 1px solid var(--gluon-color-rule); }
     [role="option"] { min-block-size: 44px; padding: 12px; }
     [role="option"][aria-selected="true"] { background: var(--gluon-color-action-soft); color: var(--gluon-color-action-soft-text); }
@@ -112,6 +145,7 @@ createApp(() => AppShell({
         ],
       }),
       q.p({ children: `Selected finish: ${finish.value}` }),
+      CheckoutActions({ total: '$128.00' }),
       Popover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
       dialogOpen.value
         ? Overlay({

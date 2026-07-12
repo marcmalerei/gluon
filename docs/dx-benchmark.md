@@ -50,7 +50,9 @@ Every framework implements the same seven outcomes:
 
 1. scaffold a strict TypeScript application with routing, persisted state,
    browser testing, and a production build;
-2. add a themed accessible input and button through public contracts;
+2. add a themed accessible input, branded purchase button, danger action, and
+   custom decorative/informative icon through public contracts, retaining the
+   same native attribute/ref/event and invalid-fixture outcomes;
 3. create and extend an app-local primitive, repeated composition, and page
    layout in the same checkout flow;
 4. build the same typed, validated, cleanup-owning quantity form control;

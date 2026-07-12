@@ -29,6 +29,9 @@ for (const [packageName, names] of expected) {
   if (JSON.stringify(actualNames) !== JSON.stringify(names)) {
     throw new Error(`${packageName} manifest entries do not match the stable inventory.`);
   }
+  if ((manifestSource.match(/extension: '/g) ?? []).length !== actualNames.length) {
+    throw new Error(`${packageName} does not publish extension metadata for every stable entry.`);
+  }
   const builtIndex = await readFile(resolve(root, `packages/${directoryName}/dist/index.js`), 'utf8');
   if (!builtIndex.includes(manifestExports.get(packageName))) {
     throw new Error(`${packageName} built entry does not export its stable manifest.`);
@@ -51,6 +54,17 @@ for (const [packageName, names] of expected) {
   await access(resolve(root, 'docs-site/examples/ui-system.ts'));
   await access(resolve(root, 'tests/ui-system.spec.ts'));
   await access(resolve(root, 'tests/ui-visual.spec.ts'));
+}
+
+await access(resolve(root, 'docs/ui-extensibility.md'));
+const scorecardTasks = JSON.parse(await readFile(
+  resolve(root, 'benchmarks/dx/specification-v1.json'),
+  'utf8',
+));
+const themedControlsTask = scorecardTasks.tasks.find(({ id }) => id === 'T2-themed-controls');
+if (!themedControlsTask?.observableOutcomes.some((outcome) => outcome.includes('branded purchase button'))
+  || !themedControlsTask.observableOutcomes.some((outcome) => outcome.includes('custom icon'))) {
+  throw new Error('Canonical DX task T2 does not retain the brand-variant and custom-icon outcomes.');
 }
 
 try {
@@ -110,4 +124,4 @@ try {
   await rm(ownerOutput, { force: true, recursive: true });
 }
 
-console.log('UI contract valid: 4 optional packages, 15 stable entries, Core-only and UI-owner-only bundles exclude unselected UI markers');
+console.log('UI contract valid: 4 optional packages, 15 typed extension entries, canonical DX T2 extensions, Core-only and UI-owner-only bundles exclude unselected UI markers');

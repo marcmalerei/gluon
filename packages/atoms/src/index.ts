@@ -1,5 +1,20 @@
-export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './button.js';
-export { Icon, type IconName, type IconProps } from './icon.js';
+export {
+  Button,
+  defineButtonPreset,
+  type ButtonAttributes,
+  type ButtonPresetOptions,
+  type ButtonProps,
+  type ButtonSize,
+  type ButtonVariant,
+} from './button.js';
+export {
+  Icon,
+  defineIcon,
+  type IconAttributes,
+  type IconDefinition,
+  type IconName,
+  type IconProps,
+} from './icon.js';
 export { Input, type InputProps } from './input.js';
 export { Label, type LabelProps } from './label.js';
 export { atomManifest } from './manifest.js';
