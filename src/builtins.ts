@@ -46,7 +46,7 @@ export type BuiltinServerContract =
   | {
       readonly kind: 'teleport';
       readonly content: TemplateValue;
-      readonly target: Element | string;
+      readonly target: Element | ShadowRoot | string;
     }
   | {
       readonly kind: 'keep-alive' | 'transition' | 'transition-group';
@@ -345,7 +345,7 @@ export function defineAsyncComponent<Props>(
 }
 
 export interface TeleportProps {
-  readonly to: Element | string;
+  readonly to: Element | ShadowRoot | string;
   readonly children: TemplateValue;
   readonly disabled?: boolean;
 }
@@ -399,7 +399,7 @@ function updateTeleport(part: PartController, props: TeleportProps, state: Telep
   part.setValue(nothing);
 }
 
-function resolveTeleportTarget(target: Element | string, document: Document): Element {
+function resolveTeleportTarget(target: Element | ShadowRoot | string, document: Document): Element | ShadowRoot {
   if (typeof target !== 'string') return target;
   const resolved = document.querySelector(target);
   if (!resolved) throw new Error(`Teleport target "${target}" was not found.`);
@@ -484,8 +484,8 @@ function updateKeepAlive(
   }
 
   entry.used = ++state.sequence;
-  renderOwnedValue(entry.host, props.children);
   part.setValue(entry.host);
+  renderOwnedValue(entry.host, props.children);
   if (state.active !== entry) props.onActivated?.(entry.key, entry.host);
   state.active = entry;
   evictKeepAliveEntries(state, props.max ?? Number.POSITIVE_INFINITY);
@@ -549,8 +549,8 @@ const transitionDirective = directive<readonly [TransitionProps]>(
         activeKey: props.transitionKey,
       };
       transitionStates.set(part, state);
-      renderOwnedValue(state.host, props.children);
       part.setValue(state.host);
+      renderOwnedValue(state.host, props.children);
       if (!prefersReducedMotion(state.host, props.reducedMotion)) {
         void animateElements(state, elementsIn(state.host), props.enter ?? defaultEnter, props);
       }
@@ -643,8 +643,8 @@ const transitionGroupDirective = directive<readonly [TransitionGroupArgs]>(
       };
       transitionGroupStates.set(part, state);
       transitionGroupHosts.set(state.host, state);
-      renderTransitionGroup(state, args);
       part.setValue(state.host);
+      renderTransitionGroup(state, args);
       if (!prefersReducedMotion(state.host, args.options.reducedMotion)) {
         void animateElements(state, groupElements(state.host), args.options.enter ?? defaultEnter, args.options);
       }

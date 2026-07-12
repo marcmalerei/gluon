@@ -427,7 +427,6 @@ describe('headless interaction primitives', () => {
 
 it('keeps the stable composed UI surface free of automated WCAG A/AA violations', async () => {
   const uiOwner = installUi(document, { theme: 'light' });
-  adoptStyles(document, atomStyles, moleculeStyles, organismStyles);
   render(AppShell({
     header: q.h1({ children: 'Account settings' }),
     navigation: q.a({ href: '#profile', children: 'Profile' }),

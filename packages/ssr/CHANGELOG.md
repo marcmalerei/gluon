@@ -17,3 +17,6 @@
   functional `GluonElement` definitions.
 - Retained the issue #112 functional quantity control through readable-stream
   serialization and route-aware static generation.
+- Derive component sheets from resolved request usage, emit progressive styles
+  before dependent patches, and validate exact client identities with typed
+  missing/extra/duplicate/order/content/target diagnostics and teardown.

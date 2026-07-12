@@ -111,12 +111,15 @@ Issue #111's partial fixture and raw metrics live under
 does not satisfy the completed-run schema, invent the other 20 framework-task
 results, or claim the required human pass.
 
-The issue #108 slice currently records the shared foundation/theme setup change
+The issue #108 slice records the shared foundation/theme setup change
 from two setup calls, five named imports, two configuration choices, and two
 cleanup operations to one `installUi()` call/import, one typed theme option, and
-one `UiOwner.dispose()` operation. Aggregate component-sheet imports remain and
-are explicitly assigned to #115; therefore the full T2/T3 measurements have not
-been claimed or compared.
+one `UiOwner.dispose()` operation. The issue #115 slice records the final
+maintained-example T2/T3 boundary: two setup calls, five style-management
+imports, and two configuration choices become two setup calls, two imports, and
+one configuration choice. The remaining `adoptStyles(document, exampleStyles)`
+is application-owned styling, not component-library setup. Neither slice is a
+completed cross-framework comparison.
 
 Issue #112's four retained controls, disaggregated metrics, diagnostic and
 cleanup evidence, verified Gluon disadvantages, and limitations live under

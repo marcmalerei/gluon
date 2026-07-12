@@ -46,6 +46,8 @@ import { FunctionalQuantityControl } from '../benchmarks/dx/stateful-form-contro
 import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-control/react.js';
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
+import { Button } from '@gluonjs/atoms';
+import { Card } from '@gluonjs/molecules';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('serializes composed functional templates through the unchanged public template contract', async () => {
@@ -463,6 +465,33 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
 });
 
 describe('@gluonjs/ssr static output and style transport', () => {
+  it('derives request and progressive component styles from rendered usage', async () => {
+    const response = await renderRequest({
+      url: '/styled',
+      createApp: () => createApp(() => html`${Button({ label: 'Continue' })}${Card({ title: 'Summary' })}`),
+    });
+    expect(response.styles.entries.map((entry) => entry.id)).toEqual([
+      'gluon-atom-button',
+      'gluon-molecule-card',
+    ]);
+
+    const value = html`${Suspense({
+      source: Promise.resolve('Ready'),
+      fallback: Button({ label: 'Loading' }),
+      children: (title) => Card({ title }),
+    })}`;
+    const chunks = [];
+    for await (const chunk of renderProgressively(value)) chunks.push(chunk);
+    expect(chunks[0]!.styles.entries.map((entry) => entry.id)).toEqual(['gluon-atom-button']);
+    expect(chunks[1]!.styles.entries.map((entry) => entry.id)).toEqual(['gluon-molecule-card']);
+
+    const transport = await new Response(renderProgressiveReadableStream(value)).text();
+    expect(transport.indexOf('data-gluon-style="gluon-atom-button"'))
+      .toBeLessThan(transport.indexOf('Loading'));
+    expect(transport.indexOf('data-gluon-style="gluon-molecule-card"'))
+      .toBeLessThan(transport.indexOf('data-gluon-async-patch="0"'));
+  });
+
   it('preserves stable selection ids and scopes without changing content diagnostics', () => {
     const sheet = css`:root { --named: 1; }`;
     const manifest = createStyleManifest({

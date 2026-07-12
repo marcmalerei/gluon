@@ -80,16 +80,12 @@ before generation. See [the generator contract](packages/create-gluon/README.md)
 ## Quick start
 
 ```ts
-import {
-  adoptStyles,
-  render,
-} from '@gluonjs/core';
+import { render } from '@gluonjs/core';
 import { q } from '@gluonjs/quarks';
-import { Button, atomStyles, installUi } from '@gluonjs/atoms';
-import { Card, moleculeStyles } from '@gluonjs/molecules';
+import { Button, installUi } from '@gluonjs/atoms';
+import { Card } from '@gluonjs/molecules';
 
 const ui = installUi(document, { theme: 'light' });
-adoptStyles(document, atomStyles, moleculeStyles); // compatibility until #115
 
 render(Card({
   title: 'Hello Gluon',
@@ -100,6 +96,12 @@ render(Card({
 ui.setTheme('dark');
 // Call ui.dispose() when this application owner is destroyed.
 ```
+
+Rendered components retain their own immutable stylesheet metadata before the
+dependent DOM is committed. Applications do not import or order Atom, Molecule,
+or Organism sheets. Deprecated aggregate exports throw
+`GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` when combined with renderer-owned exact
+styles, preventing silent duplicate styling.
 
 The same renderer can be used directly:
 

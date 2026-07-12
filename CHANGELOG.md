@@ -9,6 +9,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Immutable exact component-style metadata, render-target reference counting,
+  deterministic adoption order, async/built-in/Custom Element/application
+  lifecycle ownership, request-derived SSR and progressive transport, exact
+  hydration diagnostics, and production tree-shaking evidence.
+- GLUON GOODS search integration and retained raw/gzip/module/sheet plus final
+  bounded T2/T3 DX evidence for usage-driven UI styles.
 - The public `compose(component, props)\`body\`` functional-component authoring
   path, compiler/language-tooling boundaries, retained Gluon/React/Vue
   checkout-dialog comparison, generated starter and Playground examples, and
@@ -42,7 +48,7 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Rootless `svg` template fragments now compile in the SVG namespace and use a
   template-type-specific cache, enabling app-owned Icon geometry consistently
   in Chromium, Firefox, and WebKit.
-- Reviewed task-oriented examples for all 538 generated public API symbol
+- Reviewed task-oriented examples for all 545 generated public API symbol
   pages, with symbol-specific purpose text and concrete application, lifecycle,
   input/output, ownership, error, and cleanup flows shared through maintained
   package recipes instead of compiler-only type or import demonstrations.

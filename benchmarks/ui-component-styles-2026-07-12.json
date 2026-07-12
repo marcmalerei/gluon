@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-07-12",
+  "fullUiExample": {
+    "before": {
+      "rawBytes": 4038,
+      "gzipBytes": 1151,
+      "moduleCount": 3,
+      "modules": [
+        "packages/atoms/src/styles.ts",
+        "packages/molecules/src/styles.ts",
+        "packages/organisms/src/styles.ts"
+      ],
+      "stylesheetCount": 3,
+      "selectors": [
+        ".gluon-app-shell",
+        ".gluon-app-shell-footer",
+        ".gluon-app-shell-header",
+        ".gluon-app-shell-layout",
+        ".gluon-app-shell-main",
+        ".gluon-app-shell-navigation",
+        ".gluon-button",
+        ".gluon-card",
+        ".gluon-card-body",
+        ".gluon-card-header",
+        ".gluon-card-subtitle",
+        ".gluon-card-title",
+        ".gluon-form-error",
+        ".gluon-form-field",
+        ".gluon-form-helper",
+        ".gluon-icon",
+        ".gluon-input",
+        ".gluon-label"
+      ]
+    },
+    "after": {
+      "rawBytes": 3899,
+      "gzipBytes": 1122,
+      "moduleCount": 7,
+      "modules": [
+        "packages/atoms/src/button-styles.ts",
+        "packages/atoms/src/icon-styles.ts",
+        "packages/atoms/src/input-styles.ts",
+        "packages/atoms/src/label-styles.ts",
+        "packages/molecules/src/card-styles.ts",
+        "packages/molecules/src/form-field-styles.ts",
+        "packages/organisms/src/app-shell-styles.ts"
+      ],
+      "stylesheetCount": 7,
+      "selectors": [
+        ".gluon-app-shell",
+        ".gluon-app-shell-footer",
+        ".gluon-app-shell-header",
+        ".gluon-app-shell-layout",
+        ".gluon-app-shell-main",
+        ".gluon-app-shell-navigation",
+        ".gluon-button",
+        ".gluon-card",
+        ".gluon-card-body",
+        ".gluon-card-header",
+        ".gluon-card-subtitle",
+        ".gluon-card-title",
+        ".gluon-form-error",
+        ".gluon-form-field",
+        ".gluon-form-helper",
+        ".gluon-icon",
+        ".gluon-input",
+        ".gluon-label"
+      ]
+    }
+  },
+  "buttonOnly": {
+    "before": {
+      "rawBytes": 2073,
+      "gzipBytes": 688,
+      "moduleCount": 1,
+      "modules": ["packages/atoms/src/styles.ts"],
+      "stylesheetCount": 1,
+      "selectors": [
+        ".gluon-button",
+        ".gluon-icon",
+        ".gluon-input",
+        ".gluon-label"
+      ]
+    },
+    "after": {
+      "rawBytes": 1220,
+      "gzipBytes": 503,
+      "moduleCount": 1,
+      "modules": ["packages/atoms/src/button-styles.ts"],
+      "stylesheetCount": 1,
+      "selectors": [".gluon-button"]
+    }
+  },
+  "limitations": [
+    "Raw and gzip values measure serialized constructable stylesheet text at gzip level 9, not JavaScript chunks.",
+    "Module and stylesheet counts describe the retained full UI and Button-only style boundaries; runtime timing is not inferred.",
+    "No size or speed superiority claim is made."
+  ]
+}
