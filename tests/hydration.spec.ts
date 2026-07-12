@@ -4,6 +4,7 @@ import {
   createApp,
   createInjectionKey,
   defineElement,
+  defineGluonElement,
   css,
   elementRef,
   GluonElement,
@@ -159,6 +160,37 @@ describe('SSR hydration', () => {
     expect(result.retained).toBe(true);
     expect(upgraded.shadowRoot).toBe(shadow);
     expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
+    upgraded.remove();
+  });
+
+  it('hydrates a functional GluonElement through the same identity-preserving path', async () => {
+    const prepared = await prepareForHydration(html`<button>${'Server quantity 2'}</button>`);
+    const host = document.createElement('hydrated-functional-quantity');
+    const shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = prepared.html;
+    const button = shadow.querySelector('button');
+    document.body.append(host);
+
+    const FunctionalQuantity = defineGluonElement({
+      tagName: 'hydrated-functional-quantity',
+      setup(context) {
+        const quantity = context.state('quantity', 2);
+        return {
+          expose: { increment: () => { quantity.value += 1; } },
+          render: () => html`<button>${`Server quantity ${quantity.value}`}</button>`,
+        };
+      },
+    });
+    const upgraded = host as InstanceType<typeof FunctionalQuantity>;
+    const result = await hydrateElement(upgraded);
+    await upgraded.updateComplete;
+    expect(result.retained).toBe(true);
+    expect(upgraded.shadowRoot).toBe(shadow);
+    expect(upgraded.shadowRoot?.querySelector('button')).toBe(button);
+    upgraded.increment();
+    await nextTick();
+    await upgraded.updateComplete;
+    expect(button?.textContent).toBe('Server quantity 3');
     upgraded.remove();
   });
 

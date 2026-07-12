@@ -11,6 +11,11 @@ The compiler does not turn templates into a private renderer format. Runtime
 templates continue to use the public `html` and `css` APIs. Production
 transforms retain source mappings and diagnostics without adding HMR imports.
 
+Imported `defineGluonElement()` calls receive the functional Custom Element HMR
+bridge. The compiler also reports source-located invalid autonomous tags,
+listener/interval creation without setup cleanup ownership, and lifecycle
+registration deferred beyond synchronous setup.
+
 The public `@gluonjs/compiler/diagnostics` entry contains the versioned,
 environment-neutral catalog used by the Language Server, Playground, Devtools
 reference, compact production codes, and generated JSON documentation.

@@ -256,10 +256,6 @@ export const shopStyles = css`
     .bag-line-heading { display: flex; justify-content: space-between; gap: 12px; }
     .bag-line h3 { margin-bottom: 4px; font-size: 18px; font-weight: 570; }
     .bag-line p { color: var(--shop-muted); font-size: 12px; }
-    .quantity-control { display: flex; align-items: center; gap: 8px; }
-    .quantity-control button:not(.remove-line) { width: 44px; height: 44px; padding: 12px; border: 1px solid var(--shop-rule); background: white; cursor: pointer; }
-    .quantity-control > span { min-width: 22px; text-align: center; }
-    .remove-line { min-width: 44px; min-height: 44px; margin-left: auto; padding: 9px 0; border: 0; border-bottom: 1px solid; background: transparent; font-size: 12px; cursor: pointer; }
     .bag-summary { padding: 22px 28px max(22px, env(safe-area-inset-bottom)); border-top: 1px solid var(--shop-black); }
     .bag-summary > div { display: flex; justify-content: space-between; font-size: 20px; }
     .bag-summary p { margin: 8px 0 18px; color: var(--shop-muted); font-size: 12px; }

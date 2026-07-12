@@ -6,6 +6,7 @@ import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
 import { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
+import type { BagQuantityControlElement } from '../examples/shop/src/bag-quantity-control.js';
 import { shopStyles } from '../examples/shop/src/styles.js';
 
 describe('GLUON GOODS reference shop', () => {
@@ -43,7 +44,7 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 1');
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
-    document.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
+    getBagQuantityControl(document).shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
     await settleShop();
     expect(document.querySelector('#bag-title')?.textContent).toBe('Bag 2');
 
@@ -175,14 +176,14 @@ describe('GLUON GOODS reference shop', () => {
     getProductConfigurator(root).shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Close bag');
-    document.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
+    getBagQuantityControl(document).shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
     await settleShop();
     expect(document.querySelector('.empty-bag')).not.toBeNull();
 
     document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
     getProductConfigurator(root).shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
     await settleShop();
-    document.querySelector<HTMLButtonElement>('.remove-line')!.click();
+    getBagQuantityControl(document).shadowRoot?.querySelector<HTMLButtonElement>('.remove-line')!.click();
     await settleShop();
     expect(document.querySelector('.empty-bag')).not.toBeNull();
 
@@ -244,4 +245,10 @@ function getProductConfigurator(root: ParentNode): ProductConfiguratorElement {
   const configurator = root.querySelector<ProductConfiguratorElement>('gluon-product-configurator');
   if (!configurator) throw new Error('Expected the product configurator to be rendered.');
   return configurator;
+}
+
+function getBagQuantityControl(root: ParentNode): BagQuantityControlElement {
+  const control = root.querySelector<BagQuantityControlElement>('gluon-bag-quantity');
+  if (!control) throw new Error('Expected the bag quantity control to be rendered.');
+  return control;
 }

@@ -17,10 +17,9 @@ import {
   ArrowIcon,
   CloseIcon,
   MenuIcon,
-  MinusIcon,
-  PlusIcon,
   SearchIcon,
 } from './icons.js';
+import { BagQuantityControl } from './bag-quantity-control.js';
 
 type ShopDialog = 'bag' | 'menu' | 'search';
 
@@ -156,18 +155,13 @@ function BagDrawer(store: ShopStore): TemplateValue {
                     <span>${formatPrice(line.product.price * line.quantity)}</span>
                   </div>
                   <p>${line.configuration.finish} · ${line.configuration.temperature} · ${line.configuration.cable}</p>
-                  <div class="quantity-control" aria-label=${`Quantity for ${line.product.name}`}>
-                    <button type="button" aria-label="Decrease quantity" @click=${() => {
-                      store.changeQuantity(line.key, -1);
-                    }}>${MinusIcon()}</button>
-                    <span>${line.quantity}</span>
-                    <button type="button" aria-label="Increase quantity" @click=${() => {
-                      store.changeQuantity(line.key, 1);
-                    }}>${PlusIcon()}</button>
-                    <button class="remove-line" type="button" @click=${() => {
-                      store.removeFromBag(line.key);
-                    }}>Remove</button>
-                  </div>
+                  ${BagQuantityControl({
+                    lineKey: line.key,
+                    productName: line.product.name,
+                    quantity: line.quantity,
+                    onChange: ({ lineKey, delta }) => store.changeQuantity(lineKey, delta),
+                    onRemove: ({ lineKey }) => store.removeFromBag(lineKey),
+                  })}
                 </div>
               </article>
               `,
