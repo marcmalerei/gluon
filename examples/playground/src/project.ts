@@ -4,28 +4,33 @@ export interface PlaygroundProject {
 }
 
 export const defaultProject: PlaygroundProject = Object.freeze({
-  app: `import { compose, html, type TemplateValue } from '@gluonjs/core';
+  app: `import { defineGluonElement, elementEvent, html } from '@gluonjs/core';
 
-interface CounterFrameProps {
-  readonly count: number;
-  readonly increment: () => void;
-  readonly children?: TemplateValue;
-}
-
-function CounterFrame({ count, increment, children }: CounterFrameProps) {
-  return html\`
-    <div class="counter-card">
-      <h1>Count \${count}</h1>
-      <button @click=\${increment} type="button" aria-tap="Increment counter">Increment</button>
-      \${children}
-      <img>Preview</img>
-    </div>
-  \`;
+if (!customElements.get('gluon-playground-counter')) {
+  defineGluonElement({
+    tagName: 'gluon-playground-counter',
+    properties: { value: { type: Number, default: 0 } },
+    events: { increment: elementEvent<void>() },
+    setup(context) {
+      const count = context.state('count', context.props.value);
+      context.watch(() => context.props.value, (value) => { count.value = value; });
+      return { render: () => html\`
+        <output aria-live="polite">Stateful value \${count.value}</output>
+        <button type="button" @click=\${() => context.emit('increment', undefined)}>Increment custom element</button>
+      \` };
+    },
+  });
 }
 
 export function Counter(count: number, increment: () => void) {
-  return compose(CounterFrame, { count, increment })\`
-  <p>Template-native functional composition</p>
+  return html\`
+  <div class="counter-card">
+    <h1>Count \${count}</h1>
+    <button @click=\${increment} type="button" aria-tap="Increment counter">Increment</button>
+    <gluon-playground-counter .value=\${count} @increment=\${increment}></gluon-playground-counter>
+    <p>Functional Custom Element authoring</p>
+    <img>Preview</img>
+  </div>
   \`;
 }
 `,
@@ -33,6 +38,7 @@ export function Counter(count: number, increment: () => void) {
 
 export const counterStyles = css\`
   .counter-card { display: grid; gap: 24px; padding: 48px; border: 1px solid #b8b8b3; }
+  gluon-playground-counter { display: grid; gap: 12px; }
   button { min-height: 48px; background: #c8ff00; border: 1px solid #111; }
 \`;
 `,

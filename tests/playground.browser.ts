@@ -19,6 +19,9 @@ test('edits, runs, shares, increments, and opens the searchable diagnostic refer
   await expect.poll(() => container.querySelectorAll('.diagnostic-row').length, { timeout: 15_000 }).toBe(2);
   const preview = container.querySelector('gluon-playground-preview') as HTMLElement;
   await expect.poll(() => preview.shadowRoot?.querySelector('h1')?.textContent, { timeout: 5_000 }).toBe('Count 2');
+  const functionalCounter = preview.shadowRoot?.querySelector('gluon-playground-counter');
+  await expect.poll(() => functionalCounter?.shadowRoot?.querySelector('output')?.textContent, { timeout: 5_000 })
+    .toBe('Stateful value 2');
   (preview.shadowRoot!.querySelector('button') as HTMLButtonElement).click();
   await (preview as any).updateComplete;
   expect(preview.shadowRoot!.querySelector('h1')?.textContent).toBe('Count 3');
