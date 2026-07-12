@@ -53,6 +53,16 @@ slice must retain setup calls, imports, configuration, cleanup, evidence paths,
 and explicit no-comparison limitations; it cannot satisfy or imitate the
 required 21-result completed run.
 
+## Stateful form-control comparison gate
+
+`npm run check:stateful-control-comparison` validates issue #112's retained
+Gluon class, functional Gluon, pinned Vue, and pinned React fixtures. It checks
+strict TypeScript, public imports, package versions, disaggregated component and
+platform-boundary lines, explicit limitations, and the recorded Gluon
+disadvantages. Browser and SSR tests separately prove the common behavior,
+plain-HTML boundary, Vue-host consumption, hydration, and cleanup. This partial
+evidence has no human pass and makes no general ranking claim.
+
 ## Generated API example gate
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry

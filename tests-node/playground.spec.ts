@@ -32,6 +32,12 @@ describe('versioned diagnostic catalog', () => {
 });
 
 describe('playground project transport', () => {
+  test('ships a functional Custom Element example through the public Core entry point', () => {
+    expect(defaultProject.app).toContain('defineGluonElement');
+    expect(defaultProject.app).toContain("elementEvent<void>()");
+    expect(defaultProject.app).toContain('<gluon-playground-counter');
+  });
+
   test('round-trips Unicode projects through stable URL-safe payloads', () => {
     const project = { app: 'const label = "Grüße 🧪";', styles: 'body { color: #111; }' };
     const payload = encodePlaygroundProject(project);

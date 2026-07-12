@@ -17,6 +17,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   stateful autonomous Custom Elements with inferred public contracts, explicitly
   keyed reconnect/HMR state, connection-owned setup cleanup, form association,
   SSR/hydration, Devtools, test-utils, compiler, and language-tooling evidence.
+- A retained Gluon class/functional, Vue, and React stateful form-control
+  comparison with separate component/boundary metrics, browser and SSR evidence,
+  generator and Playground examples, explicit limitations, and every verified
+  Gluon disadvantage recorded without a general ranking claim.
 - A versioned seven-task Gluon/Vue/React developer-experience benchmark
   contract, strict raw-run evidence schema, official comparator-selection
   record, and blocking validator that reports the current zero-run boundary

@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "types": ["node", "react", "react-dom"]
+  },
+  "include": ["shared.ts", "gluon-class.ts", "gluon-functional.ts", "vue.ts", "react.tsx", "invalid-contracts.tsx"]
+}
