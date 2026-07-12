@@ -166,6 +166,9 @@ describe('functional GluonElement authoring', () => {
     await element.updateComplete;
     expect(element.quantity).toBe(3);
 
+    element.setAttribute('value', '2');
+    await expect.poll(() => element.quantity).toBe(2);
+
     element.focus();
     expect(element.shadowRoot?.activeElement).toBe(element.shadowRoot?.querySelector('button'));
     element.required = true;
@@ -176,12 +179,12 @@ describe('functional GluonElement authoring', () => {
 
     form.reset();
     await element.updateComplete;
-    expect(element.quantity).toBe(1);
+    expect(element.quantity).toBe(2);
     (element as typeof element & {
       formStateRestoreCallback(state: string, mode: 'restore'): void;
-    }).formStateRestoreCallback('2', 'restore');
+    }).formStateRestoreCallback('3', 'restore');
     await element.updateComplete;
-    expect(element.quantity).toBe(2);
+    expect(element.quantity).toBe(3);
 
     element.remove();
     expect(cleanup).toHaveBeenCalledOnce();
@@ -189,7 +192,7 @@ describe('functional GluonElement authoring', () => {
     form.append(element);
     await element.updateComplete;
     expect(setupCount).toBe(2);
-    expect(element.quantity).toBe(2);
+    expect(element.quantity).toBe(3);
     expect(captured).toEqual([]);
   });
 
