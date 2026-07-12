@@ -110,6 +110,9 @@ The latest verified renders are:
 - [Vue-migration product boundary at 390px](design/rendered-product-migration-mobile.png)
 - [desktop keyboard focus on the product gallery](design/rendered-product-focus-desktop.png)
 - [mobile keyboard focus on the product gallery](design/rendered-product-focus-mobile.png)
+- [functional bag quantity control on desktop](../../output/playwright/issue-112-functional-bag-desktop.png)
+- [functional bag quantity control at 390px](../../output/playwright/issue-112-functional-bag-390.png)
+- [functional bag quantity control at 320px](../../output/playwright/issue-112-functional-bag-320.png)
 
 ## Verification contract
 
