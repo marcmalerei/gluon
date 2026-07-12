@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["invalid.tsx", "missing-cleanup.tsx", "../app/components.tsx"],
+  "exclude": ["../app/routes/**", "../app/root.tsx"]
+}

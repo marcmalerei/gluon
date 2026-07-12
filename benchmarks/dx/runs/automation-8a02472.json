@@ -1,0 +1,2887 @@
+{
+  "schemaVersion": "1.0.0",
+  "specification": "benchmarks/dx/specification-v1.json",
+  "status": "automated-only",
+  "runId": "2026-07-12-8a024721fd48",
+  "sourceCommit": "8a024721fd484dacb79397a0bf257e49c1f4664b",
+  "startedAt": "2026-07-12T23:14:47.238Z",
+  "finishedAt": "2026-07-12T23:19:09.646Z",
+  "environment": {
+    "operatingSystem": "darwin 25.3.0",
+    "architecture": "arm64",
+    "node": "v22.22.0",
+    "packageManager": "npm 10.9.4",
+    "playwright": "1.61.1",
+    "browsers": {
+      "chromium": "149.0.7827.55",
+      "firefox": "151.0",
+      "webkit": "26.5"
+    }
+  },
+  "frameworks": [
+    {
+      "id": "gluon",
+      "lane": "create-gluon strict TypeScript universal application",
+      "versions": {
+        "@gluonjs/core": "0.0.0",
+        "@gluonjs/router": "0.0.0",
+        "@gluonjs/store": "0.0.0",
+        "@gluonjs/ssr": "0.0.0",
+        "@gluonjs/atoms": "0.0.0",
+        "typescript": "5.9.3",
+        "vite": "8.1.4",
+        "vitest": "4.1.10",
+        "playwright": "1.61.1"
+      },
+      "scaffoldCommand": "create-gluon gluon --yes --router --store --testing --ui --ssr",
+      "interactiveAnswers": [
+        "project=gluon",
+        "router=yes",
+        "store=yes",
+        "testing=yes",
+        "ui=yes",
+        "ssr=yes"
+      ],
+      "fixture": "benchmarks/dx/fixtures/gluon",
+      "lockfile": "package-lock.json",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "vue",
+      "lane": "official create-vue SPA plus the official Vue server renderer required by T6",
+      "versions": {
+        "create-vue": "3.22.4",
+        "vue": "3.5.39",
+        "vue-router": "5.1.0",
+        "pinia": "3.0.4",
+        "@vue/server-renderer": "3.5.39",
+        "typescript": "5.9.3",
+        "vite": "8.1.4",
+        "vue-tsc": "3.3.7",
+        "@playwright/test": "1.61.1"
+      },
+      "scaffoldCommand": "npm create vue@3.22.4 -- vue --ts --router --pinia --playwright --bare",
+      "interactiveAnswers": [
+        "TypeScript=yes",
+        "Router=yes",
+        "Pinia=yes",
+        "Playwright=yes",
+        "bare=yes"
+      ],
+      "fixture": "benchmarks/dx/fixtures/vue",
+      "lockfile": "benchmarks/dx/fixtures/vue/package-lock.json",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "id": "react",
+      "lane": "officially recommended React Router framework application",
+      "versions": {
+        "create-react-router": "8.2.0",
+        "react-router": "8.2.0",
+        "react": "19.2.7",
+        "react-dom": "19.2.7",
+        "typescript": "5.9.3",
+        "vite": "8.1.4",
+        "@playwright/test": "1.61.1"
+      },
+      "scaffoldCommand": "npx create-react-router@8.2.0 react --yes --no-install --no-git-init --no-agent-skills --react-router-version 8.2.0",
+      "interactiveAnswers": [
+        "defaults=yes",
+        "install=no",
+        "git-init=no",
+        "agent-skills=no"
+      ],
+      "fixture": "benchmarks/dx/fixtures/react",
+      "lockfile": "benchmarks/dx/fixtures/react/package-lock.json",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "framework": "gluon",
+      "taskId": "T1-scaffold",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "package.json",
+        "src/routes.ts",
+        "src/app.spec.ts"
+      ],
+      "authorCreatedFiles": [
+        "package.json",
+        "src/routes.ts",
+        "src/cart-store.ts"
+      ],
+      "authorSourceLines": 40,
+      "configurationLines": 6,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "create-gluon feature switches",
+        "Router records",
+        "Store manager",
+        "Vitest browser provider",
+        "Vite plugin"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/package.json",
+        "benchmarks/dx/fixtures/gluon/src/routes.ts",
+        "benchmarks/dx/fixtures/gluon/src/cart-store.ts",
+        "benchmarks/dx/fixtures/gluon/src/app.spec.ts"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "gluon",
+      "taskId": "T2-themed-controls",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/app.ts",
+        "src/styles.ts",
+        "src/components/purchase-primitive.ts"
+      ],
+      "authorCreatedFiles": [
+        "src/app.ts"
+      ],
+      "authorSourceLines": 27,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "Atom Button",
+        "constructable stylesheet",
+        "native attribute forwarding",
+        "typed ref"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/src/app.ts",
+        "benchmarks/dx/fixtures/gluon/src/styles.ts",
+        "benchmarks/dx/fixtures/gluon/src/components/purchase-primitive.ts"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "gluon",
+      "taskId": "T3-local-layers",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/components/purchase-primitive.ts",
+        "src/components/delivery-composition.ts",
+        "src/components/checkout-layout.ts"
+      ],
+      "authorCreatedFiles": [],
+      "authorSourceLines": 0,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "defineAtom",
+        "defineMolecule",
+        "defineOrganism",
+        "add-component generator"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/src/components/purchase-primitive.ts",
+        "benchmarks/dx/fixtures/gluon/src/components/delivery-composition.ts",
+        "benchmarks/dx/fixtures/gluon/src/components/checkout-layout.ts"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "gluon",
+      "taskId": "T4-stateful-control",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/quantity-control.ts"
+      ],
+      "authorCreatedFiles": [],
+      "authorSourceLines": 0,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "defineGluonElement",
+        "stateful setup context",
+        "typed cancelable event",
+        "form context",
+        "owned cleanup"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "pass"
+      },
+      "diagnostics": [
+        "benchmarks/dx/stateful-form-control/invalid-contracts.tsx",
+        "benchmarks/dx/stateful-form-control/invalid-contracts.tsx",
+        "tests-node/compiler-vite.spec.ts"
+      ],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/src/quantity-control.ts",
+        "benchmarks/dx/stateful-form-control/gluon-functional.ts",
+        "benchmarks/dx/stateful-form-control/invalid-contracts.tsx"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "gluon",
+      "taskId": "T5-customer-flow",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/app.spec.ts"
+      ],
+      "authorCreatedFiles": [],
+      "authorSourceLines": 0,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "Router navigation",
+        "Store actions",
+        "localStorage persistence",
+        "Vite HMR"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "pass",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/src/app.spec.ts",
+        "tests/vite-hmr.spec.ts",
+        "tests/router.spec.ts"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "gluon",
+      "taskId": "T6-universal-route",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/server.ts",
+        "src/main.ts"
+      ],
+      "authorCreatedFiles": [
+        "src/main.ts"
+      ],
+      "authorSourceLines": 4,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "renderRequest",
+        "request store",
+        "hydrateApplication",
+        "hydration state",
+        "style manifest"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "pass",
+        "hydration": "pass",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/src/server.ts",
+        "benchmarks/dx/fixtures/gluon/src/main.ts",
+        "tests/hydration.spec.ts"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "gluon",
+      "taskId": "T7-plain-html",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 53,
+          "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 54,
+          "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 52,
+          "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:create-gluon-fixtures",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 212107,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:template-composition",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2788,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run check:stateful-control-comparison",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2465,
+          "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/quantity-control.ts",
+        "README.md"
+      ],
+      "authorCreatedFiles": [],
+      "authorSourceLines": 0,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@gluonjs/atoms@0.0.0",
+        "@gluonjs/core@0.0.0",
+        "@gluonjs/molecules@0.0.0",
+        "@gluonjs/organisms@0.0.0",
+        "@gluonjs/quarks@0.0.0",
+        "@gluonjs/reactivity@0.0.0",
+        "@gluonjs/router@0.0.0",
+        "@gluonjs/ssr@0.0.0",
+        "@gluonjs/store@0.0.0"
+      ],
+      "developmentDependencies": [
+        "@gluonjs/language-server@0.0.0",
+        "@gluonjs/test-utils@0.0.0",
+        "@gluonjs/vite@0.0.0",
+        "@types/node@22.20.1",
+        "@vitest/browser-playwright@4.1.10",
+        "playwright@1.61.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vitest@4.1.10"
+      ],
+      "publicApis": [
+        "@gluonjs/core",
+        "@gluonjs/router",
+        "@gluonjs/store",
+        "@gluonjs/ssr",
+        "@gluonjs public UI entries"
+      ],
+      "frameworkConcepts": [
+        "autonomous Custom Element",
+        "native properties/events/slots",
+        "ElementInternals form participation"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "pass"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/gluon/src/quantity-control.ts",
+        "benchmarks/dx/fixtures/gluon/README.md",
+        "tests/dx-stateful-form-control.spec.ts"
+      ],
+      "limitations": [
+        "The retained source fixture is regenerated from repository source; clean-install validation packs the unpublished 0.0.0 workspaces and creates an isolated consumer lockfile."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T1-scaffold",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "package.json",
+        "src/router/index.ts"
+      ],
+      "authorCreatedFiles": [
+        "package.json",
+        "src/router/index.ts",
+        "src/stores/cart.ts",
+        "e2e/flow.spec.ts"
+      ],
+      "authorSourceLines": 56,
+      "configurationLines": 15,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "create-vue feature flags",
+        "Single-File Components",
+        "Vue Router",
+        "Pinia",
+        "Playwright",
+        "Vite"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/vue/package.json",
+        "benchmarks/dx/fixtures/vue/src/router/index.ts",
+        "benchmarks/dx/fixtures/vue/src/stores/cart.ts",
+        "benchmarks/dx/fixtures/vue/e2e/flow.spec.ts"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T2-themed-controls",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/App.vue"
+      ],
+      "authorCreatedFiles": [
+        "src/App.vue",
+        "src/components/PrimitiveButton.vue",
+        "src/views/ProductRoute.vue"
+      ],
+      "authorSourceLines": 38,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "SFC template",
+        "fallthrough attributes",
+        "template ref",
+        "global CSS"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/vue/src/App.vue",
+        "benchmarks/dx/fixtures/vue/src/components/PrimitiveButton.vue",
+        "benchmarks/dx/fixtures/vue/src/views/ProductRoute.vue"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T3-local-layers",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [
+        "src/components/PrimitiveButton.vue",
+        "src/components/FieldComposition.vue",
+        "src/components/CheckoutShell.vue"
+      ],
+      "authorSourceLines": 13,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "SFC props",
+        "slots",
+        "nested component tree"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/vue/src/components/PrimitiveButton.vue",
+        "benchmarks/dx/fixtures/vue/src/components/FieldComposition.vue",
+        "benchmarks/dx/fixtures/vue/src/components/CheckoutShell.vue"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T4-stateful-control",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [
+        "src/components/QuantityControl.vue",
+        "diagnostics/InvalidContracts.vue",
+        "diagnostics/MissingCleanup.vue"
+      ],
+      "authorSourceLines": 25,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "defineProps",
+        "defineEmits",
+        "ref",
+        "computed",
+        "onUnmounted",
+        "defineExpose"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "pass"
+      },
+      "diagnostics": [
+        "benchmarks/dx/fixtures/vue/diagnostics/InvalidContracts.vue",
+        "benchmarks/dx/fixtures/vue/diagnostics/InvalidContracts.vue",
+        "No vue-tsc diagnostic is emitted for benchmarks/dx/fixtures/vue/diagnostics/MissingCleanup.vue."
+      ],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/vue/src/components/QuantityControl.vue",
+        "benchmarks/dx/fixtures/vue/diagnostics/InvalidContracts.vue",
+        "benchmarks/dx/fixtures/vue/diagnostics/MissingCleanup.vue"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T5-customer-flow",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [
+        "e2e/flow.spec.ts",
+        "src/stores/cart.ts",
+        "src/hmr-marker.ts"
+      ],
+      "authorSourceLines": 30,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "Vue Router navigation",
+        "Pinia store",
+        "localStorage persistence",
+        "Vite HMR"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "pass",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/vue/e2e/flow.spec.ts",
+        "benchmarks/dx/fixtures/vue/src/stores/cart.ts",
+        "benchmarks/dx/fixtures/vue/src/hmr-marker.ts"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T6-universal-route",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "src/main.ts"
+      ],
+      "authorCreatedFiles": [
+        "src/entry-server.ts",
+        "src/main.ts",
+        "server.mjs",
+        "e2e/flow.spec.ts"
+      ],
+      "authorSourceLines": 45,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "createSSRApp",
+        "@vue/server-renderer",
+        "memory history",
+        "client hydration"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "pass",
+        "hydration": "pass",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/vue/src/entry-server.ts",
+        "benchmarks/dx/fixtures/vue/src/main.ts",
+        "benchmarks/dx/fixtures/vue/server.mjs",
+        "benchmarks/dx/fixtures/vue/e2e/flow.spec.ts"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3."
+      ]
+    },
+    {
+      "framework": "vue",
+      "taskId": "T7-plain-html",
+      "status": "platform-limitation",
+      "commands": [
+        {
+          "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 811,
+          "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run type-check",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1009,
+          "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 586,
+          "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [],
+      "authorSourceLines": 0,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@vue/server-renderer@3.5.39",
+        "pinia@3.0.4",
+        "vue-router@5.1.0",
+        "vue@3.5.39"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@tsconfig/node24@24.0.4",
+        "@types/node@24.13.2",
+        "@vitejs/plugin-vue@6.0.7",
+        "@vue/tsconfig@0.9.1",
+        "typescript@5.9.3",
+        "vite@8.1.4",
+        "vue-tsc@3.3.7"
+      ],
+      "publicApis": [
+        "vue",
+        "vue-router",
+        "pinia",
+        "@vue/server-renderer"
+      ],
+      "frameworkConcepts": [
+        "SFC host wrapper",
+        "autonomous Custom Element bridge limitation"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "platform-limitation"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/stateful-form-control/vue.ts"
+      ],
+      "limitations": [
+        "create-vue 3.22.4 generated a non-exact ~6.0.0 TypeScript range that did not resolve on 2026-07-12; this production-valid retained fixture pins compatible TypeScript 5.9.3.",
+        "The retained Vue SFC is not an autonomous Custom Element; plain HTML requires the measured bridge in the existing T4 fixture."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T1-scaffold",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "package.json",
+        "app/routes.ts"
+      ],
+      "authorCreatedFiles": [
+        "package.json",
+        "app/routes.ts",
+        "app/cart.ts",
+        "tests/flow.spec.ts"
+      ],
+      "authorSourceLines": 52,
+      "configurationLines": 18,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "create-react-router template",
+        "route config",
+        "function components",
+        "Playwright",
+        "Vite"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/react/package.json",
+        "benchmarks/dx/fixtures/react/app/routes.ts",
+        "benchmarks/dx/fixtures/react/app/cart.ts",
+        "benchmarks/dx/fixtures/react/tests/flow.spec.ts"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T2-themed-controls",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "app/app.css"
+      ],
+      "authorCreatedFiles": [
+        "app/app.css",
+        "app/components.tsx",
+        "app/routes/product.tsx"
+      ],
+      "authorSourceLines": 82,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "JSX",
+        "native prop intersection",
+        "forwardRef",
+        "application CSS"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/react/app/app.css",
+        "benchmarks/dx/fixtures/react/app/components.tsx",
+        "benchmarks/dx/fixtures/react/app/routes/product.tsx"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T3-local-layers",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [
+        "app/components.tsx"
+      ],
+      "authorSourceLines": 41,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "function components",
+        "typed props",
+        "children composition"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/react/app/components.tsx"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T4-stateful-control",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [
+        "app/components.tsx",
+        "diagnostics/invalid.tsx",
+        "diagnostics/missing-cleanup.tsx"
+      ],
+      "authorSourceLines": 50,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "useState",
+        "useMemo",
+        "useEffect cleanup",
+        "useImperativeHandle",
+        "forwardRef"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "pass"
+      },
+      "diagnostics": [
+        "benchmarks/dx/fixtures/react/diagnostics/invalid.tsx",
+        "benchmarks/dx/fixtures/react/diagnostics/invalid.tsx",
+        "TypeScript emits no diagnostic for benchmarks/dx/fixtures/react/diagnostics/missing-cleanup.tsx."
+      ],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/react/app/components.tsx",
+        "benchmarks/dx/fixtures/react/diagnostics/invalid.tsx",
+        "benchmarks/dx/fixtures/react/diagnostics/missing-cleanup.tsx"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T5-customer-flow",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [
+        "tests/flow.spec.ts",
+        "app/cart.ts",
+        "app/hmr-marker.ts"
+      ],
+      "authorSourceLines": 33,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "React Router navigation",
+        "component state",
+        "localStorage persistence",
+        "Vite HMR"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "pass",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/react/tests/flow.spec.ts",
+        "benchmarks/dx/fixtures/react/app/cart.ts",
+        "benchmarks/dx/fixtures/react/app/hmr-marker.ts"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T6-universal-route",
+      "status": "pass",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [
+        "react-router.config.ts",
+        "app/root.tsx"
+      ],
+      "authorCreatedFiles": [
+        "app/root.tsx",
+        "tests/flow.spec.ts"
+      ],
+      "authorSourceLines": 26,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "React Router framework SSR",
+        "React hydration",
+        "post-hydration effect"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "pass",
+        "hydration": "pass",
+        "cleanup": "not-applicable"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/fixtures/react/react-router.config.ts",
+        "benchmarks/dx/fixtures/react/app/root.tsx",
+        "benchmarks/dx/fixtures/react/tests/flow.spec.ts"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version."
+      ]
+    },
+    {
+      "framework": "react",
+      "taskId": "T7-plain-html",
+      "status": "platform-limitation",
+      "commands": [
+        {
+          "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 2052,
+          "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm ci --ignore-scripts",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run typecheck",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1749,
+          "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run build",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
+          "stderr": ""
+        },
+        {
+          "command": "npm run test:e2e",
+          "exitCode": 0,
+          "expectedExit": "zero",
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+        },
+        {
+          "command": "npm run diagnostics",
+          "exitCode": 2,
+          "expectedExit": "nonzero",
+          "durationMs": 537,
+          "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
+          "stderr": ""
+        }
+      ],
+      "generatedFiles": [],
+      "authorCreatedFiles": [],
+      "authorSourceLines": 0,
+      "configurationLines": 0,
+      "productionDependencies": [
+        "@react-router/node@8.2.0",
+        "@react-router/serve@8.2.0",
+        "isbot@5.1.36",
+        "react-dom@19.2.7",
+        "react-router@8.2.0",
+        "react@19.2.7"
+      ],
+      "developmentDependencies": [
+        "@playwright/test@1.61.1",
+        "@react-router/dev@8.2.0",
+        "@types/node@22.19.11",
+        "@types/react-dom@19.2.3",
+        "@types/react@19.2.17",
+        "typescript@5.9.3",
+        "vite@8.1.4"
+      ],
+      "publicApis": [
+        "react",
+        "react-router",
+        "react-dom"
+      ],
+      "frameworkConcepts": [
+        "React root wrapper",
+        "autonomous Custom Element bridge limitation"
+      ],
+      "checks": {
+        "typecheck": "pass",
+        "build": "pass",
+        "browserTest": "pass",
+        "accessibility": "pass",
+        "hmr": "not-applicable",
+        "ssr": "not-applicable",
+        "hydration": "not-applicable",
+        "cleanup": "platform-limitation"
+      },
+      "diagnostics": [],
+      "browserVisibleOutput": [
+        "Evidence Tote product route",
+        "labeled email and quantity controls",
+        "persisted checkout summary",
+        "back/forward and reload recovery"
+      ],
+      "evidence": [
+        "benchmarks/dx/stateful-form-control/react.tsx"
+      ],
+      "limitations": [
+        "create-react-router 8.2.0 copied template dependency pins at 8.0.0 despite --react-router-version 8.2.0; this retained fixture aligns all React Router packages to the invoked 8.2.0 CLI version.",
+        "The retained React function component is not an autonomous Custom Element; plain HTML requires the measured bridge in the existing T4 fixture."
+      ]
+    }
+  ],
+  "humanPasses": [],
+  "blockers": [
+    "Issue #107 requires at least one retained human usability pass using the written brief; repository automation cannot create that evidence."
+  ]
+}

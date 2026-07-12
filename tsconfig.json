@@ -51,5 +51,6 @@
     "vitest.test-utils.config.ts",
     "vitest.vite.config.ts",
     "vitest.vue-analyzer.config.ts"
-  ]
+  ],
+  "exclude": ["benchmarks/dx/fixtures"]
 }
