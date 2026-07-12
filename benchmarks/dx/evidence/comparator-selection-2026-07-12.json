@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "recordedAt": "2026-07-12",
+  "status": "comparator-selection-only",
+  "environment": {
+    "operatingSystem": "macOS 26.3.1 (25D771280a)",
+    "architecture": "arm64",
+    "node": "v22.22.0",
+    "packageManager": "npm 10.9.4",
+    "playwright": "1.61.1",
+    "browsers": {
+      "chromium": "149.0.7827.55",
+      "firefox": "151.0",
+      "webkit": "26.5"
+    }
+  },
+  "sources": [
+    {
+      "framework": "vue",
+      "url": "https://vuejs.org/guide/quick-start.html",
+      "observedGuidance": "The official quick start identifies create-vue as the official project scaffolding tool."
+    },
+    {
+      "framework": "vue",
+      "url": "https://vuejs.org/guide/essentials/component-basics.html",
+      "observedGuidance": "The official component guide uses Single-File Components and script setup for its maintained component examples."
+    },
+    {
+      "framework": "react",
+      "url": "https://react.dev/learn/creating-a-react-app",
+      "observedGuidance": "The official application guide recommends starting new applications with a framework and lists React Router as a full-stack framework that supports SPA, SSR, and SSG applications."
+    },
+    {
+      "framework": "react",
+      "url": "https://react.dev/learn",
+      "observedGuidance": "The official daily component guide uses function components, JSX, props, events, state, and Hooks."
+    }
+  ],
+  "selectedVersions": {
+    "gluon": {
+      "source": "repository source at the run commit",
+      "packageVersion": "0.0.0"
+    },
+    "vue": {
+      "create-vue": "3.22.4",
+      "vue": "3.5.39"
+    },
+    "react": {
+      "create-react-router": "8.2.0",
+      "react-router": "8.2.0",
+      "react": "19.2.7",
+      "react-dom": "19.2.7"
+    }
+  },
+  "versionEvidenceCommand": "npm view create-vue version && npm view vue version && npm view react version && npm view react-dom version && npm view create-react-router version && npm view react-router version",
+  "limitations": [
+    "This record selects comparator lanes and captures versions; it is not a completed benchmark run.",
+    "No task result, win, tie, loss, usability finding, or DX-superiority claim is supported by this record.",
+    "A completed run must conform to benchmarks/dx/schema/run-v1.schema.json and include all 21 framework-task results plus at least one retained human usability pass."
+  ]
+}

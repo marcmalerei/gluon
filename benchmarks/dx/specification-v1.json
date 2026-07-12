@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "1.0.0",
+  "benchmarkId": "gluon-dx-application-authoring",
+  "title": "Gluon, Vue, and React application-authoring comparison",
+  "comparisonRule": "Each framework implements the same observable customer and authoring outcomes. Framework-specific syntax and architecture are measured, not normalized away.",
+  "frameworks": [
+    {
+      "id": "gluon",
+      "lane": "create-gluon strict TypeScript application",
+      "selectionSource": "https://github.com/marcmalerei/gluon/tree/main/packages/create-gluon"
+    },
+    {
+      "id": "vue",
+      "lane": "official create-vue application",
+      "selectionSource": "https://vuejs.org/guide/quick-start.html"
+    },
+    {
+      "id": "react",
+      "lane": "officially recommended React Router framework application",
+      "selectionSource": "https://react.dev/learn/creating-a-react-app",
+      "selectionReason": "The retained task is a routed browser application that also renders and hydrates the same route. React's official application-creation guide lists React Router as a recommended full-stack framework with SPA, SSR, and SSG support; the from-scratch lane would require selecting separate routing and server-rendering tools."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T1-scaffold",
+      "title": "Scaffold the application",
+      "observableOutcomes": [
+        "A strict TypeScript project starts from the recorded scaffold command and answers.",
+        "The project has two navigable routes, shared persisted state, a browser test, and a production build.",
+        "A clean checkout installs, typechecks, tests, and builds without source edits."
+      ]
+    },
+    {
+      "id": "T2-themed-controls",
+      "title": "Add themed accessible controls",
+      "observableOutcomes": [
+        "A labeled text input and named button use the framework lane's supported public styling or component-extension contract.",
+        "Keyboard activation works and the browser test verifies the accessible names and visible focus.",
+        "No fixture copies private library implementation or imports private or deep build paths."
+      ]
+    },
+    {
+      "id": "T3-local-layers",
+      "title": "Create app-local UI layers",
+      "observableOutcomes": [
+        "The application owns one primitive control, one repeated control composition, and one larger page layout.",
+        "Each layer is extended once through its documented public contract.",
+        "The retained browser output is the same checkout flow in all three fixtures, not a component gallery."
+      ]
+    },
+    {
+      "id": "T4-stateful-control",
+      "title": "Build a reusable stateful form control",
+      "observableOutcomes": [
+        "A quantity control accepts a typed structured input, owns local and computed state, validates its value, and participates in a form.",
+        "It emits a typed cancelable public change event, supports default and named content, exposes focus, and releases registered work on teardown.",
+        "Retained invalid-prop, invalid-event, and missing-cleanup variants are checked by the framework's normal diagnostics."
+      ]
+    },
+    {
+      "id": "T5-customer-flow",
+      "title": "Navigate, persist, test, and hot-update",
+      "observableOutcomes": [
+        "A user opens the product route, configures quantity, adds the exact line item, reaches checkout, and returns with back/forward traversal.",
+        "Reload restores the recorded customer state.",
+        "A compatible component or style edit retains route, form, and application state; the HMR observation method is recorded."
+      ]
+    },
+    {
+      "id": "T6-universal-route",
+      "title": "Render and hydrate the same route",
+      "observableOutcomes": [
+        "The product route is rendered on the server and hydrated in the browser from the same public component implementation.",
+        "Hydration retains the server DOM identity and customer interaction works after hydration.",
+        "The run records the server command, browser assertion, hydration diagnostics, and cleanup result."
+      ]
+    },
+    {
+      "id": "T7-plain-html",
+      "title": "Consume the stateful control from plain HTML",
+      "observableOutcomes": [
+        "A plain HTML page uses the stateful quantity control without a framework-specific host wrapper where the selected platform lane permits it.",
+        "The page sets typed public input, supplies default and named content, listens for the native public event, invokes focus, submits the form value, and removes the control.",
+        "If a framework cannot expose that boundary without a wrapper, the retained result records the limitation instead of substituting a different task."
+      ]
+    }
+  ],
+  "measurements": [
+    "commands",
+    "interactiveAnswers",
+    "generatedFiles",
+    "authorCreatedFiles",
+    "authorSourceLines",
+    "configurationLines",
+    "productionDependencies",
+    "developmentDependencies",
+    "publicApis",
+    "frameworkConcepts",
+    "typecheck",
+    "build",
+    "browserTest",
+    "accessibility",
+    "hmr",
+    "ssr",
+    "hydration",
+    "diagnostics",
+    "browserVisibleOutput"
+  ],
+  "comparisonDimensions": [
+    "setupCommands",
+    "configurationFiles",
+    "authoredSource",
+    "dependencies",
+    "requiredConcepts",
+    "diagnosticCoverage",
+    "cleanupEvidence",
+    "taskResult"
+  ],
+  "prohibitedAggregation": "Results are reported per task and dimension. The benchmark must not calculate a single weighted or opaque score."
+}

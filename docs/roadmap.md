@@ -232,6 +232,7 @@ editing, testing, debugging, and production building.
 | [#32](https://github.com/marcmalerei/gluon/issues/32) | Versioned Devtools protocol, opt-in runtime bridge, Vite integration, and browser inspector are implemented. |
 | [#33](https://github.com/marcmalerei/gluon/issues/33) | Build `@gluonjs/test-utils`. |
 | [#34](https://github.com/marcmalerei/gluon/issues/34) | Shareable Playground, downloadable starters, and versioned searchable diagnostic reference are implemented. |
+| [#107](https://github.com/marcmalerei/gluon/issues/107) | Retain the task-level Gluon, Vue, and React DX comparison and implement the scoped UI-authoring improvements supported by its evidence. |
 
 ### Exit gate
 
@@ -244,6 +245,15 @@ editing, testing, debugging, and production building.
   performance information through a versioned protocol.
 - Consumer tests use public utilities with deterministic scheduler and cleanup control.
 - Diagnostics have stable codes, documentation, and shareable playground fixtures.
+- The DX comparison retains all seven equivalent tasks, exact framework lanes
+  and versions, raw per-dimension results, clean-install automation, and human
+  limitations; no general superiority claim is accepted without that evidence.
+
+The versioned issue #107 benchmark contract is documented in
+[`dx-benchmark.md`](dx-benchmark.md). Its current retained record selects the
+comparator lanes only and supports no task result. Issues #108 through #115 are
+the planned implementation slices; #107 remains open until those applicable
+slices and a complete comparison run are proven.
 
 ## M4 — Universal Rendering
 
