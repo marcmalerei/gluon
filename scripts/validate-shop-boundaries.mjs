@@ -31,6 +31,9 @@ for (const file of sourceFiles) {
   if (source.includes('<style')) {
     throw new Error(`Shop source cannot create <style> fallback elements: ${file}`);
   }
+  if (source.includes('.gluon-')) {
+    throw new Error(`Shop source cannot depend on undocumented .gluon-* implementation classes: ${file}`);
+  }
 }
 
 const html = await readFile(resolve(shopRoot, 'index.html'), 'utf8');
