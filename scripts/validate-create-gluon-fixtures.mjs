@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -77,7 +77,18 @@ try {
     run('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], result.directory);
     process.stdout.write(`validated component ${index + 1}/${componentKinds.length}: ${kind}\n`);
   }
-  process.stdout.write(`create-gluon fixture matrix valid: ${componentsOnly ? 0 : matrix.length} applications and ${componentKinds.length} component kinds\n`);
+  const retainedDirectory = join(fixtureDirectory, 'retained-dx-scorecard');
+  await cp(resolve(root, 'benchmarks/dx/fixtures/gluon'), retainedDirectory, { recursive: true });
+  await pointOfficialDependenciesAtArchives(retainedDirectory, archives, {
+    router: true, store: true, testing: true, ui: true, ssr: true,
+  });
+  run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], retainedDirectory);
+  run('npm', ['run', 'typecheck'], retainedDirectory);
+  run('npm', ['run', 'check:templates'], retainedDirectory);
+  run('npm', ['test'], retainedDirectory);
+  run('npm', ['run', 'build'], retainedDirectory);
+  process.stdout.write('validated retained DX scorecard fixture\n');
+  process.stdout.write(`create-gluon fixture matrix valid: ${componentsOnly ? 0 : matrix.length} applications, ${componentKinds.length} component kinds, and 1 retained DX fixture\n`);
 } finally {
   await rm(temporaryRoot, { recursive: true, force: true });
 }
