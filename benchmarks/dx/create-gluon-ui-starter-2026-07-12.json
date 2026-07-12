@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-07-12",
+  "issue": 109,
+  "scope": "create-gluon non-interactive UI plus browser-testing starter",
+  "scaffold": {
+    "command": "node packages/create-gluon/dist/cli.js .tmp/dx-ui-starter --yes --ui --testing --force",
+    "interactivePrompts": [],
+    "answers": ["--yes", "--ui", "--testing", "--force"],
+    "exitCode": 0
+  },
+  "generatedFiles": [
+    ".gitignore",
+    "README.md",
+    "index.html",
+    "package.json",
+    "src/app.spec.ts",
+    "src/app.ts",
+    "src/main.ts",
+    "src/quantity-control.ts",
+    "src/styles.ts",
+    "tsconfig.json",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ],
+  "firstSuccessfulTest": {
+    "matrixFixture": "13-testing-ui",
+    "command": "npm test",
+    "exitCode": 0,
+    "assertions": [
+      "reactive Button label and variant update",
+      "accessible name",
+      "computed official 44px Atom target",
+      "computed app-token background",
+      "shared theme token",
+      "exact sheet cleanup"
+    ]
+  },
+  "firstProductionBuild": {
+    "matrixFixture": "13-testing-ui",
+    "command": "npm run build",
+    "exitCode": 0,
+    "output": "Vite production client build"
+  },
+  "completeMatrix": {
+    "command": "npm run check:create-gluon-fixtures",
+    "projects": 20,
+    "perProjectCommands": ["npm install", "npm run typecheck", "npm run check:templates", "npm test", "npm run build"]
+  },
+  "limitations": [
+    "This is Gluon-only raw scaffold evidence, not a completed cross-framework benchmark run.",
+    "No human usability pass or win, tie, loss, parity, or superiority claim is recorded."
+  ]
+}
