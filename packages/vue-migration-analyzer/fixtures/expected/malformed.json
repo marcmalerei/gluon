@@ -1,0 +1,322 @@
+{
+  "schemaVersion": "1.0.0",
+  "analyzer": {
+    "name": "@gluonjs/vue-migration-analyzer",
+    "version": "0.0.0"
+  },
+  "root": ".",
+  "input": {
+    "vue": {
+      "declaredRange": null,
+      "resolvedVersion": null,
+      "versionSource": "unresolved"
+    },
+    "packageManager": {
+      "kind": "none",
+      "lockfile": null
+    },
+    "limits": {
+      "directoryEntries": 10000,
+      "analyzedFiles": 2000,
+      "bytesPerFile": 2097152,
+      "aggregateBytes": 67108864,
+      "astNodesPerFile": 250000,
+      "nesting": 256,
+      "workerMemoryMiB": 256,
+      "millisecondsPerFile": 5000,
+      "millisecondsPerInvocation": 30000
+    },
+    "entriesVisited": 3,
+    "filesVisited": 2,
+    "filesAnalyzed": 2,
+    "bytesRead": 200
+  },
+  "files": [
+    {
+      "id": "file:package.json",
+      "path": "package.json",
+      "kind": "manifest",
+      "bytes": 54,
+      "digest": "sha256:4ce58757c98ffe13a253e9d3e89d5a68d0a4c0f740e76510fa51e2b7ca03adb7",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/Broken.vue",
+      "path": "src/Broken.vue",
+      "kind": "sfc",
+      "bytes": 146,
+      "digest": "sha256:69b1afb0238cd3d80cf60b99bfc28453f347d792cea27adf098554ea9dadb103",
+      "parseStatus": "unsupported"
+    }
+  ],
+  "components": [
+    {
+      "id": "component:src/Broken.vue",
+      "fileId": "file:src/Broken.vue",
+      "scriptMode": "setup",
+      "blocks": [
+        {
+          "kind": "template",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Broken.vue",
+            "startOffset": 76,
+            "endOffset": 100,
+            "start": {
+              "line": 4,
+              "column": 11
+            },
+            "end": {
+              "line": 4,
+              "column": 35
+            }
+          }
+        },
+        {
+          "kind": "script-setup",
+          "lang": "ts",
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Broken.vue",
+            "startOffset": 24,
+            "endOffset": 56,
+            "start": {
+              "line": 1,
+              "column": 25
+            },
+            "end": {
+              "line": 3,
+              "column": 1
+            }
+          }
+        },
+        {
+          "kind": "style",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Broken.vue",
+            "startOffset": 119,
+            "endOffset": 137,
+            "start": {
+              "line": 5,
+              "column": 8
+            },
+            "end": {
+              "line": 5,
+              "column": 26
+            }
+          }
+        }
+      ],
+      "inventoryIds": [
+        "inventory:style-block:src/Broken.vue:119:137:1"
+      ],
+      "findingIds": [
+        "finding:GVA1103:src/Broken.vue:56:56:1",
+        "finding:GVA1103:src/Broken.vue:76:100:1",
+        "finding:GVA1103:src/Broken.vue:94:94:1",
+        "finding:GVA1103:src/Broken.vue:119:137:1"
+      ],
+      "migrationStages": [
+        "baseline",
+        "styles-universal"
+      ]
+    }
+  ],
+  "inventory": [
+    {
+      "id": "inventory:style-block:src/Broken.vue:119:137:1",
+      "fileId": "file:src/Broken.vue",
+      "componentId": "component:src/Broken.vue",
+      "category": "style",
+      "kind": "style-block",
+      "name": "css",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/Broken.vue",
+        "startOffset": 119,
+        "endOffset": 137,
+        "start": {
+          "line": 5,
+          "column": 8
+        },
+        "end": {
+          "line": 5,
+          "column": 26
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding:GVA1002:.:0:0:1",
+      "code": "GVA1002",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Exact Vue version cannot be established.",
+      "location": null,
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1103:package.json:0:0:1",
+      "code": "GVA1103",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "package.json is malformed.",
+      "location": null,
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1103:src/Broken.vue:56:56:1",
+      "code": "GVA1103",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Script syntax is malformed.",
+      "location": {
+        "fileId": "file:src/Broken.vue",
+        "startOffset": 56,
+        "endOffset": 56,
+        "start": {
+          "line": 3,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1103:src/Broken.vue:76:100:1",
+      "code": "GVA1103",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Template syntax is malformed.",
+      "location": {
+        "fileId": "file:src/Broken.vue",
+        "startOffset": 76,
+        "endOffset": 100,
+        "start": {
+          "line": 4,
+          "column": 11
+        },
+        "end": {
+          "line": 4,
+          "column": 35
+        }
+      },
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1103:src/Broken.vue:94:94:1",
+      "code": "GVA1103",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Single-File Component syntax is malformed.",
+      "location": {
+        "fileId": "file:src/Broken.vue",
+        "startOffset": 94,
+        "endOffset": 94,
+        "start": {
+          "line": 4,
+          "column": 29
+        },
+        "end": {
+          "line": 4,
+          "column": 29
+        }
+      },
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1103:src/Broken.vue:119:137:1",
+      "code": "GVA1103",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Style syntax is malformed.",
+      "location": {
+        "fileId": "file:src/Broken.vue",
+        "startOffset": 119,
+        "endOffset": 137,
+        "start": {
+          "line": 5,
+          "column": 8
+        },
+        "end": {
+          "line": 5,
+          "column": 26
+        }
+      },
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    }
+  ],
+  "summary": {
+    "supportState": "partial",
+    "files": 2,
+    "components": 1,
+    "fileKinds": {
+      "manifest": 1,
+      "lockfile": 0,
+      "sfc": 1,
+      "source": 0,
+      "test": 0,
+      "server": 0,
+      "build-config": 0,
+      "symlink": 0,
+      "other": 0
+    },
+    "inventory": {
+      "component": 0,
+      "prop-event-model": 0,
+      "slot-directive-ref": 0,
+      "reactivity-lifecycle": 0,
+      "router": 0,
+      "store": 0,
+      "async": 0,
+      "style": 1,
+      "ssr-hydration": 0,
+      "test": 0,
+      "build": 0,
+      "remaining-vue": 0
+    },
+    "severities": {
+      "info": 0,
+      "warning": 0,
+      "error": 6
+    },
+    "confidences": {
+      "exact": 1,
+      "structural": 0,
+      "indeterminate": 6
+    },
+    "stages": {
+      "baseline": 6,
+      "leaf-boundary": 0,
+      "state-form": 0,
+      "route-state-async": 0,
+      "styles-universal": 1,
+      "shell-removal": 0
+    }
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "schemaVersion": "1.0.0",
+  "analyzer": {
+    "name": "@gluonjs/vue-migration-analyzer",
+    "version": "0.0.0"
+  },
+  "root": ".",
+  "input": {
+    "vue": {
+      "declaredRange": "3.5.39",
+      "resolvedVersion": "3.5.39",
+      "versionSource": "exact-manifest"
+    },
+    "packageManager": {
+      "kind": "none",
+      "lockfile": null
+    },
+    "limits": {
+      "directoryEntries": 10000,
+      "analyzedFiles": 2000,
+      "bytesPerFile": 2097152,
+      "aggregateBytes": 67108864,
+      "astNodesPerFile": 250000,
+      "nesting": 256,
+      "workerMemoryMiB": 256,
+      "millisecondsPerFile": 5000,
+      "millisecondsPerInvocation": 30000
+    },
+    "entriesVisited": 5,
+    "filesVisited": 4,
+    "filesAnalyzed": 4,
+    "bytesRead": 597
+  },
+  "files": [
+    {
+      "id": "file:package.json",
+      "path": "package.json",
+      "kind": "manifest",
+      "bytes": 162,
+      "digest": "sha256:583a01f1946bd2a534459558f39d79d64441f6e03a49184facacaf6372da9ca6",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/App.vue",
+      "path": "src/App.vue",
+      "kind": "sfc",
+      "bytes": 144,
+      "digest": "sha256:dadb7cb1c4306ffe08634c08cdd165dc2d992f083a18cdb4ed80bf1a9485ad50",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/execute-plugin.js",
+      "path": "src/execute-plugin.js",
+      "kind": "source",
+      "bytes": 117,
+      "digest": "sha256:1a84fb1de4b4810fee2fc4d0c23ca6ff9f1c00c2ae81d1b009dfae33cf31de95",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:vite.config.ts",
+      "path": "vite.config.ts",
+      "kind": "build-config",
+      "bytes": 174,
+      "digest": "sha256:59faf4365e556791f41d882ff2387e49988b33d69f5dc08cb8bb46927afccac9",
+      "parseStatus": "parsed"
+    }
+  ],
+  "components": [
+    {
+      "id": "component:src/App.vue",
+      "fileId": "file:src/App.vue",
+      "scriptMode": "setup",
+      "blocks": [
+        {
+          "kind": "template",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/App.vue",
+            "startOffset": 109,
+            "endOffset": 132,
+            "start": {
+              "line": 5,
+              "column": 11
+            },
+            "end": {
+              "line": 5,
+              "column": 34
+            }
+          }
+        },
+        {
+          "kind": "script-setup",
+          "lang": "ts",
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/App.vue",
+            "startOffset": 24,
+            "endOffset": 89,
+            "start": {
+              "line": 1,
+              "column": 25
+            },
+            "end": {
+              "line": 4,
+              "column": 1
+            }
+          }
+        }
+      ],
+      "inventoryIds": [
+        "inventory:prop:src/App.vue:55:87:1",
+        "inventory:native-element:src/App.vue:109:132:1"
+      ],
+      "findingIds": [],
+      "migrationStages": [
+        "leaf-boundary"
+      ]
+    }
+  ],
+  "inventory": [
+    {
+      "id": "inventory:vue-dependency:package.json:0:162:1",
+      "fileId": "file:package.json",
+      "componentId": null,
+      "category": "remaining-vue",
+      "kind": "vue-dependency",
+      "name": "vue",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:package.json",
+        "startOffset": 0,
+        "endOffset": 162,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:prop:src/App.vue:55:87:1",
+      "fileId": "file:src/App.vue",
+      "componentId": "component:src/App.vue",
+      "category": "prop-event-model",
+      "kind": "prop",
+      "name": "safe",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/App.vue",
+        "startOffset": 55,
+        "endOffset": 87,
+        "start": {
+          "line": 3,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 33
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:native-element:src/App.vue:109:132:1",
+      "fileId": "file:src/App.vue",
+      "componentId": "component:src/App.vue",
+      "category": "component",
+      "kind": "native-element",
+      "name": "main",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/App.vue",
+        "startOffset": 109,
+        "endOffset": 132,
+        "start": {
+          "line": 5,
+          "column": 11
+        },
+        "end": {
+          "line": 5,
+          "column": 34
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:build-config:vite.config.ts:0:174:1",
+      "fileId": "file:vite.config.ts",
+      "componentId": null,
+      "category": "build",
+      "kind": "build-config",
+      "name": "vite",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:vite.config.ts",
+        "startOffset": 0,
+        "endOffset": 174,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding:GVA1601:vite.config.ts:0:174:1",
+      "code": "GVA1601",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Vite build configuration requires a removal plan.",
+      "location": {
+        "fileId": "file:vite.config.ts",
+        "startOffset": 0,
+        "endOffset": 174,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 4,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    }
+  ],
+  "summary": {
+    "supportState": "supported",
+    "files": 4,
+    "components": 1,
+    "fileKinds": {
+      "manifest": 1,
+      "lockfile": 0,
+      "sfc": 1,
+      "source": 1,
+      "test": 0,
+      "server": 0,
+      "build-config": 1,
+      "symlink": 0,
+      "other": 0
+    },
+    "inventory": {
+      "component": 1,
+      "prop-event-model": 1,
+      "slot-directive-ref": 0,
+      "reactivity-lifecycle": 0,
+      "router": 0,
+      "store": 0,
+      "async": 0,
+      "style": 0,
+      "ssr-hydration": 0,
+      "test": 0,
+      "build": 1,
+      "remaining-vue": 1
+    },
+    "severities": {
+      "info": 0,
+      "warning": 1,
+      "error": 0
+    },
+    "confidences": {
+      "exact": 3,
+      "structural": 2,
+      "indeterminate": 0
+    },
+    "stages": {
+      "baseline": 0,
+      "leaf-boundary": 2,
+      "state-form": 0,
+      "route-state-async": 0,
+      "styles-universal": 0,
+      "shell-removal": 3
+    }
+  }
+}

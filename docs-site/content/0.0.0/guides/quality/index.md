@@ -41,6 +41,8 @@ Run the repository security and dependency checks from a clean checkout:
 npm audit --audit-level=moderate
 npm run test:ssr
 npm run check:packages
+npm run test:vue-analyzer
+npm run check:vue-analyzer-fixtures
 npm run test:property-fuzz
 npm run check:security
 npm run check:shop-performance
@@ -50,6 +52,11 @@ Review the [deployment reference](/gluon/0.0.0/reference/deployment/) before
 changing CSP, asset, or server behavior. Diagnostics and runtime failures remain
 visible; production code does not report a successful state after a failed
 compile, import, hydration, or render step.
+
+The report-only Vue analyzer treats source, SFCs, tests, and Vite configuration
+as untrusted inert input. Its adversarial fixtures fail if any project code is
+executed, and its fixed path/resource limits plus schema validation are part of
+the repository check. See the [analyzer guide](/gluon/0.0.0/migration/vue-analyzer/).
 
 The repository [security threat model](https://github.com/marcmalerei/gluon/blob/main/docs/security.md),
 [accessibility protocol](https://github.com/marcmalerei/gluon/blob/main/docs/accessibility.md),

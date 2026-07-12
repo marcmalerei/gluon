@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "noEmit": true, "paths": {} },
+  "include": ["vue-migration-analyzer.types.ts"]
+}

@@ -22,6 +22,8 @@
     "packages/devtools-api/src/index.ts",
     "packages/devtools/src/index.ts",
     "packages/language-server/src/index.ts",
+    "packages/vue-migration-analyzer/src/index.ts",
+    "packages/vue-migration-analyzer/src/schema.ts",
     "packages/create-gluon/src/index.ts"
   ],
   "entryPointStrategy": "resolve",
