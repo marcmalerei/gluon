@@ -1,0 +1,6 @@
+// Rejected compile-time block syntax, retained for the checkout/dialog comparison.
+component Shell({ heading: 'Checkout', actions, dialog }) {
+  component Panel({ title: 'Delivery', onSubmit: submit }) {
+    html`<label>Email <input name="email" type="email" required></label>`
+  }
+}

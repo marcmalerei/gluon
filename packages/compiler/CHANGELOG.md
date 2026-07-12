@@ -6,3 +6,5 @@
   high-resolution source maps, and development HMR transforms.
 - Added the public versioned diagnostic catalog, compact production codes, and
   stable reference URLs under `@gluonjs/compiler/diagnostics`.
+- Recognize aliased `compose()` tagged bodies as original-source HTML template
+  boundaries without rewriting production output.

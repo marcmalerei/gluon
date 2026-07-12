@@ -7,10 +7,12 @@ contract is
 and completed evidence must conform to
 [`benchmarks/dx/schema/run-v1.schema.json`](../benchmarks/dx/schema/run-v1.schema.json).
 
-This repository does not currently contain a completed DX benchmark run. The
-only retained record selects the comparator lanes and captures the environment
-and package versions observed on 12 July 2026. It supports no win, tie, loss,
-usability, or general DX-superiority claim.
+This repository does not currently contain a completed DX benchmark run. One
+retained record selects the comparator lanes and captures the environment and
+package versions observed on 12 July 2026. A second, explicitly partial record
+captures issue #111's nested checkout/dialog syntax measurements for the
+T3-local-layers implementation slice. Neither supports a win, tie, loss,
+usability, readability, or general DX-superiority claim.
 
 ## Comparator lanes
 
@@ -92,3 +94,9 @@ the final comparison remain acceptance work in #107. The dependent public APIs
 are tracked by #108 through #115. The epic must remain open until those slices
 are complete, all three fixtures satisfy every task without private substitutes,
 and a complete run is retained and validated.
+
+Issue #111's partial fixture and raw metrics live under
+`benchmarks/dx/template-composition`; its canonical slice record is
+`benchmarks/dx/evidence/template-composition-2026-07-12.json`. It deliberately
+does not satisfy the completed-run schema, invent the other 20 framework-task
+results, or claim the required human pass.

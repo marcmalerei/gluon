@@ -10,6 +10,7 @@ import {
   Transition,
   createApp,
   createInjectionKey,
+  compose,
   css,
   defineElement,
   directive,
@@ -40,6 +41,21 @@ import { generateStaticSite } from '@gluonjs/ssr/static';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
+  it('serializes composed functional templates through the unchanged public template contract', async () => {
+    const Panel = (props: { readonly title: string; readonly children: import('@gluonjs/core').TemplateValue }) => html`
+      <section><h2>${props.title}</h2>${props.children}</section>
+    `;
+    const result = compose(Panel, { title: 'Checkout' })`<p>Delivery</p>`;
+    const rendered = withoutHydrationMarkers(await renderToString(result));
+    expect(rendered).toContain('<section><h2>Checkout</h2><p>Delivery</p></section>');
+    const ordered: string[] = [];
+    for await (const chunk of renderToChunks(result)) ordered.push(chunk);
+    expect(withoutHydrationMarkers(ordered.join(''))).toBe(rendered);
+    const progressive = [];
+    for await (const chunk of renderProgressively(result)) progressive.push(chunk);
+    expect(withoutHydrationMarkers(progressive[0]!.html)).toBe(rendered);
+  });
+
   it('loads the public Core and renderer without browser DOM globals', () => {
     expect(globalThis).not.toHaveProperty('document');
     expect(globalThis).not.toHaveProperty('HTMLElement');

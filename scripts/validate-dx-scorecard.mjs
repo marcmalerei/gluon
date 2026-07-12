@@ -61,6 +61,18 @@ for (const name of evidenceNames) {
     assert(evidence.limitations.some((value) => value.includes('No task result, win, tie, loss')), `${name} must prohibit unsupported comparison claims`);
     continue;
   }
+  if (evidence.status === 'implementation-slice-only') {
+    assert(evidence.specification === 'benchmarks/dx/specification-v1.json', `${name} must link the accepted specification`);
+    assert(evidence.trackingIssue === 111, `${name} must identify issue #111`);
+    assert(evidence.applicableTask === 'T3-local-layers', `${name} must identify the applicable parent task`);
+    assert(evidence.frameworks.length === 4, `${name} must retain current Gluon, compose Gluon, React, and Vue fixtures`);
+    assertSet(evidence.frameworks.map(({ id }) => id), ['gluon-current', 'gluon-compose', 'react', 'vue'], `${name} slice frameworks`);
+    assert(evidence.frameworks.find(({ id }) => id === 'gluon-compose').callSiteChildrenProperties === 0, `${name} must retain the children-plumbing result`);
+    assert(evidence.limitations.some((value) => value.includes('not a completed benchmark run')), `${name} must not imply a completed run`);
+    assert(evidence.limitations.some((value) => value.includes('No human usability pass')), `${name} must report the missing human pass`);
+    assert(evidence.limitations.some((value) => value.includes('win, tie, loss')), `${name} must prohibit unsupported comparison claims`);
+    continue;
+  }
   assert(validateRun(evidence), `${name} does not match the completed-run schema:\n${ajv.errorsText(validateRun.errors, { separator: '\n' })}`);
   assertSet(evidence.frameworks.map(({ id }) => id), ['gluon', 'react', 'vue'], `${name} framework runs`);
   const expectedPairs = specification.tasks.flatMap(({ id }) =>
