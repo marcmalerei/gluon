@@ -30,7 +30,8 @@ and testing work.
 
 ## Migration
 
-Manual Vue-to-Gluon concept mapping and release-to-release upgrade policy, with
-the supported automation boundary stated explicitly.
+Manual Vue-to-Gluon concept mapping, a tested reversible cutover playbook, and
+release-to-release upgrade policy, with the supported automation boundary
+stated explicitly.
 
 [See migration →](/gluon/0.0.0/migration/)
