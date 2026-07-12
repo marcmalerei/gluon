@@ -34,6 +34,13 @@ owner. `atomStyles` is deprecated; adopting it with exact rendering throws
 `GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` rather than applying duplicate rules.
 `installUiTheme()` is deprecated in favor of `installUi()`.
 
+`create-gluon --ui` is the maintained application-owner example for this
+contract. It retains the `UiOwner` for the application lifetime, keeps its
+`--starter-*` tokens in a separate application sheet, maps only
+`.starter-action` to the public Button override properties, and relies on
+`Button.styles` for exact usage-driven adoption. It does not add a blanket
+native `button` rule or adopt `atomStyles`.
+
 ## Accessibility contracts
 
 - `Button` renders a native `type="button"`, preserves disabled semantics, has

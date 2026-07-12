@@ -71,6 +71,15 @@ validates component carrier count, identity, order, digest, content, and target,
 then lets the renderer adopt exact client sheet objects before removing
 carriers. Component sheets release with the hydrated render owner.
 
+The maintained `create-gluon --ui --ssr` application composes these ownership
+paths without a second aggregate manifest: `createUiStyleSelection()` supplies
+the shared carriers, request rendering derives the exact Button carrier, and a
+named application selection supplies the starter sheet. On the client,
+`installUi({ hydrate: true })` consumes the shared carriers before
+`hydrateApplication()` validates the application selection and usage-derived
+Button sheet. Its generated browser test requires retained DOM, zero mismatches,
+`recovered: false`, one instance of each exact sheet, and release on unmount.
+
 ## License
 
 MIT License, Copyright © 2026 Marc Malerei.

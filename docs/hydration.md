@@ -100,3 +100,7 @@ hydration; Gluon does not inject executable inline scripts.
   Router, Store, shop-flow, mismatch, recovery, and declarative-shadow identity.
 - `tests-node/ssr.spec.ts` proves marker serialization, nested progressive
   boundaries, request isolation, and aborted async work without browser globals.
+- The `create-gluon --ui --ssr --testing` fixture additionally proves the
+  generated shared UI, exact Button, and app-owned carrier order, retained root
+  identity, `recovered: false`, empty mismatches, single adoption, interaction
+  after hydration, and release on unmount.
