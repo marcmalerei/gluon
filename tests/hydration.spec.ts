@@ -4,6 +4,7 @@ import {
   createComponentStyleSelection,
   createApp,
   createInjectionKey,
+  createStyleSheetSelection,
   defineElement,
   defineGluonElement,
   css,
@@ -365,5 +366,40 @@ describe('SSR hydration', () => {
         });
       document.body.replaceChildren();
     }
+  });
+
+  it('hydrates usage-derived component carriers before application-owned carriers', async () => {
+    const appSheet = css`:root { --hydration-app-token: ready; }`;
+    const appSelection = createStyleSheetSelection([
+      { id: 'hydration-app', scope: 'hydration-app', sheet: appSheet },
+    ]);
+    const app = createApp(() => Button({ label: 'Hydrated application action' }));
+    const rootValue = renderGluonApplicationForServer(app);
+    const prepared = await prepareForHydration(rootValue);
+    const componentSelection = createComponentStyleSelection(prepared.value);
+    const serverSelection = createStyleSheetSelection([
+      ...componentSelection.entries,
+      ...appSelection.entries,
+    ]);
+    const manifest = createStyleManifest(serverSelection);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    document.head.insertAdjacentHTML('beforeend', renderStyleCarriers(manifest));
+    document.body.append(root);
+
+    const hydrated = await hydrateApplication(app, root, {
+      styles: manifest,
+      styleSelection: appSelection,
+      styleRoot: document,
+    });
+
+    expect(hydrated.hydration).toEqual(expect.objectContaining({ retained: true, recovered: false }));
+    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).toContain(appSheet);
+    expect(document.querySelector('style[data-gluon-style]')).toBeNull();
+    hydrated.mount.unmount();
+    expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).not.toContain(appSheet);
+    root.remove();
   });
 });

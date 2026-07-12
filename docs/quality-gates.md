@@ -156,6 +156,19 @@ The optional `--components-only` validator argument is a development shortcut
 for the five generated projects. The blocking repository command uses no
 shortcut and therefore runs both matrices.
 
+Every one of the 20 application selections is installed from packed workspace
+artifacts, typechecked, template-checked, tested, and built. UI selections run
+the generated application test, which checks the accessible reactive Button,
+computed 44px target and app-token color, exact Button/application adoption,
+and cleanup. The UI + SSR selection additionally checks the shared UI, exact
+Button, and application carrier order, retained DOM, empty hydration mismatches,
+`recovered: false`, single adoption, post-hydration interaction, and teardown.
+
+`tests/vite-hmr.spec.ts` separately edits the generated starter's app-token
+sheet and exported Button consumer after a state change. The gate requires the
+same reactive count, native Button node, and sheet object with updated rendered
+copy and computed color.
+
 ## Developer-experience benchmark contract gate
 
 `npm run check:dx-scorecard` validates the issue #107 comparison contract: the

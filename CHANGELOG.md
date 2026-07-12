@@ -20,6 +20,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   filesystem safety, separately confirmed overwrites, managed public exports,
   and packed clean-project evidence across browser, HMR, SSR/hydration,
   language-tooling, test-utils, and Devtools-compatible boundaries.
+- Complete `create-gluon --ui` applications with a one-step shared theme owner,
+  app-owned tokens, an accessible typed reactive Button consumer, exact
+  usage-driven sheets, computed-style tests, state-preserving consumer/token
+  HMR, and SSR hydration without duplicate adoption or recovery.
 - The public `compose(component, props)\`body\`` functional-component authoring
   path, compiler/language-tooling boundaries, retained Gluon/React/Vue
   checkout-dialog comparison, generated starter and Playground examples, and

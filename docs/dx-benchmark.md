@@ -146,6 +146,14 @@ one configuration choice. The remaining `adoptStyles(document, exampleStyles)`
 is application-owned styling, not component-library setup. Neither slice is a
 completed cross-framework comparison.
 
+Issue #109 retains a bounded Gluon-only starter slice in
+`benchmarks/dx/create-gluon-ui-starter-2026-07-12.json`. It records the exact
+non-interactive scaffold command, 12 generated files, first UI-test and build
+commands, and the complete 20-selection matrix commands. The canonical
+before/after row covers tasks T1, T2, T5, and T6 and names setup, import,
+configuration, cleanup, HMR, computed-style, and hydration evidence. It contains
+no Vue/React execution, human pass, or completed benchmark claim.
+
 Issue #112's four retained controls, disaggregated metrics, diagnostic and
 cleanup evidence, verified Gluon disadvantages, and limitations live under
 `benchmarks/dx/stateful-form-control`; the method and commands are documented in

@@ -20,6 +20,12 @@ of already-adopted `CSSStyleSheet` instances. It then requests a render pass for
 mounted Gluon applications and connected Gluon elements. The page is not
 reloaded for compatible template, method, store-logic, or stylesheet edits.
 
+The maintained `create-gluon --ui` HMR regression updates both the exported
+`StarterAction` consumer and its app-token stylesheet after incrementing the
+reactive count. It requires the same application state, native Button node, and
+`CSSStyleSheet` object after the update, then verifies the new label and computed
+token color before cleanup.
+
 Imported `defineGluonElement()` calls use the same registered-constructor
 bridge. Compatible edits stop the prior setup child scope and run patched setup
 inside the existing render owner while retaining explicit keyed state,

@@ -20,3 +20,6 @@
 - Derive component sheets from resolved request usage, emit progressive styles
   before dependent patches, and validate exact client identities with typed
   missing/extra/duplicate/order/content/target diagnostics and teardown.
+- Verify the generated UI starter's shared, usage-derived Button, and
+  application-owned carriers through identity-preserving hydration with no
+  recovery or duplicate adoption.
