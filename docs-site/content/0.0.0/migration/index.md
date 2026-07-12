@@ -17,6 +17,12 @@ Supported automation starts after Gluon source exists:
 None of those tools reads Vue source or performs a semantic conversion. A Vue
 migration is a manual redesign against Gluon's public contracts.
 
+[RFC 0003](https://github.com/marcmalerei/gluon/blob/main/docs/rfcs/0003-report-only-vue-migration-analyzer.md)
+accepts a future, Node-only analyzer for bounded static Vue 3.5 inventory. The
+package and CLI do not exist in version `0.0.0`; issue #91 owns their
+implementation. The RFC authorizes reports only, not application execution,
+compatibility, Gluon source generation, source rewriting, or a codemod.
+
 For a reversible route from coexistence to full application ownership, follow
 the [tested Vue-to-Gluon cutover playbook](./vue-to-gluon-cutover/). It uses the
 production GLUON GOODS product configurator below as one continuous case study.

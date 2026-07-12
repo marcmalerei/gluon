@@ -378,12 +378,37 @@ compose any of these functional layers.
 
 Layer styles are exported as constructable sheets and must be adopted explicitly. This avoids import-time DOM mutation and keeps application stylesheet ownership visible.
 
+## Planned report-only Vue migration analyzer
+
+[RFC 0003](rfcs/0003-report-only-vue-migration-analyzer.md) authorizes the
+planned Node-only `@gluonjs/vue-migration-analyzer` package with root and
+`./schema` exports plus the `gluon-vue-analyze` executable. It has no official
+Gluon dependency and does not enter the Core, browser, application, Router,
+Store, SSR, Compiler, Vite, Devtools, language-server, or UI runtime graphs.
+Issue #91 adds it to the machine-readable package and release contracts only
+when the implementation, package contents, schema, CLI, fixtures, and release
+evidence exist.
+
+The analyzer may read only the RFC's bounded Vue 3.5 project surface. It parses
+source into inert AST data in an isolated worker and emits deterministic reports
+to stdout. It never imports application/config/plugin code, uses a network,
+follows symbolic links, or writes source. Unsupported and dynamic constructs
+remain explicit diagnostics linked to the versioned cutover guide. A later
+source writer cannot reuse this authorization; it requires another accepted
+RFC after #92.
+
+The package has no honest GLUON GOODS customer surface. The production
+configurator and Vue host remain input/evidence fixtures, while the analyzer
+itself remains developer tooling.
+
 ## Verification boundaries
 
 The machine-readable [`package-contract.json`](../package-contract.json) defines
-the complete planned package graph. `npm run check:packages` validates every
-declared package independently and additionally verifies built exports, types,
-license, changelog, README, and `npm pack` contents for implemented packages.
+the complete implemented release-group graph. RFC 0003 separately records the
+next planned analyzer package until #91 implements it. `npm run check:packages`
+validates every declared package independently and additionally verifies built
+exports, types, license, changelog, README, and `npm pack` contents for
+implemented packages.
 Reactivity behavior runs in a Node Vitest configuration; the public generated
 Core and Reactivity declarations are compiled again through
 `tests-node/core.types.ts` and `tests-node/reactivity.types.ts`.

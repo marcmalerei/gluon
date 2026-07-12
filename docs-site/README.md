@@ -47,6 +47,15 @@ The guide keeps Vue and Gluon
 application ownership explicit for every stage and embeds the compiled Vue host
 sources instead of maintaining copied snippets. `validate-docs.mjs` requires the
 page, its safety boundary, its rollback matrix, and its browser-evidence links.
+The Migration index also distinguishes RFC 0003's accepted report-only analyzer
+contract from the still-unimplemented package in issue #91; documentation
+validation requires both references so acceptance is not mistaken for a
+shipped source reader.
+The verified RFC-boundary renders are
+[`design/rendered-vue-analyzer-rfc-desktop.png`](design/rendered-vue-analyzer-rfc-desktop.png)
+at 1440×1000 and
+[`design/rendered-vue-analyzer-rfc-mobile.png`](design/rendered-vue-analyzer-rfc-mobile.png)
+at 390×1200.
 The verified playbook renders are
 [`design/rendered-vue-cutover-desktop.png`](design/rendered-vue-cutover-desktop.png)
 at 1440×1000 and

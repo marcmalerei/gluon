@@ -289,6 +289,7 @@ npm run check
 ```
 
 The output of these commands verifies compiled sources and observable behavior.
-It does not authorize automatic Vue source rewriting. Any future reader of Vue
-source requires a separately accepted RFC with an explicit syntax, reporting,
-privacy, and failure contract.
+It does not authorize automatic Vue source rewriting. RFC 0003 now accepts a
+future report-only reader with an explicit syntax, reporting, privacy, and
+failure contract; issue #91 still owns implementation. A source writer remains
+prohibited without another accepted RFC.
