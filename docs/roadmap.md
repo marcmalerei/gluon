@@ -349,11 +349,12 @@ a release gate to issue #41.
 | [#89](https://github.com/marcmalerei/gluon/issues/89) | Publish the tested, reversible Vue-to-Gluon cutover playbook. |
 | [#90](https://github.com/marcmalerei/gluon/issues/90) | Accept RFC 0003 for bounded, static, report-only Vue migration analysis. |
 | [#91](https://github.com/marcmalerei/gluon/issues/91) | Implement the accepted Node package, CLI, schema, diagnostics, fixtures, and retained evidence. |
-| [#92](https://github.com/marcmalerei/gluon/issues/92) | Use retained evidence for a bounded codemod go/no-go decision; implement no writer. |
+| [#92](https://github.com/marcmalerei/gluon/issues/92) | Retained evidence records no-go for all 14 evaluated source-writing classes; no writer is implemented. |
 
 Issue #91 places the analyzer package in the lockstep release group under the
-RFC 0003 contract. A write-capable transform remains prohibited unless #92
-produces and accepts another superseding RFC first.
+RFC 0003 contract. The completed #92 evaluation separates 52 static inventory
+records from `0/14` behaviorally equivalent transform classes and proposes no
+superseding RFC. A write-capable transform therefore remains prohibited.
 
 ## Gluon 1.0 release gates
 

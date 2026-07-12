@@ -1,0 +1,246 @@
+{
+  "schemaVersion": "1.0.0",
+  "decision": "no-go",
+  "sourceWriterProposed": false,
+  "scope": "The four versioned analyzer fixture reports only; production Vue-host tests are supplementary behavioral evidence.",
+  "corpus": {
+    "reports": [
+      "packages/vue-migration-analyzer/fixtures/expected/supported.json",
+      "packages/vue-migration-analyzer/fixtures/expected/unsupported.json",
+      "packages/vue-migration-analyzer/fixtures/expected/malformed.json",
+      "packages/vue-migration-analyzer/fixtures/expected/adversarial.json"
+    ],
+    "files": 17,
+    "inventoryRecords": 52,
+    "findings": 26,
+    "candidateClasses": 14,
+    "behaviorallyEquivalentClasses": 0
+  },
+  "risks": {
+    "falsePositive": "A static shape can match while scheduling, ownership, event, routing, store, CSS, test, or SSR behavior differs.",
+    "falseNegative": "Dynamic imports, aliases, macros, generated code, plugin transforms, runtime registration, and external build context can hide behavior from static inventory.",
+    "requiredHumanReview": "A reviewer must redesign ownership against public Gluon contracts and run behavior-specific browser, application, server, and accessibility evidence. Analyzer presence is never conversion proof."
+  },
+  "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+  "counterexamples": "quality/vue-codemod-evidence/counterexamples.md",
+  "candidates": [
+    {
+      "id": "vue-imports",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/src/OptionsCard.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/server.ts"
+      ],
+      "analyzerEvidence": [
+        "inventory:vue-import:src/OptionsCard.vue:19:57:1",
+        "inventory:vue-import:src/ProductCard.vue:25:94:1",
+        "inventory:vue-import:src/server.ts:0:35:1"
+      ],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    },
+    {
+      "id": "static-component-registration",
+      "classification": "unsupported",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue",
+        "packages/vue-migration-analyzer/fixtures/unsupported/src/runtime.ts"
+      ],
+      "analyzerEvidence": [
+        "inventory:component-element:src/ProductCard.vue:801:812:1",
+        "finding:GVA1203:src/runtime.ts:105:118:1"
+      ],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    },
+    {
+      "id": "props-emits-model",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/src/OptionsCard.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"
+      ],
+      "analyzerEvidence": [
+        "inventory:prop:src/OptionsCard.vue:117:141:1",
+        "inventory:emit:src/OptionsCard.vue:145:161:1",
+        "inventory:prop:src/ProductCard.vue:186:240:1",
+        "inventory:emit:src/ProductCard.vue:255:309:1",
+        "inventory:model:src/ProductCard.vue:325:336:1"
+      ],
+      "acceptanceEvidence": [
+        "docs-site/examples/VueProductHost.vue",
+        "tests/vue-migration-interop.spec.ts"
+      ]
+    },
+    {
+      "id": "simple-template-bindings",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/src/OptionsCard.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"
+      ],
+      "analyzerEvidence": [
+        "inventory:native-element:src/OptionsCard.vue:258:296:1",
+        "inventory:directive:src/ProductCard.vue:685:700:1",
+        "inventory:model:src/ProductCard.vue:750:765:1",
+        "inventory:directive:src/ProductCard.vue:766:785:1"
+      ],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    },
+    {
+      "id": "native-custom-element-transport",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "docs-site/examples/VueProductHost.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"
+      ],
+      "analyzerEvidence": [
+        "inventory:prop:src/ProductCard.vue:186:240:2",
+        "inventory:emit:src/ProductCard.vue:255:309:1"
+      ],
+      "acceptanceEvidence": [
+        "tests-node/vue-migration-analyzer.spec.ts",
+        "tests/vue-migration-interop.spec.ts"
+      ]
+    },
+    {
+      "id": "stylesheet-extraction",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/src/OptionsCard.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"
+      ],
+      "analyzerEvidence": [
+        "finding:GVA1402:src/OptionsCard.vue:323:347:1",
+        "finding:GVA1401:src/ProductCard.vue:864:892:1"
+      ],
+      "acceptanceEvidence": [
+        "tests/vue-migration-interop.spec.ts",
+        "quality/vue-codemod-evidence/counterexamples.md"
+      ]
+    },
+    {
+      "id": "router-store-boundaries",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": ["packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"],
+      "analyzerEvidence": [
+        "finding:GVA1301:src/ProductCard.vue:95:133:1",
+        "finding:GVA1302:src/ProductCard.vue:134:170:1"
+      ],
+      "acceptanceEvidence": [
+        "docs-site/content/0.0.0/migration/vue-to-gluon-cutover/index.md",
+        "quality/vue-codemod-evidence/counterexamples.md"
+      ]
+    },
+    {
+      "id": "lifecycle",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/src/OptionsCard.vue",
+        "packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"
+      ],
+      "analyzerEvidence": [
+        "inventory:lifecycle:src/OptionsCard.vue:197:231:1",
+        "inventory:lifecycle:src/ProductCard.vue:592:601:1"
+      ],
+      "acceptanceEvidence": [
+        "tests/vue-migration-interop.spec.ts",
+        "quality/vue-codemod-evidence/counterexamples.md"
+      ]
+    },
+    {
+      "id": "tests",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": ["packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.spec.ts"],
+      "analyzerEvidence": [
+        "finding:GVA1601:src/ProductCard.spec.ts:0:40:1",
+        "finding:GVA1601:src/ProductCard.spec.ts:0:116:1"
+      ],
+      "acceptanceEvidence": [
+        "tests/vue-migration-interop.spec.ts",
+        "quality/vue-codemod-evidence/counterexamples.md"
+      ]
+    },
+    {
+      "id": "async-components-suspense",
+      "classification": "review-required",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": ["packages/vue-migration-analyzer/fixtures/supported/src/ProductCard.vue"],
+      "analyzerEvidence": [
+        "finding:GVA1303:src/ProductCard.vue:540:560:1",
+        "inventory:suspense:src/ProductCard.vue:791:823:1"
+      ],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    },
+    {
+      "id": "dynamic-templates-macros-directives",
+      "classification": "unsupported",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": ["packages/vue-migration-analyzer/fixtures/unsupported/src/Legacy.vue"],
+      "analyzerEvidence": [
+        "finding:GVA1201:src/Legacy.vue:89:130:1",
+        "finding:GVA1202:src/Legacy.vue:111:127:1",
+        "finding:GVA1102:src/Legacy.vue:211:229:1"
+      ],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    },
+    {
+      "id": "plugins-runtime-registration",
+      "classification": "unsupported",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": [
+        "packages/vue-migration-analyzer/fixtures/supported/vite.config.ts",
+        "packages/vue-migration-analyzer/fixtures/unsupported/src/runtime.ts"
+      ],
+      "analyzerEvidence": [
+        "finding:GVA1601:vite.config.ts:0:37:1",
+        "finding:GVA1203:src/runtime.ts:105:118:1"
+      ],
+      "acceptanceEvidence": [
+        "packages/vue-migration-analyzer/fixtures/adversarial/vite.config.ts",
+        "quality/vue-codemod-evidence/counterexamples.md"
+      ]
+    },
+    {
+      "id": "ssr-hydration",
+      "classification": "unsupported",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": ["packages/vue-migration-analyzer/fixtures/supported/src/server.ts"],
+      "analyzerEvidence": [
+        "finding:GVA1501:src/server.ts:103:115:1",
+        "finding:GVA1501:src/server.ts:126:140:1"
+      ],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    },
+    {
+      "id": "css-preprocessors-external-styles",
+      "classification": "unsupported",
+      "decision": "no-go",
+      "expectedOutput": "quality/vue-codemod-evidence/no-write-expected-output.json",
+      "inputs": ["packages/vue-migration-analyzer/fixtures/unsupported/src/Legacy.vue"],
+      "analyzerEvidence": ["finding:GVA1403:src/Legacy.vue:161:196:1"],
+      "acceptanceEvidence": ["quality/vue-codemod-evidence/counterexamples.md"]
+    }
+  ]
+}

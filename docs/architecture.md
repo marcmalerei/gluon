@@ -393,7 +393,7 @@ Node-only `@gluonjs/vue-migration-analyzer` package with root and
 `./schema` exports plus the `gluon-vue-analyze` executable. It has no official
 Gluon dependency and does not enter the Core, browser, application, Router,
 Store, SSR, Compiler, Vite, Devtools, language-server, or UI runtime graphs.
-Issue #91 adds it to the machine-readable package and release contracts with
+Issue #91 added it to the machine-readable package and release contracts with
 the implementation, package contents, schema, CLI, fixtures, and release
 evidence in one slice.
 
@@ -401,9 +401,15 @@ The analyzer may read only the RFC's bounded Vue 3.5 project surface. It parses
 source into inert AST data in an isolated worker and emits deterministic reports
 to stdout. It never imports application/config/plugin code, uses a network,
 follows symbolic links, or writes source. Unsupported and dynamic constructs
-remain explicit diagnostics linked to the versioned cutover guide. A later
-source writer cannot reuse this authorization; it requires another accepted
-RFC after #92.
+remain explicit diagnostics linked to the versioned cutover guide.
+
+The bounded issue #92 evaluation is retained in
+[`vue-codemod-decision.md`](vue-codemod-decision.md) and its machine-readable
+evidence. It records no-go for source writing across 14 candidate classes:
+17 fixture files produced 52 inventory records and 26 findings, but zero
+candidate classes have retained behavioral-equivalence proof. No converter
+package, transform hook, or write mode enters the architecture. A future source
+writer cannot reuse RFC 0003; it requires another accepted RFC first.
 
 The package has no honest GLUON GOODS customer surface. The production
 configurator and Vue host remain input/evidence fixtures, while the analyzer
