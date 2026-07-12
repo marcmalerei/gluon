@@ -376,19 +376,37 @@ describe('create-gluon add-component planning and writes', () => {
     const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-safety-'));
     const project = await scaffoldProject({ directory: 'app', cwd });
     const invalid = [
-      addComponent({ root: project.directory, kind: 'atom', name: 'bad-name' }),
-      addComponent({ root: project.directory, kind: 'atom', name: 'ValidName', path: '../outside' }),
-      addComponent({ root: project.directory, kind: 'atom', name: 'ValidName', path: join(cwd, 'absolute') }),
-      addComponent({ root: project.directory, kind: 'element', name: 'ValidName', tagName: 'Invalid' }),
-      addComponent({ root: project.directory, kind: 'element', name: 'ValidName', tagName: 'annotation-xml' }),
+      () => addComponent({ root: project.directory, kind: 'atom', name: 'bad-name' }),
+      () => addComponent({ root: project.directory, kind: 'atom', name: 'ValidName', path: '../outside' }),
+      () => addComponent({ root: project.directory, kind: 'atom', name: 'ValidName', path: join(cwd, 'absolute') }),
+      () => addComponent({ root: project.directory, kind: 'element', name: 'ValidName', tagName: 'Invalid' }),
     ];
-    for (const promise of invalid) await expect(promise).rejects.toBeInstanceOf(AddComponentError);
+    for (const rejectInvalidInput of invalid) {
+      await expect(rejectInvalidInput()).rejects.toBeInstanceOf(AddComponentError);
+    }
     const outside = join(cwd, 'outside');
     await mkdir(outside);
     await symlink(outside, join(project.directory, 'src/components'));
     await expect(addComponent({ root: project.directory, kind: 'atom', name: 'SafeAction' }))
       .rejects.toMatchObject({ code: 'SYMLINK_ESCAPE' });
     await expect(readFile(join(outside, 'safe-action.ts'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  test('owns reserved custom-element tag rejection before it can escape the assertion', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-reserved-tag-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+
+    await expect(addComponent({
+      root: project.directory,
+      kind: 'element',
+      name: 'ValidName',
+      tagName: 'annotation-xml',
+    })).rejects.toMatchObject({
+      code: 'INVALID_CUSTOM_ELEMENT_NAME',
+      message: 'INVALID_CUSTOM_ELEMENT_NAME: "annotation-xml" is not a valid autonomous Custom Element name.',
+    });
+    await expect(readFile(join(project.directory, 'src/components/valid-name.ts')))
+      .rejects.toMatchObject({ code: 'ENOENT' });
   });
 
   test('fails invalid manifests before creating component paths', async () => {

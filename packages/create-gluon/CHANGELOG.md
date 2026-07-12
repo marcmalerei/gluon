@@ -24,3 +24,6 @@
   browser tests.
 - Verify every component kind through packed clean installs, type and template
   checks, Chromium, client/SSR builds, and package dry runs.
+- Own every invalid-input rejection at assertion creation time so reserved
+  Custom Element names retain their exact diagnostic without an asynchronous
+  unhandled-Promise escape under coverage.
