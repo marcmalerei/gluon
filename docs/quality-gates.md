@@ -45,13 +45,17 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-Baseline examples document the supported public import plus a compiler-valid
-call, type annotation, or value read for the symbol kind. Generic placeholder
-arguments establish type coverage, not runtime behavior. Behavior-oriented
-overrides are maintained in `docs-site/api-examples.json` and compile in the
-same corpus. `npm run check:docs` independently derives the generated symbol
-page set, requires exact manifest coverage and rendered code on every page, and
-checks the curated `createMemoryHistory()` lifecycle example.
+Baseline examples document the supported public import plus a type-aware
+concrete value, callback, configuration, or call for the symbol kind. Runtime
+objects that must be owned elsewhere use explicit consumer examples rather than
+fake construction. The generator and `npm run check:docs` reject the former
+compiler-only `declare const args`, `type Example =`, and `void value` patterns.
+
+Behavior-oriented overrides are maintained in
+`docs-site/api-examples.json` and compile in the same corpus. `npm run
+check:docs` independently derives the generated symbol page set, requires exact
+manifest coverage and rendered code on every page, and checks the curated
+memory-history, Router-options, Store-definition, and Gluon Element examples.
 
 ## Optional UI package gate
 

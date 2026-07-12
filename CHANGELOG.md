@@ -9,6 +9,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Task-oriented API reference generation that replaces compiler-only aliases
+  and declared argument tuples with concrete values, runtime-owner consumption
+  patterns, and curated lifecycle examples, including complete Router options
+  and Store definition flows.
 - Verified public-entry-point examples on every generated API symbol page,
   including a curated memory-history lifecycle example and a complete
   TypeScript compilation/coverage gate for the generated corpus.
