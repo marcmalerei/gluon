@@ -37,8 +37,8 @@
       "properties": { "command": { "type": "string" }, "exitCode": { "type": "integer" }, "expectedExit": { "enum": ["zero", "nonzero"] }, "durationMs": { "type": "integer", "minimum": 0 }, "stdout": { "type": "string" }, "stderr": { "type": "string" } }
     },
     "framework": {
-      "type": "object", "additionalProperties": false, "required": ["id", "lane", "versions", "fixture", "lockfile", "commands"],
-      "properties": { "id": { "enum": ["gluon", "vue", "react"] }, "lane": { "type": "string" }, "versions": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "string" } }, "fixture": { "type": "string" }, "lockfile": { "type": "string" }, "commands": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/command" } } }
+      "type": "object", "additionalProperties": false, "required": ["id", "lane", "versions", "scaffoldCommand", "interactiveAnswers", "fixture", "lockfile", "commands"],
+      "properties": { "id": { "enum": ["gluon", "vue", "react"] }, "lane": { "type": "string" }, "versions": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "string" } }, "scaffoldCommand": { "type": "string" }, "interactiveAnswers": { "type": "array", "items": { "type": "string" } }, "fixture": { "type": "string" }, "lockfile": { "type": "string" }, "commands": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/command" } } }
     },
     "task": {
       "type": "object", "additionalProperties": false, "required": ["framework", "taskId", "status", "commands", "generatedFiles", "authorCreatedFiles", "authorSourceLines", "configurationLines", "productionDependencies", "developmentDependencies", "publicApis", "frameworkConcepts", "checks", "diagnostics", "browserVisibleOutput", "evidence", "limitations"],
