@@ -548,6 +548,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Architecture](docs/architecture.md)
 - [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)
+- [Report-only Vue migration analyzer RFC](docs/rfcs/0003-report-only-vue-migration-analyzer.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
 - [Package, release, and supply-chain governance ADR](docs/adrs/0002-package-release-and-supply-chain-governance.md)
 - [Release operations and protected publication runbook](docs/releasing.md)
@@ -575,7 +576,8 @@ Not included now:
 
 - server-side rendering or hydration
 - islands
-- Vue compatibility APIs or migration tooling
+- Vue runtime/API compatibility, production SFC compilation, or source rewriting
+- the report-only Vue analyzer implementation accepted by RFC 0003 and tracked by #91
 - a supported performance-superiority claim
 - a stable or published package release
 
