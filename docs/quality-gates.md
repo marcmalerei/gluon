@@ -72,7 +72,7 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-All 545 current symbol pages require a reviewed entry in
+All 557 current symbol pages require a reviewed entry in
 `docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
 and either an inline scenario or a maintained package recipe that uses the
 documented symbol. The scenarios cover concrete inputs and observable results,
@@ -194,7 +194,7 @@ Browser assertions that cross a reactive transition poll for the resulting DOM
 state with a bounded timeout. They do not assume that the render and a 140-ms
 transition always finish within one fixed wall-clock delay on every engine.
 
-The current ceilings allow 9,108 raw bytes and 4,330 gzip bytes above the
+The current ceilings allow 3,881 raw bytes and 2,777 gzip bytes above the
 measured initial graph while preventing unreviewed large regressions. Changing a
 ceiling requires an evidence-backed documentation update in the same pull
 request.
