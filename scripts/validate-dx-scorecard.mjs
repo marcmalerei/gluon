@@ -200,8 +200,10 @@ for (const name of evidenceNames) {
 
 await Promise.all([
   access(resolve(root, 'docs/dx-benchmark.md')),
+  access(resolve(root, 'docs/dx-scorecard-report.md')),
   access(resolve(root, 'docs/quality-gates.md')),
   access(resolve(root, 'docs/roadmap.md')),
+  access(resolve(root, 'benchmarks/dx/human-usability-brief-v1.md')),
 ]);
 
 console.log(`DX benchmark contract valid: ${specification.tasks.length} tasks, ${specification.measurements.length} measurements, ${specification.sliceMeasurements.length} bounded slice measurement(s), ${evidenceNames.length} orientation record(s), ${automatedRunNames.length} automated run(s), 0 completed runs`);

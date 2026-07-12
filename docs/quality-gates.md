@@ -199,11 +199,13 @@ usability pass. The command rejects an opaque combined score and any orientation
 record that implies completed results.
 
 The command is part of `npm run check`, so the repository quality job runs it on
-every pull request and `main` push. The current retained evidence is comparator
-selection only and the validator reports zero completed runs. Clean-install
-fixtures, fresh measurement execution, HMR observation, human evidence, and the
-final per-dimension report remain required before issue #107 can close. The full
-contract and current boundary are documented in
+every pull request and `main` push. It validates exact pins/lockfiles, the 21
+fixture mappings, the automated-only schema and committed raw run, and still
+reports zero completed human-plus-automation runs. The DX Scorecard workflow
+executes the full clean-install/HMR/SSR/hydration/diagnostic scorecard every
+Monday and on manual dispatch, retaining raw artifacts for 90 days. Human
+evidence remains required before issue #107 can close. The full contract and
+current boundary are documented in
 [`dx-benchmark.md`](dx-benchmark.md).
 
 ## Bundle budgets

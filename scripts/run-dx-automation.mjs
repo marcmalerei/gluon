@@ -118,12 +118,12 @@ await mkdir(dirname(output), { recursive: true });
 await writeFile(output, `${JSON.stringify(evidence, null, 2)}\n`);
 console.log(`DX automated evidence written to ${output}`);
 
-async function run(command, cwd, expectedExit = 'zero') {
+async function run(command, cwd, expectedExit = 'zero', echo = true) {
   const start = performance.now();
   const child = spawn(command, { cwd, shell: true, env: { ...process.env, CI: '1', NO_COLOR: '1' } });
   let stdout = ''; let stderr = '';
-  child.stdout.on('data', (value) => { stdout += value; process.stdout.write(value); });
-  child.stderr.on('data', (value) => { stderr += value; process.stderr.write(value); });
+  child.stdout.on('data', (value) => { stdout += value; if (echo) process.stdout.write(value); });
+  child.stderr.on('data', (value) => { stderr += value; if (echo) process.stderr.write(value); });
   const exitCode = await new Promise((accept, reject) => { child.once('error', reject); child.once('close', accept); });
   return { command, exitCode, expectedExit, durationMs: Math.round(performance.now() - start), stdout, stderr };
 }
@@ -132,7 +132,7 @@ async function awaitExists(path) { try { await readFile(path); return true; } ca
 async function authoredLines(baseline, retained) {
   if (!await awaitExists(retained)) return 0;
   if (!await awaitExists(baseline)) return nonEmptyLines(retained);
-  const result = await run(`git diff --no-index --unified=0 -- ${shellQuote(baseline)} ${shellQuote(retained)}`, root, 'nonzero');
+  const result = await run(`git diff --no-index --unified=0 -- ${shellQuote(baseline)} ${shellQuote(retained)}`, root, 'nonzero', false);
   if (result.exitCode === 0) return 0;
   return result.stdout.split(/\r?\n/u).filter((line) => line.startsWith('+') && !line.startsWith('+++') && line.slice(1).trim()).length;
 }
