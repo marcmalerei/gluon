@@ -146,12 +146,13 @@ device, or general framework-speed claims.
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
-has an issue #108 owner baseline of 164,012 raw bytes and 47,686 gzip bytes. On
-the pre-#108 integration base, the issue #112 functional bag quantity boundary
-measured 166,257 raw bytes and 47,947 level-9 gzip bytes. Relative to the issue
-#88 baseline of 158,152 raw and 45,683 gzip bytes, that isolated #112 delta was
-8,105 raw bytes and 2,264 gzip bytes and included the concise authoring runtime
-plus the app-local control. The five WebP product/editorial assets total 155,126
+has an issue #108 owner baseline of 164,012 raw bytes and 47,686 gzip bytes.
+With the #112 functional bag quantity boundary and reactive property view, the
+combined entry measures 172,352 raw bytes and 50,050 level-9 gzip bytes. The
+exact #112 delta is 8,340 raw and 2,364 gzip bytes and includes the concise
+authoring runtime plus the app-local control. Relative to the issue #88 baseline
+of 158,152 raw and 45,683 gzip bytes, the combined delta is 14,200 raw and 4,367
+gzip bytes. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results
