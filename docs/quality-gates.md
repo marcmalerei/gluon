@@ -64,6 +64,14 @@ plain-HTML boundary, Vue-host consumption, exact comparator-tag hydration,
 readable-stream/static output, and cleanup. This partial
 evidence has no human pass and makes no general ranking claim.
 
+The stateful-control browser fixture treats React's scheduled `root.render()`
+commit as ready only when a ShadowRoot observer sees the exact accepted
+quantity and computed total. It checks that observable condition immediately
+before and after observer registration and uses the deadline only to fail a
+missing commit. The retained synchronous event assertion remains separate, and
+a focused 25-update React case exercises the event/render boundary in every
+configured Playwright engine.
+
 ## Generated API example gate
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry
