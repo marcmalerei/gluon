@@ -34,12 +34,33 @@ migration is a manual redesign against Gluon's public contracts.
 ## Interoperability first
 
 Incremental adoption can start by publishing a Gluon Custom Element and hosting
-it inside Vue:
+it inside Vue. The maintained fixture uses Vue `3.5.39`,
+`@vitejs/plugin-vue` `6.0.7`, and the plugin's
+`compilerOptions.isCustomElement` setting for
+`gluon-product-configurator`. Vue transfers the structured `product` and
+`configuration` values as DOM properties, owns the light-DOM title and facts,
+and observes the native `configuration-change` and `add-to-bag` events:
 
 <<< ../../../examples/vue-host.ts
 
+The exact same form-associated element is the production configuration surface
+in GLUON GOODS. Browser evidence covers registration and pre-definition
+upgrade, property updates, event detail and flags, native named/default slots,
+stable identity, disconnect/reconnect cleanup, adopted stylesheets, form
+submission/reset/state restore/validation/labels/focus/disabled behavior, and
+the configured line item delivered to the bag. Run the compiled
+[Vue host](/gluon/0.0.0/examples/vue.html) or execute:
+
+```sh
+npx vitest run tests/vue-migration-interop.spec.ts tests/docs-examples.spec.ts tests/shop-example.spec.ts
+npm run build:shop
+npm run build:docs-examples
+```
+
 This preserves the native element boundary while surrounding routes and state
-remain in the existing host. A later application rewrite is a separate decision.
+remain in the existing host. Neither host reaches into the other framework's
+store or owns the same DOM subtree. A later application rewrite is a separate
+decision.
 
 ## Gluon release upgrades
 

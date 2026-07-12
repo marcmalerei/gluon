@@ -12,7 +12,9 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - home, catalog, and deep-linkable product routes
 - desktop and mobile navigation
 - a realistic product catalog and product-detail surface
-- keyboard-operable product configuration
+- keyboard-operable product configuration through the same typed,
+  form-associated `gluon-product-configurator` Custom Element consumed by the
+  maintained Vue 3 host
 - a reactive bag with configured line items and quantities
 - a labeled checkout form, exact order summary, and URL-addressable confirmation
 - one isolated Store manager per shop application and persisted configured bag lines
@@ -34,7 +36,10 @@ ownership directly. The shop now exposes `renderShopRequest(url)` through
 functions, async inventory boundary, and application shell without browser DOM
 globals. `src/hydrate.ts` restores the request Router and Store snapshots,
 retains matching nodes, adopts validated server style carriers, and activates
-the product flow.
+the product flow. The product configurator owns its control DOM and
+`productConfiguratorStyles` sheet; product, configuration, native events, and
+light-DOM slots form the host boundary. Server output retains the product title,
+inventory status, and facts as light DOM before the element upgrades.
 
 The production pipeline emits hashed client assets and `gluon-assets.json`, a
 Vite SSR request bundle, and five route-aware static documents with one recorded
@@ -55,9 +60,9 @@ npm run measure:shop
 available local and LAN URLs. The monorepo Vite configuration maps official
 package names to workspace sources; shop application files import public
 package entry points only. The same configuration installs `@gluonjs/vite`.
-Compatible edits to exported page/components, the shop Store definition, and
-`shopStyles` update without a full reload; public-schema or constructor changes
-use the documented reload boundary.
+Compatible edits to exported page/components, the shop Store definition,
+`shopStyles`, and `productConfiguratorStyles` update without a full reload;
+public-schema or constructor changes use the documented reload boundary.
 
 ## Design system
 
@@ -81,6 +86,8 @@ The latest verified renders are:
 - [desktop home](design/rendered-home-desktop.png)
 - [mobile home](design/rendered-home-mobile.png)
 - [mobile product configuration](design/rendered-product-mobile.png)
+- [Vue-migration product boundary on desktop](design/rendered-product-migration-desktop.png)
+- [Vue-migration product boundary at 390px](design/rendered-product-migration-mobile.png)
 - [desktop keyboard focus on the product gallery](design/rendered-product-focus-desktop.png)
 - [mobile keyboard focus on the product gallery](design/rendered-product-focus-mobile.png)
 
@@ -92,6 +99,14 @@ checked against the concepts above. The evolving public-API evidence map is
 maintained in [FEATURES.md](FEATURES.md). `npm run check:shop-boundaries`
 rejects private or undeclared package imports and `<style>` fallback paths in
 shop source.
+
+`tests/vue-migration-interop.spec.ts` additionally verifies the production
+element's pre-definition upgrade, structured properties, native event flags,
+default and named slots, stable host and owned-node identity, disconnect and
+cleanup behavior, adopted stylesheet, and platform form participation. The
+compiled Vue 3.5.39 host uses `@vitejs/plugin-vue` with
+`compilerOptions.isCustomElement`; it does not wrap or translate the Gluon
+element into a Vue component.
 
 The checkout acceptance flow was verified at 390px from product through bag,
 labeled delivery fields, order submission, and confirmation. At 320px the
@@ -111,7 +126,7 @@ device, or general framework-speed claims.
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
-is 137,169 bytes raw and 40,088 bytes gzip. The five WebP product/editorial assets total 155,126
+is 158,152 bytes raw and 45,683 bytes gzip. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

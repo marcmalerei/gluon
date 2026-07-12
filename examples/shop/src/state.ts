@@ -1,11 +1,11 @@
 import { defineStore, type StoreManager } from '@gluonjs/store';
 import type { Product } from './data.js';
+import {
+  createDefaultProductConfiguration,
+  type ProductConfiguration,
+} from './product-configuration.js';
 
-export interface ProductConfiguration {
-  finish: 'Graphite' | 'Cobalt' | 'Bone';
-  temperature: 'Warm 2700K' | 'Clear 3200K';
-  cable: '1.5 m' | '2.5 m';
-}
+export type { ProductConfiguration } from './product-configuration.js';
 
 export interface BagLine {
   readonly key: string;
@@ -21,18 +21,12 @@ export interface ShopOrder {
   readonly email: string;
 }
 
-const defaultConfiguration = (): ProductConfiguration => ({
-  finish: 'Cobalt',
-  temperature: 'Warm 2700K',
-  cable: '1.5 m',
-});
-
 export const shopStoreDefinition = defineStore('shop', () => ({
   bagOpen: false,
   menuOpen: false,
   searchOpen: false,
   searchQuery: '',
-  configuration: defaultConfiguration(),
+  configuration: createDefaultProductConfiguration(),
   bag: [] as BagLine[],
   checkout: { email: '', name: '', address: '', city: '', postalCode: '' },
   order: null as ShopOrder | null,

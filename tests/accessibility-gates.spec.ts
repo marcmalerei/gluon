@@ -23,7 +23,8 @@ test('keeps the GLUON GOODS customer journey free of automated WCAG A/AA violati
   root.querySelector<HTMLAnchorElement>('[aria-label^="Orbit Lamp"]')!.click();
   await settle();
   await expectNoViolations('product detail');
-  root.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+  root.querySelector('gluon-product-configurator')!
+    .shadowRoot!.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
   await settle();
   await expectNoViolations('bag dialog');
   document.querySelector<HTMLAnchorElement>('.bag-summary a')!.click();

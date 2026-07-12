@@ -26,8 +26,9 @@ Every TypeScript recipe below is sourced from a file compiled by
 ## Host a Gluon element from Vue
 
 The host treats the Gluon component as a standards-based Custom Element. It
-passes properties and observes the native `change` event; it does not translate
-the Gluon component into a Vue component.
+passes the production product and configuration as properties, supplies native
+slots, and observes `configuration-change` and `add-to-bag`; it does not
+translate the Gluon component into a Vue component.
 
 <<< ../../../examples/vue-host.ts
 

@@ -40,6 +40,7 @@
     "tests-node/reactivity.spec.ts",
     "benchmarks/**/*.ts",
     "examples/**/*.ts",
+    "docs-site/examples/*.d.ts",
     "vite.config.ts",
     "vitest.reactivity.config.ts",
     "vitest.ssr.config.ts",
