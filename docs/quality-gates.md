@@ -60,7 +60,8 @@ Gluon class, functional Gluon, pinned Vue, and pinned React fixtures. It checks
 strict TypeScript, public imports, package versions, disaggregated component and
 platform-boundary lines, explicit limitations, and the recorded Gluon
 disadvantages. Browser and SSR tests separately prove the common behavior,
-plain-HTML boundary, Vue-host consumption, hydration, and cleanup. This partial
+plain-HTML boundary, Vue-host consumption, exact comparator-tag hydration,
+readable-stream/static output, and cleanup. This partial
 evidence has no human pass and makes no general ranking claim.
 
 ## Generated API example gate

@@ -6,8 +6,13 @@ import { pathToFileURL } from 'node:url';
 
 const root = resolve(import.meta.dirname, '..');
 const temporary = await mkdtemp(join(tmpdir(), 'gluon-language-cli-'));
-const source = `import { html } from '@gluonjs/core';
-html\`<unknown-card aria-labl="Broken"></unknown-card><img>child</img>\`;
+const source = `import { defineGluonElement, html } from '@gluonjs/core';
+defineGluonElement({
+  tagName: 'known-card',
+  slots: { default: { required: true }, help: { fallback: true } },
+  setup: () => ({ render: () => html\`<slot></slot><slot name="help"></slot>\` }),
+});
+html\`<known-card><span slot="shipping">Broken</span></known-card><unknown-card aria-labl="Broken"></unknown-card><img>child</img>\`;
 `;
 
 try {

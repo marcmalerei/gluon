@@ -12,3 +12,5 @@
   reordered, or content-mismatched scoped UI carrier evidence.
 - Added `defineGluonElement()` HMR transforms plus source-located invalid-tag,
   missing-cleanup-owner, and deferred-lifecycle diagnostics.
+- Added `GLUON_TEMPLATE_SLOT_UNKNOWN` (`G1111`) to the public catalog for
+  source-located unknown named light-DOM slot assignments.

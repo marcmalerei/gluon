@@ -255,6 +255,39 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       expect(rendered).toContain('<slot name="help">Choose a quantity.</slot>');
     }
   });
+
+  it('streams and statically generates the retained functional quantity-control path', async () => {
+    const functionalControl = () => renderElement(FunctionalQuantityControl, {
+      properties: { product, value: 2, required: true },
+      children: html`Orbit Lamp<span slot="help">Choose one to five.</span>`,
+    });
+    const streamed = withoutHydrationMarkers(await new Response(renderToReadableStream(functionalControl())).text());
+    expect(streamed).toContain('<dx-functional-quantity');
+    expect(streamed).toContain('<output aria-live="polite">2</output>');
+    expect(streamed).toContain('<strong>Total €498.00</strong>');
+
+    const output = await mkdtemp(join(tmpdir(), 'gluon-functional-control-static-'));
+    try {
+      const assets = { entry: '/assets/app.js' };
+      const generated = await generateStaticSite({
+        routes: ['/quantity'],
+        outputDirectory: output,
+        assets,
+        render: (url) => renderRequest({
+          url,
+          assets,
+          createApp: () => createApp(() => html`${functionalControl()}`),
+        }),
+      });
+      expect(generated.pages).toHaveLength(1);
+      const staticHtml = withoutHydrationMarkers(await readFile(join(output, 'quantity/index.html'), 'utf8'));
+      expect(staticHtml).toContain('<dx-functional-quantity');
+      expect(staticHtml).toContain('<output aria-live="polite">2</output>');
+      expect(staticHtml).toContain('<strong>Total €498.00</strong>');
+    } finally {
+      await rm(output, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('@gluonjs/ssr request ownership and state', () => {

@@ -9,7 +9,7 @@
     "cancelable quantity-change event",
     "default and named content",
     "validation, focus, cleanup, and form participation",
-    "server rendering and retained hydration",
+    "server rendering, readable-stream serialization, static generation, and retained hydration",
     "plain HTML consumption"
   ],
   "versions": {
@@ -58,7 +58,7 @@
       { "failure": "unowned side effect without cleanup", "tool": "@gluonjs/compiler", "evidence": "tests-node/compiler-vite.spec.ts:128" },
       { "failure": "deferred lifecycle registration", "tool": "@gluonjs/compiler", "evidence": "tests-node/compiler-vite.spec.ts:128" },
       { "failure": "invalid property or event use", "tool": "@gluonjs/language-server", "evidence": "tests-node/language-server.spec.ts:75" },
-      { "failure": "unknown named light-DOM slot", "tool": "no source-located diagnostic observed in the retained language-server fixture", "evidence": "tests-node/language-server.spec.ts:75" }
+      { "failure": "unknown named light-DOM slot", "tool": "@gluonjs/language-server and gluon-template-check", "evidence": "benchmarks/dx/stateful-form-control/invalid-contracts.tsx" }
     ],
     "vue": [
       { "failure": "invalid typed view prop", "tool": "TypeScript", "evidence": "benchmarks/dx/stateful-form-control/tsconfig.json" },
@@ -80,7 +80,8 @@
     "The framework-local view sections contain 66 non-empty lines for functional Gluon, 27 for Vue, and 20 for React; Vue and React are more concise on this narrower component-only measure.",
     "The React TSX lane requires the root TypeScript jsx=react-jsx compiler option; the Gluon and Vue TypeScript fixtures do not consume that transform.",
     "Vue and React require retained autonomous Custom Element, ElementInternals, SSR-hydration, and cleanup bridge code to satisfy the same plain-HTML and form-control boundary.",
-    "All four retained controls pass the same browser behavior assertions; all four produce retained server markup for the same quantity and computed total."
+    "All four retained controls pass the same browser behavior assertions; all four produce retained server markup for the same quantity and computed total.",
+    "The functional Gluon comparator path is retained through readable-stream serialization and static-site generation."
   ],
   "verifiedGluonDisadvantages": [
     {
@@ -92,11 +93,6 @@
       "id": "global-custom-element-registration",
       "fact": "Both Gluon fixtures register a hyphenated autonomous Custom Element name in the global CustomElementRegistry; the retained Vue and React view components do not require that registry until their plain-HTML bridges are added.",
       "scope": "Local component reuse before applying the required plain-HTML boundary."
-    },
-    {
-      "id": "unknown-slot-diagnostic",
-      "fact": "The retained language-server test diagnoses unknown properties and events but does not assert a source-located diagnostic for an unknown named light-DOM slot.",
-      "scope": "Current functional Custom Element language-tooling evidence."
     }
   ],
   "limitations": [

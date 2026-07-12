@@ -205,6 +205,10 @@ escapes the declared cleanup owner. The Custom Elements Manifest and Devtools
 tree describe the same autonomous host and inferred contract; they do not expose
 a nested functional instance.
 
+For literal definitions, an unknown literal named light-DOM assignment is
+reported as `GLUON_TEMPLATE_SLOT_UNKNOWN` at the `slot` value by the shared
+editor and `gluon-template-check` analyzer.
+
 ## Standalone and interoperability behavior
 
 Importing or creating a definition performs no document mutation until
