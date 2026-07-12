@@ -7,13 +7,17 @@ contract is
 and completed evidence must conform to
 [`benchmarks/dx/schema/run-v1.schema.json`](../benchmarks/dx/schema/run-v1.schema.json).
 
-This repository does not currently contain a completed DX benchmark run. One
-retained record selects the comparator lanes and captures the environment and
-package versions observed on 12 July 2026. A second, explicitly partial record
+This repository does not currently contain a completed human-plus-automation
+DX benchmark run. A schema-valid automated-only run retains all 21 framework-
+task records while its `humanPasses` array is deliberately empty. One retained
+record selects the comparator lanes and captures the environment and package
+versions observed on 12 July 2026. A second, explicitly partial record
 captures issue #111's nested checkout/dialog syntax measurements for the
 T3-local-layers implementation slice. A third partial record captures issue
-#112's retained stateful form-control comparison for T4. None supports a win, tie, loss,
-usability, readability, or general DX-superiority claim.
+#112's retained stateful form-control comparison for T4. Those partial records
+support no win, tie, loss, usability, readability, or general DX-superiority
+claim. The automated report classifies only dimensions proved by the complete
+automated run.
 
 The specification also retains bounded Gluon-only before/after measurements for
 completed dependency slices. These records use `$defs.sliceMeasurement` from
@@ -44,6 +48,13 @@ Exact selected versions and the command used to query them are retained in
 [`comparator-selection-2026-07-12.json`](../benchmarks/dx/evidence/comparator-selection-2026-07-12.json).
 A completed run must pin its own versions and lockfiles; it must not inherit
 "latest" from this orientation record.
+
+The automated run pins `create-vue 3.22.4`, Vue `3.5.39`, React Router `8.2.0`,
+and React `19.2.7`. The generated Vue scaffold's `~6.0.0` TypeScript range did
+not resolve during the recorded run, so the production-valid fixture pins
+compatible TypeScript `5.9.3`. The React Router 8.2 CLI copied template package
+pins at 8.0.0; the retained fixture aligns every React Router package to 8.2.0
+and records that authored configuration change.
 
 ## Identical task outcomes
 
@@ -119,16 +130,25 @@ accepted non-goal.
 ## Automation and current boundary
 
 Run `npm run check:dx-scorecard` to verify the task inventory, official source
-selection, strict run schema, raw-evidence fields, and the orientation record.
+selection, exact fixture pins and lockfiles, all 21 fixture mappings, strict
+human and automated schemas, raw-evidence fields, and retained runs.
 The command is part of `npm run check`, so pull requests and `main` execute it in
 the repository quality job.
 
-That command currently reports zero completed runs. Clean-install fixtures,
-non-human measurement execution, HMR observation, the retained human pass, and
-the final comparison remain acceptance work in #107. The dependent public APIs
-are tracked by #108 through #115. The epic must remain open until those slices
-are complete, all three fixtures satisfy every task without private substitutes,
-and a complete run is retained and validated.
+`npm run benchmark:dx` regenerates the three pinned baselines, executes the 20-
+starter and five-component Gluon matrices plus the retained Gluon consumer,
+clean-installs Vue and React, runs typecheck/build/three-engine browser tests,
+captures expected diagnostics and exact browser versions, and writes raw JSON.
+The weekly Monday workflow retains that output for 90 days; pull-request and
+main quality gates run the fast drift validator. The committed automated run
+and its disaggregated interpretation are linked from
+[`dx-scorecard-report.md`](dx-scorecard-report.md).
+
+The command still reports zero completed runs because a real participant has
+not executed
+[`human-usability-brief-v1.md`](../benchmarks/dx/human-usability-brief-v1.md).
+That human evidence and maintainer review are the remaining acceptance work;
+neither CI nor this documentation substitutes for it.
 
 Issue #111's partial fixture and raw metrics live under
 `benchmarks/dx/template-composition`; its canonical slice record is

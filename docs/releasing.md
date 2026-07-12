@@ -29,6 +29,11 @@ language-server packages to that exact release version. Candidate validation
 therefore includes the 20 generated application selections so a published
 `create-gluon --ui` command cannot point at a different framework version.
 
+Issue #107's weekly DX scorecard is release-adjacent evidence, not publication
+authorization. Its automated run may be retained while `humanPasses` is empty,
+but it cannot satisfy the completed DX contract or replace any owner-controlled
+release, browser/device, assistive-technology, registry, or approval evidence.
+
 ## Owner-controlled prerequisites
 
 Before preparing the `1.0.0` release commit, the repository owner must verify

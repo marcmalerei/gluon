@@ -1,0 +1,30 @@
+{
+  "name": "benchmarks-dx-fixtures-react",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc",
+    "test:e2e": "playwright test",
+    "diagnostics": "tsc -p diagnostics/tsconfig.json"
+  },
+  "dependencies": {
+    "@react-router/node": "8.2.0",
+    "@react-router/serve": "8.2.0",
+    "isbot": "5.1.36",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-router": "8.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@react-router/dev": "8.2.0",
+    "@types/node": "22.19.11",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3",
+    "vite": "8.1.4"
+  }
+}
