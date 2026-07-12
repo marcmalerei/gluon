@@ -505,10 +505,12 @@ diagnostics, browser results, universal-rendering evidence, cleanup evidence,
 and human observations. Results remain separate per task and dimension; no
 single weighted score is an architectural input or accepted output.
 
-`npm run check:dx-scorecard` currently validates the contract and comparator-
-selection record only. A completed evidence run cannot be inferred from that
-gate: it requires 21 framework-task records, exact run versions and lockfiles,
-all automated evidence, and at least one retained human usability pass. See
+`npm run check:dx-scorecard` validates the contract, exact retained fixtures,
+the 21-pair automation record, and the separation between automated and
+completed evidence. `npm run benchmark:dx` owns disposable scaffold baselines
+and raw command capture; it does not enter runtime packages. A completed run
+still cannot be inferred from that gate because the completed schema requires
+at least one retained human usability pass. See
 [`dx-benchmark.md`](dx-benchmark.md) for the current verified boundary.
 
 ## Verification boundaries

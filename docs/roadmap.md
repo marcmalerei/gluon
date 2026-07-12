@@ -252,11 +252,11 @@ editing, testing, debugging, and production building.
   limitations; no general superiority claim is accepted without that evidence.
 
 The versioned issue #107 benchmark contract is documented in
-[`dx-benchmark.md`](dx-benchmark.md). Its retained records select the comparator
-lanes and preserve the explicitly partial #111 syntax slice; neither is a
-completed 21-result run. Issues #108 through #115 are
-the planned implementation slices; #107 remains open until those applicable
-slices and a complete comparison run are proven.
+[`dx-benchmark.md`](dx-benchmark.md). Its retained automated run contains all 21
+framework-task results with exact versions, clean installs, diagnostics,
+three-engine flows, HMR, SSR, and hydration. It deliberately contains no human
+pass. Issue #107 remains open until at least one real participant executes the
+unchanged brief and a maintainer reviews the combined evidence.
 
 ## M4 — Universal Rendering
 
