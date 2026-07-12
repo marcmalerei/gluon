@@ -18,7 +18,15 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   contract, strict raw-run evidence schema, official comparator-selection
   record, and blocking validator that reports the current zero-run boundary
   without making an unsupported comparison claim.
-- Reviewed task-oriented examples for all 507 generated public API symbol
+- Target-scoped, reference-counted Core stylesheet owners and immutable named
+  stylesheet selections with stable transport digests.
+- One-step `@gluonjs/atoms` `installUi()` ownership for shared layers,
+  foundation, tokens, identity-preserving light/dark switching, nested
+  ShadowRoots, scoped SSR carriers, deterministic hydration diagnostics, and
+  idempotent cleanup.
+- GLUON GOODS integration of the shared UI owner in client, SSR, and hydration
+  flows while retaining its separate product stylesheet.
+- Reviewed task-oriented examples for all 523 generated public API symbol
   pages, with symbol-specific purpose text and concrete application, lifecycle,
   input/output, ownership, error, and cleanup flows shared through maintained
   package recipes instead of compiler-only type or import demonstrations.
@@ -115,6 +123,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- SSR style manifests now accept named Core selections and preserve their stable
+  IDs and optional hydration scopes in emitted carriers.
 - Empty Core node parts insert a single new node directly while preserving
   fragment batching for multi-node commits, with DOM regression coverage and
   retained before/after rendering evidence.
@@ -132,3 +142,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Renderer ownership now refreshes top-level nodes after reactive application
   and nested-template updates, so conditional dialogs are removed without
   stale nodes being reinserted by a later render.
+
+### Deprecated
+
+- `installUiTheme()` is superseded by `installUi()`, whose typed owner supports
+  runtime theme changes and exact target-scoped cleanup.

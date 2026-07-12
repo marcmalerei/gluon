@@ -2,7 +2,10 @@ import type { TemplateResult } from '@gluonjs/core';
 import {
   Button,
   atomManifest,
+  createUiStyleSelection,
   getThemeStyles,
+  installUi,
+  type UiOwner,
   type ButtonProps,
 } from '@gluonjs/atoms';
 import { Card, moleculeManifest, type CardProps } from '@gluonjs/molecules';
@@ -36,11 +39,17 @@ const tree: TemplateResult = AppShell({
 declare const container: HTMLElement;
 const scope: FocusScope = createFocusScope(container);
 const theme: CSSStyleSheet = getThemeStyles('dark');
+const selection = createUiStyleSelection('dark');
+const owner: UiOwner = installUi(document, { theme: selection.theme });
+owner.setTheme('light');
+owner.styleOwner.retain(theme);
+owner.dispose();
 const manifests = [quarkManifest, atomManifest, moleculeManifest, organismManifest] as const;
 
 void tree;
 void scope;
 void theme;
+void selection;
 void manifests;
 
 // @ts-expect-error stable themes reject unknown names

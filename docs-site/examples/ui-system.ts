@@ -4,15 +4,12 @@ import {
   Input,
   Label,
   atomStyles,
-  darkThemeStyles,
-  installUiTheme,
+  installUi,
 } from '@gluonjs/atoms';
 import {
   adoptStyles,
   createApp,
   css,
-  foundationStyles,
-  layerOrderStyles,
 } from '@gluonjs/core';
 import { Card, FormField, moleculeStyles } from '@gluonjs/molecules';
 import { AppShell, organismStyles } from '@gluonjs/organisms';
@@ -66,17 +63,8 @@ function openDialog(trigger: HTMLElement): void {
   });
 }
 
-adoptStyles(
-  document,
-  layerOrderStyles,
-  foundationStyles,
-  darkThemeStyles,
-  atomStyles,
-  moleculeStyles,
-  organismStyles,
-  exampleStyles,
-);
-installUiTheme(document, 'light');
+const uiOwner = installUi(document, { theme: 'light' });
+adoptStyles(document, atomStyles, moleculeStyles, organismStyles, exampleStyles);
 
 createApp(() => AppShell({
   header: q.div({
@@ -88,7 +76,7 @@ createApp(() => AppShell({
         variant: 'ghost',
         onClick: () => {
           theme.value = theme.value === 'light' ? 'dark' : 'light';
-          document.documentElement.dataset.gluonTheme = theme.value;
+          uiOwner.setTheme(theme.value);
         },
       }),
       Button({

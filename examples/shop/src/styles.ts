@@ -1,4 +1,5 @@
-import { css } from '@gluonjs/core';
+import { createStyleSheetSelection, css } from '@gluonjs/core';
+import { createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';
 
 export const shopStyles = css`
   @layer shop.reset, shop.base, shop.components, shop.pages, shop.responsive;
@@ -481,3 +482,17 @@ export const shopStyles = css`
     }
   }
 `;
+
+/** Shared UI foundation followed by the product-owned GLUON GOODS sheet. */
+export function createShopStyleSelection(theme: UiThemeName = 'light') {
+  const ui = createUiStyleSelection(theme);
+  return createStyleSheetSelection([
+    ...ui.entries,
+    { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
+  ]);
+}
+
+/** The app-owned carrier left after installUi() consumes the shared UI carriers. */
+export const shopHydrationStyleSelection = createStyleSheetSelection([
+  { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
+]);

@@ -99,7 +99,7 @@ remains independently ordered.
 | `@gluonjs/language-server` | Editor analysis and protocol server | `compiler` |
 | `@gluonjs/vue-migration-analyzer` | Static, report-only Vue 3.5 migration inventory and schema | none |
 | `@gluonjs/quarks` | Typed native-element factories | `core` |
-| `@gluonjs/atoms` | Focused UI primitives | `core`, `quarks` |
+| `@gluonjs/atoms` | Focused UI primitives plus the explicit shared UI style/theme owner | `core`, `quarks` |
 | `@gluonjs/molecules` | Reusable primitive compositions | `core`, `quarks`, `atoms` |
 | `@gluonjs/organisms` | Larger interface structures | `core`, `quarks`, `atoms`, `molecules` |
 | `create-gluon` | Project generator and maintained templates | none at runtime |
@@ -134,6 +134,14 @@ Core exposes only `.` and `./styles`. Quarks, Atoms, Molecules, and Organisms
 are current named packages with one root export each. Their implementation and
 manifest metadata live under `packages/`; Core contains only the generic
 component-definition helpers required by those optional consumers.
+
+The shared UI installation API belongs to `@gluonjs/atoms`; no aggregate
+package is added. This preserves the established downward graph and lets Core
+remain independent of every optional UI layer. Core owns only generic target
+stylesheet ownership and named selection primitives. The Atoms package owns UI
+tokens, theme names, hydration scope, and `installUi()` SemVer behavior. Its
+published contents remain the existing root export, declarations, runtime,
+README, license, and changelog validated by the package contract.
 
 ## Public API boundary
 

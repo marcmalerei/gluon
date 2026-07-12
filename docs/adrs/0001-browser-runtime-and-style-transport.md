@@ -347,6 +347,23 @@ reversed.
 After successful hydration, Gluon-owned styling in every hydrated root consists
 only of adopted constructed sheets. No Gluon SSR carrier remains.
 
+### Shared UI owner
+
+`@gluonjs/atoms` supplies the optional UI-specific owner without reversing the
+package graph. `createUiStyleSelection(theme)` names the layer-order,
+foundation, token, and selected-theme entries once for server serialization.
+The server manifest retains those stable IDs and the `gluon-ui` scope.
+`installUi(target, { theme, hydrate: true })` checks only that scope and reports
+`missing`, `duplicate`, `reordered`, or `mismatched` through
+`GLUON_UI_HYDRATION_MISMATCH` before adopting or changing the target.
+
+In the browser the active theme uses one constructed sheet per target. Theme
+changes replace that sheet's text in place, preserving identity for adopters
+and HMR-compatible ownership. Multiple logical UI owners share the base sheet
+set through reference counts, while every returned handle has its own component
+style owner. No UI package mutates DOM during module evaluation and no runtime
+`<style>` fallback is introduced.
+
 ## Why DSD and marked inline carriers
 
 DSD is the canonical element-owned serialization because the HTML parser can
