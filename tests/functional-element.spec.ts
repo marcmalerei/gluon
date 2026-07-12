@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  createApp,
+  createInjectionKey,
   css,
+  defineElement,
   defineGluonElement,
   elementEvent,
   elementProperty,
   html,
+  GluonElement,
   type ComponentErrorInfo,
 } from '../src/index.js';
 
@@ -30,6 +34,7 @@ describe('functional GluonElement authoring', () => {
     const cleanup = vi.fn();
     const connected = vi.fn();
     const disconnected = vi.fn();
+    const disabled = vi.fn();
     const captured: ComponentErrorInfo[] = [];
     let setupCount = 0;
 
@@ -65,6 +70,7 @@ describe('functional GluonElement authoring', () => {
           return true;
         });
         context.form.onReset(() => { draft.value = context.props.value; });
+        context.form.onDisabled(disabled);
         context.form.onRestore((state) => {
           if (typeof state === 'string') draft.value = Number(state);
         });
@@ -135,6 +141,12 @@ describe('functional GluonElement authoring', () => {
     expect(element.form).toBe(form);
     expect([...element.labels]).toContain(label);
     expect(new FormData(form).get('quantity')).toBe('1');
+    expect(element.validity).toBeDefined();
+    expect(element.willValidate).toBe(true);
+    expect(element.reportValidity()).toBe(true);
+
+    (element as typeof element & { formDisabledCallback(disabled: boolean): void }).formDisabledCallback(true);
+    expect(disabled).toHaveBeenCalledWith(true);
 
     const changes = vi.fn();
     element.addEventListener('quantity-change', changes);
@@ -181,6 +193,226 @@ describe('functional GluonElement authoring', () => {
     expect(captured).toEqual([]);
   });
 
+  it('owns reactive objects, effects, async lifecycle work, injection, and exposed accessors', async () => {
+    const tagName = `gluon-functional-owned-state-${functionalElementSequence += 1}` as `${string}-${string}`;
+    const key = createInjectionKey<string>('functional-fallback');
+    const cleanup = vi.fn();
+    const beforeUpdate = vi.fn(async () => Promise.resolve());
+    const updated = vi.fn(async () => Promise.resolve());
+    let stateInitializations = 0;
+    let effectRuns = 0;
+
+    const OwnedState = defineGluonElement({
+      tagName,
+      setup(context) {
+        const model = context.reactiveState('model', () => {
+          stateInitializations += 1;
+          return { count: 1 };
+        });
+        const direct = context.reactiveState('direct', { label: 'direct' });
+        const doubled = context.computed(() => model.count * 2);
+        const fallback = context.inject(key, 'fallback');
+        context.watchEffect(() => {
+          void model.count;
+          effectRuns += 1;
+        });
+        context.onBeforeUpdate(beforeUpdate);
+        context.onUpdated(updated);
+        context.onCleanup(cleanup);
+        return {
+          expose: {
+            plain: 'public',
+            get count() { return model.count; },
+            set count(value: number) { model.count = value; },
+            get fallback() { return fallback; },
+            get directLabel() { return direct.label; },
+            refresh: () => context.requestUpdate(),
+          },
+          render: () => html`<output>${model.count}:${doubled.value}</output>`,
+        };
+      },
+    });
+
+    const element = document.createElement(tagName) as InstanceType<typeof OwnedState> & {
+      plain: string;
+      count: number;
+      fallback: string;
+      directLabel: string;
+      refresh(): Promise<void>;
+    };
+    document.body.append(element);
+    await element.updateComplete;
+
+    expect(element.plain).toBe('public');
+    expect(element.count).toBe(1);
+    expect(element.fallback).toBe('fallback');
+    expect(element.directLabel).toBe('direct');
+    expect(element.shadowRoot?.textContent).toContain('1:2');
+    element.count = 3;
+    await element.updateComplete;
+    await Promise.resolve();
+    expect(element.shadowRoot?.textContent).toContain('3:6');
+    expect(effectRuns).toBeGreaterThan(0);
+    await element.refresh();
+    expect(beforeUpdate).toHaveBeenCalled();
+    expect(updated).toHaveBeenCalled();
+
+    element.remove();
+    expect(cleanup).toHaveBeenCalledOnce();
+    document.body.append(element);
+    await element.updateComplete;
+    expect(stateInitializations).toBe(1);
+    expect(element.count).toBe(3);
+  });
+
+  it('captures descendant render failures through the functional boundary', async () => {
+    const childTag = 'gluon-functional-error-child-fixture';
+    const boundaryTag = `gluon-functional-error-boundary-${functionalElementSequence += 1}` as `${string}-${string}`;
+    const captured: ComponentErrorInfo[] = [];
+
+    class ErrorChild extends GluonElement {
+      fail = false;
+
+      triggerFailure(): void {
+        this.fail = true;
+        this.requestUpdate();
+      }
+
+      protected override render() {
+        if (this.fail) throw new Error('descendant failure');
+        return html`<p>Ready</p>`;
+      }
+    }
+    defineElement(childTag, ErrorChild);
+    const Boundary = defineGluonElement({
+      tagName: boundaryTag,
+      setup(context) {
+        context.onErrorCaptured(() => false);
+        context.onErrorCaptured((info) => {
+          captured.push(info);
+          return true;
+        });
+        return { render: () => html`<gluon-functional-error-child-fixture></gluon-functional-error-child-fixture>` };
+      },
+    });
+
+    const boundary = document.createElement(boundaryTag) as InstanceType<typeof Boundary>;
+    document.body.append(boundary);
+    await boundary.updateComplete;
+    const child = boundary.shadowRoot?.querySelector(childTag) as ErrorChild;
+    await child.updateComplete;
+    child.triggerFailure();
+    await expect(child.updateComplete).rejects.toThrow('descendant failure');
+    expect(captured).toEqual([
+      expect.objectContaining({ source: 'render', element: child }),
+    ]);
+  });
+
+  it('provides safe standalone fallbacks and a DOM-free server render contract', async () => {
+    const tagName = `gluon-functional-standalone-${functionalElementSequence += 1}` as `${string}-${string}`;
+    const cleanup = vi.fn();
+    const Standalone = defineGluonElement({
+      tagName,
+      setup(context) {
+        context.onCleanup(cleanup);
+        return { render: () => html`<p>Standalone</p>` };
+      },
+    }, { register: false });
+
+    expect(customElements.get(tagName)).toBeUndefined();
+    customElements.define(tagName, Standalone);
+    const element = new Standalone();
+    const formPublic = element as typeof element & {
+      readonly form: HTMLFormElement | null;
+      readonly labels: NodeList;
+      readonly validity: ValidityState | undefined;
+      readonly validationMessage: string;
+      readonly willValidate: boolean;
+      checkValidity(): boolean;
+      reportValidity(): boolean;
+      setCustomValidity(message: string): void;
+    };
+    expect(formPublic.form).toBeNull();
+    expect(formPublic.labels.length).toBe(0);
+    expect(formPublic.labels.item(0)).toBeNull();
+    expect(formPublic.labels.forEach(() => undefined)).toBeUndefined();
+    expect(formPublic.validity).toBeUndefined();
+    expect(formPublic.validationMessage).toBe('');
+    expect(formPublic.willValidate).toBe(false);
+    expect(formPublic.checkValidity()).toBe(true);
+    expect(formPublic.reportValidity()).toBe(true);
+    expect(() => formPublic.setCustomValidity('ignored')).not.toThrow();
+    expect(element.renderForServer().strings.join('')).toContain('<p>Standalone</p>');
+    expect(cleanup).toHaveBeenCalledOnce();
+    expect(() => (element as unknown as { render(): unknown }).render()).toThrow(
+      `${tagName} setup has no active connection owner.`,
+    );
+
+    element.connectedCallback();
+    element.connectedCallback();
+    element.endHydration();
+    await element.updateComplete;
+    element.disconnectedCallback();
+    element.disconnectedCallback();
+  });
+
+  it('resolves setup injection without a fallback from the owning application', async () => {
+    const key = createInjectionKey<string>('functional-provided');
+    const tagName = 'gluon-functional-injected-fixture';
+    defineGluonElement({
+      tagName,
+      setup(context) {
+        const value = context.inject(key);
+        return { render: () => html`<p>${value}</p>` };
+      },
+    });
+    const app = createApp(html`<gluon-functional-injected-fixture></gluon-functional-injected-fixture>`);
+    app.provide(key, 'provided');
+    const root = document.createElement('div');
+    document.body.append(root);
+    app.mount(root);
+    const element = root.querySelector(tagName) as HTMLElement & { updateComplete: Promise<void>; shadowRoot: ShadowRoot };
+    await element.updateComplete;
+    expect(element.shadowRoot.textContent).toContain('provided');
+    app.unmount();
+  });
+
+  it('rejects a setup result without a render contract', () => {
+    const tagName = `gluon-functional-missing-render-${functionalElementSequence += 1}` as `${string}-${string}`;
+    const MissingRender = defineGluonElement({
+      tagName,
+      setup: (() => undefined) as never,
+    }, { register: false });
+    customElements.define(tagName, MissingRender);
+    const element = new MissingRender();
+    expect(() => element.renderForServer()).toThrow(
+      `${tagName} setup did not return a render contract.`,
+    );
+  });
+
+  it('reports unavailable ElementInternals for a browser form boundary', () => {
+    const descriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'attachInternals');
+    expect(descriptor).toBeDefined();
+    Object.defineProperty(HTMLElement.prototype, 'attachInternals', {
+      configurable: true,
+      value: undefined,
+    });
+    try {
+      const tagName = `gluon-functional-missing-internals-${functionalElementSequence += 1}` as `${string}-${string}`;
+      const MissingInternals = defineGluonElement({
+        tagName,
+        formAssociated: true,
+        setup: () => ({ render: () => html`<p>Unavailable</p>` }),
+      }, { register: false });
+      customElements.define(tagName, MissingInternals);
+      expect(() => new MissingInternals()).toThrow(
+        `${tagName} requires ElementInternals for form participation.`,
+      );
+    } finally {
+      Object.defineProperty(HTMLElement.prototype, 'attachInternals', descriptor!);
+    }
+  });
+
   it('routes setup failures through the existing application error boundary path', async () => {
     const tagName = `gluon-functional-failure-${functionalElementSequence += 1}` as `${string}-${string}`;
     const reportError = vi.spyOn(globalThis, 'reportError').mockImplementation(() => undefined);
@@ -201,10 +433,12 @@ describe('functional GluonElement authoring', () => {
   it('rejects lifecycle registration after synchronous setup has closed', async () => {
     const tagName = `gluon-functional-deferred-${functionalElementSequence += 1}` as `${string}-${string}`;
     let deferred!: () => void;
+    let deferredCleanup!: () => void;
     defineGluonElement({
       tagName,
       setup(context) {
         deferred = () => context.onUpdated(() => undefined);
+        deferredCleanup = () => context.onCleanup(() => undefined);
         return { render: () => html`<p>Ready</p>` };
       },
     });
@@ -212,5 +446,6 @@ describe('functional GluonElement authoring', () => {
     document.body.append(element);
     await element.updateComplete;
     expect(deferred).toThrow(`${tagName} onUpdated must be registered synchronously during setup.`);
+    expect(deferredCleanup).toThrow(`${tagName} cleanup must be registered during setup.`);
   });
 });

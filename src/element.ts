@@ -151,6 +151,7 @@ const definedElementNames = new WeakMap<GluonElementClass, `${string}-${string}`
 const serverElementDefinitions = new Map<`${string}-${string}`, GluonElementClass>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
+export const functionalElementPropertyChanged = Symbol('gluon.functional-element-property-changed');
 const publicInstance = Symbol('gluon.public-instance');
 let elementUpdateSequence = 0;
 
@@ -405,6 +406,10 @@ export abstract class GluonElement<
     if (!hasChanged(value, oldValue)) return;
 
     this[propertyValues].set(name, value);
+    const functionalObserver = (this as GluonElement<Events> & {
+      [functionalElementPropertyChanged]?: (property: string) => void;
+    })[functionalElementPropertyChanged];
+    functionalObserver?.call(this, name);
     if (reflect && declaration.reflect && this.connected) {
       this.reflectProperty(name, value, declaration);
     }

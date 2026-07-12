@@ -365,6 +365,9 @@ watchers, lifecycle registrations, and cleanups are connection-local. SSR uses
 an isolated temporary setup scope, hydration uses the normal connection owner,
 and compatible HMR reruns patched setup while retaining the host and state. The
 accepted contract is [RFC 0005](rfcs/0005-functional-custom-element-authoring.md).
+Its readonly `context.props` proxy reads native host properties and tracks an
+internal revision advanced by accepted declared-property writes; this keeps
+property watchers reactive without introducing a second property store.
 
 ## Styling invariant
 
