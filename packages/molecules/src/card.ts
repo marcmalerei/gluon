@@ -1,5 +1,6 @@
 import { defineMolecule, nothing, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
+import { cardStyleDependency } from './card-styles.js';
 
 type CardAttributes = Omit<QuarkProps<HTMLElement>, 'children'>;
 
@@ -65,7 +66,7 @@ function renderCard({
   });
 }
 
-export const Card = defineMolecule(renderCard, 'Card');
+export const Card = defineMolecule(renderCard, 'Card', [cardStyleDependency]);
 
 function hasContent(value: TemplateValue | undefined): boolean {
   return value != null && value !== false && value !== nothing;

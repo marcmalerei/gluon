@@ -3,12 +3,16 @@ import {
   GluonElement,
   applyGluonElementHotUpdate,
   createApp,
+  createComponentStyleDependency,
   css,
   defineGluonElement,
+  defineAtom,
   html,
+  render,
   refreshGluonApplications,
   refreshGluonElements,
 } from '@gluonjs/core';
+import { component as hotComponent, style as hotStyle } from '../packages/vite/src/client.js';
 import { nextTick } from '@gluonjs/reactivity';
 
 afterEach(() => {
@@ -16,6 +20,43 @@ afterEach(() => {
 });
 
 describe('Gluon Core HMR bridge', () => {
+  it('updates functional component CSS in place while retaining owner counts', () => {
+    const moduleId = `/component-style-${Date.now()}.ts`;
+    const initialSheet = hotStyle(css`@layer atoms { .hot-style { color: rgb(1, 2, 3); } }`, moduleId, 'styles');
+    const Initial = hotComponent(defineAtom(
+      () => html`<p class="hot-style">Stable</p>`,
+      'HotStyle',
+      [createComponentStyleDependency({
+        id: 'gluon-test-hot-style',
+        sheet: initialSheet,
+        layer: 'atom',
+        order: 99,
+        scope: 'gluon-component',
+      })],
+    ), moduleId, 'component');
+    render(Initial({}), document.body);
+    const adopted = document.adoptedStyleSheets.find((sheet) => sheet === initialSheet);
+    expect(adopted).toBe(initialSheet);
+
+    const updatedSheet = hotStyle(css`@layer atoms { .hot-style { color: rgb(4, 5, 6); } }`, moduleId, 'styles');
+    hotComponent(defineAtom(
+      () => html`<p class="hot-style">Updated</p>`,
+      'HotStyle',
+      [createComponentStyleDependency({
+        id: 'gluon-test-hot-style',
+        sheet: updatedSheet,
+        layer: 'atom',
+        order: 99,
+        scope: 'gluon-component',
+      })],
+    ), moduleId, 'component');
+    render(Initial({}), document.body);
+    expect(updatedSheet).toBe(initialSheet);
+    expect(document.adoptedStyleSheets.filter((sheet) => sheet === initialSheet)).toHaveLength(1);
+    expect([...initialSheet.cssRules].map((rule) => rule.cssText).join(' ')).toContain('rgb(4, 5, 6)');
+    expect(document.body.textContent).toBe('Updated');
+  });
+
   it('keeps the registered constructor, instance state, and adopted sheet identity', async () => {
     const initialSheet = css`:host { color: rgb(1, 2, 3); }`;
     class InitialCounter extends GluonElement {

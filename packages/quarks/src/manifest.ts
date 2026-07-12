@@ -6,6 +6,8 @@ export interface UiContractEntry {
   readonly extension: string;
   readonly example: string;
   readonly tests: readonly string[];
+  /** Stable component stylesheet ids retained when this entry is rendered. */
+  readonly styles?: readonly string[];
 }
 
 export interface UiPackageManifest {

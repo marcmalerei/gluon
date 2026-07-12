@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { atomStyles } from '@gluonjs/atoms';
 import { adoptStyles } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
+import { inputStyles } from '@gluonjs/atoms';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -140,6 +141,7 @@ describe('GLUON GOODS reference shop', () => {
     root.querySelector<HTMLButtonElement>('.menu-search-action')!.click();
     await settleShop();
     const input = root.querySelector<HTMLInputElement>('#shop-search')!;
+    expect(document.adoptedStyleSheets).toContain(inputStyles);
     expect(document.activeElement).toBe(input);
     input.value = 'lamp';
     input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -153,6 +155,7 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(store.searchOpen).toBe(false);
     expect(root.querySelector('.search-panel')).toBeNull();
+    expect(document.adoptedStyleSheets).not.toContain(inputStyles);
     expect(document.activeElement).toBe(searchReturnTarget);
 
     root.querySelector<HTMLButtonElement>('.bag-action')!.click();

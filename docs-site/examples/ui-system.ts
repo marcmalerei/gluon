@@ -3,7 +3,6 @@ import {
   Icon,
   Input,
   Label,
-  atomStyles,
   defineButtonPreset,
   defineIcon,
   installUi,
@@ -14,8 +13,8 @@ import {
   css,
   svg,
 } from '@gluonjs/core';
-import { Card, FormField, defineMolecule, moleculeStyles } from '@gluonjs/molecules';
-import { AppShell, defineOrganism, organismStyles } from '@gluonjs/organisms';
+import { Card, FormField, defineMolecule } from '@gluonjs/molecules';
+import { AppShell, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -97,7 +96,7 @@ function openDialog(trigger: HTMLElement): void {
 }
 
 const uiOwner = installUi(document, { theme: 'light' });
-adoptStyles(document, atomStyles, moleculeStyles, organismStyles, exampleStyles);
+adoptStyles(document, exampleStyles);
 
 createApp(() => AppShell({
   header: q.div({

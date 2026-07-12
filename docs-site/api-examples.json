@@ -383,6 +383,68 @@
         "owner.dispose();"
       ]
     },
+    "component-style-ownership": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import {",
+        "  LegacyComponentStyleConflictError,",
+        "  compareComponentStyles,",
+        "  createComponentStyleDependency,",
+        "  createComponentStyleOwner,",
+        "  createComponentStyleSelection,",
+        "  css,",
+        "  html,",
+        "  markLegacyComponentStyleSheet,",
+        "  releaseRenderStyles,",
+        "  render,",
+        "  type ComponentStyleDependency,",
+        "  type ComponentStyleLayer,",
+        "  type ComponentStyleOwner,",
+        "} from '@gluonjs/core';",
+        "",
+        "const layer: ComponentStyleLayer = 'atom';",
+        "const dependency: ComponentStyleDependency = createComponentStyleDependency({",
+        "  id: 'shop-add-button', sheet: css`@layer atoms { .add { min-height: 44px; } }`, layer, order: 0, scope: 'gluon-component',",
+        "});",
+        "const root = document.querySelector<HTMLElement>('#app')!;",
+        "const value = html`<button class=\"add\">Add to bag</button>`.withStyleDependencies([dependency]);",
+        "const selection = createComponentStyleSelection(value);",
+        "const owner: ComponentStyleOwner = createComponentStyleOwner(document);",
+        "owner.retain(dependency);",
+        "render(value, root);",
+        "releaseRenderStyles(root);",
+        "owner.release(dependency);",
+        "owner.dispose();",
+        "",
+        "const legacy = markLegacyComponentStyleSheet(css`.add { min-height: 44px; }`, [dependency.id]);",
+        "const diagnostic = new LegacyComponentStyleConflictError(dependency.id);",
+        "console.log(selection.entries, compareComponentStyles(dependency, dependency), legacy, diagnostic.code);"
+      ]
+    },
+    "ui-exact-component-styles": {
+      "module": "@gluonjs/atoms",
+      "code": [
+        "import { buttonStyles, iconStyles, inputStyles, labelStyles } from '@gluonjs/atoms';",
+        "import { cardStyles, formFieldStyles } from '@gluonjs/molecules';",
+        "import { appShellStyles } from '@gluonjs/organisms';",
+        "",
+        "const exactSheets = [buttonStyles, iconStyles, inputStyles, labelStyles, cardStyles, formFieldStyles, appShellStyles];",
+        "console.log(exactSheets.length);"
+      ]
+    },
+    "component-style-hydration": {
+      "module": "@gluonjs/ssr/hydration",
+      "code": [
+        "import {",
+        "  ComponentStyleHydrationError,",
+        "  type ComponentStyleHydrationMismatch,",
+        "} from '@gluonjs/ssr/hydration';",
+        "",
+        "const mismatch: ComponentStyleHydrationMismatch = 'wrong-target';",
+        "const error = new ComponentStyleHydrationError(mismatch, 'The component carrier belongs to another ShadowRoot.');",
+        "console.error(error.code, error.mismatch);"
+      ]
+    },
     "ssr-style-selection": {
       "module": "@gluonjs/ssr",
       "code": [
@@ -2476,6 +2538,46 @@
       "recipe": "core-styles",
       "description": "Create a constructable stylesheet from CSS text in the browser or a serializable descriptor during server rendering:"
     },
+    "src/functions/createComponentStyleSelection.md": {
+      "recipe": "component-style-ownership",
+      "description": "Derive the exact ordered component stylesheet selection reachable from a prepared rendered value tree:"
+    },
+    "src/functions/releaseRenderStyles.md": {
+      "recipe": "component-style-ownership",
+      "description": "Release a disconnected render root's component sheets while retaining its DOM state for reconnection:"
+    },
+    "src/styles/classes/LegacyComponentStyleConflictError.md": {
+      "recipe": "component-style-ownership",
+      "description": "Diagnose a deprecated aggregate sheet that would silently duplicate renderer-owned exact component rules:"
+    },
+    "src/styles/functions/compareComponentStyles.md": {
+      "recipe": "component-style-ownership",
+      "description": "Order component sheets deterministically by layer, declared order, and stable identifier:"
+    },
+    "src/styles/functions/createComponentStyleDependency.md": {
+      "recipe": "component-style-ownership",
+      "description": "Define and freeze one named exact component stylesheet dependency:"
+    },
+    "src/styles/functions/createComponentStyleOwner.md": {
+      "recipe": "component-style-ownership",
+      "description": "Retain and release exact target-local component sheets with deterministic adoption order:"
+    },
+    "src/styles/functions/markLegacyComponentStyleSheet.md": {
+      "recipe": "component-style-ownership",
+      "description": "Mark a deprecated category aggregate so exact rendering reports coexistence instead of double-styling:"
+    },
+    "src/styles/interfaces/ComponentStyleDependency.md": {
+      "recipe": "component-style-ownership",
+      "description": "Name one component sheet, cascade layer, stable order, and SSR scope in immutable metadata:"
+    },
+    "src/styles/interfaces/ComponentStyleOwner.md": {
+      "recipe": "component-style-ownership",
+      "description": "Own the exact component dependencies retained for one Document or ShadowRoot:"
+    },
+    "src/styles/type-aliases/ComponentStyleLayer.md": {
+      "recipe": "component-style-ownership",
+      "description": "Constrain exact component styles to the Atom, Molecule, or Organism cascade layer:"
+    },
     "src/styles/functions/createStyleSheetOwner.md": {
       "recipe": "core-style-owner",
       "description": "Retain target-local constructed sheets through a reference-counted owner and release exactly that handle's claims:"
@@ -2931,6 +3033,42 @@
     "packages/atoms/src/functions/getThemeStyles.md": {
       "recipe": "atom-components",
       "description": "Select the constructable light or dark theme stylesheet without installing it, for inspection or caller-controlled adoption:"
+    },
+    "packages/atoms/src/variables/buttonStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Button stylesheet retained by rendered Button values:"
+    },
+    "packages/atoms/src/variables/iconStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Icon stylesheet retained by rendered Icon values:"
+    },
+    "packages/atoms/src/variables/inputStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Input stylesheet retained by rendered Input values:"
+    },
+    "packages/atoms/src/variables/labelStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Label stylesheet retained by rendered Label values:"
+    },
+    "packages/molecules/src/variables/cardStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Card stylesheet retained by rendered Card values:"
+    },
+    "packages/molecules/src/variables/formFieldStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable FormField stylesheet retained alongside its nested Atom dependencies:"
+    },
+    "packages/organisms/src/variables/appShellStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable AppShell stylesheet retained by rendered AppShell values:"
+    },
+    "packages/ssr/src/hydration/classes/ComponentStyleHydrationError.md": {
+      "recipe": "component-style-hydration",
+      "description": "Handle deterministic request-derived component carrier mismatches before client ownership changes:"
+    },
+    "packages/ssr/src/hydration/type-aliases/ComponentStyleHydrationMismatch.md": {
+      "recipe": "component-style-hydration",
+      "description": "Distinguish missing, extra, duplicate, reordered, mismatched, and wrong-target component carrier evidence:"
     },
     "packages/atoms/src/functions/createUiStyleSelection.md": {
       "recipe": "ui-owner",

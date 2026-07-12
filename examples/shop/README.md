@@ -37,6 +37,8 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - constructable stylesheet-only design
 - one `installUi()` document owner shared by client mount and named SSR/hydration
   selection, with the GLUON GOODS product sheet retained as application-owned
+- usage-driven official `Input` styling in catalog search; its exact component
+  sheet is present only while that real customer surface is rendered
 - official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR
 - an isolated server-rendered deep-product response and browser hydration
   handoff through `@gluonjs/ssr`
@@ -47,7 +49,8 @@ ownership directly. The shop now exposes `renderShopRequest(url)` through
 functions, async inventory boundary, and application shell without browser DOM
 globals. `src/hydrate.ts` first installs the shared UI owner and validates its
 four named carriers, then restores the request Router and Store snapshots,
-retains matching nodes, adopts the remaining product-owned carrier, and
+retains matching nodes, adopts the remaining product-owned carrier plus any
+request-derived exact component sheets, and
 activates the product flow. The product configurator owns its control DOM and
 `productConfiguratorStyles` sheet; product, configuration, native events, and
 light-DOM slots form the host boundary. Server output retains the product title,

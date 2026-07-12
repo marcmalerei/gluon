@@ -1,5 +1,6 @@
-import { css } from '@gluonjs/core';
+import { css, markLegacyComponentStyleSheet } from '@gluonjs/core';
 
+/** @deprecated Components now adopt their exact stylesheet dependencies during rendering. */
 export const atomStyles = css`
   @layer atoms {
     :where(.gluon-icon) {
@@ -72,3 +73,10 @@ export const atomStyles = css`
     }
   }
 `;
+
+markLegacyComponentStyleSheet(atomStyles, [
+  'gluon-atom-button',
+  'gluon-atom-icon',
+  'gluon-atom-input',
+  'gluon-atom-label',
+]);

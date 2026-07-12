@@ -1,6 +1,6 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
-import { relative, resolve } from 'node:path';
+import { basename, relative, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const shopDist = resolve(root, 'examples/shop/dist');
@@ -13,7 +13,14 @@ if (entryNames.length !== 1) {
 }
 
 const html = await measure(resolve(shopDist, 'index.html'));
-const entry = await measure(resolve(assetsDirectory, entryNames[0]));
+const manifest = JSON.parse(await readFile(resolve(shopDist, 'gluon-assets.json'), 'utf8'));
+const initialFiles = [manifest.entry, ...(manifest.imports ?? [])].map((file) => basename(file));
+const initialMeasurements = await Promise.all(initialFiles.map((file) => measure(resolve(assetsDirectory, file))));
+const entry = {
+  paths: initialMeasurements.map(({ path }) => path),
+  bytes: initialMeasurements.reduce((total, measurement) => total + measurement.bytes, 0),
+  gzipBytes: initialMeasurements.reduce((total, measurement) => total + measurement.gzipBytes, 0),
+};
 const imageNames = assetNames.filter((name) => name.endsWith('.webp')).sort();
 const imageSizes = await Promise.all(imageNames.map(async (name) => (
   await stat(resolve(assetsDirectory, name))

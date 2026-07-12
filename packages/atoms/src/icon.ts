@@ -1,5 +1,6 @@
 import { defineAtom, html, isTemplateResult, mergeProps, svg, type TemplateResult } from '@gluonjs/core';
 import type { QuarkAriaProps, QuarkProps } from '@gluonjs/quarks';
+import { iconStyleDependency } from './icon-styles.js';
 
 export type IconName = 'trend-up' | 'trend-down' | 'alert' | 'spark';
 
@@ -86,4 +87,4 @@ function builtInIcon(name: IconName): IconDefinition<IconName> {
   }
 }
 
-export const Icon = defineAtom(renderIcon, 'Icon');
+export const Icon = defineAtom(renderIcon, 'Icon', [iconStyleDependency]);

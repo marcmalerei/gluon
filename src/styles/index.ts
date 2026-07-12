@@ -1,5 +1,21 @@
 export type StyleTarget = Document | ShadowRoot;
 export type CssValue = string | number;
+export type ComponentStyleLayer = 'atom' | 'molecule' | 'organism';
+
+export interface ComponentStyleDependency extends StyleSheetSelectionEntry {
+  readonly layer: ComponentStyleLayer;
+  /** Stable order inside one cascade layer. */
+  readonly order: number;
+}
+
+export interface ComponentStyleOwner {
+  readonly target: StyleTarget;
+  readonly dependencies: readonly ComponentStyleDependency[];
+  readonly disposed: boolean;
+  retain(...dependencies: readonly ComponentStyleDependency[]): void;
+  release(...dependencies: readonly ComponentStyleDependency[]): void;
+  dispose(): void;
+}
 
 export interface StyleSheetSelectionEntry {
   /** Stable transport identity. Content changes are detected by the digest. */
@@ -24,6 +40,7 @@ export interface StyleSheetOwner {
 }
 
 const serverStyleSheetBrand = Symbol('gluon.server-style-sheet');
+const legacyComponentStyleIds = Symbol('gluon.legacy-component-style-ids');
 const styleSheetText = new WeakMap<CSSStyleSheet, string>();
 
 interface TargetSheetOwnership {
@@ -32,10 +49,29 @@ interface TargetSheetOwnership {
 }
 
 const targetStyleOwnership = new WeakMap<StyleTarget, Map<CSSStyleSheet, TargetSheetOwnership>>();
+const targetComponentStyles = new WeakMap<StyleTarget, Map<CSSStyleSheet, {
+  count: number;
+  readonly dependency: ComponentStyleDependency;
+}>>();
 
 interface ServerStyleSheet {
   readonly [serverStyleSheetBrand]: true;
   readonly cssText: string;
+}
+
+type LegacyComponentStyleSheet = CSSStyleSheet & {
+  readonly [legacyComponentStyleIds]?: ReadonlySet<string>;
+};
+
+export class LegacyComponentStyleConflictError extends Error {
+  readonly code = 'GLUON_LEGACY_COMPONENT_STYLE_CONFLICT';
+  constructor(readonly componentStyleId: string) {
+    super(
+      `The deprecated aggregate stylesheet already covers ${componentStyleId}. `
+      + 'Remove the aggregate adoption before using rendered component styles.',
+    );
+    this.name = 'LegacyComponentStyleConflictError';
+  }
 }
 
 /** Creates a constructable stylesheet. Gluon intentionally has no `<style>` fallback. */
@@ -106,6 +142,144 @@ export function createStyleSheetSelection(
     return Object.freeze({ id: entry.id, sheet: entry.sheet, ...(entry.scope ? { scope: entry.scope } : {}) });
   });
   return Object.freeze({ version: 1 as const, entries: Object.freeze(normalized) });
+}
+
+/** Defines immutable, named metadata for one component-owned stylesheet. */
+export function createComponentStyleDependency(
+  dependency: ComponentStyleDependency,
+): ComponentStyleDependency {
+  if (!/^[a-z0-9][a-z0-9._-]*$/.test(dependency.id)) {
+    throw new TypeError(`Invalid component stylesheet id "${dependency.id}".`);
+  }
+  if (!Number.isInteger(dependency.order) || dependency.order < 0) {
+    throw new TypeError(`Component stylesheet ${dependency.id} requires a non-negative integer order.`);
+  }
+  return Object.freeze({
+    id: dependency.id,
+    sheet: dependency.sheet,
+    layer: dependency.layer,
+    order: dependency.order,
+    ...(dependency.scope ? { scope: dependency.scope } : {}),
+  });
+}
+
+/** Marks a deprecated aggregate sheet so exact rendering fails instead of silently double-styling. */
+export function markLegacyComponentStyleSheet(
+  sheet: CSSStyleSheet,
+  componentStyleIds: readonly string[],
+): CSSStyleSheet {
+  if (!Object.isExtensible(sheet)) return sheet;
+  Object.defineProperty(sheet, legacyComponentStyleIds, {
+    configurable: false,
+    enumerable: false,
+    value: new Set(componentStyleIds),
+  });
+  return sheet;
+}
+
+/**
+ * Owns exact component stylesheet references for one target. Active component
+ * sheets are kept in deterministic layer/id order without moving unrelated
+ * adopted sheets relative to one another.
+ */
+export function createComponentStyleOwner(target: StyleTarget): ComponentStyleOwner {
+  const owned = new Set<ComponentStyleDependency>();
+  let disposed = false;
+  return {
+    target,
+    get dependencies() { return Object.freeze([...owned].sort(compareComponentStyles)); },
+    get disposed() { return disposed; },
+    retain(...dependencies) {
+      if (disposed) throw new Error('A disposed Gluon component style owner cannot retain styles.');
+      for (const dependency of dependencies) {
+        if (owned.has(dependency)) continue;
+        retainComponentStyle(target, dependency);
+        owned.add(dependency);
+      }
+    },
+    release(...dependencies) {
+      if (disposed) return;
+      for (const dependency of dependencies) {
+        if (!owned.delete(dependency)) continue;
+        releaseComponentStyle(target, dependency);
+      }
+    },
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      for (const dependency of owned) releaseComponentStyle(target, dependency);
+      owned.clear();
+    },
+  };
+}
+
+function retainComponentStyle(target: StyleTarget, dependency: ComponentStyleDependency): void {
+  const conflicting = target.adoptedStyleSheets.find((sheet) => (
+    (sheet as LegacyComponentStyleSheet)[legacyComponentStyleIds]?.has(dependency.id)
+  ));
+  if (conflicting && conflicting !== dependency.sheet) {
+    throw new LegacyComponentStyleConflictError(dependency.id);
+  }
+  let state = targetComponentStyles.get(target);
+  if (!state) {
+    state = new Map();
+    targetComponentStyles.set(target, state);
+  }
+  const current = state.get(dependency.sheet);
+  if (current) {
+    if (current.dependency.id !== dependency.id) {
+      throw new Error(
+        `Component stylesheet identity collision between ${current.dependency.id} and ${dependency.id}.`,
+      );
+    }
+    current.count += 1;
+  } else {
+    state.set(dependency.sheet, { count: 1, dependency });
+    retainTargetSheet(target, dependency.sheet);
+  }
+  orderTargetComponentStyles(target, state);
+}
+
+function releaseComponentStyle(target: StyleTarget, dependency: ComponentStyleDependency): void {
+  const state = targetComponentStyles.get(target);
+  const current = state?.get(dependency.sheet);
+  if (!state || !current) return;
+  current.count -= 1;
+  if (current.count > 0) return;
+  state.delete(dependency.sheet);
+  releaseTargetSheet(target, dependency.sheet);
+  if (state.size === 0) targetComponentStyles.delete(target);
+}
+
+function orderTargetComponentStyles(
+  target: StyleTarget,
+  state: ReadonlyMap<CSSStyleSheet, { readonly dependency: ComponentStyleDependency }>,
+): void {
+  if (state.size < 2) return;
+  const positions: number[] = [];
+  const managed: ComponentStyleDependency[] = [];
+  for (let index = 0; index < target.adoptedStyleSheets.length; index += 1) {
+    const dependency = state.get(target.adoptedStyleSheets[index]!)?.dependency;
+    if (!dependency) continue;
+    positions.push(index);
+    managed.push(dependency);
+  }
+  managed.sort(compareComponentStyles);
+  const next = [...target.adoptedStyleSheets];
+  for (let index = 0; index < positions.length; index += 1) {
+    next[positions[index]!] = managed[index]!.sheet;
+  }
+  target.adoptedStyleSheets = next;
+}
+
+export function compareComponentStyles(
+  left: ComponentStyleDependency,
+  right: ComponentStyleDependency,
+): number {
+  const layers: Record<ComponentStyleLayer, number> = { atom: 0, molecule: 1, organism: 2 };
+  return layers[left.layer] - layers[right.layer]
+    || left.order - right.order
+    || left.id.localeCompare(right.id);
 }
 
 /** Tagged-template helper that returns a constructable stylesheet. */

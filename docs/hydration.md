@@ -66,6 +66,12 @@ Diagnostics use stable categories and codes:
 
 UI selection carriers additionally use `GLUON_UI_HYDRATION_MISMATCH` with the
 typed reason `missing`, `duplicate`, `reordered`, or `mismatched`.
+Usage-derived component carriers use
+`GLUON_COMPONENT_STYLE_HYDRATION_MISMATCH` with `missing`, `extra`,
+`duplicate`, `reordered`, `mismatched`, or `wrong-target`. The browser derives
+the expected component selection from the prepared value tree, adopts the exact
+client sheet identities through renderer ownership, and removes carriers only
+after successful binding. Renderer unmount then releases those sheets.
 
 Each record includes the DOM/state path, expected and actual values, chosen
 recovery, and suppression status. Default recovery replaces the complete root
@@ -77,10 +83,11 @@ still runs.
 ## Progressive responses
 
 `renderProgressively()` returns a structured async iterator. Its first record is
-the shell with every pending `Suspense` fallback. Later boundary records contain
-resolved HTML. A resolved boundary may add nested pending boundaries, which are
-then emitted independently. `renderProgressiveReadableStream()` transports the
-shell directly and each patch as an inert `template[data-gluon-async-patch]`.
+the shell with every pending `Suspense` fallback and the exact component styles
+used by that shell. Later boundary records contain resolved HTML plus only newly
+required component styles. A resolved boundary may add nested pending
+boundaries. `renderProgressiveReadableStream()` writes each record's carriers
+before its dependent shell or inert `template[data-gluon-async-patch]`.
 
 Pass the HTTP response or request `AbortSignal` through `signal`. Cancellation
 rejects the iterator with the abort reason and aborts pending Gluon async source

@@ -51,6 +51,7 @@ const scope: FocusScope = createFocusScope(container);
 const theme: CSSStyleSheet = getThemeStyles('dark');
 const selection = createUiStyleSelection('dark');
 const owner: UiOwner = installUi(document, { theme: selection.theme });
+const buttonStyleId: string = Button.styles[0]!.id;
 owner.setTheme('light');
 owner.styleOwner.retain(theme);
 owner.dispose();
@@ -98,6 +99,10 @@ void scope;
 void theme;
 void selection;
 void manifests;
+void buttonStyleId;
+
+// @ts-expect-error component style metadata is immutable
+Button.styles.push(Button.styles[0]!);
 
 // @ts-expect-error stable themes reject unknown names
 getThemeStyles('contrast');

@@ -14,3 +14,5 @@
   missing-cleanup-owner, and deferred-lifecycle diagnostics.
 - Added `GLUON_TEMPLATE_SLOT_UNKNOWN` (`G1111`) to the public catalog for
   source-located unknown named light-DOM slot assignments.
+- Added `G1208` component-style hydration and `G1209` deprecated aggregate
+  coexistence diagnostics.

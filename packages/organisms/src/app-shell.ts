@@ -1,5 +1,6 @@
 import { defineOrganism, nothing, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
+import { appShellStyleDependency } from './app-shell-styles.js';
 
 type AppShellAttributes = Omit<QuarkProps<HTMLDivElement>, 'children'>;
 
@@ -44,7 +45,7 @@ function renderAppShell({
   });
 }
 
-export const AppShell = defineOrganism(renderAppShell, 'AppShell');
+export const AppShell = defineOrganism(renderAppShell, 'AppShell', [appShellStyleDependency]);
 
 function hasContent(value: TemplateValue | undefined): boolean {
   return value != null && value !== false && value !== nothing;

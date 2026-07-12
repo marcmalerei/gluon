@@ -1,4 +1,5 @@
 import { html, nothing, type TemplateResult, type TemplateValue } from './runtime.js';
+import type { ComponentStyleDependency } from './styles/index.js';
 
 export type ComponentLayer = 'atom' | 'molecule' | 'organism';
 
@@ -6,6 +7,8 @@ export interface Component<Props = Record<string, never>> {
   (props: Props): TemplateResult;
   readonly layer: ComponentLayer;
   readonly displayName: string;
+  /** Exact immutable styles retained when this component result is rendered. */
+  readonly styles: readonly ComponentStyleDependency[];
 }
 
 export type ScopedSlot<Props = Record<string, never>> = (
@@ -48,12 +51,28 @@ function defineComponent<Props>(
   layer: ComponentLayer,
   render: (props: Props) => TemplateResult,
   displayName = render.name || 'AnonymousComponent',
+  styles: readonly ComponentStyleDependency[] = [],
 ): Component<Props> {
-  Object.defineProperties(render, {
+  const retainedStyles = Object.freeze([...styles]);
+  for (const dependency of retainedStyles) {
+    if (dependency.layer !== layer) {
+      throw new TypeError(
+        `${displayName} declares ${dependency.id} in the ${dependency.layer} layer instead of ${layer}.`,
+      );
+    }
+  }
+  const component = ((props: Props) => {
+    const result = render(props);
+    return retainedStyles.length === 0
+      ? result
+      : result.withStyleDependencies(retainedStyles);
+  }) as Component<Props>;
+  Object.defineProperties(component, {
     layer: { configurable: false, enumerable: true, value: layer },
     displayName: { configurable: false, enumerable: true, value: displayName },
+    styles: { configurable: false, enumerable: true, value: retainedStyles },
   });
-  return render as Component<Props>;
+  return component;
 }
 
 /**
@@ -64,8 +83,9 @@ function defineComponent<Props>(
 export function defineAtom<Props>(
   render: (props: Props) => TemplateResult,
   displayName?: string,
+  styles?: readonly ComponentStyleDependency[],
 ): Component<Props> {
-  return defineComponent('atom', render, displayName);
+  return defineComponent('atom', render, displayName, styles);
 }
 
 /**
@@ -76,8 +96,9 @@ export function defineAtom<Props>(
 export function defineMolecule<Props>(
   render: (props: Props) => TemplateResult,
   displayName?: string,
+  styles?: readonly ComponentStyleDependency[],
 ): Component<Props> {
-  return defineComponent('molecule', render, displayName);
+  return defineComponent('molecule', render, displayName, styles);
 }
 
 /**
@@ -88,6 +109,7 @@ export function defineMolecule<Props>(
 export function defineOrganism<Props>(
   render: (props: Props) => TemplateResult,
   displayName?: string,
+  styles?: readonly ComponentStyleDependency[],
 ): Component<Props> {
-  return defineComponent('organism', render, displayName);
+  return defineComponent('organism', render, displayName, styles);
 }

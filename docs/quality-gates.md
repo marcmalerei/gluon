@@ -72,7 +72,7 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-All 538 current symbol pages require a reviewed entry in
+All 545 current symbol pages require a reviewed entry in
 `docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
 and either an inline scenario or a maintained package recipe that uses the
 documented symbol. The scenarios cover concrete inputs and observable results,
@@ -155,8 +155,10 @@ contract and current boundary are documented in
 
 `quality-budgets.json` is the reviewed budget source. `npm run check:budgets`
 builds GLUON GOODS and fails with the exact metric, actual bytes, limit, and
-overage when its HTML, JavaScript, gzip, image bytes, or image count exceeds the
-budget. AVIF, GIF, JPEG, PNG, SVG, and WebP output all count as images. Unknown,
+overage when its HTML, initial JavaScript entry plus static modulepreload graph,
+per-file level-9 gzip total, image bytes, or image count exceeds the budget.
+Lazy hydration chunks are reported by the build but do not enter the
+client-only initial graph. AVIF, GIF, JPEG, PNG, SVG, and WebP output all count as images. Unknown,
 missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
@@ -172,6 +174,13 @@ are 182,000 raw bytes and 54,000 gzip bytes; HTML, image-byte, and image-count
 ceilings remain unchanged. These are composition measurements, not runtime-
 speed or framework-size claims. Vue is built only in the documentation host.
 
+Issue #115 replaces aggregate component retention with usage-driven exact
+component sheets. `check:ui-contract` additionally
+builds a Button-only entry and dynamic Card/AppShell chunks, rejects unrelated
+component markers, and validates the retained raw/gzip/module/sheet evidence in
+`benchmarks/ui-component-styles-2026-07-12.json`. Vue is built only in the
+separate documentation host.
+
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps
 explicitly before it builds GLUON GOODS.
@@ -185,10 +194,8 @@ Browser assertions that cross a reactive transition poll for the resulting DOM
 state with a bounded timeout. They do not assume that the render and a 140-ms
 transition always finish within one fixed wall-clock delay on every engine.
 
-The current ceilings allow limited implementation movement above the measured
-171,264-byte raw / 50,069-byte gzip shop entry while preventing unreviewed large
-regressions. Changing a ceiling requires an evidence-backed documentation update
-in the same pull request.
+The current ceilings prevent unreviewed large regressions. Changing a ceiling
+requires an evidence-backed documentation update in the same pull request.
 
 ## Customer-flow performance and retained evidence
 

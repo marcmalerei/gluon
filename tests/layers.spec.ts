@@ -1,13 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { render } from '../src/index.js';
 import {
-  adoptStyles,
-  foundationStyles,
-  layerOrderStyles,
-  render,
-} from '../src/index.js';
-import { Button, Icon, Input, Label, atomStyles } from '@gluonjs/atoms';
-import { Card, FormField, moleculeStyles } from '@gluonjs/molecules';
-import { AppShell, organismStyles } from '@gluonjs/organisms';
+  Button,
+  Icon,
+  Input,
+  Label,
+  buttonStyles,
+  iconStyles,
+  inputStyles,
+  installUi,
+  labelStyles,
+} from '@gluonjs/atoms';
+import { Card, FormField, cardStyles, formFieldStyles } from '@gluonjs/molecules';
+import { AppShell, appShellStyles } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
 
 describe('component layers', () => {
@@ -25,7 +30,7 @@ describe('component layers', () => {
     expect(FormField.layer).toBe('molecule');
     expect(AppShell.layer).toBe('organism');
     for (const component of [Button, Card, AppShell]) {
-      expect(Object.keys(component)).toEqual(['layer', 'displayName']);
+      expect(Object.keys(component)).toEqual(['layer', 'displayName', 'styles']);
       expect(Object.getOwnPropertyDescriptor(component, 'layer')).toMatchObject({
         configurable: false,
         enumerable: true,
@@ -36,18 +41,19 @@ describe('component layers', () => {
         enumerable: true,
         writable: false,
       });
+      expect(Object.getOwnPropertyDescriptor(component, 'styles')).toMatchObject({
+        configurable: false,
+        enumerable: true,
+        writable: false,
+      });
     }
+    expect(Button.styles.map(({ id }) => id)).toEqual(['gluon-atom-button']);
+    expect(FormField.styles.map(({ id }) => id)).toEqual(['gluon-molecule-form-field']);
+    expect(AppShell.styles.map(({ id }) => id)).toEqual(['gluon-organism-app-shell']);
   });
 
-  it('composes every layer and styles it only through adopted stylesheets', () => {
-    adoptStyles(
-      document,
-      layerOrderStyles,
-      foundationStyles,
-      atomStyles,
-      moleculeStyles,
-      organismStyles,
-    );
+  it('composes every layer and adopts only the exact used sheets', () => {
+    const owner = installUi(document, { theme: 'light' });
 
     render(AppShell({
       header: q.h1({ children: 'Gluon' }),
@@ -68,7 +74,24 @@ describe('component layers', () => {
     expect(document.querySelector('.gluon-card')).not.toBeNull();
     expect((document.querySelector('.gluon-input') as HTMLInputElement).value).toBe('Ada');
     expect(document.querySelector('svg path')?.namespaceURI).toBe('http://www.w3.org/2000/svg');
-    expect(document.adoptedStyleSheets).toHaveLength(5);
+    expect(document.adoptedStyleSheets.filter((sheet) => [
+      buttonStyles,
+      iconStyles,
+      inputStyles,
+      labelStyles,
+      cardStyles,
+      formFieldStyles,
+      appShellStyles,
+    ].includes(sheet))).toEqual([
+      buttonStyles,
+      iconStyles,
+      inputStyles,
+      labelStyles,
+      cardStyles,
+      formFieldStyles,
+      appShellStyles,
+    ]);
     expect(document.querySelector('style[data-gluon]')).toBeNull();
+    owner.dispose();
   });
 });
