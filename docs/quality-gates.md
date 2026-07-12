@@ -208,6 +208,11 @@ evidence remains required before issue #107 can close. The full contract and
 current boundary are documented in
 [`dx-benchmark.md`](dx-benchmark.md).
 
+The comparator projects have independent pinned TypeScript graphs and are
+excluded from the root TypeScript program. Their own clean-install typechecks in
+`npm run benchmark:dx` are the authoritative compiler evidence; the root program
+does not resolve their private `node_modules` trees.
+
 ## Bundle budgets
 
 `quality-budgets.json` is the reviewed budget source. `npm run check:budgets`
