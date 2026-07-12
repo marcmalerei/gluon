@@ -134,6 +134,7 @@ describe('SSR hydration', () => {
     expect(hydrated.store.bagOpen).toBe(true);
 
     hydrated.mount.unmount();
+    hydrated.uiOwner.dispose();
     hydrated.router.destroy();
     hydrated.storeManager.dispose();
     document.adoptedStyleSheets = previousSheets;

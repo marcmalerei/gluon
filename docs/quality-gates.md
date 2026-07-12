@@ -47,6 +47,12 @@ unchanged source-map content. The canonical `implementation-slice-only` record
 uses the parent DX evidence format, reports zero human participants, and makes
 no completed-run or general readability claim.
 
+`npm run check:dx-scorecard` validates both completed-run evidence and bounded
+dependency-slice before/after measurements against the versioned schema. A
+slice must retain setup calls, imports, configuration, cleanup, evidence paths,
+and explicit no-comparison limitations; it cannot satisfy or imitate the
+required 21-result completed run.
+
 ## Generated API example gate
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry
@@ -55,7 +61,7 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-All 507 current symbol pages require a reviewed entry in
+All 523 current symbol pages require a reviewed entry in
 `docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
 and either an inline scenario or a maintained package recipe that uses the
 documented symbol. The scenarios cover concrete inputs and observable results,
@@ -74,9 +80,12 @@ memory history, Router options, Store definition, and Gluon Element examples.
 `npm run check:ui-contract` validates the four optional package manifests,
 their stable inventories and evidence paths, and a production Core-only bundle
 that must contain none of the UI markers. `npm run typecheck:ui-api` consumes
-the generated declarations through the four public package names. The browser matrix runs UI keyboard,
-focus, axe, theme-ownership, and screenshot-regression suites in Chromium,
-Firefox, and WebKit. The root browser coverage gate includes every source file
+the generated declarations through the four public package names. The browser
+matrix runs UI keyboard, focus, axe, one-call Document/nested-ShadowRoot
+ownership, reference counting, identity-preserving theme changes, scoped SSR
+hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
+Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
+GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
 `/0.0.0/examples/ui.html` with the other versioned documentation examples.
 
@@ -133,12 +142,14 @@ budget. AVIF, GIF, JPEG, PNG, SVG, and WebP output all count as images. Unknown,
 missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
-The issue #88 production Custom Element baseline measures 158,152 raw entry
-bytes and 45,683 level-9 gzip bytes. The reviewed regression ceilings are
-160,000 raw bytes and 47,000 gzip bytes; HTML, image-byte, and image-count
-ceilings remain unchanged. These values cover the form-associated product
-configuration boundary and its constructable component stylesheet in the real
-shop entry, not Vue, which is built only in the separate documentation host.
+The issue #108 production owner baseline measures 164,012 raw entry bytes and
+47,686 level-9 gzip bytes. The reviewed regression ceilings are 166,000 raw
+bytes and 49,000 gzip bytes; HTML, image-byte, and image-count ceilings remain
+unchanged. These values cover the one-step UI owner, named SSR/hydration
+selection, form-associated product configuration boundary, and constructable
+component stylesheet in the real shop entry. The measured production entry
+contains none of the unselected Button, Input, Card, FormField, or AppShell CSS
+markers. Vue is built only in the separate documentation host.
 
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps

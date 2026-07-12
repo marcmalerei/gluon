@@ -1,20 +1,38 @@
 # `@gluonjs/atoms`
 
-Focused Gluon UI primitives plus shared tokens and themes.
+Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
+and themes.
 
 ```ts
-import { Button, Input, atomStyles, installUiTheme } from '@gluonjs/atoms';
-import { adoptStyles, foundationStyles, layerOrderStyles } from '@gluonjs/core';
+import { Button, Input, atomStyles, installUi } from '@gluonjs/atoms';
+import { adoptStyles } from '@gluonjs/core';
 
-adoptStyles(document, layerOrderStyles, foundationStyles, atomStyles);
-const uninstallTheme = installUiTheme(document, 'light');
+const ui = installUi(document, { theme: 'light' });
+adoptStyles(document, atomStyles); // compatibility path until #115
+
+ui.setTheme('dark');
+ui.dispose();
 ```
 
-Style adoption is explicit. `uiTokenStyles`, `lightThemeStyles`, and
-`darkThemeStyles` are shared stylesheet instances; `getThemeStyles()` returns
-the same instance for repeated requests. Importing the package never changes a
-document or shadow root. `installUiTheme()` reference-counts ownership per style
-target, so one consumer cannot remove a shared sheet still owned by another.
+`installUi()` is the one public call for the shared cascade-layer order, Core
+foundation, UI tokens, active theme, and target-scoped `styleOwner`. It accepts
+a `Document` or `ShadowRoot`, exposes the current typed theme, changes the
+target-local theme without replacing its active stylesheet object, and disposes
+idempotently. Owners on one target are reference-counted. Existing adopted
+sheets retain their relative order, pre-adopted shared sheets are never removed,
+and the last owner restores a theme attribute only when Gluon still owns it.
+
+`createUiStyleSelection(theme)` returns the same four named sheets for SSR.
+`installUi(target, { theme, hydrate: true })` validates and consumes the matching
+`gluon-ui` carriers. Missing, duplicate, reordered, and content/digest-mismatched
+carriers throw `UiHydrationError` before target mutation. Importing the package
+never changes a document or shadow root, and no browser `<style>` fallback is
+provided.
+
+The aggregate `atomStyles` export remains a compatibility path while #115 adds
+usage-driven exact component sheets to `UiOwner.styleOwner`. `installUiTheme()`
+is deprecated in favor of `installUi()` and remains temporarily available for
+source compatibility.
 
 ## Accessibility contracts
 

@@ -6,8 +6,11 @@ import {
   Input,
   atomManifest,
   atomStyles,
+  createUiStyleSelection,
   getThemeStyles,
+  installUi,
   installUiTheme,
+  UiHydrationError,
   uiTokenStyles,
 } from '@gluonjs/atoms';
 import {
@@ -18,6 +21,7 @@ import {
   render,
   unadoptStyles,
 } from '../src/index.js';
+import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
 import { Card, FormField, moleculeManifest, moleculeStyles } from '@gluonjs/molecules';
 import { AppShell, organismManifest, organismStyles } from '@gluonjs/organisms';
 import {
@@ -64,6 +68,165 @@ describe('separate UI package contracts', () => {
     expect(getStyleSheetText(atomStyles)).toContain('padding-inline');
     expect(getStyleSheetText(moleculeStyles)).toContain('padding-inline');
     expect(getStyleSheetText(organismStyles)).toContain('min-block-size');
+  });
+
+  it('installs one ref-counted UI owner and switches one theme sheet in place', () => {
+    const before = new CSSStyleSheet();
+    const after = new CSSStyleSheet();
+    const component = new CSSStyleSheet();
+    document.documentElement.setAttribute('data-gluon-theme', 'system');
+    document.adoptedStyleSheets = [before];
+    const first = installUi(document, { theme: 'light' });
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, after];
+    const second = installUi(document, { theme: 'dark' });
+    expect(first.disposed).toBe(false);
+    const themeSheet = first.themeSheet;
+
+    expect(first.theme).toBe('dark');
+    expect(second.theme).toBe('dark');
+    expect(first.themeSheet).toBe(second.themeSheet);
+    expect(document.documentElement.dataset.gluonTheme).toBe('dark');
+    expect(document.adoptedStyleSheets[0]).toBe(before);
+    expect(document.adoptedStyleSheets.at(-1)).toBe(after);
+    expect(new Set(document.adoptedStyleSheets).size).toBe(document.adoptedStyleSheets.length);
+
+    first.setTheme('light');
+    first.setTheme('dark');
+    first.setTheme('dark');
+    expect(first.themeSheet).toBe(themeSheet);
+    expect(getStyleSheetText(themeSheet)).toContain('--gluon-color-canvas: #101716');
+    expect(document.adoptedStyleSheets.filter((sheet) => sheet === themeSheet)).toHaveLength(1);
+
+    first.styleOwner.retain(component);
+    second.styleOwner.retain(component);
+    first.dispose();
+    first.dispose();
+    expect(first.disposed).toBe(true);
+    expect(document.adoptedStyleSheets).toContain(component);
+    expect(document.adoptedStyleSheets).toContain(themeSheet);
+    second.dispose();
+    expect(document.adoptedStyleSheets).toHaveLength(2);
+    expect(document.adoptedStyleSheets[0]).toBe(before);
+    expect(document.adoptedStyleSheets[1]).toBe(after);
+    expect(document.documentElement.dataset.gluonTheme).toBe('system');
+    expect(() => first.setTheme('light')).toThrow('disposed');
+    document.documentElement.removeAttribute('data-gluon-theme');
+  });
+
+  it('preserves a theme attribute changed by another owner and rejects invalid targets', () => {
+    const owner = installUi(document);
+    document.documentElement.dataset.gluonTheme = 'external';
+    owner.dispose();
+    expect(document.documentElement.dataset.gluonTheme).toBe('external');
+    document.documentElement.removeAttribute('data-gluon-theme');
+
+    expect(() => installUi({ documentElement: null } as unknown as Document))
+      .toThrow('requires a documentElement');
+
+    const host = document.createElement('section');
+    const failingTarget = {
+      host,
+      querySelectorAll: () => [],
+      get adoptedStyleSheets() { return [] as CSSStyleSheet[]; },
+      set adoptedStyleSheets(_sheets: CSSStyleSheet[]) { throw new Error('adoption failed'); },
+    } as unknown as ShadowRoot;
+    expect(() => installUi(failingTarget)).toThrow('adoption failed');
+    expect(host.hasAttribute('data-gluon-theme')).toBe(false);
+  });
+
+  it('installs independent nested ShadowRoot owners with host-scoped tokens', () => {
+    const outerHost = document.createElement('section');
+    const outer = outerHost.attachShadow({ mode: 'open' });
+    const innerHost = document.createElement('article');
+    outer.append(innerHost);
+    const inner = innerHost.attachShadow({ mode: 'open' });
+    const outerOwner = installUi(outer, { theme: 'dark' });
+    const innerOwner = installUi(inner, { theme: 'light' });
+
+    expect(outerHost.dataset.gluonTheme).toBe('dark');
+    expect(innerHost.dataset.gluonTheme).toBe('light');
+    expect(outerOwner.themeSheet).not.toBe(innerOwner.themeSheet);
+    expect(outer.adoptedStyleSheets).toHaveLength(4);
+    expect(inner.adoptedStyleSheets).toHaveLength(4);
+    outerOwner.setTheme('light');
+    expect(innerOwner.theme).toBe('light');
+    outerOwner.dispose();
+    expect(outer.adoptedStyleSheets).toEqual([]);
+    expect(inner.adoptedStyleSheets).toHaveLength(4);
+    innerOwner.dispose();
+  });
+
+  it('serializes one named UI selection and consumes matching hydration carriers', () => {
+    const host = document.createElement('section');
+    const root = host.attachShadow({ mode: 'open' });
+    const selection = createUiStyleSelection('dark');
+    const manifest = createStyleManifest(selection);
+    root.innerHTML = renderStyleCarriers(manifest);
+    expect(manifest.entries.map((entry) => entry.id)).toEqual([
+      'gluon-ui-layer-order',
+      'gluon-ui-foundation',
+      'gluon-ui-tokens',
+      'gluon-ui-theme',
+    ]);
+    expect(manifest.entries.every((entry) => entry.scope === 'gluon-ui')).toBe(true);
+
+    const owner = installUi(root, { theme: 'dark', hydrate: true });
+    expect(root.querySelectorAll('style[data-gluon-style]')).toHaveLength(0);
+    expect(root.adoptedStyleSheets).toHaveLength(4);
+    expect(owner.selection.entries.map((entry) => entry.id)).toEqual(
+      selection.entries.map((entry) => entry.id),
+    );
+    owner.dispose();
+  });
+
+  it.each([
+    ['missing', (html: string) => html.replace(/<style[^>]+gluon-ui-theme[\s\S]*?<\/style>/, '')],
+    ['duplicate', (html: string) => `${html}${html.match(/<style[^>]+gluon-ui-theme[\s\S]*?<\/style>/)?.[0] ?? ''}`],
+    ['reordered', (html: string) => {
+      const carriers = html.match(/<style[\s\S]*?<\/style>/g) ?? [];
+      return [carriers[1], carriers[0], ...carriers.slice(2)].join('');
+    }],
+    ['mismatched', (html: string) => html.replace('data-gluon-digest="', 'data-gluon-digest="invalid-')],
+  ] as const)('reports deterministic %s UI hydration diagnostics', (mismatch, mutate) => {
+    const host = document.createElement('section');
+    const root = host.attachShadow({ mode: 'open' });
+    root.innerHTML = mutate(renderStyleCarriers(createStyleManifest(createUiStyleSelection('light'))));
+    expect(() => installUi(root, { hydrate: true })).toThrowError(
+      expect.objectContaining<Partial<UiHydrationError>>({
+        code: 'GLUON_UI_HYDRATION_MISMATCH',
+        mismatch,
+      }),
+    );
+    expect(root.adoptedStyleSheets).toEqual([]);
+    expect(host.hasAttribute('data-gluon-theme')).toBe(false);
+  });
+
+  it('distinguishes extra, unnamed, and CSS-text UI hydration evidence', () => {
+    const manifestHtml = renderStyleCarriers(createStyleManifest(createUiStyleSelection('light')));
+
+    const extraHost = document.createElement('section');
+    const extraRoot = extraHost.attachShadow({ mode: 'open' });
+    extraRoot.innerHTML = `${manifestHtml}<style data-gluon-style="extra" data-gluon-style-scope="gluon-ui" data-gluon-digest="extra"></style>`;
+    expect(() => installUi(extraRoot, { hydrate: true })).toThrowError(
+      expect.objectContaining({ mismatch: 'mismatched' }),
+    );
+
+    const unnamedHost = document.createElement('section');
+    const unnamedRoot = unnamedHost.attachShadow({ mode: 'open' });
+    unnamedRoot.innerHTML = manifestHtml;
+    unnamedRoot.querySelector('style')?.removeAttribute('data-gluon-style');
+    expect(() => installUi(unnamedRoot, { hydrate: true })).toThrowError(
+      expect.objectContaining({ mismatch: 'missing' }),
+    );
+
+    const textHost = document.createElement('section');
+    const textRoot = textHost.attachShadow({ mode: 'open' });
+    textRoot.innerHTML = manifestHtml;
+    const themeCarrier = textRoot.querySelector<HTMLStyleElement>('style[data-gluon-style="gluon-ui-theme"]')!;
+    themeCarrier.textContent = `${themeCarrier.textContent ?? ''}\n:root { --unexpected: 1; }`;
+    expect(() => installUi(textRoot, { hydrate: true })).toThrowError(
+      expect.objectContaining({ mismatch: 'mismatched' }),
+    );
   });
 
   it('publishes stable manifest evidence for every UI layer', () => {
@@ -262,8 +425,8 @@ describe('headless interaction primitives', () => {
 });
 
 it('keeps the stable composed UI surface free of automated WCAG A/AA violations', async () => {
-  adoptStyles(document, layerOrderStyles, foundationStyles, atomStyles, moleculeStyles, organismStyles);
-  installUiTheme(document, 'light');
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, atomStyles, moleculeStyles, organismStyles);
   render(AppShell({
     header: q.h1({ children: 'Account settings' }),
     navigation: q.a({ href: '#profile', children: 'Profile' }),
@@ -286,6 +449,7 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
     runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'] },
   });
   expect(results.violations, formatViolations(results.violations)).toEqual([]);
+  uiOwner.dispose();
 });
 
 function formatViolations(violations: readonly Result[]): string {

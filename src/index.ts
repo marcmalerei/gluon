@@ -156,13 +156,21 @@ export {
 
 export {
   adoptStyles,
+  createStyleSheetSelection,
+  createStyleSheetOwner,
   createStyleSheet,
   css,
   foundationStyles,
+  getStyleSheetDigest,
   getStyleSheetText,
+  getStyleTextDigest,
   installGluonStyles,
   layerOrderStyles,
+  replaceStyleSheet,
   unadoptStyles,
   type CssValue,
+  type StyleSheetOwner,
+  type StyleSheetSelection,
+  type StyleSheetSelectionEntry,
   type StyleTarget,
 } from './styles/index.js';

@@ -3,13 +3,11 @@ import { page } from 'vitest/browser';
 import {
   Button,
   atomStyles,
-  installUiTheme,
+  installUi,
 } from '@gluonjs/atoms';
 import {
   adoptStyles,
   css,
-  foundationStyles,
-  layerOrderStyles,
   render,
 } from '../src/index.js';
 import { Card, FormField, moleculeStyles } from '@gluonjs/molecules';
@@ -33,8 +31,8 @@ test('matches the stable light-theme UI composition', async () => {
       [role="option"][aria-selected="true"] { background: #e6f4f1; }
     }
   `;
-  adoptStyles(document, layerOrderStyles, foundationStyles, atomStyles, moleculeStyles, organismStyles, visualStyles);
-  installUiTheme(document, 'light');
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, atomStyles, moleculeStyles, organismStyles, visualStyles);
 
   render(q.div({
     data: { testid: 'ui-visual' },
@@ -71,4 +69,5 @@ test('matches the stable light-theme UI composition', async () => {
       threshold: 0.15,
     },
   });
+  uiOwner.dispose();
 });

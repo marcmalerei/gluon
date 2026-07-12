@@ -370,6 +370,20 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
 });
 
 describe('@gluonjs/ssr static output and style transport', () => {
+  it('preserves stable selection ids and scopes without changing content diagnostics', () => {
+    const sheet = css`:root { --named: 1; }`;
+    const manifest = createStyleManifest({
+      version: 1,
+      entries: [{ id: 'named-sheet', scope: 'test-scope', sheet }],
+    });
+    expect(manifest.entries[0]).toEqual(expect.objectContaining({
+      id: 'named-sheet',
+      scope: 'test-scope',
+      order: 0,
+    }));
+    expect(renderStyleCarriers(manifest)).toContain('data-gluon-style-scope="test-scope"');
+  });
+
   it('emits safe ordered style carriers, assets, hints, and mixed static/dynamic output', async () => {
     const assets = {
       entry: '/assets/app.js',
@@ -378,8 +392,15 @@ describe('@gluonjs/ssr static output and style transport', () => {
       assets: ['/assets/orbit.webp'],
     };
     const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
-    expect(response.styles.entries).toHaveLength(1);
-    expect(response.head).toContain('data-gluon-style="gluon-');
+    expect(response.styles.entries).toHaveLength(5);
+    expect(response.styles.entries.map((entry) => entry.id)).toEqual([
+      'gluon-ui-layer-order',
+      'gluon-ui-foundation',
+      'gluon-ui-tokens',
+      'gluon-ui-theme',
+      'gluon-goods',
+    ]);
+    expect(response.head).toContain('data-gluon-style="gluon-ui-layer-order"');
     expect(response.head).toContain('nonce="request-nonce"');
     expect(response.head).toContain('rel="modulepreload" href="/assets/vendor.js"');
     expect(response.head).toContain('rel="stylesheet" href="/assets/app.css"');

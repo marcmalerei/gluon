@@ -271,6 +271,7 @@
         "  atomStyles,",
         "  darkThemeStyles,",
         "  getThemeStyles,",
+        "  installUi,",
         "  installUiTheme,",
         "  lightThemeStyles,",
         "  uiTokenStyles,",
@@ -281,11 +282,13 @@
         "  type IconProps,",
         "  type InputProps,",
         "  type LabelProps,",
+        "  type UiOwner,",
         "  type UiThemeName,",
         "} from '@gluonjs/atoms';",
         "",
         "const theme: UiThemeName = 'light';",
-        "const removeTheme = installUiTheme(document, theme);",
+        "const ui: UiOwner = installUi(document, { theme });",
+        "const removeLegacyTheme = installUiTheme(document, theme);",
         "const variant: ButtonVariant = 'primary';",
         "const size: ButtonSize = 'large';",
         "const button = {",
@@ -301,7 +304,73 @@
         "const label = { children: 'Email address' } satisfies LabelProps;",
         "const checkout = html`${Label(label)}${Input(input)}${Button(button)}${Icon(icon)}`;",
         "console.log(checkout, getThemeStyles(theme), atomStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
-        "removeTheme();"
+        "ui.setTheme('dark');",
+        "ui.dispose();",
+        "removeLegacyTheme();"
+      ]
+    },
+    "ui-owner": {
+      "module": "@gluonjs/atoms",
+      "code": [
+        "import {",
+        "  UiHydrationError,",
+        "  createUiStyleSelection,",
+        "  installUi,",
+        "  type InstallUiOptions,",
+        "  type UiHydrationMismatch,",
+        "  type UiOwner,",
+        "  type UiStyleSelection,",
+        "} from '@gluonjs/atoms';",
+        "",
+        "const options = { theme: 'dark', hydrate: false } satisfies InstallUiOptions;",
+        "const selection: UiStyleSelection = createUiStyleSelection(options.theme);",
+        "const owner: UiOwner = installUi(document, options);",
+        "owner.setTheme('light');",
+        "console.log(selection.entries.map((entry) => entry.id), owner.theme, owner.themeSheet);",
+        "owner.dispose();",
+        "",
+        "const mismatch: UiHydrationMismatch = 'missing';",
+        "const diagnostic = new UiHydrationError(mismatch, 'The server omitted the UI theme carrier.');",
+        "console.error(diagnostic.code, diagnostic.mismatch);"
+      ]
+    },
+    "core-style-owner": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import {",
+        "  createStyleSheetOwner,",
+        "  createStyleSheetSelection,",
+        "  css,",
+        "  getStyleSheetDigest,",
+        "  getStyleTextDigest,",
+        "  replaceStyleSheet,",
+        "  type StyleSheetOwner,",
+        "  type StyleSheetSelection,",
+        "  type StyleSheetSelectionEntry,",
+        "} from '@gluonjs/core';",
+        "",
+        "const sheet = css`:root { --shop-accent: blue; }`;",
+        "const entry = { id: 'shop-theme', scope: 'shop', sheet } satisfies StyleSheetSelectionEntry;",
+        "const selection: StyleSheetSelection = createStyleSheetSelection([entry]);",
+        "const owner: StyleSheetOwner = createStyleSheetOwner(document);",
+        "owner.retain(sheet);",
+        "replaceStyleSheet(sheet, ':root { --shop-accent: green; }');",
+        "console.log(selection.entries[0]?.id, getStyleSheetDigest(sheet), getStyleTextDigest('shop'));",
+        "owner.release(sheet);",
+        "owner.dispose();"
+      ]
+    },
+    "ssr-style-selection": {
+      "module": "@gluonjs/ssr",
+      "code": [
+        "import { createStyleSheetSelection, css } from '@gluonjs/core';",
+        "import { createStyleManifest, type StyleManifestSource } from '@gluonjs/ssr';",
+        "",
+        "const source: StyleManifestSource = createStyleSheetSelection([",
+        "  { id: 'shop', scope: 'gluon-goods', sheet: css`:root { color: black; }` },",
+        "]);",
+        "const manifest = createStyleManifest(source);",
+        "console.log(manifest.entries[0]?.id, manifest.entries[0]?.scope);"
       ]
     },
     "molecule-components": {
@@ -2351,13 +2420,45 @@
       "recipe": "core-styles",
       "description": "Create a constructable stylesheet from CSS text in the browser or a serializable descriptor during server rendering:"
     },
+    "src/styles/functions/createStyleSheetOwner.md": {
+      "recipe": "core-style-owner",
+      "description": "Retain target-local constructed sheets through a reference-counted owner and release exactly that handle's claims:"
+    },
+    "src/styles/functions/createStyleSheetSelection.md": {
+      "recipe": "core-style-owner",
+      "description": "Name and freeze an ordered stylesheet selection once for browser ownership and SSR transport:"
+    },
+    "src/styles/functions/getStyleSheetDigest.md": {
+      "recipe": "core-style-owner",
+      "description": "Read the stable transport digest of a constructed stylesheet after an identity-preserving update:"
+    },
     "src/styles/functions/getStyleSheetText.md": {
       "recipe": "core-styles",
       "description": "Recover deterministic CSS text from a Gluon-created server descriptor, tracked browser sheet, or its live rule list:"
     },
+    "src/styles/functions/getStyleTextDigest.md": {
+      "recipe": "core-style-owner",
+      "description": "Calculate the same stable content digest used to validate named server style carriers:"
+    },
     "src/styles/functions/installGluonStyles.md": {
       "recipe": "core-styles",
       "description": "Adopt the shared cascade-layer order and foundation reset on one style target, then release only those two sheets:"
+    },
+    "src/styles/functions/replaceStyleSheet.md": {
+      "recipe": "core-style-owner",
+      "description": "Replace constructed stylesheet text in place while every target preserves the same sheet identity:"
+    },
+    "src/styles/interfaces/StyleSheetOwner.md": {
+      "recipe": "core-style-owner",
+      "description": "Own a target-specific set of retained constructed sheets with explicit release and idempotent disposal:"
+    },
+    "src/styles/interfaces/StyleSheetSelection.md": {
+      "recipe": "core-style-owner",
+      "description": "Carry one immutable ordered set of named stylesheet entries across installation and SSR boundaries:"
+    },
+    "src/styles/interfaces/StyleSheetSelectionEntry.md": {
+      "recipe": "core-style-owner",
+      "description": "Associate one constructed sheet with its stable transport ID and optional hydration scope:"
     },
     "src/styles/type-aliases/CssValue.md": {
       "recipe": "core-styles",
@@ -2775,9 +2876,33 @@
       "recipe": "atom-components",
       "description": "Select the constructable light or dark theme stylesheet without installing it, for inspection or caller-controlled adoption:"
     },
+    "packages/atoms/src/functions/createUiStyleSelection.md": {
+      "recipe": "ui-owner",
+      "description": "Create the exact named shared layer, foundation, token, and selected-theme input used by server rendering:"
+    },
+    "packages/atoms/src/functions/installUi.md": {
+      "recipe": "ui-owner",
+      "description": "Install one target-scoped UI owner, switch its typed theme, and dispose every retained stylesheet claim:"
+    },
     "packages/atoms/src/functions/installUiTheme.md": {
       "recipe": "atom-components",
       "description": "Reference-count and adopt the shared tokens plus one theme on a Document or ShadowRoot, then release exactly that ownership:"
+    },
+    "packages/atoms/src/classes/UiHydrationError.md": {
+      "recipe": "ui-owner",
+      "description": "Handle a deterministic scoped UI carrier mismatch separately from application DOM hydration failures:"
+    },
+    "packages/atoms/src/interfaces/InstallUiOptions.md": {
+      "recipe": "ui-owner",
+      "description": "Select the initial typed UI theme and whether installation must validate server carriers first:"
+    },
+    "packages/atoms/src/interfaces/UiOwner.md": {
+      "recipe": "ui-owner",
+      "description": "Retain the shared target foundation, active theme, component style owner, and exact cleanup lifecycle:"
+    },
+    "packages/atoms/src/interfaces/UiStyleSelection.md": {
+      "recipe": "ui-owner",
+      "description": "Share the selected UI theme and four named style entries between server serialization and browser ownership:"
     },
     "packages/atoms/src/interfaces/ButtonProps.md": {
       "recipe": "atom-components",
@@ -2810,6 +2935,10 @@
     "packages/atoms/src/type-aliases/UiThemeName.md": {
       "recipe": "atom-components",
       "description": "Choose the public light or dark token set installed for a UI root:"
+    },
+    "packages/atoms/src/type-aliases/UiHydrationMismatch.md": {
+      "recipe": "ui-owner",
+      "description": "Branch on missing, duplicate, reordered, or content-mismatched UI carrier evidence:"
     },
     "packages/atoms/src/variables/atomManifest.md": {
       "recipe": "atom-components",
@@ -3600,6 +3729,10 @@
     "packages/ssr/src/type-aliases/ProgressiveRenderChunk.md": {
       "recipe": "ssr-serialization",
       "description": "Distinguish the initial progressive shell from a later numbered async-boundary HTML patch:"
+    },
+    "packages/ssr/src/type-aliases/StyleManifestSource.md": {
+      "recipe": "ssr-style-selection",
+      "description": "Supply either legacy ordered sheets or one named Core selection to SSR style-manifest generation:"
     },
     "packages/store/src/interfaces/DefineStoreOptions.md": {
       "recipe": "store-definition",

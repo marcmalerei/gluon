@@ -86,6 +86,64 @@
       ]
     }
   ],
+  "sliceMeasurements": [
+    {
+      "issue": 108,
+      "scope": "Shared UI foundation, cascade-layer order, tokens, active theme, and cleanup in the maintained UI example",
+      "taskIds": ["T2-themed-controls", "T6-universal-route"],
+      "before": {
+        "setupCalls": {
+          "count": 2,
+          "values": [
+            "adoptStyles(document, layerOrderStyles, foundationStyles, darkThemeStyles)",
+            "installUiTheme(document, 'light')"
+          ]
+        },
+        "imports": {
+          "count": 5,
+          "values": ["adoptStyles", "layerOrderStyles", "foundationStyles", "darkThemeStyles", "installUiTheme"]
+        },
+        "configuration": {
+          "count": 2,
+          "values": ["manual shared sheet order", "initial theme argument"]
+        },
+        "cleanup": {
+          "count": 2,
+          "values": ["installUiTheme cleanup callback", "manual unadoptStyles call for shared sheets"]
+        }
+      },
+      "after": {
+        "setupCalls": {
+          "count": 1,
+          "values": ["installUi(document, { theme: 'light' })"]
+        },
+        "imports": {
+          "count": 1,
+          "values": ["installUi"]
+        },
+        "configuration": {
+          "count": 1,
+          "values": ["typed initial theme option"]
+        },
+        "cleanup": {
+          "count": 1,
+          "values": ["UiOwner.dispose()"]
+        }
+      },
+      "evidence": [
+        "docs-site/examples/ui-system.ts",
+        "packages/atoms/src/theme.ts",
+        "tests/ui-system.spec.ts",
+        "tests/hydration.spec.ts",
+        "tests-node/ssr.spec.ts"
+      ],
+      "limitations": [
+        "This is a Gluon-only before/after slice measurement, not a completed 21-result benchmark run.",
+        "No Vue or React task result and no win, tie, loss, usability, or general DX-superiority claim is supported.",
+        "The maintained example still imports and adopts aggregate Atom, Molecule, and Organism component sheets; issue #115 owns the usage-driven replacement and the full T2/T3 measurement must be rerun after it lands."
+      ]
+    }
+  ],
   "measurements": [
     "commands",
     "interactiveAnswers",

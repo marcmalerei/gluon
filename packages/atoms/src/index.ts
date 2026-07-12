@@ -6,10 +6,17 @@ export { atomManifest } from './manifest.js';
 export { atomStyles } from './styles.js';
 export {
   darkThemeStyles,
+  createUiStyleSelection,
   getThemeStyles,
+  installUi,
   installUiTheme,
   lightThemeStyles,
   uiTokenStyles,
+  UiHydrationError,
+  type InstallUiOptions,
+  type UiHydrationMismatch,
+  type UiOwner,
+  type UiStyleSelection,
   type UiThemeName,
 } from './theme.js';
 export { defineAtom, type Component } from '@gluonjs/core';
