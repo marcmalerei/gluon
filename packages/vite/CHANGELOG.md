@@ -13,3 +13,5 @@
   explicit local/form state, ShadowRoot, and stylesheet identities.
 - Preserve functional `styles` metadata through stable HMR proxies while
   replacing active component CSS in place without changing sheet identity.
+- Retain generated UI-starter state, Button DOM, and application-sheet identity
+  across compatible consumer and token edits.

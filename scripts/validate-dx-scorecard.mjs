@@ -7,7 +7,9 @@ const root = resolve(import.meta.dirname, '..');
 const specificationPath = resolve(root, 'benchmarks/dx/specification-v1.json');
 const schemaPath = resolve(root, 'benchmarks/dx/schema/run-v1.schema.json');
 const evidenceDirectory = resolve(root, 'benchmarks/dx/evidence');
+const uiStarterEvidencePath = resolve(root, 'benchmarks/dx/create-gluon-ui-starter-2026-07-12.json');
 const specification = JSON.parse(await readFile(specificationPath, 'utf8'));
+const uiStarterEvidence = JSON.parse(await readFile(uiStarterEvidencePath, 'utf8'));
 const schema = JSON.parse(await readFile(schemaPath, 'utf8'));
 const evidenceNames = (await readdir(evidenceDirectory)).filter((name) => name.endsWith('.json')).sort();
 const ajv = new Ajv2020({ allErrors: true, strict: true });
@@ -76,6 +78,24 @@ for (const measurement of specification.sliceMeasurements) {
 assert(specification.measurements.length === 19, 'all 19 issue #107 measurements must remain explicit');
 assert(specification.comparisonDimensions.length >= 8, 'comparison dimensions must remain disaggregated');
 assert(specification.prohibitedAggregation.includes('must not calculate a single'), 'opaque score prohibition is missing');
+
+assert(uiStarterEvidence.schemaVersion === 1 && uiStarterEvidence.issue === 109, 'UI starter evidence identity is invalid');
+assert(uiStarterEvidence.scaffold.command === 'node packages/create-gluon/dist/cli.js .tmp/dx-ui-starter --yes --ui --testing --force', 'UI starter scaffold command changed without refreshed evidence');
+assert(uiStarterEvidence.scaffold.interactivePrompts.length === 0, 'the retained --yes run must not invent prompts');
+assert(uiStarterEvidence.scaffold.exitCode === 0, 'UI starter scaffold did not retain success');
+assert(uiStarterEvidence.generatedFiles.length === 12, 'UI starter generated-file inventory is incomplete');
+assert(uiStarterEvidence.firstSuccessfulTest.exitCode === 0, 'UI starter first test evidence is not successful');
+assert(uiStarterEvidence.firstProductionBuild.exitCode === 0, 'UI starter first build evidence is not successful');
+assert(uiStarterEvidence.completeMatrix.projects === 20, 'UI starter evidence must retain all 20 supported combinations');
+assertSet(uiStarterEvidence.completeMatrix.perProjectCommands, [
+  'npm install',
+  'npm run typecheck',
+  'npm run check:templates',
+  'npm test',
+  'npm run build',
+], 'UI starter matrix commands');
+assert(uiStarterEvidence.limitations.some((value) => value.includes('not a completed cross-framework benchmark run')), 'UI starter evidence must not imply a completed benchmark');
+assert(uiStarterEvidence.limitations.some((value) => value.includes('No human usability pass')), 'UI starter evidence must report the missing human pass');
 
 const sources = new Map(specification.frameworks.map(({ id, selectionSource }) => [id, new URL(selectionSource)]));
 assert(sources.get('vue').hostname === 'vuejs.org', 'Vue selection must use official vuejs.org guidance');

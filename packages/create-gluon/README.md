@@ -57,11 +57,35 @@ typed nested composition without an additional file format.
 `--ui` uses the separately consumable public `@gluonjs/atoms` package. Generated
 Button calls retain only the Button stylesheet through renderer-owned component
 metadata; generated applications do not import or adopt the deprecated aggregate
-Atom sheet. `--testing` adds the official browser fixture utilities and a
-Playwright-backed Vitest test.
+Atom sheet. The generated application calls `installUi()` once, retains its
+separate application sheet through `createStyleSheetOwner()`, maps app-owned
+tokens to the public Button custom properties, and disposes both owners with the
+application. Its typed `StarterAction` forwards native attributes, an accessible
+name, a click callback, and reactive count state. `--testing` adds the official
+browser fixture utilities and a Playwright-backed Vitest test that also checks
+the rendered Button's computed 44px target and app-token background color.
 `--ssr` adds one request-isolated server entry plus hydration. All Gluon
 dependencies use the exact `create-gluon` release version; framework packages
 and this CLI are released as one lockstep group.
+
+UI + SSR starters serialize the shared UI/theme selection, the usage-derived
+Button sheet, and the application sheet in deterministic order. Hydration lets
+`installUi({ hydrate: true })` consume the shared carriers and hands only the
+application selection to `hydrateApplication()`; the renderer consumes the
+Button carrier from actual usage. The generated browser regression requires
+retained DOM, no recovery or mismatches, one adopted Button sheet, one adopted
+application sheet, and complete cleanup.
+
+For stable automation, this is a ready-to-run UI starter command with no
+interactive answers:
+
+```sh
+npm create gluon@latest my-app -- --yes --ui --testing
+```
+
+Add `--ssr` for the maintained universal selection; Router and Store are then
+enabled by the compatibility rule described above. The generated README names
+the app token, theme, local component, and `add-component` extension points.
 
 The supported matrix is every independent Router, Store, testing, and UI
 selection, plus SSR with its required Router and Store selections. Repository

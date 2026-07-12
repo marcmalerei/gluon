@@ -22,6 +22,13 @@ license and archive allowlists, the documentation version, and the protected
 release workflow. A blocked repository must not present itself as a releasable
 candidate.
 
+`create-gluon` is part of the same lockstep group even though it has no runtime
+dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
+`@gluonjs/reactivity`, and any selected Router, Store, SSR, test-utils, Vite, and
+language-server packages to that exact release version. Candidate validation
+therefore includes the 20 generated application selections so a published
+`create-gluon --ui` command cannot point at a different framework version.
+
 ## Owner-controlled prerequisites
 
 Before preparing the `1.0.0` release commit, the repository owner must verify
