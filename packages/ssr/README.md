@@ -35,8 +35,10 @@ honors explicit `unsafeHTML()`/`unsafeURL()` values. `renderElement()` emits ope
 Declarative Shadow DOM for a class registered through `defineElement()`. Its
 deterministic comment and temporary `data-gluon-h-*` markers let
 `@gluonjs/ssr/hydration` reconstruct client bindings without replacing matching
-nodes. Style manifests use deterministic content IDs and ordered CSS text for
-initial carriers and browser handoff.
+nodes. `renderRequest()` derives exact component-style IDs from the resolved
+request tree and merges them between shared UI and application-owned sheets.
+Style manifests use deterministic IDs and ordered CSS text for initial carriers
+and browser handoff.
 
 `serializeSsrState()` accepts finite JSON data made from plain objects and
 arrays and escapes HTML-significant characters plus U+2028/U+2029. The request
@@ -50,8 +52,9 @@ aborts without mutation. Suppressed categories remain recorded but do not call
 the diagnostic callback.
 
 `@gluonjs/ssr/streaming` exposes ordered chunks, byte `ReadableStream`s, and
-progressive rendering. The shell contains fallbacks; resolved nested boundaries
-arrive as inert patch records or templates. An external `AbortSignal` cancels
+progressive rendering. Shell and boundary records include newly required exact
+component styles, and the stream writes their carriers before dependent HTML.
+Resolved nested boundaries arrive as inert patch records or templates. An external `AbortSignal` cancels
 pending response work and reaches async sources.
 
 `createStyleManifest()` accepts either an ordered sheet array or Core's named
@@ -64,8 +67,9 @@ installation without a second hand-maintained manifest.
 fallbacks without rewriting components. `renderRequest()` can receive the Vite
 asset manifest, document styles, and a request nonce; its `head` contains
 resource hints, the module entry, and temporary style carriers. Hydration
-replaces validated carriers with document-local constructed sheets only after
-successful DOM binding.
+validates component carrier count, identity, order, digest, content, and target,
+then lets the renderer adopt exact client sheet objects before removing
+carriers. Component sheets release with the hydrated render owner.
 
 ## License
 

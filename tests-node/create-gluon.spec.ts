@@ -91,6 +91,7 @@ describe('create-gluon scaffolding', () => {
     const manifest = JSON.parse(await readFile(join(result.directory, 'package.json'), 'utf8'));
     const app = await readFile(join(result.directory, 'src/app.ts'), 'utf8');
     const server = await readFile(join(result.directory, 'src/server.ts'), 'utf8');
+    const readme = await readFile(join(result.directory, 'README.md'), 'utf8');
     expect(result.features).toEqual({
       router: true,
       store: true,
@@ -106,6 +107,10 @@ describe('create-gluon scaffolding', () => {
       '@gluonjs/ssr': '0.0.0',
     });
     expect(app).toContain("from '@gluonjs/atoms'");
+    expect(app).toContain('Button({');
+    expect(app).not.toContain('atomStyles');
+    expect(readme).toContain('exact stylesheet dependencies automatically');
+    expect(readme).toContain('do not adopt the deprecated aggregate Atom sheet');
     expect(server).toContain("from '@gluonjs/ssr'");
     expect(result.files).toContain('vitest.config.ts');
   });

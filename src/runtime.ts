@@ -1,4 +1,13 @@
 import { guardEventListener } from './application-context.js';
+import {
+  compareComponentStyles,
+  createComponentStyleOwner,
+  createStyleSheetSelection,
+  type ComponentStyleDependency,
+  type ComponentStyleOwner,
+  type StyleSheetSelection,
+  type StyleTarget,
+} from './styles/index.js';
 
 const templateResultBrand = Symbol('gluon.template-result');
 const directiveBrand = Symbol('gluon.directive');
@@ -54,7 +63,28 @@ export class TemplateResult {
     readonly strings: TemplateStringsArray,
     readonly values: readonly TemplateValue[],
     readonly type: TemplateType = 'html',
+    readonly styleDependencies: readonly ComponentStyleDependency[] = Object.freeze([]),
   ) {}
+
+  /** Returns the same template value with immutable component-style metadata. */
+  withStyleDependencies(
+    dependencies: readonly ComponentStyleDependency[],
+  ): TemplateResult {
+    const byId = new Map(this.styleDependencies.map((dependency) => [dependency.id, dependency]));
+    for (const dependency of dependencies) {
+      const current = byId.get(dependency.id);
+      if (current && current.sheet !== dependency.sheet) {
+        throw new Error(`Component stylesheet id ${dependency.id} maps to multiple sheet identities.`);
+      }
+      byId.set(dependency.id, dependency);
+    }
+    return new TemplateResult(
+      this.strings,
+      this.values,
+      this.type,
+      Object.freeze([...byId.values()].sort(compareComponentStyles)),
+    );
+  }
 }
 
 export function isTemplateResult(value: unknown): value is TemplateResult {
@@ -255,6 +285,39 @@ export function getTemplateValueServerContract(
   return undefined;
 }
 
+/** Returns the exact ordered component styles reachable from a prepared value tree. */
+export function createComponentStyleSelection(value: TemplateValue): StyleSheetSelection {
+  const dependencies = new Map<string, ComponentStyleDependency>();
+  collectComponentStyles(value, dependencies);
+  return createStyleSheetSelection([...dependencies.values()]
+    .sort(compareComponentStyles)
+    .map(({ id, sheet, scope = 'gluon-component' }) => ({ id, sheet, scope })));
+}
+
+function collectComponentStyles(
+  value: unknown,
+  dependencies: Map<string, ComponentStyleDependency>,
+): void {
+  if (Array.isArray(value)) {
+    for (const child of value) collectComponentStyles(child, dependencies);
+    return;
+  }
+  if (isTemplateResult(value)) {
+    for (const dependency of value.styleDependencies) {
+      const current = dependencies.get(dependency.id);
+      if (current && current.sheet !== dependency.sheet) {
+        throw new Error(`Component stylesheet id ${dependency.id} maps to multiple sheet identities.`);
+      }
+      dependencies.set(dependency.id, dependency);
+    }
+    for (const child of value.values) collectComponentStyles(child, dependencies);
+    return;
+  }
+  if (isRepeatResult(value)) {
+    for (const child of value[repeatValues]) collectComponentStyles(child, dependencies);
+  }
+}
+
 export function directive<Args extends readonly unknown[]>(
   definition: DirectiveDefinition<Args>,
 ): (...args: Args) => DirectiveValue {
@@ -335,6 +398,95 @@ interface PreviousKeyedChild {
 
 const emptyPartChildren: Array<PartChild | undefined> = [];
 const emptyKeyedChildren: KeyedChild[] = [];
+const emptyComponentStyles: readonly ComponentStyleDependency[] = Object.freeze([]);
+
+class RenderStyleTracker {
+  readonly target: StyleTarget;
+  private owner?: ComponentStyleOwner;
+  private readonly claims = new WeakMap<object, readonly ComponentStyleDependency[]>();
+  private readonly active = new Map<string, { count: number; dependency: ComponentStyleDependency }>();
+  private suspended = false;
+  private disposed = false;
+
+  constructor(target: StyleTarget) {
+    this.target = target;
+    this.owner = createComponentStyleOwner(target);
+  }
+
+  claim(token: object, dependencies: readonly ComponentStyleDependency[]): void {
+    if (this.disposed) return;
+    const previous = this.claims.get(token) ?? emptyComponentStyles;
+    if (sameComponentStyles(previous, dependencies)) return;
+    const next = Object.freeze([...dependencies].sort(compareComponentStyles));
+    const nextIds = new Set(next.map((dependency) => dependency.id));
+    for (const dependency of previous) {
+      if (nextIds.has(dependency.id)) continue;
+      this.release(dependency);
+    }
+    const previousIds = new Set(previous.map((dependency) => dependency.id));
+    for (const dependency of next) {
+      if (previousIds.has(dependency.id)) continue;
+      this.retain(dependency);
+    }
+    this.claims.set(token, next);
+  }
+
+  suspend(): void {
+    if (this.disposed || this.suspended) return;
+    this.suspended = true;
+    this.owner?.dispose();
+    this.owner = undefined;
+  }
+
+  resume(): void {
+    if (this.disposed || !this.suspended) return;
+    this.suspended = false;
+    this.owner = createComponentStyleOwner(this.target);
+    this.owner.retain(...[...this.active.values()]
+      .map(({ dependency }) => dependency)
+      .sort(compareComponentStyles));
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.owner?.dispose();
+    this.owner = undefined;
+    this.active.clear();
+  }
+
+  private retain(dependency: ComponentStyleDependency): void {
+    const current = this.active.get(dependency.id);
+    if (current) {
+      if (current.dependency.sheet !== dependency.sheet) {
+        throw new Error(`Component stylesheet id ${dependency.id} changed identity without HMR replacement.`);
+      }
+      current.count += 1;
+      return;
+    }
+    this.active.set(dependency.id, { count: 1, dependency });
+    if (!this.suspended) this.owner?.retain(dependency);
+  }
+
+  private release(dependency: ComponentStyleDependency): void {
+    const current = this.active.get(dependency.id);
+    if (!current) return;
+    current.count -= 1;
+    if (current.count > 0) return;
+    this.active.delete(dependency.id);
+    if (!this.suspended) this.owner?.release(current.dependency);
+  }
+}
+
+function sameComponentStyles(
+  left: readonly ComponentStyleDependency[],
+  right: readonly ComponentStyleDependency[],
+): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((dependency, index) => (
+    dependency.id === right[index]?.id && dependency.sheet === right[index]?.sheet
+  ));
+}
 
 class NodePart implements Part {
   private nodes: Node[] = [];
@@ -345,13 +497,16 @@ class NodePart implements Part {
   private keyedChildren: KeyedChild[] = emptyKeyedChildren;
   private detachedKeyMarker?: Comment;
   private unsafeMarkup?: string;
+  private styleDependencies: readonly ComponentStyleDependency[] = emptyComponentStyles;
 
   constructor(
     private readonly marker: Comment,
     private readonly contextMarker: Comment = marker,
+    private readonly styles?: RenderStyleTracker,
   ) {}
 
   hydrateValue(value: TemplateValue, end: Comment, context: HydrationAdoptionContext): void {
+    this.updateStyleClaim(value);
     this.nodes = collectNodesUntil(this.marker, end);
     if (isEmptyValue(value)) return;
     if (isRenderablePrimitive(value)) {
@@ -375,7 +530,7 @@ class NodePart implements Part {
       for (let index = 0; index < value.length; index += 1) {
         const childValue = value[index]!;
         const range = takeHydrationRange(context, 'i');
-        const part = new NodePart(range.start, this.contextMarker);
+        const part = new NodePart(range.start, this.contextMarker, this.styles);
         const binding: Binding = { index: 0, part, priority: 0 };
         part.hydrateValue(childValue, range.end, context);
         range.end.remove();
@@ -389,7 +544,7 @@ class NodePart implements Part {
       const children: KeyedChild[] = [];
       for (let index = 0; index < value[repeatKeys].length; index += 1) {
         const range = takeHydrationRange(context, 'k');
-        const part = new NodePart(range.start, this.contextMarker);
+        const part = new NodePart(range.start, this.contextMarker, this.styles);
         part.hydrateValue(value[repeatValues][index]!, range.end, context);
         range.start.remove();
         range.end.remove();
@@ -407,6 +562,7 @@ class NodePart implements Part {
   }
 
   setStringValue(value: string, assumeInPlace = false): void {
+    this.updateStyleClaim(value);
     if (!this.textNode) {
       this.setValue(value, assumeInPlace);
       return;
@@ -421,6 +577,7 @@ class NodePart implements Part {
   }
 
   setValue(value: TemplateValue, assumeInPlace = false): void {
+    this.updateStyleClaim(value);
     if (isTemplateResult(value)) {
       this.setTemplate(value, assumeInPlace);
       return;
@@ -485,6 +642,8 @@ class NodePart implements Part {
   }
 
   disconnect(): void {
+    this.styles?.claim(this, emptyComponentStyles);
+    this.styleDependencies = emptyComponentStyles;
     this.resetChildren();
     this.nodes = [];
     this.textNode = undefined;
@@ -538,13 +697,14 @@ class NodePart implements Part {
     this.disconnectKeyedChildren();
     this.unsafeMarkup = undefined;
     if (this.child) disconnectBindings(this.child.bindings);
-    this.child = createChildInstance(result, compiled);
+    this.child = createChildInstance(result, compiled, this.styles);
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
     this.replaceNodes(this.child.nodes);
   }
 
   setTemplateResult(result: TemplateResult, assumeInPlace = false): void {
+    this.updateStyleClaim(result);
     this.setTemplate(result, assumeInPlace);
   }
 
@@ -780,12 +940,13 @@ class NodePart implements Part {
   }
 
   setRepeatResult(result: InternalRepeatResult): void {
+    this.updateStyleClaim(result);
     this.setKeyed(result);
   }
 
   private createKeyedChild(key: Key, value: TemplateValue): KeyedChild {
     const marker = this.detachedKeyMarker ??= document.createComment('gluon:key');
-    const part = new NodePart(marker, this.contextMarker);
+    const part = new NodePart(marker, this.contextMarker, this.styles);
     const child = { key, part };
     this.updateKeyedChild(child, value, false);
     return child;
@@ -793,7 +954,7 @@ class NodePart implements Part {
 
   private createPartChild(value: TemplateValue, markerData = 'gluon:item'): PartChild {
     const marker = document.createComment(markerData);
-    const part = new NodePart(marker, this.contextMarker);
+    const part = new NodePart(marker, this.contextMarker, this.styles);
     const binding: Binding = { index: 0, part, priority: 0 };
     applyBinding(binding, value);
     return { marker, part, binding };
@@ -888,6 +1049,17 @@ class NodePart implements Part {
       else child.part.disconnect();
     }
     this.keyedChildren = emptyKeyedChildren;
+  }
+
+  clearStyleClaim(): void {
+    this.updateStyleClaim(nothing);
+  }
+
+  private updateStyleClaim(value: TemplateValue): void {
+    const next = isTemplateResult(value) ? value.styleDependencies : emptyComponentStyles;
+    if (sameComponentStyles(this.styleDependencies, next)) return;
+    this.styles?.claim(this, next);
+    this.styleDependencies = next;
   }
 }
 
@@ -1244,6 +1416,8 @@ class SpreadPart implements Part {
 interface RootInstance {
   readonly template: CompiledTemplate;
   readonly bindings: readonly Binding[];
+  readonly styles: RenderStyleTracker;
+  readonly styleClaim: object;
   nodes: Node[];
   suspended: boolean;
   hydrated?: boolean;
@@ -1281,12 +1455,21 @@ export function render(
   }
 
   const compiled = getCompiledTemplate(result);
-  const current = getRootInstance(container);
+  const styleTarget = resolveRenderStyleTarget(container);
+  let current = getRootInstance(container);
+  if (current && current.styles.target !== styleTarget) {
+    clearRootInstance(container);
+    disconnectBindings(current.bindings);
+    current.styles.dispose();
+    current = undefined;
+  }
 
   if (
     current?.template === compiled
     && rootNodesAreInPlace(container, current.nodes)
   ) {
+    current.styles.resume();
+    current.styles.claim(current.styleClaim, result.styleDependencies);
     if (current.hydrated) {
       current.hydrated = false;
       current.suspended = false;
@@ -1308,22 +1491,33 @@ export function render(
     return;
   }
 
+  const styles = current?.styles ?? new RenderStyleTracker(styleTarget);
+  const styleClaim = current?.styleClaim ?? {};
+  styles.resume();
+  styles.claim(styleClaim, result.styleDependencies);
   if (current) {
     clearRootInstance(container);
     disconnectBindings(current.bindings);
   }
 
-  const fragment = document.importNode(compiled.element.content, true);
-  const bindings = instantiateBindings(fragment, compiled.traversalDescriptors);
-  applyBindings(bindings, result.values);
-  const nodes = [...fragment.childNodes];
-  container.replaceChildren(fragment);
-  setRootInstance(container, {
-    template: compiled,
-    bindings,
-    nodes,
-    suspended: false,
-  });
+  try {
+    const fragment = document.importNode(compiled.element.content, true);
+    const bindings = instantiateBindings(fragment, compiled.traversalDescriptors, styles);
+    applyBindings(bindings, result.values);
+    const nodes = [...fragment.childNodes];
+    container.replaceChildren(fragment);
+    setRootInstance(container, {
+      template: compiled,
+      bindings,
+      styles,
+      styleClaim,
+      nodes,
+      suspended: false,
+    });
+  } catch (error) {
+    styles.dispose();
+    throw error;
+  }
 }
 
 export type HydrationMismatchCategory = 'text' | 'attribute' | 'structure' | 'state' | 'style';
@@ -1386,19 +1580,25 @@ export function hydrate(
     return Object.freeze({ mismatches: Object.freeze(mismatches), retained: false, recovered: true });
   }
 
+  const styles = new RenderStyleTracker(resolveRenderStyleTarget(container));
+  const styleClaim = {};
+  styles.claim(styleClaim, result.styleDependencies);
   try {
-    const context = createHydrationAdoptionContext(container);
+    const context = createHydrationAdoptionContext(container, styles);
     const compiled = getCompiledTemplate(result);
     const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
     setRootInstance(container, {
       template: compiled,
       bindings,
+      styles,
+      styleClaim,
       nodes: [...container.childNodes],
       suspended: false,
       hydrated: true,
     });
     return Object.freeze({ mismatches: [], retained: true, recovered: false });
   } catch (error) {
+    styles.dispose();
     recordHydrationMismatch('structure', 'root', 'valid hydration markers', error, options, mismatches);
     if (options.recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
     render(result, container);
@@ -1415,6 +1615,12 @@ export function suspendRender(container: Element | DocumentFragment | null): voi
   suspendBindings(current.bindings);
 }
 
+/** Releases component sheets while retaining renderer DOM state for reconnection. */
+export function releaseRenderStyles(container: Element | DocumentFragment | null): void {
+  if (!container) return;
+  getRootInstance(container)?.styles.suspend();
+}
+
 /** Permanently releases a render root and removes its renderer-owned DOM. */
 export function unmount(container: Element | DocumentFragment | null): void {
   if (!container) return;
@@ -1423,6 +1629,7 @@ export function unmount(container: Element | DocumentFragment | null): void {
     if (current) {
       clearRootInstance(container);
       disconnectBindings(current.bindings);
+      current.styles.dispose();
     }
   } finally {
     container.replaceChildren();
@@ -1557,6 +1764,7 @@ function buildDescriptors(
 function instantiateBindings(
   root: DocumentFragment,
   descriptors: readonly PartDescriptor[],
+  styles?: RenderStyleTracker,
 ): Binding[] {
   if (descriptors.length === 0) return [];
   const bindings = new Array<Binding>(descriptors.length);
@@ -1576,7 +1784,7 @@ function instantiateBindings(
       }
       let part: Part;
 
-      if (descriptor.kind === 'node') part = new NodePart(node as Comment);
+      if (descriptor.kind === 'node') part = new NodePart(node as Comment, node as Comment, styles);
       else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
       else part = new AttributePart(node as Element, descriptor.name);
 
@@ -1597,9 +1805,13 @@ interface HydrationAdoptionContext {
   marker: number;
   readonly ranges: Map<string, HydrationRange>;
   readonly attributes: Map<number, Element>;
+  readonly styles: RenderStyleTracker;
 }
 
-function createHydrationAdoptionContext(root: Element | DocumentFragment): HydrationAdoptionContext {
+function createHydrationAdoptionContext(
+  root: Element | DocumentFragment,
+  styles: RenderStyleTracker,
+): HydrationAdoptionContext {
   const ranges = new Map<string, HydrationRange>();
   const starts = new Map<string, Comment>();
   const attributes = new Map<number, Element>();
@@ -1622,7 +1834,7 @@ function createHydrationAdoptionContext(root: Element | DocumentFragment): Hydra
       if (match?.[1]) attributes.set(Number(match[1]), node as Element);
     }
   }
-  return { marker: 0, ranges, attributes };
+  return { marker: 0, ranges, attributes, styles };
 }
 
 function instantiateHydratedBindings(
@@ -1638,7 +1850,7 @@ function instantiateHydratedBindings(
     if (descriptor.kind === 'node') {
       const range = context.ranges.get(`h:${marker}`);
       if (!range) throw new Error(`Missing child hydration marker ${marker}.`);
-      const nodePart = new NodePart(range.start);
+      const nodePart = new NodePart(range.start, range.start, context.styles);
       nodePart.hydrateValue(value, range.end, context);
       range.end.remove();
       part = nodePart;
@@ -1684,12 +1896,20 @@ function takeHydrationRange(
 function createChildInstance(
   result: TemplateResult,
   compiled = getCompiledTemplate(result),
+  styles?: RenderStyleTracker,
 ): ChildInstance {
   const fragment = document.importNode(compiled.element.content, true);
-  const bindings = instantiateBindings(fragment, compiled.traversalDescriptors);
+  const bindings = instantiateBindings(fragment, compiled.traversalDescriptors, styles);
   applyBindings(bindings, result.values);
   const nodes = [...fragment.childNodes];
   return { template: compiled, bindings, nodes };
+}
+
+function resolveRenderStyleTarget(container: Element | DocumentFragment): StyleTarget {
+  if (container instanceof ShadowRoot) return container;
+  const root = container.getRootNode();
+  if (root instanceof ShadowRoot) return root;
+  return container.ownerDocument ?? document;
 }
 
 function applyBindings(
@@ -1769,6 +1989,7 @@ function applyBinding(binding: Binding, value: TemplateValue, assumeInPlace = fa
     }
   }
   if (isDirectiveValue(value)) {
+    if (binding.part instanceof NodePart) binding.part.clearStyleClaim();
     applyDirective(binding, value);
   } else {
     if (binding.directive) deactivateDirective(binding);

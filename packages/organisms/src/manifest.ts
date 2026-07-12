@@ -10,6 +10,6 @@ export const organismManifest = Object.freeze({
   package: '@gluonjs/organisms',
   layer: 'organism',
   entries: Object.freeze([
-    { name: 'AppShell', kind: 'component', status: 'stable', accessibility: 'Provides header, nav, main, and footer landmarks; callers give the navigation an accessible name when more than one nav exists.', extension: 'attributes targets outer HTMLDivElement; landmark content remains explicit component input.', ...sharedEvidence },
+    { name: 'AppShell', kind: 'component', status: 'stable', styles: ['gluon-organism-app-shell'], accessibility: 'Provides header, nav, main, and footer landmarks; callers give the navigation an accessible name when more than one nav exists.', extension: 'attributes targets outer HTMLDivElement; landmark content remains explicit component input.', ...sharedEvidence },
   ]),
 } as const satisfies UiPackageManifest);

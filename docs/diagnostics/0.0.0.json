@@ -254,6 +254,26 @@
       "source": "hydration"
     },
     {
+      "id": 1208,
+      "code": "GLUON_COMPONENT_STYLE_HYDRATION_MISMATCH",
+      "compactCode": "G1208",
+      "title": "Component stylesheet hydration mismatch",
+      "summary": "Request-derived server component sheets do not match the hydrated client value tree.",
+      "why": "A component carrier is missing, extra, duplicated, reordered, content-mismatched, or emitted for another target.",
+      "remediation": "Render and hydrate the same public component tree and preserve its ordered gluon-component carriers.",
+      "source": "hydration"
+    },
+    {
+      "id": 1209,
+      "code": "GLUON_LEGACY_COMPONENT_STYLE_CONFLICT",
+      "compactCode": "G1209",
+      "title": "Legacy aggregate component styles conflict",
+      "summary": "A deprecated category sheet and exact renderer-owned component sheet cover the same component.",
+      "why": "The application retained an aggregate Atom, Molecule, or Organism sheet after migrating to usage-driven rendering.",
+      "remediation": "Remove atomStyles, moleculeStyles, or organismStyles adoption; render components through their public functions.",
+      "source": "runtime"
+    },
+    {
       "id": 1301,
       "code": "GLUON_SSR_INVALID_VALUE",
       "compactCode": "G1301",

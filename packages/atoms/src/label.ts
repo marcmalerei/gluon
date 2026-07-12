@@ -1,5 +1,6 @@
 import { defineAtom, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
+import { labelStyleDependency } from './label-styles.js';
 
 type LabelAttributes = Omit<QuarkProps<HTMLSpanElement>, 'children'>;
 
@@ -16,4 +17,4 @@ function renderLabel({ children, attributes = {} }: LabelProps): TemplateResult 
   });
 }
 
-export const Label = defineAtom(renderLabel, 'Label');
+export const Label = defineAtom(renderLabel, 'Label', [labelStyleDependency]);

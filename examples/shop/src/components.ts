@@ -9,6 +9,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
+import { Input } from '@gluonjs/atoms';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -205,16 +206,19 @@ function SearchPanel(store: ShopStore): TemplateValue {
     }}>
       <div class="search-bar">
         <label id="search-title" for="shop-search">Search the collection</label>
-        <div class="search-input-wrap">${SearchIcon()}<input
-          id="shop-search"
-          type="search"
-          placeholder="Lamp, carry, workspace…"
-          .value=${store.searchQuery}
-          @input=${(event: Event) => {
+        <div class="search-input-wrap">${SearchIcon()}${Input({
+          value: store.searchQuery,
+          type: 'search',
+          placeholder: 'Lamp, carry, workspace…',
+          onInput: (event) => {
             store.searchQuery = (event.currentTarget as HTMLInputElement).value;
-          }}
-          data-dialog-initial-focus
-        ></div>
+          },
+          attributes: {
+            id: 'shop-search',
+            class: 'shop-search-input',
+            data: { dialogInitialFocus: true },
+          },
+        })}</div>
         <button class="icon-button" type="button" aria-label="Close search" @click=${close}>${CloseIcon()}</button>
       </div>
       <div class="search-results">

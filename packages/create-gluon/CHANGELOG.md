@@ -9,3 +9,5 @@
 - Add the lockstep `gluon-template-check` command to every maintained starter.
 - Generate Router links with the public `compose()` tagged-body path while
   preserving the same starter routes and rendered anchors.
+- Generate UI starters that rely on renderer-owned exact Button styles without
+  importing or adopting the deprecated aggregate Atom sheet.

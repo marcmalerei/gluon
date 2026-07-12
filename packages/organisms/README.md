@@ -4,7 +4,7 @@ Larger Gluon interface structures. The package is optional and depends only
 downward on Core, Quarks, Atoms, and Molecules.
 
 ```ts
-import { AppShell, organismStyles } from '@gluonjs/organisms';
+import { AppShell } from '@gluonjs/organisms';
 ```
 
 `AppShell` emits native `header`, `nav`, `main`, and `footer` landmarks only for
@@ -13,9 +13,10 @@ caller must give the supplied navigation content a distinct accessible name.
 Its layout uses logical dimensions and collapses to one column below 48rem.
 
 Install the shared foundation and theme once through `installUi()` from
-`@gluonjs/atoms`. Style adoption remains explicit and import-time DOM mutation
-is prohibited; the aggregate `organismStyles` export is the compatibility path
-until #115 connects exact rendered component sheets to the UI owner.
+`@gluonjs/atoms`. `AppShell` carries its exact immutable stylesheet dependency,
+and renderer ownership follows its target-local lifecycle. Import-time DOM
+mutation remains prohibited. The deprecated `organismStyles` aggregate cannot
+coexist silently with exact rendering.
 `organismManifest` records the stable contract, compiled interactive example,
 browser coverage, and visual-regression evidence.
 

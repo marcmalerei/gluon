@@ -4,11 +4,9 @@ Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
 ```ts
-import { Button, Input, atomStyles, installUi } from '@gluonjs/atoms';
-import { adoptStyles } from '@gluonjs/core';
+import { Button, Input, installUi } from '@gluonjs/atoms';
 
 const ui = installUi(document, { theme: 'light' });
-adoptStyles(document, atomStyles); // compatibility path until #115
 
 ui.setTheme('dark');
 ui.dispose();
@@ -29,10 +27,12 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-The aggregate `atomStyles` export remains a compatibility path while #115 adds
-usage-driven exact component sheets to `UiOwner.styleOwner`. `installUiTheme()`
-is deprecated in favor of `installUi()` and remains temporarily available for
-source compatibility.
+`Button`, `Icon`, `Input`, and `Label` expose immutable `Component.styles`
+metadata and have separately tree-shakable sheets. The renderer adopts only the
+sheets reachable from its active value tree and releases them with the render
+owner. `atomStyles` is deprecated; adopting it with exact rendering throws
+`GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` rather than applying duplicate rules.
+`installUiTheme()` is deprecated in favor of `installUi()`.
 
 ## Accessibility contracts
 

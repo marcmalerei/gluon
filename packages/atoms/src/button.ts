@@ -8,6 +8,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
+import { buttonStyleDependency } from './button-styles.js';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 export type ButtonSize = 'small' | 'medium' | 'large';
@@ -71,7 +72,7 @@ function renderButton({
   return q.button(merged as QuarkProps<HTMLButtonElement>);
 }
 
-export const Button = defineAtom(renderButton, 'Button');
+export const Button = defineAtom(renderButton, 'Button', [buttonStyleDependency]);
 
 export function defineButtonPreset(options: ButtonPresetOptions): Component<ButtonProps> {
   const presetAttributes = mergeProps({

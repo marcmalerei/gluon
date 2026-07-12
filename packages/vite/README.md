@@ -14,7 +14,8 @@ export default defineConfig({
 
 In development, the plugin keeps exported functions and components behind
 stable call proxies, preserves Store objects through `StoreManager.hotUpdate()`,
-keeps registered Custom Element constructors stable, and updates the contents
+keeps registered Custom Element constructors stable, preserves functional
+component `styles` metadata, and updates the contents
 of already-adopted `CSSStyleSheet` instances. It then requests a render pass for
 mounted Gluon applications and connected Gluon elements. The page is not
 reloaded for compatible template, method, store-logic, or stylesheet edits.

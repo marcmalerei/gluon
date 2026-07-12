@@ -11,3 +11,5 @@
   functional-component HMR identity through the compiler integration.
 - Added functional Custom Element setup refresh that preserves registered host,
   explicit local/form state, ShadowRoot, and stylesheet identities.
+- Preserve functional `styles` metadata through stable HMR proxies while
+  replacing active component CSS in place without changing sheet identity.

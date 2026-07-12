@@ -76,7 +76,7 @@ export interface UiOwner {
   readonly target: StyleTarget;
   readonly theme: UiThemeName;
   readonly themeSheet: CSSStyleSheet;
-  /** Target-scoped component-style owner consumed by the renderer in #115. */
+  /** Additional target-scoped sheets explicitly retained by this UI handle. */
   readonly styleOwner: StyleSheetOwner;
   readonly selection: UiStyleSelection;
   readonly disposed: boolean;

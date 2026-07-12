@@ -1,4 +1,11 @@
-import { render, suspendRender, type RefTarget, type TemplateResult, type TemplateValue } from './runtime.js';
+import {
+  releaseRenderStyles,
+  render,
+  suspendRender,
+  type RefTarget,
+  type TemplateResult,
+  type TemplateValue,
+} from './runtime.js';
 import { adoptStyles } from './styles/index.js';
 import {
   effect,
@@ -256,6 +263,7 @@ export abstract class GluonElement<
       }
       try {
         suspendRender(this.renderRoot);
+        releaseRenderStyles(this.renderRoot);
       } finally {
         try {
           this.invokeLifecycle(this.disconnectedHooks);

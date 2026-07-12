@@ -1,6 +1,6 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const budgets = JSON.parse(await readFile(resolve(root, 'quality-budgets.json'), 'utf8'));
@@ -11,14 +11,16 @@ const entries = assetNames.filter((name) => /^index-[^.]+\.js$/.test(name));
 if (entries.length !== 1) throw new Error(`quality budget: expected one shop entry, found ${entries.length}`);
 
 const html = await readFile(resolve(dist, 'index.html'));
-const entry = await readFile(resolve(assets, entries[0]));
+const manifest = JSON.parse(await readFile(resolve(dist, 'gluon-assets.json'), 'utf8'));
+const initialFiles = [manifest.entry, ...(manifest.imports ?? [])].map((file) => basename(file));
+const initialJavaScript = await Promise.all(initialFiles.map((file) => readFile(resolve(assets, file))));
 const imageNames = assetNames.filter((name) => /\.(?:avif|gif|jpe?g|png|svg|webp)$/i.test(name)).sort();
 const imageBytes = (await Promise.all(imageNames.map(async (name) => (await stat(resolve(assets, name))).size)))
   .reduce((total, size) => total + size, 0);
 const actual = {
   htmlBytes: html.byteLength,
-  entryBytes: entry.byteLength,
-  entryGzipBytes: gzipSync(entry, { level: 9 }).byteLength,
+  entryBytes: initialJavaScript.reduce((total, file) => total + file.byteLength, 0),
+  entryGzipBytes: initialJavaScript.reduce((total, file) => total + gzipSync(file, { level: 9 }).byteLength, 0),
   imageBytes,
   imageCount: imageNames.length,
 };

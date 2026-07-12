@@ -17,6 +17,11 @@ or digest mismatches; the catalog remediation requires the same
 `createUiStyleSelection()` theme on the server and `installUi(..., { hydrate:
 true })` in the browser.
 
+`GLUON_COMPONENT_STYLE_HYDRATION_MISMATCH` (`G1208`) covers request-derived
+component carrier differences, including wrong-target evidence.
+`GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` (`G1209`) prevents deprecated aggregate
+category sheets from silently coexisting with exact renderer-owned sheets.
+
 ## Vue migration analyzer diagnostics
 
 The separate Node-only `@gluonjs/vue-migration-analyzer` package owns `GVA`

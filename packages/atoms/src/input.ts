@@ -1,5 +1,6 @@
 import { defineAtom, mergeProps, type TemplateResult } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
+import { inputStyleDependency } from './input-styles.js';
 
 type InputAttributes = Omit<
   QuarkProps<HTMLInputElement>,
@@ -57,4 +58,4 @@ function renderInput({
   }, inputAttributes));
 }
 
-export const Input = defineAtom(renderInput, 'Input');
+export const Input = defineAtom(renderInput, 'Input', [inputStyleDependency]);

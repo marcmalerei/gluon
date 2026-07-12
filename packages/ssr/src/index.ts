@@ -1,5 +1,8 @@
 import {
   disposeGluonApplicationForServer,
+  compareComponentStyles,
+  createComponentStyleSelection,
+  createStyleSheetSelection,
   getBuiltinServerContract,
   getStyleSheetText,
   getStyleTextDigest,
@@ -12,6 +15,7 @@ import {
   TemplateResult,
   type GluonApp,
   type GluonElementClass,
+  type ComponentStyleDependency,
   type StyleSheetSelection,
   type TemplateValue,
 } from '@gluonjs/core';
@@ -93,8 +97,8 @@ export async function* renderToChunks(
 }
 
 export type ProgressiveRenderChunk =
-  | { readonly kind: 'shell'; readonly html: string }
-  | { readonly kind: 'boundary'; readonly id: number; readonly html: string };
+  | { readonly kind: 'shell'; readonly html: string; readonly styles: StyleManifest }
+  | { readonly kind: 'boundary'; readonly id: number; readonly html: string; readonly styles: StyleManifest };
 
 export interface ProgressiveRenderOptions {
   readonly signal?: AbortSignal;
@@ -111,10 +115,13 @@ export async function* renderProgressively(
     tasks: [],
     signal: options.signal,
   };
-  const context: SerializationContext = { marker: 0, progressive };
+  const componentStyles = new Map<string, ComponentStyleDependency>();
+  const context: SerializationContext = { marker: 0, progressive, componentStyles };
   let shell = '';
   for await (const chunk of serializeValue(value, context)) shell += chunk;
-  yield Object.freeze({ kind: 'shell', html: shell });
+  const shellStyles = createComponentStyleManifest(componentStyles.values());
+  const emittedStyles = new Set(shellStyles.entries.map((entry) => entry.id));
+  yield Object.freeze({ kind: 'shell', html: shell, styles: shellStyles });
 
   while (progressive.tasks.length > 0) {
     throwIfAborted(options.signal);
@@ -124,7 +131,11 @@ export async function* renderProgressively(
     if ('error' in settled) throw settled.error;
     let html = '';
     for await (const chunk of serializeValue(settled.value as TemplateValue, context)) html += chunk;
-    yield Object.freeze({ kind: 'boundary', id: settled.id, html });
+    const styles = createComponentStyleManifest(
+      [...componentStyles.values()].filter((dependency) => !emittedStyles.has(dependency.id)),
+    );
+    for (const entry of styles.entries) emittedStyles.add(entry.id);
+    yield Object.freeze({ kind: 'boundary', id: settled.id, html, styles });
   }
 }
 
@@ -134,9 +145,12 @@ export interface PreparedHydration {
 }
 
 /** Resolves server async contracts once and returns the matching marker HTML and value tree. */
-export async function prepareForHydration(value: TemplateValue): Promise<PreparedHydration> {
+export async function prepareForHydration(
+  value: TemplateValue,
+  options: { readonly assets?: AssetManifest } = {},
+): Promise<PreparedHydration> {
   const prepared = await resolveHydrationValue(value);
-  return Object.freeze({ value: prepared, html: await renderToString(prepared) });
+  return Object.freeze({ value: prepared, html: await renderToString(prepared, options) });
 }
 
 export interface SsrRequestContext<Data = undefined> {
@@ -194,7 +208,8 @@ export async function renderRequest<Data = undefined>(
     if (!app) throw new Error('The request effect scope stopped before application creation.');
     const template = scope.run(() => renderGluonApplicationForServer(app!));
     if (!template) throw new Error('The request effect scope stopped before application rendering.');
-    const html = await renderToString(template, { assets: options.assets });
+    const prepared = await prepareForHydration(template, { assets: options.assets });
+    const html = prepared.html;
     const routerSnapshot = router.dehydrate();
     const storeSnapshot = store.dehydrate();
     const state = serializeSsrState({
@@ -203,7 +218,8 @@ export async function renderRequest<Data = undefined>(
       store: storeSnapshot,
       data,
     });
-    const styles = createStyleManifest(options.styles ?? []);
+    const componentStyles = createComponentStyleSelection(prepared.value);
+    const styles = createStyleManifest(mergeRequestStyleSources(options.styles ?? [], componentStyles));
     return Object.freeze({
       html,
       state,
@@ -300,6 +316,7 @@ interface SerializationContext {
   marker: number;
   readonly progressive?: ProgressiveCoordinator;
   readonly assets?: AssetManifest;
+  readonly componentStyles?: Map<string, ComponentStyleDependency>;
 }
 
 interface ProgressiveCoordinator {
@@ -337,6 +354,11 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
     return;
   }
   if (isTemplateResult(value)) {
+    if (context.componentStyles) {
+      for (const dependency of value.styleDependencies) {
+        context.componentStyles.set(dependency.id, dependency);
+      }
+    }
     yield* serializeTemplate(value, context);
     return;
   }
@@ -446,7 +468,7 @@ async function resolveHydrationValue(value: TemplateValue): Promise<TemplateValu
   }
   if (isTemplateResult(value)) {
     const values = await Promise.all(value.values.map((child) => resolveHydrationValue(child)));
-    return new TemplateResult(value.strings, values, value.type);
+    return new TemplateResult(value.strings, values, value.type, value.styleDependencies);
   }
   const builtin = getBuiltinServerContract(value);
   if (builtin) {
@@ -619,6 +641,38 @@ function escapeStyleText(value: string): string {
 
 function isStyleSheetSelection(source: StyleManifestSource): source is StyleSheetSelection {
   return 'version' in source && source.version === 1 && Array.isArray(source.entries);
+}
+
+function mergeRequestStyleSources(
+  explicit: StyleManifestSource,
+  components: StyleSheetSelection,
+): StyleSheetSelection {
+  const explicitEntries: StyleSheetSelection['entries'][number][] = isStyleSheetSelection(explicit)
+    ? [...explicit.entries]
+    : explicit.map((sheet) => ({ id: `gluon-${getStyleTextDigest(getStyleSheetText(sheet))}`, sheet }));
+  const insertAfter = explicitEntries.reduce(
+    (last, entry, index) => entry.scope === 'gluon-ui' ? index : last,
+    -1,
+  ) + 1;
+  const entries = [
+    ...explicitEntries.slice(0, insertAfter),
+    ...components.entries,
+    ...explicitEntries.slice(insertAfter),
+  ];
+  const seen = new Set<string>();
+  return createStyleSheetSelection(entries.filter((entry) => {
+    if (seen.has(entry.id)) return false;
+    seen.add(entry.id);
+    return true;
+  }));
+}
+
+function createComponentStyleManifest(
+  dependencies: Iterable<ComponentStyleDependency>,
+): StyleManifest {
+  return createStyleManifest(createStyleSheetSelection([...dependencies]
+    .sort(compareComponentStyles)
+    .map(({ id, sheet, scope = 'gluon-component' }) => ({ id, sheet, scope }))));
 }
 
 function updateMarkupState(state: { inTag: boolean; quote: string }, chunk: string): void {

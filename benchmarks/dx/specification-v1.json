@@ -143,7 +143,68 @@
       "limitations": [
         "This is a Gluon-only before/after slice measurement, not a completed 21-result benchmark run.",
         "No Vue or React task result and no win, tie, loss, usability, or general DX-superiority claim is supported.",
-        "The maintained example still imports and adopts aggregate Atom, Molecule, and Organism component sheets; issue #115 owns the usage-driven replacement and the full T2/T3 measurement must be rerun after it lands."
+        "This issue #108 record measures only shared UI ownership; the completed issue #115 slice below records the removal of aggregate component-sheet setup for T2/T3."
+      ]
+    },
+    {
+      "issue": 115,
+      "scope": "Usage-driven Atom, Molecule, and Organism component styles in the maintained UI example",
+      "taskIds": ["T2-themed-controls", "T3-local-layers", "T5-customer-flow", "T6-universal-route"],
+      "before": {
+        "setupCalls": {
+          "count": 2,
+          "values": [
+            "installUi(document, { theme: 'light' })",
+            "adoptStyles(document, atomStyles, moleculeStyles, organismStyles, exampleStyles)"
+          ]
+        },
+        "imports": {
+          "count": 5,
+          "values": ["installUi", "adoptStyles", "atomStyles", "moleculeStyles", "organismStyles"]
+        },
+        "configuration": {
+          "count": 2,
+          "values": ["typed initial theme option", "manual Atom/Molecule/Organism sheet order"]
+        },
+        "cleanup": {
+          "count": 1,
+          "values": ["UiOwner.dispose() for the page-owned shared UI state"]
+        }
+      },
+      "after": {
+        "setupCalls": {
+          "count": 2,
+          "values": [
+            "installUi(document, { theme: 'light' })",
+            "adoptStyles(document, exampleStyles)"
+          ]
+        },
+        "imports": {
+          "count": 2,
+          "values": ["installUi", "adoptStyles for the application-owned example sheet"]
+        },
+        "configuration": {
+          "count": 1,
+          "values": ["typed initial theme option"]
+        },
+        "cleanup": {
+          "count": 1,
+          "values": ["UiOwner.dispose(); rendered component sheets release through renderer lifecycle"]
+        }
+      },
+      "evidence": [
+        "docs-site/examples/ui-system.ts",
+        "tests/component-styles.spec.ts",
+        "tests/vite-hmr.spec.ts",
+        "tests/hydration.spec.ts",
+        "tests-node/ssr.spec.ts",
+        "tests-fixtures/ui-component-usage/main.ts",
+        "benchmarks/ui-component-styles-2026-07-12.json"
+      ],
+      "limitations": [
+        "This is a Gluon-only before/after slice measurement, not a completed 21-result benchmark run.",
+        "No Vue or React task result and no win, tie, loss, usability, or general DX-superiority claim is supported.",
+        "The application-owned exampleStyles adoption remains intentionally explicit and is not component-library setup."
       ]
     }
   ],

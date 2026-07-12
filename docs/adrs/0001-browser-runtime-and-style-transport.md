@@ -255,6 +255,13 @@ The extraction manifest is request-independent and immutable for a production
 build. Request-local sets record which manifest entries were emitted; they do
 not mutate the shared manifest or constructed sheets.
 
+Functional components name immutable exact stylesheet dependencies on their
+public metadata. The renderer collects those dependencies from the actual value
+tree for each target and owns their reference counts. This includes async
+reveal, Teleport targets, retained KeepAlive views, transition leave, nested
+ShadowRoots, hydration, reconnection, and teardown. Stable layer/order metadata
+keeps adoption order independent of discovery or route timing.
+
 ## SSR DOM and initial style transport
 
 ### Canonical server output
@@ -303,6 +310,8 @@ weaken CSP or fall back to an unapproved external or inline delivery path.
 ### Streaming and no-JavaScript behavior
 
 - Document-level carriers are emitted before the application markup that uses them.
+- Progressive shell and boundary records emit newly required component carriers
+  before their dependent HTML or patch template.
 - A streamed DSD boundary includes its required carriers before its owned content.
 - Async boundaries carry their own manifest dependency set and deterministic order.
 - Request-local deduplication applies to document-level carriers, not across
@@ -363,6 +372,11 @@ and HMR-compatible ownership. Multiple logical UI owners share the base sheet
 set through reference counts, while every returned handle has its own component
 style owner. No UI package mutates DOM during module evaluation and no runtime
 `<style>` fallback is introduced.
+
+Usage-derived component carriers use the separate `gluon-component` scope and
+`GLUON_COMPONENT_STYLE_HYDRATION_MISMATCH` diagnostic. Hydration validates
+missing, extra, duplicate, reordered, mismatched, and wrong-target evidence,
+then transfers ownership to the exact client sheets retained by the renderer.
 
 ## Why DSD and marked inline carriers
 

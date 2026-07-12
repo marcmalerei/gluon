@@ -1,5 +1,10 @@
 import type { TemplateValue } from '@gluonjs/core';
-import { renderProgressively, renderToChunks, type ProgressiveRenderOptions } from './index.js';
+import {
+  renderProgressively,
+  renderStyleCarriers,
+  renderToChunks,
+  type ProgressiveRenderOptions,
+} from './index.js';
 
 /** Adapts the ordered SSR chunk iterator to a byte ReadableStream. */
 export function renderToReadableStream(value: TemplateValue): ReadableStream<Uint8Array> {
@@ -31,9 +36,10 @@ export function renderProgressiveReadableStream(
         controller.close();
         return;
       }
+      const styles = renderStyleCarriers(next.value.styles);
       const chunk = next.value.kind === 'shell'
-        ? next.value.html
-        : `<template data-gluon-async-patch="${next.value.id}">${next.value.html}</template>`;
+        ? `${styles}${next.value.html}`
+        : `${styles}<template data-gluon-async-patch="${next.value.id}">${next.value.html}</template>`;
       controller.enqueue(encoder.encode(chunk));
     },
     async cancel(reason) {
