@@ -1,0 +1,1636 @@
+{
+  "schemaVersion": "1.0.0",
+  "analyzer": {
+    "name": "@gluonjs/vue-migration-analyzer",
+    "version": "0.0.0"
+  },
+  "root": ".",
+  "input": {
+    "vue": {
+      "declaredRange": "^3.5.0",
+      "resolvedVersion": "3.5.39",
+      "versionSource": "package-lock-v3"
+    },
+    "packageManager": {
+      "kind": "npm",
+      "lockfile": "package-lock.json"
+    },
+    "limits": {
+      "directoryEntries": 10000,
+      "analyzedFiles": 2000,
+      "bytesPerFile": 2097152,
+      "aggregateBytes": 67108864,
+      "astNodesPerFile": 250000,
+      "nesting": 256,
+      "workerMemoryMiB": 256,
+      "millisecondsPerFile": 5000,
+      "millisecondsPerInvocation": 30000
+    },
+    "entriesVisited": 8,
+    "filesVisited": 7,
+    "filesAnalyzed": 7,
+    "bytesRead": 1953
+  },
+  "files": [
+    {
+      "id": "file:package-lock.json",
+      "path": "package-lock.json",
+      "kind": "lockfile",
+      "bytes": 135,
+      "digest": "sha256:f3e0cee441fb3e564aa73c9324b08402616a0eb1a394c1516727ac27b3fea545",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:package.json",
+      "path": "package.json",
+      "kind": "manifest",
+      "bytes": 223,
+      "digest": "sha256:a1f693ac94d9cba8dfae645c43fbb28d0539781212af1455f102b21ac4eb9910",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/OptionsCard.vue",
+      "path": "src/OptionsCard.vue",
+      "kind": "sfc",
+      "bytes": 356,
+      "digest": "sha256:cbcc60308b424677d60eec1f33a16721b7617bfae1edea83429a15dedaafa678",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/ProductCard.spec.ts",
+      "path": "src/ProductCard.spec.ts",
+      "kind": "test",
+      "bytes": 116,
+      "digest": "sha256:6f97db19fc18e3d6d9a2dce772421cdfb9b955f6cce6b327b87a97d0357f3588",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/ProductCard.vue",
+      "path": "src/ProductCard.vue",
+      "kind": "sfc",
+      "bytes": 901,
+      "digest": "sha256:42e20abd3e0948ce06478d7a1fad8fb352bed543973c0c58d04e179585986c5b",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/server.ts",
+      "path": "src/server.ts",
+      "kind": "server",
+      "bytes": 147,
+      "digest": "sha256:769f4c352599b1df1ce2189cb1c04e9ddb302756a04521ddfda85718d4ef2040",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:vite.config.ts",
+      "path": "vite.config.ts",
+      "kind": "build-config",
+      "bytes": 75,
+      "digest": "sha256:c4ff3c248cc4f17ca714c6b764b80091f0eedb7fa0301809d039cc6f35fef466",
+      "parseStatus": "parsed"
+    }
+  ],
+  "components": [
+    {
+      "id": "component:src/OptionsCard.vue",
+      "fileId": "file:src/OptionsCard.vue",
+      "scriptMode": "options",
+      "blocks": [
+        {
+          "kind": "template",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/OptionsCard.vue",
+            "startOffset": 258,
+            "endOffset": 296,
+            "start": {
+              "line": 13,
+              "column": 11
+            },
+            "end": {
+              "line": 13,
+              "column": 49
+            }
+          }
+        },
+        {
+          "kind": "script",
+          "lang": "ts",
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/OptionsCard.vue",
+            "startOffset": 18,
+            "endOffset": 237,
+            "start": {
+              "line": 1,
+              "column": 19
+            },
+            "end": {
+              "line": 11,
+              "column": 1
+            }
+          }
+        },
+        {
+          "kind": "style",
+          "lang": null,
+          "scoped": false,
+          "module": "true",
+          "location": {
+            "fileId": "file:src/OptionsCard.vue",
+            "startOffset": 323,
+            "endOffset": 347,
+            "start": {
+              "line": 15,
+              "column": 15
+            },
+            "end": {
+              "line": 17,
+              "column": 1
+            }
+          }
+        }
+      ],
+      "inventoryIds": [
+        "inventory:vue-import:src/OptionsCard.vue:19:57:1",
+        "inventory:prop:src/OptionsCard.vue:117:141:1",
+        "inventory:emit:src/OptionsCard.vue:145:161:1",
+        "inventory:lifecycle:src/OptionsCard.vue:197:231:1",
+        "inventory:native-element:src/OptionsCard.vue:258:296:1",
+        "inventory:component-element:src/OptionsCard.vue:267:275:1",
+        "inventory:slot-use:src/OptionsCard.vue:267:275:1",
+        "inventory:style-block:src/OptionsCard.vue:323:347:1"
+      ],
+      "findingIds": [
+        "finding:GVA1402:src/OptionsCard.vue:323:347:1"
+      ],
+      "migrationStages": [
+        "leaf-boundary",
+        "state-form",
+        "styles-universal",
+        "shell-removal"
+      ]
+    },
+    {
+      "id": "component:src/ProductCard.vue",
+      "fileId": "file:src/ProductCard.vue",
+      "scriptMode": "setup",
+      "blocks": [
+        {
+          "kind": "template",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/ProductCard.vue",
+            "startOffset": 673,
+            "endOffset": 837,
+            "start": {
+              "line": 17,
+              "column": 11
+            },
+            "end": {
+              "line": 23,
+              "column": 1
+            }
+          }
+        },
+        {
+          "kind": "script-setup",
+          "lang": "ts",
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/ProductCard.vue",
+            "startOffset": 24,
+            "endOffset": 652,
+            "start": {
+              "line": 1,
+              "column": 25
+            },
+            "end": {
+              "line": 15,
+              "column": 1
+            }
+          }
+        },
+        {
+          "kind": "style",
+          "lang": null,
+          "scoped": true,
+          "module": null,
+          "location": {
+            "fileId": "file:src/ProductCard.vue",
+            "startOffset": 864,
+            "endOffset": 892,
+            "start": {
+              "line": 25,
+              "column": 15
+            },
+            "end": {
+              "line": 27,
+              "column": 1
+            }
+          }
+        }
+      ],
+      "inventoryIds": [
+        "inventory:vue-import:src/ProductCard.vue:25:94:1",
+        "inventory:router-import:src/ProductCard.vue:95:133:1",
+        "inventory:store-import:src/ProductCard.vue:134:170:1",
+        "inventory:prop:src/ProductCard.vue:186:240:1",
+        "inventory:prop:src/ProductCard.vue:186:240:2",
+        "inventory:emit:src/ProductCard.vue:255:309:1",
+        "inventory:model:src/ProductCard.vue:325:336:1",
+        "inventory:router-call:src/ProductCard.vue:372:380:1",
+        "inventory:store-call:src/ProductCard.vue:398:409:1",
+        "inventory:reactive-primitive:src/ProductCard.vue:433:436:1",
+        "inventory:reactive-primitive:src/ProductCard.vue:459:467:1",
+        "inventory:async-component:src/ProductCard.vue:540:560:1",
+        "inventory:lifecycle:src/ProductCard.vue:592:601:1",
+        "inventory:native-element:src/ProductCard.vue:676:836:1",
+        "inventory:directive:src/ProductCard.vue:685:700:1",
+        "inventory:ref:src/ProductCard.vue:701:711:1",
+        "inventory:component-element:src/ProductCard.vue:717:738:1",
+        "inventory:slot-use:src/ProductCard.vue:717:738:1",
+        "inventory:prop:src/ProductCard.vue:723:735:1",
+        "inventory:native-element:src/ProductCard.vue:743:786:1",
+        "inventory:model:src/ProductCard.vue:750:765:1",
+        "inventory:directive:src/ProductCard.vue:766:785:1",
+        "inventory:suspense:src/ProductCard.vue:791:823:1",
+        "inventory:component-element:src/ProductCard.vue:801:812:1",
+        "inventory:style-block:src/ProductCard.vue:864:892:1"
+      ],
+      "findingIds": [
+        "finding:GVA1301:src/ProductCard.vue:95:133:1",
+        "finding:GVA1302:src/ProductCard.vue:134:170:1",
+        "finding:GVA1303:src/ProductCard.vue:540:560:1",
+        "finding:GVA1401:src/ProductCard.vue:864:892:1"
+      ],
+      "migrationStages": [
+        "leaf-boundary",
+        "state-form",
+        "route-state-async",
+        "styles-universal",
+        "shell-removal"
+      ]
+    }
+  ],
+  "inventory": [
+    {
+      "id": "inventory:vue-dependency:package.json:0:223:1",
+      "fileId": "file:package.json",
+      "componentId": null,
+      "category": "remaining-vue",
+      "kind": "vue-dependency",
+      "name": "vue",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:package.json",
+        "startOffset": 0,
+        "endOffset": 223,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 7,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:vue-import:src/OptionsCard.vue:19:57:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "remaining-vue",
+      "kind": "vue-import",
+      "name": null,
+      "importSource": "vue",
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 19,
+        "endOffset": 57,
+        "start": {
+          "line": 2,
+          "column": 1
+        },
+        "end": {
+          "line": 2,
+          "column": 39
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:prop:src/OptionsCard.vue:117:141:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "prop-event-model",
+      "kind": "prop",
+      "name": "title",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 117,
+        "endOffset": 141,
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 27
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:emit:src/OptionsCard.vue:145:161:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "prop-event-model",
+      "kind": "emit",
+      "name": "close",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 145,
+        "endOffset": 161,
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 19
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:lifecycle:src/OptionsCard.vue:197:231:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "reactivity-lifecycle",
+      "kind": "lifecycle",
+      "name": "mounted",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 197,
+        "endOffset": 231,
+        "start": {
+          "line": 9,
+          "column": 3
+        },
+        "end": {
+          "line": 9,
+          "column": 37
+        }
+      },
+      "migrationStage": "state-form",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-2-transfer-component-and-form-state"
+    },
+    {
+      "id": "inventory:native-element:src/OptionsCard.vue:258:296:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "component",
+      "kind": "native-element",
+      "name": "section",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 258,
+        "endOffset": 296,
+        "start": {
+          "line": 13,
+          "column": 11
+        },
+        "end": {
+          "line": 13,
+          "column": 49
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:component-element:src/OptionsCard.vue:267:275:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "component",
+      "kind": "component-element",
+      "name": "slot",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 267,
+        "endOffset": 275,
+        "start": {
+          "line": 13,
+          "column": 20
+        },
+        "end": {
+          "line": 13,
+          "column": 28
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:slot-use:src/OptionsCard.vue:267:275:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "slot-directive-ref",
+      "kind": "slot-use",
+      "name": "default",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 267,
+        "endOffset": 275,
+        "start": {
+          "line": 13,
+          "column": 20
+        },
+        "end": {
+          "line": 13,
+          "column": 28
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:style-block:src/OptionsCard.vue:323:347:1",
+      "fileId": "file:src/OptionsCard.vue",
+      "componentId": "component:src/OptionsCard.vue",
+      "category": "style",
+      "kind": "style-block",
+      "name": "css",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 323,
+        "endOffset": 347,
+        "start": {
+          "line": 15,
+          "column": 15
+        },
+        "end": {
+          "line": 17,
+          "column": 1
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "inventory:test-file:src/ProductCard.spec.ts:0:116:1",
+      "fileId": "file:src/ProductCard.spec.ts",
+      "componentId": null,
+      "category": "test",
+      "kind": "test-file",
+      "name": "ProductCard.spec.ts",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.spec.ts",
+        "startOffset": 0,
+        "endOffset": 116,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:test-import:src/ProductCard.spec.ts:0:40:1",
+      "fileId": "file:src/ProductCard.spec.ts",
+      "componentId": null,
+      "category": "test",
+      "kind": "test-import",
+      "name": null,
+      "importSource": "@vue/test-utils",
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.spec.ts",
+        "startOffset": 0,
+        "endOffset": 40,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 1,
+          "column": 41
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:vue-import:src/ProductCard.vue:25:94:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "remaining-vue",
+      "kind": "vue-import",
+      "name": null,
+      "importSource": "vue",
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 25,
+        "endOffset": 94,
+        "start": {
+          "line": 2,
+          "column": 1
+        },
+        "end": {
+          "line": 2,
+          "column": 70
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:router-import:src/ProductCard.vue:95:133:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "router",
+      "kind": "router-import",
+      "name": null,
+      "importSource": "vue-router",
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 95,
+        "endOffset": 133,
+        "start": {
+          "line": 3,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 39
+        }
+      },
+      "migrationStage": "route-state-async",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "inventory:store-import:src/ProductCard.vue:134:170:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "store",
+      "kind": "store-import",
+      "name": null,
+      "importSource": "pinia",
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 134,
+        "endOffset": 170,
+        "start": {
+          "line": 4,
+          "column": 1
+        },
+        "end": {
+          "line": 4,
+          "column": 37
+        }
+      },
+      "migrationStage": "route-state-async",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "inventory:prop:src/ProductCard.vue:186:240:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "prop-event-model",
+      "kind": "prop",
+      "name": "product",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 186,
+        "endOffset": 240,
+        "start": {
+          "line": 6,
+          "column": 15
+        },
+        "end": {
+          "line": 6,
+          "column": 69
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:prop:src/ProductCard.vue:186:240:2",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "prop-event-model",
+      "kind": "prop",
+      "name": "selected",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 186,
+        "endOffset": 240,
+        "start": {
+          "line": 6,
+          "column": 15
+        },
+        "end": {
+          "line": 6,
+          "column": 69
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:emit:src/ProductCard.vue:255:309:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "prop-event-model",
+      "kind": "emit",
+      "name": "select",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 255,
+        "endOffset": 309,
+        "start": {
+          "line": 7,
+          "column": 14
+        },
+        "end": {
+          "line": 7,
+          "column": 68
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:model:src/ProductCard.vue:325:336:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "prop-event-model",
+      "kind": "model",
+      "name": "quantity",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 325,
+        "endOffset": 336,
+        "start": {
+          "line": 8,
+          "column": 15
+        },
+        "end": {
+          "line": 8,
+          "column": 26
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:router-call:src/ProductCard.vue:372:380:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "router",
+      "kind": "router-call",
+      "name": "useRoute",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 372,
+        "endOffset": 380,
+        "start": {
+          "line": 9,
+          "column": 15
+        },
+        "end": {
+          "line": 9,
+          "column": 23
+        }
+      },
+      "migrationStage": "route-state-async",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "inventory:store-call:src/ProductCard.vue:398:409:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "store",
+      "kind": "store-call",
+      "name": "defineStore",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 398,
+        "endOffset": 409,
+        "start": {
+          "line": 10,
+          "column": 15
+        },
+        "end": {
+          "line": 10,
+          "column": 26
+        }
+      },
+      "migrationStage": "route-state-async",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "inventory:reactive-primitive:src/ProductCard.vue:433:436:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "reactivity-lifecycle",
+      "kind": "reactive-primitive",
+      "name": "ref",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 433,
+        "endOffset": 436,
+        "start": {
+          "line": 10,
+          "column": 50
+        },
+        "end": {
+          "line": 10,
+          "column": 53
+        }
+      },
+      "migrationStage": "state-form",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-2-transfer-component-and-form-state"
+    },
+    {
+      "id": "inventory:reactive-primitive:src/ProductCard.vue:459:467:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "reactivity-lifecycle",
+      "kind": "reactive-primitive",
+      "name": "computed",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 459,
+        "endOffset": 467,
+        "start": {
+          "line": 11,
+          "column": 15
+        },
+        "end": {
+          "line": 11,
+          "column": 23
+        }
+      },
+      "migrationStage": "state-form",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-2-transfer-component-and-form-state"
+    },
+    {
+      "id": "inventory:async-component:src/ProductCard.vue:540:560:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "async",
+      "kind": "async-component",
+      "name": "defineAsyncComponent",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 540,
+        "endOffset": 560,
+        "start": {
+          "line": 12,
+          "column": 17
+        },
+        "end": {
+          "line": 12,
+          "column": 37
+        }
+      },
+      "migrationStage": "route-state-async",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "inventory:lifecycle:src/ProductCard.vue:592:601:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "reactivity-lifecycle",
+      "kind": "lifecycle",
+      "name": "onMounted",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 592,
+        "endOffset": 601,
+        "start": {
+          "line": 13,
+          "column": 1
+        },
+        "end": {
+          "line": 13,
+          "column": 10
+        }
+      },
+      "migrationStage": "state-form",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-2-transfer-component-and-form-state"
+    },
+    {
+      "id": "inventory:native-element:src/ProductCard.vue:676:836:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "component",
+      "kind": "native-element",
+      "name": "article",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 676,
+        "endOffset": 836,
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 22,
+          "column": 13
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:directive:src/ProductCard.vue:685:700:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "slot-directive-ref",
+      "kind": "directive",
+      "name": null,
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 685,
+        "endOffset": 700,
+        "start": {
+          "line": 18,
+          "column": 12
+        },
+        "end": {
+          "line": 18,
+          "column": 27
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:ref:src/ProductCard.vue:701:711:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "slot-directive-ref",
+      "kind": "ref",
+      "name": "card",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 701,
+        "endOffset": 711,
+        "start": {
+          "line": 18,
+          "column": 28
+        },
+        "end": {
+          "line": 18,
+          "column": 38
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:component-element:src/ProductCard.vue:717:738:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "component",
+      "kind": "component-element",
+      "name": "slot",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 717,
+        "endOffset": 738,
+        "start": {
+          "line": 19,
+          "column": 5
+        },
+        "end": {
+          "line": 19,
+          "column": 26
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:slot-use:src/ProductCard.vue:717:738:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "slot-directive-ref",
+      "kind": "slot-use",
+      "name": "title",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 717,
+        "endOffset": 738,
+        "start": {
+          "line": 19,
+          "column": 5
+        },
+        "end": {
+          "line": 19,
+          "column": 26
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:prop:src/ProductCard.vue:723:735:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "prop-event-model",
+      "kind": "prop",
+      "name": "name",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 723,
+        "endOffset": 735,
+        "start": {
+          "line": 19,
+          "column": 11
+        },
+        "end": {
+          "line": 19,
+          "column": 23
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:native-element:src/ProductCard.vue:743:786:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "component",
+      "kind": "native-element",
+      "name": "input",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 743,
+        "endOffset": 786,
+        "start": {
+          "line": 20,
+          "column": 5
+        },
+        "end": {
+          "line": 20,
+          "column": 48
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:model:src/ProductCard.vue:750:765:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "slot-directive-ref",
+      "kind": "model",
+      "name": null,
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 750,
+        "endOffset": 765,
+        "start": {
+          "line": 20,
+          "column": 12
+        },
+        "end": {
+          "line": 20,
+          "column": 27
+        }
+      },
+      "migrationStage": "state-form",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-2-transfer-component-and-form-state"
+    },
+    {
+      "id": "inventory:directive:src/ProductCard.vue:766:785:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "slot-directive-ref",
+      "kind": "directive",
+      "name": "aria-label",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 766,
+        "endOffset": 785,
+        "start": {
+          "line": 20,
+          "column": 28
+        },
+        "end": {
+          "line": 20,
+          "column": 47
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:suspense:src/ProductCard.vue:791:823:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "async",
+      "kind": "suspense",
+      "name": "Suspense",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 791,
+        "endOffset": 823,
+        "start": {
+          "line": 21,
+          "column": 5
+        },
+        "end": {
+          "line": 21,
+          "column": 37
+        }
+      },
+      "migrationStage": "route-state-async",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "inventory:component-element:src/ProductCard.vue:801:812:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "component",
+      "kind": "component-element",
+      "name": "Details",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 801,
+        "endOffset": 812,
+        "start": {
+          "line": 21,
+          "column": 15
+        },
+        "end": {
+          "line": 21,
+          "column": 26
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:style-block:src/ProductCard.vue:864:892:1",
+      "fileId": "file:src/ProductCard.vue",
+      "componentId": "component:src/ProductCard.vue",
+      "category": "style",
+      "kind": "style-block",
+      "name": "css",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 864,
+        "endOffset": 892,
+        "start": {
+          "line": 25,
+          "column": 15
+        },
+        "end": {
+          "line": 27,
+          "column": 1
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "inventory:vue-import:src/server.ts:0:35:1",
+      "fileId": "file:src/server.ts",
+      "componentId": null,
+      "category": "remaining-vue",
+      "kind": "vue-import",
+      "name": null,
+      "importSource": "vue",
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/server.ts",
+        "startOffset": 0,
+        "endOffset": 35,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 1,
+          "column": 36
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:hydration-call:src/server.ts:103:115:1",
+      "fileId": "file:src/server.ts",
+      "componentId": null,
+      "category": "ssr-hydration",
+      "kind": "hydration-call",
+      "name": "createSSRApp",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/server.ts",
+        "startOffset": 103,
+        "endOffset": 115,
+        "start": {
+          "line": 3,
+          "column": 13
+        },
+        "end": {
+          "line": 3,
+          "column": 25
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "inventory:ssr-call:src/server.ts:103:115:1",
+      "fileId": "file:src/server.ts",
+      "componentId": null,
+      "category": "ssr-hydration",
+      "kind": "ssr-call",
+      "name": "createSSRApp",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/server.ts",
+        "startOffset": 103,
+        "endOffset": 115,
+        "start": {
+          "line": 3,
+          "column": 13
+        },
+        "end": {
+          "line": 3,
+          "column": 25
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "inventory:ssr-call:src/server.ts:126:140:1",
+      "fileId": "file:src/server.ts",
+      "componentId": null,
+      "category": "ssr-hydration",
+      "kind": "ssr-call",
+      "name": "renderToString",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/server.ts",
+        "startOffset": 126,
+        "endOffset": 140,
+        "start": {
+          "line": 4,
+          "column": 6
+        },
+        "end": {
+          "line": 4,
+          "column": 20
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "inventory:build-config:vite.config.ts:0:75:1",
+      "fileId": "file:vite.config.ts",
+      "componentId": null,
+      "category": "build",
+      "kind": "build-config",
+      "name": "vite",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:vite.config.ts",
+        "startOffset": 0,
+        "endOffset": 75,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:build-plugin:vite.config.ts:0:37:1",
+      "fileId": "file:vite.config.ts",
+      "componentId": null,
+      "category": "build",
+      "kind": "build-plugin",
+      "name": null,
+      "importSource": "@vitejs/plugin-vue",
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:vite.config.ts",
+        "startOffset": 0,
+        "endOffset": 37,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 1,
+          "column": 38
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding:GVA1402:src/OptionsCard.vue:323:347:1",
+      "code": "GVA1402",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "CSS module behavior requires constructed-sheet review.",
+      "location": {
+        "fileId": "file:src/OptionsCard.vue",
+        "startOffset": 323,
+        "endOffset": 347,
+        "start": {
+          "line": 15,
+          "column": 15
+        },
+        "end": {
+          "line": 17,
+          "column": 1
+        }
+      },
+      "migrationStage": "styles-universal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "finding:GVA1601:src/ProductCard.spec.ts:0:40:1",
+      "code": "GVA1601",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Test evidence requires a replacement or retention plan.",
+      "location": {
+        "fileId": "file:src/ProductCard.spec.ts",
+        "startOffset": 0,
+        "endOffset": 40,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 1,
+          "column": 41
+        }
+      },
+      "migrationStage": "shell-removal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "finding:GVA1601:src/ProductCard.spec.ts:0:116:1",
+      "code": "GVA1601",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Vue test file requires a replacement or retention plan.",
+      "location": {
+        "fileId": "file:src/ProductCard.spec.ts",
+        "startOffset": 0,
+        "endOffset": 116,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 5,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "finding:GVA1301:src/ProductCard.vue:95:133:1",
+      "code": "GVA1301",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Router evidence requires route-owner redesign.",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 95,
+        "endOffset": 133,
+        "start": {
+          "line": 3,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 39
+        }
+      },
+      "migrationStage": "route-state-async",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "finding:GVA1302:src/ProductCard.vue:134:170:1",
+      "code": "GVA1302",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Store evidence requires application/request ownership redesign.",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 134,
+        "endOffset": 170,
+        "start": {
+          "line": 4,
+          "column": 1
+        },
+        "end": {
+          "line": 4,
+          "column": 37
+        }
+      },
+      "migrationStage": "route-state-async",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "finding:GVA1303:src/ProductCard.vue:540:560:1",
+      "code": "GVA1303",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Async evidence requires cancellation and teardown redesign.",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 540,
+        "endOffset": 560,
+        "start": {
+          "line": 12,
+          "column": 17
+        },
+        "end": {
+          "line": 12,
+          "column": 37
+        }
+      },
+      "migrationStage": "route-state-async",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui"
+    },
+    {
+      "id": "finding:GVA1401:src/ProductCard.vue:864:892:1",
+      "code": "GVA1401",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Scoped-style behavior requires constructed-sheet review.",
+      "location": {
+        "fileId": "file:src/ProductCard.vue",
+        "startOffset": 864,
+        "endOffset": 892,
+        "start": {
+          "line": 25,
+          "column": 15
+        },
+        "end": {
+          "line": 27,
+          "column": 1
+        }
+      },
+      "migrationStage": "styles-universal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "finding:GVA1501:src/server.ts:103:115:1",
+      "code": "GVA1501",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "SSR or hydration evidence requires single-renderer ownership review.",
+      "location": {
+        "fileId": "file:src/server.ts",
+        "startOffset": 103,
+        "endOffset": 115,
+        "start": {
+          "line": 3,
+          "column": 13
+        },
+        "end": {
+          "line": 3,
+          "column": 25
+        }
+      },
+      "migrationStage": "styles-universal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "finding:GVA1501:src/server.ts:126:140:1",
+      "code": "GVA1501",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "SSR or hydration evidence requires single-renderer ownership review.",
+      "location": {
+        "fileId": "file:src/server.ts",
+        "startOffset": 126,
+        "endOffset": 140,
+        "start": {
+          "line": 4,
+          "column": 6
+        },
+        "end": {
+          "line": 4,
+          "column": 20
+        }
+      },
+      "migrationStage": "styles-universal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "finding:GVA1601:vite.config.ts:0:37:1",
+      "code": "GVA1601",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Vue build-plugin evidence requires a removal plan.",
+      "location": {
+        "fileId": "file:vite.config.ts",
+        "startOffset": 0,
+        "endOffset": 37,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 1,
+          "column": 38
+        }
+      },
+      "migrationStage": "shell-removal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "finding:GVA1601:vite.config.ts:0:75:1",
+      "code": "GVA1601",
+      "severity": "warning",
+      "confidence": "structural",
+      "message": "Vite build configuration requires a removal plan.",
+      "location": {
+        "fileId": "file:vite.config.ts",
+        "startOffset": 0,
+        "endOffset": 75,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    }
+  ],
+  "summary": {
+    "supportState": "supported",
+    "files": 7,
+    "components": 2,
+    "fileKinds": {
+      "manifest": 1,
+      "lockfile": 1,
+      "sfc": 2,
+      "source": 0,
+      "test": 1,
+      "server": 1,
+      "build-config": 1,
+      "symlink": 0,
+      "other": 0
+    },
+    "inventory": {
+      "component": 6,
+      "prop-event-model": 7,
+      "slot-directive-ref": 6,
+      "reactivity-lifecycle": 4,
+      "router": 2,
+      "store": 2,
+      "async": 2,
+      "style": 2,
+      "ssr-hydration": 3,
+      "test": 2,
+      "build": 2,
+      "remaining-vue": 4
+    },
+    "severities": {
+      "info": 0,
+      "warning": 11,
+      "error": 0
+    },
+    "confidences": {
+      "exact": 18,
+      "structural": 35,
+      "indeterminate": 0
+    },
+    "stages": {
+      "baseline": 0,
+      "leaf-boundary": 18,
+      "state-form": 5,
+      "route-state-async": 9,
+      "styles-universal": 9,
+      "shell-removal": 12
+    }
+  }
+}

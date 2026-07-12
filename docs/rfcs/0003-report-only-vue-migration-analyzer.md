@@ -25,8 +25,7 @@ generation, source rewriting, or a migration codemod. Those remain out of
 scope. A write-capable tool still requires a later accepted RFC.
 
 The analyzer is additive developer tooling and is not a Gluon 1.0 completion
-gate. Issue #91 owns implementation. Merging this RFC records the contract; it
-does not claim that the analyzer package or CLI already exists.
+gate. Issue #91 implements this contract as the package and CLI defined below.
 
 ## Why this decision exists
 
@@ -66,7 +65,7 @@ No successful report is a source-compatibility or conversion claim.
 
 ## Package and public entry points
 
-Issue #91 will add one official package to the lockstep release group:
+Issue #91 adds one official package to the lockstep release group:
 
 | Contract | Decision |
 | --- | --- |
@@ -83,7 +82,7 @@ The root export owns the programmatic analysis and formatting API. The
 The CLI is a thin consumer of the same API. Parser implementation details and
 their AST types are not public exports.
 
-The planned public API is:
+The public API is:
 
 ```ts
 export const VUE_MIGRATION_REPORT_SCHEMA_VERSION: '1.0.0';
@@ -99,11 +98,9 @@ export function formatVueMigrationReport(
 No plugin, callback, evaluator, transform, visitor, writer, or configuration
 hook is public in schema version 1.
 
-When implementation begins, the package contract, release contract,
-lockfile, changelogs, documentation API generation, release artifacts, SBOMs,
-and clean-install fixtures must include the package. If Gluon 1.0 is released
-first, the analyzer can enter only a later lockstep release. This initiative
-does not block issue #41.
+The implementation updates the package contract, lockfile, changelogs,
+documentation API generation, release artifacts, SBOMs, and clean-install
+evidence in the same slice. This initiative does not block issue #41.
 
 ## CLI contract
 
@@ -666,7 +663,7 @@ exit `2`. Debug stack output is not a public CLI mode in schema version 1.
 
 ## Fixture and retained-evidence contract
 
-Issue #91 must retain source, expected JSON, expected human output, and expected
+Issue #91 retains source, expected JSON, expected human output, and expected
 exit code for this corpus:
 
 | Class | Required fixtures |
@@ -718,7 +715,7 @@ but not a machine parser contract; automation must use JSON.
 
 ## Documentation and release evidence
 
-Issue #91 must add:
+Issue #91 adds:
 
 - package README, API and CLI reference, report-schema reference, diagnostic
   catalog entries, changelog entries, security notes, and quality-gate commands;

@@ -9,6 +9,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The Node-only `@gluonjs/vue-migration-analyzer` package and
+  `gluon-vue-analyze` CLI with deterministic human/JSON reports, a versioned
+  public schema, bounded static Vue 3.5 SFC/project inventory, explicit
+  unsupported findings, no-execution/no-write security controls, and retained
+  positive, negative, malformed, and adversarial fixtures.
+
 - Identity-preserving SSR hydration with actionable mismatch diagnostics,
   request snapshot restoration, Declarative Shadow DOM upgrade coordination,
   and abortable nested progressive streaming in `@gluonjs/ssr`.

@@ -25,6 +25,7 @@
 - public black-box component, Router, Store, and scheduler test utilities
 - `create-gluon` scaffolding with verified Router, Store, testing, UI, and SSR combinations
 - shared HTML/SVG/CSS template diagnostics through an LSP, CI checker, and VS Code client
+- deterministic, report-only Vue 3.5 source inventory through a Node package and CLI
 - opt-in versioned Devtools with multi-application inspection and ordered runtime timelines
 - a shareable Gluon Playground with live diagnostics, reference lookup, and starter download
 - a living mobile-first GLUON GOODS reference shop built from public APIs
@@ -567,6 +568,7 @@ Included now:
 - application-scoped stores with transactions, persistence, HMR, and snapshots
 - a responsive living reference shop using public package APIs
 - versioned guides, generated API reference, cookbook, migration material, and compiled interop examples
+- static Vue 3.5 migration inventory with human/JSON reports and no source writes
 - Custom Element authoring
 - adopted stylesheet management
 - Quark, Atom, Molecule, and Organism composition
@@ -577,7 +579,6 @@ Not included now:
 - server-side rendering or hydration
 - islands
 - Vue runtime/API compatibility, production SFC compilation, or source rewriting
-- the report-only Vue analyzer implementation accepted by RFC 0003 and tracked by #91
 - a supported performance-superiority claim
 - a stable or published package release
 

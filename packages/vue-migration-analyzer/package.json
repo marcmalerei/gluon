@@ -1,0 +1,33 @@
+{
+  "name": "@gluonjs/vue-migration-analyzer",
+  "version": "0.0.0",
+  "description": "Static, report-only Vue 3.5 migration inventory for Gluon.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/vue-migration-analyzer"
+  },
+  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/vue-migration-analyzer#readme",
+  "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
+  "engines": { "node": "^22.12.0 || ^24.0.0" },
+  "sideEffects": false,
+  "bin": { "gluon-vue-analyze": "./dist/src/cli.js" },
+  "exports": {
+    ".": { "types": "./dist/src/index.d.ts", "import": "./dist/src/index.js" },
+    "./schema": { "types": "./dist/src/schema.d.ts", "import": "./dist/src/schema.js" }
+  },
+  "files": ["dist", "schemas", "README.md", "LICENSE", "CHANGELOG.md"],
+  "publishConfig": { "access": "public", "provenance": true },
+  "dependencies": {
+    "@vue/compiler-dom": "3.5.39",
+    "@vue/compiler-sfc": "3.5.39",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

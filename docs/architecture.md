@@ -70,6 +70,14 @@ packages/language-server/
 ├── src/server-cli.ts   Content-Length framed stdio server
 └── src/check-cli.ts    Project-level CI diagnostic command
 
+packages/vue-migration-analyzer/
+├── src/index.ts        Root-bounded discovery, deterministic reports, formatting
+├── src/worker.ts       Isolated Vue SFC/script/template static parser
+├── src/schema.ts       Frozen public report-schema export
+├── src/cli.ts          Report-only `gluon-vue-analyze` executable
+├── schemas/            Versioned JSON report schema
+└── fixtures/           Retained supported/unsupported/adversarial evidence
+
 editors/vscode/
 └── extension.cjs       Maintained client for the lockstep language server
 
@@ -378,16 +386,16 @@ compose any of these functional layers.
 
 Layer styles are exported as constructable sheets and must be adopted explicitly. This avoids import-time DOM mutation and keeps application stylesheet ownership visible.
 
-## Planned report-only Vue migration analyzer
+## Report-only Vue migration analyzer
 
 [RFC 0003](rfcs/0003-report-only-vue-migration-analyzer.md) authorizes the
-planned Node-only `@gluonjs/vue-migration-analyzer` package with root and
+Node-only `@gluonjs/vue-migration-analyzer` package with root and
 `./schema` exports plus the `gluon-vue-analyze` executable. It has no official
 Gluon dependency and does not enter the Core, browser, application, Router,
 Store, SSR, Compiler, Vite, Devtools, language-server, or UI runtime graphs.
-Issue #91 adds it to the machine-readable package and release contracts only
-when the implementation, package contents, schema, CLI, fixtures, and release
-evidence exist.
+Issue #91 adds it to the machine-readable package and release contracts with
+the implementation, package contents, schema, CLI, fixtures, and release
+evidence in one slice.
 
 The analyzer may read only the RFC's bounded Vue 3.5 project surface. It parses
 source into inert AST data in an isolated worker and emits deterministic reports
@@ -404,8 +412,8 @@ itself remains developer tooling.
 ## Verification boundaries
 
 The machine-readable [`package-contract.json`](../package-contract.json) defines
-the complete implemented release-group graph. RFC 0003 separately records the
-next planned analyzer package until #91 implements it. `npm run check:packages`
+the complete implemented release-group graph, including the analyzer.
+`npm run check:packages`
 validates every declared package independently and additionally verifies built
 exports, types, license, changelog, README, and `npm pack` contents for
 implemented packages.
