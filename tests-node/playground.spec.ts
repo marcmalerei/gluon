@@ -68,6 +68,8 @@ describe('playground project transport', () => {
       '@gluonjs/core': rootManifest.version,
       '@gluonjs/reactivity': reactivityManifest.version,
     });
+    expect(defaultProject.app).not.toContain('@gluonjs/atoms');
+    expect(defaultProject.app).not.toContain('atomStyles');
     expect(manifest.devDependencies).toEqual({
       '@gluonjs/language-server': languageServerManifest.version,
       '@gluonjs/vite': viteManifest.version,

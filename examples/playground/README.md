@@ -30,6 +30,16 @@ The default project also exercises `compose(Component, props)\`body\`` so the
 browser analyzer and downloaded project retain template-native functional
 composition at original TypeScript locations.
 
+The Playground intentionally has no visual UI-package application for
+component-owned sheets: its host chrome uses native controls styled by the
+Playground's app-owned constructable sheet, while executable reproductions and
+downloaded archives support only the public `@gluonjs/core` and
+`@gluonjs/reactivity` runtime imports. The retained archive test asserts that
+dependency boundary. Consequently the Playground neither imports an aggregate
+Atom/Molecule/Organism sheet nor manufactures a UI component example solely for
+style coverage; UI component lifecycle evidence remains in GLUON GOODS and the
+cross-engine component-style suite.
+
 The GitHub Pages job starts from `npm ci --ignore-scripts`, builds Core (including
 Reactivity), Compiler, and Vite in dependency order, and then builds the
 Playground and versioned documentation. It typechecks every documentation
