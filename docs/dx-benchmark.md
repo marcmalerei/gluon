@@ -154,6 +154,16 @@ before/after row covers tasks T1, T2, T5, and T6 and names setup, import,
 configuration, cleanup, HMR, computed-style, and hydration evidence. It contains
 no Vue/React execution, human pass, or completed benchmark claim.
 
+Issue #114 records the GLUON GOODS application-owner boundary across CSR and
+hydration. Three entry-level setup calls, three ownership imports, three
+configuration choices, and failure-only cleanup become two calls to the same
+`createShopApplication()` public boundary, one imported ownership API, two
+typed target/hydration options, and one `app.unmount()` cleanup path. That path
+releases dialog scopes, the `UiOwner`, GLUON GOODS token/layout sheets, and
+renderer-owned exact component sheets. This is another Gluon-only dependency
+slice, not a completed 21-result benchmark run; no Vue or React task result or
+general DX comparison follows from it.
+
 Issue #112's four retained controls, disaggregated metrics, diagnostic and
 cleanup evidence, verified Gluon disadvantages, and limitations live under
 `benchmarks/dx/stateful-form-control`; the method and commands are documented in

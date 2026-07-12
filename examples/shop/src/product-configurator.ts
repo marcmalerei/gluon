@@ -12,6 +12,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { formatPrice, type Product } from './data.js';
+import { InventoryRetryAction, ProductAddAction } from './ui-extensions.js';
 import {
   cloneProductConfiguration,
   createDefaultProductConfiguration,
@@ -372,12 +373,11 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
         ${this.renderChoiceGroup('Finish', 'finish', productConfigurationChoices.finish, disabled)}
         ${this.renderChoiceGroup('Light temperature', 'temperature', productConfigurationChoices.temperature, disabled)}
         ${this.renderChoiceGroup('Cable length', 'cable', productConfigurationChoices.cable, disabled)}
-        <button
-          class="add-to-bag"
-          type="button"
-          ?disabled=${disabled}
-          @click=${() => this.requestAddToBag()}
-        >Add to bag — ${product ? formatPrice(product.price) : 'Select product'}</button>
+        ${ProductAddAction({
+          disabled,
+          label: `Add to bag — ${product ? formatPrice(product.price) : 'Select product'}`,
+          onClick: () => this.requestAddToBag(),
+        })}
         <slot><ul class="product-facts">
           <li>Ships in 2–3 days</li>
           <li>Repairable parts</li>
@@ -503,7 +503,7 @@ function renderInventoryStatus(product: Product): TemplateValue {
     `,
     error: (_error, retry) => html`
       <span>Availability could not be checked.</span>
-      <button class="inventory-retry" type="button" @click=${retry}>Retry</button>
+      ${InventoryRetryAction({ label: 'Retry', onClick: () => retry() })}
     `,
   })}</div>`;
 }

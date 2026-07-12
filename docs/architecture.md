@@ -189,6 +189,16 @@ workspace sources until package publication. `AGENTS.md` makes the shop a
 mandatory living acceptance surface: applicable framework work integrates into
 the same customer flow instead of creating disconnected demos.
 
+The shop application is also the production UI-package ownership boundary.
+`createShopApplication()` optionally installs one target-scoped `UiOwner`,
+retains the app-owned brand-token and layout sheets through its `styleOwner`,
+and releases dialogs, exact rendered component sheets, application sheets, and
+the shared owner on unmount. Header, menu, product, bag, search, and checkout
+flows use official public Atoms/Molecules plus app-local presets and
+Molecule/Organism metadata. The stateful form-associated product configurator
+and functional quantity Custom Element keep their existing ShadowRoot and event
+ownership; functional Buttons compose inside those boundaries.
+
 ## Standalone reactivity
 
 `@gluonjs/reactivity` is compiled with `lib: ["ES2022"]` and no ambient DOM or
@@ -445,6 +455,11 @@ documented lifecycle boundaries. Target-local ordering is stable by layer and
 component ID regardless of discovery order. Deprecated aggregate sheets remain
 exported for migration, but exact rendering rejects their coexistence instead
 of silently double-styling.
+
+SSR and hydration use the same selection order: shared `gluon-ui` entries,
+request-derived exact component entries, then application-owned entries. This
+keeps server carriers and client validation identical when a page combines a
+named application selection with usage-derived component styles.
 
 ## Report-only Vue migration analyzer
 

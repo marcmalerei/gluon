@@ -1,5 +1,39 @@
-import { createStyleSheetSelection, css } from '@gluonjs/core';
-import { createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';
+import {
+  createStyleSheetSelection,
+  css,
+  type StyleTarget,
+} from '@gluonjs/core';
+import {
+  createUiStyleSelection,
+  installUi,
+  type UiOwner,
+  type UiThemeName,
+} from '@gluonjs/atoms';
+
+/** GLUON GOODS overrides only documented shared UI tokens. */
+export const shopUiTokenStyles = css`
+  @layer atoms {
+    :root, :host, [data-gluon-theme="light"], :host([data-gluon-theme="light"]) {
+      --gluon-font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --gluon-radius-control: 3px;
+      --gluon-radius-surface: 0;
+      --gluon-space-control-block: 0.75rem;
+      --gluon-space-control-inline: 1rem;
+      --gluon-focus-width: 3px;
+      --gluon-color-canvas: #ffffff;
+      --gluon-color-surface: #ffffff;
+      --gluon-color-text: #111111;
+      --gluon-color-muted: #656565;
+      --gluon-color-rule: #d5d5d1;
+      --gluon-color-action: #c8ff00;
+      --gluon-color-action-text: #111111;
+      --gluon-color-action-soft: #ffffff;
+      --gluon-color-action-soft-text: #111111;
+      --gluon-color-focus: #173f91;
+      --gluon-color-danger: #a52222;
+    }
+  }
+`;
 
 export const shopStyles = css`
   @layer shop.reset, shop.base, shop.components, shop.pages, shop.responsive;
@@ -73,6 +107,19 @@ export const shopStyles = css`
       white-space: nowrap;
       border: 0;
     }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      min-height: 44px;
+      padding: 11px 16px;
+      background: var(--shop-action);
+      color: var(--shop-black);
+      transform: translateY(calc(-100% - 16px));
+    }
+    .skip-link:focus { transform: translateY(0); }
   }
 
   @layer shop.components {
@@ -353,12 +400,11 @@ export const shopStyles = css`
     .paired-product .product-card { display: block; border: 1px solid var(--shop-rule); }
     .checkout-page { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: clamp(40px, 8vw, 130px); padding: clamp(42px, 7vw, 100px) var(--shop-gutter); }
     .checkout-page h1, .order-confirmation h1, .checkout-empty h1 { font-size: clamp(42px, 7vw, 92px); line-height: .94; letter-spacing: -.055em; }
-    .checkout-page form { display: grid; gap: 18px; max-width: 720px; margin-top: 42px; }
-    .checkout-purchase-region { display: contents; }
+    .checkout-delivery-form { display: grid; gap: 18px; max-width: 720px; margin-top: 42px; }
     .shop-purchase-button { --gluon-button-background: var(--shop-black); --gluon-button-color: var(--shop-white); }
     .shop-purchase-button svg { margin-inline-end: 0.35rem; }
-    .checkout-page label { display: grid; gap: 7px; font-size: 12px; }
-    .checkout-page input { min-height: 52px; padding: 0 14px; border: 1px solid var(--shop-rule); background: white; }
+    .checkout-field { display: grid; gap: 7px; font-size: 12px; }
+    .checkout-input { min-height: 52px; padding: 0 14px; border: 1px solid var(--shop-rule); border-radius: 0; background: white; }
     .checkout-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px; }
     .place-order { width: 100%; margin-top: 12px; }
     .order-summary { align-self: start; padding: 28px; border: 1px solid var(--shop-rule); }
@@ -482,16 +528,37 @@ export const shopStyles = css`
   }
 `;
 
+export interface InstallShopUiOptions {
+  readonly hydrate?: boolean;
+}
+
+/** Installs the shared UI owner plus product-owned token and layout sheets. */
+export function installShopUi(
+  target: StyleTarget = document,
+  options: InstallShopUiOptions = {},
+): UiOwner {
+  const owner = installUi(target, { theme: 'light', hydrate: options.hydrate });
+  try {
+    owner.styleOwner.retain(shopUiTokenStyles, shopStyles);
+    return owner;
+  } catch (error) {
+    owner.dispose();
+    throw error;
+  }
+}
+
 /** Shared UI foundation followed by the product-owned GLUON GOODS sheet. */
 export function createShopStyleSelection(theme: UiThemeName = 'light') {
   const ui = createUiStyleSelection(theme);
   return createStyleSheetSelection([
     ...ui.entries,
+    { id: 'gluon-goods-ui-tokens', scope: 'gluon-goods', sheet: shopUiTokenStyles },
     { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
   ]);
 }
 
 /** The app-owned carrier left after installUi() consumes the shared UI carriers. */
 export const shopHydrationStyleSelection = createStyleSheetSelection([
+  { id: 'gluon-goods-ui-tokens', scope: 'gluon-goods', sheet: shopUiTokenStyles },
   { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
 ]);

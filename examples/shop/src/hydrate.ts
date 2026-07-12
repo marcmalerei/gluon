@@ -1,5 +1,4 @@
 import { hydrateApplication, hydrateRequestState, readHydrationState } from '@gluonjs/ssr/hydration';
-import { installUi } from '@gluonjs/atoms';
 import { createRouter, createWebHistory } from '@gluonjs/router';
 import { createStoreManager } from '@gluonjs/store';
 import { createShopApplication, createShopRoutes } from './app.js';
@@ -11,9 +10,9 @@ export async function hydrateShop(
   container: HTMLElement,
   stateRoot: ParentNode = document,
 ) {
-  const uiOwner = installUi(document, { theme: 'light', hydrate: true });
   const storeManager = createStoreManager();
   let router: ReturnType<typeof createRouter> | undefined;
+  let uiOwner: ReturnType<typeof createShopApplication>['uiOwner'];
   try {
     const state = readHydrationState(stateRoot);
     const store = createShopStore(storeManager);
@@ -23,21 +22,24 @@ export async function hydrateShop(
       scrollBehavior: (_to, _from, saved) => saved ?? { left: 0, top: 0 },
     });
     await hydrateRequestState(state, router, storeManager);
-    const { app } = createShopApplication(undefined, {
+    const shop = createShopApplication(undefined, {
       router,
       storeManager,
       storage: null,
+      styleTarget: document,
+      hydrateStyles: true,
     });
-    const hydrated = await hydrateApplication(app, container, {
+    uiOwner = shop.uiOwner;
+    const hydrated = await hydrateApplication(shop.app, container, {
       state: { server: state.store, client: storeManager.dehydrate() },
       styleSelection: shopHydrationStyleSelection,
       styleRoot: document,
     });
-    return Object.freeze({ ...hydrated, router, storeManager, store, uiOwner });
+    return Object.freeze({ ...hydrated, router, storeManager, store, uiOwner: shop.uiOwner! });
   } catch (error) {
     router?.destroy();
     storeManager.dispose();
-    uiOwner.dispose();
+    uiOwner?.dispose();
     throw error;
   }
 }

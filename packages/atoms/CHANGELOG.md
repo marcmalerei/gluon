@@ -4,6 +4,9 @@
 
 ### Added
 
+- Production GLUON GOODS usage of Button presets across navigation, dialogs,
+  product configuration, and bag quantity flows, plus Input search, shared
+  brand tokens, lifecycle cleanup, and production marker/tree-shaking evidence.
 - Exact tree-shakable Button, Icon, Input, and Label sheets plus immutable
   style IDs on public component and manifest metadata.
 - Initial separately consumable `@gluonjs/atoms` public package.

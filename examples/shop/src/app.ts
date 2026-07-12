@@ -1,8 +1,16 @@
-import { KeepAlive, createApp, html, type GluonApp } from '@gluonjs/core';
+import {
+  KeepAlive,
+  createApp,
+  html,
+  type GluonApp,
+  type StyleTarget,
+} from '@gluonjs/core';
+import type { UiOwner } from '@gluonjs/atoms';
 import {
   BagOverlay,
   SiteFooter,
   SiteHeader,
+  disposeShopDialogs,
 } from './components.js';
 import {
   createRouter,
@@ -29,18 +37,22 @@ import {
   ShippingPage,
 } from './pages.js';
 import { createShopStore, type ShopStore } from './state.js';
+import { installShopUi } from './styles.js';
 
 export interface ShopApplication {
   readonly app: GluonApp;
   readonly router: Router;
   readonly storeManager: StoreManager;
   readonly store: ShopStore;
+  readonly uiOwner?: UiOwner;
 }
 
 export interface ShopApplicationOptions {
   readonly storage?: StorageLike | null;
   readonly router?: Router;
   readonly storeManager?: StoreManager;
+  readonly styleTarget?: StyleTarget;
+  readonly hydrateStyles?: boolean;
 }
 
 export function createShopApplication(
@@ -71,6 +83,7 @@ export function createShopApplication(
   const app = createApp(() => {
     const route = router.currentRoute.value;
     return html`
+      <a class="skip-link" href="#main-content">Skip to content</a>
       ${SiteHeader(store)}
       <main id="main-content">${KeepAlive({
         cacheKey: route.fullPath,
@@ -82,8 +95,22 @@ export function createShopApplication(
     `;
   });
   app.use(createRouterPlugin(router));
+  let uiOwner: UiOwner | undefined;
+  try {
+    uiOwner = options.styleTarget
+      ? installShopUi(options.styleTarget, { hydrate: options.hydrateStyles })
+      : undefined;
+  } catch (error) {
+    if (!options.router) router.destroy();
+    if (ownsStoreManager) storeManager.dispose();
+    throw error;
+  }
   if (ownsStoreManager) app.onUnmounted(() => storeManager.dispose());
-  return { app, router, storeManager, store };
+  app.onUnmounted(() => {
+    disposeShopDialogs();
+    uiOwner?.dispose();
+  });
+  return { app, router, storeManager, store, ...(uiOwner ? { uiOwner } : {}) };
 }
 
 export function createShopRoutes(store: ShopStore): readonly RouteRecordRaw[] {

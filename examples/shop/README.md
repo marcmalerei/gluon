@@ -35,10 +35,18 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - shared `@gluonjs/quarks` focus-scope ownership for search, menu, and bag dialogs
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
-- one `installUi()` document owner shared by client mount and named SSR/hydration
-  selection, with the GLUON GOODS product sheet retained as application-owned
-- usage-driven official `Input` styling in catalog search; its exact component
-  sheet is present only while that real customer surface is rendered
+- one `installUi()` document owner created and disposed by the shop application
+  in CSR and hydration, with the documented GLUON GOODS token preset and product
+  sheet retained through the same target owner
+- usage-driven official `Button`, `Icon`, `Input`, `Label`, and `FormField`
+  styling in customer flows; exact sheets are retained only while their real
+  rendered surfaces own them
+- app-owned Button presets for header/dialog navigation, product add/retry, and
+  bag quantity/remove actions without depending on `.gluon-*` implementation
+  classes
+- one repeated official `FormField` Molecule for all five delivery fields, an
+  app-local `PurchaseAction` Molecule, and a real `CheckoutExperience` Organism
+  that owns the single checkout form and order-summary layout
 - official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR
 - an isolated server-rendered deep-product response and browser hydration
   handoff through `@gluonjs/ssr`
@@ -47,14 +55,16 @@ Async UI is part of Core because it composes renderer Parts and application
 ownership directly. The shop now exposes `renderShopRequest(url)` through
 `src/server.ts`; it reuses the same route records, Store definition, page
 functions, async inventory boundary, and application shell without browser DOM
-globals. `src/hydrate.ts` first installs the shared UI owner and validates its
-four named carriers, then restores the request Router and Store snapshots,
-retains matching nodes, adopts the remaining product-owned carrier plus any
-request-derived exact component sheets, and
-activates the product flow. The product configurator owns its control DOM and
-`productConfiguratorStyles` sheet; product, configuration, native events, and
-light-DOM slots form the host boundary. Server output retains the product title,
-inventory status, and facts as light DOM before the element upgrades.
+globals. `src/hydrate.ts` creates the application with a hydrating style target.
+That application validates the four shared UI carriers, retains the two GLUON
+GOODS carriers, restores the request Router and Store snapshots, and activates
+the product flow. Request-derived exact component carriers remain between the
+shared `gluon-ui` selection and application-owned carriers on server and client.
+The product configurator still owns its control DOM,
+`productConfiguratorStyles`, form association, state, native events, and
+light-DOM slots; its official add/retry Button is a functional layer inside the
+same ShadowRoot. Server output retains the product title, inventory status, and
+facts as light DOM before the element upgrades.
 
 The bag quantity/remove surface is the concise-authoring acceptance boundary.
 `src/bag-quantity-control.ts` registers lazily from the real bag flow, imports
@@ -116,6 +126,10 @@ The latest verified renders are:
 - [functional bag quantity control on desktop](../../output/playwright/issue-112-functional-bag-desktop.png)
 - [functional bag quantity control at 390px](../../output/playwright/issue-112-functional-bag-390.png)
 - [functional bag quantity control at 320px](../../output/playwright/issue-112-functional-bag-320.png)
+- [issue #114 product flow on desktop](../../output/playwright/issue-114-shop-ui/product-desktop.png)
+- [issue #114 product flow at 320px](../../output/playwright/issue-114-shop-ui/product-320.png)
+- [issue #114 checkout at 390px](../../output/playwright/issue-114-shop-ui/checkout-390.png)
+- [issue #114 home at 320px](../../output/playwright/issue-114-shop-ui/home-320.png)
 
 ## Verification contract
 
@@ -152,15 +166,13 @@ device, or general framework-speed claims.
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
-includes the target-scoped UI owner and the selected typed Atom purchase-action
-styles. With the #112 functional bag quantity boundary and reactive property
-view and the #115 exact rendered component sheets, the combined entry measures
-178,503 raw bytes and 51,536 level-9 gzip bytes against the reviewed 182,000 /
-54,000 ceilings. The combined #112/#115 increment over #110 is 7,239 raw and
-1,467 gzip bytes and includes the concise authoring runtime, app-local control,
-and replacement of aggregate Atom retention. Relative to the issue #88 baseline
-of 158,152 raw and 45,683 gzip bytes, the combined increment is 20,351 raw and
-5,853 gzip bytes. The five WebP product/editorial assets total 155,126
+includes the target-scoped UI owner, GLUON GOODS token preset, selected official
+Atom/Molecule sheets, and app-local Molecule/Organism composition. Issue #114's
+entry measures 181,847 raw bytes and 52,535 level-9 gzip bytes against the
+reviewed 182,000 / 54,000 ceilings. That is 3,344 raw and 999 gzip bytes above
+the combined #112/#115 entry, and 23,695 raw and 6,852 gzip bytes above the
+issue #88 baseline of 158,152 raw and 45,683 gzip bytes. The five WebP
+product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

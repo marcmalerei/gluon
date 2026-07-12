@@ -25,3 +25,8 @@ the composed Input and `FormField.fieldAttributes` extends the outer native
 label. Both exclude owned children so callers cannot silently replace baseline
 composition. App-local Molecules use the public `defineMolecule()` metadata
 helper described in the [extension contract](../../docs/ui-extensibility.md).
+
+GLUON GOODS repeats `FormField` for its five required delivery inputs and uses
+an app-local `PurchaseAction` defined with `defineMolecule()` in the same real
+checkout form. Browser tests verify implicit labels, native constraint
+validation, interaction, SSR/hydration styles, and teardown.

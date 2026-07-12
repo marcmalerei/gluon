@@ -23,3 +23,6 @@
 - Verify the generated UI starter's shared, usage-derived Button, and
   application-owned carriers through identity-preserving hydration with no
   recovery or duplicate adoption.
+- Keep request-derived exact component sheets between explicit shared
+  `gluon-ui` entries and application-owned entries during hydration, matching
+  server rendering for branded GLUON GOODS selections.

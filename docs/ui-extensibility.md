@@ -119,11 +119,22 @@ own styles, runtime mounting, events, and cleanup around functional components.
 
 ## GLUON GOODS verification evidence
 
-The reference shop uses the public helpers for its native checkout submit
-button and `Secure checkout` custom icon. The verified desktop and 390px mobile
-checkout states preserve the shop's white, near-black, chartreuse, and cobalt
-design system:
+The reference shop uses public Button presets for header/dialog actions,
+product add/retry, and bag quantity/remove controls, while catalog search uses
+the official `Input`. Its stateful form-associated product configurator keeps
+the same Custom Element/ShadowRoot boundary and composes the functional Button
+inside it. Checkout repeats official `FormField` five times, composes the
+app-local `PurchaseAction` Molecule, and renders the one-form
+`CheckoutExperience` Organism. App styling targets its own classes and the
+documented public tokens; the shop boundary rejects `.gluon-*` implementation
+class dependencies.
+
+The verified desktop, 390px, and 320px states preserve the shop's white,
+near-black, chartreuse, cobalt, thin-rule, and square-control system:
 
 ![Desktop checkout with the typed purchase action](./evidence/ui-extensibility/checkout-desktop.png)
 
 ![390px mobile checkout with the typed purchase action](./evidence/ui-extensibility/checkout-mobile.png)
+
+Additional issue #114 captures are linked from the
+[shop verification contract](../examples/shop/README.md#verification-contract).

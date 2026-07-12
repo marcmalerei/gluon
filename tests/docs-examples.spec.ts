@@ -1,8 +1,12 @@
 import { expect, test } from 'vitest';
 import { nextTick } from '@gluonjs/reactivity';
+import { buttonStyles } from '@gluonjs/atoms';
 import { GluonCounter } from '../docs-site/examples/custom-element.js';
 import { mountVueHost } from '../docs-site/examples/vue-host.js';
-import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
+import {
+  productConfiguratorStyles,
+  type ProductConfiguratorElement,
+} from '../examples/shop/src/product-configurator.js';
 
 test('runs the plain Custom Element example through native events', async () => {
   const element = new GluonCounter();
@@ -26,7 +30,11 @@ test('runs the Vue 3 migration host around the production Gluon product element'
   const element = root.querySelector('gluon-product-configurator') as ProductConfiguratorElement;
   await element.updateComplete;
   expect(element.product?.slug).toBe('orbit-lamp');
-  expect(element.shadowRoot?.adoptedStyleSheets).toHaveLength(1);
+  expect(element.shadowRoot?.adoptedStyleSheets).toEqual(expect.arrayContaining([
+    productConfiguratorStyles,
+    buttonStyles,
+  ]));
+  expect(element.shadowRoot?.adoptedStyleSheets).toHaveLength(2);
   expect(element.shadowRoot?.querySelector('style')).toBeNull();
   expect(element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="title"]')?.assignedNodes()).toHaveLength(1);
 

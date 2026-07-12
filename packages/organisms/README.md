@@ -25,3 +25,8 @@ remain owned by explicit props. App-local Organisms use the public
 `defineOrganism()` metadata helper; it adds no lifecycle, registration,
 styling, validation, or cleanup behavior. See the complete
 [extension contract](../../docs/ui-extensibility.md).
+
+GLUON GOODS defines its real `CheckoutExperience` page layout with
+`defineOrganism()`. The composition contains the single delivery form, repeated
+FormFields, app-local PurchaseAction, and live order summary; Router, Store,
+form state, rendering, and lifecycle ownership remain with the application.
