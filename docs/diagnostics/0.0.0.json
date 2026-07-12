@@ -204,6 +204,16 @@
       "source": "hydration"
     },
     {
+      "id": 1207,
+      "code": "GLUON_UI_HYDRATION_MISMATCH",
+      "compactCode": "G1207",
+      "title": "UI stylesheet hydration mismatch",
+      "summary": "The scoped server UI sheets do not match the selected client theme and shared layers.",
+      "why": "A required UI sheet is missing, duplicated, reordered, or has different content or a different digest.",
+      "remediation": "Create server styles with createUiStyleSelection() and install the same theme with installUi(..., { hydrate: true }).",
+      "source": "hydration"
+    },
+    {
       "id": 1301,
       "code": "GLUON_SSR_INVALID_VALUE",
       "compactCode": "G1301",
