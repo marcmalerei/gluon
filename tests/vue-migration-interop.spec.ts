@@ -1,8 +1,10 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { defineElement } from '@gluonjs/core';
+import { buttonStyles } from '@gluonjs/atoms';
 import { products } from '../examples/shop/src/data.js';
 import {
   ProductConfiguratorElement,
+  productConfiguratorStyles,
   registerProductConfigurator,
   type ProductConfiguratorEvent,
 } from '../examples/shop/src/product-configurator.js';
@@ -134,8 +136,12 @@ test('preserves native slots, adopted styles, host identity, lifecycle retention
   expect(titleSlot.assignedNodes()).toEqual([title]);
   expect(defaultSlot.assignedNodes()).toEqual([facts]);
   expect(title.parentNode).toBe(element);
-  expect(shadow.adoptedStyleSheets).toHaveLength(1);
-  expect(shadow.adoptedStyleSheets[0]?.cssRules.length).toBeGreaterThan(0);
+  expect(shadow.adoptedStyleSheets).toEqual(expect.arrayContaining([
+    productConfiguratorStyles,
+    buttonStyles,
+  ]));
+  expect(shadow.adoptedStyleSheets).toHaveLength(2);
+  expect(shadow.adoptedStyleSheets.every((sheet) => sheet.cssRules.length > 0)).toBe(true);
   expect(shadow.querySelector('style')).toBeNull();
 
   const slotChanged = new Promise<void>((resolve) => {

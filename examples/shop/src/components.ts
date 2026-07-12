@@ -21,6 +21,11 @@ import {
   SearchIcon,
 } from './icons.js';
 import { BagQuantityControl } from './bag-quantity-control.js';
+import {
+  ShopIconAction,
+  ShopMenuAction,
+  ShopTextAction,
+} from './ui-extensions.js';
 
 type ShopDialog = 'bag' | 'menu' | 'search';
 
@@ -44,32 +49,33 @@ export function SiteHeader(store: ShopStore): TemplateValue {
         <a href="#journal">Journal</a>
       </nav>
       <div class="header-actions">
-        <button
-          class="text-action search-action"
-          type="button"
-          @click=${(event: Event) => {
+        ${ShopTextAction({
+          children: [SearchIcon(), html`<span>Search</span>`],
+          attributes: { class: 'search-action' },
+          onClick: (event) => {
             store.searchOpen = true;
             focusOpenedDialog('search', event.currentTarget as HTMLElement);
-          }}
-        >${SearchIcon()}<span>Search</span></button>
-        <button
-          class="text-action bag-action"
-          type="button"
-          aria-label=${`Open bag with ${store.bagCount} ${store.bagCount === 1 ? 'item' : 'items'}`}
-          @click=${(event: Event) => {
+          },
+        })}
+        ${ShopTextAction({
+          label: `Bag ${store.bagCount}`,
+          attributes: {
+            class: 'bag-action',
+            aria: { label: `Open bag with ${store.bagCount} ${store.bagCount === 1 ? 'item' : 'items'}` },
+          },
+          onClick: (event) => {
             store.bagOpen = true;
             focusOpenedDialog('bag', event.currentTarget as HTMLElement);
-          }}
-        >Bag ${store.bagCount}</button>
-        <button
-          class="icon-button mobile-menu-button"
-          type="button"
-          aria-label="Open menu"
-          @click=${(event: Event) => {
+          },
+        })}
+        ${ShopIconAction({
+          children: [html`<span>Menu</span>`, MenuIcon()],
+          attributes: { class: 'mobile-menu-button', aria: { label: 'Open menu' } },
+          onClick: (event) => {
             store.menuOpen = true;
             focusOpenedDialog('menu', event.currentTarget as HTMLElement);
-          }}
-        ><span>Menu</span>${MenuIcon()}</button>
+          },
+        })}
       </div>
     </header>
     ${SearchPanel(store)}
@@ -131,7 +137,11 @@ function BagDrawer(store: ShopStore): TemplateValue {
       }}>
         <header class="drawer-header">
           <h2 id="bag-title">Bag ${store.bagCount}</h2>
-          <button class="icon-button" type="button" aria-label="Close bag" data-dialog-initial-focus @click=${close}>${CloseIcon()}</button>
+          ${ShopIconAction({
+            children: CloseIcon(),
+            attributes: { aria: { label: 'Close bag' }, data: { dialogInitialFocus: true } },
+            onClick: close,
+          })}
         </header>
         ${store.bag.length === 0 ? html`
           <div class="empty-bag">
@@ -219,7 +229,11 @@ function SearchPanel(store: ShopStore): TemplateValue {
             data: { dialogInitialFocus: true },
           },
         })}</div>
-        <button class="icon-button" type="button" aria-label="Close search" @click=${close}>${CloseIcon()}</button>
+        ${ShopIconAction({
+          children: CloseIcon(),
+          attributes: { aria: { label: 'Close search' } },
+          onClick: close,
+        })}
       </div>
       <div class="search-results">
         <p>${matches.length} ${matches.length === 1 ? 'object' : 'objects'}</p>
@@ -241,15 +255,22 @@ function MobileMenu(store: ShopStore): TemplateValue {
       }}>
         <header class="drawer-header">
           <strong>GLUON GOODS</strong>
-          <button class="icon-button" type="button" aria-label="Close menu" data-dialog-initial-focus @click=${close}>${CloseIcon()}</button>
+          ${ShopIconAction({
+            children: CloseIcon(),
+            attributes: { aria: { label: 'Close menu' }, data: { dialogInitialFocus: true } },
+            onClick: close,
+          })}
         </header>
         <nav aria-label="Mobile navigation">
-          <button class="menu-search-action" type="button" @click=${() => {
-            store.menuOpen = false;
-            store.searchOpen = true;
-            const returnTarget = document.querySelector<HTMLElement>('.mobile-menu-button');
-            if (returnTarget) focusOpenedDialog('search', returnTarget);
-          }}><span>Search</span>${SearchIcon()}</button>
+          ${ShopMenuAction({
+            children: [html`<span>Search</span>`, SearchIcon()],
+            onClick: () => {
+              store.menuOpen = false;
+              store.searchOpen = true;
+              const returnTarget = document.querySelector<HTMLElement>('.mobile-menu-button');
+              if (returnTarget) focusOpenedDialog('search', returnTarget);
+            },
+          })}
           ${compose(RouterLink, { to: '/shop' })`<span>Shop</span>${ArrowIcon()}`}
           ${compose(RouterLink, { to: '/shop?sort=new' })`<span>New</span>${ArrowIcon()}`}
           <a href="#journal" @click=${close}><span>Journal</span>${ArrowIcon()}</a>
@@ -278,6 +299,11 @@ function dismissDialog(dialog: ShopDialog, close: () => void): void {
   close();
   dialogFocusScopes.get(dialog)?.deactivate();
   dialogFocusScopes.delete(dialog);
+}
+
+export function disposeShopDialogs(): void {
+  for (const scope of dialogFocusScopes.values()) scope.deactivate();
+  dialogFocusScopes.clear();
 }
 
 function handleDialogKeydown(

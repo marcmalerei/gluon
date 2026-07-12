@@ -20,7 +20,7 @@ import {
   ProductRail,
   focusOpenedDialog,
 } from './components.js';
-import { PurchaseRegion } from './ui-extensions.js';
+import { CheckoutExperience } from './ui-extensions.js';
 
 export function HomePage(_store: ShopStore): TemplateValue {
   return html`
@@ -174,27 +174,20 @@ export function CheckoutPage(store: ShopStore): TemplateValue {
     <section class="checkout-empty"><h1>Your bag is empty.</h1>
       ${RouterLink({ to: '/shop', children: 'Return to the collection', attributes: { class: 'primary-button' } })}
     </section>`;
-  const field = (name: keyof typeof store.checkout, label: string, type = 'text') => html`
-    <label><span>${label}</span><input name=${name} type=${type} required .value=${store.checkout[name]}
-      @input=${(event: Event) => store.updateCheckout(name, (event.currentTarget as HTMLInputElement).value)}></label>`;
-  return html`
-    <section class="checkout-page" aria-labelledby="checkout-title">
-      <div><p class="eyebrow">Secure checkout</p><h1 id="checkout-title">Delivery details</h1>
-        <form @submit=${(event: Event) => {
-          event.preventDefault();
-          const order = store.placeOrder();
-          void router.push(`/orders/${encodeURIComponent(order.id)}`);
-        }}>
-          ${field('email', 'Email', 'email')}${field('name', 'Full name')}${field('address', 'Address')}
-          <div class="checkout-row">${field('postalCode', 'Postal code')}${field('city', 'City')}</div>
-          ${PurchaseRegion({ totalLabel: formatPrice(store.bagTotal) })}
-        </form>
-      </div>
-      <aside class="order-summary" aria-label="Order summary"><h2>Order summary</h2>
+  const summary = html`<aside class="order-summary" aria-label="Order summary"><h2>Order summary</h2>
         ${repeat(store.bag, (line) => line.key, (line) => html`<div><span>${line.quantity} × ${line.product.name}</span><strong>${formatPrice(line.product.price * line.quantity)}</strong></div>`)}
-        <footer><span>Total</span><strong>${formatPrice(store.bagTotal)}</strong></footer>
-      </aside>
-    </section>`;
+        <footer><span>Total</span><strong>${formatPrice(store.bagTotal)}</strong></footer></aside>`;
+  return CheckoutExperience({
+    values: store.checkout,
+    totalLabel: formatPrice(store.bagTotal),
+    summary,
+    onFieldInput: (name, value) => store.updateCheckout(name, value),
+    onSubmit: (event) => {
+      event.preventDefault();
+      const order = store.placeOrder();
+      void router.push(`/orders/${encodeURIComponent(order.id)}`);
+    },
+  });
 }
 
 export function OrderConfirmationPage(store: ShopStore): TemplateValue {

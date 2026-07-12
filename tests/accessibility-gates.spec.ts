@@ -1,19 +1,20 @@
 import { beforeEach, expect, test } from 'vitest';
 import axe, { type Result } from 'axe-core';
-import { adoptStyles } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
-import { shopStyles } from '../examples/shop/src/styles.js';
 
 beforeEach(() => {
   document.body.replaceChildren();
   localStorage.clear();
-  adoptStyles(document, shopStyles);
+  document.adoptedStyleSheets = [];
 });
 
 test('keeps the GLUON GOODS customer journey free of automated WCAG A/AA violations', async () => {
-  const { app, router } = createShopApplication(createMemoryHistory(['/']), { storage: null });
+  const { app, router } = createShopApplication(createMemoryHistory(['/']), {
+    storage: null,
+    styleTarget: document,
+  });
   await router.isReady();
   const root = document.createElement('div');
   document.body.append(root);
