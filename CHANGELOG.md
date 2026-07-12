@@ -9,6 +9,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- A machine-validated Vue codemod no-go decision covering 14 candidate classes,
+  17 retained files, 52 analyzer inventory records, 26 findings, explicit
+  counterexamples, and a zero-write expected-output contract.
 - The Node-only `@gluonjs/vue-migration-analyzer` package and
   `gluon-vue-analyze` CLI with deterministic human/JSON reports, a versioned
   public schema, bounded static Vue 3.5 SFC/project inventory, explicit

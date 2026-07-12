@@ -72,3 +72,11 @@ writer hook is public.
 This developer tool has no customer-facing GLUON GOODS control. Its integration
 evidence analyzes `VueProductHost.vue`, while the production configurator and
 browser tests remain the behavioral evidence for the linked migration stages.
+
+## Codemod decision
+
+The retained analyzer corpus informed a separate
+[bounded codemod evaluation](../vue-codemod-decision/). Its result is no-go for
+a source writer: 14 candidate classes have static evidence, but none has a
+retained generated target plus semantic acceptance proof. RFC 0003 therefore
+remains report-only, and this package exposes no transform or write API.
