@@ -45,17 +45,19 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-Baseline examples document the supported public import plus a type-aware
-concrete value, callback, configuration, or call for the symbol kind. Runtime
-objects that must be owned elsewhere use explicit consumer examples rather than
-fake construction. The generator and `npm run check:docs` reject the former
-compiler-only `declare const args`, `type Example =`, and `void value` patterns.
+All 507 current symbol pages require a reviewed entry in
+`docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
+and either an inline scenario or a maintained package recipe that uses the
+documented symbol. The scenarios cover concrete inputs and observable results,
+plus ownership, failure, and cleanup behavior where applicable; a generic type
+alias, import demonstration, or runtime-owner wrapper is not accepted.
 
-Behavior-oriented overrides are maintained in
-`docs-site/api-examples.json` and compile in the same corpus. `npm run
-check:docs` independently derives the generated symbol page set, requires exact
-manifest coverage and rendered code on every page, and checks the curated
-memory-history, Router-options, Store-definition, and Gluon Element examples.
+The complete catalog compiles in one strict generated TypeScript corpus.
+`npm run check:docs` independently derives the symbol page set, requires the
+reviewed-example count to equal the page count, validates rendered code on every
+page, rejects generic purpose copy and the former compiler-only `declare const
+args`, `type Example =`, and `void value` patterns, and retains focused gates for
+memory history, Router options, Store definition, and Gluon Element examples.
 
 ## Optional UI package gate
 

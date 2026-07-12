@@ -9,13 +9,13 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Task-oriented API reference generation that replaces compiler-only aliases
-  and declared argument tuples with concrete values, runtime-owner consumption
-  patterns, and curated lifecycle examples, including complete Router options
-  and Store definition flows.
-- Verified public-entry-point examples on every generated API symbol page,
-  including a curated memory-history lifecycle example and a complete
-  TypeScript compilation/coverage gate for the generated corpus.
+- Reviewed task-oriented examples for all 507 generated public API symbol
+  pages, with symbol-specific purpose text and concrete application, lifecycle,
+  input/output, ownership, error, and cleanup flows shared through maintained
+  package recipes instead of compiler-only type or import demonstrations.
+- A blocking generated-reference gate that rejects missing catalog coverage,
+  generic dependency-consumer copy, compiler placeholders, private imports, and
+  snippets that fail strict TypeScript compilation or rendered-page validation.
 - A machine-validated Vue codemod no-go decision covering 14 candidate classes,
   17 retained files, 52 analyzer inventory records, 26 findings, explicit
   counterexamples, and a zero-write expected-output contract.

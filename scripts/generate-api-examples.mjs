@@ -17,9 +17,10 @@ const symbolKinds = new Map([
   ['variables', { label: 'Variable', reflectionKind: 32, typeOnly: false }],
 ]);
 
-if (catalog.version !== 1 || !isRecord(catalog.overrides)) {
-  throw new Error('docs-site/api-examples.json must contain version 1 and an overrides object.');
+if (catalog.version !== 1 || !isRecord(catalog.overrides) || (catalog.recipes !== undefined && !isRecord(catalog.recipes))) {
+  throw new Error('docs-site/api-examples.json must contain version 1, an overrides object, and an optional recipes object.');
 }
+const recipes = catalog.recipes ?? {};
 
 const modules = new Map();
 const compilerPaths = {};
@@ -54,12 +55,14 @@ for (const [index, page] of symbolPages.entries()) {
   if (!reflection) throw new Error(`${page.path} has no matching TypeDoc reflection.`);
   const override = catalog.overrides[page.path];
   if (override) unusedOverrides.delete(page.path);
-  const publicModule = override?.module ?? module.publicModule;
+  const recipe = override?.recipe ? recipes[override.recipe] : undefined;
+  if (override?.recipe && !recipe) throw new Error(`${page.path} references unknown API example recipe ${override.recipe}.`);
+  const publicModule = override?.module ?? recipe?.module ?? module.publicModule;
   if (!compilerPaths[publicModule]) {
     throw new Error(`${page.path} uses non-public or unconfigured module ${publicModule}.`);
   }
-  const description = override?.description ?? baselineDescription(page, publicModule);
-  const code = override ? curatedCode(page, override) : baselineCode(page, publicModule, reflection);
+  const description = override?.description ?? baselineDescription(page, publicModule, reflection);
+  const code = override ? curatedCode(page, override, recipe) : baselineCode(page, publicModule, reflection);
   for (const placeholder of [/\bdeclare const\b/, /\btype Example\s*=/, /\bvoid value\b/]) {
     if (placeholder.test(code)) throw new Error(`${page.path} contains a compiler-only placeholder.`);
   }
@@ -79,6 +82,7 @@ for (const [index, page] of symbolPages.entries()) {
     symbol: page.symbol,
     module: publicModule,
     curated: Boolean(override),
+    ...(override?.recipe ? { recipe: override.recipe } : {}),
     fallback: false,
     typecheckFile,
   };
@@ -129,6 +133,14 @@ if (diagnostics.length > 0) {
   diagnostics = diagnosticsFor(tsconfigPath);
 }
 if (diagnostics.length > 0) throw new Error(`Generated API examples do not typecheck:\n${formatDiagnostics(diagnostics)}`);
+const uncuratedEntries = manifestEntries.filter(({ curated }) => !curated);
+if (uncuratedEntries.length > 0) {
+  throw new Error(`Every public API symbol requires a reviewed task-oriented example:\n${uncuratedEntries.map(({ path }) => `- ${path}`).join('\n')}`);
+}
+const dependencyEntries = manifestEntries.filter(({ fallback }) => fallback);
+if (dependencyEntries.length > 0) {
+  throw new Error(`Task-oriented API examples are required for every symbol page; replace generated dependency consumers:\n${dependencyEntries.map(({ path }) => `- ${path}`).join('\n')}`);
+}
 
 const counts = Object.fromEntries([...symbolKinds.values()].map(({ label }) => [label, 0]));
 for (const entry of manifestEntries) counts[entry.kind] += 1;
@@ -137,7 +149,7 @@ const manifest = {
   generatedAt: null,
   symbolPages: manifestEntries.length,
   curatedExamples: manifestEntries.filter(({ curated }) => curated).length,
-  dependencyExamples: manifestEntries.filter(({ fallback }) => fallback).length,
+  dependencyExamples: dependencyEntries.length,
   counts,
   entries: manifestEntries,
 };
@@ -189,16 +201,10 @@ function packageModule(packageName, exportPath) {
   return exportPath === '.' ? packageName : `${packageName}/${exportPath.slice(2)}`;
 }
 
-function baselineDescription(page, publicModule) {
-  const action = {
-    Function: 'Call',
-    Class: 'Construct and use',
-    Interface: 'Use',
-    'Type alias': 'Use',
-    Variable: 'Use',
-  }[page.kind.label];
-  const name = page.symbol === 'default' ? 'the default export' : `\`${page.symbol}\``;
-  return `${action} ${name} through the public \`${publicModule}\` entry point with representative values:`;
+function baselineDescription(page, publicModule, reflection) {
+  const documented = reflectionSummary(reflection);
+  const purpose = documented || inferredPurpose(page, reflection);
+  return `${sentence(purpose)} The example uses the public \`${publicModule}\` entry point:`;
 }
 
 function baselineCode(page, publicModule, reflection) {
@@ -211,7 +217,7 @@ function baselineCode(page, publicModule, reflection) {
     const signature = reflection.signatures?.[0];
     if (!signature) throw new Error(`${page.path} has no callable signature.`);
     const argumentsList = requiredParameters(signature)
-      .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name }))
+      .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name, includeOptional: true }))
       .join(', ');
     const call = `${localName}(${argumentsList})`;
     if (isVoidType(signature.type)) return `${importLine}\n\n${call};`;
@@ -221,7 +227,7 @@ function baselineCode(page, publicModule, reflection) {
     const callable = callableInfo(reflection.type);
     if (callable) {
       const argumentsList = requiredParameters(callable.signature)
-        .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name, substitutions: callable.substitutions }))
+        .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name, includeOptional: true, substitutions: callable.substitutions }))
         .join(', ');
       const call = `${localName}(${argumentsList})`;
       return isVoidType(callable.signature.type)
@@ -247,7 +253,117 @@ function baselineCode(page, publicModule, reflection) {
   const expression = page.kind.label === 'Interface'
     ? synthesizeDeclaration(reflection, { includeOptional: true, hint: localName })
     : synthesizeType(reflection.type, { includeOptional: true, hint: localName });
-  return `${importLine}\n\nconst example = (${expression}) satisfies ${localName}${typeArguments};\nconsole.log(example);`;
+  const variableName = exampleVariableName(localName);
+  return `${importLine}\n\nconst ${variableName} = (${expression}) satisfies ${localName}${typeArguments};\nconsole.log(${variableName});`;
+}
+
+function reflectionSummary(reflection) {
+  const comment = reflection.comment ?? reflection.signatures?.[0]?.comment;
+  return (comment?.summary ?? [])
+    .map((part) => part.text ?? '')
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function inferredPurpose(page, reflection) {
+  const name = page.symbol === 'default' ? 'Gluon Vite plugin' : humanizeIdentifier(page.symbol);
+  const lowerName = name.toLowerCase();
+  const domain = domainPurpose(page.moduleName);
+  if (page.kind.label === 'Function') {
+    const returnName = humanizeIdentifier(typeName(reflection.signatures?.[0]?.type) ?? `${page.symbol} result`).toLowerCase();
+    if (/^create[A-Z]/.test(page.symbol)) return `Create a ${returnName} with caller-owned configuration for ${domain}`;
+    if (/^define[A-Z]/.test(page.symbol)) return `Define a reusable ${humanizeIdentifier(page.symbol.slice(6)).toLowerCase()} with typed inputs for ${domain}`;
+    if (/^is[A-Z]/.test(page.symbol)) return `Check whether an unknown value is ${humanizeIdentifier(page.symbol.slice(2)).toLowerCase()} before using its public contract`;
+    if (/^get[A-Z]/.test(page.symbol)) return `Read ${humanizeIdentifier(page.symbol.slice(3)).toLowerCase()} needed by ${domain}`;
+    if (/^set[A-Z]/.test(page.symbol)) return `Install ${humanizeIdentifier(page.symbol.slice(3)).toLowerCase()} for ${domain} and retain the returned cleanup handle when provided`;
+    if (/^use[A-Z]/.test(page.symbol)) return `Read ${humanizeIdentifier(page.symbol.slice(3)).toLowerCase()} from the current application context for ${domain}`;
+    if (/^render[A-Z]/.test(page.symbol) || page.symbol === 'render') return `Render ${humanizeIdentifier(page.symbol.replace(/^render/, '') || 'template').toLowerCase()} into the output required by ${domain}`;
+    if (/^hydrate[A-Z]/.test(page.symbol) || page.symbol === 'hydrate') return `Bind ${humanizeIdentifier(page.symbol.replace(/^hydrate/, '') || 'template').toLowerCase()} to matching server-rendered state for ${domain}`;
+    if (/^mount[A-Z]/.test(page.symbol)) return `Mount ${humanizeIdentifier(page.symbol.slice(5)).toLowerCase()} into an owned DOM target for ${domain}`;
+    if (/^format[A-Z]/.test(page.symbol)) return `Format ${humanizeIdentifier(page.symbol.slice(6)).toLowerCase()} for human or machine consumption in ${domain}`;
+    if (/^parse[A-Z]/.test(page.symbol)) return `Parse ${humanizeIdentifier(page.symbol.slice(5)).toLowerCase()} into the normalized structure used by ${domain}`;
+    if (/^stringify[A-Z]/.test(page.symbol) || /^serialize[A-Z]/.test(page.symbol)) return `Serialize ${humanizeIdentifier(page.symbol.replace(/^(?:stringify|serialize)/, '')).toLowerCase()} for transport or URLs in ${domain}`;
+    if (/^install[A-Z]/.test(page.symbol)) return `Install ${humanizeIdentifier(page.symbol.slice(7)).toLowerCase()} on its owner and retain deterministic cleanup for ${domain}`;
+    if (/^analyze[A-Z]/.test(page.symbol)) return `Analyze ${humanizeIdentifier(page.symbol.slice(7)).toLowerCase()} and return structured evidence for ${domain}`;
+    if (/^assert[A-Z]/.test(page.symbol)) return `Assert ${humanizeIdentifier(page.symbol.slice(6)).toLowerCase()} so leaked or invalid ${domain} state fails immediately`;
+    if (/^cleanup[A-Z]/.test(page.symbol)) return `Release ${humanizeIdentifier(page.symbol.slice(7)).toLowerCase()} and report cleanup failures in ${domain}`;
+    return `Use ${lowerName} to produce ${returnName} for ${domain}`;
+  }
+  if (page.kind.label === 'Class') {
+    if (/Error$/.test(page.symbol)) return `Catch ${name} to distinguish structured ${domain} failures from unrelated exceptions`;
+    return `Construct ${name} to own and coordinate its ${domain} lifecycle`;
+  }
+  if (page.kind.label === 'Variable') {
+    if (/Styles?$/.test(page.symbol)) return `Adopt the shared ${name} stylesheet to apply the supported ${domain} visual contract`;
+    if (/VERSION$|Version$/.test(page.symbol)) return `Compare ${name} when validating compatibility with the current ${domain} protocol or schema`;
+    if (/Manifest$|manifest$/i.test(page.symbol)) return `Inspect ${name} to discover the public inventory supported by ${domain}`;
+    if (page.symbol === 'nothing') return 'Render no child content or remove a dynamic attribute without inserting a placeholder node';
+    if (page.symbol === 'q') return 'Create typed HTML Quarks through property access when composing low-level UI templates';
+    if (/Key$/.test(page.symbol)) return `Use ${name} as the stable dependency-injection identity for ${domain}`;
+    return `Use ${name} as the exported ${domain} value instead of duplicating its contract locally`;
+  }
+  if (/Options$|Config$/.test(page.symbol)) return `Configure ${name} before passing it to the owning ${domain} API`;
+  if (/Props$/.test(page.symbol)) return `Supply typed ${name} values when rendering the corresponding ${domain} component`;
+  if (/Result$|Response$|Report$|Summary$/.test(page.symbol)) return `Inspect ${name} returned after the ${domain} operation completes`;
+  if (/Context$/.test(page.symbol)) return `Access the dependencies and state supplied while a ${domain} operation is running`;
+  if (/Snapshot$|State$/.test(page.symbol)) return `Represent serializable ${domain} state for transport, restoration, or deterministic testing`;
+  if (/Event$|EventMap$|EventRecord$/.test(page.symbol)) return `Handle structured ${name} data emitted by ${domain}`;
+  if (/Callback$|Handler$|Hook$|Listener$|Behavior$|Guard$/.test(page.symbol)) return `Implement the ${name} callback invoked at the documented ${domain} lifecycle boundary`;
+  if (/Plugin$/.test(page.symbol)) return `Extend ${domain} through the typed ${name} installation and cleanup contract`;
+  if (/Fixture$/.test(page.symbol)) return `Control the isolated ${domain} resources and cleanup exposed by ${name}`;
+  if (/Error$|Failure$|Diagnostic$|Finding$|Issue$/.test(page.symbol)) return `Inspect ${name} to handle a structured ${domain} failure or diagnostic`;
+  if (/Map$|Record$|Manifest$|Declarations?$|Definitions?$/.test(page.symbol)) return `Describe the named ${domain} entries accepted by the ${name} contract`;
+  if (/Ref$|Target$/.test(page.symbol)) return `Retain a typed reference to the ${domain} value represented by ${name}`;
+  if (/Component$|Element$/.test(page.symbol)) return `Represent the typed renderable ${name} contract used by ${domain}`;
+  return `Represent ${name} values exchanged through the public ${domain} APIs`;
+}
+
+function domainPurpose(moduleName) {
+  if (moduleName.includes('/reactivity/')) return 'reactive state, effects, scheduling, and watchers';
+  if (moduleName.includes('/router/')) return 'routing and navigation';
+  if (moduleName.includes('/store/')) return 'application-scoped state management';
+  if (moduleName.includes('/ssr/')) return 'server rendering and hydration';
+  if (moduleName.includes('/test-utils/')) return 'component and application tests';
+  if (moduleName.includes('/compiler/')) return 'Gluon source transformation and diagnostics';
+  if (moduleName.includes('/vite/')) return 'Vite build integration';
+  if (moduleName.includes('/language-server/')) return 'editor analysis and diagnostics';
+  if (moduleName.includes('/vue-migration-analyzer/')) return 'Vue migration analysis';
+  if (moduleName.includes('/devtools')) return 'development inspection';
+  if (moduleName.includes('/create-gluon/')) return 'project scaffolding';
+  if (/packages\/(?:quarks|atoms|molecules|organisms)\//.test(moduleName)) return 'the layered UI system';
+  return 'Gluon application rendering';
+}
+
+function typeName(type) {
+  if (!type) return null;
+  if (type.type === 'reference' || type.type === 'intrinsic') return type.name;
+  if (type.type === 'array') return 'array';
+  if (type.type === 'reflection' && type.declaration?.signatures?.length) return 'callback result';
+  return null;
+}
+
+function humanizeIdentifier(value) {
+  return String(value)
+    .replace(/^GLUON_/, 'Gluon ')
+    .replace(/_/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function sentence(value) {
+  return /[.!?]$/.test(value) ? value : `${value}.`;
+}
+
+function exampleVariableName(localName) {
+  if (/Options$/.test(localName)) return 'options';
+  if (/Props$/.test(localName)) return 'props';
+  if (/Snapshot$/.test(localName)) return 'snapshot';
+  if (/Result$/.test(localName)) return 'result';
+  if (/Event$/.test(localName)) return 'eventRecord';
+  return `${localName[0].toLowerCase()}${localName.slice(1)}Value`;
 }
 
 function fallbackDescription(page, publicModule) {
@@ -536,6 +652,9 @@ function templateLiteralPart(type) {
 
 function stringValue(hint = '') {
   const normalized = hint.toLowerCase();
+  if (normalized.includes('query')) return "'?category=lighting&page=2'";
+  if (normalized.includes('hash')) return "'#details'";
+  if (normalized.includes('message')) return "'Product saved'";
   if (normalized.includes('path') || normalized.includes('location') || normalized.includes('url')) return "'/products/42'";
   if (normalized.includes('id') || normalized.includes('name') || normalized.includes('key')) return "'example'";
   if (normalized.includes('source') || normalized.includes('code')) return "'export const value = 42;'";
@@ -644,15 +763,20 @@ function indexReflections(value) {
   for (const nested of Object.values(value)) indexReflections(nested);
 }
 
-function curatedCode(page, override) {
+function curatedCode(page, override, recipe) {
   if (typeof override.description !== 'string' || override.description.trim() === '') {
     throw new Error(`${page.path} curated example requires a description.`);
   }
-  if (!Array.isArray(override.code) || override.code.length === 0
-    || override.code.some((line) => typeof line !== 'string')) {
+  const code = override.code ?? recipe?.code;
+  if (!Array.isArray(code) || code.length === 0
+    || code.some((line) => typeof line !== 'string')) {
     throw new Error(`${page.path} curated example requires a non-empty code line array.`);
   }
-  return override.code.join('\n');
+  const source = code.join('\n');
+  if (page.symbol !== 'default' && !source.includes(page.symbol)) {
+    throw new Error(`${page.path} curated example must use its documented symbol.`);
+  }
+  return source;
 }
 
 function diagnosticsFor(tsconfigPath) {
