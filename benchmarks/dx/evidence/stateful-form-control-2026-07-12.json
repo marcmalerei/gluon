@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "specification": "benchmarks/dx/specification-v1.json",
+  "recordedAt": "2026-07-12",
+  "status": "implementation-slice-only",
+  "trackingIssue": 112,
+  "applicableTask": "T4-stateful-control",
+  "fixtureDirectory": "benchmarks/dx/stateful-form-control",
+  "frameworks": [
+    { "id": "gluon-class", "fixture": "benchmarks/dx/stateful-form-control/gluon-class.ts", "authoredLines": 105, "componentLines": 83, "boundaryLines": 22, "duplicatePublicDeclarations": 3 },
+    { "id": "gluon-functional", "fixture": "benchmarks/dx/stateful-form-control/gluon-functional.ts", "authoredLines": 77, "componentLines": 66, "boundaryLines": 11, "duplicatePublicDeclarations": 0 },
+    { "id": "vue", "fixture": "benchmarks/dx/stateful-form-control/vue.ts", "authoredLines": 125, "componentLines": 27, "boundaryLines": 98, "duplicatePublicDeclarations": 2 },
+    { "id": "react", "fixture": "benchmarks/dx/stateful-form-control/react.tsx", "authoredLines": 120, "componentLines": 20, "boundaryLines": 100, "duplicatePublicDeclarations": 2 }
+  ],
+  "rawEvidence": "benchmarks/dx/stateful-form-control/evidence.json",
+  "verificationCommands": [
+    "npm run check:stateful-control-comparison",
+    "npx vitest run tests/dx-stateful-form-control.spec.ts",
+    "npm run test:ssr -- --run tests-node/ssr.spec.ts",
+    "npm run test:create-gluon",
+    "npm run test:playground"
+  ],
+  "limitations": [
+    "This record covers the issue #112 stateful-control implementation slice only; it is not a completed benchmark run.",
+    "It does not contain all 21 framework-task results required by benchmarks/dx/schema/run-v1.schema.json.",
+    "No human usability pass was run, so no readability, win, tie, loss, usability, or general DX-superiority claim is supported.",
+    "The Vue and React framework-local view metrics exclude their retained autonomous Custom Element bridges; both measures remain separately reported."
+  ]
+}

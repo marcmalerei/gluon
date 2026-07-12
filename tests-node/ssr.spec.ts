@@ -41,6 +41,11 @@ import {
 import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
 import { renderShopRequest } from '../examples/shop/src/server.js';
+import { ClassQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-class.js';
+import { FunctionalQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-functional.js';
+import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-control/react.js';
+import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
+import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('serializes composed functional templates through the unchanged public template contract', async () => {
@@ -225,6 +230,30 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     );
     expect(connected).not.toHaveBeenCalled();
     expect(cleanup).toHaveBeenCalledOnce();
+  });
+
+  it('retains equivalent stateful form-control server output for Gluon, Vue, and React', async () => {
+    const children = html`Orbit Lamp<span slot="help">Choose one to five.</span>`;
+    for (const definition of [ClassQuantityControl, FunctionalQuantityControl]) {
+      const rendered = withoutHydrationMarkers(await renderToString(renderElement(definition, {
+        properties: { product, value: 2, required: true },
+        children,
+      })));
+      expect(rendered).toContain('<template shadowrootmode="open">');
+      expect(rendered).toContain('<output aria-live="polite">2</output>');
+      expect(rendered).toContain('<strong>Total €498.00</strong>');
+      expect(rendered).toContain('<slot name="help">Choose a quantity.</slot>');
+      expect(rendered).toContain('<span slot="help">Choose one to five.</span>');
+    }
+
+    const vue = await renderVueQuantityShadow(product, 2);
+    const react = renderReactQuantityShadow(product, 2);
+    for (const output of [vue, react]) {
+      const rendered = output.replaceAll('<!-- -->', '');
+      expect(rendered).toContain('<output aria-live="polite">2</output>');
+      expect(rendered).toContain('<strong>Total €498.00</strong>');
+      expect(rendered).toContain('<slot name="help">Choose a quantity.</slot>');
+    }
   });
 });
 

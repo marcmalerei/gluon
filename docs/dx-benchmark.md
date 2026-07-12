@@ -11,7 +11,8 @@ This repository does not currently contain a completed DX benchmark run. One
 retained record selects the comparator lanes and captures the environment and
 package versions observed on 12 July 2026. A second, explicitly partial record
 captures issue #111's nested checkout/dialog syntax measurements for the
-T3-local-layers implementation slice. Neither supports a win, tie, loss,
+T3-local-layers implementation slice. A third partial record captures issue
+#112's retained stateful form-control comparison for T4. None supports a win, tie, loss,
 usability, readability, or general DX-superiority claim.
 
 The specification also retains bounded Gluon-only before/after measurements for
@@ -114,3 +115,8 @@ cleanup operations to one `installUi()` call/import, one typed theme option, and
 one `UiOwner.dispose()` operation. Aggregate component-sheet imports remain and
 are explicitly assigned to #115; therefore the full T2/T3 measurements have not
 been claimed or compared.
+
+Issue #112's four retained controls, disaggregated metrics, diagnostic and
+cleanup evidence, verified Gluon disadvantages, and limitations live under
+`benchmarks/dx/stateful-form-control`; the method and commands are documented in
+[`stateful-form-control-comparison.md`](stateful-form-control-comparison.md).
