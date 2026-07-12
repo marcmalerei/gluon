@@ -2,11 +2,15 @@ import ts from 'typescript';
 import { getGluonDiagnostic, transformGluonModule } from '@gluonjs/compiler';
 
 export type TemplateDiagnosticCode =
+  | 'GLUON_ELEMENT_SETUP_CLEANUP_MISSING'
+  | 'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED'
+  | 'GLUON_ELEMENT_TAG_INVALID'
   | 'GLUON_TEMPLATE_ARIA_UNKNOWN'
   | 'GLUON_TEMPLATE_BINDING_POSITION'
   | 'GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN'
   | 'GLUON_TEMPLATE_EVENT_UNKNOWN'
   | 'GLUON_TEMPLATE_PROP_UNKNOWN'
+  | 'GLUON_TEMPLATE_SLOT_UNKNOWN'
   | 'GLUON_TEMPLATE_STYLE_ELEMENT'
   | 'GLUON_TEMPLATE_VOID_CHILDREN';
 
@@ -179,6 +183,7 @@ export function analyzeGluonDocument(
         }
       }
     }
+    diagnoseSlotAssignments(markup, contentStart, declarationMap, source, diagnostics);
   }
   return Object.freeze({ uri, diagnostics: Object.freeze(diagnostics), declarations: Object.freeze(declarations) });
 }
@@ -360,11 +365,45 @@ function collectDeclarations(uri: string, source: ts.SourceFile): CustomElementD
           slots: Object.freeze(staticKeys(declaration, 'slots')),
         }));
       }
+    } else if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)
+      && node.expression.text === 'defineGluonElement') {
+      const definition = node.arguments[0];
+      if (definition && ts.isObjectLiteralExpression(definition)) {
+        const tag = objectPropertyInitializer(definition, 'tagName');
+        if (tag && ts.isStringLiteral(tag)) {
+          declarations.push(Object.freeze({
+            tagName: tag.text,
+            uri,
+            range: rangeAt(source, tag.getStart(source) + 1, tag.end - 1),
+            props: Object.freeze(objectLiteralKeys(objectPropertyInitializer(definition, 'properties'))),
+            events: Object.freeze(objectLiteralKeys(objectPropertyInitializer(definition, 'events'))),
+            slots: Object.freeze(objectLiteralKeys(objectPropertyInitializer(definition, 'slots'))),
+          }));
+        }
+      }
     }
     ts.forEachChild(node, visit);
   };
   visit(source);
   return declarations;
+}
+
+function objectPropertyInitializer(
+  object: ts.ObjectLiteralExpression,
+  name: string,
+): ts.Expression | undefined {
+  const property = object.properties.find((candidate): candidate is ts.PropertyAssignment =>
+    ts.isPropertyAssignment(candidate)
+    && candidate.name.getText().replace(/^['"]|['"]$/g, '') === name);
+  return property?.initializer;
+}
+
+function objectLiteralKeys(expression: ts.Expression | undefined): string[] {
+  if (!expression || !ts.isObjectLiteralExpression(expression)) return [];
+  return expression.properties.flatMap((property) =>
+    ts.isPropertyAssignment(property) || ts.isMethodDeclaration(property)
+      ? [property.name.getText().replace(/^['"]|['"]$/g, '')]
+      : []);
 }
 
 function staticKeys(declaration: ts.ClassLikeDeclaration | undefined, name: string): string[] {
@@ -398,6 +437,45 @@ function offsetAt(text: string, position: Position): number {
 
 function scriptKind(uri: string): ts.ScriptKind { return /\.tsx?$/.test(uri) ? (uri.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS) : ts.ScriptKind.JS; }
 function escapeRegExp(value: string): string { return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function diagnoseSlotAssignments(
+  markup: string,
+  contentStart: number,
+  declarations: ReadonlyMap<string, CustomElementDeclaration>,
+  source: ts.SourceFile,
+  diagnostics: TemplateDiagnostic[],
+): void {
+  const elementStack: string[] = [];
+  for (const match of markup.matchAll(/<\s*(\/?)\s*([A-Za-z][\w-]*)\b([^>]*)>/g)) {
+    const closing = match[1] === '/';
+    const tagName = match[2]!.toLowerCase();
+    if (closing) {
+      const openIndex = elementStack.lastIndexOf(tagName);
+      if (openIndex >= 0) elementStack.length = openIndex;
+      continue;
+    }
+
+    const parentDeclaration = declarations.get(elementStack.at(-1) ?? '');
+    if (parentDeclaration) {
+      const attributes = match[3]!;
+      const attributesOffset = contentStart + match.index + match[0].indexOf(attributes);
+      for (const slotMatch of attributes.matchAll(/\bslot\s*=\s*(["'])([^"']+)\1/g)) {
+        const name = slotMatch[2]!;
+        if (parentDeclaration.slots.includes(name)) continue;
+        const start = attributesOffset + slotMatch.index + slotMatch[0].lastIndexOf(name);
+        diagnostics.push(diagnostic(
+          'GLUON_TEMPLATE_SLOT_UNKNOWN',
+          `<${parentDeclaration.tagName}> does not declare slot ${name}.`,
+          start,
+          start + name.length,
+          source,
+        ));
+      }
+    }
+
+    if (!voidTags.includes(tagName) && !/\/\s*>$/.test(match[0])) elementStack.push(tagName);
+  }
+}
 
 function namedEntries(entries: readonly unknown[], accept: (entry: Record<string, unknown>) => boolean = () => true): string[] {
   return entries.flatMap((entry) => entry && typeof entry === 'object'

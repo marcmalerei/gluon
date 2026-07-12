@@ -53,6 +53,17 @@ slice must retain setup calls, imports, configuration, cleanup, evidence paths,
 and explicit no-comparison limitations; it cannot satisfy or imitate the
 required 21-result completed run.
 
+## Stateful form-control comparison gate
+
+`npm run check:stateful-control-comparison` validates issue #112's retained
+Gluon class, functional Gluon, pinned Vue, and pinned React fixtures. It checks
+strict TypeScript, public imports, package versions, disaggregated component and
+platform-boundary lines, explicit limitations, and the recorded Gluon
+disadvantages. Browser and SSR tests separately prove the common behavior,
+plain-HTML boundary, Vue-host consumption, exact comparator-tag hydration,
+readable-stream/static output, and cleanup. This partial
+evidence has no human pass and makes no general ranking claim.
+
 ## Generated API example gate
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry
@@ -150,12 +161,16 @@ missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
 The issue #108 production owner baseline measures 164,012 raw entry bytes and
-47,686 level-9 gzip bytes. Issue #110 then adds the selected Atom Button/Icon
-styles and the app-local Molecule/Organism purchase path. The reviewed combined
-regression ceilings are 174,000 raw bytes and 52,000 gzip bytes; HTML,
-image-byte, and image-count ceilings remain unchanged. The combined production
-entry measures 171,264 raw bytes and 50,069 level-9 gzip bytes. Vue is built
-only in the separate documentation host.
+47,686 level-9 gzip bytes. Issue #110 adds the selected Atom Button/Icon styles
+and app-local Molecule/Organism purchase path, measuring 171,264 raw and 50,069
+gzip bytes. With the #112 functional bag quantity boundary and reactive property
+view, the combined production entry measures 179,650 raw and 52,435 gzip bytes.
+The exact #112 increment over #110 is 8,386 raw and 2,366 gzip bytes; relative
+to the issue #88 baseline of 158,152 raw and 45,683 gzip bytes, the combined
+increment is 21,498 raw and 6,752 gzip bytes. The reviewed regression ceilings
+are 182,000 raw bytes and 54,000 gzip bytes; HTML, image-byte, and image-count
+ceilings remain unchanged. These are composition measurements, not runtime-
+speed or framework-size claims. Vue is built only in the documentation host.
 
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps

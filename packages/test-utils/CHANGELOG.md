@@ -8,3 +8,5 @@
   props, slots, events, application context, plugins, and deterministic cleanup.
 - Isolated Router and Store factories, fixture leak reporting, automatic cleanup,
   and public scheduler settling controls.
+- Functional Custom Element fixtures retain inferred properties/exposed methods
+  and verify setup cleanup through ordinary mount ownership.

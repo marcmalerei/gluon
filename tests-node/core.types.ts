@@ -10,7 +10,10 @@ import {
   compose,
   directive,
   defineAsyncComponent,
+  defineGluonElement,
   dynamicComponent,
+  elementEvent,
+  elementProperty,
   elementRef,
   event,
   exposedRef,
@@ -214,6 +217,49 @@ class TypedElement extends GluonElement<TypedEvents> {
   }
 }
 void TypedElement;
+
+const FunctionalQuantityElement = defineGluonElement({
+  tagName: 'typed-functional-quantity',
+  formAssociated: true,
+  properties: {
+    product: elementProperty<{ id: string; price: number }>({ type: Object, required: true }),
+    value: { type: Number, reflect: true, default: 1 },
+  },
+  events: {
+    change: elementEvent<{ value: number }>({ cancelable: true }),
+  },
+  slots: {
+    default: { required: true },
+  },
+  setup(context) {
+    context.props.product.price.toFixed(2);
+    context.props.value.toFixed();
+    const draft = context.state('draft', context.props.value);
+    const doubled = context.computed(() => draft.value * 2);
+    context.watch(draft, (value) => { value.toFixed(); });
+    context.form.setValue(String(draft.value));
+    context.onCleanup(() => undefined);
+    return {
+      expose: {
+        focus: (options?: FocusOptions) => context.host.shadowRoot?.querySelector('button')?.focus(options),
+        setValue(value: number) { draft.value = value; },
+      },
+      render: () => html`<button>${doubled.value}</button><slot></slot>`,
+    };
+  },
+});
+const functionalQuantity = new FunctionalQuantityElement();
+functionalQuantity.product = { id: 'lamp', price: 12 };
+functionalQuantity.value = 2;
+functionalQuantity.setValue(3);
+functionalQuantity.focus();
+functionalQuantity.checkValidity();
+// @ts-expect-error inferred structured properties retain their value type
+functionalQuantity.product = { id: 'lamp', price: 'invalid' };
+// @ts-expect-error inferred primitive properties retain their value type
+functionalQuantity.value = 'invalid';
+// @ts-expect-error exposed methods retain their argument type
+functionalQuantity.setValue('invalid');
 
 const typedSlot: ScopedSlot<{ count: number }> = ({ count }) => html`<b>${count}</b>`;
 renderScopedSlot(typedSlot, { count: 1 });

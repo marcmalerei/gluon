@@ -22,6 +22,9 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
   form-associated `gluon-product-configurator` Custom Element consumed by the
   maintained Vue 3 host
 - a reactive bag with configured line items and quantities
+- an app-local `gluon-bag-quantity` autonomous Custom Element authored through
+  `defineGluonElement()`, with inferred properties/native events, cancelable
+  optimistic quantity state, exposed focus, and 44px actions
 - a labeled checkout form, exact order summary, and URL-addressable confirmation
 - one isolated Store manager per shop application and persisted configured bag lines
 - abortable product availability with explicit loading, error, timeout, and retry UI
@@ -50,6 +53,13 @@ activates the product flow. The product configurator owns its control DOM and
 light-DOM slots form the host boundary. Server output retains the product title,
 inventory status, and facts as light DOM before the element upgrades.
 
+The bag quantity/remove surface is the concise-authoring acceptance boundary.
+`src/bag-quantity-control.ts` registers lazily from the real bag flow, imports
+only `@gluonjs/core`, owns one constructable ShadowRoot sheet, and communicates
+with the Store through cancelable native events. Its explicitly keyed optimistic
+quantity survives reconnect and compatible HMR; the Store remains the
+authoritative bag owner.
+
 The production pipeline emits hashed client assets and `gluon-assets.json`, a
 Vite SSR request bundle, and five route-aware static documents with one recorded
 dynamic product family plus stateful checkout and order fallbacks. See [static
@@ -70,7 +80,8 @@ available local and LAN URLs. The monorepo Vite configuration maps official
 package names to workspace sources; shop application files import public
 package entry points only. The same configuration installs `@gluonjs/vite`.
 Compatible edits to exported page/components, the shop Store definition,
-`shopStyles`, and `productConfiguratorStyles` update without a full reload;
+`shopStyles`, `productConfiguratorStyles`, and functional bag-control setup
+update without a full reload;
 public-schema or constructor changes use the documented reload boundary.
 
 ## Design system
@@ -99,6 +110,9 @@ The latest verified renders are:
 - [Vue-migration product boundary at 390px](design/rendered-product-migration-mobile.png)
 - [desktop keyboard focus on the product gallery](design/rendered-product-focus-desktop.png)
 - [mobile keyboard focus on the product gallery](design/rendered-product-focus-mobile.png)
+- [functional bag quantity control on desktop](../../output/playwright/issue-112-functional-bag-desktop.png)
+- [functional bag quantity control at 390px](../../output/playwright/issue-112-functional-bag-390.png)
+- [functional bag quantity control at 320px](../../output/playwright/issue-112-functional-bag-320.png)
 
 ## Verification contract
 
@@ -136,8 +150,13 @@ device, or general framework-speed claims.
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
 includes the target-scoped UI owner and the selected typed Atom purchase-action
-styles. It measures 171,264 raw bytes and 50,069 level-9 gzip bytes against the
-reviewed 174,000 / 52,000 ceilings. The five WebP product/editorial assets total 155,126
+styles. With the #112 functional bag quantity boundary and reactive property
+view, the combined entry measures 179,650 raw bytes and 52,435 level-9 gzip
+bytes against the reviewed 182,000 / 54,000 ceilings. The exact #112 increment
+over #110 is 8,386 raw and 2,366 gzip bytes and includes the concise authoring
+runtime plus the app-local control. Relative to the issue #88 baseline of
+158,152 raw and 45,683 gzip bytes, the combined increment is 21,498 raw and
+6,752 gzip bytes. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

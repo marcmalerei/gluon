@@ -4,6 +4,8 @@ import {
   compose,
   createInjectionKey,
   defineElement,
+  defineGluonElement,
+  elementEvent,
   html,
   inject,
   type GluonPlugin,
@@ -104,6 +106,34 @@ describe('@gluonjs/test-utils component fixtures', () => {
 });
 
 describe('@gluonjs/test-utils Custom Element fixtures', () => {
+  it('mounts the inferred contract of a functional Custom Element and releases setup', async () => {
+    const cleanup = vi.fn();
+    const FunctionalPanel = defineGluonElement({
+      tagName: 'gluon-functional-test-panel',
+      properties: { title: { type: String, default: 'Panel' } },
+      events: { confirm: elementEvent<{ title: string }>() },
+      setup(context) {
+        context.onCleanup(cleanup);
+        return {
+          expose: { confirm: () => context.emit('confirm', { title: context.props.title }) },
+          render: () => html`<h2>${context.props.title}</h2><slot></slot>`,
+        };
+      },
+    });
+    const onConfirm = vi.fn();
+    const fixture = mountElement<InstanceType<typeof FunctionalPanel>>('gluon-functional-test-panel', {
+      properties: { title: 'Review' },
+      slots: { default: 'Body' },
+      events: { confirm: onConfirm },
+    });
+    await flushUpdates();
+    expect(fixture.element.shadowRoot?.querySelector('h2')?.textContent).toBe('Review');
+    fixture.element.confirm();
+    expect((fixture.emitted('confirm')[0]?.event as CustomEvent).detail).toEqual({ title: 'Review' });
+    fixture.cleanup();
+    expect(cleanup).toHaveBeenCalledOnce();
+  });
+
   it('supports properties, attributes, slots, events, and listener cleanup', async () => {
     class TestPanel extends GluonElement {
       declare title: string;

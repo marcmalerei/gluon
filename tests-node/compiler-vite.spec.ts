@@ -45,7 +45,7 @@ describe('@gluonjs/compiler', () => {
   it('maps template expressions and adds development-only stable identities', () => {
     const id = '/app/product-card.ts';
     const source = [
-      "import { css as sheet, defineElement as register, GluonElement, html as view } from '@gluonjs/core';",
+      "import { css as sheet, defineElement as register, defineGluonElement as registerFunctional, GluonElement, html as view } from '@gluonjs/core';",
       "import { defineStore as storeDefinition } from '@gluonjs/store';",
       "export const state = storeDefinition({ id: 'card', state: () => ({ count: 1 }) });",
       'export class ProductCard extends GluonElement {',
@@ -56,6 +56,7 @@ describe('@gluonjs/compiler', () => {
       '  }',
       '}',
       "register('product-card', ProductCard);",
+      "registerFunctional({ tagName: 'quantity-control', setup: () => ({ render: () => view`<output>${state.id}</output>` }) });",
       'export function Price() { return view`<output>${state.options.id}</output>`; }',
       'export const Badge = () => view`<mark>${state.id}</mark>`;',
     ].join('\n');
@@ -65,10 +66,11 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.code).toContain('__gluonHmrStyle(sheet`');
     expect(transformed.code).toContain('__gluonHmrStore(storeDefinition(');
     expect(transformed.code).toContain('__gluonHmrElement(register,');
+    expect(transformed.code).toContain('__gluonHmrFunctionalElement(registerFunctional,');
     expect(transformed.code).toContain('declare selected: boolean;');
     expect(transformed.code).toContain('import.meta.hot.accept');
     expect(transformed.code).toContain('Badge = __gluonHmrComponent(');
-    expect(transformed.templates).toHaveLength(4);
+    expect(transformed.templates).toHaveLength(5);
     expect(transformed.templates[1]?.parts).toHaveLength(1);
 
     const generatedOffset = transformed.code.indexOf('state.options.id');
@@ -121,6 +123,45 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.templates[1]?.start.line).toBe(3);
     expect(transformed.code).toContain('nest(Panel, {})`');
     expect(transformed.map.sourcesContent).toEqual([source]);
+  });
+
+  it('reports source-located functional element tag, cleanup, and lifecycle ownership mistakes', () => {
+    const source = `
+      import { defineGluonElement, html } from '@gluonjs/core';
+      defineGluonElement({
+        tagName: 'Invalid',
+        setup(context) {
+          window.addEventListener('resize', () => undefined);
+          queueMicrotask(() => context.onUpdated(() => undefined));
+          return { render: () => html\`<p>Invalid</p>\` };
+        },
+      });
+    `;
+    const transformed = transformGluonModule(source, '/app/invalid-element.ts');
+    expect(transformed.diagnostics.map(({ code }) => code)).toEqual([
+      'GLUON_ELEMENT_TAG_INVALID',
+      'GLUON_ELEMENT_SETUP_CLEANUP_MISSING',
+      'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED',
+    ]);
+    for (const diagnostic of transformed.diagnostics) {
+      expect(diagnostic.location.line).toBeGreaterThan(1);
+      expect(diagnostic.location.column).toBeGreaterThan(0);
+    }
+
+    const valid = transformGluonModule(`
+      import { defineGluonElement, html } from '@gluonjs/core';
+      defineGluonElement({
+        tagName: 'valid-element',
+        setup(context) {
+          const listener = () => undefined;
+          window.addEventListener('resize', listener);
+          context.onCleanup(() => window.removeEventListener('resize', listener));
+          context.onUpdated(() => undefined);
+          return { render: () => html\`<p>Valid</p>\` };
+        },
+      });
+    `, '/app/valid-element.ts');
+    expect(valid.diagnostics).toEqual([]);
   });
 });
 

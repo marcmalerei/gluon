@@ -163,6 +163,11 @@ security, SSR, and third-party-host rules.
 Gluon 1.0 defines autonomous Custom Elements only. Customized built-in elements
 are outside the public Gluon component API.
 
+[RFC 0005](0005-functional-custom-element-authoring.md) adds a concise
+setup-based authoring path that generates this same `GluonElement` boundary. It
+does not change the stateful/stateless split, autonomous registration, native
+transport, renderer, or lifecycle decisions in this RFC.
+
 Registration follows these rules:
 
 - A package exports its element class and an explicit registration path. Merely

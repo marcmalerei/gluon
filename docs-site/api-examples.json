@@ -826,11 +826,11 @@
         "} from '@gluonjs/compiler/diagnostics';",
         "",
         "const definition: GluonDiagnosticDefinition | undefined =",
-        "  getGluonDiagnostic('GLUON_TEMPLATE_STYLE_ELEMENT');",
+        "  getGluonDiagnostic('GLUON_TEMPLATE_SLOT_UNKNOWN');",
         "const source: GluonDiagnosticSource | undefined = definition?.source;",
-        "const message = formatGluonDiagnostic('GLUON_TEMPLATE_STYLE_ELEMENT', 'product-card.ts:12');",
-        "const productionMessage = formatGluonDiagnostic('GLUON_TEMPLATE_STYLE_ELEMENT', '', { production: true });",
-        "const url = gluonDiagnosticReferenceUrl('G1101', '/gluon/diagnostics');",
+        "const message = formatGluonDiagnostic('GLUON_TEMPLATE_SLOT_UNKNOWN', 'product-card.ts:12');",
+        "const productionMessage = formatGluonDiagnostic('GLUON_TEMPLATE_SLOT_UNKNOWN', '', { production: true });",
+        "const url = gluonDiagnosticReferenceUrl('G1111', '/gluon/diagnostics');",
         "console.log(GLUON_DIAGNOSTIC_CATALOG_VERSION, gluonDiagnosticCatalog.length, source, message, productionMessage, url);"
       ]
     },
@@ -1443,6 +1443,39 @@
         "  'Catalog',",
         ");",
         "console.log(Price.layer, ProductCard.layer, Catalog({ products: [] }));"
+      ]
+    },
+    "core-functional-element": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import { defineGluonElement, elementEvent, elementProperty, html } from '@gluonjs/core';",
+        "",
+        "type Product = { id: string; price: number };",
+        "const QuantityControl = defineGluonElement({",
+        "  tagName: 'shop-quantity',",
+        "  formAssociated: true,",
+        "  properties: {",
+        "    product: elementProperty<Product>({ type: Object, required: true }),",
+        "    value: { type: Number, reflect: true, default: 1 },",
+        "  },",
+        "  events: { change: elementEvent<{ value: number }>({ cancelable: true }) },",
+        "  slots: { default: { required: true }, help: { fallback: true } },",
+        "  setup(context) {",
+        "    const value = context.state('value', context.props.value);",
+        "    const total = context.computed(() => value.value * context.props.product.price);",
+        "    context.onUpdated(() => context.form.setValue(String(value.value)));",
+        "    context.onCleanup(() => console.log('quantity setup released'));",
+        "    return {",
+        "      expose: { focus: () => context.host.shadowRoot?.querySelector('button')?.focus() },",
+        "      render: () => html`<slot></slot><button>${value.value}</button><output>${total.value}</output><slot name=\"help\"></slot>`,",
+        "    };",
+        "  },",
+        "});",
+        "",
+        "const quantity = new QuantityControl();",
+        "quantity.product = { id: 'lamp', price: 12 };",
+        "quantity.value = 2;",
+        "quantity.focus();"
       ]
     },
     "core-element-contract": {
@@ -4128,6 +4161,10 @@
       "recipe": "core-element-contract",
       "description": "Register a Gluon Element constructor under one stable custom-element tag before browser or server instantiation:"
     },
+    "src/functions/defineGluonElement.md": {
+      "recipe": "core-functional-element",
+      "description": "Define one registered autonomous Custom Element with inferred properties, events, slots, form APIs, retained local state, connection-owned cleanup, and a render function:"
+    },
     "src/functions/defineMolecule.md": {
       "recipe": "core-component-layers",
       "description": "Compose Atoms into a typed Molecule with a stable display name and layer metadata:"
@@ -4139,6 +4176,14 @@
     "src/functions/disposeGluonApplicationForServer.md": {
       "recipe": "core-server-application",
       "description": "Release server-only application plugins, scopes, and lifecycle resources in a `finally` block after serialization:"
+    },
+    "src/functions/elementEvent.md": {
+      "recipe": "core-functional-element",
+      "description": "Carry a native CustomEvent detail type and dispatch options into a functional element definition without a duplicate event interface:"
+    },
+    "src/functions/elementProperty.md": {
+      "recipe": "core-functional-element",
+      "description": "Carry a structured property type into a functional element definition without an instance declare field:"
     },
     "src/functions/event.md": {
       "recipe": "core-template-rendering",

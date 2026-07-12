@@ -14,6 +14,7 @@ src/
 ├── model.ts            Controlled native and Custom Element model bindings
 ├── runtime.ts          Template results, compiler plans, Parts, spreading, render
 ├── element.ts          Reactive Custom Element base and definition helper
+├── functional-element.ts Setup-based authoring lowered to GluonElement
 ├── component.ts        Atom, Molecule, and Organism metadata helpers
 ├── props.ts            Class/style-aware prop merging
 └── styles/             Constructable stylesheet creation and adoption
@@ -168,7 +169,8 @@ call. RFC 0004 fixes this boundary.
 
 `@gluonjs/vite` transforms application modules inside the resolved Vite root.
 Development transforms route exported functions, Store definitions,
-`defineElement()` registration, and `css` results through one virtual client.
+`defineElement()` and `defineGluonElement()` registration, and `css` results
+through one virtual client.
 That client keeps identities by normalized module URL and transform key. Store
 managers receive their public `hotUpdate()` path; adopted sheets retain their
 object identity while `replaceSync()` changes CSSOM contents; mounted
@@ -176,8 +178,8 @@ applications and connected elements receive scheduler-owned render requests.
 
 The first registered Custom Element constructor remains the registry value.
 Compatible edits patch its prototype and static contracts. Tag, superclass,
-form association, constructor/instance-field initialization, property/attribute
-schema, and component stylesheet-count changes invalidate the boundary and
+form association, constructor/instance-field initialization, property/attribute,
+event, or slot schema, and component stylesheet-count changes invalidate the boundary and
 require a reload. Production transforms omit the virtual client, hot handlers,
 and module keys and define Core's render-debug flag as false.
 
@@ -362,6 +364,17 @@ prototype gaps and the required Gluon 1.0 contract.
 - inherited constructable stylesheets
 
 Every instance renders into an open ShadowRoot. Component styles are always adopted `CSSStyleSheet` instances.
+
+`defineGluonElement()` generates a subclass with the same declarations and
+protected hooks. Setup runs in a child of the connection render scope;
+explicitly keyed ref/reactive state is instance-retained, while computed values,
+watchers, lifecycle registrations, and cleanups are connection-local. SSR uses
+an isolated temporary setup scope, hydration uses the normal connection owner,
+and compatible HMR reruns patched setup while retaining the host and state. The
+accepted contract is [RFC 0005](rfcs/0005-functional-custom-element-authoring.md).
+Its readonly `context.props` proxy reads native host properties and tracks an
+internal revision advanced by accepted declared-property writes; this keeps
+property watchers reactive without introducing a second property store.
 
 ## Styling invariant
 

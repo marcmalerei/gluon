@@ -19,8 +19,14 @@ of already-adopted `CSSStyleSheet` instances. It then requests a render pass for
 mounted Gluon applications and connected Gluon elements. The page is not
 reloaded for compatible template, method, store-logic, or stylesheet edits.
 
+Imported `defineGluonElement()` calls use the same registered-constructor
+bridge. Compatible edits stop the prior setup child scope and run patched setup
+inside the existing render owner while retaining explicit keyed state,
+`ElementInternals` form state, host, ShadowRoot, compatible template DOM, and
+stylesheet identity.
+
 A Custom Element superclass, form association, tag name, constructor/instance
-field initialization, or public property/attribute schema change is not a
+field initialization, or public property/attribute, event, or slot schema change is not a
 compatible edit. Such changes invalidate the HMR boundary and require a page
 reload. Store IDs are also stable HMR identities.
 

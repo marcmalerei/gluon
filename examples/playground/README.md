@@ -10,6 +10,11 @@ npm run dev:playground
 npm run build:playground
 ```
 
+The default reproduction defines and renders a stateful Custom Element with the
+public `defineGluonElement` and `elementEvent` APIs. Re-running edited source
+reuses the registered example tag while the preview continues to receive typed
+property and native event bindings.
+
 The App and Styles tabs edit a typed two-file reproduction. Run transpiles the
 TypeScript modules, executes imports from the supported public `@gluonjs/core`
 and `@gluonjs/reactivity` entry points, renders the exported default, `App`,

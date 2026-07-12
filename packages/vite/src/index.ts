@@ -36,7 +36,7 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
     load(id) {
       if (id !== resolvedVirtualId) return null;
       const client = normalizePath(existsSync(sourceClient) ? sourceClient : builtClient);
-      return `export { accept, component, element, store, style } from ${JSON.stringify(client)};`;
+      return `export { accept, component, element, functionalElement, store, style } from ${JSON.stringify(client)};`;
     },
     transform(code, id) {
       const cleanId = normalizePath(id.split('?', 1)[0]!);

@@ -13,7 +13,16 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   path, compiler/language-tooling boundaries, retained Gluon/React/Vue
   checkout-dialog comparison, generated starter and Playground examples, and
   GLUON GOODS RouterLink adoption without another renderer or host.
-
+- `defineGluonElement()`, `elementProperty()`, and `elementEvent()` for concise
+  stateful autonomous Custom Elements with inferred public contracts, explicitly
+  keyed reconnect/HMR state, connection-owned setup cleanup, form association,
+  SSR/hydration, Devtools, test-utils, compiler, and language-tooling evidence.
+- A retained Gluon class/functional, Vue, and React stateful form-control
+  comparison with separate component/boundary metrics, browser and SSR evidence,
+  generator and Playground examples, explicit limitations, and every verified
+  Gluon disadvantage recorded without a general ranking claim.
+- Source-located editor and `gluon-template-check` diagnostics for unknown named
+  light-DOM slot assignments against literal functional-element declarations.
 - A versioned seven-task Gluon/Vue/React developer-experience benchmark
   contract, strict raw-run evidence schema, official comparator-selection
   record, and blocking validator that reports the current zero-run boundary
