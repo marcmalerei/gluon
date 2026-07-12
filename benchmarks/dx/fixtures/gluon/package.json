@@ -17,6 +17,7 @@
     "@gluonjs/molecules": "0.0.0",
     "@gluonjs/organisms": "0.0.0",
     "@gluonjs/quarks": "0.0.0",
+    "@gluonjs/reactivity": "0.0.0",
     "@gluonjs/router": "0.0.0",
     "@gluonjs/ssr": "0.0.0",
     "@gluonjs/store": "0.0.0"
