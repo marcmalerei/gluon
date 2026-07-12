@@ -56,6 +56,12 @@ if (apiExampleManifest.symbolPages !== apiSymbolFiles.length
   || apiExampleManifest.entries.length !== apiSymbolFiles.length) {
   throw new Error(`API examples cover ${apiExampleManifest.entries.length} pages; generated API has ${apiSymbolFiles.length} symbol pages`);
 }
+if (apiExampleManifest.dependencyExamples !== 0) {
+  throw new Error(`API reference still contains ${apiExampleManifest.dependencyExamples} generic runtime-owner consumer examples`);
+}
+if (apiExampleManifest.curatedExamples !== apiExampleManifest.symbolPages) {
+  throw new Error(`API reference has ${apiExampleManifest.curatedExamples} reviewed examples for ${apiExampleManifest.symbolPages} symbol pages`);
+}
 const examplePaths = apiExampleManifest.entries.map(({ path }) => path).sort();
 if (JSON.stringify(examplePaths) !== JSON.stringify(apiSymbolFiles)) {
   throw new Error('API example manifest paths do not match the generated symbol pages');
@@ -68,6 +74,11 @@ for (const entry of apiExampleManifest.entries) {
   for (const placeholder of [/\bdeclare const\b/, /\btype Example\s*=/, /\bvoid value\b/]) {
     if (placeholder.test(markdown)) throw new Error(`Generated API example contains a compiler-only placeholder: ${entry.path}`);
   }
+  for (const genericCopy of [
+    'with representative values',
+    'when the application already owns its required runtime dependencies',
+    'without recreating framework-owned runtime state',
+  ]) if (markdown.includes(genericCopy)) throw new Error(`Generated API example contains generic purpose copy: ${entry.path}`);
   const html = await readFile(resolve(outputRoot, versions.latest, 'api/generated', entry.htmlPath), 'utf8');
   if (!html.includes('id="example"') || !html.includes('class="language-ts"')) {
     throw new Error(`Rendered API example is missing from ${entry.htmlPath}`);
@@ -107,7 +118,7 @@ const buttonPropsExample = await readFile(resolve(
   root,
   '.tmp/docs-api/packages/atoms/src/interfaces/ButtonProps.md',
 ), 'utf8');
-for (const required of ['disabled: true', "label: 'example'", 'onClick: (event)']) {
+for (const required of ["label: 'Add to bag'", "variant: ButtonVariant = 'primary'", "size: ButtonSize = 'large'", 'onClick: (event: MouseEvent)', 'Button(button)']) {
   if (!buttonPropsExample.includes(required)) throw new Error(`ButtonProps API example is missing: ${required}`);
 }
 
