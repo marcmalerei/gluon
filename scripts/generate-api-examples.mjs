@@ -24,6 +24,8 @@ if (catalog.version !== 1 || !isRecord(catalog.overrides)) {
 const modules = new Map();
 const compilerPaths = {};
 const reflectionModules = new Map((reflectionProject.children ?? []).map((module) => [module.name, module]));
+const reflectionsById = new Map();
+indexReflections(reflectionProject);
 for (const entryPoint of typedoc.entryPoints) {
   const moduleName = moduleNameForEntryPoint(entryPoint);
   const publicModule = publicModuleFor(moduleName);
@@ -42,6 +44,7 @@ await rm(corpusRoot, { recursive: true, force: true });
 await mkdir(resolve(corpusRoot, 'corpus'), { recursive: true });
 const unusedOverrides = new Set(Object.keys(catalog.overrides));
 const manifestEntries = [];
+const workItems = new Map();
 
 for (const [index, page] of symbolPages.entries()) {
   const module = modules.get(page.moduleName);
@@ -57,6 +60,9 @@ for (const [index, page] of symbolPages.entries()) {
   }
   const description = override?.description ?? baselineDescription(page, publicModule);
   const code = override ? curatedCode(page, override) : baselineCode(page, publicModule, reflection);
+  for (const placeholder of [/\bdeclare const\b/, /\btype Example\s*=/, /\bvoid value\b/]) {
+    if (placeholder.test(code)) throw new Error(`${page.path} contains a compiler-only placeholder.`);
+  }
   const markdownPath = resolve(apiRoot, page.path);
   const markdown = await readFile(markdownPath, 'utf8');
   if (/^## Examples?$/m.test(markdown)) {
@@ -66,14 +72,25 @@ for (const [index, page] of symbolPages.entries()) {
 
   const typecheckFile = `corpus/${String(index + 1).padStart(4, '0')}.ts`;
   await writeFile(resolve(corpusRoot, typecheckFile), `${code}\n`);
-  manifestEntries.push({
+  const manifestEntry = {
     path: page.path,
     htmlPath: page.path.replace(/\.md$/, '.html'),
     kind: page.kind.label,
     symbol: page.symbol,
     module: publicModule,
     curated: Boolean(override),
+    fallback: false,
     typecheckFile,
+  };
+  manifestEntries.push(manifestEntry);
+  workItems.set(typecheckFile, {
+    page,
+    reflection,
+    publicModule,
+    markdownPath,
+    markdown: markdown.trimEnd(),
+    manifestEntry,
+    curated: Boolean(override),
   });
 }
 
@@ -91,7 +108,27 @@ await writeFile(tsconfigPath, `${JSON.stringify({
   },
   include: ['corpus/**/*.ts'],
 }, null, 2)}\n`);
-typecheck(tsconfigPath);
+let diagnostics = diagnosticsFor(tsconfigPath);
+if (diagnostics.length > 0) {
+  const failingFiles = new Set(diagnostics
+    .map((diagnostic) => diagnostic.file?.fileName)
+    .filter(Boolean)
+    .map((fileName) => slash(relative(corpusRoot, fileName))));
+  for (const typecheckFile of failingFiles) {
+    const item = workItems.get(typecheckFile);
+    if (!item) continue;
+    if (item.curated) {
+      throw new Error(`Curated API example does not typecheck: ${item.page.path}\n${formatDiagnostics(diagnostics.filter((diagnostic) => diagnostic.file?.fileName.endsWith(typecheckFile)))}`);
+    }
+    const description = fallbackDescription(item.page, item.publicModule);
+    const code = fallbackCode(item.page, item.publicModule, item.reflection);
+    await writeFile(item.markdownPath, `${item.markdown}\n\n## Example\n\n${description}\n\n\`\`\`ts\n${code}\n\`\`\`\n`);
+    await writeFile(resolve(corpusRoot, typecheckFile), `${code}\n`);
+    item.manifestEntry.fallback = true;
+  }
+  diagnostics = diagnosticsFor(tsconfigPath);
+}
+if (diagnostics.length > 0) throw new Error(`Generated API examples do not typecheck:\n${formatDiagnostics(diagnostics)}`);
 
 const counts = Object.fromEntries([...symbolKinds.values()].map(({ label }) => [label, 0]));
 for (const entry of manifestEntries) counts[entry.kind] += 1;
@@ -100,12 +137,13 @@ const manifest = {
   generatedAt: null,
   symbolPages: manifestEntries.length,
   curatedExamples: manifestEntries.filter(({ curated }) => curated).length,
+  dependencyExamples: manifestEntries.filter(({ fallback }) => fallback).length,
   counts,
   entries: manifestEntries,
 };
 await writeFile(resolve(corpusRoot, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 
-console.log(`API examples valid: ${manifest.symbolPages} symbol pages, ${manifest.curatedExamples} curated, all snippets typechecked`);
+console.log(`API examples valid: ${manifest.symbolPages} symbol pages, ${manifest.curatedExamples} curated, ${manifest.dependencyExamples} application-owned dependency examples, all snippets typechecked`);
 
 function symbolPage(path) {
   const parts = path.split('/');
@@ -152,11 +190,15 @@ function packageModule(packageName, exportPath) {
 }
 
 function baselineDescription(page, publicModule) {
-  const noun = page.kind.typeOnly ? 'type' : page.kind.label.toLowerCase();
-  if (page.symbol === 'default') {
-    return `Import and use the default ${noun} from its public \`${publicModule}\` entry point:`;
-  }
-  return `Import and use the \`${page.symbol}\` ${noun} from its public \`${publicModule}\` entry point:`;
+  const action = {
+    Function: 'Call',
+    Class: 'Construct and use',
+    Interface: 'Use',
+    'Type alias': 'Use',
+    Variable: 'Use',
+  }[page.kind.label];
+  const name = page.symbol === 'default' ? 'the default export' : `\`${page.symbol}\``;
+  return `${action} ${name} through the public \`${publicModule}\` entry point with representative values:`;
 }
 
 function baselineCode(page, publicModule, reflection) {
@@ -164,16 +206,442 @@ function baselineCode(page, publicModule, reflection) {
   const importLine = page.symbol === 'default'
     ? `import ${page.kind.typeOnly ? 'type ' : ''}${localName} from '${publicModule}';`
     : `import ${page.kind.typeOnly ? 'type ' : ''}{ ${page.symbol} } from '${publicModule}';`;
-  const typeArguments = reflection.typeParameters?.length > 0
-    ? `<${reflection.typeParameters.map(() => 'any').join(', ')}>`
-    : '';
+  const typeArguments = typeArgumentsFor(reflection);
   if (page.kind.label === 'Function') {
-    return `${importLine}\n\ntype ApiArguments = typeof ${localName} extends (...args: infer Args) => unknown ? Args : never;\ndeclare const args: ApiArguments;\nconst result = ${localName}(...args);\nvoid result;`;
+    const signature = reflection.signatures?.[0];
+    if (!signature) throw new Error(`${page.path} has no callable signature.`);
+    const argumentsList = requiredParameters(signature)
+      .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name }))
+      .join(', ');
+    const call = `${localName}(${argumentsList})`;
+    if (isVoidType(signature.type)) return `${importLine}\n\n${call};`;
+    return `${importLine}\n\nconst result = ${call};\nconsole.log(result);`;
   }
   if (page.kind.label === 'Variable') {
-    return `${importLine}\n\nconst value = ${localName};\nvoid value;`;
+    const callable = callableInfo(reflection.type);
+    if (callable) {
+      const argumentsList = requiredParameters(callable.signature)
+        .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name, substitutions: callable.substitutions }))
+        .join(', ');
+      const call = `${localName}(${argumentsList})`;
+      return isVoidType(callable.signature.type)
+        ? `${importLine}\n\n${call};`
+        : `${importLine}\n\nconst result = ${call};\nconsole.log(result);`;
+    }
+    const property = firstReadableProperty(reflection.type);
+    if (property) return `${importLine}\n\nconsole.log(${localName}.${property});`;
+    return `${importLine}\n\nconsole.log('${localName}:', ${localName});`;
   }
-  return `${importLine}\n\ntype Example = ${localName}${typeArguments};`;
+  if (page.kind.label === 'Class') {
+    if (reflection.flags?.isAbstract) return consumerExample(importLine, localName, typeArguments, reflection);
+    const constructor = reflection.children?.find(({ kind }) => kind === 512)?.signatures?.[0];
+    if (!constructor) throw new Error(`${page.path} has no public constructor.`);
+    const argumentsList = requiredParameters(constructor)
+      .map((parameter) => synthesizeType(parameter.type, { hint: parameter.name }))
+      .join(', ');
+    return `${importLine}\n\nconst instance = new ${localName}(${argumentsList});\nconsole.log(instance);`;
+  }
+  if (!shouldCreateConcreteValue(page, reflection)) {
+    return consumerExample(importLine, localName, typeArguments, reflection);
+  }
+  const expression = page.kind.label === 'Interface'
+    ? synthesizeDeclaration(reflection, { includeOptional: true, hint: localName })
+    : synthesizeType(reflection.type, { includeOptional: true, hint: localName });
+  return `${importLine}\n\nconst example = (${expression}) satisfies ${localName}${typeArguments};\nconsole.log(example);`;
+}
+
+function fallbackDescription(page, publicModule) {
+  const name = page.symbol === 'default' ? 'the default export' : `\`${page.symbol}\``;
+  if (page.kind.label === 'Function') {
+    return `Call ${name} from the public \`${publicModule}\` entry point when the application already owns its required runtime dependencies:`;
+  }
+  return `Consume ${name} from the public \`${publicModule}\` entry point without recreating framework-owned runtime state:`;
+}
+
+function fallbackCode(page, publicModule, reflection) {
+  const localName = page.symbol === 'default' ? 'api' : page.symbol;
+  const importLine = page.symbol === 'default'
+    ? `import ${page.kind.typeOnly ? 'type ' : ''}${localName} from '${publicModule}';`
+    : `import ${page.kind.typeOnly ? 'type ' : ''}{ ${page.symbol} } from '${publicModule}';`;
+  if (page.kind.label === 'Function') {
+    const functionName = `run${localName === 'api' ? 'Api' : localName[0].toUpperCase() + localName.slice(1)}`;
+    const signature = reflection.signatures?.[0];
+    if (!signature) throw new Error(`${page.path} has no callable signature for its dependency example.`);
+    const parameters = requiredParameters(signature);
+    const declarations = parameters.map((parameter, index) => (
+      `${safeIdentifier(parameter.name, `value${index + 1}`)}: Parameters<typeof ${localName}>[${index}]`
+    ));
+    const argumentsList = parameters.map((parameter, index) => safeIdentifier(parameter.name, `value${index + 1}`));
+    return `${importLine}\n\nfunction ${functionName}(\n  ${declarations.join(',\n  ')},\n): ReturnType<typeof ${localName}> {\n  return ${localName}(${argumentsList.join(', ')});\n}`;
+  }
+  return consumerExample(importLine, localName, typeArgumentsFor(reflection), reflection);
+}
+
+function shouldCreateConcreteValue(page, reflection) {
+  if (page.kind.label === 'Interface') {
+    const members = reflection.children ?? [];
+    const required = members.filter((member) => !member.flags?.isOptional);
+    if (required.length > 7 || members.length > 14) return false;
+    return /(?:Options|Props|Position|Snapshot|Location|Definition|Entry|Range|Diagnostic|Source|State|Request|Record|Metadata|Mutation|Action|Manifest|Report|Config|Message|Hint|Issue|Edit|Selection|Span|Token|Event|Payload|Response|Finding|Inventory|Summary|Counts|Recommendation|Feature|Project|File|Limit|Budget|Violation|Carrier|Descriptor|Registration|Target|Declaration|Map)$/.test(page.symbol)
+      || required.length <= 4;
+  }
+  if (page.kind.label === 'Type alias') {
+    if (reflection.type?.type === 'intersection') return false;
+    if (reflection.type?.type === 'reflection') {
+      return Boolean(reflection.type.declaration?.signatures?.length)
+        || (reflection.type.declaration?.children?.length ?? 0) <= 7;
+    }
+    return ['intrinsic', 'literal', 'union', 'reference', 'array', 'tuple', 'templateLiteral'].includes(reflection.type?.type);
+  }
+  return true;
+}
+
+function consumerExample(importLine, localName, typeArguments, reflection) {
+  const property = (reflection.children ?? []).find((member) => (
+    (member.kind === 1024 || member.kind === 2048) && /^[$A-Z_a-z][$0-9A-Z_a-z]*$/.test(member.name)
+  ));
+  const parameterName = safeIdentifier(localName[0].toLowerCase() + localName.slice(1), 'value');
+  const observation = property ? `${parameterName}.${property.name}` : parameterName;
+  return `${importLine}\n\nfunction use${localName}(${parameterName}: ${localName}${typeArguments}): void {\n  console.log(${observation});\n}`;
+}
+
+function requiredParameters(signature) {
+  return (signature.parameters ?? []).filter((parameter) => (
+    !parameter.flags?.isOptional && parameter.defaultValue === undefined
+  ));
+}
+
+function synthesizeType(type, context = {}) {
+  const depth = context.depth ?? 0;
+  const visited = context.visited ?? new Set();
+  if (!type) return 'undefined';
+  if (depth > 7) return fallbackValue(type, context.hint);
+  const next = (nestedType, extra = {}) => synthesizeType(nestedType, {
+    ...context,
+    ...extra,
+    depth: depth + 1,
+    visited,
+  });
+  switch (type.type) {
+    case 'intrinsic':
+      return intrinsicValue(type.name, context.hint);
+    case 'literal':
+      return typeof type.value === 'bigint' ? `${type.value}n` : JSON.stringify(type.value);
+    case 'array':
+      return shouldPopulateArray(context.hint)
+        ? `[${next(type.elementType, { hint: singular(context.hint) })}]`
+        : '[]';
+    case 'tuple':
+      return `[${(type.elements ?? []).map((element, index) => next(element, { hint: `${context.hint ?? 'item'}${index + 1}` })).join(', ')}]`;
+    case 'typeOperator':
+      return next(type.target);
+    case 'optional':
+      return next(type.elementType);
+    case 'rest':
+      return next(type.elementType);
+    case 'union': {
+      const candidate = preferredUnionType(type.types ?? []);
+      return next(candidate);
+    }
+    case 'intersection': {
+      const objects = (type.types ?? []).map((part) => next(part));
+      return objects.length === 1 ? objects[0] : `Object.assign({}, ${objects.join(', ')})`;
+    }
+    case 'reflection':
+      return synthesizeDeclaration(type.declaration, { ...context, depth: depth + 1, visited });
+    case 'reference':
+      return synthesizeReference(type, context);
+    case 'templateLiteral':
+      return JSON.stringify(`${type.head ?? ''}${(type.tail ?? []).map(([part, suffix]) => `${templateLiteralPart(part)}${suffix}`).join('')}`);
+    case 'unknown':
+      return '{}';
+    default:
+      return fallbackValue(type, context.hint);
+  }
+}
+
+function synthesizeReference(type, context) {
+  if (type.refersToTypeParameter) {
+    const substitution = context.substitutions?.get(type.name);
+    if (substitution) return synthesizeType(substitution, { ...context, depth: (context.depth ?? 0) + 1 });
+    const parameter = typeof type.target === 'number' ? reflectionsById.get(type.target) : undefined;
+    if (parameter?.type) return synthesizeType(parameter.type, { ...context, hint: type.name, depth: (context.depth ?? 0) + 1 });
+    return valueForName(type.name);
+  }
+  const name = type.name;
+  const argumentsList = type.typeArguments ?? [];
+  if (name === 'Array' || name === 'ReadonlyArray') {
+    return shouldPopulateArray(context.hint)
+      ? `[${synthesizeType(argumentsList[0], { ...context, hint: singular(context.hint), depth: (context.depth ?? 0) + 1 })}]`
+      : '[]';
+  }
+  if (name === 'Readonly' || name === 'Required' || name === 'Partial') {
+    return name === 'Partial' ? '{}' : synthesizeType(argumentsList[0], { ...context, depth: (context.depth ?? 0) + 1 });
+  }
+  if (name === 'Record') {
+    return `{ example: ${synthesizeType(argumentsList[1], { ...context, hint: 'value', depth: (context.depth ?? 0) + 1 })} }`;
+  }
+  if (name === 'Promise' || name === 'PromiseLike') {
+    return `Promise.resolve(${synthesizeType(argumentsList[0], { ...context, hint: 'result', depth: (context.depth ?? 0) + 1 })})`;
+  }
+  if (name === 'Map' || name === 'ReadonlyMap') return 'new Map()';
+  if (name === 'Set' || name === 'ReadonlySet') return 'new Set()';
+  if (name === 'Date') return "new Date('2026-01-01T00:00:00Z')";
+  if (name === 'RegExp') return '/example/u';
+  if (name === 'URL') return "new URL('https://example.com/products')";
+  if (name === 'URLSearchParams') return "new URLSearchParams({ page: '1' })";
+  if (name === 'AbortSignal') return 'new AbortController().signal';
+  if (name === 'Error') return "new Error('Example failure')";
+  if (name === 'CSSStyleSheet') return 'new CSSStyleSheet()';
+  if (name === 'Document') return 'document';
+  if (name === 'ShadowRoot') return "document.createElement('div').attachShadow({ mode: 'open' })";
+  if (/^(?:HTML\w*Element|HTMLElement|Element|Node)$/.test(name)) return "document.createElement('div')";
+  if (name === 'CustomElementConstructor') return 'class ExampleElement extends HTMLElement {}';
+  if (name === 'PropertyKey') return "'example'";
+  if (name === 'Awaited') return synthesizeType(argumentsList[0], { ...context, depth: (context.depth ?? 0) + 1 });
+  if (typeof type.target === 'number') {
+    const declaration = reflectionsById.get(type.target);
+    if (declaration) {
+      const key = `${type.target}:${context.hint ?? ''}`;
+      if (context.visited?.has(key)) return fallbackValue(type, context.hint);
+      const visited = new Set(context.visited ?? []);
+      visited.add(key);
+      const substitutions = new Map(context.substitutions ?? []);
+      for (const [index, parameter] of (declaration.typeParameters ?? []).entries()) {
+        const argument = type.typeArguments?.[index] ?? parameter.default;
+        if (argument) substitutions.set(parameter.name, argument);
+      }
+      if (declaration.kind === 256) {
+        return synthesizeDeclaration(declaration, { ...context, depth: (context.depth ?? 0) + 1, visited, substitutions });
+      }
+      if (declaration.kind === 2097152) {
+        return synthesizeType(declaration.type, { ...context, depth: (context.depth ?? 0) + 1, visited, substitutions });
+      }
+      if (declaration.kind === 8) {
+        const member = declaration.children?.[0]?.name;
+        if (member) return JSON.stringify(member);
+      }
+      if (declaration.kind === 128) {
+        return synthesizeDeclaration(declaration, { ...context, depth: (context.depth ?? 0) + 1, visited, substitutions });
+      }
+    }
+  }
+  return valueForName(name || context.hint);
+}
+
+function synthesizeDeclaration(declaration, context = {}) {
+  const signature = declaration.signatures?.[0];
+  if (signature) return synthesizeFunction(signature, context);
+  const indexSignature = declaration.indexSignatures?.[0];
+  const properties = (declaration.children ?? []).filter(({ kind }) => kind === 1024);
+  const methods = (declaration.children ?? []).filter(({ kind }) => kind === 2048);
+  const required = [...properties, ...methods].filter((member) => !member.flags?.isOptional);
+  const optional = context.includeOptional
+    ? [...properties, ...methods]
+      .filter((member) => member.flags?.isOptional)
+      .sort((left, right) => exampleMemberScore(left) - exampleMemberScore(right))
+      .slice(0, 3)
+    : [];
+  const selected = [...required, ...optional];
+  if (selected.length === 0 && indexSignature) {
+    return `{ example: ${synthesizeType(indexSignature.type, { ...context, hint: 'value', depth: (context.depth ?? 0) + 1 })} }`;
+  }
+  if (selected.length === 0) return '{}';
+  const lines = selected.map((member) => {
+    const memberSignature = member.signatures?.[0];
+    const value = memberSignature
+      ? synthesizeFunction(memberSignature, { ...context, hint: member.name })
+      : synthesizeType(member.type, { ...context, hint: member.name, depth: (context.depth ?? 0) + 1 });
+    return `  ${propertyName(member.name)}: ${indent(value, 2)},`;
+  });
+  return `{\n${lines.join('\n')}\n}`;
+}
+
+function synthesizeFunction(signature, context = {}) {
+  const parameters = (signature.parameters ?? []).map((parameter, index) => (
+    safeIdentifier(parameter.name, `value${index + 1}`)
+  ));
+  const body = isVoidType(signature.type)
+    ? parameters.length > 0 ? `console.log(${parameters[0]});` : 'return;'
+    : `return ${synthesizeType(signature.type, { ...context, hint: 'result', depth: (context.depth ?? 0) + 1 })};`;
+  return `(${parameters.join(', ')}) => { ${body} }`;
+}
+
+function typeArgumentsFor(reflection) {
+  if (!reflection.typeParameters?.length) return '';
+  return `<${reflection.typeParameters.map((parameter) => typeArgumentFor(parameter)).join(', ')}>`;
+}
+
+function typeArgumentFor(parameter) {
+  const named = {
+    Id: "'counter'",
+    State: '{ count: number }',
+    Getters: '{}',
+    Actions: '{}',
+    Events: '{ change: CustomEvent<number> }',
+    Params: '{ id: string }',
+    Props: '{ label: string }',
+    ElementType: 'HTMLButtonElement',
+    Constructor: 'typeof HTMLElement',
+    Routes: "{ product: { params: { id: string } } }",
+    Args: '[string]',
+    Names: "'default'",
+    TagName: "'button'",
+  }[parameter.name];
+  if (named) return named;
+  if (parameter.default) return typeText(parameter.default, parameter.name);
+  return constraintTypeArgument(parameter.type);
+}
+
+function constraintTypeArgument(type) {
+  if (type?.type === 'intrinsic' && type.name === 'string') return "'example'";
+  if (type?.type === 'intrinsic' && type.name === 'object') return 'Record<string, unknown>';
+  if (type?.type === 'reference' && /Element$/.test(type.name)) return 'HTMLButtonElement';
+  if (type?.type === 'typeOperator') return '[string]';
+  return 'string';
+}
+
+function typeText(type, hint) {
+  if (!type) return constraintTypeArgument(type);
+  if (type.type === 'intrinsic') return type.name;
+  if (type.type === 'literal') return JSON.stringify(type.value);
+  if (type.type === 'reference' && type.refersToTypeParameter) return typeArgumentFor({ name: type.name });
+  if (type.type === 'reference' && type.name === 'Record') return 'Record<string, unknown>';
+  if (type.type === 'reference' && /Element$/.test(type.name)) return 'HTMLButtonElement';
+  if (type.type === 'array') return `${typeText(type.elementType, hint)}[]`;
+  if (type.type === 'typeOperator') return `readonly ${typeText(type.target, hint)}[]`;
+  return constraintTypeArgument(type, hint);
+}
+
+function intrinsicValue(name, hint) {
+  if (name === 'string') return stringValue(hint);
+  if (name === 'number') return numberValue(hint);
+  if (name === 'boolean') return 'true';
+  if (name === 'bigint') return '1n';
+  if (name === 'symbol') return "Symbol('example')";
+  if (name === 'null') return 'null';
+  if (name === 'undefined' || name === 'void') return 'undefined';
+  if (name === 'object') return "{ id: 'example' }";
+  if (name === 'unknown') return "{ id: 'example' }";
+  if (name === 'never') return "(() => { throw new Error('Unreachable'); })()";
+  return '{}';
+}
+
+function templateLiteralPart(type) {
+  if (type?.type === 'intrinsic' && type.name === 'number') return '1';
+  if (type?.type === 'intrinsic' && type.name === 'bigint') return '1';
+  if (type?.type === 'literal') return String(type.value);
+  return 'example';
+}
+
+function stringValue(hint = '') {
+  const normalized = hint.toLowerCase();
+  if (normalized.includes('path') || normalized.includes('location') || normalized.includes('url')) return "'/products/42'";
+  if (normalized.includes('id') || normalized.includes('name') || normalized.includes('key')) return "'example'";
+  if (normalized.includes('source') || normalized.includes('code')) return "'export const value = 42;'";
+  if (normalized.includes('selector')) return "'button'";
+  if (normalized.includes('tag')) return "'button'";
+  return "'example'";
+}
+
+function numberValue(hint = '') {
+  const normalized = hint.toLowerCase();
+  if (normalized.includes('index') || normalized.includes('position')) return '0';
+  if (normalized.includes('delta')) return '-1';
+  return '1';
+}
+
+function valueForName(name = '') {
+  if (/^(?:T|Value|Data|Public|Props|Item|Options)$/.test(name)) return "'example'";
+  if (/^(?:Id|Name|Key|TagName|Names)$/.test(name)) return "'example'";
+  if (/Element|Node/.test(name)) return "document.createElement('div')";
+  if (/Error/.test(name)) return "new Error('Example failure')";
+  if (/Route|Location|Path/.test(name)) return "'/products/42'";
+  return "{ id: 'example' }";
+}
+
+function preferredUnionType(types) {
+  const withoutEmpty = types.filter((type) => !(
+    type.type === 'intrinsic' && ['undefined', 'void', 'null', 'never'].includes(type.name)
+  ));
+  const literals = withoutEmpty.filter(({ type }) => type === 'literal');
+  return literals[0] ?? withoutEmpty[0] ?? types[0];
+}
+
+function fallbackValue(type, hint) {
+  if (type?.type === 'intrinsic') return intrinsicValue(type.name, hint);
+  if (type?.type === 'array') return '[]';
+  return valueForName(type?.name ?? hint);
+}
+
+function callableInfo(type) {
+  if (type?.type === 'reflection') {
+    const signature = type.declaration?.signatures?.[0];
+    return signature ? { signature, substitutions: new Map() } : null;
+  }
+  if (type?.type === 'reference' && typeof type.target === 'number') {
+    const target = reflectionsById.get(type.target);
+    const signature = target?.signatures?.[0]
+      ?? (target?.type?.type === 'reflection' ? target.type.declaration?.signatures?.[0] : undefined);
+    if (!signature) return null;
+    const substitutions = new Map();
+    for (const [index, parameter] of (target.typeParameters ?? []).entries()) {
+      const argument = type.typeArguments?.[index] ?? parameter.default;
+      if (argument) substitutions.set(parameter.name, argument);
+    }
+    return { signature, substitutions };
+  }
+  return null;
+}
+
+function firstReadableProperty(type) {
+  if (type?.type !== 'reflection' && !(type?.type === 'reference' && typeof type.target === 'number')) return null;
+  const declaration = type.type === 'reflection' ? type.declaration : reflectionsById.get(type.target);
+  return declaration?.children?.find(({ kind }) => kind === 1024)?.name ?? null;
+}
+
+function isVoidType(type) {
+  return type?.type === 'intrinsic' && (type.name === 'void' || type.name === 'undefined');
+}
+
+function shouldPopulateArray(hint = '') {
+  return /routes|entries|items|records|components|files|diagnostics/i.test(hint);
+}
+
+function exampleMemberScore(member) {
+  if (member.signatures?.length) return 2;
+  const type = member.type;
+  if (type?.type === 'intrinsic' || type?.type === 'literal' || type?.type === 'templateLiteral') return 0;
+  if (type?.type === 'union' && type.types?.some((entry) => entry.type === 'literal' || entry.type === 'intrinsic')) return 1;
+  if (type?.type === 'reflection' && type.declaration?.signatures?.length) return 2;
+  if (type?.type === 'array' || type?.type === 'tuple') return 3;
+  return 5;
+}
+
+function singular(value = 'item') {
+  return value.replace(/ies$/i, 'y').replace(/s$/i, '') || 'item';
+}
+
+function propertyName(name) {
+  return /^[$A-Z_a-z][$0-9A-Z_a-z]*$/.test(name) ? name : JSON.stringify(name);
+}
+
+function safeIdentifier(name, fallback) {
+  return /^[$A-Z_a-z][$0-9A-Z_a-z]*$/.test(name) ? name : fallback;
+}
+
+function indent(value, spaces) {
+  return value.replace(/\n/g, `\n${' '.repeat(spaces)}`);
+}
+
+function indexReflections(value) {
+  if (Array.isArray(value)) {
+    for (const entry of value) indexReflections(entry);
+    return;
+  }
+  if (!isRecord(value)) return;
+  if (typeof value.id === 'number') reflectionsById.set(value.id, value);
+  for (const nested of Object.values(value)) indexReflections(nested);
 }
 
 function curatedCode(page, override) {
@@ -187,15 +655,16 @@ function curatedCode(page, override) {
   return override.code.join('\n');
 }
 
-function typecheck(tsconfigPath) {
+function diagnosticsFor(tsconfigPath) {
   const loaded = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
   if (loaded.error) throw new Error(ts.formatDiagnosticsWithColorAndContext([loaded.error], formatHost()));
   const parsed = ts.parseJsonConfigFileContent(loaded.config, ts.sys, dirname(tsconfigPath));
   const program = ts.createProgram(parsed.fileNames, parsed.options);
-  const diagnostics = ts.getPreEmitDiagnostics(program);
-  if (diagnostics.length > 0) {
-    throw new Error(`Generated API examples do not typecheck:\n${ts.formatDiagnosticsWithColorAndContext(diagnostics, formatHost())}`);
-  }
+  return ts.getPreEmitDiagnostics(program);
+}
+
+function formatDiagnostics(diagnostics) {
+  return ts.formatDiagnosticsWithColorAndContext(diagnostics, formatHost());
 }
 
 function formatHost() {

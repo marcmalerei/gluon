@@ -6,6 +6,8 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ### Added
 
+- A complete `RouterOptions` usage example with memory history, routes, saved
+  scroll restoration, router readiness, and cleanup.
 - Public API purpose, parameter, failure, ownership, and curated usage
   documentation for `createMemoryHistory()`.
 - Browser, hash, and DOM-free memory histories with state positions and saved

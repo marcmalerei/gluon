@@ -20,6 +20,88 @@
         "stop();",
         "history.destroy();"
       ]
+    },
+    "packages/router/src/interfaces/RouterOptions.md": {
+      "module": "@gluonjs/router",
+      "description": "Configure a memory-backed router and restore a saved scroll position during back/forward navigation:",
+      "code": [
+        "import { createRouter, type RouterOptions } from '@gluonjs/router';",
+        "import { createMemoryHistory } from '@gluonjs/router/memory';",
+        "",
+        "const options = {",
+        "  history: createMemoryHistory(['/products']),",
+        "  routes: [{ path: '/products' }],",
+        "  scrollBehavior(_to, _from, savedPosition) {",
+        "    return savedPosition ?? { left: 0, top: 0 };",
+        "  },",
+        "} satisfies RouterOptions;",
+        "",
+        "const router = createRouter(options);",
+        "await router.isReady();",
+        "console.log(router.currentRoute.value.fullPath); // '/products'",
+        "router.destroy();"
+      ]
+    },
+    "packages/store/src/functions/defineStore.md": {
+      "module": "@gluonjs/store",
+      "description": "Define a typed counter store, attach it to an application-owned manager, update its state, and release it:",
+      "code": [
+        "import { createStoreManager, defineStore } from '@gluonjs/store';",
+        "",
+        "const counter = defineStore({",
+        "  id: 'counter',",
+        "  state: () => ({ count: 0 }),",
+        "});",
+        "",
+        "const manager = createStoreManager();",
+        "const store = counter.use(manager);",
+        "store.$patch({ count: store.count + 1 });",
+        "console.log(store.count); // 1",
+        "manager.dispose();"
+      ]
+    },
+    "src/interfaces/GluonElementHotUpdateResult.md": {
+      "module": "@gluonjs/core",
+      "description": "Inspect the typed result returned by the Vite integration after applying a compatible element update:",
+      "code": [
+        "import {",
+        "  GluonElement,",
+        "  applyGluonElementHotUpdate,",
+        "  html,",
+        "  type GluonElementHotUpdateResult,",
+        "} from '@gluonjs/core';",
+        "",
+        "class ProductCard extends GluonElement {",
+        "  protected render() {",
+        "    return html`<article>Product</article>`;",
+        "  }",
+        "}",
+        "",
+        "const update: GluonElementHotUpdateResult<typeof ProductCard> =",
+        "  applyGluonElementHotUpdate('product-card', ProductCard);",
+        "console.log(update.compatible, update.reason);"
+      ]
+    },
+    "src/type-aliases/GluonElementClass.md": {
+      "module": "@gluonjs/core",
+      "description": "Type and register a constructible Gluon Custom Element class through the public Core entry point:",
+      "code": [
+        "import {",
+        "  GluonElement,",
+        "  defineElement,",
+        "  html,",
+        "  type GluonElementClass,",
+        "} from '@gluonjs/core';",
+        "",
+        "class ProductCard extends GluonElement {",
+        "  protected render() {",
+        "    return html`<article>Product</article>`;",
+        "  }",
+        "}",
+        "",
+        "const ProductCardElement: GluonElementClass<ProductCard> = ProductCard;",
+        "defineElement('product-card', ProductCardElement);"
+      ]
     }
   }
 }

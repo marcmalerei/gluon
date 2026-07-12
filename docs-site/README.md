@@ -38,11 +38,18 @@ migration material, examples, and release archive. `validate-docs.mjs` verifies
 the version tree, public API entry-point count, one rendered example per public
 symbol page, required curated content, compiled examples, and internal links.
 
-Generated baselines demonstrate a compiler-valid function call, class/type
-annotation, or value read as appropriate for the symbol kind. They are the
-minimum public-entry-point contract, not a claim that generic placeholder
-arguments represent application behavior. Add behavior-oriented code through a
-curated override when lifecycle, ownership, errors, or interactions matter.
+Generated baselines synthesize representative primitive values, object
+configurations, callbacks, component properties, and function calls from the
+public TypeDoc reflection. They must not contain compiler-only constructs such
+as declared argument tuples, empty type aliases, or bare value reads.
+
+Some APIs consume Router, Store, DOM, server, or test objects that the
+application or framework must already own. For those pages the generator emits
+a typed consumption example instead of fabricating an invalid lifecycle.
+Behavior-oriented examples live in `api-examples.json` when setup, ownership,
+cleanup, errors, or multiple public entry points need to be shown together.
+The catalog currently curates memory history, Router options, Store definition,
+and Gluon Element class/HMR flows.
 
 All TypeScript and Vue example sources live in `examples/` and are compiled
 through `examples/tsconfig.json` plus the maintained Vite configurations;
