@@ -15,6 +15,7 @@ application content or supplies an application security policy.
 | SSR state | Only JSON-compatible state is accepted; script-breaking characters are escaped; resources are request-owned. | Keep secrets out of browser-visible state and authorize every serialized field. | `tests-node/ssr.spec.ts`, property/fuzz gate |
 | CSP | A request nonce is transported to initial style carriers without being generated or weakened by Gluon; module scripts use external asset URLs. | Generate unpredictable per-response nonces or hashes, emit policy/report headers, and reject violations. | `tests-node/ssr.spec.ts`, `docs/deployment.md` |
 | Trusted Types | Unsafe sinks are visible in public API names. No `0.0.0` enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
+| Vue source analysis | The Node analyzer realpath-checks one root, never follows symlinks or executes project code, enforces fixed worker/resource budgets, emits no source excerpts/absolute paths, and has no writer/network/plugin hook. | Treat findings as static inventory only; review indeterminate runtime, Router, Store, style, SSR, async, test, and build semantics. | `tests-node/vue-migration-analyzer.spec.ts`, retained adversarial fixtures, RFC 0003 |
 
 ## Trust boundaries
 
@@ -25,6 +26,8 @@ application content or supplies an application security policy.
   explicit reviewer-controlled escalation points, not sanitizers.
 - HTML responses, hydration state, static files, resource hints, and progressive
   stream chunks cross the server-to-browser boundary.
+- Vue project bytes cross into a Node parser worker as untrusted inert input;
+  only normalized report data crosses back.
 
 ## Failure behavior
 
@@ -35,9 +38,13 @@ does not report a successful handoff. Applications must surface these failures
 through their error and CSP reporting rather than treating them as successful
 renders.
 
+Unsupported, malformed, root-escaping, changing, or over-budget Vue inputs emit
+stable `GVA` findings and non-zero exit codes. The analyzer does not recover by
+executing a project or guessing a source mapping.
+
 ## Review procedure
 
-Run `npm run check:security`, the deterministic property/fuzz suite, SSR tests,
+Run `npm run check:security`, `npm run test:vue-analyzer`, the deterministic property/fuzz suite, SSR tests,
 and the browser matrix. A change to a sink, escape hatch, serializer, asset URL,
 style carrier, hydration boundary, or request-ownership rule must update the
 machine-readable model and this review in the same pull request.

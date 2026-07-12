@@ -67,6 +67,18 @@
       ],
       "residualRisk": "Template parsing and explicit raw-markup paths use browser HTML sinks; an enforcing application must supply and review its own compatible Trusted Types policy until Gluon defines a public policy contract.",
       "evidence": ["src/runtime.ts", "docs/dom-runtime.md", "docs/security.md"]
+    },
+    {
+      "id": "vue-source-analysis",
+      "status": "accepted-boundary",
+      "controls": [
+        "The analyzer reads only realpath-checked files below one root and never follows symbolic links.",
+        "Project application, configuration, plugin, loader, test, dependency, and package-script code is parsed as inert input and never executed.",
+        "Fixed file, byte, AST, depth, worker-memory, and worker-time budgets stop unbounded analysis; reports omit excerpts, absolute paths, host data, environment data, and timestamps.",
+        "The package exposes no source writer, transform, evaluator, visitor plugin, network, or telemetry hook."
+      ],
+      "residualRisk": "Static syntax inventory cannot establish arbitrary runtime behavior or semantic migration equivalence; indeterminate and unsupported findings require human review.",
+      "evidence": ["tests-node/vue-migration-analyzer.spec.ts", "packages/vue-migration-analyzer/README.md", "docs/rfcs/0003-report-only-vue-migration-analyzer.md"]
     }
   ]
 }

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marcmalerei.github.io/gluon/schemas/vue-migration-report-1.0.0.json",
+  "title": "Gluon Vue migration report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "analyzer", "root", "input", "files", "components", "inventory", "findings", "summary"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "analyzer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "@gluonjs/vue-migration-analyzer" },
+        "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" }
+      }
+    },
+    "root": { "const": "." },
+    "input": { "$ref": "#/$defs/input" },
+    "files": { "type": "array", "items": { "$ref": "#/$defs/file" } },
+    "components": { "type": "array", "items": { "$ref": "#/$defs/component" } },
+    "inventory": { "type": "array", "items": { "$ref": "#/$defs/inventoryItem" } },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "summary": { "$ref": "#/$defs/summary" }
+  },
+  "$defs": {
+    "nonNegative": { "type": "integer", "minimum": 0 },
+    "positive": { "type": "integer", "minimum": 1 },
+    "severity": { "enum": ["info", "warning", "error"] },
+    "confidence": { "enum": ["exact", "structural", "indeterminate"] },
+    "supportState": { "enum": ["supported", "partial", "unsupported"] },
+    "stage": { "enum": ["baseline", "leaf-boundary", "state-form", "route-state-async", "styles-universal", "shell-removal"] },
+    "fileKind": { "enum": ["manifest", "lockfile", "sfc", "source", "test", "server", "build-config", "symlink", "other"] },
+    "parseStatus": { "enum": ["parsed", "skipped", "malformed", "unsupported", "limited"] },
+    "inventoryCategory": { "enum": ["component", "prop-event-model", "slot-directive-ref", "reactivity-lifecycle", "router", "store", "async", "style", "ssr-hydration", "test", "build", "remaining-vue"] },
+    "inventoryKind": { "enum": ["component-element", "native-element", "prop", "emit", "model", "slot-declaration", "slot-use", "directive", "ref", "reactive-primitive", "lifecycle", "router-import", "router-call", "store-import", "store-call", "async-component", "suspense", "teleport", "keep-alive", "style-block", "ssr-call", "hydration-call", "test-file", "test-import", "build-config", "build-plugin", "vue-import", "vue-dependency"] },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line", "column"],
+      "properties": { "line": { "$ref": "#/$defs/positive" }, "column": { "$ref": "#/$defs/positive" } }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileId", "startOffset", "endOffset", "start", "end"],
+      "properties": {
+        "fileId": { "type": "string", "pattern": "^file:" },
+        "startOffset": { "$ref": "#/$defs/nonNegative" },
+        "endOffset": { "$ref": "#/$defs/nonNegative" },
+        "start": { "$ref": "#/$defs/point" },
+        "end": { "$ref": "#/$defs/point" }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vue", "packageManager", "limits", "entriesVisited", "filesVisited", "filesAnalyzed", "bytesRead"],
+      "properties": {
+        "vue": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["declaredRange", "resolvedVersion", "versionSource"],
+          "properties": {
+            "declaredRange": { "type": ["string", "null"] },
+            "resolvedVersion": { "type": ["string", "null"] },
+            "versionSource": { "enum": ["exact-manifest", "package-lock-v2", "package-lock-v3", "unresolved"] }
+          }
+        },
+        "packageManager": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "lockfile"],
+          "properties": {
+            "kind": { "enum": ["npm", "yarn", "pnpm", "other", "none"] },
+            "lockfile": { "type": ["string", "null"] }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["directoryEntries", "analyzedFiles", "bytesPerFile", "aggregateBytes", "astNodesPerFile", "nesting", "workerMemoryMiB", "millisecondsPerFile", "millisecondsPerInvocation"],
+          "properties": {
+            "directoryEntries": { "const": 10000 },
+            "analyzedFiles": { "const": 2000 },
+            "bytesPerFile": { "const": 2097152 },
+            "aggregateBytes": { "const": 67108864 },
+            "astNodesPerFile": { "const": 250000 },
+            "nesting": { "const": 256 },
+            "workerMemoryMiB": { "const": 256 },
+            "millisecondsPerFile": { "const": 5000 },
+            "millisecondsPerInvocation": { "const": 30000 }
+          }
+        },
+        "entriesVisited": { "$ref": "#/$defs/nonNegative" },
+        "filesVisited": { "$ref": "#/$defs/nonNegative" },
+        "filesAnalyzed": { "$ref": "#/$defs/nonNegative" },
+        "bytesRead": { "$ref": "#/$defs/nonNegative" }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "kind", "bytes", "digest", "parseStatus"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^file:" },
+        "path": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+        "kind": { "$ref": "#/$defs/fileKind" },
+        "bytes": { "$ref": "#/$defs/nonNegative" },
+        "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "parseStatus": { "$ref": "#/$defs/parseStatus" }
+      }
+    },
+    "block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "lang", "scoped", "module", "location"],
+      "properties": {
+        "kind": { "enum": ["template", "script", "script-setup", "style", "custom"] },
+        "lang": { "type": ["string", "null"] },
+        "scoped": { "type": "boolean" },
+        "module": { "type": ["string", "null"] },
+        "location": { "$ref": "#/$defs/location" }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fileId", "scriptMode", "blocks", "inventoryIds", "findingIds", "migrationStages"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^component:" },
+        "fileId": { "type": "string", "pattern": "^file:" },
+        "scriptMode": { "enum": ["none", "setup", "options", "setup-and-options"] },
+        "blocks": { "type": "array", "items": { "$ref": "#/$defs/block" } },
+        "inventoryIds": { "type": "array", "items": { "type": "string", "pattern": "^inventory:" }, "uniqueItems": true },
+        "findingIds": { "type": "array", "items": { "type": "string", "pattern": "^finding:" }, "uniqueItems": true },
+        "migrationStages": { "type": "array", "items": { "$ref": "#/$defs/stage" }, "uniqueItems": true }
+      }
+    },
+    "inventoryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fileId", "componentId", "category", "kind", "name", "importSource", "confidence", "location", "migrationStage", "guideUrl"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^inventory:" },
+        "fileId": { "type": "string", "pattern": "^file:" },
+        "componentId": { "type": ["string", "null"], "pattern": "^component:" },
+        "category": { "$ref": "#/$defs/inventoryCategory" },
+        "kind": { "$ref": "#/$defs/inventoryKind" },
+        "name": { "type": ["string", "null"] },
+        "importSource": { "type": ["string", "null"] },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "location": { "$ref": "#/$defs/location" },
+        "migrationStage": { "$ref": "#/$defs/stage" },
+        "guideUrl": { "type": "string", "format": "uri" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "code", "severity", "confidence", "message", "location", "migrationStage", "relatedStages", "guideUrl"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^finding:" },
+        "code": { "type": "string", "pattern": "^GVA[0-9]{4}$" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "message": { "type": "string", "minLength": 1 },
+        "location": { "oneOf": [{ "$ref": "#/$defs/location" }, { "type": "null" }] },
+        "migrationStage": { "$ref": "#/$defs/stage" },
+        "relatedStages": { "type": "array", "items": { "$ref": "#/$defs/stage" }, "uniqueItems": true },
+        "guideUrl": { "type": "string", "format": "uri" }
+      }
+    },
+    "fileKindCounts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["manifest", "lockfile", "sfc", "source", "test", "server", "build-config", "symlink", "other"],
+      "properties": { "manifest": { "$ref": "#/$defs/nonNegative" }, "lockfile": { "$ref": "#/$defs/nonNegative" }, "sfc": { "$ref": "#/$defs/nonNegative" }, "source": { "$ref": "#/$defs/nonNegative" }, "test": { "$ref": "#/$defs/nonNegative" }, "server": { "$ref": "#/$defs/nonNegative" }, "build-config": { "$ref": "#/$defs/nonNegative" }, "symlink": { "$ref": "#/$defs/nonNegative" }, "other": { "$ref": "#/$defs/nonNegative" } }
+    },
+    "inventoryCounts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component", "prop-event-model", "slot-directive-ref", "reactivity-lifecycle", "router", "store", "async", "style", "ssr-hydration", "test", "build", "remaining-vue"],
+      "properties": { "component": { "$ref": "#/$defs/nonNegative" }, "prop-event-model": { "$ref": "#/$defs/nonNegative" }, "slot-directive-ref": { "$ref": "#/$defs/nonNegative" }, "reactivity-lifecycle": { "$ref": "#/$defs/nonNegative" }, "router": { "$ref": "#/$defs/nonNegative" }, "store": { "$ref": "#/$defs/nonNegative" }, "async": { "$ref": "#/$defs/nonNegative" }, "style": { "$ref": "#/$defs/nonNegative" }, "ssr-hydration": { "$ref": "#/$defs/nonNegative" }, "test": { "$ref": "#/$defs/nonNegative" }, "build": { "$ref": "#/$defs/nonNegative" }, "remaining-vue": { "$ref": "#/$defs/nonNegative" } }
+    },
+    "severityCounts": {
+      "type": "object", "additionalProperties": false, "required": ["info", "warning", "error"],
+      "properties": { "info": { "$ref": "#/$defs/nonNegative" }, "warning": { "$ref": "#/$defs/nonNegative" }, "error": { "$ref": "#/$defs/nonNegative" } }
+    },
+    "confidenceCounts": {
+      "type": "object", "additionalProperties": false, "required": ["exact", "structural", "indeterminate"],
+      "properties": { "exact": { "$ref": "#/$defs/nonNegative" }, "structural": { "$ref": "#/$defs/nonNegative" }, "indeterminate": { "$ref": "#/$defs/nonNegative" } }
+    },
+    "stageCounts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["baseline", "leaf-boundary", "state-form", "route-state-async", "styles-universal", "shell-removal"],
+      "properties": { "baseline": { "$ref": "#/$defs/nonNegative" }, "leaf-boundary": { "$ref": "#/$defs/nonNegative" }, "state-form": { "$ref": "#/$defs/nonNegative" }, "route-state-async": { "$ref": "#/$defs/nonNegative" }, "styles-universal": { "$ref": "#/$defs/nonNegative" }, "shell-removal": { "$ref": "#/$defs/nonNegative" } }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supportState", "files", "components", "fileKinds", "inventory", "severities", "confidences", "stages"],
+      "properties": {
+        "supportState": { "$ref": "#/$defs/supportState" },
+        "files": { "$ref": "#/$defs/nonNegative" },
+        "components": { "$ref": "#/$defs/nonNegative" },
+        "fileKinds": { "$ref": "#/$defs/fileKindCounts" },
+        "inventory": { "$ref": "#/$defs/inventoryCounts" },
+        "severities": { "$ref": "#/$defs/severityCounts" },
+        "confidences": { "$ref": "#/$defs/confidenceCounts" },
+        "stages": { "$ref": "#/$defs/stageCounts" }
+      }
+    }
+  }
+}

@@ -16,6 +16,8 @@
       "@gluonjs/devtools": ["packages/devtools/src/index.ts"],
       "@gluonjs/devtools-api": ["packages/devtools-api/src/index.ts"],
       "@gluonjs/language-server": ["packages/language-server/src/index.ts"],
+      "@gluonjs/vue-migration-analyzer": ["packages/vue-migration-analyzer/src/index.ts"],
+      "@gluonjs/vue-migration-analyzer/schema": ["packages/vue-migration-analyzer/src/schema.ts"],
       "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
       "@gluonjs/router": ["packages/router/src/index.ts"],
       "@gluonjs/router/memory": ["packages/router/src/memory.ts"],
@@ -46,6 +48,7 @@
     "vitest.ssr.config.ts",
     "vitest.store.config.ts",
     "vitest.test-utils.config.ts",
-    "vitest.vite.config.ts"
+    "vitest.vite.config.ts",
+    "vitest.vue-analyzer.config.ts"
   ]
 }

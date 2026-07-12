@@ -48,6 +48,25 @@ Firefox, and WebKit. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
 `/0.0.0/examples/ui.html` with the other versioned documentation examples.
 
+## Report-only Vue analyzer gate
+
+`npm run test:vue-analyzer` builds the Node package and verifies deterministic
+human/JSON output, schema validation, supported/unsupported/malformed input,
+the production Vue host, exact CLI exit codes, invalid UTF-8, fixed file limits,
+symlink escapes, and adversarial no-execution sentinels. The property/fuzz gate
+also varies retained declared names and requires byte-stable JSON formatting.
+
+`npm run check:vue-analyzer-fixtures` regenerates all four retained report pairs
+in memory and fails when their JSON, human output, or exit-code manifest differs
+from the committed evidence. `npm run check:packages`, public type fixtures,
+TypeDoc, package archives, release digests, and per-package SBOMs cover the root,
+`./schema`, and `gluon-vue-analyze` public boundaries.
+`npm run check:vue-analyzer-clean-install` additionally packs the package,
+installs it in an empty consumer, runs the installed bin, validates its JSON,
+and imports both public entries. The analyzer has no
+browser-engine or GLUON GOODS route because it is Node developer tooling; the
+real Vue host and production configurator sources are its application evidence.
+
 ## Bundle budgets
 
 `quality-budgets.json` is the reviewed budget source. `npm run check:budgets`

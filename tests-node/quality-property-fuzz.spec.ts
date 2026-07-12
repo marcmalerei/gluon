@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
+import { readFileSync } from 'node:fs';
 import { transformGluonModule } from '../packages/compiler/src/index.js';
 import { parseQuery, stringifyQuery } from '../packages/router/src/query.js';
 import { serializeSsrState } from '../packages/ssr/src/index.js';
+import { formatVueMigrationReport, type VueMigrationReport } from '../packages/vue-migration-analyzer/src/index.js';
 
 const propertyOptions = Object.freeze({ numRuns: 500, seed: 38, endOnFailure: true });
 
@@ -54,5 +56,20 @@ describe('deterministic property and fuzz gates', () => {
       expect(second).toEqual(first);
       expect(first.templates).toHaveLength(1);
     }), propertyOptions);
+  });
+
+  it('serializes retained analyzer reports deterministically for arbitrary declared names', () => {
+    const retained = JSON.parse(readFileSync(
+      new URL('../packages/vue-migration-analyzer/fixtures/expected/supported.json', import.meta.url),
+      'utf8',
+    )) as VueMigrationReport;
+    fc.assert(fc.property(fc.string({ maxLength: 80 }), (name) => {
+      const report = structuredClone(retained) as VueMigrationReport;
+      const target = report.inventory.find((item) => item.name !== null);
+      if (target) (target as { name: string | null }).name = name;
+      const first = formatVueMigrationReport(report, 'json');
+      expect(formatVueMigrationReport(report, 'json')).toBe(first);
+      expect(JSON.parse(first).inventory).toHaveLength(report.inventory.length);
+    }), { ...propertyOptions, numRuns: 100 });
   });
 });
