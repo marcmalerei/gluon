@@ -8,6 +8,7 @@
 | Standalone reactivity | Bag, configuration, search, and navigation UI state | `tests/shop-example.spec.ts` | Integrated |
 | Router histories and links | Home, catalog, product deep links, active navigation | Router suite + shop browser test | Integrated |
 | Adopted stylesheets | Complete responsive shop presentation | Shop browser test + visual QA | Integrated |
+| `GluonElement`, typed properties/events/slots, and form-associated Custom Elements | Product configuration is the same public `gluon-product-configurator` boundary in GLUON GOODS and the maintained Vue 3 host | `tests/vue-migration-interop.spec.ts`, `tests/docs-examples.spec.ts`, shop customer flow, SSR/hydration regression, desktop/390px/320px QA | Integrated incremental migration boundary |
 | Native dialog and control accessibility | Search, mobile menu, product choices, and bag | `tests/shop-example.spec.ts` + 390px/320px browser QA | Integrated |
 | Official Store | Per-app bag state, configured line items, persisted bag, derived totals | Store Node/type suites + `tests/shop-example.spec.ts` | Integrated |
 | Store actions + Router forms | Labeled delivery checkout, order summary, atomic order placement, and confirmation URL | Desktop/mobile shop flow + Store snapshot and browser assertions | Integrated purchase path |

@@ -1,9 +1,17 @@
 import { resolve } from 'node:path';
+import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
 const repositoryRoot = resolve(import.meta.dirname, '../..');
 
 export default defineConfig({
+  plugins: [vue({
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag === 'gluon-product-configurator',
+      },
+    },
+  })],
   root: import.meta.dirname,
   base: '/gluon/0.0.0/examples/',
   resolve: {

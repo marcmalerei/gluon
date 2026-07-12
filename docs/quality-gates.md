@@ -57,6 +57,13 @@ budget. AVIF, GIF, JPEG, PNG, SVG, and WebP output all count as images. Unknown,
 missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
+The issue #88 production Custom Element baseline measures 158,152 raw entry
+bytes and 45,683 level-9 gzip bytes. The reviewed regression ceilings are
+160,000 raw bytes and 47,000 gzip bytes; HTML, image-byte, and image-count
+ceilings remain unchanged. These values cover the form-associated product
+configuration boundary and its constructable component stylesheet in the real
+shop entry, not Vue, which is built only in the separate documentation host.
+
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps
 explicitly before it builds GLUON GOODS.

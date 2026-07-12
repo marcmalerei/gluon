@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 import { nextTick } from '@gluonjs/reactivity';
 import { GluonCounter } from '../docs-site/examples/custom-element.js';
 import { mountVueHost } from '../docs-site/examples/vue-host.js';
+import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
 
 test('runs the plain Custom Element example through native events', async () => {
   const element = new GluonCounter();
@@ -16,15 +17,38 @@ test('runs the plain Custom Element example through native events', async () => 
   element.remove();
 });
 
-test('runs the Vue host example around the Gluon Custom Element', async () => {
+test('runs the Vue 3 migration host around the production Gluon product element', async () => {
   const root = document.createElement('div');
   document.body.append(root);
   const host = mountVueHost(root);
+  await Promise.resolve();
   await nextTick();
-  const element = root.querySelector('gluon-counter') as GluonCounter;
-  expect(element).toBeInstanceOf(GluonCounter);
+  const element = root.querySelector('gluon-product-configurator') as ProductConfiguratorElement;
   await element.updateComplete;
-  expect(element.shadowRoot!.querySelector('button')).not.toBeNull();
+  expect(element.product?.slug).toBe('orbit-lamp');
+  expect(element.shadowRoot?.adoptedStyleSheets).toHaveLength(1);
+  expect(element.shadowRoot?.querySelector('style')).toBeNull();
+  expect(element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="title"]')?.assignedNodes()).toHaveLength(1);
+
+  element.shadowRoot?.querySelector<HTMLInputElement>('input[name="finish"][value="Graphite"]')?.click();
+  await Promise.resolve();
+  await element.updateComplete;
+  expect(root.querySelector('[data-current-configuration]')?.textContent).toContain('Graphite');
+
+  element.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')?.click();
+  await Promise.resolve();
+  expect(root.querySelector('[data-added-line]')?.textContent)
+    .toContain('Orbit Lamp · Graphite · Warm 2700K · 1.5 m');
+
+  root.querySelector<HTMLButtonElement>('[data-use-product]')?.click();
+  await Promise.resolve();
+  await element.updateComplete;
+  expect(element.product?.slug).toBe('stack-tray');
+  expect(root.querySelector('#vue-product-title')?.textContent).toBe('Stack Tray');
+
+  root.querySelector<HTMLFormElement>('form')?.requestSubmit();
+  await Promise.resolve();
+  expect(root.querySelector('[data-form-value]')?.textContent).toContain('"finish":"Cobalt"');
   host.unmount();
   root.remove();
 });

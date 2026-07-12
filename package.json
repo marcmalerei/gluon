@@ -161,6 +161,7 @@
     "@cyclonedx/cdxgen": "12.7.1",
     "@jridgewell/trace-mapping": "^0.3.31",
     "@types/node": "^22.10.0",
+    "@vitejs/plugin-vue": "^6.0.7",
     "@vitest/browser-playwright": "^4.0.18",
     "@vitest/coverage-v8": "^4.1.10",
     "ajv": "8.20.0",
