@@ -4,6 +4,7 @@ import {
   applyGluonElementHotUpdate,
   createApp,
   css,
+  defineGluonElement,
   html,
   refreshGluonApplications,
   refreshGluonElements,
@@ -49,6 +50,68 @@ describe('Gluon Core HMR bridge', () => {
     expect(element.shadowRoot!.adoptedStyleSheets[0]).toBe(adopted);
     expect([...adopted.cssRules].map((rule) => rule.cssText).join(' ')).toContain('rgb(4, 5, 6)');
     expect('legacyMethod' in InitialCounter.prototype).toBe(false);
+  });
+
+  it('reruns functional setup while retaining host, local state, form state, DOM, and sheet identity', async () => {
+    const initialSheet = css`:host { color: rgb(10, 20, 30); }`;
+    const initialCleanup: string[] = [];
+    const InitialQuantity = defineGluonElement({
+      tagName: 'gluon-functional-hot-quantity',
+      formAssociated: true,
+      properties: { value: { type: Number, reflect: true, default: 1 } },
+      styles: initialSheet,
+      setup(context) {
+        const quantity = context.state('quantity', context.props.value);
+        context.onCleanup(() => initialCleanup.push('initial'));
+        context.onUpdated(() => context.form.setValue(String(quantity.value)));
+        return {
+          expose: { increment: () => { quantity.value += 1; } },
+          render: () => html`<output>Initial ${quantity.value}</output>`,
+        };
+      },
+    }, { register: false });
+    const initial = applyGluonElementHotUpdate('gluon-functional-hot-quantity', InitialQuantity);
+    const element = document.createElement('gluon-functional-hot-quantity') as InstanceType<typeof InitialQuantity>;
+    element.setAttribute('name', 'quantity');
+    const form = document.createElement('form');
+    form.append(element);
+    document.body.append(form);
+    await element.updateComplete;
+    element.increment();
+    await element.updateComplete;
+    const output = element.shadowRoot?.querySelector('output');
+    const shadowRoot = element.shadowRoot;
+    const adopted = element.shadowRoot?.adoptedStyleSheets[0];
+    expect(output?.textContent).toBe('Initial 2');
+    expect(new FormData(form).get('quantity')).toBe('2');
+
+    const nextSheet = css`:host { color: rgb(30, 40, 50); }`;
+    const UpdatedQuantity = defineGluonElement({
+      tagName: 'gluon-functional-hot-quantity',
+      formAssociated: true,
+      properties: { value: { type: Number, reflect: true, default: 1 } },
+      styles: nextSheet,
+      setup(context) {
+        const quantity = context.state('quantity', context.props.value);
+        context.onUpdated(() => context.form.setValue(String(quantity.value)));
+        return {
+          expose: { increment: () => { quantity.value += 2; } },
+          render: () => html`<output>Updated ${quantity.value}</output>`,
+        };
+      },
+    }, { register: false });
+    const updated = applyGluonElementHotUpdate('gluon-functional-hot-quantity', UpdatedQuantity);
+    expect(updated).toEqual({ compatible: true, constructor: initial.constructor });
+    await element.updateComplete;
+    expect(initialCleanup).toEqual(['initial']);
+    expect(element.shadowRoot).toBe(shadowRoot);
+    expect(element.shadowRoot?.querySelector('output')?.textContent).toBe('Updated 2');
+    expect(element.shadowRoot?.adoptedStyleSheets[0]).toBe(adopted);
+    expect([...adopted!.cssRules].map((rule) => rule.cssText).join(' ')).toContain('rgb(30, 40, 50)');
+    expect(new FormData(form).get('quantity')).toBe('2');
+    element.increment();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector('output')?.textContent).toBe('Updated 4');
   });
 
   it('surfaces incompatible superclass, form, schema, and sheet-list edits', () => {

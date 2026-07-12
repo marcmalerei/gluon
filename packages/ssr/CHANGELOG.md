@@ -13,3 +13,5 @@
   request-nonce style carriers, and transactional adopted-sheet handoff.
 - Added stable IDs and optional scopes for named Core stylesheet selections so
   UI packages can share one server/browser selection contract.
+- Added request-owned setup rendering and identity-preserving hydration for
+  functional `GluonElement` definitions.

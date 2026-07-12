@@ -143,13 +143,20 @@ missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
 The issue #108 production owner baseline measures 164,012 raw entry bytes and
-47,686 level-9 gzip bytes. The reviewed regression ceilings are 166,000 raw
-bytes and 49,000 gzip bytes; HTML, image-byte, and image-count ceilings remain
-unchanged. These values cover the one-step UI owner, named SSR/hydration
+47,686 level-9 gzip bytes. It covers the one-step UI owner, named SSR/hydration
 selection, form-associated product configuration boundary, and constructable
 component stylesheet in the real shop entry. The measured production entry
 contains none of the unselected Button, Input, Card, FormField, or AppShell CSS
-markers. Vue is built only in the separate documentation host.
+markers.
+
+On the pre-#108 integration base, issue #112 measured 166,257 raw bytes and
+47,947 level-9 gzip bytes after the functional bag quantity boundary joined the
+customer flow. Relative to the issue #88 baseline of 158,152 raw and 45,683
+gzip bytes, that isolated delta was 8,105 raw and 2,264 gzip bytes. The reviewed
+combined regression ceilings are 168,000 raw bytes and 49,000 gzip bytes;
+HTML, image-byte, and image-count ceilings remain unchanged. These are
+composition measurements, not runtime-speed or framework-size claims. Vue
+remains built only in the separate documentation host.
 
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps

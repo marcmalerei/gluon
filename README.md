@@ -256,9 +256,15 @@ See the [`@gluonjs/test-utils` guide](packages/test-utils/README.md).
 `@gluonjs/vite` records `html` and `css` template and interpolation locations,
 reports adopted-stylesheet violations, and supplies high-resolution source maps.
 During development it gives exported functions, Store definitions, registered
-Custom Elements, and constructable stylesheets stable identities. Compatible
+class and functional Custom Elements, and constructable stylesheets stable identities. Compatible
 edits rerender mounted applications and elements without replacing their DOM or
 compatible state.
+
+For `defineGluonElement()`, compatible setup edits stop the previous setup child
+scope and run the patched setup in the existing render owner. The registered
+host, explicit keyed state, `ElementInternals` form state, ShadowRoot, compatible
+template DOM, and stylesheet objects remain stable. Tag, form, property/event/
+slot, superclass, and sheet-count schema changes require reload.
 
 ```ts
 import { defineConfig } from 'vite';
@@ -368,6 +374,41 @@ class GreetingElement extends GluonElement {
 
 defineElement('gluon-greeting', GreetingElement);
 ```
+
+`defineGluonElement()` is the concise path for the same autonomous boundary. It
+infers primitive and structured properties, native event details, slots, form
+APIs, and exposed host methods without a duplicate element interface plus
+instance `declare` fields:
+
+```ts
+import { defineGluonElement, elementEvent, elementProperty, html } from '@gluonjs/core';
+
+const QuantityControl = defineGluonElement({
+  tagName: 'shop-quantity',
+  formAssociated: true,
+  properties: {
+    product: elementProperty<{ id: string; price: number }>({ type: Object, required: true }),
+    value: { type: Number, reflect: true, default: 1 },
+  },
+  events: { change: elementEvent<{ value: number }>({ cancelable: true }) },
+  slots: { default: { required: true }, help: { fallback: true } },
+  setup(context) {
+    const value = context.state('value', context.props.value);
+    context.onUpdated(() => context.form.setValue(String(value.value)));
+    context.onCleanup(() => console.log('connection resources released'));
+    return {
+      expose: { focus: () => context.host.shadowRoot?.querySelector('button')?.focus() },
+      render: () => html`<slot></slot><button>${value.value}</button><slot name="help"></slot>`,
+    };
+  },
+});
+```
+
+Setup runs once per connected lifetime inside the existing element effect scope.
+Explicitly keyed state survives reconnects and compatible HMR; computed values,
+watchers, listeners, and cleanup registrations are recreated and released with
+the connection. The class API remains supported. See the
+[functional authoring RFC](docs/rfcs/0005-functional-custom-element-authoring.md).
 
 Declared properties receive accessors, may reflect to attributes, and join
 reactive values read during render on one scope-owned, update-phase scheduler
@@ -545,6 +586,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Architecture](docs/architecture.md)
 - [Gluon 1.0 product scope RFC](docs/rfcs/0001-gluon-1.0-product-scope.md)
 - [Unified component and Custom Element model RFC](docs/rfcs/0002-unified-component-model.md)
+- [Functional Custom Element authoring RFC](docs/rfcs/0005-functional-custom-element-authoring.md)
 - [Report-only Vue migration analyzer RFC](docs/rfcs/0003-report-only-vue-migration-analyzer.md)
 - [Bounded Vue codemod no-go decision](docs/vue-codemod-decision.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)

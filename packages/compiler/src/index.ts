@@ -33,7 +33,11 @@ export interface GluonTemplateLocation {
 }
 
 export interface GluonCompilerDiagnostic {
-  readonly code: 'GLUON_TEMPLATE_STYLE_ELEMENT';
+  readonly code:
+    | 'GLUON_ELEMENT_SETUP_CLEANUP_MISSING'
+    | 'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED'
+    | 'GLUON_ELEMENT_TAG_INVALID'
+    | 'GLUON_TEMPLATE_STYLE_ELEMENT';
   readonly message: string;
   readonly location: SourceLocation;
 }
@@ -59,12 +63,13 @@ export interface GluonSourceMap {
   version: number;
 }
 
-type TransformKind = 'component' | 'element' | 'store' | 'style';
+type TransformKind = 'component' | 'element' | 'functional-element' | 'store' | 'style';
 
 const coreTransforms = new Map<string, TransformKind>([
   ['css', 'style'],
   ['defineAtom', 'component'],
   ['defineElement', 'element'],
+  ['defineGluonElement', 'functional-element'],
   ['defineMolecule', 'component'],
   ['defineOrganism', 'component'],
 ]);
@@ -136,6 +141,17 @@ export function transformGluonModule(
           `, import.meta.url, ${JSON.stringify(key)}, ${JSON.stringify(initializerSignature)}, import.meta.hot`,
         );
         changed = true;
+      } else if (kind === 'functional-element') {
+        const key = `functional-element:${transformSequence++}`;
+        const expressionStart = node.expression.getStart(sourceFile);
+        const argumentsStart = node.arguments.pos;
+        magic.overwrite(expressionStart, node.expression.end, '__gluonHmrFunctionalElement');
+        magic.prependLeft(argumentsStart, `${node.expression.text}, `);
+        magic.appendLeft(
+          node.end - 1,
+          `, import.meta.url, ${JSON.stringify(key)}, import.meta.hot`,
+        );
+        changed = true;
       } else if (kind === 'component' || kind === 'store') {
         const helper = kind === 'component' ? '__gluonHmrComponent' : '__gluonHmrStore';
         const key = `${kind}:${transformSequence++}`;
@@ -143,6 +159,11 @@ export function transformGluonModule(
         magic.appendRight(node.end, `, import.meta.url, ${JSON.stringify(key)})`);
         changed = true;
       }
+    }
+
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)
+      && transforms.get(node.expression.text) === 'functional-element') {
+      diagnostics.push(...functionalElementDiagnostics(sourceFile, node));
     }
 
     if (development && ts.isFunctionDeclaration(node) && node.body && node.name
@@ -178,7 +199,7 @@ export function transformGluonModule(
   visit(sourceFile);
 
   if (changed) {
-    magic.prepend('import { accept as __gluonHmrAccept, component as __gluonHmrComponent, element as __gluonHmrElement, store as __gluonHmrStore, style as __gluonHmrStyle } from "virtual:gluon-hmr";\n');
+    magic.prepend('import { accept as __gluonHmrAccept, component as __gluonHmrComponent, element as __gluonHmrElement, functionalElement as __gluonHmrFunctionalElement, store as __gluonHmrStore, style as __gluonHmrStyle } from "virtual:gluon-hmr";\n');
     if (exportStatements.length > 0) magic.append(`\n${exportStatements.join('\n')}\n`);
     magic.append('\nif (import.meta.hot) import.meta.hot.accept(() => __gluonHmrAccept(import.meta.url));\n');
   }
@@ -196,6 +217,109 @@ export function transformGluonModule(
     templates: Object.freeze(templates),
     hmr: changed,
   });
+}
+
+function functionalElementDiagnostics(
+  sourceFile: ts.SourceFile,
+  call: ts.CallExpression,
+): GluonCompilerDiagnostic[] {
+  const definition = call.arguments[0];
+  if (!definition || !ts.isObjectLiteralExpression(definition)) return [];
+  const diagnostics: GluonCompilerDiagnostic[] = [];
+  const tag = objectPropertyExpression(definition, 'tagName');
+  if (tag && ts.isStringLiteral(tag) && !isValidCustomElementName(tag.text)) {
+    diagnostics.push(Object.freeze({
+      code: 'GLUON_ELEMENT_TAG_INVALID',
+      message: `"${tag.text}" is not a valid lowercase autonomous Custom Element name.`,
+      location: locationAt(sourceFile, tag.getStart(sourceFile) + 1),
+    }));
+  }
+  const setup = setupFunction(definition);
+  if (!setup?.body) return diagnostics;
+  const parameter = setup.parameters[0]?.name;
+  const contextName = parameter && ts.isIdentifier(parameter) ? parameter.text : undefined;
+  const resources: ts.CallExpression[] = [];
+  let ownsCleanup = false;
+  const lifecycleCalls: ts.CallExpression[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node)) {
+      const called = calledName(node.expression);
+      if (called === 'setInterval' || called === 'addEventListener') resources.push(node);
+      if (contextName && ts.isPropertyAccessExpression(node.expression)
+        && ts.isIdentifier(node.expression.expression)
+        && node.expression.expression.text === contextName) {
+        if (node.expression.name.text === 'onCleanup' || node.expression.name.text === 'onDisconnected') {
+          ownsCleanup = true;
+        }
+        if (['onConnected', 'onBeforeUpdate', 'onUpdated', 'onDisconnected', 'onErrorCaptured']
+          .includes(node.expression.name.text)) {
+          lifecycleCalls.push(node);
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(setup.body);
+  if (resources.length > 0 && !ownsCleanup) {
+    diagnostics.push(Object.freeze({
+      code: 'GLUON_ELEMENT_SETUP_CLEANUP_MISSING',
+      message: 'Functional element setup creates a listener or interval without context.onCleanup() or context.onDisconnected() ownership.',
+      location: locationAt(sourceFile, resources[0]!.getStart(sourceFile)),
+    }));
+  }
+  for (const lifecycleCall of lifecycleCalls) {
+    const owner = nearestFunction(lifecycleCall, setup);
+    if (owner === setup) continue;
+    diagnostics.push(Object.freeze({
+      code: 'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED',
+      message: 'Functional element lifecycle registration must run synchronously in setup, not from a nested or deferred callback.',
+      location: locationAt(sourceFile, lifecycleCall.getStart(sourceFile)),
+    }));
+  }
+  return diagnostics;
+}
+
+function objectPropertyExpression(
+  object: ts.ObjectLiteralExpression,
+  name: string,
+): ts.Expression | undefined {
+  const property = object.properties.find((entry): entry is ts.PropertyAssignment =>
+    ts.isPropertyAssignment(entry)
+    && entry.name.getText().replace(/^['"]|['"]$/g, '') === name);
+  return property?.initializer;
+}
+
+function setupFunction(
+  object: ts.ObjectLiteralExpression,
+): ts.ArrowFunction | ts.FunctionExpression | ts.MethodDeclaration | undefined {
+  for (const property of object.properties) {
+    if (property.name?.getText().replace(/^['"]|['"]$/g, '') !== 'setup') continue;
+    if (ts.isMethodDeclaration(property)) return property;
+    if (ts.isPropertyAssignment(property)
+      && (ts.isArrowFunction(property.initializer) || ts.isFunctionExpression(property.initializer))) {
+      return property.initializer;
+    }
+  }
+  return undefined;
+}
+
+function calledName(expression: ts.Expression): string | undefined {
+  if (ts.isIdentifier(expression)) return expression.text;
+  if (ts.isPropertyAccessExpression(expression)) return expression.name.text;
+  return undefined;
+}
+
+function nearestFunction(node: ts.Node, boundary: ts.SignatureDeclaration): ts.SignatureDeclaration {
+  let current = node.parent;
+  while (current && current !== boundary) {
+    if (ts.isFunctionLike(current)) return current;
+    current = current.parent;
+  }
+  return boundary;
+}
+
+function isValidCustomElementName(name: string): boolean {
+  return /^[a-z][.0-9_a-z-]*-[.0-9_a-z-]*$/.test(name) && !name.startsWith('xml');
 }
 
 function collectImportedTransforms(sourceFile: ts.SourceFile): Map<string, TransformKind> {

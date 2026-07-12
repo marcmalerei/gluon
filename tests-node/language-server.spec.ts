@@ -72,6 +72,31 @@ describe('Gluon template analysis', () => {
     expect(result.diagnostics.every((entry) => entry.range.start.line === 2)).toBe(true);
   });
 
+  test('derives the public contract from a functional element definition', () => {
+    const result = analyzeGluonDocument('file:///quantity.ts', `
+      import { defineGluonElement, html } from '@gluonjs/core';
+      defineGluonElement({
+        tagName: 'shop-quantity',
+        properties: { value: Number, product: Object },
+        events: { change: { cancelable: true } },
+        slots: { default: { required: true }, help: { fallback: true } },
+        setup: () => ({ render: () => html\`<slot></slot><slot name="help"></slot>\` }),
+      });
+      html\`<shop-quantity .value=\${1} .missing=\${1} @change=\${() => {}} @missing=\${() => {}}></shop-quantity>\`;
+    `);
+    expect(result.declarations[0]).toMatchObject({
+      tagName: 'shop-quantity',
+      props: ['value', 'product'],
+      events: ['change'],
+      slots: ['default', 'help'],
+    });
+    expect(result.diagnostics.map((entry) => entry.code)).toEqual(expect.arrayContaining([
+      'GLUON_TEMPLATE_EVENT_UNKNOWN',
+      'GLUON_TEMPLATE_PROP_UNKNOWN',
+    ]));
+    expect(result.diagnostics).toHaveLength(2);
+  });
+
   test('accepts public Custom Elements Manifest metadata', () => {
     const declarations = declarationsFromCustomElementsManifest('file:///custom-elements.json', {
       modules: [{ declarations: [{

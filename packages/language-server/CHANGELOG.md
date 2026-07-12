@@ -7,3 +7,5 @@
 - Add the stdio LSP server and `gluon-template-check` CI command.
 - Analyze native HTML and expose editor features inside aliased `compose()`
   template bodies at their original TypeScript locations.
+- Add literal `defineGluonElement()` property, event, slot, tag, lifecycle, and
+  cleanup-owner analysis to the shared editor/CLI contract.

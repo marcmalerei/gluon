@@ -22,6 +22,9 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
   form-associated `gluon-product-configurator` Custom Element consumed by the
   maintained Vue 3 host
 - a reactive bag with configured line items and quantities
+- an app-local `gluon-bag-quantity` autonomous Custom Element authored through
+  `defineGluonElement()`, with inferred properties/native events, cancelable
+  optimistic quantity state, exposed focus, and 44px actions
 - a labeled checkout form, exact order summary, and URL-addressable confirmation
 - one isolated Store manager per shop application and persisted configured bag lines
 - abortable product availability with explicit loading, error, timeout, and retry UI
@@ -50,6 +53,13 @@ activates the product flow. The product configurator owns its control DOM and
 light-DOM slots form the host boundary. Server output retains the product title,
 inventory status, and facts as light DOM before the element upgrades.
 
+The bag quantity/remove surface is the concise-authoring acceptance boundary.
+`src/bag-quantity-control.ts` registers lazily from the real bag flow, imports
+only `@gluonjs/core`, owns one constructable ShadowRoot sheet, and communicates
+with the Store through cancelable native events. Its explicitly keyed optimistic
+quantity survives reconnect and compatible HMR; the Store remains the
+authoritative bag owner.
+
 The production pipeline emits hashed client assets and `gluon-assets.json`, a
 Vite SSR request bundle, and five route-aware static documents with one recorded
 dynamic product family plus stateful checkout and order fallbacks. See [static
@@ -70,7 +80,8 @@ available local and LAN URLs. The monorepo Vite configuration maps official
 package names to workspace sources; shop application files import public
 package entry points only. The same configuration installs `@gluonjs/vite`.
 Compatible edits to exported page/components, the shop Store definition,
-`shopStyles`, and `productConfiguratorStyles` update without a full reload;
+`shopStyles`, `productConfiguratorStyles`, and functional bag-control setup
+update without a full reload;
 public-schema or constructor changes use the documented reload boundary.
 
 ## Design system
@@ -135,7 +146,12 @@ device, or general framework-speed claims.
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
-is 164,012 bytes raw and 47,686 bytes gzip. The five WebP product/editorial assets total 155,126
+has an issue #108 owner baseline of 164,012 raw bytes and 47,686 gzip bytes. On
+the pre-#108 integration base, the issue #112 functional bag quantity boundary
+measured 166,257 raw bytes and 47,947 level-9 gzip bytes. Relative to the issue
+#88 baseline of 158,152 raw and 45,683 gzip bytes, that isolated #112 delta was
+8,105 raw bytes and 2,264 gzip bytes and included the concise authoring runtime
+plus the app-local control. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

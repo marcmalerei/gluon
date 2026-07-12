@@ -144,6 +144,36 @@
       "after": "<img alt=\"Preview\">"
     },
     {
+      "id": 1108,
+      "code": "GLUON_ELEMENT_TAG_INVALID",
+      "compactCode": "G1108",
+      "title": "Custom Element tag is invalid",
+      "summary": "A functional element definition uses an invalid autonomous Custom Element name.",
+      "why": "Platform Custom Element names must be lowercase, contain a hyphen, and cannot use the reserved xml prefix.",
+      "remediation": "Use a valid lowercase autonomous Custom Element name such as shop-quantity.",
+      "source": "compiler"
+    },
+    {
+      "id": 1109,
+      "code": "GLUON_ELEMENT_SETUP_CLEANUP_MISSING",
+      "compactCode": "G1109",
+      "title": "Setup resource has no cleanup owner",
+      "summary": "Functional element setup creates a listener or interval without a declared cleanup path.",
+      "why": "Connection-owned resources must be released when the element disconnects or hot setup is replaced.",
+      "remediation": "Register release work with context.onCleanup() or context.onDisconnected().",
+      "source": "compiler"
+    },
+    {
+      "id": 1110,
+      "code": "GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED",
+      "compactCode": "G1110",
+      "title": "Lifecycle registration is deferred",
+      "summary": "A functional element lifecycle callback is registered from nested or deferred work.",
+      "why": "Lifecycle ownership is fixed synchronously during setup and cannot depend on later call order.",
+      "remediation": "Move context.onConnected(), onUpdated(), onDisconnected(), or onErrorCaptured() registration into the synchronous setup body.",
+      "source": "compiler"
+    },
+    {
       "id": 1201,
       "code": "GLUON_HYDRATION_TEXT_MISMATCH",
       "compactCode": "G1201",

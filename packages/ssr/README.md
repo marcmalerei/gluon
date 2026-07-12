@@ -4,6 +4,13 @@ The official DOM-independent Gluon server renderer consumes the same public
 `html`, functional component, application, Store, Router, async built-in, and
 registered `GluonElement` definitions used by the browser.
 
+Definitions created by `defineGluonElement()` use the same registered-class
+path. Server rendering runs setup in a request-local effect scope, derives the
+ShadowRoot template, and stops the scope without browser connection lifecycle.
+Streaming and SSG consume that template unchanged; hydration reruns setup under
+the browser connection owner and binds the declarative ShadowRoot through the
+normal element hydrator.
+
 ```ts
 import { createApp, html } from '@gluonjs/core';
 import { renderRequest } from '@gluonjs/ssr';

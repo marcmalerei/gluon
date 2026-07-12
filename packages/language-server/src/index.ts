@@ -2,6 +2,9 @@ import ts from 'typescript';
 import { getGluonDiagnostic, transformGluonModule } from '@gluonjs/compiler';
 
 export type TemplateDiagnosticCode =
+  | 'GLUON_ELEMENT_SETUP_CLEANUP_MISSING'
+  | 'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED'
+  | 'GLUON_ELEMENT_TAG_INVALID'
   | 'GLUON_TEMPLATE_ARIA_UNKNOWN'
   | 'GLUON_TEMPLATE_BINDING_POSITION'
   | 'GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN'
@@ -360,11 +363,45 @@ function collectDeclarations(uri: string, source: ts.SourceFile): CustomElementD
           slots: Object.freeze(staticKeys(declaration, 'slots')),
         }));
       }
+    } else if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)
+      && node.expression.text === 'defineGluonElement') {
+      const definition = node.arguments[0];
+      if (definition && ts.isObjectLiteralExpression(definition)) {
+        const tag = objectPropertyInitializer(definition, 'tagName');
+        if (tag && ts.isStringLiteral(tag)) {
+          declarations.push(Object.freeze({
+            tagName: tag.text,
+            uri,
+            range: rangeAt(source, tag.getStart(source) + 1, tag.end - 1),
+            props: Object.freeze(objectLiteralKeys(objectPropertyInitializer(definition, 'properties'))),
+            events: Object.freeze(objectLiteralKeys(objectPropertyInitializer(definition, 'events'))),
+            slots: Object.freeze(objectLiteralKeys(objectPropertyInitializer(definition, 'slots'))),
+          }));
+        }
+      }
     }
     ts.forEachChild(node, visit);
   };
   visit(source);
   return declarations;
+}
+
+function objectPropertyInitializer(
+  object: ts.ObjectLiteralExpression,
+  name: string,
+): ts.Expression | undefined {
+  const property = object.properties.find((candidate): candidate is ts.PropertyAssignment =>
+    ts.isPropertyAssignment(candidate)
+    && candidate.name.getText().replace(/^['"]|['"]$/g, '') === name);
+  return property?.initializer;
+}
+
+function objectLiteralKeys(expression: ts.Expression | undefined): string[] {
+  if (!expression || !ts.isObjectLiteralExpression(expression)) return [];
+  return expression.properties.flatMap((property) =>
+    ts.isPropertyAssignment(property) || ts.isMethodDeclaration(property)
+      ? [property.name.getText().replace(/^['"]|['"]$/g, '')]
+      : []);
 }
 
 function staticKeys(declaration: ts.ClassLikeDeclaration | undefined, name: string): string[] {

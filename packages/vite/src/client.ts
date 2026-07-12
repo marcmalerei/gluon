@@ -37,6 +37,10 @@ interface ElementRecord {
   readonly tagName: `${string}-${string}`;
 }
 
+interface FunctionalElementDefinitionLike {
+  readonly tagName: `${string}-${string}`;
+}
+
 const componentRecords = new Map<string, ComponentRecord>();
 const elementRecords = new Map<string, ElementRecord>();
 const storeRecords = new Map<string, StoreRecord>();
@@ -83,7 +87,32 @@ export function element<Constructor extends GluonElementClass>(
   initializerSignature: string,
   hot?: HotContext,
 ): Constructor {
-  const id = recordId(_moduleId, _key);
+  return installElement(tagName, next, _moduleId, _key, initializerSignature, hot);
+}
+
+export function functionalElement<Constructor extends GluonElementClass>(
+  define: (
+    definition: FunctionalElementDefinitionLike,
+    options: { readonly register: false },
+  ) => Constructor,
+  definition: FunctionalElementDefinitionLike,
+  moduleId: string,
+  key: string,
+  hot?: HotContext,
+): Constructor {
+  const next = define(definition, { register: false });
+  return installElement(definition.tagName, next, moduleId, key, 'functional-setup-v1', hot);
+}
+
+function installElement<Constructor extends GluonElementClass>(
+  tagName: `${string}-${string}`,
+  next: Constructor,
+  moduleId: string,
+  key: string,
+  initializerSignature: string,
+  hot?: HotContext,
+): Constructor {
+  const id = recordId(moduleId, key);
   const existing = elementRecords.get(id);
   if (existing && (existing.tagName !== tagName || existing.signature !== initializerSignature)) {
     const reason = existing.tagName !== tagName
