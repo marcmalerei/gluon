@@ -1,5 +1,6 @@
-import { css } from '@gluonjs/core';
+import { css, markLegacyComponentStyleSheet } from '@gluonjs/core';
 
+/** @deprecated Components now adopt their exact stylesheet dependencies during rendering. */
 export const moleculeStyles = css`
   @layer molecules {
     :where(.gluon-card) {
@@ -38,3 +39,8 @@ export const moleculeStyles = css`
     :where(.gluon-form-error) { color: var(--gluon-color-danger, #a52222); }
   }
 `;
+
+markLegacyComponentStyleSheet(moleculeStyles, [
+  'gluon-molecule-card',
+  'gluon-molecule-form-field',
+]);

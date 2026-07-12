@@ -1,15 +1,10 @@
-import {
-  adoptStyles,
-  compose,
-  render,
-} from '../src/index.js';
-import { Button, atomStyles, installUi } from '@gluonjs/atoms';
-import { Card, moleculeStyles } from '@gluonjs/molecules';
-import { AppShell, organismStyles } from '@gluonjs/organisms';
+import { compose, render } from '../src/index.js';
+import { Button, installUi } from '@gluonjs/atoms';
+import { Card } from '@gluonjs/molecules';
+import { AppShell } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
 
 installUi(document, { theme: 'light' });
-adoptStyles(document, atomStyles, moleculeStyles, organismStyles);
 
 render(compose(AppShell, {
   header: q.h1({ children: 'Gluon' }),

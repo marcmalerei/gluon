@@ -1,5 +1,6 @@
-import { css } from '@gluonjs/core';
+import { css, markLegacyComponentStyleSheet } from '@gluonjs/core';
 
+/** @deprecated Components now adopt their exact stylesheet dependencies during rendering. */
 export const organismStyles = css`
   @layer organisms {
     :where(.gluon-app-shell) {
@@ -24,3 +25,5 @@ export const organismStyles = css`
     }
   }
 `;
+
+markLegacyComponentStyleSheet(organismStyles, ['gluon-organism-app-shell']);

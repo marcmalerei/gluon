@@ -23,8 +23,11 @@ Router starters author link children with the public
 `compose(RouterLink, props)\`body\`` path, so generated projects demonstrate
 typed nested composition without an additional file format.
 `npm run check:templates` runs the same diagnostics exposed by the Gluon editor service.
-`--ui` uses the separately consumable public `@gluonjs/atoms` package. `--testing` adds
-the official browser fixture utilities and a Playwright-backed Vitest test.
+`--ui` uses the separately consumable public `@gluonjs/atoms` package. Generated
+Button calls retain only the Button stylesheet through renderer-owned component
+metadata; generated applications do not import or adopt the deprecated aggregate
+Atom sheet. `--testing` adds the official browser fixture utilities and a
+Playwright-backed Vitest test.
 `--ssr` adds one request-isolated server entry plus hydration. All Gluon
 dependencies use the exact `create-gluon` release version; framework packages
 and this CLI are released as one lockstep group.

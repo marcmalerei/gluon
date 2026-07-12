@@ -1,4 +1,4 @@
-import { GluonElement, createApp, defineElement, html } from '@gluonjs/core';
+import { GluonElement, createApp, createComponentStyleSelection, defineElement, html } from '@gluonjs/core';
 import { defineStore } from '@gluonjs/store';
 import {
   prepareForHydration,
@@ -28,7 +28,11 @@ void progressive;
 void renderProgressively(html`<p>Async</p>`);
 void prepareForHydration(html`<p>Hydrate</p>`);
 const hydrationRoot = document.createElement('div');
-void hydrateTemplate(html`<p>Hydrate</p>`, hydrationRoot, { recovery: 'throw' });
+const hydrationValue = html`<p>Hydrate</p>`;
+void hydrateTemplate(hydrationValue, hydrationRoot, {
+  recovery: 'throw',
+  styleSelection: createComponentStyleSelection(hydrationValue),
+});
 void hydrateApplication(createApp(() => html`<p>App</p>`), hydrationRoot);
 
 const counter = defineStore({ id: 'typed-request', state: () => ({ count: 0 }) });

@@ -152,6 +152,16 @@ selectors. The exact stable-entry matrix is maintained in
 changelog, declaration, package, and release validation rules as other public
 APIs.
 
+Each visual functional component owns a separately tree-shakable sheet module
+inside its existing package and publishes immutable style IDs through
+`Component.styles` and the package manifest. No new package or export-map entry
+is introduced. The root `atomStyles`, `moleculeStyles`, and `organismStyles`
+exports remain present but deprecated under the repository's normal removal
+policy. Combining one with exact renderer ownership reports
+`GLUON_LEGACY_COMPONENT_STYLE_CONFLICT`; this makes the migration failure
+explicit and prevents silent duplicate CSS. Removing those exports after a
+stable release requires the documented major-release deprecation process.
+
 ## Public API boundary
 
 The following are public compatibility commitments once a package reaches a

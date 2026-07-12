@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   compose,
+  createComponentStyleSelection,
   createApp,
   createInjectionKey,
   defineElement,
@@ -15,7 +16,10 @@ import {
   renderGluonApplicationForServer,
   Suspense,
   unsafeHTML,
+  unmount,
 } from '@gluonjs/core';
+import { Button, buttonStyles } from '@gluonjs/atoms';
+import { Card, cardStyles } from '@gluonjs/molecules';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   hydrateApplication,
@@ -303,5 +307,63 @@ describe('SSR hydration', () => {
       .rejects.toMatchObject({ code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT' });
     expect(styleRoot.querySelector('style[data-gluon-style]')).not.toBeNull();
     document.adoptedStyleSheets = previous;
+  });
+
+  it('hands component carriers to their exact renderer-owned sheets and diagnoses mismatches', async () => {
+    const value = html`<main>${Button({ label: 'Hydrated action' })}${Card({ title: 'Hydrated card' })}</main>`;
+    const prepared = await prepareForHydration(value);
+    const selection = createComponentStyleSelection(prepared.value);
+    const manifest = createStyleManifest(selection);
+    const host = document.createElement('section');
+    const styleRoot = host.attachShadow({ mode: 'open' });
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    styleRoot.innerHTML = renderStyleCarriers(manifest);
+    styleRoot.append(root);
+
+    const result = await hydrateTemplate(value, root, { styles: manifest, styleRoot });
+    expect(result.retained).toBe(true);
+    expect(styleRoot.adoptedStyleSheets).toContain(buttonStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(cardStyles);
+    expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
+    unmount(root);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(buttonStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(cardStyles);
+
+    const carrierTemplate = document.createElement('template');
+    carrierTemplate.innerHTML = renderStyleCarriers(manifest);
+    const carrierHtml = [...carrierTemplate.content.children].map((carrier) => carrier.outerHTML);
+    const scenarios: Array<{
+      mismatch: string;
+      carriers: string;
+      wrongTarget?: boolean;
+    }> = [
+      { mismatch: 'missing', carriers: carrierHtml[0]! },
+      { mismatch: 'duplicate', carriers: `${carrierHtml[0]}${carrierHtml[0]}` },
+      { mismatch: 'extra', carriers: `${carrierHtml.join('')}<style data-gluon-style="extra" data-gluon-digest="extra"></style>` },
+      { mismatch: 'reordered', carriers: [...carrierHtml].reverse().join('') },
+      { mismatch: 'mismatched', carriers: carrierHtml.join('').replace(manifest.entries[0]!.digest, 'invalid') },
+      { mismatch: 'wrong-target', carriers: '', wrongTarget: true },
+    ];
+    for (const scenario of scenarios) {
+      const scenarioHost = document.createElement('section');
+      const scenarioStyleRoot = scenarioHost.attachShadow({ mode: 'open' });
+      const scenarioRoot = document.createElement('div');
+      scenarioRoot.innerHTML = prepared.html;
+      scenarioStyleRoot.innerHTML = scenario.carriers;
+      scenarioStyleRoot.append(scenarioRoot);
+      document.body.append(scenarioHost);
+      if (scenario.wrongTarget) {
+        const misplaced = document.createElement('div');
+        misplaced.innerHTML = carrierHtml.join('');
+        document.body.append(misplaced);
+      }
+      await expect(hydrateTemplate(value, scenarioRoot, { styles: manifest, styleRoot: scenarioStyleRoot }))
+        .rejects.toMatchObject({
+          code: 'GLUON_COMPONENT_STYLE_HYDRATION_MISMATCH',
+          mismatch: scenario.mismatch,
+        });
+      document.body.replaceChildren();
+    }
   });
 });

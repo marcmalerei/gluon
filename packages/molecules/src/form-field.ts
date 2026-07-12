@@ -1,6 +1,7 @@
 import { Input, Label, type InputProps } from '@gluonjs/atoms';
 import { defineMolecule, nothing, type TemplateResult } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
+import { formFieldStyleDependency } from './form-field-styles.js';
 
 type FormFieldAttributes = Omit<QuarkProps<HTMLLabelElement>, 'children'>;
 
@@ -36,4 +37,4 @@ function renderFormField({
   });
 }
 
-export const FormField = defineMolecule(renderFormField, 'FormField');
+export const FormField = defineMolecule(renderFormField, 'FormField', [formFieldStyleDependency]);

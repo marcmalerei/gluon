@@ -1,5 +1,5 @@
 import { createStyleSheetSelection, css } from '@gluonjs/core';
-import { atomStyles, createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';
+import { createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';
 
 export const shopStyles = css`
   @layer shop.reset, shop.base, shop.components, shop.pages, shop.responsive;
@@ -487,13 +487,11 @@ export function createShopStyleSelection(theme: UiThemeName = 'light') {
   const ui = createUiStyleSelection(theme);
   return createStyleSheetSelection([
     ...ui.entries,
-    { id: 'gluon-atoms-components', scope: 'gluon-atoms', sheet: atomStyles },
     { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
   ]);
 }
 
 /** The app-owned carrier left after installUi() consumes the shared UI carriers. */
 export const shopHydrationStyleSelection = createStyleSheetSelection([
-  { id: 'gluon-atoms-components', scope: 'gluon-atoms', sheet: atomStyles },
   { id: 'gluon-goods', scope: 'gluon-goods', sheet: shopStyles },
 ]);

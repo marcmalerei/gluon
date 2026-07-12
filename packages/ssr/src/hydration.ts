@@ -1,18 +1,23 @@
 import {
+  createComponentStyleSelection,
+  createStyleSheetOwner,
+  createStyleSheetSelection,
   hydrate,
   getStyleSheetText,
   renderGluonApplicationForServer,
   TemplateResult,
+  unmount,
   type AppContainer,
   type AppMount,
   type GluonApp,
   type GluonElement,
   type HydrationMismatchCategory,
   type HydrationResult,
+  type StyleSheetSelection,
 } from '@gluonjs/core';
 import type { Router, RouterSnapshot } from '@gluonjs/router/memory';
 import type { StoreManager, StoreSnapshot } from '@gluonjs/store';
-import { prepareForHydration } from './index.js';
+import { createStyleManifest, prepareForHydration } from './index.js';
 import type { StyleManifest } from './index.js';
 
 export interface HydrateTemplateOptions {
@@ -21,6 +26,8 @@ export interface HydrateTemplateOptions {
   readonly onMismatch?: Parameters<typeof hydrate>[2]['onMismatch'];
   readonly state?: { readonly server: unknown; readonly client: unknown };
   readonly styles?: StyleManifest;
+  /** Exact application sheets combined with component styles discovered from the hydrated tree. */
+  readonly styleSelection?: StyleSheetSelection;
   readonly styleRoot?: Document | ShadowRoot;
 }
 
@@ -54,8 +61,13 @@ export async function hydrateTemplate(
   if (!(prepared.value instanceof TemplateResult)) {
     throw new TypeError('A hydration root must resolve to a TemplateResult.');
   }
-  const handoff = options.styles
-    ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, options.styles)
+  const selection = mergeHydrationSelections(
+    options.styleSelection,
+    createComponentStyleSelection(prepared.value),
+  );
+  const manifest = options.styles ?? (selection.entries.length > 0 ? createStyleManifest(selection) : undefined);
+  const handoff = manifest
+    ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, manifest, selection)
     : undefined;
   try {
     const result = hydrate(prepared.value, container, {
@@ -65,7 +77,10 @@ export async function hydrateTemplate(
       onMismatch: options.onMismatch,
       state: options.state,
     });
-    if (!result.retained && handoff) throw new SsrTransportError('DOM hydration recovery is incompatible with an active style handoff.');
+    if (!result.retained && handoff) {
+      unmount(container);
+      throw new SsrTransportError('DOM hydration recovery is incompatible with an active style handoff.');
+    }
     handoff?.commit();
     return result;
   } catch (error) {
@@ -82,29 +97,80 @@ export class SsrTransportError extends Error {
   }
 }
 
-function prepareStyleHandoff(root: Document | ShadowRoot, manifest: StyleManifest) {
+export type ComponentStyleHydrationMismatch =
+  | 'missing'
+  | 'extra'
+  | 'duplicate'
+  | 'reordered'
+  | 'mismatched'
+  | 'wrong-target';
+
+export class ComponentStyleHydrationError extends Error {
+  readonly code = 'GLUON_COMPONENT_STYLE_HYDRATION_MISMATCH';
+  constructor(readonly mismatch: ComponentStyleHydrationMismatch, message: string) {
+    super(message);
+    this.name = 'ComponentStyleHydrationError';
+  }
+}
+
+function prepareStyleHandoff(
+  root: Document | ShadowRoot,
+  manifest: StyleManifest,
+  selection: StyleSheetSelection,
+) {
   if (!('adoptedStyleSheets' in root)) throw new SsrTransportError('The hydration root does not support adoptedStyleSheets.');
   const carriers = [...root.querySelectorAll<HTMLStyleElement>('style[data-gluon-style]')];
-  if (carriers.length !== manifest.entries.length) throw new SsrTransportError('The SSR style carrier count does not match the manifest.');
-  const sheets: CSSStyleSheet[] = [];
+  const actualIds = carriers.map((carrier) => carrier.dataset.gluonStyle ?? '');
+  if (new Set(actualIds).size !== actualIds.length) {
+    throw hydrationStyleError(manifest, 'duplicate', 'The hydration target contains duplicate SSR style carriers.');
+  }
+  if (carriers.length < manifest.entries.length) {
+    const expectedIds = new Set(manifest.entries.map((entry) => entry.id));
+    const actualIds = new Set(carriers.map((carrier) => carrier.dataset.gluonStyle));
+    const missing = [...expectedIds].filter((id) => !actualIds.has(id));
+    const elsewhere = root instanceof ShadowRoot
+      && missing.some((id) => root.ownerDocument.querySelector(`style[data-gluon-style="${id}"]`));
+    throw hydrationStyleError(
+      manifest,
+      elsewhere ? 'wrong-target' : 'missing',
+      elsewhere
+        ? `SSR component style carrier ${missing.join(', ')} was emitted for the wrong style target.`
+        : `Missing SSR component style carrier ${missing.join(', ')}.`,
+    );
+  }
+  if (carriers.length > manifest.entries.length) {
+    throw hydrationStyleError(manifest, 'extra', 'The hydration target contains extra SSR style carriers.');
+  }
+  const explicitOwner = createStyleSheetOwner(root);
+  const selectedById = new Map(selection.entries.map((entry) => [entry.id, entry]));
   for (let index = 0; index < manifest.entries.length; index += 1) {
     const entry = manifest.entries[index]!;
     const carrier = carriers[index]!;
-    if (carrier.dataset.gluonStyle !== entry.id || carrier.dataset.gluonDigest !== entry.digest) {
-      throw new SsrTransportError(`SSR style carrier ${index} does not match manifest order or digest.`);
+    if (carrier.dataset.gluonStyle !== entry.id) {
+      explicitOwner.dispose();
+      throw hydrationStyleError(manifest, 'reordered', `SSR style carrier ${index} is not ${entry.id}.`);
+    }
+    if (carrier.dataset.gluonDigest !== entry.digest) {
+      explicitOwner.dispose();
+      throw hydrationStyleError(manifest, 'mismatched', `SSR style carrier ${entry.id} has a mismatched digest.`);
     }
     if ((carrier.textContent ?? '').replace(/<\\\/style/gi, '</style') !== entry.cssText) {
-      throw new SsrTransportError(`SSR style carrier ${entry.id} CSS does not match its manifest entry.`);
+      explicitOwner.dispose();
+      throw hydrationStyleError(manifest, 'mismatched', `SSR style carrier ${entry.id} CSS does not match its manifest entry.`);
     }
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(entry.cssText);
-    if (getStyleSheetText(sheet).length === 0 && entry.cssText.length > 0) {
-      throw new SsrTransportError(`SSR style carrier ${entry.id} could not be constructed.`);
+    const selected = selectedById.get(entry.id);
+    if (selected && selected.scope !== 'gluon-component') {
+      explicitOwner.retain(selected.sheet);
+    } else if (!selected) {
+      const sheet = new CSSStyleSheet();
+      sheet.replaceSync(entry.cssText);
+      if (getStyleSheetText(sheet).length === 0 && entry.cssText.length > 0) {
+        explicitOwner.dispose();
+        throw new SsrTransportError(`SSR style carrier ${entry.id} could not be constructed.`);
+      }
+      explicitOwner.retain(sheet);
     }
-    sheets.push(sheet);
   }
-  const previous = [...root.adoptedStyleSheets];
-  root.adoptedStyleSheets = [...previous, ...sheets.filter((sheet) => !previous.includes(sheet))];
   let complete = false;
   return {
     commit() {
@@ -115,9 +181,20 @@ function prepareStyleHandoff(root: Document | ShadowRoot, manifest: StyleManifes
     rollback() {
       if (complete) return;
       complete = true;
-      root.adoptedStyleSheets = previous;
+      explicitOwner.dispose();
     },
+    dispose() { explicitOwner.dispose(); },
   };
+}
+
+function hydrationStyleError(
+  manifest: StyleManifest,
+  mismatch: ComponentStyleHydrationMismatch,
+  message: string,
+): ComponentStyleHydrationError | SsrTransportError {
+  return manifest.entries.some((entry) => entry.scope === 'gluon-component')
+    ? new ComponentStyleHydrationError(mismatch, message)
+    : new SsrTransportError(message);
 }
 
 /** Hydrates one created application, then mounts its reactive client runtime on the retained root. */
@@ -131,8 +208,13 @@ export async function hydrateApplication<Public = unknown>(
   if (!(prepared.value instanceof TemplateResult)) {
     throw new TypeError('A Gluon application hydration root must resolve to a TemplateResult.');
   }
-  const handoff = options.styles
-    ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, options.styles)
+  const selection = mergeHydrationSelections(
+    options.styleSelection,
+    createComponentStyleSelection(prepared.value),
+  );
+  const manifest = options.styles ?? (selection.entries.length > 0 ? createStyleManifest(selection) : undefined);
+  const handoff = manifest
+    ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, manifest, selection)
     : undefined;
   try {
     const hydration = await app.run(() => hydrate(prepared.value as TemplateResult, container, {
@@ -143,16 +225,46 @@ export async function hydrateApplication<Public = unknown>(
       state: options.state,
     }));
     if (!hydration) throw new Error('The Gluon application hydration did not complete.');
-    if (!hydration.retained && handoff) throw new SsrTransportError(
-      `DOM hydration recovery is incompatible with an active style handoff: ${hydration.mismatches.map((mismatch) => `${mismatch.category} ${mismatch.path} expected ${mismatch.expected} actual ${mismatch.actual}`).join('; ')}`,
-    );
-    const mount = app.mount(container);
+    if (!hydration.retained && handoff) {
+      unmount(container);
+      throw new SsrTransportError(
+        `DOM hydration recovery is incompatible with an active style handoff: ${hydration.mismatches.map((mismatch) => `${mismatch.category} ${mismatch.path} expected ${mismatch.expected} actual ${mismatch.actual}`).join('; ')}`,
+      );
+    }
+    const mounted = app.mount(container);
     handoff?.commit();
+    const mount: AppMount<Public> = handoff
+      ? Object.freeze({
+          app: mounted.app,
+          container: mounted.container,
+          get exposed() { return mounted.exposed; },
+          unmount() {
+            try {
+              mounted.unmount();
+            } finally {
+              handoff.dispose();
+            }
+          },
+        })
+      : mounted;
     return Object.freeze({ hydration, mount });
   } catch (error) {
     handoff?.rollback();
     throw error;
   }
+}
+
+function mergeHydrationSelections(
+  explicit: StyleSheetSelection | undefined,
+  components: StyleSheetSelection,
+): StyleSheetSelection {
+  const entries = [...(explicit?.entries ?? []), ...components.entries];
+  const ids = new Set<string>();
+  return createStyleSheetSelection(entries.filter((entry) => {
+    if (ids.has(entry.id)) return false;
+    ids.add(entry.id);
+    return true;
+  }));
 }
 
 export interface RequestHydrationState<Data = unknown> {

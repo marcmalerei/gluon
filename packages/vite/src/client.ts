@@ -73,6 +73,11 @@ export function component<Implementation extends Function>(
     enumerable: true,
     get: () => Reflect.get(record.current, 'layer'),
   });
+  Object.defineProperty(stable, 'styles', {
+    configurable: true,
+    enumerable: true,
+    get: () => Reflect.get(record.current, 'styles'),
+  });
   Object.defineProperty(record, 'stable', { value: stable });
   componentRecords.set(id, record);
   return stable as unknown as Implementation;

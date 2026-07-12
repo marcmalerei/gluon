@@ -1,10 +1,12 @@
 import { access, readFile, readdir, rm } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { build } from 'vite';
 
 const root = resolve(import.meta.dirname, '..');
 const output = resolve(root, '.tmp/core-without-ui');
 const ownerOutput = resolve(root, '.tmp/ui-owner-only');
+const componentOutput = resolve(root, '.tmp/ui-component-usage');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['Button', 'Icon', 'Input', 'Label', 'installUi']],
@@ -49,6 +51,13 @@ for (const [packageName, names] of expected) {
     const exampleName = name === 'q/quark/fragment' ? 'q' : name;
     if (!exampleSource.includes(exampleName)) {
       throw new Error(`${packageName} ${name} is missing from the interactive UI example.`);
+    }
+    if (
+      packageName !== '@gluonjs/quarks'
+      && name !== 'installUi'
+      && !manifestSource.match(new RegExp(`name: '${name}'[^\\n]+styles: \\[\\s*'gluon-`))
+    ) {
+      throw new Error(`${packageName} ${name} does not name its exact component stylesheet evidence.`);
     }
   }
   await access(resolve(root, 'docs-site/examples/ui-system.ts'));
@@ -124,4 +133,55 @@ try {
   await rm(ownerOutput, { force: true, recursive: true });
 }
 
-console.log('UI contract valid: 4 optional packages, 15 typed extension entries, canonical DX T2 extensions, Core-only and UI-owner-only bundles exclude unselected UI markers');
+try {
+  await build({
+    configFile: false,
+    logLevel: 'silent',
+    resolve: { alias: {
+      '@gluonjs/core': resolve(root, 'src/index.ts'),
+      '@gluonjs/quarks': resolve(root, 'packages/quarks/src/index.ts'),
+      '@gluonjs/atoms': resolve(root, 'packages/atoms/src/index.ts'),
+      '@gluonjs/molecules': resolve(root, 'packages/molecules/src/index.ts'),
+      '@gluonjs/organisms': resolve(root, 'packages/organisms/src/index.ts'),
+      '@gluonjs/reactivity': resolve(root, 'packages/reactivity/src/index.ts'),
+    } },
+    build: {
+      emptyOutDir: true,
+      minify: false,
+      outDir: componentOutput,
+      rollupOptions: {
+        input: resolve(root, 'tests-fixtures/ui-component-usage/main.ts'),
+        output: {
+          entryFileNames: 'button-only.js',
+          chunkFileNames: '[name].js',
+        },
+      },
+    },
+  });
+  const files = await readdir(componentOutput);
+  const entries = new Map(await Promise.all(files
+    .filter((file) => file.endsWith('.js'))
+    .map(async (file) => [file, await readFile(resolve(componentOutput, file), 'utf8')])));
+  const initial = entries.get('button-only.js') ?? '';
+  for (const marker of ['gluon-input', 'gluon-label', 'gluon-icon', 'gluon-card', 'gluon-form-field', 'gluon-app-shell']) {
+    if (initial.includes(marker)) throw new Error(`Button-only entry contains unselected marker ${marker}.`);
+  }
+  if (!initial.includes('gluon-button')) throw new Error('Button-only entry does not contain its exact component marker.');
+  const cardChunk = [...entries].find(([file]) => file.startsWith('card'))?.[1] ?? '';
+  const shellChunk = [...entries].find(([file]) => file.startsWith('shell'))?.[1] ?? '';
+  if (!cardChunk.includes('gluon-card') || cardChunk.includes('gluon-form-field')) {
+    throw new Error(`The dynamic Card chunk does not contain exactly the Card style boundary (${[...entries.keys()].join(', ')}).`);
+  }
+  if (!shellChunk.includes('gluon-app-shell')) {
+    throw new Error('The dynamic AppShell chunk does not own the AppShell style boundary.');
+  }
+} finally {
+  await rm(componentOutput, { force: true, recursive: true });
+}
+
+execFileSync(process.execPath, [resolve(root, 'scripts/measure-component-styles.mjs'), '--check'], {
+  cwd: root,
+  stdio: 'inherit',
+});
+
+console.log('UI contract valid: 4 optional packages, 15 typed extension entries, canonical DX T2 extensions, and exact production component chunks exclude unrelated UI markers');

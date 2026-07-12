@@ -409,7 +409,9 @@ The type of `q` maps every key in `HTMLElementTagNameMap` to a cached factory. `
 
 ## UI layers
 
-Atoms, Molecules, and Organisms are ordinary render functions with explicit metadata. They all return `TemplateResult` and compose through Quarks; there is no second component runtime.
+Atoms, Molecules, and Organisms are ordinary render functions with explicit
+layer, display-name, and immutable exact-style metadata. They all return
+`TemplateResult` and compose through Quarks; there is no second component runtime.
 
 They have no host, state instance, or lifecycle of their own. Stateful and
 publicly interoperable components use `GluonElement`; their render methods may
@@ -420,14 +422,21 @@ direction already points from Atoms to Core. `installUi()` creates no new
 package edge: one call retains Core's layer order and foundation plus Atom-owned
 tokens and one target-local active theme sheet. Its returned `UiOwner` exposes
 typed theme switching, idempotent disposal, and a separate target-scoped
-`styleOwner` for exact rendered component dependencies. Core never imports an
+`styleOwner` for additional explicit target sheets. Core never imports an
 optional UI package.
 
 The active theme sheet keeps one identity while its CSS text changes. Each
 Document or ShadowRoot receives its own instance, so theme state is not a
 process singleton. Named `StyleSheetSelection` entries carry the same four
-sheets through SSR. The aggregate category sheets remain a compatibility path;
-#115 owns usage-driven Atom, Molecule, and Organism selection.
+sheets through SSR. Component calls copy their exact dependencies onto the
+returned template value. Root and nested Parts retain those dependencies on the
+actual `Document` or `ShadowRoot` before committing dependent DOM, reference-
+count duplicate instances, and release conditional, async, teleported,
+transitioned, element, application, hydration, and unmount ownership at their
+documented lifecycle boundaries. Target-local ordering is stable by layer and
+component ID regardless of discovery order. Deprecated aggregate sheets remain
+exported for migration, but exact rendering rejects their coexistence instead
+of silently double-styling.
 
 ## Report-only Vue migration analyzer
 

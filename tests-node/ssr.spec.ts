@@ -46,6 +46,8 @@ import { FunctionalQuantityControl } from '../benchmarks/dx/stateful-form-contro
 import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-control/react.js';
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
+import { Button } from '@gluonjs/atoms';
+import { Card } from '@gluonjs/molecules';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('serializes composed functional templates through the unchanged public template contract', async () => {
@@ -463,6 +465,33 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
 });
 
 describe('@gluonjs/ssr static output and style transport', () => {
+  it('derives request and progressive component styles from rendered usage', async () => {
+    const response = await renderRequest({
+      url: '/styled',
+      createApp: () => createApp(() => html`${Button({ label: 'Continue' })}${Card({ title: 'Summary' })}`),
+    });
+    expect(response.styles.entries.map((entry) => entry.id)).toEqual([
+      'gluon-atom-button',
+      'gluon-molecule-card',
+    ]);
+
+    const value = html`${Suspense({
+      source: Promise.resolve('Ready'),
+      fallback: Button({ label: 'Loading' }),
+      children: (title) => Card({ title }),
+    })}`;
+    const chunks = [];
+    for await (const chunk of renderProgressively(value)) chunks.push(chunk);
+    expect(chunks[0]!.styles.entries.map((entry) => entry.id)).toEqual(['gluon-atom-button']);
+    expect(chunks[1]!.styles.entries.map((entry) => entry.id)).toEqual(['gluon-molecule-card']);
+
+    const transport = await new Response(renderProgressiveReadableStream(value)).text();
+    expect(transport.indexOf('data-gluon-style="gluon-atom-button"'))
+      .toBeLessThan(transport.indexOf('Loading'));
+    expect(transport.indexOf('data-gluon-style="gluon-molecule-card"'))
+      .toBeLessThan(transport.indexOf('data-gluon-async-patch="0"'));
+  });
+
   it('preserves stable selection ids and scopes without changing content diagnostics', () => {
     const sheet = css`:root { --named: 1; }`;
     const manifest = createStyleManifest({
@@ -485,18 +514,17 @@ describe('@gluonjs/ssr static output and style transport', () => {
       assets: ['/assets/orbit.webp'],
     };
     const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
-    expect(response.styles.entries).toHaveLength(6);
+    expect(response.styles.entries).toHaveLength(5);
     expect(response.styles.entries.map((entry) => entry.id)).toEqual([
       'gluon-ui-layer-order',
       'gluon-ui-foundation',
       'gluon-ui-tokens',
       'gluon-ui-theme',
-      'gluon-atoms-components',
       'gluon-goods',
     ]);
-    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5]);
-    expect(response.styles.entries[4]?.cssText).toContain('.gluon-button');
-    expect(response.styles.entries[5]?.cssText).toContain('.checkout-page');
+    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4]);
+    expect(response.styles.entries[4]?.cssText).toContain('.checkout-page');
+    expect(response.styles.entries.some((entry) => entry.id === 'gluon-atoms-components')).toBe(false);
     expect(response.head).toContain('data-gluon-style="gluon-ui-layer-order"');
     expect(response.head).toContain('nonce="request-nonce"');
     expect(response.head).toContain('rel="modulepreload" href="/assets/vendor.js"');

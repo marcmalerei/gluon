@@ -2,7 +2,6 @@ import { expect, test } from 'vitest';
 import { page } from 'vitest/browser';
 import {
   Button,
-  atomStyles,
   installUi,
 } from '@gluonjs/atoms';
 import {
@@ -10,8 +9,8 @@ import {
   css,
   render,
 } from '../src/index.js';
-import { Card, FormField, moleculeStyles } from '@gluonjs/molecules';
-import { AppShell, organismStyles } from '@gluonjs/organisms';
+import { Card, FormField } from '@gluonjs/molecules';
+import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
 test('matches the stable light-theme UI composition', async () => {
@@ -32,7 +31,7 @@ test('matches the stable light-theme UI composition', async () => {
     }
   `;
   const uiOwner = installUi(document, { theme: 'light' });
-  adoptStyles(document, atomStyles, moleculeStyles, organismStyles, visualStyles);
+  adoptStyles(document, visualStyles);
 
   render(q.div({
     data: { testid: 'ui-visual' },
