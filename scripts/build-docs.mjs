@@ -172,7 +172,7 @@ async function expandIncludes(markdown, directory) {
     const source = resolve(directory, requested);
     if (!source.startsWith(siteRoot + sep)) throw new Error(`documentation include escapes docs-site: ${requested}`);
     const code = await readFile(source, 'utf8');
-    const language = ({ '.ts': 'ts', '.html': 'html', '.sh': 'sh' })[extname(source)] ?? 'text';
+    const language = ({ '.ts': 'ts', '.vue': 'vue', '.html': 'html', '.sh': 'sh' })[extname(source)] ?? 'text';
     markdown = markdown.replace(include[0], `\`\`\`${language}\n${code.trimEnd()}\n\`\`\``);
   }
   return markdown;

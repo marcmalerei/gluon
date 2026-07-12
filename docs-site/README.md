@@ -40,3 +40,15 @@ the production GLUON GOODS product configurator with an explicit
 at 1440×1000 and
 [`design/rendered-vue-migration-mobile.png`](design/rendered-vue-migration-mobile.png)
 at 390×844.
+
+The versioned Migration entry links to the tested
+[Vue-to-Gluon cutover playbook](content/0.0.0/migration/vue-to-gluon-cutover/index.md).
+The guide keeps Vue and Gluon
+application ownership explicit for every stage and embeds the compiled Vue host
+sources instead of maintaining copied snippets. `validate-docs.mjs` requires the
+page, its safety boundary, its rollback matrix, and its browser-evidence links.
+The verified playbook renders are
+[`design/rendered-vue-cutover-desktop.png`](design/rendered-vue-cutover-desktop.png)
+at 1440×1000 and
+[`design/rendered-vue-cutover-mobile.png`](design/rendered-vue-cutover-mobile.png)
+at 390×844.
