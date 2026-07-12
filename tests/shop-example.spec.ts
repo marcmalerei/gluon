@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { atomStyles } from '@gluonjs/atoms';
 import { adoptStyles } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { inputStyles } from '@gluonjs/atoms';
@@ -17,7 +16,7 @@ describe('GLUON GOODS reference shop', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     localStorage.clear();
-    adoptStyles(document, atomStyles, shopStyles);
+    adoptStyles(document, shopStyles);
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {

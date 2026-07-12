@@ -1,6 +1,5 @@
 import { beforeEach, expect, test } from 'vitest';
 import axe, { type Result } from 'axe-core';
-import { atomStyles } from '@gluonjs/atoms';
 import { adoptStyles } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
@@ -10,7 +9,7 @@ import { shopStyles } from '../examples/shop/src/styles.js';
 beforeEach(() => {
   document.body.replaceChildren();
   localStorage.clear();
-  adoptStyles(document, atomStyles, shopStyles);
+  adoptStyles(document, shopStyles);
 });
 
 test('keeps the GLUON GOODS customer journey free of automated WCAG A/AA violations', async () => {
