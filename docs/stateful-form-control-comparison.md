@@ -26,6 +26,17 @@ server outputs, readable-stream serialization, and static generation. Generator
 and Playground tests retain public
 `defineGluonElement` examples.
 
+React 19's `root.render()` schedules a commit after the autonomous-element
+bridge has synchronously accepted and dispatched a `quantity-change` event. A
+single animation frame is not a React commit signal: retained pull-request runs
+observed the exact quantity-2 event while the ShadowRoot still rendered
+quantity 1 in both Chromium and WebKit. The browser fixture therefore observes
+the ShadowRoot until both the exact quantity and computed total are rendered,
+with an immediate check before and after observer registration. Its timeout is
+only a failure boundary; it is not a settlement delay. A focused React case
+repeats 25 accepted changes while preserving separate event, quantity, and
+computed-total assertions.
+
 The raw record is
 `benchmarks/dx/stateful-form-control/evidence.json`; its parent-contract record
 is `benchmarks/dx/evidence/stateful-form-control-2026-07-12.json`. These records

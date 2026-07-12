@@ -85,6 +85,25 @@ describe.each([
   });
 });
 
+test('the React bridge settles every accepted quantity against its rendered ShadowRoot output', async () => {
+  const control = document.createElement(reactQuantityTag) as TestControl;
+  control.product = product;
+  control.value = 1;
+  document.body.append(control);
+  await settled(control);
+
+  const changes: QuantityChange[] = [];
+  control.addEventListener('quantity-change', (event) => changes.push((event as CustomEvent<QuantityChange>).detail));
+  for (let iteration = 0; iteration < 25; iteration += 1) {
+    const quantity = (iteration % 5) + 1;
+    expect(control.setQuantity(quantity)).toBe(true);
+    expect(changes.at(-1)).toEqual({ productId: product.id, quantity });
+    await settled(control);
+    expect(control.shadowRoot?.querySelector('output')?.textContent).toBe(String(quantity));
+    expect(control.shadowRoot?.querySelector('strong')?.textContent).toBe(`Total €${(quantity * product.price).toFixed(2)}`);
+  }
+});
+
 test('the retained Gluon class and functional comparator tags hydrate their exact server DOM', async () => {
   for (const [tagName, definition] of [
     [gluonClassTag, ClassQuantityControl],
@@ -178,4 +197,34 @@ async function settled(control: TestControl): Promise<void> {
   await control.updateComplete;
   await nextTick();
   await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  if (!control.isConnected) return;
+  await renderedQuantity(control, control.quantity);
+}
+
+async function renderedQuantity(control: TestControl, quantity: number): Promise<void> {
+  const expectedOutput = String(quantity);
+  const expectedTotal = `Total €${(quantity * control.product.price).toFixed(2)}`;
+  const isReady = (): boolean => control.shadowRoot?.querySelector('output')?.textContent === expectedOutput
+    && control.shadowRoot?.querySelector('strong')?.textContent === expectedTotal;
+  if (isReady()) return;
+
+  await new Promise<void>((resolve, reject) => {
+    const observer = new MutationObserver(() => {
+      if (!isReady()) return;
+      window.clearTimeout(deadline);
+      observer.disconnect();
+      resolve();
+    });
+    const deadline = window.setTimeout(() => {
+      observer.disconnect();
+      reject(new Error(`Timed out waiting for rendered quantity ${expectedOutput} and ${expectedTotal}.`));
+    }, 5_000);
+    observer.observe(control.shadowRoot!, { childList: true, characterData: true, subtree: true });
+
+    if (isReady()) {
+      window.clearTimeout(deadline);
+      observer.disconnect();
+      resolve();
+    }
+  });
 }
