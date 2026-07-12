@@ -145,6 +145,7 @@
     "check:vue-analyzer-fixtures": "npm run build:vue-analyzer && node scripts/generate-vue-analyzer-fixtures.mjs --check",
     "check:vue-analyzer-clean-install": "npm run build:vue-analyzer && node scripts/validate-vue-analyzer-clean-install.mjs",
     "check:vue-codemod-decision": "node scripts/validate-vue-codemod-decision.mjs",
+    "check:dx-scorecard": "node scripts/validate-dx-scorecard.mjs",
     "check:vscode-client": "node --check editors/vscode/extension.cjs",
     "check:language-server-cli": "node scripts/validate-language-server-cli.mjs",
     "check:diagnostics": "node scripts/validate-diagnostic-catalog.mjs",
@@ -163,7 +164,7 @@
     "release:verify-registry": "node scripts/verify-registry-release.mjs",
     "check:release-contract": "node scripts/validate-release-contract.mjs",
     "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state",
-    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run build && npm run check:quality-budgets && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:docs && npm run check:release-contract && npm run check:release-artifacts"
+    "check": "npm run typecheck && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run build && npm run check:quality-budgets && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-contract && npm run check:release-artifacts"
   },
   "devDependencies": {
     "@cyclonedx/cdxgen": "12.7.1",

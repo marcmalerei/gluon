@@ -9,6 +9,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- A versioned seven-task Gluon/Vue/React developer-experience benchmark
+  contract, strict raw-run evidence schema, official comparator-selection
+  record, and blocking validator that reports the current zero-run boundary
+  without making an unsupported comparison claim.
 - Reviewed task-oriented examples for all 507 generated public API symbol
   pages, with symbol-specific purpose text and concrete application, lifecycle,
   input/output, ownership, error, and cleanup flows shared through maintained

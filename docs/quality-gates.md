@@ -97,6 +97,23 @@ counterexample. The gate rejects any authorized generated, modified, or deleted
 file. It measures fixture syntax only and proves behavioral equivalence for no
 candidate class.
 
+## Developer-experience benchmark contract gate
+
+`npm run check:dx-scorecard` validates the issue #107 comparison contract: the
+seven identical observable tasks, three selected framework lanes, 19 raw
+measurement fields, official Vue and React selection sources, strict completed-
+run schema, mandatory 21 framework-task records, and at least one human
+usability pass. The command rejects an opaque combined score and any orientation
+record that implies completed results.
+
+The command is part of `npm run check`, so the repository quality job runs it on
+every pull request and `main` push. The current retained evidence is comparator
+selection only and the validator reports zero completed runs. Clean-install
+fixtures, fresh measurement execution, HMR observation, human evidence, and the
+final per-dimension report remain required before issue #107 can close. The full
+contract and current boundary are documented in
+[`dx-benchmark.md`](dx-benchmark.md).
+
 ## Bundle budgets
 
 `quality-budgets.json` is the reviewed budget source. `npm run check:budgets`
