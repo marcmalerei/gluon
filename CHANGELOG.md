@@ -48,7 +48,7 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Rootless `svg` template fragments now compile in the SVG namespace and use a
   template-type-specific cache, enabling app-owned Icon geometry consistently
   in Chromium, Firefox, and WebKit.
-- Reviewed task-oriented examples for all 557 generated public API symbol
+- Reviewed task-oriented examples for all 560 generated public API symbol
   pages, with symbol-specific purpose text and concrete application, lifecycle,
   input/output, ownership, error, and cleanup flows shared through maintained
   package recipes instead of compiler-only type or import demonstrations.

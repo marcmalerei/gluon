@@ -94,6 +94,7 @@
   },
   "limitations": [
     "Raw and gzip values measure serialized constructable stylesheet text at gzip level 9, not JavaScript chunks.",
+    "Recorded gzip bytes use Node.js 22.22.0 zlib output; the blocking check validates their presence but excludes the value from cross-Node equality because supported Node/zlib versions can emit different byte counts for identical input.",
     "Module and stylesheet counts describe the retained full UI and Button-only style boundaries; runtime timing is not inferred.",
     "No size or speed superiority claim is made."
   ]
