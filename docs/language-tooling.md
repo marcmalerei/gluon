@@ -2,8 +2,8 @@
 
 `@gluonjs/language-server` is the shared template-analysis boundary for editor
 and CI workflows. It parses TypeScript or JavaScript source without executing
-it, recognizes imported aliases of Gluon's public `html`, `svg`, and `css`
-tags, and performs a two-pass project analysis so Custom Element declarations
+it, recognizes imported aliases of Gluon's public `html`, `svg`, `css`, and
+`compose` tags, and performs a two-pass project analysis so Custom Element declarations
 are available across files.
 
 ## Commands
@@ -34,6 +34,13 @@ the same facts through `CustomElementDeclaration` values or convert standard
 Custom Elements Manifest data with `declarationsFromCustomElementsManifest()`.
 Definitions and
 renames link the tag string and every open template occurrence.
+
+Inside `compose(Component, props)\`body\``, Gluon supplies the same native HTML
+diagnostics, completion, hover, semantic tokens, and source ranges as `html`.
+The built-in TypeScript service owns the component identifier, props and
+callbacks, completion, hover, definition, rename, and outer TypeScript
+formatting. The Gluon server preserves body whitespace and does not create a
+virtual proprietary document.
 
 ## Diagnostic contract
 

@@ -1,4 +1,4 @@
-import { html, repeat, type TemplateValue } from '@gluonjs/core';
+import { compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -27,11 +27,10 @@ export function HomePage(_store: ShopStore): TemplateValue {
       <div class="hero-copy">
         <h1>Objects that work the way you do.</h1>
         <p>Modular essentials, made for changing spaces.</p>
-        ${RouterLink({
+        ${compose(RouterLink, {
           to: '/shop',
           attributes: { class: 'primary-button' },
-          children: html`<span>Shop the collection</span>${ArrowIcon()}`,
-        })}
+        })`<span>Shop the collection</span>${ArrowIcon()}`}
       </div>
       <div class="hero-media">
         <img src=${heroImage} alt="Orbit Lamp and cobalt Stack Tray on a sunlit workspace">

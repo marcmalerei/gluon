@@ -9,6 +9,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The public `compose(component, props)\`body\`` functional-component authoring
+  path, compiler/language-tooling boundaries, retained Gluon/React/Vue
+  checkout-dialog comparison, generated starter and Playground examples, and
+  GLUON GOODS RouterLink adoption without another renderer or host.
+
 - A versioned seven-task Gluon/Vue/React developer-experience benchmark
   contract, strict raw-run evidence schema, official comparator-selection
   record, and blocking validator that reports the current zero-run boundary

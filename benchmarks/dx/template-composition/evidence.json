@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12",
+  "metrics": {
+    "gluon-current": {
+      "nonEmptyLines": 28,
+      "tokens": 202,
+      "maximumIndentation": 4,
+      "explicitChildrenProperties": 4,
+      "callSiteChildrenProperties": 2
+    },
+    "gluon-compose": {
+      "nonEmptyLines": 28,
+      "tokens": 213,
+      "maximumIndentation": 4,
+      "explicitChildrenProperties": 2,
+      "callSiteChildrenProperties": 0
+    },
+    "react": {
+      "nonEmptyLines": 29,
+      "tokens": 250,
+      "maximumIndentation": 6,
+      "explicitChildrenProperties": 2,
+      "callSiteChildrenProperties": 0
+    },
+    "vue": {
+      "nonEmptyLines": 16,
+      "tokens": 192,
+      "maximumIndentation": 6,
+      "explicitChildrenProperties": 0,
+      "callSiteChildrenProperties": 0
+    }
+  }
+}

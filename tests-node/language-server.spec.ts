@@ -60,6 +60,18 @@ describe('Gluon template analysis', () => {
     expect(result.diagnostics.map((entry) => entry.code)).toContain('GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN');
   });
 
+  test('analyzes native markup at original locations inside compose template bodies', () => {
+    const source = `import { compose, html, type TemplateValue } from '@gluonjs/core';
+      const Panel = (props: { children: TemplateValue }) => html\`<section>\${props.children}</section>\`;
+      compose(Panel, {})\`<button aria-labl="Pay">Pay</button><img>invalid</img>\`;`;
+    const result = analyzeGluonDocument('file:///compose.ts', source);
+    expect(result.diagnostics.map((entry) => entry.code)).toEqual(expect.arrayContaining([
+      'GLUON_TEMPLATE_ARIA_UNKNOWN',
+      'GLUON_TEMPLATE_VOID_CHILDREN',
+    ]));
+    expect(result.diagnostics.every((entry) => entry.range.start.line === 2)).toBe(true);
+  });
+
   test('accepts public Custom Elements Manifest metadata', () => {
     const declarations = declarationsFromCustomElementsManifest('file:///custom-elements.json', {
       modules: [{ declarations: [{
@@ -116,6 +128,18 @@ describe('Gluon language service', () => {
     expect(service.complete('file:///native.ts', { line: 0, character: 47 }).some((entry) => entry.label === 'button')).toBe(true);
     expect(service.definition('file:///native.ts', { line: 0, character: 49 })).toEqual([]);
     expect(service.rename('file:///native.ts', { line: 0, character: 49 }, 'new-button')).toBeUndefined();
+  });
+
+  test('provides template-body editor features inside compose calls', () => {
+    const service = new GluonLanguageService();
+    const source = `import { compose, html, type TemplateValue } from '@gluonjs/core';
+const Panel = (props: { children: TemplateValue }) => html\`<section>\${props.children}</section>\`;
+compose(Panel, {})\`<button type="button">Pay</button>\`;`;
+    service.open('file:///compose.ts', source);
+    const button = positionFor(source, source.lastIndexOf('button') + 2);
+    expect(service.hover('file:///compose.ts', button)?.contents).toContain('Native HTML');
+    expect(service.complete('file:///compose.ts', button).some((entry) => entry.label === 'button')).toBe(true);
+    expect(service.semanticTokens('file:///compose.ts').length).toBeGreaterThan(0);
   });
 });
 

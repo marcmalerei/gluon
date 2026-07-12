@@ -106,6 +106,22 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.code).not.toContain('import.meta.hot');
     expect(transformed.map.sourcesContent).toEqual([source]);
   });
+
+  it('records compose template bodies and preserves their original source mappings', () => {
+    const id = '/app/checkout.ts';
+    const source = [
+      "import { compose as nest, html } from '@gluonjs/core';",
+      "const Panel = (props: { children: unknown }) => html`<section>${props.children as never}</section>`;",
+      'export const Checkout = () => nest(Panel, {})`',
+      '  <button>Pay</button>',
+      '`;',
+    ].join('\n');
+    const transformed = transformGluonModule(source, id, { development: true });
+    expect(transformed.templates.map((template) => template.tag)).toEqual(['html', 'compose']);
+    expect(transformed.templates[1]?.start.line).toBe(3);
+    expect(transformed.code).toContain('nest(Panel, {})`');
+    expect(transformed.map.sourcesContent).toEqual([source]);
+  });
 });
 
 describe('@gluonjs/vite real server contract', () => {
@@ -230,7 +246,7 @@ async function createFixture(version: string, increment: number, color: string):
 
 function componentSource(version: string, increment: number, color: string): string {
   return [
-    "import { css, defineElement, GluonElement, html } from '@gluonjs/core';",
+    "import { compose, css, defineElement, GluonElement, html, type TemplateValue } from '@gluonjs/core';",
     "import { defineStore, type Store } from '@gluonjs/store';",
     'export const counterDefinition = defineStore({',
     "  id: 'vite-counter',",
@@ -239,7 +255,8 @@ function componentSource(version: string, increment: number, color: string): str
     '});',
     `const counterStyles = css\`button { color: ${color}; }\`;`,
     'type CounterStore = Store<\'vite-counter\', { count: number }, Record<never, never>, { increment(): void }>; ',
-    `export function Status(store: CounterStore) { return html\`<output>Function ${version}: \${store.count}</output>\`; }`,
+    'function StatusPanel(props: { children: TemplateValue }) { return html`<output>${props.children}</output>`; }',
+    `export function Status(store: CounterStore) { return compose(StatusPanel, {})\`Function ${version}: \${store.count}\`; }`,
     'export class HmrCounter extends GluonElement {',
     '  static override readonly properties = { store: { attribute: false } };',
     '  static override readonly styles = counterStyles;',

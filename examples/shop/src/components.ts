@@ -2,6 +2,7 @@ import {
   Teleport,
   Transition,
   TransitionGroup,
+  compose,
   html,
   nothing,
   repeat,
@@ -33,14 +34,13 @@ const dialogFocusScopes = new Map<ShopDialog, FocusScope>();
 export function SiteHeader(store: ShopStore): TemplateValue {
   return html`
     <header class="site-header">
-      ${RouterLink({
+      ${compose(RouterLink, {
         to: '/',
-        children: 'GLUON GOODS',
         attributes: { class: 'wordmark', 'aria-label': 'GLUON GOODS home' },
-      })}
+      })`GLUON GOODS`}
       <nav class="desktop-nav" aria-label="Primary navigation">
-        ${RouterLink({ to: '/shop', children: 'Shop' })}
-        ${RouterLink({ to: '/shop?sort=new', children: 'New' })}
+        ${compose(RouterLink, { to: '/shop' })`Shop`}
+        ${compose(RouterLink, { to: '/shop?sort=new' })`New`}
         <a href="#journal">Journal</a>
       </nav>
       <div class="header-actions">
@@ -86,27 +86,25 @@ export function ProductRail(items: readonly Product[] = products): TemplateValue
 }
 
 export function ProductCard(product: Product): TemplateValue {
-  return RouterLink({
+  return compose(RouterLink, {
     to: `/products/${product.slug}`,
     attributes: { class: 'product-card', 'aria-label': `${product.name}, ${formatPrice(product.price)}` },
-    children: html`
+  })`
       <span class="product-media"><img src=${product.image} alt=${product.alt}></span>
       <span class="product-copy">
         <span><strong>${product.name}</strong><small>${formatPrice(product.price)}</small></span>
         <span class="product-arrow">${ArrowIcon()}</span>
       </span>
-    `,
-  });
+  `;
 }
 
 export function CategoryLinks(): TemplateValue {
   return html`
     <nav class="category-links" aria-label="Shop by category">
-      ${repeat(categories, (category) => category, (category) => RouterLink({
+      ${repeat(categories, (category) => category, (category) => compose(RouterLink, {
         to: `/shop?category=${encodeURIComponent(category)}`,
         attributes: { class: 'category-link' },
-        children: html`<span>${category}</span>${ArrowIcon()}`,
-      }))}
+      })`<span>${category}</span>${ArrowIcon()}`)}
     </nav>
   `;
 }
@@ -138,11 +136,10 @@ function BagDrawer(store: ShopStore): TemplateValue {
         ${store.bag.length === 0 ? html`
           <div class="empty-bag">
             <p>Your bag is ready for something useful.</p>
-            ${RouterLink({
+            ${compose(RouterLink, {
               to: '/shop',
-              children: 'Shop all objects',
               attributes: { class: 'inline-link' },
-            })}
+            })`Shop all objects`}
           </div>
         ` : html`
           <div class="bag-lines">
@@ -179,7 +176,7 @@ function BagDrawer(store: ShopStore): TemplateValue {
           <footer class="bag-summary">
             <div><span>Subtotal</span><strong>${formatPrice(store.bagTotal)}</strong></div>
             <p>Shipping calculated at checkout.</p>
-            ${RouterLink({ to: '/checkout', children: 'Checkout', attributes: { class: 'primary-button' } })}
+            ${compose(RouterLink, { to: '/checkout', attributes: { class: 'primary-button' } })`Checkout`}
           </footer>
         `}
       </aside>
@@ -192,9 +189,9 @@ export function SiteFooter(): TemplateValue {
     <footer class="site-footer" id="journal">
       <strong>GLUON GOODS</strong>
       <nav aria-label="Footer navigation">
-        ${RouterLink({ to: '/shipping', children: 'Shipping' })}
-        ${RouterLink({ to: '/returns', children: 'Returns' })}
-        ${RouterLink({ to: '/#materials', children: 'Materials' })}
+        ${compose(RouterLink, { to: '/shipping' })`Shipping`}
+        ${compose(RouterLink, { to: '/returns' })`Returns`}
+        ${compose(RouterLink, { to: '/#materials' })`Materials`}
         <a href="mailto:hello@example.com">Contact</a>
       </nav>
     </footer>
@@ -255,8 +252,8 @@ function MobileMenu(store: ShopStore): TemplateValue {
             const returnTarget = document.querySelector<HTMLElement>('.mobile-menu-button');
             if (returnTarget) focusOpenedDialog('search', returnTarget);
           }}><span>Search</span>${SearchIcon()}</button>
-          ${RouterLink({ to: '/shop', children: html`<span>Shop</span>${ArrowIcon()}` })}
-          ${RouterLink({ to: '/shop?sort=new', children: html`<span>New</span>${ArrowIcon()}` })}
+          ${compose(RouterLink, { to: '/shop' })`<span>Shop</span>${ArrowIcon()}`}
+          ${compose(RouterLink, { to: '/shop?sort=new' })`<span>New</span>${ArrowIcon()}`}
           <a href="#journal" @click=${close}><span>Journal</span>${ArrowIcon()}</a>
         </nav>
         <div class="menu-categories">${CategoryLinks()}</div>

@@ -7,3 +7,5 @@
 - Validate paths, npm package names, non-empty targets, conflicting flags, and
   SSR compatibility before generation.
 - Add the lockstep `gluon-template-check` command to every maintained starter.
+- Generate Router links with the public `compose()` tagged-body path while
+  preserving the same starter routes and rendered anchors.

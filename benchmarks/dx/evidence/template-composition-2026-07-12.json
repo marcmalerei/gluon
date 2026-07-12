@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "specification": "benchmarks/dx/specification-v1.json",
+  "recordedAt": "2026-07-12",
+  "status": "implementation-slice-only",
+  "trackingIssue": 111,
+  "applicableTask": "T3-local-layers",
+  "fixtureDirectory": "benchmarks/dx/template-composition",
+  "observables": [
+    "Checkout",
+    "Delivery",
+    "Confirm order",
+    "Email",
+    "Place order",
+    "Close"
+  ],
+  "frameworks": [
+    {
+      "id": "gluon-current",
+      "lane": "direct functional calls",
+      "fixture": "benchmarks/dx/template-composition/gluon-current.ts",
+      "nonEmptyLines": 28,
+      "tokens": 202,
+      "maximumIndentation": 4,
+      "callSiteChildrenProperties": 2
+    },
+    {
+      "id": "gluon-compose",
+      "lane": "compose(Component, props) tagged body",
+      "fixture": "benchmarks/dx/template-composition/gluon-compose.ts",
+      "nonEmptyLines": 28,
+      "tokens": 213,
+      "maximumIndentation": 4,
+      "callSiteChildrenProperties": 0
+    },
+    {
+      "id": "react",
+      "lane": "React JSX comparator selected by the parent contract",
+      "fixture": "benchmarks/dx/template-composition/react.tsx",
+      "nonEmptyLines": 29,
+      "tokens": 250,
+      "maximumIndentation": 6,
+      "callSiteChildrenProperties": 0
+    },
+    {
+      "id": "vue",
+      "lane": "Vue SFC template comparator selected by the parent contract",
+      "fixture": "benchmarks/dx/template-composition/vue.vue",
+      "nonEmptyLines": 16,
+      "tokens": 192,
+      "maximumIndentation": 6,
+      "callSiteChildrenProperties": 0
+    }
+  ],
+  "verificationCommands": [
+    "npm run check:template-composition",
+    "npm run typecheck:core-api",
+    "npm run test:browser -- --run tests/components-and-utilities.spec.ts",
+    "npm run test:ssr -- --run tests-node/ssr.spec.ts",
+    "npm run test:vite -- --run tests-node/compiler-vite.spec.ts",
+    "npm run test:language-server -- --run tests-node/language-server.spec.ts"
+  ],
+  "limitations": [
+    "This record covers the issue #111 composition implementation slice only; it is not a completed benchmark run.",
+    "It does not contain all 21 framework-task results required by benchmarks/dx/schema/run-v1.schema.json.",
+    "No human usability pass was run, so no readability, win, tie, loss, usability, or general DX-superiority claim is supported.",
+    "The React and Vue files compare the nested checkout/dialog syntax only; they are not completed parent-scorecard applications."
+  ]
+}

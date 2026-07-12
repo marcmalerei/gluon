@@ -14,6 +14,9 @@ Router and Store; explicitly combining `--ssr` with `--no-router` or
 `--no-store` fails before files are written.
 
 Every selection includes TypeScript, Vite, typecheck, template-check, test, and build scripts.
+Router starters author link children with the public
+`compose(RouterLink, props)\`body\`` path, so generated projects demonstrate
+typed nested composition without an additional file format.
 `npm run check:templates` runs the same diagnostics exposed by the Gluon editor service.
 `--ui` uses the separately consumable public `@gluonjs/atoms` package. `--testing` adds
 the official browser fixture utilities and a Playwright-backed Vitest test.
