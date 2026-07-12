@@ -106,6 +106,15 @@
       "dependencies": ["@gluonjs/compiler"]
     },
     {
+      "name": "@gluonjs/vue-migration-analyzer",
+      "directory": "packages/vue-migration-analyzer",
+      "state": "current",
+      "environment": "node",
+      "exports": [".", "./schema"],
+      "bins": ["gluon-vue-analyze"],
+      "dependencies": []
+    },
+    {
       "name": "@gluonjs/quarks",
       "directory": "packages/quarks",
       "state": "current",

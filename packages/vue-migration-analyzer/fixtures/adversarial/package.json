@@ -1,0 +1,6 @@
+{
+  "name": "adversarial-vue-migration-fixture",
+  "private": true,
+  "scripts": { "pretest": "node write-sentinel.js" },
+  "dependencies": { "vue": "3.5.39" }
+}

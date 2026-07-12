@@ -351,8 +351,8 @@ a release gate to issue #41.
 | [#91](https://github.com/marcmalerei/gluon/issues/91) | Implement the accepted Node package, CLI, schema, diagnostics, fixtures, and retained evidence. |
 | [#92](https://github.com/marcmalerei/gluon/issues/92) | Use retained evidence for a bounded codemod go/no-go decision; implement no writer. |
 
-The analyzer package joins the lockstep release group only when #91 implements
-the RFC contract. A write-capable transform remains prohibited unless #92
+Issue #91 places the analyzer package in the lockstep release group under the
+RFC 0003 contract. A write-capable transform remains prohibited unless #92
 produces and accepts another superseding RFC first.
 
 ## Gluon 1.0 release gates

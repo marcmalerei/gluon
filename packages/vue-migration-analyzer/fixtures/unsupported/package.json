@@ -1,0 +1,5 @@
+{
+  "name": "unsupported-vue-migration-fixture",
+  "private": true,
+  "dependencies": { "vue": "2.7.16" }
+}

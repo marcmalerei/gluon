@@ -1,8 +1,8 @@
 # Migration
 
 Gluon is an alternative application platform, not a Vue compatibility layer.
-There is no automatic Vue-to-Gluon source converter, `.vue` parser, SFC
-compiler, compatibility runtime, or migration codemod in version `0.0.0`.
+There is no automatic Vue-to-Gluon source converter, production SFC compiler,
+compatibility runtime, or migration codemod in version `0.0.0`.
 
 ## Automation boundary
 
@@ -13,15 +13,19 @@ Supported automation starts after Gluon source exists:
 - TypeScript validates public package and component types;
 - `@gluonjs/vite` builds and hot-updates supported Gluon modules;
 - the Playground packages stable Gluon reproductions.
+- `gluon-vue-analyze` statically inventories the bounded Vue 3.5 source surface
+  accepted by RFC 0003 and emits reports without executing or changing it.
 
-None of those tools reads Vue source or performs a semantic conversion. A Vue
-migration is a manual redesign against Gluon's public contracts.
+Only the report-only analyzer reads Vue source. It performs no semantic
+conversion. A Vue migration remains a manual redesign against Gluon's public
+contracts.
 
 [RFC 0003](https://github.com/marcmalerei/gluon/blob/main/docs/rfcs/0003-report-only-vue-migration-analyzer.md)
-accepts a future, Node-only analyzer for bounded static Vue 3.5 inventory. The
-package and CLI do not exist in version `0.0.0`; issue #91 owns their
-implementation. The RFC authorizes reports only, not application execution,
-compatibility, Gluon source generation, source rewriting, or a codemod.
+defines the Node-only analyzer for bounded static Vue 3.5 inventory. Follow the
+[analyzer guide](./vue-analyzer/) for the package, CLI, report schema,
+diagnostics, exit codes, and safety boundary. RFC 0003 authorizes reports only,
+not application execution, compatibility, Gluon source generation, source
+rewriting, or a codemod.
 
 For a reversible route from coexistence to full application ownership, follow
 the [tested Vue-to-Gluon cutover playbook](./vue-to-gluon-cutover/). It uses the

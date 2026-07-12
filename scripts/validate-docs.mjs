@@ -22,6 +22,7 @@ for (const version of versions.supported) {
     'cookbook/index.html',
     'migration/index.html',
     'migration/vue-to-gluon-cutover/index.html',
+    'migration/vue-analyzer/index.html',
     'examples/plain.html',
     'examples/ui.html',
     'examples/vue.html',
@@ -47,8 +48,19 @@ for (const required of [
   'Supported automation',
   'Vue-to-Gluon concept map',
   'RFC 0003',
-  'issue #91',
+  'gluon-vue-analyze',
 ]) if (!migration.includes(required)) throw new Error(`migration documentation is missing: ${required}`);
+
+const vueAnalyzer = await readFile(resolve(siteRoot, 'content', versions.latest, 'migration/vue-analyzer/index.md'), 'utf8');
+for (const required of [
+  '@gluonjs/vue-migration-analyzer',
+  'gluon-vue-analyze',
+  'schemaVersion',
+  'Exit codes',
+  'does not execute',
+  'does not write',
+  'GVA9002',
+]) if (!vueAnalyzer.includes(required)) throw new Error(`Vue analyzer guide is missing: ${required}`);
 
 const cutover = await readFile(resolve(
   siteRoot,

@@ -1,0 +1,507 @@
+{
+  "schemaVersion": "1.0.0",
+  "analyzer": {
+    "name": "@gluonjs/vue-migration-analyzer",
+    "version": "0.0.0"
+  },
+  "root": ".",
+  "input": {
+    "vue": {
+      "declaredRange": "2.7.16",
+      "resolvedVersion": "2.7.16",
+      "versionSource": "exact-manifest"
+    },
+    "packageManager": {
+      "kind": "yarn",
+      "lockfile": "yarn.lock"
+    },
+    "limits": {
+      "directoryEntries": 10000,
+      "analyzedFiles": 2000,
+      "bytesPerFile": 2097152,
+      "aggregateBytes": 67108864,
+      "astNodesPerFile": 250000,
+      "nesting": 256,
+      "workerMemoryMiB": 256,
+      "millisecondsPerFile": 5000,
+      "millisecondsPerInvocation": 30000
+    },
+    "entriesVisited": 5,
+    "filesVisited": 4,
+    "filesAnalyzed": 4,
+    "bytesRead": 544
+  },
+  "files": [
+    {
+      "id": "file:package.json",
+      "path": "package.json",
+      "kind": "manifest",
+      "bytes": 108,
+      "digest": "sha256:371b8f0ce1235e1ea6b32b027d7d2f9ba92e6341c812a47879b511aa7b31a410",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:src/Legacy.vue",
+      "path": "src/Legacy.vue",
+      "kind": "sfc",
+      "bytes": 237,
+      "digest": "sha256:cf58993fab837432438ea7a7965dec2f6695db9fa35bc2a097c72cd8db6dc93f",
+      "parseStatus": "unsupported"
+    },
+    {
+      "id": "file:src/runtime.ts",
+      "path": "src/runtime.ts",
+      "kind": "source",
+      "bytes": 138,
+      "digest": "sha256:7b7282092efaaadf762c2b51b9bcc4f1ef43c14ca4e1695ab0a70a4a0bcae97c",
+      "parseStatus": "parsed"
+    },
+    {
+      "id": "file:yarn.lock",
+      "path": "yarn.lock",
+      "kind": "lockfile",
+      "bytes": 61,
+      "digest": "sha256:9cdfa719db3bcbf91615ffcab3c6207356c430fe99e6bef92232c3c9530f8038",
+      "parseStatus": "parsed"
+    }
+  ],
+  "components": [
+    {
+      "id": "component:src/Legacy.vue",
+      "fileId": "file:src/Legacy.vue",
+      "scriptMode": "options",
+      "blocks": [
+        {
+          "kind": "template",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Legacy.vue",
+            "startOffset": 89,
+            "endOffset": 130,
+            "start": {
+              "line": 4,
+              "column": 11
+            },
+            "end": {
+              "line": 4,
+              "column": 52
+            }
+          }
+        },
+        {
+          "kind": "script",
+          "lang": "tsx",
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Legacy.vue",
+            "startOffset": 19,
+            "endOffset": 69,
+            "start": {
+              "line": 1,
+              "column": 20
+            },
+            "end": {
+              "line": 3,
+              "column": 1
+            }
+          }
+        },
+        {
+          "kind": "style",
+          "lang": "scss",
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Legacy.vue",
+            "startOffset": 161,
+            "endOffset": 196,
+            "start": {
+              "line": 5,
+              "column": 20
+            },
+            "end": {
+              "line": 5,
+              "column": 55
+            }
+          }
+        },
+        {
+          "kind": "custom",
+          "lang": null,
+          "scoped": false,
+          "module": null,
+          "location": {
+            "fileId": "file:src/Legacy.vue",
+            "startOffset": 211,
+            "endOffset": 229,
+            "start": {
+              "line": 6,
+              "column": 7
+            },
+            "end": {
+              "line": 6,
+              "column": 25
+            }
+          }
+        }
+      ],
+      "inventoryIds": [
+        "inventory:component-element:src/Legacy.vue:89:130:1",
+        "inventory:directive:src/Legacy.vue:100:110:1",
+        "inventory:directive:src/Legacy.vue:111:127:1",
+        "inventory:style-block:src/Legacy.vue:161:196:1"
+      ],
+      "findingIds": [
+        "finding:GVA1101:src/Legacy.vue:19:69:1",
+        "finding:GVA1201:src/Legacy.vue:89:130:1",
+        "finding:GVA1202:src/Legacy.vue:111:127:1",
+        "finding:GVA1403:src/Legacy.vue:161:196:1",
+        "finding:GVA1102:src/Legacy.vue:211:229:1"
+      ],
+      "migrationStages": [
+        "leaf-boundary",
+        "styles-universal"
+      ]
+    }
+  ],
+  "inventory": [
+    {
+      "id": "inventory:vue-dependency:package.json:0:108:1",
+      "fileId": "file:package.json",
+      "componentId": null,
+      "category": "remaining-vue",
+      "kind": "vue-dependency",
+      "name": "vue",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:package.json",
+        "startOffset": 0,
+        "endOffset": 108,
+        "start": {
+          "line": 1,
+          "column": 1
+        },
+        "end": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "migrationStage": "shell-removal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+    },
+    {
+      "id": "inventory:component-element:src/Legacy.vue:89:130:1",
+      "fileId": "file:src/Legacy.vue",
+      "componentId": "component:src/Legacy.vue",
+      "category": "component",
+      "kind": "component-element",
+      "name": "component",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 89,
+        "endOffset": 130,
+        "start": {
+          "line": 4,
+          "column": 11
+        },
+        "end": {
+          "line": 4,
+          "column": 52
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:directive:src/Legacy.vue:100:110:1",
+      "fileId": "file:src/Legacy.vue",
+      "componentId": "component:src/Legacy.vue",
+      "category": "slot-directive-ref",
+      "kind": "directive",
+      "name": "is",
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 100,
+        "endOffset": 110,
+        "start": {
+          "line": 4,
+          "column": 22
+        },
+        "end": {
+          "line": 4,
+          "column": 32
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:directive:src/Legacy.vue:111:127:1",
+      "fileId": "file:src/Legacy.vue",
+      "componentId": "component:src/Legacy.vue",
+      "category": "slot-directive-ref",
+      "kind": "directive",
+      "name": null,
+      "importSource": null,
+      "confidence": "structural",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 111,
+        "endOffset": 127,
+        "start": {
+          "line": 4,
+          "column": 33
+        },
+        "end": {
+          "line": 4,
+          "column": 49
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "inventory:style-block:src/Legacy.vue:161:196:1",
+      "fileId": "file:src/Legacy.vue",
+      "componentId": "component:src/Legacy.vue",
+      "category": "style",
+      "kind": "style-block",
+      "name": "scss",
+      "importSource": null,
+      "confidence": "exact",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 161,
+        "endOffset": 196,
+        "start": {
+          "line": 5,
+          "column": 20
+        },
+        "end": {
+          "line": 5,
+          "column": 55
+        }
+      },
+      "migrationStage": "styles-universal",
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding:GVA1001:.:0:0:1",
+      "code": "GVA1001",
+      "severity": "error",
+      "confidence": "exact",
+      "message": "Vue version 2.7.16 is unsupported; expected >=3.5.0 <3.6.0.",
+      "location": null,
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1003:.:0:0:1",
+      "code": "GVA1003",
+      "severity": "warning",
+      "confidence": "indeterminate",
+      "message": "yarn lock data is not a supported exact version source.",
+      "location": null,
+      "migrationStage": "baseline",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+    },
+    {
+      "id": "finding:GVA1101:src/Legacy.vue:19:69:1",
+      "code": "GVA1101",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Script language tsx is unsupported.",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 19,
+        "endOffset": 69,
+        "start": {
+          "line": 1,
+          "column": 20
+        },
+        "end": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "finding:GVA1201:src/Legacy.vue:89:130:1",
+      "code": "GVA1201",
+      "severity": "warning",
+      "confidence": "indeterminate",
+      "message": "Dynamic component identity requires review.",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 89,
+        "endOffset": 130,
+        "start": {
+          "line": 4,
+          "column": 11
+        },
+        "end": {
+          "line": 4,
+          "column": 52
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "finding:GVA1202:src/Legacy.vue:111:127:1",
+      "code": "GVA1202",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Custom directive v-legacy is unsupported.",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 111,
+        "endOffset": 127,
+        "start": {
+          "line": 4,
+          "column": 33
+        },
+        "end": {
+          "line": 4,
+          "column": 49
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "finding:GVA1403:src/Legacy.vue:161:196:1",
+      "code": "GVA1403",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "Style language scss or external style source is unsupported.",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 161,
+        "endOffset": 196,
+        "start": {
+          "line": 5,
+          "column": 20
+        },
+        "end": {
+          "line": 5,
+          "column": 55
+        }
+      },
+      "migrationStage": "styles-universal",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+    },
+    {
+      "id": "finding:GVA1102:src/Legacy.vue:211:229:1",
+      "code": "GVA1102",
+      "severity": "error",
+      "confidence": "indeterminate",
+      "message": "External and custom SFC blocks are unsupported.",
+      "location": {
+        "fileId": "file:src/Legacy.vue",
+        "startOffset": 211,
+        "endOffset": 229,
+        "start": {
+          "line": 6,
+          "column": 7
+        },
+        "end": {
+          "line": 6,
+          "column": 25
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    },
+    {
+      "id": "finding:GVA1203:src/runtime.ts:105:118:1",
+      "code": "GVA1203",
+      "severity": "warning",
+      "confidence": "indeterminate",
+      "message": "Runtime component registration requires review.",
+      "location": {
+        "fileId": "file:src/runtime.ts",
+        "startOffset": 105,
+        "endOffset": 118,
+        "start": {
+          "line": 3,
+          "column": 1
+        },
+        "end": {
+          "line": 3,
+          "column": 14
+        }
+      },
+      "migrationStage": "leaf-boundary",
+      "relatedStages": [],
+      "guideUrl": "https://marcmalerei.github.io/gluon/0.0.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+    }
+  ],
+  "summary": {
+    "supportState": "partial",
+    "files": 4,
+    "components": 1,
+    "fileKinds": {
+      "manifest": 1,
+      "lockfile": 1,
+      "sfc": 1,
+      "source": 1,
+      "test": 0,
+      "server": 0,
+      "build-config": 0,
+      "symlink": 0,
+      "other": 0
+    },
+    "inventory": {
+      "component": 1,
+      "prop-event-model": 0,
+      "slot-directive-ref": 2,
+      "reactivity-lifecycle": 0,
+      "router": 0,
+      "store": 0,
+      "async": 0,
+      "style": 1,
+      "ssr-hydration": 0,
+      "test": 0,
+      "build": 0,
+      "remaining-vue": 1
+    },
+    "severities": {
+      "info": 0,
+      "warning": 3,
+      "error": 5
+    },
+    "confidences": {
+      "exact": 3,
+      "structural": 3,
+      "indeterminate": 7
+    },
+    "stages": {
+      "baseline": 2,
+      "leaf-boundary": 8,
+      "state-form": 0,
+      "route-state-async": 0,
+      "styles-universal": 2,
+      "shell-removal": 1
+    }
+  }
+}

@@ -78,12 +78,11 @@ Planned packages pass contract validation before their directories exist. When
 implementation starts, changing a package state to `current` makes its package
 manifest, export targets, license, changelog, README, and pack output mandatory.
 
-RFC 0003 reserves `@gluonjs/vue-migration-analyzer`, its `.` and `./schema`
-exports, and the `gluon-vue-analyze` executable. It is intentionally not yet in
-`package-contract.json`: issue #91 must add the package as `current` together
-with its implementation because the current release contract requires every
-declared release-group package to be releasable. Until then, the RFC is the
-authoritative planned-package record and issue #41 remains independent.
+RFC 0003 defines `@gluonjs/vue-migration-analyzer`, its `.` and `./schema`
+exports, and the `gluon-vue-analyze` executable. Issue #91 adds the package as
+`current` together with its implementation because the release contract
+requires every declared release-group package to be releasable. Issue #41
+remains independently ordered.
 
 | Package | Responsibility | Allowed official dependencies |
 | --- | --- | --- |
@@ -98,7 +97,7 @@ authoritative planned-package record and issue #41 remains independent.
 | `@gluonjs/devtools-api` | Versioned, environment-neutral inspection protocol | none |
 | `@gluonjs/devtools` | Browser Devtools client and integrations | `devtools-api` |
 | `@gluonjs/language-server` | Editor analysis and protocol server | `compiler` |
-| `@gluonjs/vue-migration-analyzer` (planned by RFC 0003) | Static, report-only Vue 3.5 migration inventory and schema | none |
+| `@gluonjs/vue-migration-analyzer` | Static, report-only Vue 3.5 migration inventory and schema | none |
 | `@gluonjs/quarks` | Typed native-element factories | `core` |
 | `@gluonjs/atoms` | Focused UI primitives | `core`, `quarks` |
 | `@gluonjs/molecules` | Reusable primitive compositions | `core`, `quarks`, `atoms` |
