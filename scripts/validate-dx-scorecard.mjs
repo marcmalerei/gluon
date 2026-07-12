@@ -13,6 +13,7 @@ const evidenceNames = (await readdir(evidenceDirectory)).filter((name) => name.e
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
 const validateRun = ajv.compile(schema);
+const validateSliceMeasurement = ajv.getSchema(`${schema.$id}#/$defs/sliceMeasurement`);
 
 assert(specification.schemaVersion === '1.0.0', 'specification schema version must be 1.0.0');
 assert(specification.benchmarkId === 'gluon-dx-application-authoring', 'unexpected benchmark identifier');
@@ -30,6 +31,21 @@ assertSet(specification.tasks.map(({ id }) => id), [
 ], 'task IDs');
 for (const task of specification.tasks) {
   assert(task.observableOutcomes.length >= 3, `${task.id} must define at least three observable outcomes`);
+}
+assert(validateSliceMeasurement, 'slice measurement schema must be addressable');
+assert(Array.isArray(specification.sliceMeasurements), 'slice measurements must be recorded explicitly');
+const taskIds = new Set(specification.tasks.map(({ id }) => id));
+for (const measurement of specification.sliceMeasurements) {
+  assert(validateSliceMeasurement(measurement), `issue #${measurement.issue ?? 'unknown'} slice measurement is invalid:\n${ajv.errorsText(validateSliceMeasurement.errors, { separator: '\n' })}`);
+  assert(measurement.taskIds.every((taskId) => taskIds.has(taskId)), `issue #${measurement.issue} names an unknown benchmark task`);
+  for (const snapshot of [measurement.before, measurement.after]) {
+    for (const dimension of ['setupCalls', 'imports', 'configuration', 'cleanup']) {
+      assert(snapshot[dimension].count === snapshot[dimension].values.length, `issue #${measurement.issue} ${dimension} count does not match its retained values`);
+    }
+  }
+  assert(measurement.limitations.some((value) => value.includes('not a completed 21-result benchmark run')), `issue #${measurement.issue} must not imply a completed run`);
+  assert(measurement.limitations.some((value) => value.includes('No Vue or React task result')), `issue #${measurement.issue} must prohibit unsupported comparison claims`);
+  await Promise.all(measurement.evidence.map((path) => access(resolve(root, path))));
 }
 assert(specification.measurements.length === 19, 'all 19 issue #107 measurements must remain explicit');
 assert(specification.comparisonDimensions.length >= 8, 'comparison dimensions must remain disaggregated');
@@ -87,7 +103,7 @@ await Promise.all([
   access(resolve(root, 'docs/roadmap.md')),
 ]);
 
-console.log(`DX benchmark contract valid: ${specification.tasks.length} tasks, ${specification.measurements.length} measurements, ${evidenceNames.length} orientation record(s), 0 completed runs`);
+console.log(`DX benchmark contract valid: ${specification.tasks.length} tasks, ${specification.measurements.length} measurements, ${specification.sliceMeasurements.length} bounded slice measurement(s), ${evidenceNames.length} orientation record(s), 0 completed runs`);
 
 function assert(condition, message) {
   if (!condition) throw new Error(`DX benchmark contract: ${message}`);

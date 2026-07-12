@@ -14,6 +14,13 @@ captures issue #111's nested checkout/dialog syntax measurements for the
 T3-local-layers implementation slice. Neither supports a win, tie, loss,
 usability, readability, or general DX-superiority claim.
 
+The specification also retains bounded Gluon-only before/after measurements for
+completed dependency slices. These records use `$defs.sliceMeasurement` from
+the run schema, name their affected benchmark tasks, retain setup/import/
+configuration/cleanup counts and concrete values, and state their remaining
+acceptance boundary. They are not evidence files or substitutes for the 21
+framework-task results required by a completed run.
+
 ## Comparator lanes
 
 - Gluon uses the maintained strict-TypeScript `create-gluon` lane from the run
@@ -100,3 +107,10 @@ Issue #111's partial fixture and raw metrics live under
 `benchmarks/dx/evidence/template-composition-2026-07-12.json`. It deliberately
 does not satisfy the completed-run schema, invent the other 20 framework-task
 results, or claim the required human pass.
+
+The issue #108 slice currently records the shared foundation/theme setup change
+from two setup calls, five named imports, two configuration choices, and two
+cleanup operations to one `installUi()` call/import, one typed theme option, and
+one `UiOwner.dispose()` operation. Aggregate component-sheet imports remain and
+are explicitly assigned to #115; therefore the full T2/T3 measurements have not
+been claimed or compared.
