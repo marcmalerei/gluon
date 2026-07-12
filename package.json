@@ -69,7 +69,7 @@
     "build:shop:server": "vite build --config examples/shop/vite.config.ts --ssr src/server.ts --outDir dist-server",
     "build:shop:static": "node scripts/generate-shop-static.mjs",
     "build:playground": "vite build --config examples/playground/vite.config.ts",
-    "docs:api": "typedoc --options typedoc.json --treatWarningsAsErrors",
+    "docs:api": "typedoc --options typedoc.json --treatWarningsAsErrors && node scripts/generate-api-examples.mjs",
     "build:docs": "npm run docs:api && node scripts/build-docs.mjs && npm run build:docs-examples",
     "build:docs-examples": "vite build --config docs-site/examples/vite.config.ts",
     "dev:shop": "vite --config examples/shop/vite.config.ts",
