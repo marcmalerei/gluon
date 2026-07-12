@@ -55,6 +55,7 @@ virtual proprietary document.
 | `GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN` | Hyphenated tag lacks a declaration or manifest entry |
 | `GLUON_TEMPLATE_EVENT_UNKNOWN` | `@event` is absent from declared events |
 | `GLUON_TEMPLATE_PROP_UNKNOWN` | `.property` is absent from declared properties |
+| `GLUON_TEMPLATE_SLOT_UNKNOWN` | Literal named light-DOM `slot` is absent from a literal element slot declaration |
 | `GLUON_TEMPLATE_STYLE_ELEMENT` | Browser template contains an inline style element |
 | `GLUON_TEMPLATE_VOID_CHILDREN` | Void HTML element has children or a closing tag |
 

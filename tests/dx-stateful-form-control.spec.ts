@@ -1,5 +1,8 @@
 import { createApp, defineComponent, h, nextTick } from 'vue';
 import { afterEach, describe, expect, test } from 'vitest';
+import { GluonElement, renderGluonElementForServer } from '@gluonjs/core';
+import { prepareForHydration } from '@gluonjs/ssr';
+import { hydrateElement } from '@gluonjs/ssr/hydration';
 import {
   ClassQuantityControl,
   gluonClassLifecycleEvidence,
@@ -80,6 +83,35 @@ describe.each([
     control.focus();
     expect(control.shadowRoot?.activeElement).toBe(control.shadowRoot?.querySelector('button'));
   });
+});
+
+test('the retained Gluon class and functional comparator tags hydrate their exact server DOM', async () => {
+  for (const [tagName, definition] of [
+    [gluonClassTag, ClassQuantityControl],
+    [gluonFunctionalTag, FunctionalQuantityControl],
+  ] as const) {
+    const server = renderGluonElementForServer(definition, { product, value: 2, required: true });
+    const prepared = await prepareForHydration(server.template);
+    const control = document.createElement(tagName) as TestControl;
+    control.product = product;
+    control.value = 2;
+    control.required = true;
+    appendQuantityContent(control);
+    control.shadowRoot!.innerHTML = prepared.html;
+    const retainedSection = control.shadowRoot?.querySelector('section');
+
+    const hydration = await hydrateElement(control as unknown as GluonElement);
+    document.body.append(control);
+    await settled(control);
+    expect(hydration.retained).toBe(true);
+    expect(hydration.recovered).toBe(false);
+    expect(control.shadowRoot?.querySelector('section')).toBe(retainedSection);
+    expect(control.shadowRoot?.querySelector('strong')?.textContent).toBe('Total €498.00');
+    control.setQuantity(3);
+    await settled(control);
+    expect(control.shadowRoot?.querySelector('output')?.textContent).toBe('3');
+    control.remove();
+  }
 });
 
 test('Vue and React hydrate retained server markup and every lane disposes its connection owner', async () => {

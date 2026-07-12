@@ -150,7 +150,7 @@
     "check:language-server-cli": "node scripts/validate-language-server-cli.mjs",
     "check:diagnostics": "node scripts/validate-diagnostic-catalog.mjs",
     "check:template-composition": "npm run build:compiler && node scripts/validate-template-composition.mjs",
-    "check:stateful-control-comparison": "node scripts/validate-stateful-form-control-comparison.mjs",
+    "check:stateful-control-comparison": "npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs",
     "check:quality-budgets": "node scripts/validate-quality-budgets.mjs",
     "test:property-fuzz": "npm run build:vue-analyzer && vitest run --config vitest.quality.config.ts",
     "check:security": "node scripts/validate-security-evidence.mjs",

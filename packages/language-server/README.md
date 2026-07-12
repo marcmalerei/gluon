@@ -5,14 +5,16 @@ The Gluon language server analyzes imported `html`, `svg`, `css`, and aliased
 code. The public service and the
 `gluon-template-check` CI command share the same two-pass project analyzer.
 
-Diagnostics cover unknown Custom Elements, declared Custom Element properties
-and events, ARIA names, invalid binding positions, void-element children, and
+Diagnostics cover unknown Custom Elements, declared Custom Element properties,
+events, and named light-DOM slots, ARIA names, invalid binding positions, void-element children, and
 inline style elements. `defineElement()` declarations expose tag definitions,
 static `properties`, `events`, and `slots` metadata to completion, hover,
 definition, and workspace rename operations.
 Literal `defineGluonElement()` definitions expose the same inferred tag,
 property, event, and slot contract and share the compiler's tag/setup ownership
 diagnostics.
+Unknown literal named light-DOM assignments receive
+`GLUON_TEMPLATE_SLOT_UNKNOWN` at the slot-name source range.
 `declarationsFromCustomElementsManifest()` accepts standard manifest module
 declarations and exposes their fields, events, and slots to the same analyzer.
 Every emitted code is required to exist in the public `@gluonjs/compiler`
