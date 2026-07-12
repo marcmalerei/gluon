@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   GluonElement,
   adoptStyles,
+  createStyleSheetSelection,
   createStyleSheetOwner,
   css,
   defineElement,
   html,
+  replaceStyleSheet,
   unadoptStyles,
 } from '../src/index.js';
 
@@ -39,6 +41,7 @@ describe('adopted stylesheets', () => {
     adoptStyles(document, before, shared);
     const first = createStyleSheetOwner(document);
     const second = createStyleSheetOwner(document);
+    expect(first.disposed).toBe(false);
     first.retain(shared);
     second.retain(shared);
     first.retain(after);
@@ -49,9 +52,15 @@ describe('adopted stylesheets', () => {
     expect(first.sheets).toHaveLength(2);
     expect(first.sheets[0]).toBe(shared);
     expect(first.sheets[1]).toBe(after);
+    first.release(css`:root { --not-owned: 1; }`);
+    first.release(after);
+    expect(document.adoptedStyleSheets).toHaveLength(2);
+    first.retain(after);
 
     first.dispose();
     first.dispose();
+    expect(first.disposed).toBe(true);
+    first.release(after);
     expect(document.adoptedStyleSheets).toHaveLength(2);
     expect(document.adoptedStyleSheets[0]).toBe(before);
     expect(document.adoptedStyleSheets[1]).toBe(shared);
@@ -60,6 +69,22 @@ describe('adopted stylesheets', () => {
     expect(document.adoptedStyleSheets[0]).toBe(before);
     expect(document.adoptedStyleSheets[1]).toBe(shared);
     expect(() => first.retain(after)).toThrow('disposed');
+  });
+
+  it('validates named style selections and rejects non-constructed replacement targets', () => {
+    const sheet = css`:root { --selection: 1; }`;
+    const selection = createStyleSheetSelection([
+      { id: 'plain', sheet },
+      { id: 'scoped', scope: 'example', sheet },
+    ]);
+    expect(selection.entries[0]).not.toHaveProperty('scope');
+    expect(selection.entries[1]?.scope).toBe('example');
+    expect(() => createStyleSheetSelection([{ id: 'Invalid ID', sheet }])).toThrow('Invalid');
+    expect(() => createStyleSheetSelection([
+      { id: 'duplicate', sheet },
+      { id: 'duplicate', sheet },
+    ])).toThrow('Duplicate');
+    expect(() => replaceStyleSheet({} as CSSStyleSheet, ':root {}')).toThrow('server stylesheet descriptor');
   });
 
   it('renders reactive custom elements and adopts sheets without a style fallback', async () => {
