@@ -4,6 +4,7 @@ import {
   applyGluonElementHotUpdate,
   createApp,
   createComponentStyleDependency,
+  createStyleSheetOwner,
   css,
   defineGluonElement,
   defineAtom,
@@ -12,14 +13,68 @@ import {
   refreshGluonApplications,
   refreshGluonElements,
 } from '@gluonjs/core';
+import { Button, buttonStyles, installUi } from '@gluonjs/atoms';
 import { component as hotComponent, style as hotStyle } from '../packages/vite/src/client.js';
-import { nextTick } from '@gluonjs/reactivity';
+import { nextTick, ref } from '@gluonjs/reactivity';
 
 afterEach(() => {
   document.body.replaceChildren();
 });
 
 describe('Gluon Core HMR bridge', () => {
+  it('retains generated starter state while hot-updating app tokens and the Atom consumer', async () => {
+    const moduleId = `/create-gluon-ui-${Date.now()}.ts`;
+    const tokenSheet = hotStyle(css`@layer starter { .starter-action { --gluon-button-background: rgb(200, 255, 0); } }`, moduleId, 'starterStyles');
+    const uiOwner = installUi(document, { theme: 'light' });
+    const appStyles = createStyleSheetOwner(document);
+    appStyles.retain(tokenSheet);
+    const count = ref(0);
+    const InitialAction = hotComponent(defineAtom(
+      ({ value, increment }: { value: number; increment: () => void }) => Button({
+        label: `Actions: ${value}`,
+        onClick: increment,
+        attributes: { class: 'starter-action' },
+      }),
+      'StarterAction',
+    ), moduleId, 'StarterAction');
+    const container = document.createElement('main');
+    document.body.append(container);
+    const app = createApp(() => InitialAction({
+      value: count.value,
+      increment: () => { count.value += 1; },
+    }));
+    app.onUnmounted(() => {
+      appStyles.dispose();
+      uiOwner.dispose();
+    });
+    const mounted = app.mount(container);
+    const button = container.querySelector<HTMLButtonElement>('button')!;
+    button.click();
+    await nextTick();
+    expect(button.textContent).toBe('Actions: 1');
+    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+
+    const updatedSheet = hotStyle(css`@layer starter { .starter-action { --gluon-button-background: rgb(23, 63, 145); } }`, moduleId, 'starterStyles');
+    hotComponent(defineAtom(
+      ({ value, increment }: { value: number; increment: () => void }) => Button({
+        label: `Updated actions: ${value}`,
+        onClick: increment,
+        attributes: { class: 'starter-action' },
+      }),
+      'StarterAction',
+    ), moduleId, 'StarterAction');
+    refreshGluonApplications();
+    await nextTick();
+
+    expect(updatedSheet).toBe(tokenSheet);
+    expect(container.querySelector('button')).toBe(button);
+    expect(button.textContent).toBe('Updated actions: 1');
+    expect(getComputedStyle(button).backgroundColor).toBe('rgb(23, 63, 145)');
+    mounted.unmount();
+    expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).not.toContain(tokenSheet);
+  });
+
   it('updates functional component CSS in place while retaining owner counts', () => {
     const moduleId = `/component-style-${Date.now()}.ts`;
     const initialSheet = hotStyle(css`@layer atoms { .hot-style { color: rgb(1, 2, 3); } }`, moduleId, 'styles');

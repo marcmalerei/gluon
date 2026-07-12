@@ -98,7 +98,10 @@ describe('create-gluon scaffolding', () => {
     });
     const manifest = JSON.parse(await readFile(join(result.directory, 'package.json'), 'utf8'));
     const app = await readFile(join(result.directory, 'src/app.ts'), 'utf8');
+    const main = await readFile(join(result.directory, 'src/main.ts'), 'utf8');
     const server = await readFile(join(result.directory, 'src/server.ts'), 'utf8');
+    const styles = await readFile(join(result.directory, 'src/styles.ts'), 'utf8');
+    const testSource = await readFile(join(result.directory, 'src/app.spec.ts'), 'utf8');
     const readme = await readFile(join(result.directory, 'README.md'), 'utf8');
     expect(result.features).toEqual({
       router: true,
@@ -111,15 +114,28 @@ describe('create-gluon scaffolding', () => {
       '@gluonjs/core': '0.0.0',
       '@gluonjs/atoms': '0.0.0',
       '@gluonjs/router': '0.0.0',
+      '@gluonjs/reactivity': '0.0.0',
       '@gluonjs/store': '0.0.0',
       '@gluonjs/ssr': '0.0.0',
     });
     expect(app).toContain("from '@gluonjs/atoms'");
     expect(app).toContain('Button({');
+    expect(app).toContain("variant: count % 2 === 0 ? 'primary' : 'secondary'");
+    expect(app).toContain("'aria-label': 'Increment starter action count'");
+    expect(app).toContain('data: { starterAction: true }');
     expect(app).not.toContain('atomStyles');
+    expect(main).toContain("installUi(document, { theme: 'light', hydrate: true })");
+    expect(main).toContain('styleSelection: starterHydrationStyleSelection');
+    expect(main).toContain('appStyleOwner.dispose()');
+    expect(styles).toContain('--starter-accent: #c8ff00');
+    expect(styles).toContain('--gluon-button-background: var(--starter-accent)');
+    expect(styles).not.toMatch(/\bbutton\s*\{/);
+    expect(testSource).toContain('getComputedStyle(button).minBlockSize');
+    expect(testSource).toContain('recovered: false');
     expect(readme).toContain('exact stylesheet dependencies automatically');
     expect(readme).toContain('do not adopt the deprecated aggregate Atom sheet');
     expect(server).toContain("from '@gluonjs/ssr'");
+    expect(server).toContain("styles: createStarterStyleSelection('light')");
     expect(result.files).toContain('vitest.config.ts');
   });
 

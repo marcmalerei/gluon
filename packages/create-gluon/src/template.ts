@@ -24,10 +24,10 @@ export function createStarterFiles(
   files.set('src/app.ts', appSource(features));
   files.set('src/quantity-control.ts', quantityControlSource());
   files.set('src/main.ts', mainSource(features));
-  files.set('src/styles.ts', stylesSource());
+  files.set('src/styles.ts', stylesSource(features));
   if (features.router) files.set('src/routes.ts', routesSource());
   if (features.store) files.set('src/counter-store.ts', storeSource());
-  if (features.ssr) files.set('src/server.ts', serverSource());
+  if (features.ssr) files.set('src/server.ts', serverSource(features));
   if (features.testing) {
     files.set('src/app.spec.ts', testSource(features));
     files.set('vitest.config.ts', vitestConfig());
@@ -47,7 +47,10 @@ function packageJson(name: string, features: GluonFeatures): string {
   if (features.router) dependencies['@gluonjs/router'] = versions.gluon;
   if (features.store) dependencies['@gluonjs/store'] = versions.gluon;
   if (features.ssr) dependencies['@gluonjs/ssr'] = versions.gluon;
-  if (features.ui) dependencies['@gluonjs/atoms'] = versions.gluon;
+  if (features.ui) {
+    dependencies['@gluonjs/atoms'] = versions.gluon;
+    dependencies['@gluonjs/reactivity'] = versions.gluon;
+  }
   if (features.testing) {
     devDependencies['@gluonjs/test-utils'] = versions.gluon;
     devDependencies['@vitest/browser-playwright'] = versions.vitestBrowser;
@@ -128,6 +131,7 @@ function appSource(features: GluonFeatures): string {
   const imports = [
     "import { compose, createApp, html, type GluonApp } from '@gluonjs/core';",
     features.ui ? "import { Button } from '@gluonjs/atoms';" : '',
+    features.ui ? "import { ref } from '@gluonjs/reactivity';" : '',
     features.router
       ? "import { RouterLink, RouterView, createRouterPlugin, type Router } from '@gluonjs/router';"
       : '',
@@ -149,6 +153,7 @@ function appSource(features: GluonFeatures): string {
   const counter = useCounterStore.use(storeManager);
 `
     : '';
+  const uiSetup = features.ui ? '  const actionCount = ref(0);\n' : '';
   const navigation = features.router
     ? `      <nav aria-label="Primary">
         \${compose(RouterLink, { to: '/' })\`Home\`}
@@ -158,22 +163,43 @@ function appSource(features: GluonFeatures): string {
   const content = features.router
     ? '${RouterView()}'
     : '<h1>Built with Gluon</h1><p>Edit <code>src/app.ts</code> to get started.</p>';
-  const counter = features.store
-    ? features.ui
-      ? `\${Button({
-          label: \`Count: \${counter.count}\`,
-          onClick: () => counter.increment(),
-          attributes: { 'aria-label': 'Increment counter' },
+  const counter = features.ui
+    ? `\${StarterAction({
+          count: ${features.store ? 'counter.count' : 'actionCount.value'},
+          onIncrement: () => {
+            actionCount.value += 1;${features.store ? '\n            counter.increment();' : ''}
+          },
         })}`
-      : `<button type="button" @click=\${() => counter.increment()}>Count: \${counter.count}</button>`
-    : features.ui
-      ? "${Button({ label: 'Gluon UI is ready' })}"
+    : features.store
+      ? `<button type="button" @click=\${() => counter.increment()}>Count: \${counter.count}</button>`
       : '';
   const plugin = features.router ? '  app.use(createRouterPlugin(options.router));\n' : '';
   const cleanup = features.store ? '  if (ownsStoreManager) app.onUnmounted(() => storeManager.dispose());\n' : '';
   const result = features.store ? '  return { app, storeManager, counter };' : '  return { app };';
+  const uiComponent = features.ui ? `
+export interface StarterActionProps {
+  readonly count: number;
+  readonly onIncrement: () => void;
+}
+
+/** App-owned Atom consumer. Vite hot-updates this function without recreating application state. */
+export function StarterAction({ count, onIncrement }: StarterActionProps) {
+  return Button({
+    label: \`Actions: \${count}\`,
+    variant: count % 2 === 0 ? 'primary' : 'secondary',
+    size: 'large',
+    onClick: onIncrement,
+    attributes: {
+      class: 'starter-action',
+      'aria-label': 'Increment starter action count',
+      data: { starterAction: true },
+    },
+  });
+}
+` : '';
 
   return `${imports}
+${uiComponent}
 
 export interface StarterApplicationOptions {
 ${optionFields}
@@ -184,14 +210,16 @@ ${resultFields}
 }
 
 export function createStarterApplication(options: StarterApplicationOptions${features.router ? '' : ' = {}'}): StarterApplication {
-${storeSetup}  const app = createApp(() => html\`
+${storeSetup}${uiSetup}  const app = createApp(() => html\`
     <header>
       <a class="brand" href="/">Gluon Starter</a>
 ${navigation}
     </header>
     <main>
+      <section class="starter-panel">
       ${content}
       ${counter}
+      </section>
     </main>
   \`);
 ${plugin}${cleanup}${result}
@@ -201,30 +229,70 @@ ${plugin}${cleanup}${result}
 
 function mainSource(features: GluonFeatures): string {
   const imports = [
-    "import { adoptStyles } from '@gluonjs/core';",
+    features.ui
+      ? "import { createStyleSheetOwner } from '@gluonjs/core';\nimport { installUi } from '@gluonjs/atoms';"
+      : "import { adoptStyles } from '@gluonjs/core';",
     features.router
       ? "import { createRouter, createWebHistory } from '@gluonjs/router';\nimport { routes } from './routes.js';"
       : '',
     features.store && features.ssr ? "import { createStoreManager } from '@gluonjs/store';" : '',
-    features.ssr
+    features.ssr && !features.ui
       ? "import { createStyleManifest } from '@gluonjs/ssr';\nimport { hydrateApplication, hydrateRequestState, readHydrationState } from '@gluonjs/ssr/hydration';"
+      : features.ssr
+        ? "import { hydrateApplication, hydrateRequestState, readHydrationState } from '@gluonjs/ssr/hydration';"
       : '',
     "import { createStarterApplication } from './app.js';",
-    "import { starterStyles } from './styles.js';",
+    features.ui && features.ssr
+      ? "import { starterHydrationStyleSelection, starterStyles } from './styles.js';"
+      : "import { starterStyles } from './styles.js';",
   ].filter(Boolean).join('\n');
   const routerSetup = features.router
     ? `const router = createRouter({ history: createWebHistory(), routes });
 await router.isReady();
 `
     : '';
+  const options = features.router ? '{ router }' : '';
+  const mountClient = features.ui
+    ? `const uiOwner = installUi(document, { theme: 'light' });
+const appStyleOwner = createStyleSheetOwner(document);
+appStyleOwner.retain(starterStyles);
+try {
+  const { app } = createStarterApplication(${options});
+  app.onUnmounted(() => {
+    appStyleOwner.dispose();
+    uiOwner.dispose();
+  });
+  app.mount(container);
+} catch (error) {
+  appStyleOwner.dispose();
+  uiOwner.dispose();
+  throw error;
+}`
+    : `adoptStyles(document, starterStyles);
+createStarterApplication(${options}).app.mount(container);`;
   if (features.ssr) {
-    return `${imports}
-
-const container = document.querySelector<HTMLElement>('#app');
-if (!container) throw new Error('The Gluon starter requires an #app mount element.');
-
-${routerSetup}if (document.querySelector('script[data-gluon-state]')) {
+    const hydrateClient = features.ui
+      ? `const uiOwner = installUi(document, { theme: 'light', hydrate: true });
   const state = readHydrationState();
+  const storeManager = createStoreManager();
+  try {
+    await hydrateRequestState(state, router, storeManager);
+    const { app } = createStarterApplication({ router, storeManager });
+    app.onUnmounted(() => {
+      uiOwner.dispose();
+      storeManager.dispose();
+    });
+    await hydrateApplication(app, container, {
+      state: { server: state.store, client: storeManager.dehydrate() },
+      styleSelection: starterHydrationStyleSelection,
+      styleRoot: document,
+    });
+  } catch (error) {
+    storeManager.dispose();
+    uiOwner.dispose();
+    throw error;
+  }`
+      : `const state = readHydrationState();
   const storeManager = createStoreManager();
   await hydrateRequestState(state, router, storeManager);
   const { app } = createStarterApplication({ router, storeManager });
@@ -232,21 +300,25 @@ ${routerSetup}if (document.querySelector('script[data-gluon-state]')) {
     state: { server: state.store, client: storeManager.dehydrate() },
     styles: createStyleManifest([starterStyles]),
     styleRoot: document,
-  });
+  });`;
+    return `${imports}
+
+const container = document.querySelector<HTMLElement>('#app');
+if (!container) throw new Error('The Gluon starter requires an #app mount element.');
+
+${routerSetup}if (document.querySelector('script[data-gluon-state]')) {
+  ${hydrateClient}
 } else {
-  adoptStyles(document, starterStyles);
-  createStarterApplication({ router }).app.mount(container);
+  ${mountClient}
 }
 `;
   }
-  const options = features.router ? '{ router }' : '';
   return `${imports}
 
 const container = document.querySelector<HTMLElement>('#app');
 if (!container) throw new Error('The Gluon starter requires an #app mount element.');
 
-adoptStyles(document, starterStyles);
-${routerSetup}createStarterApplication(${options}).app.mount(container);
+${routerSetup}${mountClient}
 `;
 }
 
@@ -324,17 +396,21 @@ export const StarterQuantityControl = defineGluonElement({
 `;
 }
 
-function serverSource(): string {
+function serverSource(features: GluonFeatures): string {
+  const styleImport = features.ui
+    ? "import { createStarterStyleSelection } from './styles.js';"
+    : "import { starterStyles } from './styles.js';";
+  const styles = features.ui ? "createStarterStyleSelection('light')" : '[starterStyles]';
   return `import { renderRequest, type SsrRequestResult } from '@gluonjs/ssr';
 import { createStarterApplication } from './app.js';
 import { routes } from './routes.js';
-import { starterStyles } from './styles.js';
+${styleImport}
 
 export function render(url: string): Promise<SsrRequestResult> {
   return renderRequest({
     url,
     routes,
-    styles: [starterStyles],
+    styles: ${styles},
     createApp: ({ router, store }) => createStarterApplication({
       router,
       storeManager: store,
@@ -344,21 +420,64 @@ export function render(url: string): Promise<SsrRequestResult> {
 `;
 }
 
-function stylesSource(): string {
-  return `import { css } from '@gluonjs/core';
+function stylesSource(features: GluonFeatures): string {
+  const imports = features.ui
+    ? `import { createStyleSheetSelection, css } from '@gluonjs/core';
+import { createUiStyleSelection, type UiThemeName } from '@gluonjs/atoms';`
+    : "import { css } from '@gluonjs/core';";
+  const selections = features.ui ? `
+
+/** Shared UI carriers followed by the app-owned starter token and layout sheet. */
+export function createStarterStyleSelection(theme: UiThemeName = 'light') {
+  const ui = createUiStyleSelection(theme);
+  return createStyleSheetSelection([
+    ...ui.entries,
+    { id: 'gluon-starter', scope: 'gluon-starter', sheet: starterStyles },
+  ]);
+}
+
+/** App-owned carrier left after installUi() consumes the shared UI carriers. */
+export const starterHydrationStyleSelection = createStyleSheetSelection([
+  { id: 'gluon-starter', scope: 'gluon-starter', sheet: starterStyles },
+]);` : '';
+  return `${imports}
 
 export const starterStyles = css\`
-  *, *::before, *::after { box-sizing: border-box; }
-  :root { font-family: Inter, system-ui, sans-serif; color: #111; background: #fff; }
-  body { margin: 0; min-width: 320px; }
-  header { display: flex; min-height: 64px; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid #d7d7d2; }
-  nav { display: flex; gap: 24px; }
-  a { color: inherit; }
-  .brand { font-weight: 700; text-decoration: none; }
-  main { width: min(720px, 100%); margin: 0 auto; padding: 64px 24px; }
-  button { min-height: 44px; padding: 10px 18px; border: 1px solid #111; background: #c8ff00; color: #111; font: inherit; cursor: pointer; }
-  :focus-visible { outline: 3px solid #173f91; outline-offset: 3px; }
+  @layer starter {
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      font-family: Inter, system-ui, sans-serif;
+      color: #111111;
+      background: #f6f7f2;
+      --starter-accent: #c8ff00;
+      --starter-ink: #111111;
+      --starter-rule: #c8cbc1;
+      --starter-surface: #ffffff;
+    }
+    body { margin: 0; min-width: 320px; }
+    header { display: flex; min-height: 64px; align-items: center; justify-content: space-between; gap: 24px; padding: 0 24px; border-bottom: 1px solid var(--starter-rule); background: var(--starter-surface); }
+    nav { display: flex; gap: 24px; }
+    a { color: inherit; }
+    .brand { font-weight: 750; letter-spacing: -0.02em; text-decoration: none; }
+    main { width: min(760px, 100%); margin: 0 auto; padding: clamp(40px, 9vw, 96px) 24px; }
+    .starter-panel { display: grid; gap: 24px; padding: clamp(28px, 6vw, 56px); border: 1px solid var(--starter-rule); background: var(--starter-surface); }
+    .starter-panel h1 { margin: 0; font-size: clamp(2.5rem, 9vw, 5.5rem); line-height: 0.95; letter-spacing: -0.055em; }
+    .starter-panel p { max-width: 52ch; margin: 0; color: #51534d; }
+    .starter-action {
+      justify-self: start;
+      --gluon-button-background: var(--starter-accent);
+      --gluon-button-border-color: var(--starter-ink);
+      --gluon-button-color: var(--starter-ink);
+    }
+    :focus-visible { outline: 3px solid #173f91; outline-offset: 3px; }
+    @media (max-width: 480px) {
+      header { align-items: flex-start; flex-direction: column; padding-block: 16px; }
+      main { padding-inline: 16px; }
+      .starter-panel { padding: 24px; }
+    }
+  }
 \`;
+${selections}
 `;
 }
 
@@ -380,6 +499,124 @@ export default defineConfig({
 }
 
 function testSource(features: GluonFeatures): string {
+  if (features.ui) {
+    const routerImports = features.router
+      ? "import { createMemoryHistory, createRouter } from '@gluonjs/router';\nimport { routes } from './routes.js';"
+      : '';
+    const storeImports = features.ssr ? "import { createStoreManager } from '@gluonjs/store';" : '';
+    const ssrImports = features.ssr
+      ? "import { hydrateApplication, hydrateRequestState, readHydrationState } from '@gluonjs/ssr/hydration';\nimport { render } from './server.js';"
+      : '';
+    const styleImports = features.ssr
+      ? 'import { starterHydrationStyleSelection, starterStyles } from \'./styles.js\';'
+      : 'import { starterStyles } from \'./styles.js\';';
+    const routerSetup = features.router
+      ? `const router = createRouter({ history: createMemoryHistory(['/']), routes });
+  await router.isReady();`
+      : '';
+    const options = features.router ? '{ router }' : '';
+    const ssrTest = features.ssr ? `
+
+test('hydrates the generated UI selection without duplication or recovery', async () => {
+  document.adoptedStyleSheets = [];
+  const response = await render('/');
+  expect(response.styles.entries.map(({ id }) => id)).toEqual([
+    'gluon-ui-layer-order',
+    'gluon-ui-foundation',
+    'gluon-ui-tokens',
+    'gluon-ui-theme',
+    'gluon-atom-button',
+    'gluon-starter',
+  ]);
+  const carriers = document.createElement('template');
+  carriers.innerHTML = response.head;
+  document.head.append(...carriers.content.querySelectorAll('style[data-gluon-style]'));
+  const root = document.createElement('div');
+  root.innerHTML = response.html;
+  document.body.append(root);
+  document.body.insertAdjacentHTML('beforeend', response.stateScript);
+
+  const state = readHydrationState(document);
+  const router = createRouter({ history: createMemoryHistory(['/']), routes });
+  const storeManager = createStoreManager();
+  await hydrateRequestState(state, router, storeManager);
+  const uiOwner = installUi(document, { theme: 'light', hydrate: true });
+  const { app } = createStarterApplication({ router, storeManager });
+  app.onUnmounted(() => {
+    uiOwner.dispose();
+    storeManager.dispose();
+  });
+  const serverRoot = root.firstElementChild;
+  const hydrated = await hydrateApplication(app, root, {
+    state: { server: state.store, client: storeManager.dehydrate() },
+    styleSelection: starterHydrationStyleSelection,
+    styleRoot: document,
+  });
+
+  expect(hydrated.hydration).toEqual(expect.objectContaining({ retained: true, recovered: false, mismatches: [] }));
+  expect(root.firstElementChild).toBe(serverRoot);
+  expect(document.querySelector('style[data-gluon-style]')).toBeNull();
+  expect(document.adoptedStyleSheets.filter((sheet) => sheet === buttonStyles)).toHaveLength(1);
+  expect(document.adoptedStyleSheets.filter((sheet) => sheet === starterStyles)).toHaveLength(1);
+  root.querySelector<HTMLButtonElement>('[data-starter-action]')!.click();
+  await nextTick();
+  expect(root.querySelector('[data-starter-action]')?.textContent).toBe('Actions: 1');
+  hydrated.mount.unmount();
+  expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+  expect(document.adoptedStyleSheets).not.toContain(starterStyles);
+  root.remove();
+  document.querySelector('script[data-gluon-state]')?.remove();
+});` : '';
+    return `import { afterEach, expect, test } from 'vitest';
+import { createStyleSheetOwner } from '@gluonjs/core';
+import { buttonStyles, installUi } from '@gluonjs/atoms';
+import { nextTick } from '@gluonjs/reactivity';
+${routerImports}
+${storeImports}
+${ssrImports}
+import { createStarterApplication } from './app.js';
+${styleImports}
+
+afterEach(() => {
+  document.body.replaceChildren();
+  document.querySelectorAll('style[data-gluon-style]').forEach((carrier) => carrier.remove());
+});
+
+test('renders a themed, accessible, reactive Atom consumer', async () => {
+  document.adoptedStyleSheets = [];
+  const uiOwner = installUi(document, { theme: 'light' });
+  const appStyleOwner = createStyleSheetOwner(document);
+  appStyleOwner.retain(starterStyles);
+  ${routerSetup}
+  const { app } = createStarterApplication(${options});
+  app.onUnmounted(() => {
+    appStyleOwner.dispose();
+    uiOwner.dispose();
+  });
+  const root = document.createElement('div');
+  document.body.append(root);
+  const mounted = app.mount(root);
+  const button = root.querySelector<HTMLButtonElement>('[data-starter-action]')!;
+
+  expect(button.textContent).toBe('Actions: 0');
+  expect(button.getAttribute('aria-label')).toBe('Increment starter action count');
+  expect(button.classList.contains('is-primary')).toBe(true);
+  expect(getComputedStyle(button).minBlockSize).toBe('44px');
+  expect(getComputedStyle(button).backgroundColor).toBe('rgb(200, 255, 0)');
+  expect(getComputedStyle(document.documentElement).getPropertyValue('--gluon-color-canvas').trim()).toBe('#ffffff');
+  expect(document.adoptedStyleSheets).toContain(buttonStyles);
+  expect(document.adoptedStyleSheets).toContain(starterStyles);
+
+  button.click();
+  await nextTick();
+  expect(button.textContent).toBe('Actions: 1');
+  expect(button.classList.contains('is-secondary')).toBe(true);
+  mounted.unmount();
+  expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+  expect(document.adoptedStyleSheets).not.toContain(starterStyles);
+});${ssrTest}
+`;
+  }
   const uiImport = features.ui ? "import { Button } from '@gluonjs/atoms';\n" : '';
   const render = features.ui
     ? "Button({ label: 'Ready' })"
@@ -399,6 +636,24 @@ test('renders an operable starter control', () => {
 
 function starterReadme(name: string, features: GluonFeatures): string {
   const enabled = Object.entries(features).filter(([, value]) => value).map(([key]) => key);
+  const uiGuidance = features.ui ? `
+
+## UI ownership and extension points
+
+- \`src/main.ts\` calls \`installUi(document, { theme: 'light' })\` once, owns the
+  returned shared UI/theme handle, and disposes it with the application.
+- \`src/styles.ts\` owns \`--starter-*\` application tokens and maps the
+  \`.starter-action\` class to documented Button custom properties. Add or edit
+  application tokens there; do not target every native \`button\`.
+- \`src/app.ts\` contains the typed \`StarterAction\` Atom consumer. Add local
+  components beside it or generate them with the documented create-gluon
+  component command, then import them through the local application barrel.
+- To add an application theme, extend the typed theme choice passed to
+  \`installUi()\` and add app-token values under the matching
+  \`[data-gluon-theme]\` selector in \`src/styles.ts\`.
+- Rendered Atoms retain their exact component sheets automatically. The starter
+  never imports the deprecated aggregate Atom sheet.
+` : '';
   return `# ${name}
 
 Generated by \`create-gluon\` with ${enabled.length ? enabled.join(', ') : 'the minimal'} feature selection.
@@ -412,6 +667,7 @@ Generated by \`create-gluon\` with ${enabled.length ? enabled.join(', ') : 'the 
 - \`npm run build\` builds the ${features.ssr ? 'client and SSR server entries' : 'client entry'}.
 
 Application source imports only documented package entry points. Styles are installed through constructable stylesheets and \`adoptedStyleSheets\`.${features.ui ? ' Rendered UI components retain their exact stylesheet dependencies automatically; do not adopt the deprecated aggregate Atom sheet.' : ''}
+${uiGuidance}
 
 ## Add app-local components
 
