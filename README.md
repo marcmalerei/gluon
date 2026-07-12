@@ -568,7 +568,8 @@ Included now:
 - application routing with browser, hash, and memory histories
 - application-scoped stores with transactions, persistence, HMR, and snapshots
 - a responsive living reference shop using public package APIs
-- versioned guides, generated API reference, cookbook, migration material, and compiled interop examples
+- versioned guides, generated API reference with typechecked examples on every
+  public symbol page, cookbook, migration material, and compiled interop examples
 - static Vue 3.5 migration inventory with human/JSON reports and no source writes
 - Custom Element authoring
 - adopted stylesheet management

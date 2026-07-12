@@ -43,6 +43,20 @@ interface MemoryEntry {
   scroll?: ScrollPosition;
 }
 
+/**
+ * Creates a caller-owned history stack that does not read or change browser
+ * globals. Use it for tests, server requests, and other isolated Router owners.
+ *
+ * The final item in `initialEntries` is the current location. Earlier items
+ * remain available to `go()`, while later `push()` calls truncate any forward
+ * entries from the current position.
+ *
+ * @param initialEntries Initial URL strings for the stack. Defaults to `/` and
+ * must contain at least one entry.
+ * @returns A memory-backed history whose listeners and entries remain owned by
+ * the caller until `destroy()` is called.
+ * @throws An `Error` when `initialEntries` is empty.
+ */
 export function createMemoryHistory(
   initialEntries: readonly string[] = ['/'],
 ): RouterHistory {

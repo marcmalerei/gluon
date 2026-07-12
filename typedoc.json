@@ -30,6 +30,7 @@
   "tsconfig": "tsconfig.typedoc.json",
   "plugin": ["typedoc-plugin-markdown"],
   "out": ".tmp/docs-api",
+  "json": ".tmp/docs-api-reflections.json",
   "readme": "none",
   "excludeInternal": true,
   "disableSources": true,

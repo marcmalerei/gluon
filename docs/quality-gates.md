@@ -37,6 +37,22 @@ accessibility responsibilities are separated in
 [`accessibility.md`](accessibility.md), and deterministic retention evidence is
 defined in [`memory-retention.md`](memory-retention.md).
 
+## Generated API example gate
+
+`npm run docs:api` generates TypeDoc Markdown for every public package entry
+point, appends one verified `Example` section to every public function, class,
+interface, type-alias, and variable page, and compiles every snippet through a
+generated strict TypeScript project. Package and subpath imports are derived
+from `package-contract.json`; internal source and deep build paths are rejected.
+
+Baseline examples document the supported public import plus a compiler-valid
+call, type annotation, or value read for the symbol kind. Generic placeholder
+arguments establish type coverage, not runtime behavior. Behavior-oriented
+overrides are maintained in `docs-site/api-examples.json` and compile in the
+same corpus. `npm run check:docs` independently derives the generated symbol
+page set, requires exact manifest coverage and rendered code on every page, and
+checks the curated `createMemoryHistory()` lifecycle example.
+
 ## Optional UI package gate
 
 `npm run check:ui-contract` validates the four optional package manifests,

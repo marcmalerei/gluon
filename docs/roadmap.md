@@ -300,7 +300,9 @@ reference pages from every current public package entry point, and compiles the
 maintained SPA, Custom Element, Router/Store, universal-rendering, testing,
 plain-HTML, and Vue-host examples. The Pages workflow validates the same version
 manifest, links, API coverage, and examples before deploying the documentation
-and Playground as one public site.
+and Playground as one public site. Issue #102 adds a derived, typechecked public
+import example to every generated symbol page and supports curated behavioral
+examples without allowing private or deep package paths.
 
 Issue #39 makes Quarks, Atoms, Molecules, and Organisms current optional
 workspaces and removes their transitional Core subpaths. Stable manifest
