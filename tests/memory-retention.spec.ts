@@ -1,22 +1,22 @@
 import { expect, test, vi } from 'vitest';
-import { adoptStyles, defineGluonElement, html } from '../src/index.js';
+import { defineGluonElement, html } from '../src/index.js';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
 import { activeFixtureNames, assertNoFixtureLeaks, renderFixture } from '@gluonjs/test-utils';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
 import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
-import { shopStyles } from '../examples/shop/src/styles.js';
+import { shopStyles, shopUiTokenStyles } from '../examples/shop/src/styles.js';
 
 test('releases repeated customer-flow apps, caches, listeners, refs, Router, and Store ownership', async () => {
   document.body.replaceChildren();
   localStorage.clear();
-  adoptStyles(document, shopStyles);
+  document.adoptedStyleSheets = [];
 
   for (let cycle = 0; cycle < 30; cycle += 1) {
     const { app, router, store } = createShopApplication(
       createMemoryHistory(['/products/orbit-lamp']),
-      { storage: null },
+      { storage: null, styleTarget: document },
     );
     await router.isReady();
     const root = document.createElement('div');
@@ -40,6 +40,8 @@ test('releases repeated customer-flow apps, caches, listeners, refs, Router, and
     expect(root.childNodes).toHaveLength(0);
     expect(document.querySelector('gluon-teleport')).toBeNull();
     expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
+    expect(document.adoptedStyleSheets).not.toContain(shopStyles);
     root.remove();
   }
 });

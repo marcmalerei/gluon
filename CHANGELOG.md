@@ -9,6 +9,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- GLUON GOODS production dogfooding for official Button, Icon, Input, Label,
+  and FormField components plus app-local brand presets, a repeated delivery
+  Molecule, a real checkout Organism, target-owned CSR/SSR/hydration/static
+  styles, cross-engine accessibility/teardown evidence, and selected-component
+  production tree-shaking checks.
 - Immutable exact component-style metadata, render-target reference counting,
   deterministic adoption order, async/built-in/Custom Element/application
   lifecycle ownership, request-derived SSR and progressive transport, exact

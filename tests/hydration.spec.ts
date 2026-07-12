@@ -31,6 +31,10 @@ import { createStyleManifest, prepareForHydration, renderProgressively, renderSt
 import { renderShopRequest } from '../examples/shop/src/server.js';
 import { hydrateShop } from '../examples/shop/src/hydrate.js';
 import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
+import {
+  shopStyles,
+  shopUiTokenStyles,
+} from '../examples/shop/src/styles.js';
 
 describe('SSR hydration', () => {
   it('retains the server DOM produced by a composed functional template', async () => {
@@ -131,6 +135,9 @@ describe('SSR hydration', () => {
     expect(hydrated.hydration.retained).toBe(true);
     expect(root.querySelector('#product-title')).toBe(heading);
     expect(hydrated.router.currentRoute.value.fullPath).toBe('/products/orbit-lamp');
+    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
+    expect(document.adoptedStyleSheets).toContain(shopStyles);
 
     const configurator = root.querySelector('gluon-product-configurator');
     await (configurator as ProductConfiguratorElement | null)?.updateComplete;
@@ -140,6 +147,10 @@ describe('SSR hydration', () => {
     expect(hydrated.store.bagOpen).toBe(true);
 
     hydrated.mount.unmount();
+    expect(hydrated.uiOwner.disposed).toBe(true);
+    expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
+    expect(document.adoptedStyleSheets).not.toContain(shopStyles);
     hydrated.uiOwner.dispose();
     hydrated.router.destroy();
     hydrated.storeManager.dispose();

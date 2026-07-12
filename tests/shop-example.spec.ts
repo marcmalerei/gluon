@@ -1,30 +1,52 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { adoptStyles } from '../src/index.js';
+import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
-import { inputStyles } from '@gluonjs/atoms';
+import { buttonStyles, inputStyles, labelStyles } from '@gluonjs/atoms';
+import { formFieldStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
-import { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
+import {
+  ProductConfiguratorElement,
+  productConfiguratorStyles,
+} from '../examples/shop/src/product-configurator.js';
 import {
   registerBagQuantityControl,
   type BagQuantityControlElement,
 } from '../examples/shop/src/bag-quantity-control.js';
-import { shopStyles } from '../examples/shop/src/styles.js';
+import {
+  shopStyles,
+  shopUiTokenStyles,
+} from '../examples/shop/src/styles.js';
 
 describe('GLUON GOODS reference shop', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     localStorage.clear();
-    adoptStyles(document, shopStyles);
+    document.adoptedStyleSheets = [];
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {
-    const { app, router } = createShopApplication(createMemoryHistory(['/']), { storage: null });
+    const { app, router, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
+      storage: null,
+      styleTarget: document,
+    });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
     app.mount(root);
+
+    expect(uiOwner?.theme).toBe('light');
+    expect(document.documentElement.dataset.gluonTheme).toBe('light');
+    expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
+    expect(document.adoptedStyleSheets).toContain(shopStyles);
+    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    expect(getComputedStyle(document.documentElement).getPropertyValue('--gluon-color-action').trim())
+      .toBe('#c8ff00');
+    const skipLink = root.querySelector<HTMLAnchorElement>('.skip-link')!;
+    skipLink.focus();
+    expect(document.activeElement).toBe(skipLink);
+    expect(skipLink.getAttribute('href')).toBe('#main-content');
 
     expect(root.querySelector('h1')?.textContent).toBe('Objects that work the way you do.');
     expect(root.querySelectorAll('.product-card')).toHaveLength(4);
@@ -35,6 +57,9 @@ describe('GLUON GOODS reference shop', () => {
     const productPage = root.querySelector('.product-page');
     const configurator = getProductConfigurator(root);
     await configurator.updateComplete;
+    expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(buttonStyles);
+    const addButton = configurator.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!;
+    expect(getComputedStyle(addButton).backgroundColor).toBe('rgb(200, 255, 0)');
     await new Promise((resolve) => setTimeout(resolve, 70));
     expect(configurator.shadowRoot?.querySelector('.inventory-status')?.textContent)
       .toContain('Checking workshop availability');
@@ -43,7 +68,7 @@ describe('GLUON GOODS reference shop', () => {
       .toContain('In stock · dispatches in 2–3 days');
 
     configurator.shadowRoot?.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
-    configurator.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    addButton.click();
     await settleShop();
     expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 1');
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
@@ -60,11 +85,18 @@ describe('GLUON GOODS reference shop', () => {
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');
     expect(root.querySelector('.product-page')).toBe(productPage);
     app.unmount();
+    expect(uiOwner?.disposed).toBe(true);
+    expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
+    expect(document.adoptedStyleSheets).not.toContain(shopStyles);
+    expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.querySelector('gluon-teleport')).toBeNull();
   });
 
   it('exposes functional mobile navigation and catalog filters', async () => {
-    const { app, router, store } = createShopApplication(createMemoryHistory(['/shop']), { storage: null });
+    const { app, router, store } = createShopApplication(createMemoryHistory(['/shop']), {
+      storage: null,
+      styleTarget: document,
+    });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -91,7 +123,10 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('completes bag checkout and renders a durable order confirmation route', async () => {
-    const { app, router, store } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']), { storage: null });
+    const { app, router, store } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']), {
+      storage: null,
+      styleTarget: document,
+    });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -109,6 +144,18 @@ describe('GLUON GOODS reference shop', () => {
     expect(purchase.classList.contains('shop-purchase-button')).toBe(true);
     expect(purchase.querySelector('svg')?.getAttribute('role')).toBe('img');
     expect(purchase.querySelector('svg')?.getAttribute('aria-label')).toBe('Secure checkout');
+    expect(root.querySelectorAll('form')).toHaveLength(1);
+    expect(root.querySelectorAll('.checkout-field')).toHaveLength(5);
+    expect([...root.querySelectorAll<HTMLInputElement>('.checkout-input')].every((input) => (
+      input.required && input.closest('label')?.classList.contains('checkout-field')
+    ))).toBe(true);
+    expect(document.adoptedStyleSheets).toContain(formFieldStyles);
+    expect(document.adoptedStyleSheets).toContain(inputStyles);
+    expect(document.adoptedStyleSheets).toContain(labelStyles);
+    purchase.click();
+    await settleShop();
+    expect(router.currentRoute.value.path).toBe('/checkout');
+    expect(root.querySelector<HTMLInputElement>('input[name="email"]')?.validity.valueMissing).toBe(true);
 
     for (const [name, value] of Object.entries({
       email: 'ada@example.com', name: 'Ada Lovelace', address: '1 Gluon Way', postalCode: '10115', city: 'Berlin',
@@ -128,7 +175,10 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('searches the catalog and exposes a useful empty bag path', async () => {
-    const { app, router, store } = createShopApplication(createMemoryHistory(['/']), { storage: null });
+    const { app, router, store } = createShopApplication(createMemoryHistory(['/']), {
+      storage: null,
+      styleTarget: document,
+    });
     await router.isReady();
     const root = document.createElement('div');
     document.body.append(root);
@@ -170,7 +220,7 @@ describe('GLUON GOODS reference shop', () => {
   it('removes bag lines and renders policy and fallback routes', async () => {
     const { app, router } = createShopApplication(
       createMemoryHistory(['/products/orbit-lamp']),
-      { storage: null },
+      { storage: null, styleTarget: document },
     );
     await router.isReady();
     const root = document.createElement('div');
@@ -214,7 +264,9 @@ describe('GLUON GOODS reference shop', () => {
     expect(isolatedA.store.bagCount).toBe(1);
     expect(isolatedB.store.bagCount).toBe(0);
 
-    const first = createShopApplication(createMemoryHistory(['/products/stack-tray']));
+    const first = createShopApplication(createMemoryHistory(['/products/stack-tray']), {
+      styleTarget: document,
+    });
     await first.router.isReady();
     const firstRoot = document.createElement('div');
     document.body.append(firstRoot);
@@ -224,7 +276,7 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     first.app.unmount();
 
-    const second = createShopApplication(createMemoryHistory(['/']));
+    const second = createShopApplication(createMemoryHistory(['/']), { styleTarget: document });
     await second.router.isReady();
     const secondRoot = document.createElement('div');
     document.body.append(secondRoot);
@@ -250,6 +302,7 @@ describe('GLUON GOODS reference shop', () => {
 
     control.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
     await control.updateComplete;
+    expect(control.shadowRoot?.adoptedStyleSheets).toContain(buttonStyles);
     expect(control.shadowRoot?.querySelector('output')?.textContent).toBe('1');
 
     control.quantity = 2;
@@ -266,6 +319,16 @@ describe('GLUON GOODS reference shop', () => {
     control.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Decrease quantity"]')!.click();
     await control.updateComplete;
     expect(control.shadowRoot?.querySelector('output')?.textContent).toBe('0');
+  });
+
+  it('retains the reduced-motion and product-owned public-token contracts', () => {
+    expect(getStyleSheetText(shopStyles)).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(getStyleSheetText(productConfiguratorStyles)).toContain('@media (prefers-reduced-motion: reduce)');
+    const tokens = getStyleSheetText(shopUiTokenStyles);
+    expect(tokens).toContain('--gluon-color-canvas: #ffffff');
+    expect(tokens).toContain('--gluon-color-text: #111111');
+    expect(tokens).toContain('--gluon-color-action: #c8ff00');
+    expect(tokens).toContain('--gluon-color-focus: #173f91');
   });
 });
 

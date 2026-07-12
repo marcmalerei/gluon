@@ -20,6 +20,15 @@ Component-owned role, naming, disabled, children, and validation bindings are
 excluded from the corresponding `attributes` type and remain explicit props;
 the complete matrix is in [`ui-extensibility.md`](ui-extensibility.md).
 
+GLUON GOODS additionally exercises official Button presets in global
+navigation, dialogs, the form-associated product configurator, and the bag
+quantity Custom Element. Checkout contains exactly one form and five required
+official `FormField` compositions with implicit native labels. Customer-flow
+tests verify the skip link, empty-submit constraint validation, 44px mobile
+actions, visible cobalt focus, reduced-motion styles, theme tokens, dialog
+focus entry/containment/return, and release of shared, app, and exact-component
+styles after unmount in Chromium, Firefox, and WebKit.
+
 Automated rules cannot establish reading order quality, useful announcements,
 zoom usability, speech output, or whether a keyboard sequence is understandable.
 The following protocol is therefore release-blocking for changed customer flows.

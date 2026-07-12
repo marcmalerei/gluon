@@ -115,6 +115,12 @@ rule in `benchmarks/dx/specification-v1.json` applies that unchanged outcome to
 Gluon, Vue, and React. #107 still owns comparator implementations, completed-run
 evidence conforming to the canonical schema, and the final comparison.
 
+The production scan also proves that GLUON GOODS contains only the selected
+Button, Icon, Input, Label, FormField, `PurchaseAction`, and
+`CheckoutExperience` markers. It rejects unused Card/AppShell and deprecated
+aggregate-style markers, while `check:shop-boundaries` rejects private package
+paths, `<style>` fallbacks, and undocumented `.gluon-*` class coupling.
+
 ## Report-only Vue analyzer gate
 
 `npm run test:vue-analyzer` builds the Node package and verifies deterministic
@@ -214,12 +220,11 @@ missing, negative, or non-numeric budget entries fail before comparison.
 The issue #108 production owner baseline measures 164,012 raw entry bytes and
 47,686 level-9 gzip bytes. Issue #110 adds the selected Atom Button/Icon styles
 and app-local Molecule/Organism purchase path, measuring 171,264 raw and 50,069
-gzip bytes. With the #112 functional bag quantity boundary, reactive property
-view, and #115 exact component-sheet retention, the combined production entry
-measures 178,503 raw and 51,536 gzip bytes. The combined #112/#115 increment over
-#110 is 7,239 raw and 1,467 gzip bytes; relative to the issue #88 baseline of
-158,152 raw and 45,683 gzip bytes, the combined increment is 20,351 raw and 5,853
-gzip bytes. The reviewed regression ceilings
+gzip bytes. With issue #114's real Button/Input/FormField surfaces, app-local
+Molecule/Organism composition, and brand-token owner, the production entry
+measures 181,847 raw and 52,535 gzip bytes. That is 3,344 raw and 999 gzip bytes
+above the combined #112/#115 entry, and 23,695 raw and 6,852 gzip bytes above
+the issue #88 baseline of 158,152 raw and 45,683 gzip bytes. The reviewed regression ceilings
 are 182,000 raw bytes and 54,000 gzip bytes; HTML, image-byte, and image-count
 ceilings remain unchanged. These are composition measurements, not runtime-
 speed or framework-size claims. Vue is built only in the documentation host.
@@ -250,7 +255,7 @@ Browser assertions that cross a reactive transition poll for the resulting DOM
 state with a bounded timeout. They do not assume that the render and a 140-ms
 transition always finish within one fixed wall-clock delay on every engine.
 
-The current ceilings allow 3,497 raw bytes and 2,464 gzip bytes above the
+The current ceilings allow 153 raw bytes and 1,465 gzip bytes above the
 measured initial graph while preventing unreviewed large regressions. Changing a
 ceiling requires an evidence-backed documentation update in the same pull
 request.

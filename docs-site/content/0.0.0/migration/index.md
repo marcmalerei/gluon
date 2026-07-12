@@ -65,7 +65,9 @@ in GLUON GOODS. Browser evidence covers registration and pre-definition
 upgrade, property updates, event detail and flags, native named/default slots,
 stable identity, disconnect/reconnect cleanup, adopted stylesheets, form
 submission/reset/state restore/validation/labels/focus/disabled behavior, and
-the configured line item delivered to the bag. Run the compiled
+the configured line item delivered to the bag. The existing ShadowRoot owns
+both the product configurator sheet and the usage-derived official Button sheet;
+Vue does not adopt or duplicate either sheet. Run the compiled
 [Vue host](/gluon/0.0.0/examples/vue.html) or execute:
 
 ```sh

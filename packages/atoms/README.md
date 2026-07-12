@@ -72,3 +72,8 @@ and the browser/visual evidence named by that manifest.
 
 Atoms contain no translated interface copy; labels and visible strings remain
 application inputs so localization stays with the consuming product.
+
+GLUON GOODS is the production dogfood surface: its public Button presets cover
+global navigation, dialogs, product add/retry, and bag quantity/remove actions;
+catalog search uses `Input`. The application supplies only documented public
+tokens/classes and owns the shared/exact sheets through one `UiOwner` lifecycle.

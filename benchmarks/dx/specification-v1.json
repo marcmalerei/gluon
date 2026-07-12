@@ -322,6 +322,70 @@
         "No Vue or React task result and no win, tie, loss, usability, or general DX-superiority claim is supported.",
         "The complete 20-project matrix is automated, but this record does not substitute for the epic's human usability pass."
       ]
+    },
+    {
+      "issue": 114,
+      "scope": "Application-owned UI installation, brand tokens, exact component styles, and teardown in the GLUON GOODS customer journey",
+      "taskIds": ["T2-themed-controls", "T3-local-layers", "T5-customer-flow", "T6-universal-route"],
+      "before": {
+        "setupCalls": {
+          "count": 3,
+          "values": [
+            "installUi(document, { theme: 'light' }) in the CSR entry",
+            "adoptStyles(document, shopStyles) in the CSR entry",
+            "installUi(document, { theme: 'light', hydrate: true }) in the hydration entry"
+          ]
+        },
+        "imports": {
+          "count": 3,
+          "values": ["installUi", "adoptStyles", "shopStyles"]
+        },
+        "configuration": {
+          "count": 3,
+          "values": ["typed initial theme option", "manual application-sheet adoption", "hydration boolean"]
+        },
+        "cleanup": {
+          "count": 1,
+          "values": ["UiOwner.dispose() only on hydration setup failure; CSR and successful hydration did not release the owner or app sheet"]
+        }
+      },
+      "after": {
+        "setupCalls": {
+          "count": 2,
+          "values": [
+            "createShopApplication(createWebHistory(), { styleTarget: document })",
+            "createShopApplication(undefined, { router, storeManager, storage: null, styleTarget: document, hydrateStyles: true })"
+          ]
+        },
+        "imports": {
+          "count": 1,
+          "values": ["createShopApplication is the only UI-ownership API used by the CSR and hydration entries"]
+        },
+        "configuration": {
+          "count": 2,
+          "values": ["typed styleTarget option", "typed hydrateStyles option for the hydration entry"]
+        },
+        "cleanup": {
+          "count": 1,
+          "values": ["app.unmount() disposes dialog focus scopes, UiOwner, GLUON GOODS token/layout sheets, and renderer-owned exact component sheets"]
+        }
+      },
+      "evidence": [
+        "examples/shop/src/app.ts",
+        "examples/shop/src/styles.ts",
+        "examples/shop/src/ui-extensions.ts",
+        "examples/shop/src/main.ts",
+        "examples/shop/src/hydrate.ts",
+        "tests/shop-example.spec.ts",
+        "tests/hydration.spec.ts",
+        "tests/memory-retention.spec.ts",
+        "scripts/validate-ui-contract.mjs"
+      ],
+      "limitations": [
+        "This is a Gluon-only before/after slice measurement, not a completed 21-result benchmark run.",
+        "No Vue or React task result and no win, tie, loss, usability, or general DX-superiority claim is supported.",
+        "The styleTarget and hydrateStyles options are application-specific ownership configuration, and the official framework-lane comparison still requires the complete issue #107 run."
+      ]
     }
   ],
   "measurements": [

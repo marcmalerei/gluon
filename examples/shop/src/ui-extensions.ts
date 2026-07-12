@@ -6,7 +6,7 @@ import {
   type ButtonProps,
 } from '@gluonjs/atoms';
 import { html, svg, type TemplateResult } from '@gluonjs/core';
-import { defineMolecule } from '@gluonjs/molecules';
+import { FormField, defineMolecule } from '@gluonjs/molecules';
 import { defineOrganism } from '@gluonjs/organisms';
 
 const checkoutLock = defineIcon({
@@ -20,6 +20,54 @@ const PurchaseButton = defineButtonPreset({
   class: ['primary-button', 'place-order', 'shop-purchase-button'],
   type: 'submit',
   attributes: { data: { checkoutAction: 'place-order' } },
+});
+
+export const ShopTextAction = defineButtonPreset({
+  displayName: 'ShopTextAction',
+  variant: 'ghost',
+  size: 'small',
+  class: 'text-action',
+});
+
+export const ShopIconAction = defineButtonPreset({
+  displayName: 'ShopIconAction',
+  variant: 'ghost',
+  size: 'small',
+  class: 'icon-button',
+});
+
+export const ShopMenuAction = defineButtonPreset({
+  displayName: 'ShopMenuAction',
+  variant: 'ghost',
+  class: 'menu-search-action',
+});
+
+export const ProductAddAction = defineButtonPreset({
+  displayName: 'ProductAddAction',
+  variant: 'primary',
+  size: 'large',
+  class: 'add-to-bag',
+});
+
+export const InventoryRetryAction = defineButtonPreset({
+  displayName: 'InventoryRetryAction',
+  variant: 'ghost',
+  size: 'small',
+  class: 'inventory-retry',
+});
+
+export const QuantityStepAction = defineButtonPreset({
+  displayName: 'QuantityStepAction',
+  variant: 'secondary',
+  size: 'small',
+  class: ['quantity-action', 'step'],
+});
+
+export const QuantityRemoveAction = defineButtonPreset({
+  displayName: 'QuantityRemoveAction',
+  variant: 'ghost',
+  size: 'small',
+  class: ['quantity-action', 'remove-line'],
 });
 
 export interface PurchaseActionProps extends Omit<ButtonProps, 'type'> {
@@ -37,6 +85,73 @@ export const PurchaseAction = defineMolecule(({
   ],
 }), 'PurchaseAction');
 
-export const PurchaseRegion = defineOrganism((props: PurchaseActionProps): TemplateResult => html`
-  <div class="checkout-purchase-region">${PurchaseAction(props)}</div>
-`, 'PurchaseRegion');
+export type CheckoutFieldName = 'email' | 'name' | 'address' | 'postalCode' | 'city';
+
+export interface CheckoutExperienceProps {
+  readonly values: Readonly<Record<CheckoutFieldName, string>>;
+  readonly totalLabel: string;
+  readonly summary: TemplateResult;
+  readonly onFieldInput: (name: CheckoutFieldName, value: string) => void;
+  readonly onSubmit: (event: Event) => void;
+}
+
+const checkoutFields = Object.freeze([
+  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
+  { name: 'name', label: 'Full name', type: 'text', autocomplete: 'name' },
+  { name: 'address', label: 'Address', type: 'text', autocomplete: 'street-address' },
+] as const);
+
+export const CheckoutExperience = defineOrganism((props: CheckoutExperienceProps): TemplateResult => html`
+  <section class="checkout-page" aria-labelledby="checkout-title">
+    <div>
+      <p class="eyebrow">Secure checkout</p>
+      <h1 id="checkout-title">Delivery details</h1>
+      <form class="checkout-delivery-form" @submit=${props.onSubmit}>
+        ${checkoutFields.map((field) => checkoutField(props, field))}
+        <div class="checkout-row">
+          ${checkoutField(props, {
+            name: 'postalCode',
+            label: 'Postal code',
+            type: 'text',
+            autocomplete: 'postal-code',
+          })}
+          ${checkoutField(props, {
+            name: 'city',
+            label: 'City',
+            type: 'text',
+            autocomplete: 'address-level2',
+          })}
+        </div>
+        ${PurchaseAction({ totalLabel: props.totalLabel })}
+      </form>
+    </div>
+    ${props.summary}
+  </section>
+`, 'CheckoutExperience');
+
+function checkoutField(
+  props: CheckoutExperienceProps,
+  field: {
+    readonly name: CheckoutFieldName;
+    readonly label: string;
+    readonly type: string;
+    readonly autocomplete: 'email' | 'name' | 'street-address' | 'postal-code' | 'address-level2';
+  },
+): TemplateResult {
+  return FormField({
+    label: field.label,
+    name: field.name,
+    type: field.type,
+    value: props.values[field.name],
+    onInput: (event) => props.onFieldInput(
+      field.name,
+      (event.currentTarget as HTMLInputElement).value,
+    ),
+    attributes: {
+      class: 'checkout-input',
+      required: true,
+      autocomplete: field.autocomplete,
+    },
+    fieldAttributes: { class: 'checkout-field' },
+  });
+}

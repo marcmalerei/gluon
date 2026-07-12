@@ -1,5 +1,6 @@
 import { access, readFile, readdir, rm } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
+import { gzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
 import { build } from 'vite';
 
@@ -184,4 +185,40 @@ execFileSync(process.execPath, [resolve(root, 'scripts/measure-component-styles.
   stdio: 'inherit',
 });
 
-console.log('UI contract valid: 4 optional packages, 15 typed extension entries, canonical DX T2 extensions, and exact production component chunks exclude unrelated UI markers');
+const shopAssets = resolve(root, 'examples/shop/dist/assets');
+const shopManifest = JSON.parse(await readFile(resolve(root, 'examples/shop/dist/gluon-assets.json'), 'utf8'));
+const shopInitialFiles = [shopManifest.entry, ...(shopManifest.imports ?? [])]
+  .map((path) => resolve(shopAssets, path.split('/').at(-1)));
+const shopInitialBuffers = await Promise.all(shopInitialFiles.map((path) => readFile(path)));
+const shopInitialSource = shopInitialBuffers.map((buffer) => buffer.toString('utf8')).join('\n');
+for (const marker of [
+  'gluon-button',
+  'gluon-icon',
+  'gluon-input',
+  'gluon-label',
+  'gluon-form-field',
+  'PurchaseAction',
+  'CheckoutExperience',
+]) {
+  if (!shopInitialSource.includes(marker)) {
+    throw new Error(`GLUON GOODS production entry is missing selected UI marker ${marker}.`);
+  }
+}
+for (const marker of [
+  'gluon-card',
+  'gluon-app-shell',
+  'gluon-atoms-components',
+  'gluon-molecules-components',
+  'gluon-organisms-components',
+]) {
+  if (shopInitialSource.includes(marker)) {
+    throw new Error(`GLUON GOODS production entry contains unused UI marker ${marker}.`);
+  }
+}
+const shopComposition = {
+  rawBytes: shopInitialBuffers.reduce((total, buffer) => total + buffer.byteLength, 0),
+  gzipBytes: shopInitialBuffers.reduce((total, buffer) => total + gzipSync(buffer, { level: 9 }).byteLength, 0),
+  files: shopInitialFiles.map((path) => path.split('/').at(-1)),
+};
+
+console.log(`UI contract valid: 4 optional packages, 15 typed extension entries, canonical DX T2 extensions, exact production component chunks exclude unrelated UI markers, GLUON GOODS ${JSON.stringify(shopComposition)}`);

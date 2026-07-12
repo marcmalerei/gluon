@@ -6,6 +6,7 @@ import {
   html,
   type TemplateValue,
 } from '@gluonjs/core';
+import { QuantityRemoveAction, QuantityStepAction } from './ui-extensions.js';
 
 const bagQuantityTag = 'gluon-bag-quantity';
 
@@ -63,12 +64,23 @@ function createBagQuantityControl() {
         },
         render: () => html`
           <div class="quantity-control" role="group" aria-label=${`Quantity for ${context.props.productName}`}>
-            <button class="step" type="button" aria-label="Decrease quantity" @click=${() => change(-1)}>−</button>
+            ${QuantityStepAction({
+              label: '−',
+              attributes: { aria: { label: 'Decrease quantity' } },
+              onClick: () => change(-1),
+            })}
             <output aria-live="polite">${optimisticQuantity.value}</output>
-            <button class="step" type="button" aria-label="Increase quantity" @click=${() => change(1)}>+</button>
-            <button class="remove-line" type="button" @click=${() => {
-              context.emit('remove', { lineKey: context.props.lineKey });
-            }}>Remove</button>
+            ${QuantityStepAction({
+              label: '+',
+              attributes: { aria: { label: 'Increase quantity' } },
+              onClick: () => change(1),
+            })}
+            ${QuantityRemoveAction({
+              label: 'Remove',
+              onClick: () => {
+                context.emit('remove', { lineKey: context.props.lineKey });
+              },
+            })}
           </div>
         `,
       };
