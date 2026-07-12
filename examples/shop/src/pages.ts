@@ -20,6 +20,7 @@ import {
   ProductRail,
   focusOpenedDialog,
 } from './components.js';
+import { PurchaseRegion } from './ui-extensions.js';
 
 export function HomePage(_store: ShopStore): TemplateValue {
   return html`
@@ -186,7 +187,7 @@ export function CheckoutPage(store: ShopStore): TemplateValue {
         }}>
           ${field('email', 'Email', 'email')}${field('name', 'Full name')}${field('address', 'Address')}
           <div class="checkout-row">${field('postalCode', 'Postal code')}${field('city', 'City')}</div>
-          <button class="primary-button place-order" type="submit">Place order — ${formatPrice(store.bagTotal)}</button>
+          ${PurchaseRegion({ totalLabel: formatPrice(store.bagTotal) })}
         </form>
       </div>
       <aside class="order-summary" aria-label="Order summary"><h2>Order summary</h2>

@@ -143,6 +143,15 @@ tokens, theme names, hydration scope, and `installUi()` SemVer behavior. Its
 published contents remain the existing root export, declarations, runtime,
 README, license, and changelog validated by the package contract.
 
+The public UI extension boundary comprises the `attributes`/ref types,
+`unsafeQuarkProps()` opt-out, Button preset and Icon definition APIs,
+application-owned classes, and the documented shared/component CSS custom
+properties. Official `.gluon-*` implementation classes are not public
+selectors. The exact stable-entry matrix is maintained in
+[`ui-extensibility.md`](../ui-extensibility.md); changes follow the same SemVer,
+changelog, declaration, package, and release validation rules as other public
+APIs.
+
 ## Public API boundary
 
 The following are public compatibility commitments once a package reaches a

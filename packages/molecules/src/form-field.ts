@@ -2,11 +2,13 @@ import { Input, Label, type InputProps } from '@gluonjs/atoms';
 import { defineMolecule, nothing, type TemplateResult } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
 
+type FormFieldAttributes = Omit<QuarkProps<HTMLLabelElement>, 'children'>;
+
 export interface FormFieldProps extends InputProps {
   readonly label: string;
   readonly helper?: string;
   readonly error?: string;
-  readonly fieldAttributes?: QuarkProps<HTMLLabelElement>;
+  readonly fieldAttributes?: FormFieldAttributes;
 }
 
 function renderFormField({

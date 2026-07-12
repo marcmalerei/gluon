@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest';
+import { atomStyles } from '@gluonjs/atoms';
 import { adoptStyles, html } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
@@ -11,7 +12,7 @@ import { shopStyles } from '../examples/shop/src/styles.js';
 test('releases repeated customer-flow apps, caches, listeners, refs, Router, and Store ownership', async () => {
   document.body.replaceChildren();
   localStorage.clear();
-  adoptStyles(document, shopStyles);
+  adoptStyles(document, atomStyles, shopStyles);
 
   for (let cycle = 0; cycle < 30; cycle += 1) {
     const { app, router, store } = createShopApplication(

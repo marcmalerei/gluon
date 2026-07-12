@@ -101,6 +101,11 @@ signals.
 The HTML parser establishes HTML, SVG, and MathML element namespaces. Dynamic
 qualified attributes additionally use the platform namespace APIs:
 
+`svg` tagged templates compile both complete `<svg>...</svg>` roots and
+rootless fragments such as `<path ...></path>` in the SVG namespace. HTML and
+SVG template plans use separate caches even when a caller supplies the same
+template-string identity to both tag functions.
+
 | Prefix | Namespace |
 | --- | --- |
 | `xlink:` | `http://www.w3.org/1999/xlink` |

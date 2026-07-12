@@ -56,6 +56,11 @@ function defineComponent<Props>(
   return render as Component<Props>;
 }
 
+/**
+ * Adds immutable `layer: 'atom'` and `displayName` metadata to a stateless
+ * render function. It does not add lifecycle, registration, styling, prop
+ * validation, accessibility semantics, state ownership, or cleanup.
+ */
 export function defineAtom<Props>(
   render: (props: Props) => TemplateResult,
   displayName?: string,
@@ -63,6 +68,11 @@ export function defineAtom<Props>(
   return defineComponent('atom', render, displayName);
 }
 
+/**
+ * Adds immutable `layer: 'molecule'` and `displayName` metadata to a stateless
+ * render function. It does not add lifecycle, registration, styling, prop
+ * validation, accessibility semantics, state ownership, or cleanup.
+ */
 export function defineMolecule<Props>(
   render: (props: Props) => TemplateResult,
   displayName?: string,
@@ -70,6 +80,11 @@ export function defineMolecule<Props>(
   return defineComponent('molecule', render, displayName);
 }
 
+/**
+ * Adds immutable `layer: 'organism'` and `displayName` metadata to a stateless
+ * render function. It does not add lifecycle, registration, styling, prop
+ * validation, accessibility semantics, state ownership, or cleanup.
+ */
 export function defineOrganism<Props>(
   render: (props: Props) => TemplateResult,
   displayName?: string,

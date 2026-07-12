@@ -1,9 +1,11 @@
 import { defineAtom, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
 
+type LabelAttributes = Omit<QuarkProps<HTMLSpanElement>, 'children'>;
+
 export interface LabelProps {
   readonly children: TemplateValue;
-  readonly attributes?: QuarkProps<HTMLSpanElement>;
+  readonly attributes?: LabelAttributes;
 }
 
 function renderLabel({ children, attributes = {} }: LabelProps): TemplateResult {

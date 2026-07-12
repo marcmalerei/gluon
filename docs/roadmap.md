@@ -316,7 +316,7 @@ and Playground as one public site. Issue #102 adds a derived, typechecked public
 import example to every generated symbol page and supports curated behavioral
 examples without allowing private or deep package paths.
 Issue #104 replaces the resulting compiler-contract placeholders with reviewed
-task-oriented examples for all 523 public symbol pages. The catalog gives every
+task-oriented examples for all 538 public symbol pages. The catalog gives every
 page a symbol-specific purpose statement and a compiled concrete scenario;
 shared recipes keep related application lifecycles coherent while the blocking
 gate rejects any new symbol without reviewed coverage.

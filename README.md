@@ -40,6 +40,8 @@
 - constructable `CSSStyleSheet` creation and `adoptedStyleSheets` adoption only
 - typed `q.<tag>()` Quark factories for `HTMLElementTagNameMap`
 - working Atom, Molecule, and Organism entry points
+- typed native extension props, app-owned Button presets, and custom Icon
+  definitions across the optional UI layers
 - TypeScript declarations, an ESM library build, and real-browser tests
 
 The repository includes a reproducible production comparison with Lit, Vue,
@@ -110,6 +112,10 @@ render(view('Gluon'), document.body);
 ```
 
 The second call updates the existing text part when the template shape is unchanged.
+
+The [typed UI extension contract](docs/ui-extensibility.md) defines the stable
+native-attribute/ref matrix, preset and custom-icon paths, application-owned
+style hooks, and the exact metadata-only boundary of the component helpers.
 
 ## Keyed lists
 

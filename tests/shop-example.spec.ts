@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { atomStyles } from '@gluonjs/atoms';
 import { adoptStyles } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { createMemoryHistory } from '@gluonjs/router';
@@ -11,7 +12,7 @@ describe('GLUON GOODS reference shop', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     localStorage.clear();
-    adoptStyles(document, shopStyles);
+    adoptStyles(document, atomStyles, shopStyles);
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {
@@ -99,6 +100,11 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/checkout');
     expect(root.querySelector('h1')?.textContent).toBe('Delivery details');
+    const purchase = root.querySelector<HTMLButtonElement>('[data-checkout-action="place-order"]')!;
+    expect(purchase.type).toBe('submit');
+    expect(purchase.classList.contains('shop-purchase-button')).toBe(true);
+    expect(purchase.querySelector('svg')?.getAttribute('role')).toBe('img');
+    expect(purchase.querySelector('svg')?.getAttribute('aria-label')).toBe('Secure checkout');
 
     for (const [name, value] of Object.entries({
       email: 'ada@example.com', name: 'Ada Lovelace', address: '1 Gluon Way', postalCode: '10115', city: 'Berlin',
@@ -107,7 +113,7 @@ describe('GLUON GOODS reference shop', () => {
       input.value = value;
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    root.querySelector<HTMLFormElement>('form')!.requestSubmit();
+    purchase.click();
     await settleShop();
     expect(router.currentRoute.value.path).toMatch(/^\/orders\/GG-/);
     expect(root.querySelector('.order-confirmation')?.textContent).toContain('ada@example.com');

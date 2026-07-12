@@ -45,6 +45,19 @@ source compatibility.
 - `Label` is visible label text. `FormField` places it inside a native label;
   standalone callers must compose it with a native labeling relationship.
 
+Every compatible Atom uses the named `attributes` extension contract. Use
+`defineButtonPreset()` for app-owned brand/danger classes and analytics/ref/data
+bindings while `ButtonVariant` and `ButtonSize` remain closed. Use
+`defineIcon()` plus `Icon({ icon })` for app-owned SVG geometry; Icon continues
+to own decorative/informative ARIA semantics. `defineIcon()` rejects empty
+metadata and bodies not created by Core's `svg` template tag. Official
+`.gluon-*` classes are
+implementation details. The public Button override properties are
+`--gluon-button-background`, `--gluon-button-color`, and
+`--gluon-button-border-color`; shared public tokens retain their documented
+`--gluon-*` names. See the
+[extension matrix](../../docs/ui-extensibility.md).
+
 Logical CSS properties support both text directions, and the maintained themes
 define light/dark contrast and focus tokens. `atomManifest` is the stable
 machine-readable inventory. All components appear in the compiled UI example

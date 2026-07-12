@@ -1,6 +1,6 @@
 import { hydrateApplication, hydrateRequestState, readHydrationState } from '@gluonjs/ssr/hydration';
 import { createStyleManifest } from '@gluonjs/ssr';
-import { installUi } from '@gluonjs/atoms';
+import { atomStyles, installUi } from '@gluonjs/atoms';
 import { createRouter, createWebHistory } from '@gluonjs/router';
 import { createStoreManager } from '@gluonjs/store';
 import { createShopApplication, createShopRoutes } from './app.js';
@@ -13,6 +13,7 @@ export async function hydrateShop(
   stateRoot: ParentNode = document,
 ) {
   const uiOwner = installUi(document, { theme: 'light', hydrate: true });
+  uiOwner.styleOwner.retain(atomStyles);
   const storeManager = createStoreManager();
   let router: ReturnType<typeof createRouter> | undefined;
   try {
