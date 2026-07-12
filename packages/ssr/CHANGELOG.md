@@ -11,3 +11,5 @@
   snapshot restoration, nested progressive boundaries, and abort propagation.
 - Added route-aware static output, mixed deployment manifests, resource hints,
   request-nonce style carriers, and transactional adopted-sheet handoff.
+- Added stable IDs and optional scopes for named Core stylesheet selections so
+  UI packages can share one server/browser selection contract.

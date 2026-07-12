@@ -12,6 +12,10 @@ native label association. An error sets the child input's `aria-invalid` state
 and exposes a visible `role="alert"`; helper text is visible supplementary copy.
 
 Styles use logical properties and the shared Atom token names. Adoption is
-explicit through Core `adoptStyles()`, with no import-time DOM mutation.
+explicit through Core `adoptStyles()`, with no import-time DOM mutation. Install
+the shared foundation and theme once through `installUi()` from
+`@gluonjs/atoms`; the aggregate `moleculeStyles` export remains the current
+compatibility path until #115 connects exact rendered component sheets to that
+owner.
 `moleculeManifest` records every stable component, its accessibility contract,
 interactive example, browser test, and visual-regression evidence.

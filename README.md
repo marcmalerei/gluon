@@ -80,27 +80,23 @@ before generation. See [the generator contract](packages/create-gluon/README.md)
 ```ts
 import {
   adoptStyles,
-  foundationStyles,
-  layerOrderStyles,
   render,
 } from '@gluonjs/core';
 import { q } from '@gluonjs/quarks';
-import { Button, atomStyles } from '@gluonjs/atoms';
+import { Button, atomStyles, installUi } from '@gluonjs/atoms';
 import { Card, moleculeStyles } from '@gluonjs/molecules';
 
-adoptStyles(
-  document,
-  layerOrderStyles,
-  foundationStyles,
-  atomStyles,
-  moleculeStyles,
-);
+const ui = installUi(document, { theme: 'light' });
+adoptStyles(document, atomStyles, moleculeStyles); // compatibility until #115
 
 render(Card({
   title: 'Hello Gluon',
   children: q.p({ children: 'Native elements, composed.' }),
   actions: Button({ label: 'Continue' }),
 }), document.body);
+
+ui.setTheme('dark');
+// Call ui.dispose() when this application owner is destroyed.
 ```
 
 The same renderer can be used directly:
@@ -491,8 +487,8 @@ The accepted browser matrix and the server-to-browser style handoff are defined
 by [ADR 0001](docs/adrs/0001-browser-runtime-and-style-transport.md). SSR may
 serialize marked initial style carriers inside Declarative Shadow DOM; after a
 successful hydration handoff, Gluon removes those carriers and the hydrated
-runtime again contains adopted stylesheets only. This contract is not yet
-implemented in the current browser-only prototype.
+runtime again contains adopted stylesheets only. The shared UI owner validates
+its named SSR carriers before consuming them.
 
 ## The system
 

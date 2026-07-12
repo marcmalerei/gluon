@@ -2,6 +2,7 @@ import {
   disposeGluonApplicationForServer,
   getBuiltinServerContract,
   getStyleSheetText,
+  getStyleTextDigest,
   getTemplateValueServerContract,
   isTemplateResult,
   nothing,
@@ -11,6 +12,7 @@ import {
   TemplateResult,
   type GluonApp,
   type GluonElementClass,
+  type StyleSheetSelection,
   type TemplateValue,
 } from '@gluonjs/core';
 import { effectScope, type EffectScope } from '@gluonjs/reactivity';
@@ -151,7 +153,7 @@ export interface SsrRequestOptions<Data = undefined> {
   readonly load?: (context: Omit<SsrRequestContext<Data>, 'data'>) => Promise<Data> | Data;
   readonly createApp: (context: SsrRequestContext<Data>) => GluonApp;
   readonly state?: Readonly<Record<string, unknown>>;
-  readonly styles?: readonly CSSStyleSheet[];
+  readonly styles?: StyleManifestSource;
   readonly nonce?: string;
   readonly assets?: AssetManifest;
 }
@@ -224,6 +226,7 @@ export interface StyleManifestEntry {
   readonly cssText: string;
   readonly digest: string;
   readonly order: number;
+  readonly scope?: string;
 }
 
 export interface StyleManifest {
@@ -238,11 +241,22 @@ export interface AssetManifest {
   readonly assets?: readonly string[];
 }
 
-export function createStyleManifest(sheets: readonly CSSStyleSheet[]): StyleManifest {
-  const entries = sheets.map((sheet, order) => {
-    const cssText = getStyleSheetText(sheet);
-    const digest = stableContentDigest(cssText);
-    return Object.freeze({ id: `gluon-${digest}`, cssText, digest, order });
+export type StyleManifestSource = readonly CSSStyleSheet[] | StyleSheetSelection;
+
+export function createStyleManifest(source: StyleManifestSource): StyleManifest {
+  const selected = isStyleSheetSelection(source)
+    ? source.entries
+    : source.map((sheet) => ({ sheet }));
+  const entries = selected.map((selectedEntry, order) => {
+    const cssText = getStyleSheetText(selectedEntry.sheet);
+    const digest = getStyleTextDigest(cssText);
+    return Object.freeze({
+      id: 'id' in selectedEntry ? selectedEntry.id : `gluon-${digest}`,
+      cssText,
+      digest,
+      order,
+      ...('scope' in selectedEntry && selectedEntry.scope ? { scope: selectedEntry.scope } : {}),
+    });
   });
   return Object.freeze({ version: 1 as const, entries: Object.freeze(entries) });
 }
@@ -253,7 +267,8 @@ export function renderStyleCarriers(
 ): string {
   return manifest.entries.map((entry) => {
     const nonce = options.nonce === undefined ? '' : ` nonce="${escapeAttribute(options.nonce)}"`;
-    return `<style data-gluon-style="${entry.id}" data-gluon-digest="${entry.digest}"${nonce}>${escapeStyleText(entry.cssText)}</style>`;
+    const scope = entry.scope === undefined ? '' : ` data-gluon-style-scope="${escapeAttribute(entry.scope)}"`;
+    return `<style data-gluon-style="${escapeAttribute(entry.id)}" data-gluon-digest="${entry.digest}"${scope}${nonce}>${escapeStyleText(entry.cssText)}</style>`;
   }).join('');
 }
 
@@ -602,13 +617,8 @@ function escapeStyleText(value: string): string {
   return value.replace(/<\/style/gi, '<\\/style');
 }
 
-function stableContentDigest(value: string): string {
-  let hash = 0x811c9dc5;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0');
+function isStyleSheetSelection(source: StyleManifestSource): source is StyleSheetSelection {
+  return 'version' in source && source.version === 1 && Array.isArray(source.entries);
 }
 
 function updateMarkupState(state: { inTag: boolean; quote: string }, chunk: string): void {

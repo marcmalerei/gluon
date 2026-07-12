@@ -32,6 +32,8 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - shared `@gluonjs/quarks` focus-scope ownership for search, menu, and bag dialogs
 - 44px minimum mobile action targets at 390px and 320px
 - constructable stylesheet-only design
+- one `installUi()` document owner shared by client mount and named SSR/hydration
+  selection, with the GLUON GOODS product sheet retained as application-owned
 - official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR
 - an isolated server-rendered deep-product response and browser hydration
   handoff through `@gluonjs/ssr`
@@ -40,9 +42,10 @@ Async UI is part of Core because it composes renderer Parts and application
 ownership directly. The shop now exposes `renderShopRequest(url)` through
 `src/server.ts`; it reuses the same route records, Store definition, page
 functions, async inventory boundary, and application shell without browser DOM
-globals. `src/hydrate.ts` restores the request Router and Store snapshots,
-retains matching nodes, adopts validated server style carriers, and activates
-the product flow. The product configurator owns its control DOM and
+globals. `src/hydrate.ts` first installs the shared UI owner and validates its
+four named carriers, then restores the request Router and Store snapshots,
+retains matching nodes, adopts the remaining product-owned carrier, and
+activates the product flow. The product configurator owns its control DOM and
 `productConfiguratorStyles` sheet; product, configuration, native events, and
 light-DOM slots form the host boundary. Server output retains the product title,
 inventory status, and facts as light DOM before the element upgrades.
@@ -132,7 +135,7 @@ device, or general framework-speed claims.
 `npm run measure:shop` performs a production build and reports raw and level-9
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
-is 158,152 bytes raw and 45,683 bytes gzip. The five WebP product/editorial assets total 155,126
+is 164,012 bytes raw and 47,686 bytes gzip. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results

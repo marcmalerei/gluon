@@ -12,6 +12,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
       '@gluonjs/quarks': resolve(repositoryRoot, 'packages/quarks/src/index.ts'),
+      '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),
       '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router/memory': resolve(repositoryRoot, 'packages/router/src/memory.ts'),
       '@gluonjs/router': resolve(repositoryRoot, 'packages/router/src/index.ts'),

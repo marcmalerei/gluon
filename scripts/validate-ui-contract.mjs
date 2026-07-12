@@ -4,9 +4,10 @@ import { build } from 'vite';
 
 const root = resolve(import.meta.dirname, '..');
 const output = resolve(root, '.tmp/core-without-ui');
+const ownerOutput = resolve(root, '.tmp/ui-owner-only');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
-  ['@gluonjs/atoms', ['Button', 'Icon', 'Input', 'Label', 'installUiTheme']],
+  ['@gluonjs/atoms', ['Button', 'Icon', 'Input', 'Label', 'installUi']],
   ['@gluonjs/molecules', ['Card', 'FormField']],
   ['@gluonjs/organisms', ['AppShell']],
 ]);
@@ -78,4 +79,35 @@ try {
   await rm(output, { force: true, recursive: true });
 }
 
-console.log('UI contract valid: 4 optional packages, 15 stable entries, core-only bundle excludes UI markers');
+try {
+  await build({
+    configFile: false,
+    logLevel: 'silent',
+    resolve: { alias: {
+      '@gluonjs/core': resolve(root, 'src/index.ts'),
+      '@gluonjs/quarks': resolve(root, 'packages/quarks/src/index.ts'),
+      '@gluonjs/atoms': resolve(root, 'packages/atoms/src/index.ts'),
+      '@gluonjs/reactivity': resolve(root, 'packages/reactivity/src/index.ts'),
+    } },
+    build: {
+      emptyOutDir: true,
+      minify: false,
+      outDir: ownerOutput,
+      rollupOptions: {
+        input: resolve(root, 'tests-fixtures/ui-owner-only/main.ts'),
+        output: { entryFileNames: 'ui-owner-only.js' },
+      },
+    },
+  });
+  const files = await readdir(ownerOutput);
+  const source = (await Promise.all(files
+    .filter((file) => file.endsWith('.js'))
+    .map((file) => readFile(resolve(ownerOutput, file), 'utf8')))).join('\n');
+  for (const marker of ['gluon-card', 'gluon-form-field', 'gluon-app-shell']) {
+    if (source.includes(marker)) throw new Error(`UI-owner-only bundle contains unselected marker ${marker}.`);
+  }
+} finally {
+  await rm(ownerOutput, { force: true, recursive: true });
+}
+
+console.log('UI contract valid: 4 optional packages, 15 stable entries, Core-only and UI-owner-only bundles exclude unselected UI markers');

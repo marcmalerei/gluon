@@ -47,6 +47,12 @@ progressive rendering. The shell contains fallbacks; resolved nested boundaries
 arrive as inert patch records or templates. An external `AbortSignal` cancels
 pending response work and reaches async sources.
 
+`createStyleManifest()` accepts either an ordered sheet array or Core's named
+`StyleSheetSelection`. Named entries retain their public ID and optional scope
+in the carrier, so `@gluonjs/atoms` can serialize
+`createUiStyleSelection(theme)` and validate the exact selection during browser
+installation without a second hand-maintained manifest.
+
 `@gluonjs/ssr/static` prerenders explicit route URLs and records dynamic
 fallbacks without rewriting components. `renderRequest()` can receive the Vite
 asset manifest, document styles, and a request nonce; its `head` contains
