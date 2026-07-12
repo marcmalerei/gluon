@@ -67,6 +67,14 @@ and imports both public entries. The analyzer has no
 browser-engine or GLUON GOODS route because it is Node developer tooling; the
 real Vue host and production configurator sources are its application evidence.
 
+`npm run check:vue-codemod-decision` validates the issue #92 no-go evidence:
+four versioned reports must still contain 17 files, 52 inventory records, and
+26 findings; every one of the 14 candidate classes must link retained input,
+an exact analyzer record, no-write expected output, and a semantic test or
+counterexample. The gate rejects any authorized generated, modified, or deleted
+file. It measures fixture syntax only and proves behavioral equivalence for no
+candidate class.
+
 ## Bundle budgets
 
 `quality-budgets.json` is the reviewed budget source. `npm run check:budgets`

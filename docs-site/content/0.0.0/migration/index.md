@@ -17,7 +17,10 @@ Supported automation starts after Gluon source exists:
   accepted by RFC 0003 and emits reports without executing or changing it.
 
 Only the report-only analyzer reads Vue source. It performs no semantic
-conversion. A Vue migration remains a manual redesign against Gluon's public
+conversion. The retained 14-class
+[codemod evaluation](./vue-codemod-decision/) records a source-writer no-go:
+syntax inventory established behavioral equivalence for `0/14` candidate
+classes. A Vue migration remains a manual redesign against Gluon's public
 contracts.
 
 [RFC 0003](https://github.com/marcmalerei/gluon/blob/main/docs/rfcs/0003-report-only-vue-migration-analyzer.md)

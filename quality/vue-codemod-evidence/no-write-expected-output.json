@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "decision": "no-go",
+  "generatedFiles": [],
+  "modifiedFiles": [],
+  "deletedFiles": [],
+  "sourcePreserved": true,
+  "candidateIds": [
+    "vue-imports",
+    "static-component-registration",
+    "props-emits-model",
+    "simple-template-bindings",
+    "native-custom-element-transport",
+    "stylesheet-extraction",
+    "router-store-boundaries",
+    "lifecycle",
+    "tests",
+    "async-components-suspense",
+    "dynamic-templates-macros-directives",
+    "plugins-runtime-registration",
+    "ssr-hydration",
+    "css-preprocessors-external-styles"
+  ]
+}

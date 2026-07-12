@@ -687,9 +687,11 @@ The CI artifacts retained for #91 include:
 - sentinel assertions proving no source/config/plugin execution;
 - clean-install package, public type, CLI, and pack-content evidence.
 
-Issue #92 may evaluate a source transformation only against this retained
-corpus. Analyzer detection coverage is not behavioral equivalence, and no
-result generalizes to arbitrary Vue projects.
+Issue #92 evaluated source transformations only against this retained corpus.
+The resulting [no-go decision](../vue-codemod-decision.md) found behavioral
+equivalence for `0/14` candidate classes and proposed no writer RFC. Analyzer
+detection coverage is not behavioral equivalence, and no result generalizes to
+arbitrary Vue projects.
 
 ## SemVer and support policy
 
@@ -759,8 +761,8 @@ inventory is the accepted boundary.
 
 ### Add a writer behind an experimental flag
 
-An experimental flag still writes source and would bypass the evidence and RFC
-gate required by #92. No writer exists in this package contract.
+An experimental flag still writes source and would bypass RFC 0003 plus the
+completed #92 no-go decision. No writer exists in this package contract.
 
 ## Acceptance checklist
 
