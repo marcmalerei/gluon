@@ -258,7 +258,16 @@ function mergeHydrationSelections(
   explicit: StyleSheetSelection | undefined,
   components: StyleSheetSelection,
 ): StyleSheetSelection {
-  const entries = [...(explicit?.entries ?? []), ...components.entries];
+  const explicitEntries = [...(explicit?.entries ?? [])];
+  const insertAfter = explicitEntries.reduce(
+    (last, entry, index) => entry.scope === 'gluon-ui' ? index : last,
+    -1,
+  ) + 1;
+  const entries = [
+    ...explicitEntries.slice(0, insertAfter),
+    ...components.entries,
+    ...explicitEntries.slice(insertAfter),
+  ];
   const ids = new Set<string>();
   return createStyleSheetSelection(entries.filter((entry) => {
     if (ids.has(entry.id)) return false;

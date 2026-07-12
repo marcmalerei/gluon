@@ -11,6 +11,10 @@
   preserving the same starter routes and rendered anchors.
 - Generate UI starters that rely on renderer-owned exact Button styles without
   importing or adopting the deprecated aggregate Atom sheet.
+- Generate complete UI applications with one shared UI/theme owner, a separate
+  app-token owner, a typed reactive and accessible Button consumer, computed
+  style assertions, compatible token/consumer HMR evidence, and SSR hydration
+  that retains DOM without duplicate sheet adoption or recovery.
 - Add the interactive and flag-stable `add-component` workflow for app-local
   Atoms, Atom-composed Molecules, downward Organisms, `defineGluonElement`
   Custom Elements, and headless wrappers.

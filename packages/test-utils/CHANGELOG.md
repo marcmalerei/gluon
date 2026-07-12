@@ -10,3 +10,6 @@
   and public scheduler settling controls.
 - Functional Custom Element fixtures retain inferred properties/exposed methods
   and verify setup cleanup through ordinary mount ownership.
+- The maintained UI starter now uses a Playwright-backed application test for
+  accessible reactive behavior, computed styling, exact-sheet cleanup, and the
+  public SSR hydration boundary.

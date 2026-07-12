@@ -81,6 +81,17 @@ after `npm run build:create-gluon`. Stable automation uses `--yes` and any of
 Store; explicit `--ssr --no-router` and `--ssr --no-store` combinations fail
 before generation. See [the generator contract](packages/create-gluon/README.md).
 
+The non-interactive UI path generates a complete themed, reactive application
+with app-owned tokens, exact Button styles, computed-style browser evidence,
+and deterministic owner cleanup:
+
+```bash
+npm create gluon@latest my-app -- --yes --ui --testing
+```
+
+Adding `--ssr` selects the maintained Router + Store universal starter and its
+identity-preserving shared/exact/application stylesheet hydration regression.
+
 Existing projects can run `create-gluon add-component` interactively or use
 stable `--kind`, `--root`, `--path`, `--tag`, and `--dry-run` flags. Generated
 file collisions require both `--overwrite` and the separate

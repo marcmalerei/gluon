@@ -89,6 +89,13 @@ hydration assertions use `hydrateTemplate()` or `hydrateApplication()` from the
 public `@gluonjs/ssr/hydration` entry point; this package does not emulate
 marker, mismatch, or recovery behavior privately.
 
+`create-gluon --ui --testing` generates a complete application-level Chromium
+test rather than an isolated markup sample. It mounts the real starter owner,
+queries the native Button by its app-owned data attribute, checks its accessible
+name and computed styles, drives the reactive click update, and verifies exact
+sheet cleanup. The UI + SSR selection adds the public hydration path and asserts
+retained DOM with no recovery.
+
 ## Verification
 
 - `npm run test:test-utils:coverage`

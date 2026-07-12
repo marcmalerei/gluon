@@ -22,3 +22,6 @@
 - Typed native `attributes` contracts, app-owned `defineButtonPreset()` brand
   extensions, `defineIcon()` custom geometry, protected accessibility
   semantics, and documented Button CSS custom properties.
+- The maintained `create-gluon --ui` starter now demonstrates one shared owner,
+  app-owned token mapping, exact Button sheet retention, native attributes,
+  reactive state, computed styles, and deterministic cleanup.
