@@ -1,13 +1,21 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PassThrough } from 'node:stream';
 import { describe, expect, test } from 'vitest';
+import { transformGluonModule } from '@gluonjs/compiler';
+import { analyzeGluonProject } from '@gluonjs/language-server';
 import {
+  AddComponentError,
+  addComponent,
+  addComponentHelpText,
+  componentKindHelpText,
   ScaffoldError,
   helpText,
   normalizeFeatures,
+  parseAddComponentArguments,
   parseCliArguments,
+  planComponent,
   runCli,
   scaffoldProject,
 } from '../packages/create-gluon/src/index.js';
@@ -196,4 +204,210 @@ test('runCli rejects empty and invalid interactive answers', async () => {
     prompt: { question: async () => answers.shift() ?? '', close() {} },
   })).rejects
     .toThrow('CLI_ANSWER_INVALID');
+});
+
+describe('create-gluon add-component arguments', () => {
+  test('parses the stable non-interactive component flags', () => {
+    expect(parseAddComponentArguments([
+      'PurchaseAction', '--kind', 'molecule', '--root', 'app', '--path', 'src/ui',
+      '--tag', 'app-purchase', '--dry-run', '--overwrite', '--confirm-overwrite', '--yes',
+    ])).toEqual({
+      kind: 'molecule',
+      name: 'PurchaseAction',
+      root: 'app',
+      path: 'src/ui',
+      tagName: 'app-purchase',
+      yes: true,
+      dryRun: true,
+      overwrite: true,
+      confirmOverwrite: true,
+      help: false,
+    });
+  });
+
+  test('rejects unsupported kinds, missing values, and incomplete overwrite intent', () => {
+    expect(() => parseAddComponentArguments(['Thing', '--kind', 'page'])).toThrow('INVALID_COMPONENT_KIND');
+    expect(() => parseAddComponentArguments(['Thing', '--kind'])).toThrow('CLI_ARGUMENT_MISSING');
+    expect(() => parseAddComponentArguments(['Thing', '--unknown'])).toThrow('CLI_ARGUMENT_UNKNOWN');
+    expect(() => parseAddComponentArguments(['One', 'Two'])).toThrow('CLI_ARGUMENT_EXTRA');
+    expect(() => parseAddComponentArguments(['Thing', '--confirm-overwrite'])).toThrow('OVERWRITE_NOT_CONFIRMED');
+  });
+});
+
+describe('create-gluon add-component planning and writes', () => {
+  test('prints a complete dry-run plan without mutating the project', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-dry-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+    const originalManifest = await readFile(join(project.directory, 'package.json'), 'utf8');
+    const result = await planComponent({
+      root: project.directory,
+      kind: 'atom',
+      name: 'PurchaseAction',
+      dryRun: true,
+    });
+    expect(result.operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'package.json', action: 'update' }),
+      expect.objectContaining({ path: 'src/components/index.ts', action: 'create' }),
+      expect.objectContaining({ path: 'src/components/purchase-action.ts', action: 'create' }),
+      expect.objectContaining({ path: 'src/components/purchase-action.spec.ts', action: 'create' }),
+      expect.objectContaining({ path: 'vitest.config.ts', action: 'create' }),
+    ]));
+    await expect(readFile(join(project.directory, 'src/components/purchase-action.ts'))).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(await readFile(join(project.directory, 'package.json'), 'utf8')).toBe(originalManifest);
+  });
+
+  test('generates every supported kind with public imports, tests, and deterministic exports', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-kinds-'));
+    const expectations = [
+      ['atom', 'PrimitiveAction', "from '@gluonjs/atoms'", 'createStyleSheetSelection'],
+      ['molecule', 'DeliveryPanel', "from '@gluonjs/molecules'", "from '@gluonjs/atoms'"],
+      ['organism', 'CheckoutRegion', "from '@gluonjs/organisms'", "from '@gluonjs/molecules'"],
+      ['element', 'AccountControl', 'defineGluonElement', 'context.onCleanup'],
+      ['headless', 'ModalFocus', 'createFocusScope', 'caller owns markup'],
+    ] as const;
+    for (const [kind, name, sourceMarker, ownershipMarker] of expectations) {
+      const project = await scaffoldProject({ directory: kind, cwd });
+      const result = await addComponent({ root: project.directory, kind, name });
+      const slug = result.operations.find(({ path }) => path.endsWith('.ts') && !path.endsWith('.spec.ts') && path !== 'src/components/index.ts')!.path.split('/').at(-1)!.replace('.ts', '');
+      const source = await readFile(join(project.directory, `src/components/${slug}.ts`), 'utf8');
+      const testSource = await readFile(join(project.directory, `src/components/${slug}.spec.ts`), 'utf8');
+      const barrel = await readFile(join(project.directory, 'src/components/index.ts'), 'utf8');
+      expect(source).toContain(sourceMarker);
+      expect(source).toContain(ownershipMarker);
+      expect(source).not.toContain('/src/');
+      expect(testSource).toContain("from '@gluonjs/test-utils'");
+      expect(barrel).toContain(`export * from './${slug}.js';`);
+      const manifest = JSON.parse(await readFile(join(project.directory, 'package.json'), 'utf8'));
+      expect(manifest.scripts['test:components']).toBe('vitest run src/components');
+      expect(manifest.devDependencies).toMatchObject({
+        '@gluonjs/test-utils': '0.0.0',
+        '@vitest/browser-playwright': '^4.0.18',
+        playwright: '^1.58.2',
+        vitest: '^4.0.18',
+      });
+    }
+    const elementUsage = await readFile(join(cwd, 'element/src/components/account-control.usage.html'), 'utf8');
+    expect(elementUsage).toContain('<app-account-control label="Continue">');
+    expect(elementUsage).toContain("addEventListener('activate'");
+  });
+
+  test('emits HMR-transformable and language-tooling-visible public component contracts', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-tooling-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+    await addComponent({ root: project.directory, kind: 'atom', name: 'SaveAction' });
+    await addComponent({
+      root: project.directory,
+      kind: 'element',
+      name: 'AccountControl',
+      tagName: 'app-account-control',
+    });
+    const atom = await readFile(join(project.directory, 'src/components/save-action.ts'), 'utf8');
+    const element = await readFile(join(project.directory, 'src/components/account-control.ts'), 'utf8');
+    const atomTransform = transformGluonModule(atom, '/app/save-action.ts', { development: true });
+    const elementTransform = transformGluonModule(element, '/app/account-control.ts', { development: true });
+    expect(atomTransform.diagnostics).toEqual([]);
+    expect(atomTransform.code).toContain('__gluonHmrComponent');
+    expect(atomTransform.code).toContain('__gluonHmrStyle');
+    expect(elementTransform.diagnostics).toEqual([]);
+    expect(elementTransform.code).toContain('__gluonHmrFunctionalElement');
+    const analyses = analyzeGluonProject([
+      { uri: '/app/save-action.ts', text: atom },
+      { uri: '/app/account-control.ts', text: element },
+    ]);
+    expect(analyses.flatMap(({ diagnostics }) => diagnostics)).toEqual([]);
+    expect(analyses.flatMap(({ declarations }) => declarations)).toContainEqual(expect.objectContaining({
+      tagName: 'app-account-control',
+      props: ['label', 'disabled', 'metadata'],
+      events: ['activate'],
+      slots: ['default', 'help'],
+    }));
+  });
+
+  test('sorts only its marked barrel region and preserves application-owned exports', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-barrel-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+    await mkdir(join(project.directory, 'src/components'), { recursive: true });
+    await writeFile(join(project.directory, 'src/components/index.ts'), "export { Existing } from './existing.js';\n");
+    await addComponent({ root: project.directory, kind: 'atom', name: 'ZuluAction' });
+    await addComponent({ root: project.directory, kind: 'headless', name: 'AlphaFocus' });
+    const barrel = await readFile(join(project.directory, 'src/components/index.ts'), 'utf8');
+    expect(barrel.startsWith("export { Existing } from './existing.js';")).toBe(true);
+    expect(barrel.indexOf("./alpha-focus.js")).toBeLessThan(barrel.indexOf("./zulu-action.js"));
+    expect(barrel.match(/create-gluon:add-component:exports/g)).toHaveLength(2);
+  });
+
+  test('requires separate overwrite intent and confirmation for generated collisions', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-overwrite-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+    await addComponent({ root: project.directory, kind: 'atom', name: 'SaveAction' });
+    const target = join(project.directory, 'src/components/save-action.ts');
+    await writeFile(target, 'application-owned content\n');
+    await expect(addComponent({ root: project.directory, kind: 'atom', name: 'SaveAction' }))
+      .rejects.toMatchObject({ code: 'FILE_COLLISION' });
+    await expect(addComponent({ root: project.directory, kind: 'atom', name: 'SaveAction', overwrite: true }))
+      .rejects.toMatchObject({ code: 'OVERWRITE_NOT_CONFIRMED' });
+    await addComponent({
+      root: project.directory,
+      kind: 'atom',
+      name: 'SaveAction',
+      overwrite: true,
+      confirmOverwrite: true,
+    });
+    expect(await readFile(target, 'utf8')).toContain('defineAtom');
+  });
+
+  test('rejects names, traversal, absolute paths, invalid tags, and symlink escapes before writes', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-safety-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+    const invalid = [
+      addComponent({ root: project.directory, kind: 'atom', name: 'bad-name' }),
+      addComponent({ root: project.directory, kind: 'atom', name: 'ValidName', path: '../outside' }),
+      addComponent({ root: project.directory, kind: 'atom', name: 'ValidName', path: join(cwd, 'absolute') }),
+      addComponent({ root: project.directory, kind: 'element', name: 'ValidName', tagName: 'Invalid' }),
+      addComponent({ root: project.directory, kind: 'element', name: 'ValidName', tagName: 'annotation-xml' }),
+    ];
+    for (const promise of invalid) await expect(promise).rejects.toBeInstanceOf(AddComponentError);
+    const outside = join(cwd, 'outside');
+    await mkdir(outside);
+    await symlink(outside, join(project.directory, 'src/components'));
+    await expect(addComponent({ root: project.directory, kind: 'atom', name: 'SafeAction' }))
+      .rejects.toMatchObject({ code: 'SYMLINK_ESCAPE' });
+    await expect(readFile(join(outside, 'safe-action.ts'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  test('fails invalid manifests before creating component paths', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-invalid-'));
+    const project = await scaffoldProject({ directory: 'app', cwd });
+    await writeFile(join(project.directory, 'package.json'), '{invalid');
+    await expect(addComponent({ root: project.directory, kind: 'atom', name: 'SafeAction' }))
+      .rejects.toMatchObject({ code: 'INVALID_PROJECT_MANIFEST' });
+    await expect(readFile(join(project.directory, 'src/components/safe-action.ts'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+});
+
+test('runCli documents and executes interactive and dry-run add-component flows', async () => {
+  const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-component-cli-'));
+  const project = await scaffoldProject({ directory: 'app', cwd });
+  const output = new PassThrough();
+  let written = '';
+  output.on('data', (chunk) => { written += chunk.toString(); });
+  await runCli(['add-component', '--help'], { output });
+  expect(written).toContain(addComponentHelpText);
+  expect(written).toContain(componentKindHelpText);
+
+  written = '';
+  const dryRun = await runCli([
+    'add-component', 'OrderPanel', '--kind', 'molecule', '--root', project.directory, '--dry-run', '--yes',
+  ], { output });
+  expect(dryRun).toMatchObject({ kind: 'molecule', name: 'OrderPanel', dryRun: true });
+  expect(written).toContain('No files were written.');
+
+  written = '';
+  const answers = ['headless', 'DialogFocus'];
+  const interactive = await runCli(['add-component', '--root', project.directory], {
+    output,
+    prompt: { question: async () => answers.shift() ?? '', close() {} },
+  });
+  expect(interactive).toMatchObject({ kind: 'headless', name: 'DialogFocus' });
+  expect(written).toContain('behavior-only wrapper');
 });

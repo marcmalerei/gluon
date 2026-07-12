@@ -3,6 +3,37 @@
 `create-gluon` scaffolds supported TypeScript applications that consume only
 public Gluon package entry points.
 
+It also adds verified app-local UI boundaries to an existing generated or
+compatible strict-TypeScript project:
+
+```sh
+create-gluon add-component PurchaseAction --kind molecule --yes
+create-gluon add-component AccountControl --kind element --tag app-account-control --yes
+create-gluon add-component DialogFocus --kind headless --dry-run --yes
+```
+
+Run `create-gluon add-component` without `--yes` for the ownership-guided
+interactive prompt. Stable kinds are `atom`, `molecule`, `organism`, `element`,
+and `headless`. `--root` selects the project, while `--path` selects a safe
+relative component directory. `--dry-run` reports every planned source, test,
+barrel, manifest, and test-config mutation without writing.
+
+Names are PascalCase and paths must remain project-relative. Absolute paths,
+traversal, symbolic-link segments, invalid Custom Element tags, malformed
+manifests, and collisions fail during planning. A generated source or test is
+replaced only when both `--overwrite` and the separate
+`--confirm-overwrite` flag are present; interactive runs ask the second
+confirmation directly. Managed `package.json` fields and the marked barrel
+region are deterministic application integrations, not template overwrites.
+
+Visual kinds export a constructable sheet, an SSR/hydration selection, and a
+target-scoped style-owner helper. Stateful elements use `defineGluonElement`,
+own their ShadowRoot sheet and connection cleanup, publish typed properties and
+native events, and include a standalone HTML example. Every kind includes a
+strict Playwright-backed browser test using `@gluonjs/test-utils`. Generated
+imports use public entry points and preserve Quark → Atom → Molecule → Organism
+dependency direction.
+
 Every generated project includes `src/quantity-control.ts`, a strict public-API
 `defineGluonElement` example with typed local state, a cancelable event, slots,
 validation, and form participation. The generated README shows its plain-HTML
@@ -38,6 +69,12 @@ fixture verification generates all 20 combinations. Each fixture is installed,
 typechecked, tested, and built against packed workspace artifacts. UI fixtures
 install packed `@gluonjs/quarks` and `@gluonjs/atoms` archives rather than
 resolving unpublished workspace versions from the registry.
+
+The blocking component matrix separately generates all five kinds into clean
+universal starters, then installs, typechecks, template-checks, runs their
+browser tests, builds client and SSR entries, and verifies `npm pack --dry-run`.
+See [the component-generator contract](../../docs/component-generator.md) for
+the exact ownership and integration evidence.
 
 ## License
 

@@ -72,7 +72,7 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-All 560 current symbol pages require a reviewed entry in
+All 575 current symbol pages require a reviewed entry in
 `docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
 and either an inline scenario or a maintained package recipe that uses the
 documented symbol. The scenarios cover concrete inputs and observable results,
@@ -133,6 +133,28 @@ an exact analyzer record, no-write expected output, and a semantic test or
 counterexample. The gate rejects any authorized generated, modified, or deleted
 file. It measures fixture syntax only and proves behavioral equivalence for no
 candidate class.
+
+## Component-generation gate
+
+`npm run check:create-gluon-fixtures` retains the existing 20-project feature
+matrix and a separate five-kind add-component matrix. Each component project is
+a clean Router + Store + testing + UI + SSR starter using packed workspace
+artifacts. The gate generates exactly one Atom, Molecule, Organism, stateful
+Custom Element, or headless wrapper, then installs, typechecks, runs
+`gluon-template-check`, executes the generated Chromium browser test, builds
+client and SSR entries, and runs `npm pack --dry-run --json`.
+
+`npm run test:create-gluon` separately covers deterministic planning, dry-run
+non-mutation, public imports, dependency direction, barrel sorting, malformed
+manifests, name/path/tag validation, traversal and absolute paths, symbolic-link
+escapes, collision refusal, two-part overwrite confirmation, compiler/Vite HMR
+transforms, and language-service declaration discovery. The filesystem writer
+stages same-directory temporary files and restores already-applied targets if a
+commit step fails.
+
+The optional `--components-only` validator argument is a development shortcut
+for the five generated projects. The blocking repository command uses no
+shortcut and therefore runs both matrices.
 
 ## Developer-experience benchmark contract gate
 
