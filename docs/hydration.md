@@ -21,6 +21,28 @@ await hydrateRequestState(state, router, store);
 const { mount, hydration } = await hydrateApplication(app, container);
 ```
 
+For the optional UI packages, create the server style input and browser owner
+from the same public theme value:
+
+```ts
+// server
+import { createUiStyleSelection } from '@gluonjs/atoms';
+const response = await renderRequest({
+  url,
+  createApp,
+  styles: createUiStyleSelection('dark'),
+});
+
+// browser, before application hydration
+import { installUi } from '@gluonjs/atoms';
+const ui = installUi(document, { theme: 'dark', hydrate: true });
+```
+
+No separate UI manifest is maintained. `installUi()` validates the four named
+`gluon-ui` carriers and removes only those carriers after it has adopted its
+target-local sheets. The returned owner must live as long as the application
+and be disposed with it.
+
 The handoff validates the parsed DOM before mutation. A matching root is adopted
 as renderer state, event listeners and refs are installed, and the first
 application render records reactive dependencies without reapplying the DOM.
@@ -41,6 +63,9 @@ Diagnostics use stable categories and codes:
 | structure | `GLUON_HYDRATION_STRUCTURE_MISMATCH` | Node count, type, element name, namespace, and marker ranges |
 | state | `GLUON_HYDRATION_STATE_MISMATCH` | Caller-supplied server/client snapshots |
 | style | `GLUON_HYDRATION_STYLE_MISMATCH` | Inline style attributes; SSR carrier failures use `GLUON_UNSUPPORTED_SSR_TRANSPORT` before DOM hydration |
+
+UI selection carriers additionally use `GLUON_UI_HYDRATION_MISMATCH` with the
+typed reason `missing`, `duplicate`, `reordered`, or `mismatched`.
 
 Each record includes the DOM/state path, expected and actual values, chosen
 recovery, and suppression status. Default recovery replaces the complete root

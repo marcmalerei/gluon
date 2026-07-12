@@ -363,7 +363,11 @@ are defined in
 [ADR 0001](adrs/0001-browser-runtime-and-style-transport.md). The current source
 implements only the client-side constructed-sheet portion of that contract.
 
-Gluon does not create or inject `<style>` elements. `css` creates a `CSSStyleSheet`; `adoptStyles` and `unadoptStyles` manage `adoptedStyleSheets` while preserving unrelated sheets.
+Gluon does not create or inject browser-runtime `<style>` elements. `css`
+creates a `CSSStyleSheet`; `adoptStyles` and `unadoptStyles` manage
+`adoptedStyleSheets` while preserving unrelated sheets. `createStyleSheetOwner`
+adds target-local reference counting: each handle releases only sheets it
+retained, and a sheet that predated the first handle remains adopted.
 
 This is a deliberate browser baseline. A browser without constructable and adopted stylesheet support receives a descriptive error.
 
@@ -391,7 +395,19 @@ They have no host, state instance, or lifecycle of their own. Stateful and
 publicly interoperable components use `GluonElement`; their render methods may
 compose any of these functional layers.
 
-Layer styles are exported as constructable sheets and must be adopted explicitly. This avoids import-time DOM mutation and keeps application stylesheet ownership visible.
+`@gluonjs/atoms` owns the optional UI installation boundary because dependency
+direction already points from Atoms to Core. `installUi()` creates no new
+package edge: one call retains Core's layer order and foundation plus Atom-owned
+tokens and one target-local active theme sheet. Its returned `UiOwner` exposes
+typed theme switching, idempotent disposal, and a separate target-scoped
+`styleOwner` for exact rendered component dependencies. Core never imports an
+optional UI package.
+
+The active theme sheet keeps one identity while its CSS text changes. Each
+Document or ShadowRoot receives its own instance, so theme state is not a
+process singleton. Named `StyleSheetSelection` entries carry the same four
+sheets through SSR. The aggregate category sheets remain a compatibility path;
+#115 owns usage-driven Atom, Molecule, and Organism selection.
 
 ## Report-only Vue migration analyzer
 

@@ -11,6 +11,12 @@ public source for `GLUON_*` codes, accounts for the generated hydration family,
 including the browser Playground, requires catalog coverage, and compares the
 committed versioned JSON byte for byte with the built public package.
 
+`GLUON_UI_HYDRATION_MISMATCH` (`G1207`) owns scoped UI selection failures. Its
+typed runtime reason distinguishes missing, duplicate, reordered, and content
+or digest mismatches; the catalog remediation requires the same
+`createUiStyleSelection()` theme on the server and `installUi(..., { hydrate:
+true })` in the browser.
+
 ## Vue migration analyzer diagnostics
 
 The separate Node-only `@gluonjs/vue-migration-analyzer` package owns `GVA`

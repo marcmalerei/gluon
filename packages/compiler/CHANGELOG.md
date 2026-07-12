@@ -8,3 +8,5 @@
   stable reference URLs under `@gluonjs/compiler/diagnostics`.
 - Recognize aliased `compose()` tagged bodies as original-source HTML template
   boundaries without rewriting production output.
+- Added `GLUON_UI_HYDRATION_MISMATCH` (`G1207`) for missing, duplicate,
+  reordered, or content-mismatched scoped UI carrier evidence.

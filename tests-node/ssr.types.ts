@@ -44,6 +44,10 @@ const request: Promise<SsrRequestResult> = renderRequest<{ path: string }>({
 void request;
 serializeSsrState({ ready: true });
 createStyleManifest([]);
+createStyleManifest({
+  version: 1,
+  entries: [{ id: 'app', scope: 'example', sheet: new CSSStyleSheet() }],
+});
 void generateStaticSite({
   routes: ['/'],
   outputDirectory: 'dist-static',
