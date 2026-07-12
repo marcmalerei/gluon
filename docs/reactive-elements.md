@@ -30,6 +30,53 @@ class CounterElement extends GluonElement {
 defineElement('gluon-counter', CounterElement);
 ```
 
+`defineGluonElement()` lowers concise setup-based authoring to the same class,
+ShadowRoot, scheduler, lifecycle, event, form, SSR, hydration, HMR, Devtools,
+and test-utility contract:
+
+```ts
+import { defineGluonElement, elementEvent, elementProperty, html } from '@gluonjs/core';
+
+defineGluonElement({
+  tagName: 'shop-quantity',
+  formAssociated: true,
+  properties: {
+    product: elementProperty<{ id: string; price: number }>({ type: Object, required: true }),
+    value: { type: Number, reflect: true, default: 1 },
+  },
+  events: { change: elementEvent<{ value: number }>({ cancelable: true }) },
+  slots: { default: { required: true }, help: { fallback: true } },
+  setup(context) {
+    const value = context.state('value', context.props.value);
+    const total = context.computed(() => value.value * context.props.product.price);
+    context.onUpdated(() => context.form.setValue(String(value.value)));
+    context.onCleanup(() => releaseListener());
+    return {
+      expose: { focus: () => context.host.shadowRoot?.querySelector('button')?.focus() },
+      render: () => html`<slot></slot><button>${value.value}</button><output>${total.value}</output><slot name="help"></slot>`,
+    };
+  },
+});
+```
+
+Primitive declarations infer from constructors/defaults.
+`elementProperty<Value>()` carries a structured input type and
+`elementEvent<Detail>()` carries native event detail; no duplicate element
+interface or instance `declare` fields are needed. Setup runs synchronously once
+per connected lifetime in a child effect scope. Explicitly keyed `state()` and
+`reactiveState()` values survive reconnects; derived effects, watchers,
+callbacks, and `onCleanup()` work are connection-owned. Lifecycle or form
+registration after setup throws. The compiler reports detectable deferred
+registration and listener/interval creation with no cleanup owner.
+`context.props` is a readonly reactive view of the element's native declared
+properties: every accepted property or reflected-attribute change invalidates
+that view, so `watch(() => context.props.value, ...)` observes the same writes
+that schedule the host render.
+
+The complete timing, stop order, error, context, form, universal-rendering,
+HMR, and standalone behavior is specified by
+[RFC 0005](rfcs/0005-functional-custom-element-authoring.md).
+
 Only reactive properties and collection operations read during the current
 `update()`/`render()` execution become dependencies. Dependencies are rebuilt
 on every run, so a value that is no longer read after a conditional branch

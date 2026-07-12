@@ -40,6 +40,12 @@ listeners. `emitted(name)` records the original browser events. Cleanup removes
 the test-owned listeners and unmounts the application before removing its
 generated container.
 
+The same helper consumes constructors registered through
+`defineGluonElement()`. Its `properties` type includes inferred structured and
+primitive inputs, while exposed setup methods remain callable on
+`fixture.element`; disconnecting the fixture stops setup watchers and runs
+`onCleanup()` through the ordinary element lifecycle.
+
 Tests query rendered output through native black-box selectors:
 
 - `query(selector)` returns an element or `null`;

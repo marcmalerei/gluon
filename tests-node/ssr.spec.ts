@@ -13,7 +13,9 @@ import {
   compose,
   css,
   defineElement,
+  defineGluonElement,
   directive,
+  elementProperty,
   event,
   html,
   inject,
@@ -39,6 +41,11 @@ import {
 import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
 import { renderShopRequest } from '../examples/shop/src/server.js';
+import { ClassQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-class.js';
+import { FunctionalQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-functional.js';
+import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-control/react.js';
+import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
+import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('serializes composed functional templates through the unchanged public template contract', async () => {
@@ -194,6 +201,92 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       protected override render() { return html`No tag`; }
     }
     expect(() => renderElement(Unregistered)).toThrow('must be registered');
+  });
+
+  it('renders functional GluonElement definitions with request-owned setup cleanup', async () => {
+    const connected = vi.fn();
+    const cleanup = vi.fn();
+    const FunctionalGreeting = defineGluonElement({
+      tagName: 'server-functional-greeting',
+      properties: {
+        person: elementProperty<{ name: string }>({ type: Object, required: true }),
+      },
+      setup(context) {
+        const punctuation = context.state('punctuation', '!');
+        const greeting = context.computed(() => `Hello ${context.props.person.name}${punctuation.value}`);
+        context.onConnected(connected);
+        context.onCleanup(cleanup);
+        return { render: () => html`<p>${greeting.value}</p><slot></slot>` };
+      },
+    });
+    const rendered = await renderToString(renderElement(FunctionalGreeting, {
+      properties: { person: { name: 'Ada' } },
+      children: html`<span>Light DOM</span>`,
+    }));
+    expect(withoutHydrationMarkers(rendered)).toBe(
+      '<server-functional-greeting person="[object Object]">'
+      + '<template shadowrootmode="open"><p>Hello Ada!</p><slot></slot></template>'
+      + '<span>Light DOM</span></server-functional-greeting>',
+    );
+    expect(connected).not.toHaveBeenCalled();
+    expect(cleanup).toHaveBeenCalledOnce();
+  });
+
+  it('retains equivalent stateful form-control server output for Gluon, Vue, and React', async () => {
+    const children = html`Orbit Lamp<span slot="help">Choose one to five.</span>`;
+    for (const definition of [ClassQuantityControl, FunctionalQuantityControl]) {
+      const rendered = withoutHydrationMarkers(await renderToString(renderElement(definition, {
+        properties: { product, value: 2, required: true },
+        children,
+      })));
+      expect(rendered).toContain('<template shadowrootmode="open">');
+      expect(rendered).toContain('<output aria-live="polite">2</output>');
+      expect(rendered).toContain('<strong>Total €498.00</strong>');
+      expect(rendered).toContain('<slot name="help">Choose a quantity.</slot>');
+      expect(rendered).toContain('<span slot="help">Choose one to five.</span>');
+    }
+
+    const vue = await renderVueQuantityShadow(product, 2);
+    const react = renderReactQuantityShadow(product, 2);
+    for (const output of [vue, react]) {
+      const rendered = output.replaceAll('<!-- -->', '');
+      expect(rendered).toContain('<output aria-live="polite">2</output>');
+      expect(rendered).toContain('<strong>Total €498.00</strong>');
+      expect(rendered).toContain('<slot name="help">Choose a quantity.</slot>');
+    }
+  });
+
+  it('streams and statically generates the retained functional quantity-control path', async () => {
+    const functionalControl = () => renderElement(FunctionalQuantityControl, {
+      properties: { product, value: 2, required: true },
+      children: html`Orbit Lamp<span slot="help">Choose one to five.</span>`,
+    });
+    const streamed = withoutHydrationMarkers(await new Response(renderToReadableStream(functionalControl())).text());
+    expect(streamed).toContain('<dx-functional-quantity');
+    expect(streamed).toContain('<output aria-live="polite">2</output>');
+    expect(streamed).toContain('<strong>Total €498.00</strong>');
+
+    const output = await mkdtemp(join(tmpdir(), 'gluon-functional-control-static-'));
+    try {
+      const assets = { entry: '/assets/app.js' };
+      const generated = await generateStaticSite({
+        routes: ['/quantity'],
+        outputDirectory: output,
+        assets,
+        render: (url) => renderRequest({
+          url,
+          assets,
+          createApp: () => createApp(() => html`${functionalControl()}`),
+        }),
+      });
+      expect(generated.pages).toHaveLength(1);
+      const staticHtml = withoutHydrationMarkers(await readFile(join(output, 'quantity/index.html'), 'utf8'));
+      expect(staticHtml).toContain('<dx-functional-quantity');
+      expect(staticHtml).toContain('<output aria-live="polite">2</output>');
+      expect(staticHtml).toContain('<strong>Total €498.00</strong>');
+    } finally {
+      await rm(output, { recursive: true, force: true });
+    }
   });
 });
 

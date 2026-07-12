@@ -3,6 +3,11 @@
 `create-gluon` scaffolds supported TypeScript applications that consume only
 public Gluon package entry points.
 
+Every generated project includes `src/quantity-control.ts`, a strict public-API
+`defineGluonElement` example with typed local state, a cancelable event, slots,
+validation, and form participation. The generated README shows its plain-HTML
+tag and import boundary.
+
 ```sh
 npm create gluon@latest my-app -- --router --store --testing
 ```

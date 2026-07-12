@@ -9,3 +9,5 @@
   constructable stylesheet HMR without full page reloads.
 - Preserve `compose()` template locations and the existing compatible
   functional-component HMR identity through the compiler integration.
+- Added functional Custom Element setup refresh that preserves registered host,
+  explicit local/form state, ShadowRoot, and stylesheet identities.

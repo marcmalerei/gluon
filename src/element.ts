@@ -151,6 +151,7 @@ const definedElementNames = new WeakMap<GluonElementClass, `${string}-${string}`
 const serverElementDefinitions = new Map<`${string}-${string}`, GluonElementClass>();
 const propertyValues = Symbol('gluon.property-values');
 const setProperty = Symbol('gluon.set-property');
+export const functionalElementPropertyChanged = Symbol('gluon.functional-element-property-changed');
 const publicInstance = Symbol('gluon.public-instance');
 let elementUpdateSequence = 0;
 
@@ -256,9 +257,13 @@ export abstract class GluonElement<
       try {
         suspendRender(this.renderRoot);
       } finally {
-        this.invokeLifecycle(this.disconnectedHooks);
-        this.connectionRendered = false;
-        this.applicationContext = undefined;
+        try {
+          this.invokeLifecycle(this.disconnectedHooks);
+        } finally {
+          this.teardownConnection();
+          this.connectionRendered = false;
+          this.applicationContext = undefined;
+        }
       }
     }
   }
@@ -341,6 +346,12 @@ export abstract class GluonElement<
     this.errorBoundaries.push(callback);
   }
 
+  /** Initializes resources owned by the current connection effect scope. */
+  protected setupConnection(): void {}
+
+  /** Releases connection-local references after scoped cleanup and disconnect hooks. */
+  protected teardownConnection(): void {}
+
   protected expose<Public extends object>(value: Public): Readonly<Public> {
     const exposed = Object.freeze(value);
     this[publicInstance] = exposed;
@@ -395,6 +406,10 @@ export abstract class GluonElement<
     if (!hasChanged(value, oldValue)) return;
 
     this[propertyValues].set(name, value);
+    const functionalObserver = (this as GluonElement<Events> & {
+      [functionalElementPropertyChanged]?: (property: string) => void;
+    })[functionalElementPropertyChanged];
+    functionalObserver?.call(this, name);
     if (reflect && declaration.reflect && this.connected) {
       this.reflectProperty(name, value, declaration);
     }
@@ -415,6 +430,17 @@ export abstract class GluonElement<
         ? { onError: (errorContext: ReactivityErrorContext) => this.reportReactiveError(errorContext) }
         : {}),
     });
+    try {
+      scope.run(() => this.runOwned(() => this.setupConnection()));
+    } catch (error) {
+      try {
+        scope.stop();
+      } finally {
+        this.teardownConnection();
+      }
+      this.handleComponentError(error, 'lifecycle');
+      return;
+    }
     const runner = scope.run(() => effect(
       () => scope.run(() => this.performUpdate()),
       {
@@ -961,10 +987,37 @@ function getHotUpdateIncompatibility(
   if (hotPropertySchema(current) !== hotPropertySchema(next)) {
     return 'the public property or attribute schema changed';
   }
+  if (hotEventSchema(current) !== hotEventSchema(next)) {
+    return 'the public event schema changed';
+  }
+  if (hotSlotSchema(current) !== hotSlotSchema(next)) {
+    return 'the public slot schema changed';
+  }
   if (normalizeStyleList(current.styles).length !== normalizeStyleList(next.styles).length) {
     return 'the number of adopted component stylesheets changed';
   }
   return undefined;
+}
+
+function hotEventSchema(constructor: GluonElementConstructor): string {
+  return JSON.stringify(Object.entries(getEventDeclarations(constructor))
+    .map(([name, declaration]) => [
+      name,
+      declaration?.bubbles ?? true,
+      declaration?.composed ?? true,
+      declaration?.cancelable ?? false,
+    ])
+    .sort(([left], [right]) => String(left).localeCompare(String(right))));
+}
+
+function hotSlotSchema(constructor: GluonElementConstructor): string {
+  return JSON.stringify(Object.entries(getSlotDeclarations(constructor))
+    .map(([name, declaration]) => [
+      name,
+      declaration?.required ?? false,
+      declaration?.fallback ?? false,
+    ])
+    .sort(([left], [right]) => String(left).localeCompare(String(right))));
 }
 
 function hotPropertySchema(constructor: GluonElementConstructor): string {

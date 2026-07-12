@@ -72,6 +72,36 @@ describe('Gluon template analysis', () => {
     expect(result.diagnostics.every((entry) => entry.range.start.line === 2)).toBe(true);
   });
 
+  test('derives the public contract from a functional element definition', () => {
+    const source = `
+      import { defineGluonElement, html } from '@gluonjs/core';
+      defineGluonElement({
+        tagName: 'shop-quantity',
+        properties: { value: Number, product: Object },
+        events: { change: { cancelable: true } },
+        slots: { default: { required: true }, help: { fallback: true } },
+        setup: () => ({ render: () => html\`<slot></slot><slot name="help"></slot>\` }),
+      });
+      html\`<shop-quantity .value=\${1} .missing=\${1} @change=\${() => {}} @missing=\${() => {}}><span slot="help">Valid</span><span slot="shipping">Invalid</span></shop-quantity>\`;
+    `;
+    const result = analyzeGluonDocument('file:///quantity.ts', source);
+    expect(result.declarations[0]).toMatchObject({
+      tagName: 'shop-quantity',
+      props: ['value', 'product'],
+      events: ['change'],
+      slots: ['default', 'help'],
+    });
+    expect(result.diagnostics.map((entry) => entry.code)).toEqual(expect.arrayContaining([
+      'GLUON_TEMPLATE_EVENT_UNKNOWN',
+      'GLUON_TEMPLATE_PROP_UNKNOWN',
+      'GLUON_TEMPLATE_SLOT_UNKNOWN',
+    ]));
+    expect(result.diagnostics).toHaveLength(3);
+    const slotDiagnostic = result.diagnostics.find((entry) => entry.code === 'GLUON_TEMPLATE_SLOT_UNKNOWN');
+    expect(slotDiagnostic?.range.start.line).toBe(9);
+    expect(slotDiagnostic && textForRange(source, slotDiagnostic.range)).toBe('shipping');
+  });
+
   test('accepts public Custom Elements Manifest metadata', () => {
     const declarations = declarationsFromCustomElementsManifest('file:///custom-elements.json', {
       modules: [{ declarations: [{
@@ -90,6 +120,19 @@ describe('Gluon template analysis', () => {
     );
     expect(analysis.diagnostics).toEqual([]);
     expect(declarationsFromCustomElementsManifest('file:///invalid.json', null)).toEqual([]);
+  });
+
+  test('checks only direct literal light-DOM assignments against the owning element', () => {
+    const result = analyzeGluonDocument('file:///slots.ts', `
+      import { defineGluonElement, html } from '@gluonjs/core';
+      defineGluonElement({
+        tagName: 'slot-owner',
+        slots: { help: { fallback: true } },
+        setup: () => ({ render: () => html\`<slot name="help"></slot>\` }),
+      });
+      html\`<slot-owner><span slot="help">Valid</span><div><span slot="nested">Not assigned to the host</span></div></slot-owner>\`;
+    `);
+    expect(result.diagnostics).toEqual([]);
   });
 });
 
@@ -197,4 +240,9 @@ describe('Gluon LSP protocol', () => {
 function positionFor(text: string, offset: number) {
   const before = text.slice(0, offset).split('\n');
   return { line: before.length - 1, character: before.at(-1)!.length };
+}
+
+function textForRange(text: string, range: { start: { line: number; character: number }; end: { line: number; character: number } }): string {
+  const line = text.split('\n')[range.start.line] ?? '';
+  return line.slice(range.start.character, range.end.character);
 }

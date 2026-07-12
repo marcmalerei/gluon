@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { GluonElement, compose, defineElement, html, render, type TemplateValue } from '../src/index.js';
+import {
+  GluonElement,
+  compose,
+  defineElement,
+  defineGluonElement,
+  html,
+  render,
+  type TemplateValue,
+} from '../src/index.js';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   GLUON_DEVTOOLS_GLOBAL,
@@ -109,14 +117,27 @@ describe('Gluon Devtools browser bridge', () => {
     await nextTick();
     signal.value = 1;
     await nextTick();
+    const FunctionalCounter = defineGluonElement({
+      tagName: 'devtools-functional-counter',
+      properties: { count: { type: Number, default: 0 } },
+      setup: (context) => ({ render: () => html`<output>${context.props.count}</output>` }),
+    });
+    const functional = document.createElement('devtools-functional-counter') as InstanceType<typeof FunctionalCounter>;
+    functional.count = 3;
+    root.append(functional);
+    await nextTick();
     const snapshot = bridge.snapshot();
     expect(snapshot.applications[0]?.components[0]).toMatchObject({
       name: 'devtools-debug-counter', properties: { count: 2 }, stylesheets: 0,
     });
+    expect(snapshot.applications[0]?.components.find(({ name }) => name === 'devtools-functional-counter')).toMatchObject({
+      name: 'devtools-functional-counter', properties: { count: 3 }, stylesheets: 0,
+    });
     const renders = snapshot.timeline.filter((entry) => entry.kind === 'render');
     expect(renders.length).toBeGreaterThanOrEqual(1);
-    expect(renders.at(-1)?.payload).toMatchObject({ component: 'devtools-debug-counter' });
-    const causes = renders.flatMap((render) => (render.payload as any).causes);
+    expect(renders.some((render) => (render.payload as any).component === 'devtools-functional-counter')).toBe(true);
+    const debugRenders = renders.filter((render) => (render.payload as any).component === 'devtools-debug-counter');
+    const causes = debugRenders.flatMap((render) => (render.payload as any).causes);
     expect(causes).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: 'property', name: 'count' }),
       expect.objectContaining({ type: 'reactive' }),

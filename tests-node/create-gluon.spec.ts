@@ -62,6 +62,7 @@ describe('create-gluon scaffolding', () => {
     const result = await scaffoldProject({ directory: 'starter', cwd });
     const manifest = JSON.parse(await readFile(join(result.directory, 'package.json'), 'utf8'));
     const app = await readFile(join(result.directory, 'src/app.ts'), 'utf8');
+    const quantityControl = await readFile(join(result.directory, 'src/quantity-control.ts'), 'utf8');
     expect(result.features).toEqual({
       router: false,
       store: false,
@@ -73,6 +74,9 @@ describe('create-gluon scaffolding', () => {
     expect(manifest.scripts).toMatchObject({ test: 'npm run typecheck', build: 'vite build' });
     expect(app).toContain("from '@gluonjs/core'");
     expect(app).not.toContain('/src/');
+    expect(quantityControl).toContain('defineGluonElement');
+    expect(quantityControl).toContain('formAssociated: true');
+    expect(quantityControl).toContain("elementEvent<{ quantity: number }>({ cancelable: true })");
   });
 
   test('writes the universal testing and UI surfaces', async () => {

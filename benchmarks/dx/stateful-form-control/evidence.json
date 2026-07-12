@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "1.0.0",
+  "fixtureVersion": "1.0.0",
+  "recordedAt": "2026-07-12",
+  "task": "T4-stateful-control",
+  "requirements": [
+    "typed structured product input",
+    "local and computed quantity state",
+    "cancelable quantity-change event",
+    "default and named content",
+    "validation, focus, cleanup, and form participation",
+    "server rendering, readable-stream serialization, static generation, and retained hydration",
+    "plain HTML consumption"
+  ],
+  "versions": {
+    "vue": "3.5.39",
+    "@vue/server-renderer": "3.5.39",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "frameworks": {
+    "gluon-class": {
+      "fixture": "gluon-class.ts",
+      "authoredLines": 105,
+      "componentLines": 83,
+      "boundaryLines": 22,
+      "duplicatePublicDeclarations": 3,
+      "concepts": ["GluonElement class", "static properties/events/slots", "declared instance properties", "ElementInternals", "lifecycle callbacks", "constructable stylesheet"]
+    },
+    "gluon-functional": {
+      "fixture": "gluon-functional.ts",
+      "authoredLines": 77,
+      "componentLines": 66,
+      "boundaryLines": 11,
+      "duplicatePublicDeclarations": 0,
+      "concepts": ["defineGluonElement", "elementProperty/elementEvent inference", "setup context", "keyed state", "computed/watch", "owned cleanup", "form context", "constructable stylesheet"]
+    },
+    "vue": {
+      "fixture": "vue.ts",
+      "authoredLines": 125,
+      "componentLines": 27,
+      "boundaryLines": 98,
+      "duplicatePublicDeclarations": 2,
+      "concepts": ["defineComponent", "ref/computed/watch", "onUnmounted", "render function", "autonomous Custom Element bridge", "ElementInternals", "createApp/createSSRApp", "constructable stylesheet"]
+    },
+    "react": {
+      "fixture": "react.tsx",
+      "authoredLines": 120,
+      "componentLines": 20,
+      "boundaryLines": 100,
+      "duplicatePublicDeclarations": 2,
+      "concepts": ["function component", "useState/useMemo/useEffect", "JSX", "autonomous Custom Element bridge", "ElementInternals", "createRoot/hydrateRoot", "constructable stylesheet"]
+    }
+  },
+  "diagnostics": {
+    "gluon": [
+      { "failure": "invalid functional tag name", "tool": "@gluonjs/compiler", "evidence": "tests-node/compiler-vite.spec.ts:128" },
+      { "failure": "unowned side effect without cleanup", "tool": "@gluonjs/compiler", "evidence": "tests-node/compiler-vite.spec.ts:128" },
+      { "failure": "deferred lifecycle registration", "tool": "@gluonjs/compiler", "evidence": "tests-node/compiler-vite.spec.ts:128" },
+      { "failure": "invalid property or event use", "tool": "@gluonjs/language-server", "evidence": "tests-node/language-server.spec.ts:75" },
+      { "failure": "unknown named light-DOM slot", "tool": "@gluonjs/language-server and gluon-template-check", "evidence": "benchmarks/dx/stateful-form-control/invalid-contracts.tsx" }
+    ],
+    "vue": [
+      { "failure": "invalid typed view prop", "tool": "TypeScript", "evidence": "benchmarks/dx/stateful-form-control/tsconfig.json" },
+      { "failure": "missing cleanup ownership", "tool": "none observed in the retained fixture checks", "evidence": "npm run check:stateful-control-comparison" }
+    ],
+    "react": [
+      { "failure": "invalid typed view prop", "tool": "TypeScript", "evidence": "benchmarks/dx/stateful-form-control/tsconfig.json" },
+      { "failure": "missing cleanup ownership", "tool": "none observed in the retained fixture checks", "evidence": "npm run check:stateful-control-comparison" }
+    ]
+  },
+  "cleanupEvidence": [
+    "tests/dx-stateful-form-control.spec.ts records class disconnect, functional owner cleanup, Vue onUnmounted, and React useEffect disposal after host removal",
+    "tests/functional-element.spec.ts verifies functional setup cleanup",
+    "tests/memory-retention.spec.ts verifies 30 functional connect/disconnect cleanup cycles"
+  ],
+  "findings": [
+    "The functional Gluon fixture removes 28 non-empty authored lines and all three repeated instance property declarations relative to the retained Gluon class fixture.",
+    "The complete autonomous-control fixtures contain 77 non-empty authored lines for functional Gluon, 125 for Vue, and 120 for React.",
+    "The framework-local view sections contain 66 non-empty lines for functional Gluon, 27 for Vue, and 20 for React; Vue and React are more concise on this narrower component-only measure.",
+    "The React TSX lane requires the root TypeScript jsx=react-jsx compiler option; the Gluon and Vue TypeScript fixtures do not consume that transform.",
+    "Vue and React require retained autonomous Custom Element, ElementInternals, SSR-hydration, and cleanup bridge code to satisfy the same plain-HTML and form-control boundary.",
+    "All four retained controls pass the same browser behavior assertions; all four produce retained server markup for the same quantity and computed total.",
+    "The functional Gluon comparator path is retained through readable-stream serialization and static-site generation."
+  ],
+  "verifiedGluonDisadvantages": [
+    {
+      "id": "component-only-authored-lines",
+      "fact": "The functional Gluon component section is 39 lines longer than Vue's view section and 46 lines longer than React's view section.",
+      "scope": "Framework-local view code only; excludes the Vue and React autonomous Custom Element bridges."
+    },
+    {
+      "id": "global-custom-element-registration",
+      "fact": "Both Gluon fixtures register a hyphenated autonomous Custom Element name in the global CustomElementRegistry; the retained Vue and React view components do not require that registry until their plain-HTML bridges are added.",
+      "scope": "Local component reuse before applying the required plain-HTML boundary."
+    }
+  ],
+  "limitations": [
+    "This is an implementation-slice fixture, not a completed benchmark run.",
+    "It does not contain all 21 framework-task results required by the parent schema.",
+    "No human usability pass was run; no readability, win, tie, loss, usability, or general DX-superiority claim is supported.",
+    "The authored-line measures exclude blank lines and the two DX range marker comments; they do not measure maintenance time or cognitive effort."
+  ]
+}

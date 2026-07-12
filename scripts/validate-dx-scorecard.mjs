@@ -79,11 +79,19 @@ for (const name of evidenceNames) {
   }
   if (evidence.status === 'implementation-slice-only') {
     assert(evidence.specification === 'benchmarks/dx/specification-v1.json', `${name} must link the accepted specification`);
-    assert(evidence.trackingIssue === 111, `${name} must identify issue #111`);
-    assert(evidence.applicableTask === 'T3-local-layers', `${name} must identify the applicable parent task`);
     assert(evidence.frameworks.length === 4, `${name} must retain current Gluon, compose Gluon, React, and Vue fixtures`);
-    assertSet(evidence.frameworks.map(({ id }) => id), ['gluon-current', 'gluon-compose', 'react', 'vue'], `${name} slice frameworks`);
-    assert(evidence.frameworks.find(({ id }) => id === 'gluon-compose').callSiteChildrenProperties === 0, `${name} must retain the children-plumbing result`);
+    if (evidence.trackingIssue === 111) {
+      assert(evidence.applicableTask === 'T3-local-layers', `${name} must identify the applicable parent task`);
+      assertSet(evidence.frameworks.map(({ id }) => id), ['gluon-current', 'gluon-compose', 'react', 'vue'], `${name} slice frameworks`);
+      assert(evidence.frameworks.find(({ id }) => id === 'gluon-compose').callSiteChildrenProperties === 0, `${name} must retain the children-plumbing result`);
+    } else if (evidence.trackingIssue === 112) {
+      assert(evidence.applicableTask === 'T4-stateful-control', `${name} must identify the applicable parent task`);
+      assertSet(evidence.frameworks.map(({ id }) => id), ['gluon-class', 'gluon-functional', 'react', 'vue'], `${name} slice frameworks`);
+      assert(evidence.frameworks.find(({ id }) => id === 'gluon-functional').duplicatePublicDeclarations === 0, `${name} must retain the inferred-declaration result`);
+      assert(typeof evidence.rawEvidence === 'string', `${name} must link its raw evidence`);
+    } else {
+      assert(false, `${name} identifies an unsupported implementation slice`);
+    }
     assert(evidence.limitations.some((value) => value.includes('not a completed benchmark run')), `${name} must not imply a completed run`);
     assert(evidence.limitations.some((value) => value.includes('No human usability pass')), `${name} must report the missing human pass`);
     assert(evidence.limitations.some((value) => value.includes('win, tie, loss')), `${name} must prohibit unsupported comparison claims`);
