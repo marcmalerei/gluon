@@ -18,3 +18,9 @@ is prohibited; the aggregate `organismStyles` export is the compatibility path
 until #115 connects exact rendered component sheets to the UI owner.
 `organismManifest` records the stable contract, compiled interactive example,
 browser coverage, and visual-regression evidence.
+
+`AppShell.attributes` extends its outer native div while its landmark children
+remain owned by explicit props. App-local Organisms use the public
+`defineOrganism()` metadata helper; it adds no lifecycle, registration,
+styling, validation, or cleanup behavior. See the complete
+[extension contract](../../docs/ui-extensibility.md).

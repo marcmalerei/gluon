@@ -392,14 +392,18 @@ describe('@gluonjs/ssr static output and style transport', () => {
       assets: ['/assets/orbit.webp'],
     };
     const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
-    expect(response.styles.entries).toHaveLength(5);
+    expect(response.styles.entries).toHaveLength(6);
     expect(response.styles.entries.map((entry) => entry.id)).toEqual([
       'gluon-ui-layer-order',
       'gluon-ui-foundation',
       'gluon-ui-tokens',
       'gluon-ui-theme',
+      'gluon-atoms-components',
       'gluon-goods',
     ]);
+    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(response.styles.entries[4]?.cssText).toContain('.gluon-button');
+    expect(response.styles.entries[5]?.cssText).toContain('.checkout-page');
     expect(response.head).toContain('data-gluon-style="gluon-ui-layer-order"');
     expect(response.head).toContain('nonce="request-nonce"');
     expect(response.head).toContain('rel="modulepreload" href="/assets/vendor.js"');

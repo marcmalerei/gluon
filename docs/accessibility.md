@@ -13,6 +13,12 @@ focus return, native labels, and mobile navigation.
 Quark, Atom, Molecule, and Organism composition. It also verifies focus-scope
 entry, Tab containment, focus return, listbox keyboard selection, dialog naming,
 validation alerts, and manifest evidence links in every browser engine lane.
+`tests/ui-extensibility.spec.ts` additionally verifies that extension refs,
+events, ARIA/data, class/style merging, theme rendering, keyboard activation,
+cleanup, Button presets, and custom Icon semantics preserve those contracts.
+Component-owned role, naming, disabled, children, and validation bindings are
+excluded from the corresponding `attributes` type and remain explicit props;
+the complete matrix is in [`ui-extensibility.md`](ui-extensibility.md).
 
 Automated rules cannot establish reading order quality, useful announcements,
 zoom usability, speech output, or whether a keyboard sequence is understandable.

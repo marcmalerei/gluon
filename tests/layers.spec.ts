@@ -24,6 +24,19 @@ describe('component layers', () => {
     expect(Card.layer).toBe('molecule');
     expect(FormField.layer).toBe('molecule');
     expect(AppShell.layer).toBe('organism');
+    for (const component of [Button, Card, AppShell]) {
+      expect(Object.keys(component)).toEqual(['layer', 'displayName']);
+      expect(Object.getOwnPropertyDescriptor(component, 'layer')).toMatchObject({
+        configurable: false,
+        enumerable: true,
+        writable: false,
+      });
+      expect(Object.getOwnPropertyDescriptor(component, 'displayName')).toMatchObject({
+        configurable: false,
+        enumerable: true,
+        writable: false,
+      });
+    }
   });
 
   it('composes every layer and styles it only through adopted stylesheets', () => {

@@ -19,3 +19,9 @@ compatibility path until #115 connects exact rendered component sheets to that
 owner.
 `moleculeManifest` records every stable component, its accessibility contract,
 interactive example, browser test, and visual-regression evidence.
+
+`Card.attributes` extends its native article. `FormField.attributes` extends
+the composed Input and `FormField.fieldAttributes` extends the outer native
+label. Both exclude owned children so callers cannot silently replace baseline
+composition. App-local Molecules use the public `defineMolecule()` metadata
+helper described in the [extension contract](../../docs/ui-extensibility.md).

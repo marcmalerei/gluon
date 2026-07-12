@@ -10,6 +10,11 @@ const focusableSelector = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+type ContentAttributes<ElementType extends HTMLElement> = Omit<
+  QuarkProps<ElementType>,
+  'children'
+>;
+
 export interface FocusScopeOptions {
   readonly initialFocus?: string | HTMLElement | (() => HTMLElement | null);
   readonly returnFocus?: HTMLElement | null;
@@ -94,27 +99,45 @@ function resolveInitialFocus(
 export interface OverlayProps {
   readonly children: TemplateValue;
   readonly onDismiss?: () => void;
-  readonly attributes?: QuarkProps<HTMLDivElement>;
+  readonly attributes?: ContentAttributes<HTMLDivElement>;
 }
 
 export function Overlay({ children, onDismiss, attributes = {} }: OverlayProps): TemplateResult {
-  const attributePointerDown = attributes.onPointerDown as EventListenerOrEventListenerObject | null | undefined;
-  return q.div(mergeProps({
+  const { onPointerDown: attributePointerDown, ...nativeAttributes } = attributes;
+  const merged = mergeProps({
     class: { gluon: true, quark: true, 'gluon-overlay': true },
     data: { gluonOverlay: true },
-    onPointerDown: ((event: PointerEvent) => {
+    children,
+  }, nativeAttributes);
+  Object.assign(merged, {
+    onPointerDown: (event: PointerEvent): void => {
       callEventListener(attributePointerDown, event);
       if (!event.defaultPrevented && event.target === event.currentTarget) onDismiss?.();
-    }) as EventListener,
-    children,
-  }, attributes));
+    },
+  });
+  return q.div(merged as QuarkProps<HTMLDivElement>);
 }
 
 interface DialogCommonProps {
   readonly children: TemplateValue;
   readonly modal?: boolean;
   readonly onDismiss?: () => void;
-  readonly attributes?: QuarkProps<HTMLDivElement>;
+  readonly attributes?: Omit<ContentAttributes<HTMLDivElement>,
+    | 'role'
+    | '.role'
+    | 'aria'
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-modal'
+    | 'ariaLabel'
+    | '.ariaLabel'
+    | 'ariaLabelledBy'
+    | '.ariaLabelledBy'
+    | 'ariaModal'
+    | '.ariaModal'
+  > & {
+    readonly aria?: Omit<NonNullable<QuarkProps<HTMLDivElement>['aria']>, 'label' | 'labelledby' | 'modal'>;
+  };
 }
 
 export type DialogProps = DialogCommonProps & (
@@ -153,7 +176,7 @@ export interface PopoverProps {
   readonly id: string;
   readonly children: TemplateValue;
   readonly mode?: 'auto' | 'manual';
-  readonly attributes?: QuarkProps<HTMLDivElement>;
+  readonly attributes?: Omit<ContentAttributes<HTMLDivElement>, 'id' | '.id' | 'popover' | '.popover'>;
 }
 
 export function Popover({ id, children, mode = 'auto', attributes = {} }: PopoverProps): TemplateResult {
@@ -172,7 +195,21 @@ export interface ListboxProps {
   readonly value?: string;
   readonly options: readonly ListboxOption[];
   readonly onChange?: (value: string) => void;
-  readonly attributes?: QuarkProps<HTMLDivElement>;
+  readonly attributes?: Omit<ContentAttributes<HTMLDivElement>,
+    | 'id'
+    | '.id'
+    | 'role'
+    | '.role'
+    | 'aria'
+    | 'aria-label'
+    | 'aria-activedescendant'
+    | 'ariaLabel'
+    | '.ariaLabel'
+    | 'ariaActiveDescendantElement'
+    | '.ariaActiveDescendantElement'
+  > & {
+    readonly aria?: Omit<NonNullable<QuarkProps<HTMLDivElement>['aria']>, 'label' | 'activedescendant'>;
+  };
 }
 
 export function Listbox({
@@ -233,7 +270,7 @@ export interface FieldProps {
   readonly children: TemplateValue;
   readonly helper?: TemplateValue;
   readonly error?: TemplateValue;
-  readonly attributes?: QuarkProps<HTMLLabelElement>;
+  readonly attributes?: ContentAttributes<HTMLLabelElement>;
 }
 
 export function Field({ label, children, helper, error, attributes = {} }: FieldProps): TemplateResult {
@@ -248,12 +285,12 @@ export function Field({ label, children, helper, error, attributes = {} }: Field
           ? q.span({ data: { fieldHelper: true }, children: helper })
           : nothing,
     ],
-  }, attributes));
+  }, attributes) as QuarkProps<HTMLLabelElement>);
 }
 
-function callEventListener(
-  listener: EventListenerOrEventListenerObject | null | undefined,
-  event: Event,
+function callEventListener<EventType extends Event>(
+  listener: { handleEvent(event: EventType): void } | ((event: EventType) => unknown) | null | undefined,
+  event: EventType,
 ): void {
   if (typeof listener === 'function') listener.call(event.currentTarget, event);
   else listener?.handleEvent(event);

@@ -1,12 +1,14 @@
 import { defineOrganism, nothing, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
 
+type AppShellAttributes = Omit<QuarkProps<HTMLDivElement>, 'children'>;
+
 export interface AppShellProps {
   readonly header?: TemplateValue;
   readonly navigation?: TemplateValue;
   readonly children: TemplateValue;
   readonly footer?: TemplateValue;
-  readonly attributes?: QuarkProps<HTMLDivElement>;
+  readonly attributes?: AppShellAttributes;
 }
 
 function renderAppShell({

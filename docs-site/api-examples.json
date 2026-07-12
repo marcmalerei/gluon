@@ -195,16 +195,28 @@
         "  htmlTagNames,",
         "  q,",
         "  quark,",
+        "  unsafeQuarkProps,",
+        "  type AriaAttributeName,",
+        "  type QuarkAriaProps,",
+        "  type QuarkAttributeValue,",
         "  type QuarkCommonProps,",
+        "  type QuarkDataProps,",
         "  type QuarkMap,",
         "  type QuarkProps,",
+        "  type UnsafeQuarkProps,",
         "} from '@gluonjs/quarks';",
         "",
+        "const ariaName: AriaAttributeName = 'label';",
+        "const attributeValue: QuarkAttributeValue = 'Add to bag';",
+        "const aria = { [ariaName]: attributeValue } satisfies QuarkAriaProps;",
+        "const data = { analyticsAction: 'purchase' } satisfies QuarkDataProps;",
         "const common = { id: 'add-to-bag', class: 'primary' } satisfies QuarkCommonProps<HTMLButtonElement>;",
-        "const props = { ...common, type: 'button', children: 'Add to bag' } satisfies QuarkProps<HTMLButtonElement>;",
+        "const props = { ...common, type: 'button', aria, data, children: 'Add to bag' } satisfies QuarkProps<HTMLButtonElement>;",
+        "const future = unsafeQuarkProps<HTMLButtonElement>({ 'vendor-future-key': true });",
+        "const unsafe: UnsafeQuarkProps<HTMLButtonElement> = future;",
         "const Button = quark('button');",
         "const tags: QuarkMap = q;",
-        "const actions = fragment([Button(props), tags.a({ href: '/bag', children: html`View bag` })]);",
+        "const actions = fragment([Button(props), Button(unsafe), tags.a({ href: '/bag', children: html`View bag` })]);",
         "console.log(Button.tagName, htmlTagNames.includes('button'), actions);"
       ]
     },
@@ -261,7 +273,7 @@
     "atom-components": {
       "module": "@gluonjs/atoms",
       "code": [
-        "import { html } from '@gluonjs/core';",
+        "import { html, svg } from '@gluonjs/core';",
         "import {",
         "  Button,",
         "  Icon,",
@@ -270,15 +282,21 @@
         "  atomManifest,",
         "  atomStyles,",
         "  darkThemeStyles,",
+        "  defineButtonPreset,",
+        "  defineIcon,",
         "  getThemeStyles,",
         "  installUi,",
         "  installUiTheme,",
         "  lightThemeStyles,",
         "  uiTokenStyles,",
         "  type ButtonProps,",
+        "  type ButtonAttributes,",
+        "  type ButtonPresetOptions,",
         "  type ButtonSize,",
         "  type ButtonVariant,",
         "  type IconName,",
+        "  type IconAttributes,",
+        "  type IconDefinition,",
         "  type IconProps,",
         "  type InputProps,",
         "  type LabelProps,",
@@ -291,6 +309,9 @@
         "const removeLegacyTheme = installUiTheme(document, theme);",
         "const variant: ButtonVariant = 'primary';",
         "const size: ButtonSize = 'large';",
+        "const buttonAttributes = { class: 'goods-purchase', data: { analyticsAction: 'purchase' } } satisfies ButtonAttributes;",
+        "const presetOptions = { displayName: 'PurchaseButton', class: 'goods-purchase', attributes: buttonAttributes } satisfies ButtonPresetOptions;",
+        "const PurchaseButton = defineButtonPreset(presetOptions);",
         "const button = {",
         "  label: 'Add to bag',",
         "  variant,",
@@ -299,10 +320,12 @@
         "  onClick: (event: MouseEvent) => console.log('added', event.currentTarget),",
         "} satisfies ButtonProps;",
         "const iconName: IconName = 'spark';",
+        "const iconDefinition = defineIcon({ name: 'goods-bag', viewBox: '0 0 24 24', body: svg`<path d=\"M6 8h12l1 13H5z\"></path>` }) satisfies IconDefinition<'goods-bag'>;",
+        "const iconAttributes = { data: { iconOwner: 'app' } } satisfies IconAttributes;",
         "const icon = { name: iconName, label: 'New arrival' } satisfies IconProps;",
         "const input = { name: 'email', type: 'email', placeholder: 'you@example.com' } satisfies InputProps;",
         "const label = { children: 'Email address' } satisfies LabelProps;",
-        "const checkout = html`${Label(label)}${Input(input)}${Button(button)}${Icon(icon)}`;",
+        "const checkout = html`${Label(label)}${Input(input)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
         "console.log(checkout, getThemeStyles(theme), atomStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
         "ui.setTheme('dark');",
         "ui.dispose();",
@@ -2908,9 +2931,33 @@
       "recipe": "atom-components",
       "description": "Configure a Button's content, visual variant, size, disabled state, click handler, and native quark attributes:"
     },
-    "packages/atoms/src/interfaces/IconProps.md": {
+    "packages/atoms/src/type-aliases/IconProps.md": {
       "recipe": "atom-components",
-      "description": "Choose a supported icon, rendered size, and optional accessible label for a decorative or meaningful SVG:"
+      "description": "Choose a supported built-in or explicit app-owned icon, rendered size, and optional accessible label for a decorative or meaningful SVG:"
+    },
+    "packages/atoms/src/functions/defineButtonPreset.md": {
+      "recipe": "atom-components",
+      "description": "Create an app-owned branded or danger Button preset while retaining the official native implementation and protected semantics:"
+    },
+    "packages/atoms/src/functions/defineIcon.md": {
+      "recipe": "atom-components",
+      "description": "Validate and freeze app-owned icon geometry for rendering through the official decorative/informative Icon contract:"
+    },
+    "packages/atoms/src/interfaces/ButtonPresetOptions.md": {
+      "recipe": "atom-components",
+      "description": "Declare the display metadata, closed variant/size, app-owned class/style, and native defaults for one Button preset:"
+    },
+    "packages/atoms/src/interfaces/IconDefinition.md": {
+      "recipe": "atom-components",
+      "description": "Describe one named app-owned SVG view box and template body without copying the official Icon renderer:"
+    },
+    "packages/atoms/src/type-aliases/ButtonAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed HTMLButtonElement attributes, events, data, classes, styles, and refs while keeping children, type, and disabled explicit:"
+    },
+    "packages/atoms/src/type-aliases/IconAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed SVG attributes and refs while Icon retains geometry and decorative/informative accessibility ownership:"
     },
     "packages/atoms/src/interfaces/InputProps.md": {
       "recipe": "atom-components",
@@ -3052,6 +3099,10 @@
       "recipe": "quark-elements",
       "description": "Create and cache a typed native-element factory that accepts explicit property, boolean, event, ARIA, data, class, style, and ref bindings:"
     },
+    "packages/quarks/src/functions/unsafeQuarkProps.md": {
+      "recipe": "quark-elements",
+      "description": "Opt a reviewed vendor or not-yet-typed platform key out of compile-time key checking without adding runtime validation:"
+    },
     "packages/quarks/src/interfaces/FieldProps.md": {
       "recipe": "quark-headless",
       "description": "Supply required visible label and form content plus optional helper, error, and native label attributes:"
@@ -3096,13 +3147,33 @@
       "recipe": "quark-headless",
       "description": "Require either a direct label or `labelledBy` relationship while configuring modal state, content, dismissal, and attributes:"
     },
+    "packages/quarks/src/type-aliases/AriaAttributeName.md": {
+      "recipe": "quark-elements",
+      "description": "Select a supported nested or direct ARIA attribute name and reject retained misspellings in object literals:"
+    },
+    "packages/quarks/src/type-aliases/QuarkAriaProps.md": {
+      "recipe": "quark-elements",
+      "description": "Build a checked nested ARIA binding object for a native Quark or official UI component:"
+    },
+    "packages/quarks/src/type-aliases/QuarkAttributeValue.md": {
+      "recipe": "quark-elements",
+      "description": "Constrain ARIA and data bindings to serializable native attribute scalar values and absence:"
+    },
+    "packages/quarks/src/type-aliases/QuarkDataProps.md": {
+      "recipe": "quark-elements",
+      "description": "Build application-owned data bindings whose keys are normalized to native data attributes:"
+    },
     "packages/quarks/src/type-aliases/QuarkMap.md": {
       "recipe": "quark-elements",
       "description": "Access a correctly typed Quark factory for every native HTML tag through the `q` proxy:"
     },
     "packages/quarks/src/type-aliases/QuarkProps.md": {
       "recipe": "quark-elements",
-      "description": "Combine common Quark values with explicit property, boolean, event, and arbitrary native attribute bindings:"
+      "description": "Combine element-derived scalar/property/boolean bindings with checked event, ARIA, data, class, style, and ref extensions:"
+    },
+    "packages/quarks/src/type-aliases/UnsafeQuarkProps.md": {
+      "recipe": "quark-elements",
+      "description": "Carry the explicit unsafe brand for a reviewed native extension that is outside the checked Quark key inventory:"
     },
     "packages/quarks/src/variables/htmlTagNames.md": {
       "recipe": "quark-elements",

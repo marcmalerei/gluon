@@ -1,6 +1,28 @@
 import { defineAtom, mergeProps, type TemplateResult } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
 
+type InputAttributes = Omit<
+  QuarkProps<HTMLInputElement>,
+  | 'children'
+  | 'value'
+  | '.value'
+  | 'placeholder'
+  | '.placeholder'
+  | 'type'
+  | '.type'
+  | 'name'
+  | '.name'
+  | 'disabled'
+  | '.disabled'
+  | '?disabled'
+  | 'aria'
+  | 'aria-invalid'
+  | 'ariaInvalid'
+  | '.ariaInvalid'
+> & {
+  readonly aria?: Omit<NonNullable<QuarkProps<HTMLInputElement>['aria']>, 'invalid'>;
+};
+
 export interface InputProps {
   readonly value?: string;
   readonly placeholder?: string;
@@ -9,7 +31,7 @@ export interface InputProps {
   readonly disabled?: boolean;
   readonly invalid?: boolean;
   readonly onInput?: (event: InputEvent) => void;
-  readonly attributes?: QuarkProps<HTMLInputElement>;
+  readonly attributes?: InputAttributes;
 }
 
 function renderInput({

@@ -61,7 +61,7 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-All 523 current symbol pages require a reviewed entry in
+All 538 current symbol pages require a reviewed entry in
 `docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
 and either an inline scenario or a maintained package recipe that uses the
 documented symbol. The scenarios cover concrete inputs and observable results,
@@ -88,6 +88,13 @@ Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
 `/0.0.0/examples/ui.html` with the other versioned documentation examples.
+
+The same UI gate requires extension metadata for all 15 stable entries, the
+documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
+danger-action, and custom-icon outcomes in canonical DX task T2. The comparison
+rule in `benchmarks/dx/specification-v1.json` applies that unchanged outcome to
+Gluon, Vue, and React. #107 still owns comparator implementations, completed-run
+evidence conforming to the canonical schema, and the final comparison.
 
 ## Report-only Vue analyzer gate
 
@@ -143,13 +150,12 @@ missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
 The issue #108 production owner baseline measures 164,012 raw entry bytes and
-47,686 level-9 gzip bytes. The reviewed regression ceilings are 166,000 raw
-bytes and 49,000 gzip bytes; HTML, image-byte, and image-count ceilings remain
-unchanged. These values cover the one-step UI owner, named SSR/hydration
-selection, form-associated product configuration boundary, and constructable
-component stylesheet in the real shop entry. The measured production entry
-contains none of the unselected Button, Input, Card, FormField, or AppShell CSS
-markers. Vue is built only in the separate documentation host.
+47,686 level-9 gzip bytes. Issue #110 then adds the selected Atom Button/Icon
+styles and the app-local Molecule/Organism purchase path. The reviewed combined
+regression ceilings are 174,000 raw bytes and 52,000 gzip bytes; HTML,
+image-byte, and image-count ceilings remain unchanged. The combined production
+entry measures 171,264 raw bytes and 50,069 level-9 gzip bytes. Vue is built
+only in the separate documentation host.
 
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps
@@ -165,7 +171,7 @@ state with a bounded timeout. They do not assume that the render and a 140-ms
 transition always finish within one fixed wall-clock delay on every engine.
 
 The current ceilings allow limited implementation movement above the measured
-137,169-byte raw / 40,088-byte gzip shop entry while preventing unreviewed large
+171,264-byte raw / 50,069-byte gzip shop entry while preventing unreviewed large
 regressions. Changing a ceiling requires an evidence-backed documentation update
 in the same pull request.
 

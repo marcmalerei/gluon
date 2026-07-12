@@ -105,6 +105,13 @@ examples/playground/
 └── design/             Accepted editor and diagnostic-reference concepts
 ```
 
+The optional UI packages share the typed native extension boundary documented
+in [`ui-extensibility.md`](ui-extensibility.md). `defineAtom`,
+`defineMolecule`, and `defineOrganism` only attach immutable `layer` and
+`displayName` metadata to a stateless render function. They do not register a
+Custom Element, create lifecycle/state ownership, adopt styles, install themes,
+validate props, add semantics, or arrange cleanup.
+
 Core builds only `@gluonjs/core` and `@gluonjs/core/styles`. The optional UI
 graph is separately consumable as `@gluonjs/quarks`, `@gluonjs/atoms`,
 `@gluonjs/molecules`, and `@gluonjs/organisms`, with dependencies pointing only

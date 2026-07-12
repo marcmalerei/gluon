@@ -26,7 +26,14 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   idempotent cleanup.
 - GLUON GOODS integration of the shared UI owner in client, SSR, and hydration
   flows while retaining its separate product stylesheet.
-- Reviewed task-oriented examples for all 523 generated public API symbol
+- A consistent typed native extensibility contract across all 15 stable UI
+  entries, including Button presets, custom Icon definitions, explicit unsafe
+  opt-out, public style-hook ownership, strict fixtures, cross-engine evidence,
+  identical Gluon/Vue/React DX tasks, and a GLUON GOODS checkout integration.
+- Rootless `svg` template fragments now compile in the SVG namespace and use a
+  template-type-specific cache, enabling app-owned Icon geometry consistently
+  in Chromium, Firefox, and WebKit.
+- Reviewed task-oriented examples for all 538 generated public API symbol
   pages, with symbol-specific purpose text and concrete application, lifecycle,
   input/output, ownership, error, and cleanup flows shared through maintained
   package recipes instead of compiler-only type or import demonstrations.

@@ -243,6 +243,7 @@ describe('separate UI package contracts', () => {
       for (const entry of manifest.entries) {
         expect(entry.status).toBe('stable');
         expect(entry.accessibility.length).toBeGreaterThan(20);
+        expect(entry.extension.length).toBeGreaterThan(20);
         expect(entry.example).toBe('docs-site/examples/ui-system.ts');
         expect(entry.tests).toContain('tests/ui-system.spec.ts');
       }

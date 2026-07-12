@@ -1,6 +1,8 @@
 import { defineMolecule, nothing, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
 
+type CardAttributes = Omit<QuarkProps<HTMLElement>, 'children'>;
+
 export type CardTone = 'default' | 'success' | 'warning' | 'danger';
 
 export interface CardProps {
@@ -10,7 +12,7 @@ export interface CardProps {
   readonly actions?: TemplateValue;
   readonly media?: TemplateValue;
   readonly children?: TemplateValue;
-  readonly attributes?: QuarkProps<HTMLElement>;
+  readonly attributes?: CardAttributes;
 }
 
 function renderCard({

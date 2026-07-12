@@ -22,30 +22,32 @@ export interface MergeableProps {
  * or object-style values. All other keys use last-writer-wins semantics.
  */
 export function mergeProps<
-  Defaults extends MergeableProps,
-  Overrides extends MergeableProps,
+  Defaults extends object,
+  Overrides extends object,
 >(
   defaults: Defaults,
   overrides: Overrides,
 ): Defaults & Overrides;
-export function mergeProps<Defaults extends MergeableProps>(
+export function mergeProps<Defaults extends object>(
   defaults: Defaults,
 ): Defaults;
 export function mergeProps(
-  defaults: MergeableProps,
-  overrides: MergeableProps = {},
+  defaults: object,
+  overrides: object = {},
 ): MergeableProps {
   const merged = { ...defaults, ...overrides } as MergeableProps;
-  const defaultClass = defaults.class ?? defaults.className;
-  const overrideClass = overrides.class ?? overrides.className;
+  const defaultProps = defaults as MergeableProps;
+  const overrideProps = overrides as MergeableProps;
+  const defaultClass = defaultProps.class ?? defaultProps.className;
+  const overrideClass = overrideProps.class ?? overrideProps.className;
 
   if (defaultClass || overrideClass) {
     merged.class = [defaultClass, overrideClass];
     delete merged.className;
   }
 
-  const defaultStyle = defaults.style;
-  const overrideStyle = overrides.style;
+  const defaultStyle = defaultProps.style;
+  const overrideStyle = overrideProps.style;
   if (isStyleRecord(defaultStyle) && isStyleRecord(overrideStyle)) {
     merged.style = { ...defaultStyle, ...overrideStyle };
   }

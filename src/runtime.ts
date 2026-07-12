@@ -74,8 +74,8 @@ export function html(
 }
 
 /**
- * Creates an SVG template result. Include the root `<svg>` element in the
- * template so the HTML parser establishes the SVG namespace.
+ * Creates an SVG template result. Root and rootless SVG fragments are parsed
+ * in the SVG namespace.
  */
 export function svg(
   strings: TemplateStringsArray,
@@ -1249,8 +1249,12 @@ interface RootInstance {
   hydrated?: boolean;
 }
 
-const templateCache = new WeakMap<TemplateStringsArray, CompiledTemplate>();
+const templateCache: Record<TemplateType, WeakMap<TemplateStringsArray, CompiledTemplate>> = {
+  html: new WeakMap(),
+  svg: new WeakMap(),
+};
 let lastTemplateStrings: TemplateStringsArray | undefined;
+let lastTemplateType: TemplateType | undefined;
 let lastCompiledTemplate: CompiledTemplate | undefined;
 const rootInstanceProperty = Symbol('gluon.root-instance');
 type OwnedRoot = (Element | DocumentFragment) & { [rootInstanceProperty]?: RootInstance };
@@ -1426,11 +1430,16 @@ export function unmount(container: Element | DocumentFragment | null): void {
 }
 
 function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
-  if (result.strings === lastTemplateStrings && lastCompiledTemplate) return lastCompiledTemplate;
+  if (
+    result.strings === lastTemplateStrings
+    && result.type === lastTemplateType
+    && lastCompiledTemplate
+  ) return lastCompiledTemplate;
 
-  const cached = templateCache.get(result.strings);
+  const cached = templateCache[result.type].get(result.strings);
   if (cached) {
     lastTemplateStrings = result.strings;
+    lastTemplateType = result.type;
     lastCompiledTemplate = cached;
     return cached;
   }
@@ -1462,7 +1471,13 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   }
 
   markup += result.strings[result.strings.length - 1] ?? '';
-  element.innerHTML = markup;
+  if (result.type === 'svg') {
+    element.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`;
+    const wrapper = element.content.firstElementChild as SVGSVGElement;
+    element.content.replaceChildren(...wrapper.childNodes);
+  } else {
+    element.innerHTML = markup;
+  }
   const descriptors = buildDescriptors(element.content, attributeNames);
   const traversalDescriptors = [...descriptors].sort(
     (left, right) => left.traversalIndex - right.traversalIndex || left.index - right.index,
@@ -1484,8 +1499,9 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
     traversalDescriptors,
     rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 1),
   };
-  templateCache.set(result.strings, compiled);
+  templateCache[result.type].set(result.strings, compiled);
   lastTemplateStrings = result.strings;
+  lastTemplateType = result.type;
   lastCompiledTemplate = compiled;
   return compiled;
 }

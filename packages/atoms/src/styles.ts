@@ -21,19 +21,21 @@ export const atomStyles = css`
     }
 
     :where(.gluon-button.is-primary) {
-      background: var(--gluon-color-action, #087f7b);
-      color: var(--gluon-color-action-text, white);
+      background: var(--gluon-button-background, var(--gluon-color-action, #087f7b));
+      border-color: var(--gluon-button-border-color, transparent);
+      color: var(--gluon-button-color, var(--gluon-color-action-text, white));
     }
 
     :where(.gluon-button.is-secondary) {
-      background: var(--gluon-color-action-soft, #e6f4f1);
-      color: var(--gluon-color-action-soft-text, #075e5b);
+      background: var(--gluon-button-background, var(--gluon-color-action-soft, #e6f4f1));
+      border-color: var(--gluon-button-border-color, transparent);
+      color: var(--gluon-button-color, var(--gluon-color-action-soft-text, #075e5b));
     }
 
     :where(.gluon-button.is-ghost) {
-      background: transparent;
-      border-color: currentcolor;
-      color: inherit;
+      background: var(--gluon-button-background, transparent);
+      border-color: var(--gluon-button-border-color, currentcolor);
+      color: var(--gluon-button-color, inherit);
     }
 
     :where(.gluon-button.is-small) { padding-block: 0.5rem; padding-inline: 0.75rem; }
