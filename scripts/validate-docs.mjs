@@ -21,6 +21,7 @@ for (const version of versions.supported) {
     'api/index.html',
     'cookbook/index.html',
     'migration/index.html',
+    'migration/vue-to-gluon-cutover/index.html',
     'examples/plain.html',
     'examples/ui.html',
     'examples/vue.html',
@@ -46,6 +47,24 @@ for (const required of [
   'Supported automation',
   'Vue-to-Gluon concept map',
 ]) if (!migration.includes(required)) throw new Error(`migration documentation is missing: ${required}`);
+
+const cutover = await readFile(resolve(
+  siteRoot,
+  'content',
+  versions.latest,
+  'migration/vue-to-gluon-cutover/index.md',
+), 'utf8');
+for (const required of [
+  'Stage 0 — Establish the baseline',
+  'Entry criteria',
+  'Exit criteria',
+  'Boundary and rollback matrix',
+  'process-global live store',
+  'same DOM subtree',
+  'does not parse or transform Vue source',
+  'VueProductHost.vue',
+  'tests/vue-migration-interop.spec.ts',
+]) if (!cutover.includes(required)) throw new Error(`Vue cutover playbook is missing: ${required}`);
 
 const htmlFiles = await filesWithExtension(outputRoot, '.html');
 const missingLinks = [];

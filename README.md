@@ -28,6 +28,7 @@
 - opt-in versioned Devtools with multi-application inspection and ordered runtime timelines
 - a shareable Gluon Playground with live diagnostics, reference lookup, and starter download
 - a living mobile-first GLUON GOODS reference shop built from public APIs
+- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/0.0.0/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`

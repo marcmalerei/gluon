@@ -17,6 +17,10 @@ Supported automation starts after Gluon source exists:
 None of those tools reads Vue source or performs a semantic conversion. A Vue
 migration is a manual redesign against Gluon's public contracts.
 
+For a reversible route from coexistence to full application ownership, follow
+the [tested Vue-to-Gluon cutover playbook](./vue-to-gluon-cutover/). It uses the
+production GLUON GOODS product configurator below as one continuous case study.
+
 ## Vue-to-Gluon concept map
 
 | Vue concept | Gluon contract | Migration work |
