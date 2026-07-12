@@ -6,15 +6,22 @@ import addFormats from 'ajv-formats';
 const root = resolve(import.meta.dirname, '..');
 const specificationPath = resolve(root, 'benchmarks/dx/specification-v1.json');
 const schemaPath = resolve(root, 'benchmarks/dx/schema/run-v1.schema.json');
+const automationSchemaPath = resolve(root, 'benchmarks/dx/schema/automation-v1.schema.json');
+const fixtureManifestPath = resolve(root, 'benchmarks/dx/fixtures/manifest-v1.json');
 const evidenceDirectory = resolve(root, 'benchmarks/dx/evidence');
 const uiStarterEvidencePath = resolve(root, 'benchmarks/dx/create-gluon-ui-starter-2026-07-12.json');
+const automatedRunDirectory = resolve(root, 'benchmarks/dx/runs');
 const specification = JSON.parse(await readFile(specificationPath, 'utf8'));
 const uiStarterEvidence = JSON.parse(await readFile(uiStarterEvidencePath, 'utf8'));
 const schema = JSON.parse(await readFile(schemaPath, 'utf8'));
+const automationSchema = JSON.parse(await readFile(automationSchemaPath, 'utf8'));
+const fixtureManifest = JSON.parse(await readFile(fixtureManifestPath, 'utf8'));
 const evidenceNames = (await readdir(evidenceDirectory)).filter((name) => name.endsWith('.json')).sort();
+const automatedRunNames = (await readdir(automatedRunDirectory)).filter((name) => name.endsWith('.json')).sort();
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 addFormats(ajv);
 const validateRun = ajv.compile(schema);
+const validateAutomation = ajv.compile(automationSchema);
 const validateSliceMeasurement = ajv.getSchema(`${schema.$id}#/$defs/sliceMeasurement`);
 
 assert(specification.schemaVersion === '1.0.0', 'specification schema version must be 1.0.0');
@@ -109,6 +116,46 @@ assert(schema.properties.humanPasses.minItems === 1, 'a run must retain at least
 assert(schema.$defs.task.additionalProperties === false, 'task evidence must reject undeclared fields');
 assert(schema.$defs.commandResult.required.includes('exitCode'), 'command evidence must retain exit codes');
 
+assert(fixtureManifest.schemaVersion === specification.schemaVersion, 'fixture manifest and specification versions differ');
+assert(fixtureManifest.specification === 'benchmarks/dx/specification-v1.json', 'fixture manifest must link the accepted specification');
+assertSet(fixtureManifest.frameworks.map(({ id }) => id), ['gluon', 'react', 'vue'], 'fixture frameworks');
+for (const framework of fixtureManifest.frameworks) {
+  assertSet(Object.keys(framework.tasks), [...taskIds], `${framework.id} fixture tasks`);
+  assert(Object.values(framework.exactVersions).every((version) => /^\d+\.\d+\.\d+$/u.test(version)), `${framework.id} versions must be exact`);
+  await access(resolve(root, framework.fixture, 'package.json'));
+  await access(resolve(root, framework.lockfile));
+  const packageJson = JSON.parse(await readFile(resolve(root, framework.fixture, 'package.json'), 'utf8'));
+  for (const [name, version] of Object.entries({ ...packageJson.dependencies, ...packageJson.devDependencies })) {
+    assert(!/^[~^*]|latest|workspace:/u.test(version), `${framework.id} dependency ${name} is not exactly pinned`);
+    if (framework.exactVersions[name]) assert(framework.exactVersions[name] === version, `${framework.id} manifest version for ${name} differs from package.json`);
+  }
+  for (const task of Object.values(framework.tasks)) {
+    assert(['covered', 'platform-limitation'].includes(task.status), `${framework.id} has an invalid task status`);
+    if (task.status === 'platform-limitation') assert(task.limitation?.length > 20, `${framework.id} platform limitation requires an explanation`);
+    await Promise.all(task.evidence.map((path) => access(resolve(root, framework.fixture, path))));
+  }
+}
+const gluonFixtureFiles = [...new Set(Object.values(fixtureManifest.frameworks.find(({ id }) => id === 'gluon').tasks).flatMap(({ evidence }) => evidence))]
+  .filter((path) => !path.startsWith('../'));
+for (const path of gluonFixtureFiles) {
+  const source = await readFile(resolve(root, 'benchmarks/dx/fixtures/gluon', path), 'utf8');
+  assert(!/from\s+['"][^'"]*(?:\/src\/|\/dist\/)/u.test(source), `Gluon fixture ${path} uses a private or deep import`);
+  assert(!/<style(?:\s|>)/iu.test(source), `Gluon fixture ${path} contains a style fallback`);
+}
+
+assert(automationSchema.properties.humanPasses.maxItems === 0, 'automated evidence must not manufacture human passes');
+assert(automationSchema.properties.tasks.minItems === 21 && automationSchema.properties.tasks.maxItems === 21, 'automated evidence must retain 21 task records');
+for (const name of automatedRunNames) {
+  const run = JSON.parse(await readFile(resolve(automatedRunDirectory, name), 'utf8'));
+  assert(validateAutomation(run), `${name} does not match the automation schema:\n${ajv.errorsText(validateAutomation.errors, { separator: '\n' })}`);
+  assertSet(run.frameworks.map(({ id }) => id), ['gluon', 'react', 'vue'], `${name} automated frameworks`);
+  const expectedPairs = specification.tasks.flatMap(({ id }) => ['gluon', 'vue', 'react'].map((framework) => `${framework}:${id}`));
+  assertSet(run.tasks.map(({ framework, taskId }) => `${framework}:${taskId}`), expectedPairs, `${name} automated framework-task results`);
+  assert(run.humanPasses.length === 0, `${name} must not contain a human pass`);
+  assert(run.blockers.some((value) => value.includes('human usability pass')), `${name} must retain the human-evidence blocker`);
+  assert(!containsOpaqueScore(run), `${name} contains a prohibited aggregate or weighted score field`);
+}
+
 assert(evidenceNames.length > 0, 'at least one comparator-selection or completed-run record is required');
 for (const name of evidenceNames) {
   const evidence = JSON.parse(await readFile(resolve(evidenceDirectory, name), 'utf8'));
@@ -157,7 +204,7 @@ await Promise.all([
   access(resolve(root, 'docs/roadmap.md')),
 ]);
 
-console.log(`DX benchmark contract valid: ${specification.tasks.length} tasks, ${specification.measurements.length} measurements, ${specification.sliceMeasurements.length} bounded slice measurement(s), ${evidenceNames.length} orientation record(s), 0 completed runs`);
+console.log(`DX benchmark contract valid: ${specification.tasks.length} tasks, ${specification.measurements.length} measurements, ${specification.sliceMeasurements.length} bounded slice measurement(s), ${evidenceNames.length} orientation record(s), ${automatedRunNames.length} automated run(s), 0 completed runs`);
 
 function assert(condition, message) {
   if (!condition) throw new Error(`DX benchmark contract: ${message}`);
