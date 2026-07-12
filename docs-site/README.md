@@ -25,10 +25,24 @@ npm run check:docs
 ```
 
 TypeDoc reads every current public entry point declared by the package contract
-and emits reviewed Markdown into `.tmp/docs-api`. `build-docs.mjs` renders that
-reference beside the maintained guides, cookbook, migration material, examples,
-and release archive. `validate-docs.mjs` verifies the version tree, public API
-entry-point count, required pages, examples, and internal links.
+and emits reviewed Markdown into `.tmp/docs-api`.
+`generate-api-examples.mjs` then derives every public function, class,
+interface, type-alias, and variable page, maps it back to an official package
+entry point, appends an `Example` section, and typechecks the complete generated
+snippet corpus. Curated examples live in `api-examples.json`; unknown pages,
+private modules, invalid snippets, duplicate external example sections, or
+missing symbol coverage fail `npm run docs:api`.
+
+`build-docs.mjs` renders that reference beside the maintained guides, cookbook,
+migration material, examples, and release archive. `validate-docs.mjs` verifies
+the version tree, public API entry-point count, one rendered example per public
+symbol page, required curated content, compiled examples, and internal links.
+
+Generated baselines demonstrate a compiler-valid function call, class/type
+annotation, or value read as appropriate for the symbol kind. They are the
+minimum public-entry-point contract, not a claim that generic placeholder
+arguments represent application behavior. Add behavior-oriented code through a
+curated override when lifecycle, ownership, errors, or interactions matter.
 
 All TypeScript and Vue example sources live in `examples/` and are compiled
 through `examples/tsconfig.json` plus the maintained Vite configurations;
