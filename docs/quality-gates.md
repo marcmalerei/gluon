@@ -161,17 +161,16 @@ missing, negative, or non-numeric budget entries fail before comparison.
 `npm run check` validates the same budget after the repository build.
 
 The issue #108 production owner baseline measures 164,012 raw entry bytes and
-47,686 level-9 gzip bytes. Issue #110 then adds the selected Atom Button/Icon
-styles and the app-local Molecule/Organism purchase path. The reviewed combined
-regression ceilings are 174,000 raw bytes and 52,000 gzip bytes; HTML,
-image-byte, and image-count ceilings remain unchanged. The combined production
-entry measures 171,264 raw bytes and 50,069 level-9 gzip bytes. Vue is built
-only in the separate documentation host. On the pre-#108 integration base,
-issue #112 measured 166,257 raw bytes and
-47,947 level-9 gzip bytes after the functional bag quantity boundary joined the
-customer flow. Relative to the issue #88 baseline of 158,152 raw and 45,683
-gzip bytes, that isolated delta was 8,105 raw and 2,264 gzip bytes. These are
-composition measurements, not runtime-speed or framework-size claims.
+47,686 level-9 gzip bytes. Issue #110 adds the selected Atom Button/Icon styles
+and app-local Molecule/Organism purchase path, measuring 171,264 raw and 50,069
+gzip bytes. With the #112 functional bag quantity boundary and reactive property
+view, the combined production entry measures 179,650 raw and 52,435 gzip bytes.
+The exact #112 increment over #110 is 8,386 raw and 2,366 gzip bytes; relative
+to the issue #88 baseline of 158,152 raw and 45,683 gzip bytes, the combined
+increment is 21,498 raw and 6,752 gzip bytes. The reviewed regression ceilings
+are 182,000 raw bytes and 54,000 gzip bytes; HTML, image-byte, and image-count
+ceilings remain unchanged. These are composition measurements, not runtime-
+speed or framework-size claims. Vue is built only in the documentation host.
 
 On a clean checkout, build Core, Compiler, and the Gluon Vite plugin before
 running `npm run check:budgets`. The blocking budget job performs those steps

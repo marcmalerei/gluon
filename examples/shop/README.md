@@ -147,13 +147,13 @@ device, or general framework-speed claims.
 gzip byte counts from the generated files. For this slice, the single browser
 entry that contains Core, Reactivity, Router, Store, async built-ins, and the shop
 includes the target-scoped UI owner and the selected typed Atom purchase-action
-styles. It measures 171,264 raw bytes and 50,069 level-9 gzip bytes against the
-reviewed 174,000 / 52,000 ceilings. On the pre-#108 integration base, the issue
-#112 functional bag quantity boundary
-measured 166,257 raw bytes and 47,947 level-9 gzip bytes. Relative to the issue
-#88 baseline of 158,152 raw and 45,683 gzip bytes, that isolated #112 delta was
-8,105 raw bytes and 2,264 gzip bytes and included the concise authoring runtime
-plus the app-local control. The five WebP product/editorial assets total 155,126
+styles. With the #112 functional bag quantity boundary and reactive property
+view, the combined entry measures 179,650 raw bytes and 52,435 level-9 gzip
+bytes against the reviewed 182,000 / 54,000 ceilings. The exact #112 increment
+over #110 is 8,386 raw and 2,366 gzip bytes and includes the concise authoring
+runtime plus the app-local control. Relative to the issue #88 baseline of
+158,152 raw and 45,683 gzip bytes, the combined increment is 21,498 raw and
+6,752 gzip bytes. The five WebP product/editorial assets total 155,126
 bytes. These are composition measurements, not a rendering-speed claim. The
 comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results
