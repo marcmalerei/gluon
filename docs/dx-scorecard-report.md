@@ -1,9 +1,9 @@
 # Automated DX scorecard report
 
 This report interprets only
-[`automation-7b2ecc5.json`](../benchmarks/dx/runs/automation-7b2ecc5.json),
+[`automation-8a02472.json`](../benchmarks/dx/runs/automation-8a02472.json),
 captured on 12 July 2026 from commit
-`7b2ecc5b75155aaa8da3e1ea46470443dbcad590`. It is not the final issue #107
+`8a024721fd484dacb79397a0bf257e49c1f4664b`. It is not the final issue #107
 report: the required human usability pass has not occurred, so no general DX
 superiority claim is supported.
 

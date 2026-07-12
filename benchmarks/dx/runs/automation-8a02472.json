@@ -2,10 +2,10 @@
   "schemaVersion": "1.0.0",
   "specification": "benchmarks/dx/specification-v1.json",
   "status": "automated-only",
-  "runId": "2026-07-12-7b2ecc5b7515",
-  "sourceCommit": "7b2ecc5b75155aaa8da3e1ea46470443dbcad590",
-  "startedAt": "2026-07-12T21:49:07.864Z",
-  "finishedAt": "2026-07-12T21:52:08.857Z",
+  "runId": "2026-07-12-8a024721fd48",
+  "sourceCommit": "8a024721fd484dacb79397a0bf257e49c1f4664b",
+  "startedAt": "2026-07-12T23:14:47.238Z",
+  "finishedAt": "2026-07-12T23:19:09.646Z",
   "environment": {
     "operatingSystem": "darwin 25.3.0",
     "architecture": "arm64",
@@ -49,7 +49,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -57,7 +57,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -65,7 +65,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -73,7 +73,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -81,7 +81,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -89,7 +89,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -97,7 +97,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -105,8 +105,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ]
@@ -140,7 +140,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -148,15 +148,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -164,23 +164,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -212,7 +212,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -220,15 +220,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -236,23 +236,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -269,7 +269,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -277,7 +277,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -285,7 +285,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -293,7 +293,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -301,7 +301,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -309,7 +309,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -317,7 +317,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -325,8 +325,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -414,7 +414,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -422,7 +422,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -430,7 +430,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -438,7 +438,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -446,7 +446,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -454,7 +454,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -462,7 +462,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -470,8 +470,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -555,7 +555,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -563,7 +563,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -571,7 +571,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -579,7 +579,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -587,7 +587,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -595,7 +595,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -603,7 +603,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -611,8 +611,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -694,7 +694,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -702,7 +702,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -710,7 +710,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -718,7 +718,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -726,7 +726,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -734,7 +734,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -742,7 +742,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -750,8 +750,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -836,7 +836,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -844,7 +844,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -852,7 +852,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -860,7 +860,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -868,7 +868,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -876,7 +876,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -884,7 +884,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -892,8 +892,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -973,7 +973,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -981,7 +981,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -989,7 +989,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -997,7 +997,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -1005,7 +1005,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -1013,7 +1013,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -1021,7 +1021,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -1029,8 +1029,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -1114,7 +1114,7 @@
           "command": "node packages/create-gluon/dist/cli.js '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes --router --store --testing --ui --ssr --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 65,
+          "durationMs": 53,
           "stdout": "Created gluon in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\nNext: npm install && npm run dev\n",
           "stderr": ""
         },
@@ -1122,7 +1122,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component PurchasePrimitive --kind atom --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 82,
+          "durationMs": 53,
           "stdout": "Added atom PurchasePrimitive in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (978 bytes)\n  CREATE src/components/index.ts (121 bytes)\n  CREATE src/components/purchase-primitive.spec.ts (1229 bytes)\n  CREATE src/components/purchase-primitive.ts (1300 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -1130,7 +1130,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component DeliveryComposition --kind molecule --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 80,
+          "durationMs": 54,
           "stdout": "Added molecule DeliveryComposition in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1013 bytes)\n  CREATE src/components/delivery-composition.spec.ts (1186 bytes)\n  CREATE src/components/delivery-composition.ts (1345 bytes)\n  UPDATE src/components/index.ts (164 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -1138,7 +1138,7 @@
           "command": "node packages/create-gluon/dist/cli.js add-component CheckoutLayout --kind organism --root '/Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon' --yes",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 81,
+          "durationMs": 52,
           "stdout": "Added organism CheckoutLayout in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/gluon\n  UPDATE package.json (1048 bytes)\n  CREATE src/components/checkout-layout.spec.ts (1216 bytes)\n  CREATE src/components/checkout-layout.ts (1412 bytes)\n  UPDATE src/components/index.ts (202 bytes)\nNext: npm run test:components && npm run check:templates && npm run build\n",
           "stderr": ""
         },
@@ -1146,7 +1146,7 @@
           "command": "npm run check:create-gluon-fixtures",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 140599,
+          "durationMs": 212107,
           "stdout": "\n> @gluonjs/core@0.0.0 check:create-gluon-fixtures\n> node scripts/validate-create-gluon-fixtures.mjs\n\nvalidated starter 1/20: 01-minimal\nvalidated starter 2/20: 02-router\nvalidated starter 3/20: 03-store\nvalidated starter 4/20: 04-router-store\nvalidated starter 5/20: 05-testing\nvalidated starter 6/20: 06-router-testing\nvalidated starter 7/20: 07-store-testing\nvalidated starter 8/20: 08-router-store-testing\nvalidated starter 9/20: 09-ui\nvalidated starter 10/20: 10-router-ui\nvalidated starter 11/20: 11-store-ui\nvalidated starter 12/20: 12-router-store-ui\nvalidated starter 13/20: 13-testing-ui\nvalidated starter 14/20: 14-router-testing-ui\nvalidated starter 15/20: 15-store-testing-ui\nvalidated starter 16/20: 16-router-store-testing-ui\nvalidated starter 17/20: 17-router-store-ssr\nvalidated starter 18/20: 18-router-store-testing-ssr\nvalidated starter 19/20: 19-router-store-ui-ssr\nvalidated starter 20/20: 20-router-store-testing-ui-ssr\nvalidated component 1/5: atom\nvalidated component 2/5: molecule\nvalidated component 3/5: organism\nvalidated component 4/5: element\nvalidated component 5/5: headless\nvalidated retained DX scorecard fixture\ncreate-gluon fixture matrix valid: 20 applications, 5 component kinds, and 1 retained DX fixture\n",
           "stderr": ""
         },
@@ -1154,7 +1154,7 @@
           "command": "npm run check:template-composition",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3040,
+          "durationMs": 2788,
           "stdout": "\n> @gluonjs/core@0.0.0 check:template-composition\n> npm run build:compiler && node scripts/validate-template-composition.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated template composition evidence: gluon-current, gluon-compose, react, vue.\n",
           "stderr": ""
         },
@@ -1162,7 +1162,7 @@
           "command": "npm run check:stateful-control-comparison",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2885,
+          "durationMs": 2465,
           "stdout": "\n> @gluonjs/core@0.0.0 check:stateful-control-comparison\n> npm run build:compiler && npm run build:language-server && node scripts/validate-stateful-form-control-comparison.mjs\n\n\n> @gluonjs/core@0.0.0 build:compiler\n> npm run build --workspace @gluonjs/compiler\n\n\n> @gluonjs/compiler@0.0.0 build\n> tsc -p tsconfig.build.json\n\n\n> @gluonjs/core@0.0.0 build:language-server\n> npm run build --workspace @gluonjs/language-server\n\n\n> @gluonjs/language-server@0.0.0 build\n> tsc -p tsconfig.build.json\n\nValidated retained stateful form-control comparison: Gluon class, functional Gluon, Vue, and React.\n",
           "stderr": ""
         },
@@ -1170,8 +1170,8 @@
           "command": "npm run test:browser -- --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2171,
-          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  28 passed (28)\n   Start at  23:51:38\n   Duration  1.50s (transform 0ms, setup 0ms, import 633ms, tests 845ms, environment 0ms)\n\n",
+          "durationMs": 4019,
+          "stdout": "\n> @gluonjs/core@0.0.0 test:browser\n> vitest run --run tests/vite-hmr.spec.ts tests/dx-stateful-form-control.spec.ts tests/hydration.spec.ts\n\n\n RUN  v4.1.10 /Volumes/ssd/GitHub/gluon-agent-107\n\n\n Test Files  3 passed (3)\n      Tests  29 passed (29)\n   Start at  01:18:31\n   Duration  2.15s (transform 0ms, setup 0ms, import 538ms, tests 1.33s, environment 0ms)\n\n",
           "stderr": ""
         }
       ],
@@ -1251,7 +1251,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1259,15 +1259,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1275,23 +1275,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -1374,7 +1374,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1382,15 +1382,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1398,23 +1398,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -1492,7 +1492,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1500,15 +1500,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1516,23 +1516,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -1607,7 +1607,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1615,15 +1615,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1631,23 +1631,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -1729,7 +1729,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1737,15 +1737,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1753,23 +1753,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -1845,7 +1845,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1853,15 +1853,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1869,23 +1869,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -1965,7 +1965,7 @@
           "command": "npx --yes create-vue@3.22.4 vue --ts --router --pinia --playwright --bare --force",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 888,
+          "durationMs": 811,
           "stdout": "┌  Vue.js - The Progressive JavaScript Framework\n\nScaffolding project in /Volumes/ssd/GitHub/gluon-agent-107/.tmp/dx-automation-fixtures/generated-baselines/vue...\n│\n└  Done. Now run:\n\n   cd vue\n   npm install\n   npm run dev\n\n| Optional: Initialize Git in your project directory with:\n\n   git init && git add -A && git commit -m \"initial commit\"\n\n",
           "stderr": ""
         },
@@ -1973,15 +1973,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2564,
-          "stdout": "\nadded 106 packages, and audited 107 packages in 2s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 5070,
+          "stdout": "\nadded 106 packages, and audited 107 packages in 5s\n\n24 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run type-check",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1221,
+          "durationMs": 1009,
           "stdout": "\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n",
           "stderr": ""
         },
@@ -1989,23 +1989,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2484,
-          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 327ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 53ms\n",
+          "durationMs": 2221,
+          "stdout": "\n> vue@0.0.0 build\n> npm run type-check && npm run build-only && vite build --ssr src/entry-server.ts --outDir dist-server\n\n\n> vue@0.0.0 type-check\n> vue-tsc --build\n\n\n> vue@0.0.0 build-only\n> vite build\n\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 42 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.42 kB │ gzip:  0.28 kB\ndist/assets/index-DJ9FO7kB.css    0.56 kB │ gzip:  0.33 kB\ndist/assets/index-DqO6M6Jo.js   101.30 kB │ gzip: 39.65 kB\n\n✓ built in 253ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 21 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist-server/entry-server.js  14.94 kB │ gzip: 3.33 kB\n\n✓ built in 50ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6851,
-          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:41289) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7668,
+          "stdout": "\n> vue@0.0.0 test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.9s)\n",
+          "stderr": "[WebServer] (node:40876) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:40883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:40990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 624,
+          "durationMs": 586,
           "stdout": "\n> vue@0.0.0 diagnostics\n> vue-tsc --noEmit -p diagnostics/tsconfig.json\n\ndiagnostics/InvalidContracts.vue(2,28): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/InvalidContracts.vue(2,45): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\ndiagnostics/InvalidContracts.vue(2,134): error TS2322: Type '(value: string) => number' is not assignable to type '(value: number) => any'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2074,7 +2074,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2082,15 +2082,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2098,23 +2098,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2196,7 +2196,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2204,15 +2204,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2220,23 +2220,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2314,7 +2314,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2322,15 +2322,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2338,23 +2338,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2425,7 +2425,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2433,15 +2433,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2449,23 +2449,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2546,7 +2546,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2554,15 +2554,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2570,23 +2570,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2662,7 +2662,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2670,15 +2670,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2686,23 +2686,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
@@ -2779,7 +2779,7 @@
           "command": "npx --yes create-react-router@8.2.0 react --no-install --yes --no-git-init --no-agent-skills --react-router-version 8.2.0",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 2145,
+          "durationMs": 2052,
           "stdout": "\n         create-react-router v8.2.0\n\n      ◼  Shell is not interactive. Using default options. This is equivalent to running with the --yes flag.\n      ◼  Directory: Using react as project directory\n\n      ◼  Using default template See https://github.com/remix-run/react-router-templates for more\n      ✔  Template copied\n      ◼  Skipping agent skill. You can add it later from https://github.com/remix-run/react-router/tree/main/.agents/skills/react-router.\n      ◼  Skipping install step. Remember to install dependencies after setup with npm install.\n\n  done   That's it!\n\n         Enter your project directory using cd ./react\n         Check out README.md for development and deploy instructions.\n\n         Join the community at https://remix.run/discord\n\n",
           "stderr": ""
         },
@@ -2787,15 +2787,15 @@
           "command": "npm ci --ignore-scripts",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 3507,
-          "stdout": "\nadded 186 packages, and audited 187 packages in 3s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
+          "durationMs": 7071,
+          "stdout": "\nadded 186 packages, and audited 187 packages in 7s\n\n44 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities\n",
           "stderr": ""
         },
         {
           "command": "npm run typecheck",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 1925,
+          "durationMs": 1749,
           "stdout": "\n> typecheck\n> react-router typegen && tsc\n\n",
           "stderr": ""
         },
@@ -2803,23 +2803,23 @@
           "command": "npm run build",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 778,
-          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 272ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 21ms\n",
+          "durationMs": 1159,
+          "stdout": "\n> build\n> react-router build\n\nUsing Vite Environment API\nvite v8.1.4 building client environment for production...\n\u001b[2K\rtransforming...✓ 85 modules transformed.\nrendering chunks...\ncomputing gzip size...\nbuild/client/.vite/manifest.json                   1.98 kB │ gzip:  0.43 kB\nbuild/client/assets/root-DJ9FO7kB.css              0.56 kB │ gzip:  0.33 kB\nbuild/client/assets/checkout-BTPoaNG1.js           0.49 kB │ gzip:  0.34 kB\nbuild/client/assets/root-DJ8szhlC.js               1.08 kB │ gzip:  0.62 kB\nbuild/client/assets/product-DXTufiFz.js            1.30 kB │ gzip:  0.71 kB\nbuild/client/assets/cart-DMe4txiJ.js               1.49 kB │ gzip:  0.77 kB\nbuild/client/assets/lib-BP4BPaOu.js               10.29 kB │ gzip:  4.13 kB\nbuild/client/assets/errorBoundaries-BXWPBLUz.js   33.30 kB │ gzip: 11.65 kB\nbuild/client/assets/jsx-runtime-Cvv8R5mo.js       83.85 kB │ gzip: 27.89 kB\nbuild/client/assets/entry.client-B4B5rrsJ.js     185.89 kB │ gzip: 58.63 kB\n\n✓ built in 290ms\nvite v8.1.4 building ssr environment for production...\n\u001b[2K\rtransforming...✓ 11 modules transformed.\nrendering chunks...\n\n✓ 1 asset cleaned from React Router server build.\nbuild/server/assets/server-build-DJ9FO7kB.css\n\ncomputing gzip size...\nbuild/server/.vite/manifest.json                0.22 kB │ gzip: 0.15 kB\nbuild/server/assets/server-build-DJ9FO7kB.css   0.56 kB │ gzip: 0.33 kB\nbuild/server/index.js                          12.61 kB │ gzip: 3.87 kB\n\n✓ built in 23ms\n",
           "stderr": ""
         },
         {
           "command": "npm run test:e2e",
           "exitCode": 0,
           "expectedExit": "zero",
-          "durationMs": 6697,
-          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.0s)\n",
-          "stderr": "[WebServer] (node:42049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:42051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:42322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+          "durationMs": 7349,
+          "stdout": "\n> test:e2e\n> playwright test\n\n\nRunning 3 tests using 1 worker\n···\n  3 passed (6.6s)\n",
+          "stderr": "[WebServer] (node:41208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)\n(node:41221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
         },
         {
           "command": "npm run diagnostics",
           "exitCode": 2,
           "expectedExit": "nonzero",
-          "durationMs": 594,
+          "durationMs": 537,
           "stdout": "\n> diagnostics\n> tsc -p diagnostics/tsconfig.json\n\ndiagnostics/invalid.tsx(3,45): error TS2322: Type 'string' is not assignable to type 'Product'.\ndiagnostics/invalid.tsx(4,64): error TS2322: Type '(value: string) => boolean' is not assignable to type '(value: number) => boolean | void'.\n  Types of parameters 'value' and 'value' are incompatible.\n    Type 'number' is not assignable to type 'string'.\n",
           "stderr": ""
         }
