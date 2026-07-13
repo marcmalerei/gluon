@@ -1,23 +1,24 @@
 # Getting started
 
-Gluon is currently a private `0.0.0` repository build. Registry installation is
-not claimed. From a clean checkout, use Node 22.12 or Node 24:
-
-```sh
-npm ci --ignore-scripts
-npx playwright install chromium
-npm run build
-npm run check
-```
-
-After public release, the maintained generator command is:
+Gluon `1.0.0` supports Node `^22.12.0 || ^24.0.0`. Create a maintained
+application from the public generator:
 
 ```sh
 npm create gluon@latest my-app
+cd my-app
+npm install
+npm run dev
 ```
 
-Until publication, run `npm run build:create-gluon` and invoke
-`node packages/create-gluon/dist/cli.js my-app` from this repository.
+To add the runtime to an existing project, install its public package entry
+point:
+
+```sh
+npm install @gluonjs/core
+```
+
+Repository contributors use `npm ci --ignore-scripts`, install the required
+Playwright browsers, and run `npm run check` from a clean checkout.
 
 ## First application
 

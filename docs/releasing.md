@@ -7,22 +7,22 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-Publication remains blocked while the machine-readable package contract records
-`publicationState: blocked` and `scopeControl: unverified`. In that state every
-package stays `private: true`, uses the documentation version `0.0.0`, and keeps
-release work under `Unreleased`. External setup work does not make the source
-tree releasable until every owner-controlled prerequisite has been verified and
-the reviewed release-cut PR changes those fields together. This is enforced by:
+The machine-readable package contract records `publicationState: ready` and
+`scopeControl: verified` for the `1.0.0` release candidate. Every official
+manifest is public and lockstep at `1.0.0`. The candidate is not publishable
+until its exact commit has a successful Quality Gates run and the two matching
+evidence files are committed. This is enforced by:
 
 ```sh
 npm run check:release-contract
 ```
 
-The validator also checks lockstep manifest and lockfile versions, exact
+The validator checks the package-contract JSON against its declared schema,
+lockstep manifest and lockfile versions, exact
 official-package dependency versions, public/provenance publish settings,
 license and archive allowlists, the documentation version, and the protected
-release workflow. A blocked repository must not present itself as a releasable
-candidate.
+release workflow. Strict candidate validation additionally requires the exact
+tested commit and successful workflow run.
 
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
@@ -198,7 +198,7 @@ long-lived publication token may be added to GitHub.
 
 ## Release-candidate commit
 
-The reviewed release PR must make these changes together:
+The reviewed release PR makes these changes together:
 
 - set every official manifest to version `1.0.0` and `private: false`;
 - set every official implementation and peer dependency to exact `1.0.0`;
@@ -208,8 +208,9 @@ The reviewed release PR must make these changes together:
 - add dated `1.0.0` sections to the root and all package changelogs;
 - copy and review the versioned documentation as `1.0.0`, then make that version
   latest and supported;
-- attach the completed automated release-cut evidence;
-- attach the completed immutable compatibility manifest.
+- after the prepared commit passes Quality Gates, attach the completed automated
+  release-cut evidence and immutable compatibility manifest as the only two
+  files changed after that tested commit.
 
 Validate that commit before creating a tag:
 
@@ -230,7 +231,7 @@ The release contract pins its upstream commit, source URL, and SHA-256; a schema
 change therefore requires an explicit reviewed contract update.
 
 For repository-development verification, the same artifact builder can run on
-the current blocked version without making the result publishable:
+a blocked development version without making the result publishable:
 
 ```sh
 npm run build
@@ -239,6 +240,14 @@ npm run release:artifacts -- --allow-blocked
 
 The resulting evidence explicitly records `blockedDevelopmentBuild: true`, and
 the publisher rejects it.
+
+During the two-commit release-cut PR, `npm run check` also permits the prepared
+`ready` commit to build a non-publishable artifact while both evidence files are
+still absent. That artifact has the same `blockedDevelopmentBuild: true` guard.
+Once the two evidence files exist, `--check-state` automatically switches to
+strict candidate validation; a partial evidence pair fails immediately. The
+Quality Gates repository job fetches full Git history so this strict pass can
+prove that the recorded tested commit is an ancestor of the candidate commit.
 
 ## Protected publication
 

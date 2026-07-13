@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "releaseLine": "0.0.0",
+  "releaseLine": "1.0.0",
   "reviewedAt": "2026-07-12",
   "areas": [
     {
@@ -56,14 +56,14 @@
         "Static resource URLs are escaped before entering generated markup."
       ],
       "residualRisk": "The deploying application owns the policy header, nonce generation, hash allowlists, and report handling.",
-      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/0.0.0/guides/quality/index.md"]
+      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.0.0/guides/quality/index.md"]
     },
     {
       "id": "trusted-types",
       "status": "not-claimed",
       "controls": [
         "Gluon exposes explicit unsafeHTML() and unsafeURL() review points rather than silently trusting strings.",
-        "Version 0.0.0 makes no compatibility claim for require-trusted-types-for enforcement."
+        "Version 1.0.0 makes no compatibility claim for require-trusted-types-for enforcement."
       ],
       "residualRisk": "Template parsing and explicit raw-markup paths use browser HTML sinks; an enforcing application must supply and review its own compatible Trusted Types policy until Gluon defines a public policy contract.",
       "evidence": ["src/runtime.ts", "docs/dom-runtime.md", "docs/security.md"]

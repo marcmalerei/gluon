@@ -22,11 +22,13 @@ const spdxSchemaDigest = createHash('sha256')
   .update(await readFile(resolve(root, releaseContract.spdxSchema.path)))
   .digest('hex');
 const packageContract = await readJson('package-contract.json');
+const packageContractSchema = await readJson('schemas/package-contract.schema.json');
 const rootManifest = await readJson('package.json');
 const versions = await readJson('docs-site/versions.json');
 const lockfile = await readJson('package-lock.json');
 const rootChangelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
 const workflow = await readFile(resolve(root, '.github/workflows/release.yml'), 'utf8');
+const qualityWorkflow = await readFile(resolve(root, '.github/workflows/quality-gates.yml'), 'utf8');
 const publishScript = await readFile(resolve(root, 'scripts/publish-release.mjs'), 'utf8');
 const artifactBuildScript = await readFile(resolve(root, 'scripts/build-release-artifacts.mjs'), 'utf8');
 const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-bootstrap-artifacts.mjs'), 'utf8');
@@ -38,11 +40,13 @@ const compatibilityManifestSchema = await readJson('release/compatibility-manife
 const schemaValidator = new Ajv2020({ allErrors: true, strict: false });
 addFormats(schemaValidator);
 const validateReleaseContractSchema = schemaValidator.compile(releaseContractSchema);
+const validatePackageContractSchema = schemaValidator.compile(packageContractSchema);
 const validateReleaseCutEvidenceSchema = schemaValidator.compile(releaseCutEvidenceSchema);
 const validateCompatibilityManifestSchema = schemaValidator.compile(compatibilityManifestSchema);
 const manifests = [];
 
 validateReleaseContract();
+validateJsonSchema('package-contract.json', packageContract, validatePackageContractSchema);
 validateEvidenceSchemaBoundary();
 
 for (const entry of packageContract.packages) {
@@ -417,6 +421,9 @@ function validateJsonSchema(path, value, validator) {
 }
 
 function validateWorkflow() {
+  if (!qualityWorkflow.includes('- uses: actions/checkout@v7\n        with:\n          fetch-depth: 0')) {
+    throw new Error('Quality Gates repository validation must fetch full history for tested-commit ancestry checks.');
+  }
   for (const required of [
     'environment: npm',
     'id-token: write',

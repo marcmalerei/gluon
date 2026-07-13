@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-10",
+    "checkedAt": "2026-07-13",
     "scope": "@gluonjs",
-    "scopeControl": "unverified",
-    "publicationState": "blocked",
-    "observation": "The exact scoped package requests returned HTTP 404 when checked; this does not prove scope ownership, reservation, or future availability."
+    "scopeControl": "verified",
+    "publicationState": "ready",
+    "observation": "marcmalerei is a verified owner of the gluonjs npm organization; all 17 package records exist publicly with reviewed bootstrap integrity and verified GitHub Actions trusted-publisher bindings."
   },
   "packages": [
     {

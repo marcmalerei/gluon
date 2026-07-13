@@ -4,8 +4,7 @@ The official Gluon store provides typed, application-scoped state without a
 DOM dependency. Store definitions infer state, computed getter values, action
 arguments, and action results from one definition.
 
-The package is private and unreleased while the repository remains before its
-first public version.
+The package is part of the lockstep Gluon `1.0.0` release line.
 
 ## Define and use a store
 

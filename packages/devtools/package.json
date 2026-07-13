@@ -1,20 +1,53 @@
 {
   "name": "@gluonjs/devtools",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Opt-in Gluon development bridge, browser inspector, and Vite integration.",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/marcmalerei/gluon.git", "directory": "packages/devtools" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/devtools"
+  },
   "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/devtools#readme",
-  "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
-  "engines": { "node": "^22.12.0 || ^24.0.0" },
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
   "sideEffects": false,
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
-  "publishConfig": { "access": "public", "provenance": true },
-  "dependencies": { "@gluonjs/devtools-api": "0.0.0" },
-  "peerDependencies": { "@gluonjs/core": "0.0.0", "vite": "^8.0.0" },
-  "peerDependenciesMeta": { "@gluonjs/core": { "optional": true } },
-  "scripts": { "build": "tsc -p tsconfig.build.json", "typecheck": "tsc -p tsconfig.json --noEmit" }
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@gluonjs/devtools-api": "1.0.0"
+  },
+  "peerDependencies": {
+    "@gluonjs/core": "1.0.0",
+    "vite": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@gluonjs/core": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
 }

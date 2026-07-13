@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.0.0
+## [Unreleased]
+
+## [1.0.0] - 2026-07-13
 
 - Added the opt-in universal client asset manifest for SSR and static builds.
 - Added development and production Gluon transforms with high-resolution

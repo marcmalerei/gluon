@@ -17,14 +17,14 @@ import {
 
 describe('versioned diagnostic catalog', () => {
   test('has complete full and compact lookups with production formatting', async () => {
-    const artifact = JSON.parse(await readFile('docs/diagnostics/0.0.0.json', 'utf8'));
+    const artifact = JSON.parse(await readFile('docs/diagnostics/1.0.0.json', 'utf8'));
     expect(artifact.version).toBe(GLUON_DIAGNOSTIC_CATALOG_VERSION);
     expect(artifact.diagnostics).toEqual(gluonDiagnosticCatalog);
     for (const definition of gluonDiagnosticCatalog) {
       expect(getGluonDiagnostic(definition.code)).toBe(definition);
       expect(getGluonDiagnostic(definition.compactCode)).toBe(definition);
       expect(formatGluonDiagnostic(definition.code, '', { production: true })).toBe(definition.compactCode);
-      expect(gluonDiagnosticReferenceUrl(definition.compactCode)).toContain(`/0.0.0/${definition.code}`);
+      expect(gluonDiagnosticReferenceUrl(definition.compactCode)).toContain(`/1.0.0/${definition.code}`);
       expect(definition.remediation.length).toBeGreaterThan(10);
     }
     expect(formatGluonDiagnostic('GLUON_UNKNOWN', 'detail')).toBe('GLUON_UNKNOWN: detail');

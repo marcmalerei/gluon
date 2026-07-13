@@ -11,7 +11,7 @@
 </p>
 
 > [!IMPORTANT]
-> Gluon is an early prototype. A working runtime and component-layer foundation now exist in this repository, but the package is private, unpublished, and its public API is not stable.
+> The repository carries the `1.0.0` release line. npm publication is performed only from an immutable `v1.0.0` tag through the protected release workflow.
 
 ## What works today
 
@@ -30,7 +30,7 @@
 - opt-in versioned Devtools with multi-application inspection and ordered runtime timelines
 - a shareable Gluon Playground with live diagnostics, reference lookup, and starter download
 - a living mobile-first GLUON GOODS reference shop built from public APIs
-- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/0.0.0/migration/vue-to-gluon-cutover/index.md)
+- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.0.0/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -49,9 +49,9 @@ The repository includes a reproducible production comparison with Lit, Vue,
 and optimized Vanilla DOM. The retained baseline does not establish that Gluon
 is generally faster; see [Rendering performance evidence](docs/performance.md).
 
-## Install for development
+## Repository development
 
-The package is not published. Work from this repository:
+Work from a clean checkout:
 
 ```bash
 npm install
@@ -69,13 +69,13 @@ client/SSR builds, and package dry runs.
 
 ## Create an application
 
-After publication, interactive project creation uses the lockstep generator:
+Interactive project creation uses the lockstep generator:
 
 ```bash
 npm create gluon@latest my-app
 ```
 
-Repository development can run `node packages/create-gluon/dist/cli.js my-app`
+Repository development can also run `node packages/create-gluon/dist/cli.js my-app`
 after `npm run build:create-gluon`. Stable automation uses `--yes` and any of
 `--router`, `--store`, `--testing`, `--ui`, or `--ssr`. SSR enables Router and
 Store; explicit `--ssr --no-router` and `--ssr --no-store` combinations fail
@@ -648,12 +648,11 @@ Included now:
 
 Not included now:
 
-- server-side rendering or hydration
 - islands
 - Vue runtime/API compatibility, production SFC compilation, or source rewriting;
   the retained codemod evaluation proves no behaviorally equivalent writer class
 - a supported performance-superiority claim
-- a stable or published package release
+- branded browser, operating-system, device, or assistive-technology support claims
 
 ## Development
 

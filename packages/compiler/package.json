@@ -1,8 +1,8 @@
 {
   "name": "@gluonjs/compiler",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Source transforms and template locations for Gluon tooling.",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -11,8 +11,12 @@
     "directory": "packages/compiler"
   },
   "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/compiler#readme",
-  "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
-  "engines": { "node": "^22.12.0 || ^24.0.0" },
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
   "sideEffects": false,
   "exports": {
     ".": {
@@ -24,8 +28,16 @@
       "import": "./dist/diagnostics.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
-  "publishConfig": { "access": "public", "provenance": true },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "dependencies": {
     "magic-string": "^0.30.21",
     "typescript": "^5.7.0"

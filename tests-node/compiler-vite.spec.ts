@@ -38,7 +38,7 @@ describe('@gluonjs/compiler', () => {
     expect(formatGluonDiagnostic(definition.code, 'detail', { production: true })).toBe(`${definition.compactCode}: detail`);
     expect(formatGluonDiagnostic('GLUON_UNKNOWN')).toBe('GLUON_UNKNOWN');
     expect(formatGluonDiagnostic('GLUON_UNKNOWN', 'detail')).toBe('GLUON_UNKNOWN: detail');
-    expect(gluonDiagnosticReferenceUrl(definition.compactCode, '/reference/')).toContain(`/0.0.0/${definition.code}`);
+    expect(gluonDiagnosticReferenceUrl(definition.compactCode, '/reference/')).toContain(`/1.0.0/${definition.code}`);
     expect(gluonDiagnosticReferenceUrl('GLUON UNKNOWN')).toMatch(/\/GLUON%20UNKNOWN$/);
   });
 

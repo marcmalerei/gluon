@@ -1,7 +1,7 @@
 # `@gluonjs/reactivity`
 
-DOM-free reactive state primitives for Gluon. The package is private and
-unpublished while the Gluon 1.0 contracts are being implemented.
+DOM-free reactive state primitives for Gluon. The package is part of the
+lockstep Gluon `1.0.0` release line.
 
 ```ts
 import { computed, effect, nextTick, reactive, ref } from '@gluonjs/reactivity';

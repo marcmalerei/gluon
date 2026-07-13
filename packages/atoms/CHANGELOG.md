@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13
+
 ### Added
 
 - Production GLUON GOODS usage of Button presets across navigation, dialogs,

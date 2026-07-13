@@ -78,7 +78,7 @@ describe('create-gluon scaffolding', () => {
       ui: false,
       ssr: false,
     });
-    expect(manifest.dependencies).toEqual({ '@gluonjs/core': '0.0.0' });
+    expect(manifest.dependencies).toEqual({ '@gluonjs/core': '1.0.0' });
     expect(manifest.scripts).toMatchObject({ test: 'npm run typecheck', build: 'vite build' });
     expect(app).toContain("from '@gluonjs/core'");
     expect(app).not.toContain('/src/');
@@ -111,12 +111,12 @@ describe('create-gluon scaffolding', () => {
       ssr: true,
     });
     expect(manifest.dependencies).toMatchObject({
-      '@gluonjs/core': '0.0.0',
-      '@gluonjs/atoms': '0.0.0',
-      '@gluonjs/router': '0.0.0',
-      '@gluonjs/reactivity': '0.0.0',
-      '@gluonjs/store': '0.0.0',
-      '@gluonjs/ssr': '0.0.0',
+      '@gluonjs/core': '1.0.0',
+      '@gluonjs/atoms': '1.0.0',
+      '@gluonjs/router': '1.0.0',
+      '@gluonjs/reactivity': '1.0.0',
+      '@gluonjs/store': '1.0.0',
+      '@gluonjs/ssr': '1.0.0',
     });
     expect(app).toContain("from '@gluonjs/atoms'");
     expect(app).toContain('Button({');
@@ -172,7 +172,7 @@ test('runCli exposes help and stable --yes behavior', async () => {
 
   written = '';
   await runCli(['--version'], { output });
-  expect(written).toBe('0.0.0\n');
+  expect(written).toBe('1.0.0\n');
 
   written = '';
   const cwd = await mkdtemp(join(tmpdir(), 'create-gluon-cli-'));
@@ -296,7 +296,7 @@ describe('create-gluon add-component planning and writes', () => {
       const manifest = JSON.parse(await readFile(join(project.directory, 'package.json'), 'utf8'));
       expect(manifest.scripts['test:components']).toBe('vitest run src/components');
       expect(manifest.devDependencies).toMatchObject({
-        '@gluonjs/test-utils': '0.0.0',
+        '@gluonjs/test-utils': '1.0.0',
         '@vitest/browser-playwright': '^4.0.18',
         playwright: '^1.58.2',
         vitest: '^4.0.18',

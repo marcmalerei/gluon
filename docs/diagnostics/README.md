@@ -1,9 +1,10 @@
 # Diagnostic reference
 
 The versioned machine-readable Gluon diagnostic catalog is generated from the
-public `@gluonjs/compiler/diagnostics` entry point. Version `0.0.0` is available
-as [`0.0.0.json`](./0.0.0.json) and through the searchable Config state in the
-Gluon Playground.
+public `@gluonjs/compiler/diagnostics` entry point. Version `1.0.0` is available
+as [`1.0.0.json`](./1.0.0.json) and through the searchable Config state in the
+Gluon Playground. The unpublished prototype catalog remains retained as
+[`0.0.0.json`](./0.0.0.json) for repository history.
 
 Every entry has a stable full code, compact production code, title, summary,
 cause, remediation, and owning subsystem. `npm run check:diagnostics` scans

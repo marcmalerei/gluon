@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13
+
 ### Added
 
 - Standalone refs, object and collection proxies, effects, computed values, and

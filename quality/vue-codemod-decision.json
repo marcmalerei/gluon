@@ -141,7 +141,7 @@
         "finding:GVA1302:src/ProductCard.vue:134:170:1"
       ],
       "acceptanceEvidence": [
-        "docs-site/content/0.0.0/migration/vue-to-gluon-cutover/index.md",
+        "docs-site/content/1.0.0/migration/vue-to-gluon-cutover/index.md",
         "quality/vue-codemod-evidence/counterexamples.md"
       ]
     },

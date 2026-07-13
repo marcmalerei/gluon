@@ -1,8 +1,8 @@
 {
   "name": "@gluonjs/atoms",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Accessible focused UI primitives and reusable Gluon theme styles.",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -35,10 +35,10 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/quarks": "0.0.0"
+    "@gluonjs/quarks": "1.0.0"
   },
   "peerDependencies": {
-    "@gluonjs/core": "0.0.0"
+    "@gluonjs/core": "1.0.0"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {

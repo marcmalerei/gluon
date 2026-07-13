@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13
+
 ### Added
 
 - Production GLUON GOODS checkout usage of five repeated, required FormField
