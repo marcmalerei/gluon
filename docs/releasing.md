@@ -7,10 +7,12 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-Publication remains blocked while the repository is private and npm scope
-control is unverified. In that state every package stays `private: true`, uses
-the documentation version `0.0.0`, and keeps release work under `Unreleased`.
-This is enforced by:
+Publication remains blocked while the machine-readable package contract records
+`publicationState: blocked` and `scopeControl: unverified`. In that state every
+package stays `private: true`, uses the documentation version `0.0.0`, and keeps
+release work under `Unreleased`. External setup work does not make the source
+tree releasable until every owner-controlled prerequisite has been verified and
+the reviewed release-cut PR changes those fields together. This is enforced by:
 
 ```sh
 npm run check:release-contract
@@ -107,6 +109,61 @@ that commit, strict validation permits only those two evidence files to change.
 
 Do not change `package-contract.json` from `blocked`/`unverified` to
 `ready`/`verified` until those facts have been checked by an owner.
+
+## Owner-controlled package-record bootstrap
+
+npm package settings expose trusted-publisher configuration only after the
+package record exists. The one-time bootstrap therefore publishes a minimal
+`0.0.0-bootstrap.0` placeholder for every package under the
+`gluon-bootstrap` dist-tag. These placeholders contain only `package.json`,
+`README.md`, and `LICENSE`: they expose no runtime, executable, types, exports,
+dependencies, or supported API. They do not use provenance, because this is an
+interactive owner publication rather than the protected release workflow, and
+they must never receive `latest`.
+
+Prepare and inspect the deterministic allowlisted archives from clean `main`:
+
+```sh
+npm ci --ignore-scripts
+npm run check:release-bootstrap
+npm run release:bootstrap:artifacts
+cat .tmp/npm-bootstrap/bootstrap-evidence.json
+cat .tmp/npm-bootstrap/SHA256SUMS
+for archive in .tmp/npm-bootstrap/packages/*.tgz; do
+  tar -tzf "$archive"
+done
+npm run release:bootstrap:publish -- --dry-run
+```
+
+The builder records the exact source commit, archive integrity, SHA-1, SHA-256,
+and file allowlist for all 17 packages. Review every name and archive before the
+irreversible step. The publisher rejects `NPM_TOKEN` and `NODE_AUTH_TOKEN`, an
+artifact set that is not byte-identical to an independent rebuild, a dirty or
+non-`main` checkout, a source commit that is not the exact current
+`origin/main`, a user who is not an npm organization owner, a conflicting
+existing package record, any unexpected `latest`, and a rerun whose registry
+integrity differs from the reviewed archive.
+
+The npm owner then runs this command in an interactive terminal and completes
+the registry's 2FA challenges without copying credentials or one-time codes
+into logs, issues, or chat:
+
+```sh
+npm run release:bootstrap:publish -- --confirm-owner-controlled-bootstrap
+```
+
+A matching partial run is recoverable: already-published immutable bootstrap
+versions are verified and skipped, while missing records continue. After all
+records exist, confirm that each package maps only `gluon-bootstrap` to
+`0.0.0-bootstrap.0` and has no `latest` tag.
+
+For each package, configure npm Trusted Publishing from its package settings
+with GitHub Actions, repository owner `marcmalerei`, repository `gluon`,
+workflow filename `release.yml`, environment `npm`, and the `npm publish`
+allowed action required by this repository's workflow. npm does not validate
+these coordinates when they are saved, so review them exactly. Configure and
+verify all 17 bindings before restricting traditional token publishing; no
+long-lived publication token may be added to GitHub.
 
 ## Release-candidate commit
 

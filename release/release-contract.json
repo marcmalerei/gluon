@@ -8,6 +8,19 @@
   "artifactDirectory": ".tmp/release",
   "manualEvidencePath": "release/evidence/{version}.json",
   "compatibilityManifestPath": "release/compatibility/{version}.json",
+  "bootstrap": {
+    "version": "0.0.0-bootstrap.0",
+    "artifactDirectory": ".tmp/npm-bootstrap",
+    "distTag": "gluon-bootstrap",
+    "access": "public",
+    "identity": "owner-interactive-2fa",
+    "latestAllowed": false,
+    "packageFiles": [
+      "package.json",
+      "README.md",
+      "LICENSE"
+    ]
+  },
   "spdxSchema": {
     "path": "release/spdx-2.3.schema.json",
     "source": "https://raw.githubusercontent.com/spdx/spdx-spec/44ab76293754df4af5af700fd4abd5453b866c86/schemas/spdx-schema.json",

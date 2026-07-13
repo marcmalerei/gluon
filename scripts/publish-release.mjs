@@ -63,13 +63,13 @@ if (!dryRun) {
 }
 
 async function requireExistingPackage(name) {
-  try {
-    await execFile('npm', ['view', name, 'name', '--json'], { cwd: root, encoding: 'utf8', maxBuffer: 1024 * 1024 });
-  } catch (error) {
-    if (npmNotFound(error)) {
-      throw new Error(`${name} has no existing npm package record. Trusted publishing cannot bootstrap a new package; complete the owner-controlled bootstrap before running this workflow.`);
-    }
-    throw error;
+  const bootstrapVersion = releaseContract.bootstrap.version;
+  const metadata = await registryMetadata(name, bootstrapVersion);
+  if (!metadata) {
+    throw new Error(`${name} has no reviewed ${bootstrapVersion} npm bootstrap record. Trusted publishing cannot bootstrap a new package; complete the owner-controlled bootstrap before running this workflow.`);
+  }
+  if (metadata.name !== name || metadata.version !== bootstrapVersion) {
+    throw new Error(`${name} npm bootstrap metadata does not match ${name}@${bootstrapVersion}.`);
   }
 }
 

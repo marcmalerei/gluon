@@ -22,11 +22,14 @@ const spdxSchemaDigest = createHash('sha256')
   .update(await readFile(resolve(root, releaseContract.spdxSchema.path)))
   .digest('hex');
 const packageContract = await readJson('package-contract.json');
+const rootManifest = await readJson('package.json');
 const versions = await readJson('docs-site/versions.json');
 const lockfile = await readJson('package-lock.json');
 const rootChangelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
 const workflow = await readFile(resolve(root, '.github/workflows/release.yml'), 'utf8');
 const publishScript = await readFile(resolve(root, 'scripts/publish-release.mjs'), 'utf8');
+const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-bootstrap-artifacts.mjs'), 'utf8');
+const bootstrapPublishScript = await readFile(resolve(root, 'scripts/publish-npm-bootstrap.mjs'), 'utf8');
 const hostingScript = await readFile(resolve(root, 'scripts/verify-release-hosting.mjs'), 'utf8');
 const officialNames = new Set(packageContract.packages.map((entry) => entry.name));
 const manualEvidenceSchema = await readJson('release/manual-evidence.schema.json');
@@ -97,6 +100,7 @@ const result = {
   version: currentVersion,
   candidate: candidateVersion ?? null,
   packagesPrivate,
+  bootstrap: releaseContract.bootstrap,
   publicationState: packageContract.registry.publicationState,
   scopeControl: packageContract.registry.scopeControl,
   externalPrerequisites: releaseContract.externalPrerequisites,
@@ -121,6 +125,16 @@ function validateReleaseContract() {
   if (releaseContract.publication?.stagingDistTagPrefix !== 'gluon-staging-v'
     || releaseContract.publication?.promotion !== 'interactive-2fa') {
     throw new Error('Release publication must stage under a non-latest dist-tag and require interactive 2FA promotion.');
+  }
+  if (!prereleaseVersion(releaseContract.bootstrap?.version)
+    || releaseContract.bootstrap.version === releaseContract.targetVersion
+    || releaseContract.bootstrap.distTag === releaseContract.publication.distTag
+    || releaseContract.bootstrap.latestAllowed !== false
+    || releaseContract.bootstrap.identity !== 'owner-interactive-2fa') {
+    throw new Error('npm bootstrap must use a distinct prerelease, a non-latest dist-tag, and owner-controlled interactive 2FA.');
+  }
+  if (JSON.stringify(releaseContract.bootstrap.packageFiles) !== JSON.stringify(['package.json', 'README.md', 'LICENSE'])) {
+    throw new Error('npm bootstrap archives must contain only package.json, README.md, and LICENSE.');
   }
   if (!releaseContract.spdxSchema.source.includes(`/${releaseContract.spdxSchema.sourceCommit}/`)) {
     throw new Error('SPDX schema source URL must pin the declared source commit.');
@@ -315,6 +329,29 @@ function validateWorkflow() {
   for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', stagingTag", 'requireExistingPackage']) {
     if (!publishScript.includes(required)) throw new Error(`Release publisher is missing ${required}.`);
   }
+  if (!publishScript.includes('releaseContract.bootstrap.version')) {
+    throw new Error('Release publisher must verify the exact contracted bootstrap package record.');
+  }
+  for (const [name, command] of Object.entries({
+    'release:bootstrap:artifacts': 'node scripts/build-npm-bootstrap-artifacts.mjs',
+    'release:bootstrap:publish': 'node scripts/publish-npm-bootstrap.mjs --directory .tmp/npm-bootstrap',
+    'check:release-bootstrap': 'node scripts/build-npm-bootstrap-artifacts.mjs --check',
+  })) {
+    if (rootManifest.scripts?.[name] !== command) throw new Error(`package.json must define ${name} as ${command}.`);
+  }
+  for (const required of ['bootstrap.packageFiles', 'publishConfig', "'README.md'", "'LICENSE'"]) {
+    if (!bootstrapBuildScript.includes(required)) throw new Error(`npm bootstrap builder is missing ${required}.`);
+  }
+  for (const required of [
+    'confirm-owner-controlled-bootstrap',
+    'NPM_TOKEN',
+    'NODE_AUTH_TOKEN',
+    "'--tag', bootstrap.distTag",
+    'bootstrap.latestAllowed === false',
+    'requireCleanMain',
+    'requireNpmOwner',
+    'reproduceArtifacts',
+  ]) if (!bootstrapPublishScript.includes(required)) throw new Error(`npm bootstrap publisher is missing ${required}.`);
   for (const match of workflow.matchAll(/uses:\s+[^\s@]+@([^\s#]+)/g)) {
     if (!/^[a-f0-9]{40}$/.test(match[1])) {
       throw new Error(`Release workflow action ref ${match[1]} is not an immutable commit SHA.`);
@@ -330,6 +367,10 @@ function validateWorkflow() {
 
 function stableVersion(value) {
   return /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(value);
+}
+
+function prereleaseVersion(value) {
+  return /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*$/.test(value ?? '');
 }
 
 function escapeRegExp(value) {
