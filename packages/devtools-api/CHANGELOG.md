@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
+### Changed
+
+- Included the unchanged Devtools API runtime in the lockstep `1.0.1` recovery
+  candidate after `v1.0.0` stopped before publication.
+
 ## [1.0.0] - 2026-07-13
 
 - Add version 1 application snapshots, event timeline, selection, subscriptions,

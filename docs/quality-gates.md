@@ -9,8 +9,10 @@ security, accessibility, retention, performance-evidence, and shop-budget jobs.
 dispatch. It uses the current Node 24-based `actions/checkout@v7` and
 `actions/setup-node@v6` action majors:
 
-- a clean production build followed by the full `npm run check` gate on Node
-  22.12 with Chromium, so workspace package exports exist before typechecking;
+- the full `npm run check` gate directly after a clean install on Node 22.12
+  with Chromium, so source typechecks cannot depend on leftover or prebuilt
+  workspace package exports; the check then builds those public exports before
+  coverage and integration suites consume them;
 - the browser, Router, test-utils, Devtools, Playground, and GLUON GOODS suites
   with Playwright Chromium, Firefox, and WebKit;
 - production builds plus SSR tests on Node 22.12 and Node 24;
@@ -23,6 +25,12 @@ dispatch. It uses the current Node 24-based `actions/checkout@v7` and
 - a production Chromium GLUON GOODS flow budget and a ten-sample comparative
   Chromium/Firefox/WebKit rendering run retained for 30 days as JSON and
   Markdown workflow artifacts.
+
+Package TypeScript configurations that replace the root path map retain every
+direct and transitive official source alias required by their typecheck. Their
+build configurations resolve those dependencies through built declarations.
+This keeps clean-source typechecking independent from build order while keeping
+published declaration builds inside each package's `rootDir`.
 
 Set `GLUON_BROWSER` to `chromium`, `firefox`, or `webkit` to reproduce one engine
 lane locally. An unknown value fails configuration before tests start.
@@ -107,7 +115,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.0.0/examples/ui.html` with the other versioned documentation examples.
+`/1.0.1/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 15 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
@@ -121,6 +129,12 @@ Button, Icon, Input, Label, FormField, `PurchaseAction`, and
 `CheckoutExperience` markers. It rejects unused Card/AppShell and deprecated
 aggregate-style markers, while `check:shop-boundaries` rejects private package
 paths, `<style>` fallbacks, and undocumented `.gluon-*` class coupling.
+
+Each optional UI package replaces the root TypeScript path map with its bounded
+source dependency map. That map includes both Core and Reactivity because the
+Core source program imports the public Reactivity entry point. The clean
+repository gate runs before any workspace build so an omitted transitive source
+alias fails in the same state used by the release candidate job.
 
 ## Report-only Vue analyzer gate
 

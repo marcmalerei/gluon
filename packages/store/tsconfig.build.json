@@ -6,6 +6,9 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
+    "paths": {
+      "@gluonjs/reactivity": ["packages/reactivity/dist/index.d.ts"]
+    },
     "stripInternal": true
   }
 }

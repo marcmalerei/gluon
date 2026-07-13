@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
+### Changed
+
+- Updated official dependency pins for the lockstep `1.0.1` recovery candidate
+  after `v1.0.0` stopped before publication.
+
 ## [1.0.0] - 2026-07-13
 
 - Add shared project diagnostics for Gluon HTML, SVG, and CSS templates.

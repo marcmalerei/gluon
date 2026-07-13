@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
+### Changed
+
+- Included the unchanged Compiler runtime in the lockstep `1.0.1` recovery
+  candidate after `v1.0.0` stopped before publication.
+
 ## [1.0.0] - 2026-07-13
 
 - Added tagged-template locations, interpolation locations, diagnostics,

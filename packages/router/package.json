@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The official Gluon router with browser, hash, and memory histories.",
   "private": false,
   "type": "module",
@@ -39,8 +39,8 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.0",
-    "@gluonjs/reactivity": "1.0.0"
+    "@gluonjs/core": "1.0.1",
+    "@gluonjs/reactivity": "1.0.1"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {

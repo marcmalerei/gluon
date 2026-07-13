@@ -7,6 +7,22 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
+### Fixed
+
+- Package source typechecks now retain the Reactivity aliases required by their
+  direct or Core-transitive imports, so a clean release checkout no longer
+  depends on prebuilt workspace declarations.
+- The primary Quality Gates repository job now starts the full check directly
+  after installation. The check typechecks clean source first, then builds the
+  public package exports required by its coverage and integration suites.
+
+### Changed
+
+- Advanced the first supported release candidate to `1.0.1` after the immutable
+  `v1.0.0` tag failed before artifact creation or registry publication.
+
 ## [1.0.0] - 2026-07-13
 
 ### Added

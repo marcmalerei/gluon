@@ -8,7 +8,8 @@
     "rootDir": "src",
     "paths": {
       "@gluonjs/compiler": ["packages/compiler/dist/index.d.ts"],
-      "@gluonjs/core": ["dist/types/index.d.ts"]
+      "@gluonjs/core": ["dist/types/index.d.ts"],
+      "@gluonjs/reactivity": ["packages/reactivity/dist/index.d.ts"]
     },
     "sourceMap": true
   }

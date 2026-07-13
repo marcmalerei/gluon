@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
+### Fixed
+
+- Source typechecking now resolves Reactivity without requiring its prebuilt
+  workspace declarations.
+
+### Changed
+
+- Updated the Reactivity dependency pin for the lockstep `1.0.1` recovery
+  candidate after `v1.0.0` stopped before publication.
+
 ## [1.0.0] - 2026-07-13
 
 ### Added
