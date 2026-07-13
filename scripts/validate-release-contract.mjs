@@ -263,6 +263,18 @@ function validateEvidenceSchemaBoundary() {
         checkedBy: releaseContract.npmOwnerRecovery.owner,
         checkedAt: '2026-07-13T00:00:00.000Z',
       },
+      releaseTagRulesets: {
+        creationRulesetId: 1,
+        immutabilityRulesetId: 2,
+        creationBypass: {
+          actorId: 25964605,
+          actorType: releaseContract.githubReleaseTagProtection.creationBypassActorType,
+          bypassMode: releaseContract.githubReleaseTagProtection.creationBypassMode,
+        },
+        immutabilityBypassActorCount: 0,
+        checkedBy: releaseContract.npmOwnerRecovery.owner,
+        checkedAt: '2026-07-13T00:00:00.000Z',
+      },
     },
     supportBoundary: releaseContract.supportBoundary,
     acceptedBy: releaseContract.npmOwnerRecovery.owner,
@@ -370,6 +382,19 @@ async function validateReleaseCutEvidence(version) {
     || !Number.isFinite(Date.parse(immutablePreflight.checkedAt))
     || immutablePreflight.checkedAt !== evidence.acceptedAt) {
     throw new Error(`${path} must record the sole operator's successful immutable-releases preflight.`);
+  }
+  const rulesetPreflight = evidence.hostingPreflight?.releaseTagRulesets;
+  if (!Number.isInteger(rulesetPreflight?.creationRulesetId)
+    || !Number.isInteger(rulesetPreflight?.immutabilityRulesetId)
+    || rulesetPreflight.creationRulesetId === rulesetPreflight.immutabilityRulesetId
+    || rulesetPreflight.creationBypass?.actorId !== 25964605
+    || rulesetPreflight.creationBypass?.actorType !== releaseContract.githubReleaseTagProtection.creationBypassActorType
+    || rulesetPreflight.creationBypass?.bypassMode !== releaseContract.githubReleaseTagProtection.creationBypassMode
+    || rulesetPreflight.immutabilityBypassActorCount !== 0
+    || rulesetPreflight.checkedBy !== releaseContract.npmOwnerRecovery.owner
+    || !Number.isFinite(Date.parse(rulesetPreflight.checkedAt))
+    || rulesetPreflight.checkedAt !== evidence.acceptedAt) {
+    throw new Error(`${path} must record the sole operator's exact release-tag ruleset bypass preflight.`);
   }
   if (Object.entries(releaseContract.supportBoundary)
     .some(([field, expected]) => evidence.supportBoundary?.[field] !== expected)
@@ -499,8 +524,10 @@ function validateWorkflow() {
       throw new Error(`Release workflow action ref ${match[1]} is not an immutable commit SHA.`);
     }
   }
-  if (!hostingScript.includes('hostingPreflight?.immutableReleases') || !hostingScript.includes("!== 'public'")) {
-    throw new Error('Release hosting verification must require public GitHub hosting and versioned immutable-release preflight evidence.');
+  if (!hostingScript.includes('hostingPreflight?.immutableReleases')
+    || !hostingScript.includes('hostingPreflight?.releaseTagRulesets')
+    || !hostingScript.includes("!== 'public'")) {
+    throw new Error('Release hosting verification must require public GitHub hosting and versioned administration-only preflight evidence.');
   }
   for (const required of [
     "rule.type === 'required_reviewers'",
@@ -508,10 +535,12 @@ function validateWorkflow() {
     'environment.can_admins_bypass !== false',
     'deploymentPolicies.branch_policies.length !== 1',
     "deploymentPolicies.branch_policies[0].name !== 'v*'",
-    "ruleTypes.has('creation')",
-    "ruleTypes.has('update')",
-    "ruleTypes.has('deletion')",
-    'bypassActors.length === 0',
+    "creationRuleTypes.has('creation')",
+    "immutabilityRuleTypes.has('update')",
+    "immutabilityRuleTypes.has('deletion')",
+    'rulesetPreflight.creationBypass?.actorId',
+    'rulesetPreflight.immutabilityBypassActorCount',
+    "entry.target === 'tag' && entry.enforcement === 'active'",
     'releaseCutEvidence.supportBoundary',
     'releaseCutEvidence.acceptedBy',
     'immutablePreflight.checkedBy',

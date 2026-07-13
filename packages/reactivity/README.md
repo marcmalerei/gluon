@@ -1,7 +1,7 @@
 # `@gluonjs/reactivity`
 
 DOM-free reactive state primitives for Gluon. The package is part of the
-lockstep Gluon `1.0.5` release line.
+lockstep Gluon `1.0.6` release line.
 
 ```ts
 import { computed, effect, nextTick, reactive, ref } from '@gluonjs/reactivity';

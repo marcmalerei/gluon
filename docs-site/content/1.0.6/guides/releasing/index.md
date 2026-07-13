@@ -1,6 +1,6 @@
 # Release readiness
 
-The `1.0.5` documentation describes the first supported public release line.
+The `1.0.6` documentation describes the first supported public release line.
 The `@gluonjs` scope, all 17 package records, and their trusted-publisher
 bindings are verified in the package contract.
 
@@ -47,10 +47,11 @@ administrator.
 
 Strict validation requires a machine-readable release-cut record containing the
 exact tested commit, its successful Quality Gates run, the sole operator's
-administrative verification that immutable GitHub releases are enabled, and
-the operator's acceptance of the automated-only support boundary. Gluon 1.0
-makes no branded browser, operating-system, device, or assistive-technology
-support claim and does not require manual evidence for those combinations.
+administrative verification that immutable GitHub releases are enabled and
+that the exact tag-ruleset bypass lists match the contract, and the operator's
+acceptance of the automated-only support boundary. Gluon 1.0 makes no branded
+browser, operating-system, device, or assistive-technology support claim and
+does not require manual evidence for those combinations.
 
 The same release cut freezes an immutable compatibility manifest with exact
 Playwright Chromium, Firefox, and WebKit binaries, Node LTS versions, and
@@ -76,10 +77,13 @@ publication because hosting verification lacked GitHub's ephemeral workflow
 token for its read-only API checks. The immutable `v1.0.4` tag passed every
 release and reproducibility gate, then stopped before draft or npm publication
 because the immutable-releases endpoint requires Administration read access
-that an Actions `GITHUB_TOKEN` cannot receive. The `1.0.5` release line uses the
-complete root build, leaves setup-node registry authentication disabled, passes
-the contracted registry explicitly to npm, records the operator's successful
-immutable-release preflight in versioned release-cut evidence, and scopes the
+that an Actions `GITHUB_TOKEN` cannot receive. The immutable `v1.0.5` tag also
+passed every release and reproducibility gate, then stopped before draft or npm
+publication because GitHub omits ruleset `bypass_actors` from non-administration
+responses. The `1.0.6` release line uses the complete root build, leaves
+setup-node registry authentication disabled, passes the contracted registry
+explicitly to npm, records the operator's successful immutable-release and
+ruleset-bypass preflights in versioned release-cut evidence, and scopes the
 ephemeral GitHub token to the remaining live hosting checks. The failed tags
 are not moved or reused.
 

@@ -33,7 +33,7 @@
     "hostingPreflight": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["immutableReleases"],
+      "required": ["immutableReleases", "releaseTagRulesets"],
       "properties": {
         "immutableReleases": {
           "type": "object",
@@ -42,6 +42,35 @@
           "properties": {
             "enabled": { "const": true },
             "enforcedByOwner": { "type": "boolean" },
+            "checkedBy": { "const": "marcmalerei" },
+            "checkedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "releaseTagRulesets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "creationRulesetId",
+            "immutabilityRulesetId",
+            "creationBypass",
+            "immutabilityBypassActorCount",
+            "checkedBy",
+            "checkedAt"
+          ],
+          "properties": {
+            "creationRulesetId": { "type": "integer", "minimum": 1 },
+            "immutabilityRulesetId": { "type": "integer", "minimum": 1 },
+            "creationBypass": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["actorId", "actorType", "bypassMode"],
+              "properties": {
+                "actorId": { "type": "integer", "minimum": 1 },
+                "actorType": { "const": "User" },
+                "bypassMode": { "const": "always" }
+              }
+            },
+            "immutabilityBypassActorCount": { "const": 0 },
             "checkedBy": { "const": "marcmalerei" },
             "checkedAt": { "type": "string", "format": "date-time" }
           }

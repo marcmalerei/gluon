@@ -285,13 +285,15 @@ that operator nor an administrator can rewrite or delete an existing release
 tag.
 
 GitHub's immutable-releases status endpoint requires repository Administration
-read access, which an ephemeral Actions `GITHUB_TOKEN` cannot receive. The sole
-operator therefore verifies that endpoint immediately before the release tag
-and commits its enabled state, owner-enforcement state, identity, and timestamp
-in the versioned release-cut evidence. Protected publication continues to
-verify the public environment, deployment policy, tag rulesets, operator, and
-Quality Gates run live with the ephemeral workflow token; no long-lived GitHub
-administration secret is introduced.
+read access, and GitHub omits ruleset `bypass_actors` from responses without
+that access. An ephemeral Actions `GITHUB_TOKEN` cannot receive repository
+Administration permission. The sole operator therefore verifies both controls
+immediately before the release tag and commits the immutable-release state,
+exact ruleset IDs and bypass configuration, identity, and timestamp in the
+versioned release-cut evidence. Protected publication continues to verify the
+public environment, deployment policy, active tag ruleset IDs, conditions and
+rule types, operator, and Quality Gates run live with the ephemeral workflow
+token; no long-lived GitHub administration secret is introduced.
 
 The first public release deliberately skips manual branded-browser/device and
 assistive-technology evidence. Its immutable compatibility manifest contains

@@ -267,7 +267,7 @@ function updateManifest(
   const scripts = recordValue(next.scripts);
   const gluonVersion = stringValue(dependencies['@gluonjs/core'])
     ?? stringValue(devDependencies['@gluonjs/core'])
-    ?? '1.0.5';
+    ?? '1.0.6';
   for (const dependency of componentDependencies) {
     dependencies[dependency] = stringValue(dependencies[dependency])
       ?? stringValue(devDependencies[dependency])

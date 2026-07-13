@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-07-13
+
+### Changed
+
+- Advanced the lockstep package release with versioned release-tag ruleset
+  bypass preflight evidence while retaining live public ruleset enforcement
+  verification before npm publication.
+
 ## [1.0.5] - 2026-07-13
 
 ### Changed

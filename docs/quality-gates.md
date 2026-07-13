@@ -115,7 +115,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.0.5/examples/ui.html` with the other versioned documentation examples.
+`/1.0.6/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 15 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,

@@ -47,40 +47,6 @@ if (!Array.isArray(deploymentPolicies.branch_policies)
 const rulesets = await githubJson(`repos/${repository}/rulesets?includes_parents=true`);
 const releaseTagProtection = releaseContract.githubReleaseTagProtection;
 const operator = await githubJson(`users/${releaseTagProtection.operator}`);
-let operatorCanCreateReleaseTags = false;
-let releaseTagUpdatesAreImmutable = false;
-let releaseTagDeletionsAreImmutable = false;
-for (const summary of rulesets.filter((entry) => entry.target === 'tag' && entry.enforcement === 'active')) {
-  const ruleset = await githubJson(`repos/${repository}/rulesets/${summary.id}`);
-  const includes = ruleset.conditions?.ref_name?.include ?? [];
-  const excludes = ruleset.conditions?.ref_name?.exclude ?? [];
-  const ruleTypes = new Set(ruleset.rules?.map((rule) => rule.type));
-  const coversReleaseTags = JSON.stringify(includes) === JSON.stringify(releaseTagProtection.includePatterns)
-    && excludes.length === 0;
-  if (!coversReleaseTags) continue;
-
-  const bypassActors = ruleset.bypass_actors ?? [];
-  const hasExactCreationBypass = bypassActors.length === 1
-    && bypassActors[0].actor_type === releaseTagProtection.creationBypassActorType
-    && bypassActors[0].actor_id === operator.id
-    && bypassActors[0].bypass_mode === releaseTagProtection.creationBypassMode;
-  if (ruleTypes.has('creation') && hasExactCreationBypass) {
-    operatorCanCreateReleaseTags = true;
-  }
-  if (bypassActors.length === 0 && ruleTypes.has('update')) {
-    releaseTagUpdatesAreImmutable = true;
-  }
-  if (bypassActors.length === 0 && ruleTypes.has('deletion')) {
-    releaseTagDeletionsAreImmutable = true;
-  }
-}
-if (!operatorCanCreateReleaseTags) {
-  throw new Error(`An active ruleset must allow only ${releaseTagProtection.operator} to create v-prefixed release tags.`);
-}
-if (!releaseTagUpdatesAreImmutable || !releaseTagDeletionsAreImmutable) {
-  throw new Error('Active no-bypass rulesets must prevent update and deletion of v-prefixed release tags.');
-}
-
 const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', releaseVersion);
 const releaseCutEvidence = JSON.parse(await readFile(resolve(root, evidencePath), 'utf8'));
 const immutablePreflight = releaseCutEvidence.hostingPreflight?.immutableReleases;
@@ -89,6 +55,43 @@ if (immutablePreflight?.enabled !== true
   || !Number.isFinite(Date.parse(immutablePreflight.checkedAt))
   || immutablePreflight.checkedAt !== releaseCutEvidence.acceptedAt) {
   throw new Error('Release-cut evidence must record the sole operator\'s successful immutable-releases preflight.');
+}
+const rulesetPreflight = releaseCutEvidence.hostingPreflight?.releaseTagRulesets;
+if (!Number.isInteger(rulesetPreflight?.creationRulesetId)
+  || !Number.isInteger(rulesetPreflight?.immutabilityRulesetId)
+  || rulesetPreflight.creationRulesetId === rulesetPreflight.immutabilityRulesetId
+  || rulesetPreflight.creationBypass?.actorId !== operator.id
+  || rulesetPreflight.creationBypass?.actorType !== releaseTagProtection.creationBypassActorType
+  || rulesetPreflight.creationBypass?.bypassMode !== releaseTagProtection.creationBypassMode
+  || rulesetPreflight.immutabilityBypassActorCount !== 0
+  || rulesetPreflight.checkedBy !== releaseContract.npmOwnerRecovery.owner
+  || !Number.isFinite(Date.parse(rulesetPreflight.checkedAt))
+  || rulesetPreflight.checkedAt !== releaseCutEvidence.acceptedAt) {
+  throw new Error('Release-cut evidence must record the sole operator\'s exact release-tag ruleset bypass preflight.');
+}
+const activeTagRulesets = new Map(rulesets
+  .filter((entry) => entry.target === 'tag' && entry.enforcement === 'active')
+  .map((entry) => [entry.id, entry]));
+if (!activeTagRulesets.has(rulesetPreflight.creationRulesetId)
+  || !activeTagRulesets.has(rulesetPreflight.immutabilityRulesetId)) {
+  throw new Error('The preflight release-tag rulesets must remain active.');
+}
+const creationRuleset = await githubJson(`repos/${repository}/rulesets/${rulesetPreflight.creationRulesetId}`);
+const immutabilityRuleset = await githubJson(`repos/${repository}/rulesets/${rulesetPreflight.immutabilityRulesetId}`);
+for (const ruleset of [creationRuleset, immutabilityRuleset]) {
+  const includes = ruleset.conditions?.ref_name?.include ?? [];
+  const excludes = ruleset.conditions?.ref_name?.exclude ?? [];
+  if (JSON.stringify(includes) !== JSON.stringify(releaseTagProtection.includePatterns) || excludes.length !== 0) {
+    throw new Error('Active release-tag rulesets must cover exactly the contracted v-prefixed tag pattern.');
+  }
+}
+const creationRuleTypes = new Set(creationRuleset.rules?.map((rule) => rule.type));
+const immutabilityRuleTypes = new Set(immutabilityRuleset.rules?.map((rule) => rule.type));
+if (!creationRuleTypes.has('creation')) {
+  throw new Error('The active creation ruleset must restrict v-prefixed release-tag creation.');
+}
+if (!immutabilityRuleTypes.has('update') || !immutabilityRuleTypes.has('deletion')) {
+  throw new Error('The active immutability ruleset must prevent update and deletion of v-prefixed release tags.');
 }
 if (Object.entries(releaseContract.supportBoundary)
   .some(([field, expected]) => releaseCutEvidence.supportBoundary?.[field] !== expected)
