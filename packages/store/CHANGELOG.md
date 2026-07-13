@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-07-13
+
+### Changed
+
+- Advanced the lockstep package release with versioned immutable-release
+  operator preflight evidence so protected publication no longer requires an
+  unavailable Actions Administration permission.
+
 ## [1.0.4] - 2026-07-13
 
 ### Changed

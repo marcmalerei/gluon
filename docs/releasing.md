@@ -8,8 +8,8 @@ and `.github/workflows/release.yml` is the only supported publication path.
 ## Current publication state
 
 The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the `1.0.4` release candidate. Every official
-manifest is public and lockstep at `1.0.4`. The candidate is not publishable
+`scopeControl: verified` for the `1.0.5` release candidate. Every official
+manifest is public and lockstep at `1.0.5`. The candidate is not publishable
 until its exact commit has a successful Quality Gates run and the two matching
 evidence files are committed. This is enforced by:
 
@@ -53,8 +53,17 @@ The immutable `v1.0.3` tag points to commit
 and performance jobs. The protected publish job then stopped before draft
 creation, attestation, or npm publication because the hosting verifier's
 read-only `gh api` calls did not receive GitHub's ephemeral workflow token.
-Registry verification found no official `1.0.3` package version. All four
-failed tags remain unchanged; recovery uses the new `1.0.4` version and tag.
+Registry verification found no official `1.0.3` package version.
+
+The immutable `v1.0.4` tag points to commit
+`dc0da6e47d52cc31e1d2569bbf1fb86b3a90e054`. Its Release run
+`29270008612` passed candidate, reproducibility, browser-engine, Node-runtime,
+and performance jobs. The protected publish job received GitHub's ephemeral
+workflow token but stopped before draft creation, attestation, or npm
+publication because the immutable-releases endpoint requires repository
+Administration read access, which an Actions `GITHUB_TOKEN` cannot receive.
+Registry verification found no official `1.0.4` package version. All five
+failed tags remain unchanged; recovery uses the new `1.0.5` version and tag.
 
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
@@ -102,7 +111,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.0.4` release commit, the repository owner must verify
+Before preparing the `1.0.5` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -134,7 +143,11 @@ all of the following outside the source tree:
    operator can cut a release. The update and deletion rules have no bypass
    actor, making an existing release tag immutable for every user, including
    repository administrators.
-8. GitHub immutable releases are enabled.
+8. GitHub immutable releases are enabled. Immediately before committing the
+   release evidence, the sole operator verifies the administration-only
+   immutable-releases endpoint and records its exact enabled and
+   owner-enforcement booleans, operator, and check time in the versioned
+   release-cut evidence.
 9. The accepted support boundary is automated engine evidence only. Gluon 1.0
    makes no branded-browser, operating-system, device, or assistive-technology
    support claim and does not require the corresponding manual protocols.
@@ -142,8 +155,9 @@ all of the following outside the source tree:
 Record the release-cut decision in `release/evidence/<version>.json` using
 [`release/release-cut-evidence.schema.json`](../release/release-cut-evidence.schema.json).
 Strict candidate validation requires the exact tested commit, its successful
-Quality Gates run, the contracted no-branded-support boundary, and acceptance
-by the sole operator. Do not commit placeholder or inferred results.
+Quality Gates run, the successful immutable-release operator preflight, the
+contracted no-branded-support boundary, and acceptance by the sole operator.
+Do not commit placeholder or inferred results.
 
 Also freeze `release/compatibility/<version>.json` against
 [`release/compatibility-manifest.schema.json`](../release/compatibility-manifest.schema.json).
@@ -232,13 +246,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.0.4` and `private: false`;
-- set every official implementation and peer dependency to exact `1.0.4`;
+- set every official manifest to version `1.0.5` and `private: false`;
+- set every official implementation and peer dependency to exact `1.0.5`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.0.4` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.0.4`, then make that version
+- add dated `1.0.5` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.0.5`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -249,8 +263,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm run release:validate -- --candidate 1.0.4
-npm run release:artifacts -- --version 1.0.4
+npm run release:validate -- --candidate 1.0.5
+npm run release:artifacts -- --version 1.0.5
 ```
 
 `release:artifacts` packs every package twice and compares canonical unpacked
@@ -284,7 +298,7 @@ prove that the recorded tested commit is an ancestor of the candidate commit.
 ## Protected publication
 
 After the candidate PR is merged and all gates are green, create the exact
-reviewed `v1.0.4` tag. The tag starts the `Release` workflow. Its candidate job
+reviewed `v1.0.5` tag. The tag starts the `Release` workflow. Its candidate job
 repeats the full repository check and artifact build. The single-operator `npm`
 environment then admits the publication job without independent approval. It
 permits only `v*` tags and disallows administrator bypass and long-lived npm
@@ -292,11 +306,12 @@ secrets.
 
 The publication job verifies public repository visibility, the absence of
 environment reviewers and an uncontracted wait timer, the exact `v*` tag policy,
-disabled administrator bypass, release-tag mutation rules, immutable GitHub
-releases, and the absence of long-lived npm token variables. All
-release-workflow actions are pinned to commit SHAs. It attests archives, SBOMs,
-checksums, the immutable compatibility manifest, and other evidence, then
-creates or updates a draft GitHub release.
+disabled administrator bypass, release-tag mutation rules, the versioned
+operator preflight that records immutable GitHub releases as enabled, and the
+absence of long-lived npm token variables. All release-workflow actions are
+pinned to commit SHAs. It attests archives, SBOMs, checksums, the immutable
+compatibility manifest, and other evidence, then creates or updates a draft
+GitHub release.
 
 The protected publish and finalize jobs use `actions/setup-node` only to select
 Node; they do not provide its `registry-url` input because that input writes
@@ -305,9 +320,14 @@ when OIDC is intended. Publisher and registry-verification commands pass the
 registry from `release/release-contract.json` explicitly. Contract validation
 rejects either protected job if setup-node registry authentication returns.
 The hosting-verification step alone receives GitHub's ephemeral workflow token
-as `GH_TOKEN` for its read-only repository, environment, immutable-release, and
-ruleset queries. The surrounding job still has no long-lived GitHub or npm
-secret, and contract validation rejects a verifier without the ephemeral token.
+as `GH_TOKEN` for its live public environment, deployment-policy, ruleset,
+operator, and Quality Gates queries. GitHub's immutable-releases endpoint
+requires repository Administration read access, which an Actions
+`GITHUB_TOKEN` cannot receive; the sole operator therefore records that
+successful administrative preflight in the versioned release-cut evidence
+before tagging. The surrounding job still has no long-lived GitHub or npm
+secret, and contract validation rejects either missing preflight evidence or a
+verifier without the ephemeral token.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance under `gluon-staging-v<version-with-dashes>`, never directly to

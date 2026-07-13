@@ -256,6 +256,14 @@ function validateEvidenceSchemaBoundary() {
     testedCommit: '0'.repeat(40),
     cutAt: '2026-07-13T00:00:00.000Z',
     automatedQualityRun,
+    hostingPreflight: {
+      immutableReleases: {
+        enabled: true,
+        enforcedByOwner: false,
+        checkedBy: releaseContract.npmOwnerRecovery.owner,
+        checkedAt: '2026-07-13T00:00:00.000Z',
+      },
+    },
     supportBoundary: releaseContract.supportBoundary,
     acceptedBy: releaseContract.npmOwnerRecovery.owner,
     acceptedAt: '2026-07-13T00:00:00.000Z',
@@ -355,6 +363,13 @@ async function validateReleaseCutEvidence(version) {
   if (evidence.automatedQualityRun?.conclusion !== 'success'
     || !/^https:\/\/github\.com\/marcmalerei\/gluon\/actions\/runs\/\d+$/.test(evidence.automatedQualityRun?.url ?? '')) {
     throw new Error(`${path} requires a successful Quality Gates run URL.`);
+  }
+  const immutablePreflight = evidence.hostingPreflight?.immutableReleases;
+  if (immutablePreflight?.enabled !== true
+    || immutablePreflight.checkedBy !== releaseContract.npmOwnerRecovery.owner
+    || !Number.isFinite(Date.parse(immutablePreflight.checkedAt))
+    || immutablePreflight.checkedAt !== evidence.acceptedAt) {
+    throw new Error(`${path} must record the sole operator's successful immutable-releases preflight.`);
   }
   if (Object.entries(releaseContract.supportBoundary)
     .some(([field, expected]) => evidence.supportBoundary?.[field] !== expected)
@@ -484,8 +499,8 @@ function validateWorkflow() {
       throw new Error(`Release workflow action ref ${match[1]} is not an immutable commit SHA.`);
     }
   }
-  if (!hostingScript.includes('immutable-releases') || !hostingScript.includes("!== 'public'")) {
-    throw new Error('Release hosting verification must require public, immutable GitHub releases.');
+  if (!hostingScript.includes('hostingPreflight?.immutableReleases') || !hostingScript.includes("!== 'public'")) {
+    throw new Error('Release hosting verification must require public GitHub hosting and versioned immutable-release preflight evidence.');
   }
   for (const required of [
     "rule.type === 'required_reviewers'",
@@ -499,6 +514,7 @@ function validateWorkflow() {
     'bypassActors.length === 0',
     'releaseCutEvidence.supportBoundary',
     'releaseCutEvidence.acceptedBy',
+    'immutablePreflight.checkedBy',
   ]) if (!hostingScript.includes(required)) {
     throw new Error(`Release hosting verification is missing single-operator environment control ${required}.`);
   }

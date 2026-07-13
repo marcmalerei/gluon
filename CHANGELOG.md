@@ -7,6 +7,25 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-07-13
+
+### Fixed
+
+- Immutable GitHub release enablement is now captured in the versioned
+  operator preflight evidence instead of being queried by the workflow token;
+  GitHub requires repository Administration read access for that endpoint, a
+  permission unavailable to an ephemeral Actions `GITHUB_TOKEN`.
+- Protected publication continues to verify the public repository,
+  environment, deployment policy, tag rulesets, operator identity, and exact
+  Quality Gates run live with the scoped workflow token.
+
+### Changed
+
+- Advanced the first supported release candidate to `1.0.5` after immutable
+  `v1.0.4` passed all release and reproducibility gates but stopped before
+  draft creation, attestation, or npm publication on the administration-only
+  immutable-releases query.
+
 ## [1.0.4] - 2026-07-13
 
 ### Fixed

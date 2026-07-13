@@ -193,7 +193,7 @@ Gluon follows Semantic Versioning:
 
 - `0.y.z` releases are explicitly unstable. Minor releases may contain breaking
   changes, and every such change must be called out in the changelog.
-- Starting with `1.0.4`, incompatible public API changes require a major release,
+- Starting with `1.0.5`, incompatible public API changes require a major release,
   backward-compatible additions require a minor release, and compatible fixes
   require a patch release.
 - A released version is immutable and is never rebuilt or republished. A defect
@@ -283,6 +283,15 @@ the same pattern and blocks update and deletion without any bypass actor. The
 sole operator can therefore cut a release without a second person, but neither
 that operator nor an administrator can rewrite or delete an existing release
 tag.
+
+GitHub's immutable-releases status endpoint requires repository Administration
+read access, which an ephemeral Actions `GITHUB_TOKEN` cannot receive. The sole
+operator therefore verifies that endpoint immediately before the release tag
+and commits its enabled state, owner-enforcement state, identity, and timestamp
+in the versioned release-cut evidence. Protected publication continues to
+verify the public environment, deployment policy, tag rulesets, operator, and
+Quality Gates run live with the ephemeral workflow token; no long-lived GitHub
+administration secret is introduced.
 
 The first public release deliberately skips manual branded-browser/device and
 assistive-technology evidence. Its immutable compatibility manifest contains

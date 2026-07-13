@@ -21,9 +21,6 @@ if (process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN) {
   throw new Error('Long-lived npm publication tokens are prohibited; use npm trusted publishing.');
 }
 
-const immutable = await githubJson(`repos/${repository}/immutable-releases`);
-if (immutable.enabled !== true) throw new Error('GitHub immutable releases must be enabled before publication.');
-
 const environment = await githubJson(`repos/${repository}/environments/npm`);
 const reviewerRule = environment.protection_rules?.find((rule) => rule.type === 'required_reviewers');
 if (reviewerRule) {
@@ -86,6 +83,13 @@ if (!releaseTagUpdatesAreImmutable || !releaseTagDeletionsAreImmutable) {
 
 const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', releaseVersion);
 const releaseCutEvidence = JSON.parse(await readFile(resolve(root, evidencePath), 'utf8'));
+const immutablePreflight = releaseCutEvidence.hostingPreflight?.immutableReleases;
+if (immutablePreflight?.enabled !== true
+  || immutablePreflight.checkedBy !== releaseContract.npmOwnerRecovery.owner
+  || !Number.isFinite(Date.parse(immutablePreflight.checkedAt))
+  || immutablePreflight.checkedAt !== releaseCutEvidence.acceptedAt) {
+  throw new Error('Release-cut evidence must record the sole operator\'s successful immutable-releases preflight.');
+}
 if (Object.entries(releaseContract.supportBoundary)
   .some(([field, expected]) => releaseCutEvidence.supportBoundary?.[field] !== expected)
   || releaseCutEvidence.acceptedBy !== releaseContract.npmOwnerRecovery.owner) {
@@ -116,7 +120,7 @@ if (changedAfterTesting.some((path) => !permittedEvidenceChanges.has(path))) {
   throw new Error(`Acceptance-relevant files changed after the automated Quality Gates run: ${changedAfterTesting.filter((path) => !permittedEvidenceChanges.has(path)).join(', ')}.`);
 }
 
-console.log(`release hosting valid: ${repository} is public, immutable releases enabled, npm environment active, tested commit verified`);
+console.log(`release hosting valid: ${repository} is public, immutable releases recorded enabled, npm environment active, tested commit verified`);
 
 async function githubJson(path) {
   return JSON.parse((await execFile('gh', ['api', path], {

@@ -10,6 +10,7 @@
     "testedCommit",
     "cutAt",
     "automatedQualityRun",
+    "hostingPreflight",
     "supportBoundary",
     "acceptedBy",
     "acceptedAt"
@@ -27,6 +28,24 @@
       "properties": {
         "url": { "type": "string", "format": "uri", "pattern": "^https://github.com/marcmalerei/gluon/actions/runs/[0-9]+$" },
         "conclusion": { "const": "success" }
+      }
+    },
+    "hostingPreflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["immutableReleases"],
+      "properties": {
+        "immutableReleases": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "enforcedByOwner", "checkedBy", "checkedAt"],
+          "properties": {
+            "enabled": { "const": true },
+            "enforcedByOwner": { "type": "boolean" },
+            "checkedBy": { "const": "marcmalerei" },
+            "checkedAt": { "type": "string", "format": "date-time" }
+          }
+        }
       }
     },
     "supportBoundary": {
