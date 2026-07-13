@@ -6,7 +6,7 @@
   "tagPrefix": "v",
   "environment": "npm",
   "artifactDirectory": ".tmp/release",
-  "manualEvidencePath": "release/evidence/{version}.json",
+  "releaseCutEvidencePath": "release/evidence/{version}.json",
   "compatibilityManifestPath": "release/compatibility/{version}.json",
   "bootstrap": {
     "version": "0.0.0-bootstrap.1",
@@ -61,6 +61,16 @@
     "updateBypassAllowed": false,
     "deletionBypassAllowed": false
   },
+  "supportBoundary": {
+    "model": "automated-engine-evidence-only",
+    "brandedBrowserSupportClaimed": false,
+    "operatingSystemSupportClaimed": false,
+    "deviceSupportClaimed": false,
+    "assistiveTechnologySupportClaimed": false,
+    "manualBrowserDeviceEvidenceRequired": false,
+    "manualAssistiveTechnologyEvidenceRequired": false,
+    "singleOperatorRiskAccepted": true
+  },
   "spdxSchema": {
     "path": "release/spdx-2.3.schema.json",
     "source": "https://raw.githubusercontent.com/spdx/spdx-spec/44ab76293754df4af5af700fd4abd5453b866c86/schemas/spdx-schema.json",
@@ -93,8 +103,6 @@
     "verified-npm-trusted-publisher",
     "verified-single-operator-npm-environment",
     "protected-release-tags",
-    "immutable-github-releases",
-    "release-cut-browser-device-evidence",
-    "release-cut-assistive-technology-evidence"
+    "immutable-github-releases"
   ]
 }

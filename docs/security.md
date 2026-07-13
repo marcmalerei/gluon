@@ -54,7 +54,7 @@ pre-write contents.
 ## Review procedure
 
 Run `npm run check:security`, `npm run test:vue-analyzer`, the deterministic property/fuzz suite, SSR tests,
-and the browser matrix. A change to a sink, escape hatch, serializer, asset URL,
+and the automated browser-engine matrix. A change to a sink, escape hatch, serializer, asset URL,
 style carrier, hydration boundary, request-ownership rule, or generator writer
 must update the
 machine-readable model and this review in the same pull request.

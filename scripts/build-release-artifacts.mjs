@@ -94,8 +94,8 @@ const releaseNotes = changelogSection(changelog, allowBlocked ? 'Unreleased' : v
 await writeFile(resolve(output, 'CHANGELOG.md'), changelog, 'utf8');
 await writeFile(resolve(output, 'RELEASE_NOTES.md'), `${releaseNotes.trim()}\n`, 'utf8');
 if (!allowBlocked) {
-  const evidencePath = releaseContract.manualEvidencePath.replace('{version}', version);
-  await writeFile(resolve(output, 'manual-release-evidence.json'), await readFile(resolve(root, evidencePath)));
+  const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', version);
+  await writeFile(resolve(output, 'release-cut-evidence.json'), await readFile(resolve(root, evidencePath)));
   const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', version);
   await writeFile(resolve(output, 'compatibility-manifest.json'), await readFile(resolve(root, compatibilityPath)));
 }
@@ -167,6 +167,7 @@ const evidence = {
       `sbom/${fileSafe(entry.name)}.cdx.json`,
     ]),
   },
+  releaseCutEvidence: allowBlocked ? null : 'release-cut-evidence.json',
   compatibilityManifest: allowBlocked ? null : 'compatibility-manifest.json',
 };
 await writeJson(resolve(output, 'release-evidence.json'), evidence);

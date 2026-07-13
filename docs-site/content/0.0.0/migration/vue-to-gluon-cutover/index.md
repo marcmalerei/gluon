@@ -225,7 +225,8 @@ Custom Events and forms; they are not temporary compatibility code.
 - A clean install, typecheck, test, server build, client build, and production
   bundle scan pass without Vue or its build plugin.
 - All supported URLs, forms, dialogs, focus returns, persistence, server
-  responses, hydration, and critical customer flows pass in supported browsers.
+  responses, hydration, and critical customer flows pass in every configured
+  automated engine target.
 - Rollback means deploying the retained prior artifact and compatible data
   contract, not running two application owners on the same subtree.
 

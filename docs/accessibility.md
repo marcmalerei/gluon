@@ -1,13 +1,14 @@
-# Accessibility evidence and manual protocol
+# Accessibility evidence and future manual protocol
 
-Gluon accessibility claims require both automated checks and task-based manual
-review. `tests/accessibility-gates.spec.ts` runs axe-core WCAG 2 A/AA, 2.1 AA,
-and 2.2 AA rules against the GLUON GOODS home, product, bag-dialog, and checkout
-surfaces in every Playwright engine lane. Before each axe scan, the test waits
-for every finite Web Animation on the surface to finish so that transient entry
-opacity cannot change the computed contrast result. The customer-flow suite
-separately asserts initial dialog focus, focus containment, Escape behavior,
-focus return, native labels, and mobile navigation.
+Gluon 1.0 publishes automated accessibility regression evidence and makes no
+assistive-technology support claim. `tests/accessibility-gates.spec.ts` runs
+axe-core WCAG 2 A/AA, 2.1 AA, and 2.2 AA rules against the GLUON GOODS home,
+product, bag-dialog, and checkout surfaces in every Playwright engine lane.
+Before each axe scan, the test waits for every finite Web Animation on the
+surface to finish so that transient entry opacity cannot change the computed
+contrast result. The customer-flow suite separately asserts initial dialog
+focus, focus containment, Escape behavior, focus return, native labels, and
+mobile navigation.
 
 `tests/ui-system.spec.ts` applies the same WCAG A/AA rule set to the stable
 Quark, Atom, Molecule, and Organism composition. It also verifies focus-scope
@@ -31,12 +32,14 @@ styles after unmount in Chromium, Firefox, and WebKit.
 
 Automated rules cannot establish reading order quality, useful announcements,
 zoom usability, speech output, or whether a keyboard sequence is understandable.
-The following protocol is therefore release-blocking for changed customer flows.
+The following protocol is retained for a future release that chooses to make a
+corresponding manual accessibility or assistive-technology support claim. It is
+not a Gluon 1.0 release gate.
 
 ## Keyboard protocol
 
-Record the commit, browser product/version, OS, viewport, input method, date,
-tester, and outcome for each run.
+For such a future support claim, record the commit, browser product/version, OS,
+viewport, input method, date, tester, and outcome for each run.
 
 1. At 1536px, 390px, and 320px, traverse from the skip link through global
    navigation, product cards, configuration, bag, checkout, and footer using
@@ -56,12 +59,13 @@ tester, and outcome for each run.
 
 ## Assistive-technology protocol
 
-At release-candidate cut, execute the same browse-to-checkout task with the
-latest supported combinations named in the frozen browser manifest:
+If a future release chooses to claim assistive-technology support, execute the
+same browse-to-checkout task with the combinations named in that release's
+accepted browser manifest:
 
 - VoiceOver with real Safari on macOS and iOS/iPadOS;
-- NVDA with supported Chrome, Edge, and Firefox on Windows;
-- TalkBack with supported Chrome and Firefox on Android.
+- NVDA with the targeted Chrome, Edge, and Firefox versions on Windows;
+- TalkBack with the targeted Chrome and Firefox versions on Android.
 
 Verify landmarks, headings, link/control names, product price and configuration,
 dialog name/state, live inventory status, bag quantity changes, required checkout
@@ -71,7 +75,8 @@ WebKit or an accessibility-tree snapshot cannot replace real assistive technolog
 
 ## Evidence status
 
-The automated axe and focus-behavior gates are blocking in CI. The branded
-browser and assistive-technology runs are intentionally not claimed for the
-private `0.0.0` line; their signed evidence record is created at the Gluon 1.0
-release-candidate cut under the browser/device protocol.
+The automated axe and focus-behavior gates remain blocking in CI. Gluon 1.0
+makes no branded-browser, device, or assistive-technology support claim, so the
+manual protocols above are not release gates and no signed manual matrix is
+required. They remain the minimum evidence for any future support claim; an
+automated accessibility-tree result cannot satisfy such a claim.

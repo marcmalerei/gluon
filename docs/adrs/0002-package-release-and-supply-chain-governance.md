@@ -205,8 +205,9 @@ Gluon follows Semantic Versioning:
 - The latest major and its latest minor receive regular fixes. The latest minor
   of the immediately preceding major receives critical security fixes. Older
   lines are unsupported unless a release notice explicitly extends support.
-- Supported Node and browser versions follow ADR 0001 and the immutable
-  compatibility manifest attached to each release.
+- Supported Node versions and the automated browser-engine evidence boundary
+  follow ADR 0001 and the immutable compatibility manifest attached to each
+  release. Gluon 1.0 makes no branded-browser or platform support claim.
 
 ## Deprecation and removal
 
@@ -282,6 +283,14 @@ the same pattern and blocks update and deletion without any bypass actor. The
 sole operator can therefore cut a release without a second person, but neither
 that operator nor an administrator can rewrite or delete an existing release
 tag.
+
+The first public release deliberately skips manual branded-browser/device and
+assistive-technology evidence. Its immutable compatibility manifest contains
+only the exact Playwright Chromium, Firefox, and WebKit engine lanes, Node LTS
+lanes, and rendering-surface evidence from the successful Quality Gates run.
+The sole operator accepts that this creates no branded-browser,
+operating-system, device, or assistive-technology support claim. A future claim
+requires a new accepted contract and the retained manual protocols.
 
 The package-record bootstrap is a distinct, owner-controlled operation. It
 publishes the minimal `0.0.0-bootstrap.1` placeholder under the

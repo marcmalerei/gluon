@@ -1,9 +1,9 @@
 # DOM, form, directive, and cleanup contract
 
 This document defines the browser-runtime behavior implemented by
-`@gluonjs/core`. The current conformance target is the configured Playwright
-Chromium instance. Cross-browser support is a separate release gate in issue
-#38.
+`@gluonjs/core`. The release conformance targets are the configured
+Playwright-managed Chromium, Firefox, and WebKit binaries. They are engine-level
+evidence and do not establish branded-browser or platform support claims.
 
 ## Form controls
 

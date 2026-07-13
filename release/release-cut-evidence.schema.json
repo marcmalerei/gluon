@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/marcmalerei/gluon/blob/main/release/release-cut-evidence.schema.json",
+  "title": "Gluon release-cut evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "releaseVersion",
+    "testedCommit",
+    "cutAt",
+    "automatedQualityRun",
+    "supportBoundary",
+    "acceptedBy",
+    "acceptedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "releaseVersion": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "testedCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "cutAt": { "type": "string", "format": "date-time" },
+    "automatedQualityRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "conclusion"],
+      "properties": {
+        "url": { "type": "string", "format": "uri", "pattern": "^https://github.com/marcmalerei/gluon/actions/runs/[0-9]+$" },
+        "conclusion": { "const": "success" }
+      }
+    },
+    "supportBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "brandedBrowserSupportClaimed",
+        "operatingSystemSupportClaimed",
+        "deviceSupportClaimed",
+        "assistiveTechnologySupportClaimed",
+        "manualBrowserDeviceEvidenceRequired",
+        "manualAssistiveTechnologyEvidenceRequired",
+        "singleOperatorRiskAccepted"
+      ],
+      "properties": {
+        "model": { "const": "automated-engine-evidence-only" },
+        "brandedBrowserSupportClaimed": { "const": false },
+        "operatingSystemSupportClaimed": { "const": false },
+        "deviceSupportClaimed": { "const": false },
+        "assistiveTechnologySupportClaimed": { "const": false },
+        "manualBrowserDeviceEvidenceRequired": { "const": false },
+        "manualAssistiveTechnologyEvidenceRequired": { "const": false },
+        "singleOperatorRiskAccepted": { "const": true }
+      }
+    },
+    "acceptedBy": { "const": "marcmalerei" },
+    "acceptedAt": { "type": "string", "format": "date-time" }
+  }
+}

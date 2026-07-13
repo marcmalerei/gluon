@@ -27,15 +27,16 @@ dispatch. It uses the current Node 24-based `actions/checkout@v7` and
 Set `GLUON_BROWSER` to `chromium`, `firefox`, or `webkit` to reproduce one engine
 lane locally. An unknown value fails configuration before tests start.
 
-These Playwright projects are engine-level automation. They do not replace the
-branded Chrome, Edge, Firefox ESR, Safari, iOS, or Android release evidence
-required by the accepted support contract in ADR 0001.
+These Playwright projects are engine-level automation. The amended ADR 0001
+defines them as Gluon 1.0's complete browser evidence boundary and explicitly
+forbids deriving branded Chrome, Edge, Firefox ESR, Safari, iOS, or Android
+support claims from them.
 
-The exact release-candidate procedure is documented in
-[`browser-device-evidence.md`](browser-device-evidence.md). Automated and manual
-accessibility responsibilities are separated in
-[`accessibility.md`](accessibility.md), and deterministic retention evidence is
-defined in [`memory-retention.md`](memory-retention.md).
+The future branded-product evidence protocol is documented in
+[`browser-device-evidence.md`](browser-device-evidence.md). The current
+automated accessibility boundary and the future manual protocol are separated
+in [`accessibility.md`](accessibility.md), and deterministic retention evidence
+is defined in [`memory-retention.md`](memory-retention.md).
 
 ## Template composition gate
 
@@ -284,6 +285,9 @@ committed baseline remains the evidence used for comparative prose.
 
 ## Release-cut evidence boundary
 
-Branded-browser/device and assistive-technology results remain release-cut
-evidence rather than claims for the private `0.0.0` line. Issue #41 freezes and
-executes that product/version manifest before Gluon 1.0 publication.
+Gluon 1.0 records the exact Playwright-managed Chromium, Firefox, and WebKit
+binaries and the successful Quality Gates run. Branded-browser/device and
+assistive-technology manual evidence is intentionally skipped, is not a release
+gate, and produces no product, operating-system, device, or assistive-technology
+support claim. A future claim requires a new accepted contract and the retained
+manual protocols.

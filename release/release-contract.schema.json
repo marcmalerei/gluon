@@ -11,12 +11,13 @@
     "tagPrefix",
     "environment",
     "artifactDirectory",
-    "manualEvidencePath",
+    "releaseCutEvidencePath",
     "compatibilityManifestPath",
     "bootstrap",
     "npmOwnerRecovery",
     "githubReleaseEnvironment",
     "githubReleaseTagProtection",
+    "supportBoundary",
     "spdxSchema",
     "artifacts",
     "publication",
@@ -30,7 +31,7 @@
     "tagPrefix": { "const": "v" },
     "environment": { "const": "npm" },
     "artifactDirectory": { "const": ".tmp/release" },
-    "manualEvidencePath": { "const": "release/evidence/{version}.json" },
+    "releaseCutEvidencePath": { "const": "release/evidence/{version}.json" },
     "compatibilityManifestPath": { "const": "release/compatibility/{version}.json" },
     "bootstrap": {
       "type": "object",
@@ -159,6 +160,30 @@
         "deletionBypassAllowed": { "const": false }
       }
     },
+    "supportBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "brandedBrowserSupportClaimed",
+        "operatingSystemSupportClaimed",
+        "deviceSupportClaimed",
+        "assistiveTechnologySupportClaimed",
+        "manualBrowserDeviceEvidenceRequired",
+        "manualAssistiveTechnologyEvidenceRequired",
+        "singleOperatorRiskAccepted"
+      ],
+      "properties": {
+        "model": { "const": "automated-engine-evidence-only" },
+        "brandedBrowserSupportClaimed": { "const": false },
+        "operatingSystemSupportClaimed": { "const": false },
+        "deviceSupportClaimed": { "const": false },
+        "assistiveTechnologySupportClaimed": { "const": false },
+        "manualBrowserDeviceEvidenceRequired": { "const": false },
+        "manualAssistiveTechnologyEvidenceRequired": { "const": false },
+        "singleOperatorRiskAccepted": { "const": true }
+      }
+    },
     "spdxSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -215,7 +240,7 @@
     },
     "externalPrerequisites": {
       "type": "array",
-      "minItems": 10,
+      "minItems": 8,
       "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 }
     }
