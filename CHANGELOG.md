@@ -7,6 +7,23 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-13
+
+### Fixed
+
+- The release reproducibility job now runs the complete root build before
+  rebuilding package artifacts, so `@gluonjs/vue-migration-analyzer` and future
+  release-group additions cannot be omitted by a manually maintained build
+  list.
+- Release-contract validation now rejects a reproducibility job that does not
+  use the complete root build.
+
+### Changed
+
+- Advanced the first supported release candidate to `1.0.2` after the immutable
+  `v1.0.1` tag passed candidate, browser, Node, and performance gates but failed
+  reproducibility before GitHub draft creation or npm publication.
+
 ## [1.0.1] - 2026-07-13
 
 ### Fixed
