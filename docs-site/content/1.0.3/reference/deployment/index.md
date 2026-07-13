@@ -6,4 +6,4 @@ serialized state, route output, and mixed static/dynamic fallbacks are verified
 by repository tests.
 
 See the maintained [deployment contract](https://github.com/marcmalerei/gluon/blob/main/docs/deployment.md)
-and the [deployment guide](/gluon/1.0.2/guides/deployment/).
+and the [deployment guide](/gluon/1.0.3/guides/deployment/).

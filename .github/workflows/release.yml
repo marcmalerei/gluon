@@ -81,7 +81,6 @@ jobs:
         with:
           node-version: 24.x
           package-manager-cache: false
-          registry-url: https://registry.npmjs.org
       - run: npm install --global npm@11.18.0
       - run: npm ci --ignore-scripts
       - name: Resolve release version
@@ -243,7 +242,6 @@ jobs:
         with:
           node-version: 24.x
           package-manager-cache: false
-          registry-url: https://registry.npmjs.org
       - run: npm install --global npm@11.18.0
       - run: npm ci --ignore-scripts
       - name: Require the exact release tag and draft

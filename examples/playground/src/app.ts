@@ -128,7 +128,7 @@ export function createPlaygroundApplication(location: Pick<Location, 'hash' | 'h
           <code>${entry.code}</code><small>App.ts:${entry.range.start.line + 1}:${entry.range.start.character + 1}</small><span>${catalog(entry.code)?.remediation ?? entry.message}</span>
         </button>`)}
       </section>
-      <footer class="status"><span>Gluon 1.0.2</span><span>TypeScript</span><span class="ready">Ready</span></footer>
+      <footer class="status"><span>Gluon 1.0.3</span><span>TypeScript</span><span class="ready">Ready</span></footer>
       ${state.toast ? html`<div class="toast" role="status">${state.toast}</div>` : null}
     </div>
   `);

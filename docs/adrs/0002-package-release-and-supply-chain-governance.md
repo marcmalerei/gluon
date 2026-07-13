@@ -193,7 +193,7 @@ Gluon follows Semantic Versioning:
 
 - `0.y.z` releases are explicitly unstable. Minor releases may contain breaking
   changes, and every such change must be called out in the changelog.
-- Starting with `1.0.2`, incompatible public API changes require a major release,
+- Starting with `1.0.3`, incompatible public API changes require a major release,
   backward-compatible additions require a minor release, and compatible fixes
   require a patch release.
 - A released version is immutable and is never rebuilt or republished. A defect

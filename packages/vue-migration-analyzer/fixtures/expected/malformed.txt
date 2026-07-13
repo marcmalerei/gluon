@@ -1,16 +1,16 @@
-Gluon Vue migration analysis 1.0.2
+Gluon Vue migration analysis 1.0.3
 Support: partial
 Files: 2; components: 1; findings: 6
 
 . GVA1002 error indeterminate Exact Vue version cannot be established.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.3/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 . GVA1103 error indeterminate package.json is malformed.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.3/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 src/Broken.vue:3:1 GVA1103 error indeterminate Script syntax is malformed.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.3/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 src/Broken.vue:4:11 GVA1103 error indeterminate Template syntax is malformed.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.3/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 src/Broken.vue:4:29 GVA1103 error indeterminate Single-File Component syntax is malformed.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.3/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 src/Broken.vue:5:8 GVA1103 error indeterminate Style syntax is malformed.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.3/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
