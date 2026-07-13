@@ -1,6 +1,6 @@
 # Release readiness
 
-The `1.0.3` documentation describes the first supported public release line.
+The `1.0.4` documentation describes the first supported public release line.
 The `@gluonjs` scope, all 17 package records, and their trusted-publisher
 bindings are verified in the package contract.
 
@@ -69,10 +69,13 @@ the reproduction build omitted `@gluonjs/vue-migration-analyzer`; its publish
 job was skipped and no npm version or GitHub draft was created. The immutable
 `v1.0.2` tag passed all release gates, then stopped before draft creation or npm
 publication because setup-node registry authentication exported a placeholder
-`NODE_AUTH_TOKEN` that the no-token policy rejected. The `1.0.3` release line
-uses the complete root build, leaves setup-node registry authentication disabled
-in protected jobs, and passes the contracted registry explicitly to npm. The
-failed tags are not moved or reused.
+`NODE_AUTH_TOKEN` that the no-token policy rejected. The immutable `v1.0.3` tag
+passed every release and reproducibility gate, then stopped before draft or npm
+publication because hosting verification lacked GitHub's ephemeral workflow
+token for its read-only API checks. The `1.0.4` release line uses the complete
+root build, leaves setup-node registry authentication disabled, passes the
+contracted registry explicitly to npm, and scopes the ephemeral GitHub token to
+hosting verification. The failed tags are not moved or reused.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,

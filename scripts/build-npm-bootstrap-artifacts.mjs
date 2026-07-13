@@ -116,7 +116,7 @@ function bootstrapManifest(entry, rootPackage) {
 }
 
 function bootstrapReadme(name) {
-  return `# ${name}\n\nThis package version only establishes the npm package record required by Gluon's trusted-publishing release workflow.\n\nIt contains no runtime, build integration, executable, or supported public API. Do not install this bootstrap version. The first supported release is planned as \`1.0.3\`.\n\nThe reviewed bootstrap dist-tag is \`${bootstrap.distTag}\`. For a new package record, npm may also materialize a temporary \`latest\` tag that points to a reviewed bootstrap placeholder until the first supported release replaces it. Reviewed source and release evidence live at https://github.com/marcmalerei/gluon.\n`;
+  return `# ${name}\n\nThis package version only establishes the npm package record required by Gluon's trusted-publishing release workflow.\n\nIt contains no runtime, build integration, executable, or supported public API. Do not install this bootstrap version. The first supported release is planned as \`1.0.4\`.\n\nThe reviewed bootstrap dist-tag is \`${bootstrap.distTag}\`. For a new package record, npm may also materialize a temporary \`latest\` tag that points to a reviewed bootstrap placeholder until the first supported release replaces it. Reviewed source and release evidence live at https://github.com/marcmalerei/gluon.\n`;
 }
 
 function validatePackedManifest(name, manifest) {

@@ -98,6 +98,8 @@ jobs:
           name: gluon-${{ github.sha }}-performance
           path: .tmp/release/performance
       - run: node scripts/verify-release-hosting.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: npm run release:finalize-assets
       - name: Attest release archives and evidence
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
@@ -252,6 +254,8 @@ jobs:
           test "$GITHUB_REF_NAME" = "v$RELEASE_VERSION"
           test "$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft)" = true
       - run: node scripts/verify-release-hosting.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Download reviewed draft assets
         env:
           GH_TOKEN: ${{ github.token }}

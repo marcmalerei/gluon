@@ -4,8 +4,8 @@ export function createStarterTar(project: PlaygroundProject): Blob {
   const manifest = `${JSON.stringify({
     name: 'gluon-playground-reproduction', version: '0.0.0', private: true, type: 'module',
     scripts: { dev: 'vite', build: 'vite build', typecheck: 'tsc --noEmit', 'check:templates': 'gluon-template-check src' },
-    dependencies: { '@gluonjs/core': '1.0.3', '@gluonjs/reactivity': '1.0.3' },
-    devDependencies: { '@gluonjs/language-server': '1.0.3', '@gluonjs/vite': '1.0.3', typescript: '^5.7.0', vite: '^8.1.4' },
+    dependencies: { '@gluonjs/core': '1.0.4', '@gluonjs/reactivity': '1.0.4' },
+    devDependencies: { '@gluonjs/language-server': '1.0.4', '@gluonjs/vite': '1.0.4', typescript: '^5.7.0', vite: '^8.1.4' },
   }, null, 2)}\n`;
   const files = new Map([
     ['package.json', manifest],
