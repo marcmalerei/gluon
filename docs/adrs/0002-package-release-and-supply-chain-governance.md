@@ -251,9 +251,18 @@ moving a dist-tag may limit discovery but does not rewrite history.
 
 The first public release additionally verifies the npm organization, package
 names, existing owner-controlled package records, public repository state,
-trusted-publisher bindings, recovery owners, and account multi-factor
-authentication. Existing package records are mandatory because npm does not
-allow trusted publishers to bootstrap brand-new package names.
+trusted-publisher bindings, and account recovery and multi-factor
+authentication controls. Existing package records are mandatory because npm
+does not allow trusted publishers to bootstrap brand-new package names.
+
+The accepted npm ownership model has one organization owner: `marcmalerei`. A
+second owner is not required. The owner uses `auth-and-writes` 2FA, keeps the
+npm account linked to GitHub, and must retain current recovery codes outside the
+device used as the second factor. This deliberately accepts a single-person
+administration dependency: loss of the sole owner account can stop organization
+and package administration and require npm Support account recovery. The
+release contract states these required controls but does not treat repository
+configuration as proof that recovery codes are stored.
 
 The package-record bootstrap is a distinct, owner-controlled operation. It
 publishes the minimal `0.0.0-bootstrap.1` placeholder under the

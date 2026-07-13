@@ -101,6 +101,7 @@ const result = {
   candidate: candidateVersion ?? null,
   packagesPrivate,
   bootstrap: releaseContract.bootstrap,
+  npmOwnerRecovery: releaseContract.npmOwnerRecovery,
   publicationState: packageContract.registry.publicationState,
   scopeControl: packageContract.registry.scopeControl,
   externalPrerequisites: releaseContract.externalPrerequisites,
@@ -125,6 +126,20 @@ function validateReleaseContract() {
   if (releaseContract.publication?.stagingDistTagPrefix !== 'gluon-staging-v'
     || releaseContract.publication?.promotion !== 'interactive-2fa') {
     throw new Error('Release publication must stage under a non-latest dist-tag and require interactive 2FA promotion.');
+  }
+  const expectedNpmOwnerRecovery = {
+    model: 'single-owner',
+    owner: 'marcmalerei',
+    secondOwnerRequired: false,
+    mfaMode: 'auth-and-writes',
+    linkedGitHubAccountRequired: true,
+    recoveryCodesRequired: true,
+    recoveryCodeStorage: 'outside-second-factor-device',
+    npmSupportRecoveryRiskAccepted: true,
+  };
+  if (Object.entries(expectedNpmOwnerRecovery)
+    .some(([field, expected]) => releaseContract.npmOwnerRecovery?.[field] !== expected)) {
+    throw new Error('npm owner recovery must use the accepted single-owner, auth-and-writes MFA, linked-GitHub, separately stored recovery-code policy.');
   }
   if (!prereleaseVersion(releaseContract.bootstrap?.version)
     || releaseContract.bootstrap.version === releaseContract.targetVersion
@@ -156,6 +171,10 @@ function validateReleaseContract() {
   }
   if (!releaseContract.externalPrerequisites.includes('existing-npm-package-records')) {
     throw new Error('Release contract must record the npm package-existence prerequisite for trusted publishing.');
+  }
+  if (!releaseContract.externalPrerequisites.includes('npm-single-owner-recovery-and-mfa')
+    || releaseContract.externalPrerequisites.includes('npm-recovery-owners-and-mfa')) {
+    throw new Error('Release contract must record the accepted single-owner npm recovery and MFA prerequisite.');
   }
 }
 
