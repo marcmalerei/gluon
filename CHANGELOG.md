@@ -9,6 +9,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Machine-validated single-operator release-tag governance that lets only the
+  named operator create `v*` tags while no-bypass rules make existing release
+  tags immutable against update and deletion.
 - A machine-validated, owner-controlled npm bootstrap contract that produces
   minimal non-runtime archives for all 17 package records, restricts any
   registry-created temporary `latest` tag to a reviewed bootstrap placeholder,

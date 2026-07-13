@@ -275,6 +275,14 @@ publishes package versions under the staging dist-tag without another person's
 approval; later `latest` promotion does not make that initial publication
 reversible.
 
+Release-tag protection separates creation from later mutation. One active
+repository ruleset covers exactly `refs/tags/v*`, restricts creation, and gives
+only the `marcmalerei` user an `always` bypass. A second active ruleset covers
+the same pattern and blocks update and deletion without any bypass actor. The
+sole operator can therefore cut a release without a second person, but neither
+that operator nor an administrator can rewrite or delete an existing release
+tag.
+
 The package-record bootstrap is a distinct, owner-controlled operation. It
 publishes the minimal `0.0.0-bootstrap.1` placeholder under the
 `gluon-bootstrap` dist-tag with interactive 2FA and no provenance claim. npm

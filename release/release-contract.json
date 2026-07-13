@@ -52,6 +52,15 @@
     "longLivedNpmSecretsAllowed": false,
     "singleOperatorImmutableStagingRiskAccepted": true
   },
+  "githubReleaseTagProtection": {
+    "model": "operator-created-immutable-tags",
+    "operator": "marcmalerei",
+    "includePatterns": ["refs/tags/v*"],
+    "creationBypassActorType": "User",
+    "creationBypassMode": "always",
+    "updateBypassAllowed": false,
+    "deletionBypassAllowed": false
+  },
   "spdxSchema": {
     "path": "release/spdx-2.3.schema.json",
     "source": "https://raw.githubusercontent.com/spdx/spdx-spec/44ab76293754df4af5af700fd4abd5453b866c86/schemas/spdx-schema.json",
