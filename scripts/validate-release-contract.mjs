@@ -445,6 +445,9 @@ function validateWorkflow() {
     if (!job || /registry-url:/.test(job)) {
       throw new Error(`Release ${name} must not ask setup-node to create token-backed registry authentication.`);
     }
+    if (!/- run: node scripts\/verify-release-hosting\.mjs\n\s+env:\n\s+GH_TOKEN: \$\{\{ github\.token \}\}/.test(job)) {
+      throw new Error(`Release ${name} must expose the ephemeral GitHub token only to hosting verification.`);
+    }
   }
   for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', stagingTag", "'--registry', registry", 'releaseContract.publication.registry', 'requireExistingPackage']) {
     if (!publishScript.includes(required)) throw new Error(`Release publisher is missing ${required}.`);

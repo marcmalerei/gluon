@@ -7,6 +7,23 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-07-13
+
+### Fixed
+
+- Protected publication and finalization now expose GitHub's ephemeral workflow
+  token to the hosting-verification step, allowing its read-only repository,
+  environment, immutable-release, and ruleset checks to run in GitHub Actions.
+- Release-contract validation now rejects either protected job when the hosting
+  verifier lacks that scoped ephemeral token.
+
+### Changed
+
+- Advanced the first supported release candidate to `1.0.4` after the immutable
+  `v1.0.3` tag passed every release and reproducibility gate but stopped before
+  GitHub draft creation or npm publication because hosting verification could
+  not authenticate its GitHub API reads.
+
 ## [1.0.3] - 2026-07-13
 
 ### Fixed

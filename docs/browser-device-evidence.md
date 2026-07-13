@@ -32,6 +32,6 @@ Android device/simulator rows would follow the manual keyboard and assistive-tec
 protocol in [`accessibility.md`](accessibility.md). Engine-only substitutions
 remain labeled as early evidence and never inherit a branded support claim.
 
-The private `0.0.0` line and the first supported `1.0.3` release have no branded-product
+The private `0.0.0` line and the first supported `1.0.4` release have no branded-product
 support claim. Documentation may report only the exact engine, runner, and mode
 that actually ran. This future protocol is not a Gluon 1.0 release gate.

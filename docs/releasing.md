@@ -8,8 +8,8 @@ and `.github/workflows/release.yml` is the only supported publication path.
 ## Current publication state
 
 The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the `1.0.3` release candidate. Every official
-manifest is public and lockstep at `1.0.3`. The candidate is not publishable
+`scopeControl: verified` for the `1.0.4` release candidate. Every official
+manifest is public and lockstep at `1.0.4`. The candidate is not publishable
 until its exact commit has a successful Quality Gates run and the two matching
 evidence files are committed. This is enforced by:
 
@@ -45,8 +45,16 @@ and performance jobs. The protected publish job then stopped before draft
 creation or npm publication because `actions/setup-node` had exported its
 documented placeholder `NODE_AUTH_TOKEN` while the repository prohibits every
 token-shaped publication environment. Registry verification found no official
-`1.0.2` package version. All three failed tags remain unchanged; recovery uses
-the new `1.0.3` version and tag.
+`1.0.2` package version.
+
+The immutable `v1.0.3` tag points to commit
+`7f4063936043113fc718627c9aa39606884f8e5e`. Its Release run
+`29267653797` passed candidate, reproducibility, browser-engine, Node-runtime,
+and performance jobs. The protected publish job then stopped before draft
+creation, attestation, or npm publication because the hosting verifier's
+read-only `gh api` calls did not receive GitHub's ephemeral workflow token.
+Registry verification found no official `1.0.3` package version. All four
+failed tags remain unchanged; recovery uses the new `1.0.4` version and tag.
 
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
@@ -94,7 +102,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.0.3` release commit, the repository owner must verify
+Before preparing the `1.0.4` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -224,13 +232,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.0.3` and `private: false`;
-- set every official implementation and peer dependency to exact `1.0.3`;
+- set every official manifest to version `1.0.4` and `private: false`;
+- set every official implementation and peer dependency to exact `1.0.4`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.0.3` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.0.3`, then make that version
+- add dated `1.0.4` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.0.4`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -241,8 +249,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm run release:validate -- --candidate 1.0.3
-npm run release:artifacts -- --version 1.0.3
+npm run release:validate -- --candidate 1.0.4
+npm run release:artifacts -- --version 1.0.4
 ```
 
 `release:artifacts` packs every package twice and compares canonical unpacked
@@ -276,7 +284,7 @@ prove that the recorded tested commit is an ancestor of the candidate commit.
 ## Protected publication
 
 After the candidate PR is merged and all gates are green, create the exact
-reviewed `v1.0.3` tag. The tag starts the `Release` workflow. Its candidate job
+reviewed `v1.0.4` tag. The tag starts the `Release` workflow. Its candidate job
 repeats the full repository check and artifact build. The single-operator `npm`
 environment then admits the publication job without independent approval. It
 permits only `v*` tags and disallows administrator bypass and long-lived npm
@@ -296,6 +304,10 @@ token-backed npm configuration and exports a placeholder `NODE_AUTH_TOKEN` even
 when OIDC is intended. Publisher and registry-verification commands pass the
 registry from `release/release-contract.json` explicitly. Contract validation
 rejects either protected job if setup-node registry authentication returns.
+The hosting-verification step alone receives GitHub's ephemeral workflow token
+as `GH_TOKEN` for its read-only repository, environment, immutable-release, and
+ruleset queries. The surrounding job still has no long-lived GitHub or npm
+secret, and contract validation rejects a verifier without the ephemeral token.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance under `gluon-staging-v<version-with-dashes>`, never directly to

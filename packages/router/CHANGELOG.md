@@ -4,6 +4,13 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-07-13
+
+### Changed
+
+- Advanced this package to the lockstep `1.0.4` recovery candidate after the
+  immutable `v1.0.3` release stopped before publication.
+
 ## [1.0.3] - 2026-07-13
 
 ### Changed
