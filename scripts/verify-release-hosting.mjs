@@ -9,6 +9,7 @@ const root = resolve(import.meta.dirname, '..');
 const repository = process.env.GITHUB_REPOSITORY;
 const expectedEnvironment = process.env.GLUON_RELEASE_ENVIRONMENT;
 const releaseVersion = process.env.RELEASE_VERSION;
+const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
 
 if (!repository) throw new Error('GITHUB_REPOSITORY is required.');
 if (!releaseVersion) throw new Error('RELEASE_VERSION is required.');
@@ -47,18 +48,41 @@ if (!Array.isArray(deploymentPolicies.branch_policies)
 }
 
 const rulesets = await githubJson(`repos/${repository}/rulesets?includes_parents=true`);
-let protectedReleaseTags = false;
+const releaseTagProtection = releaseContract.githubReleaseTagProtection;
+const operator = await githubJson(`users/${releaseTagProtection.operator}`);
+let operatorCanCreateReleaseTags = false;
+let releaseTagUpdatesAreImmutable = false;
+let releaseTagDeletionsAreImmutable = false;
 for (const summary of rulesets.filter((entry) => entry.target === 'tag' && entry.enforcement === 'active')) {
   const ruleset = await githubJson(`repos/${repository}/rulesets/${summary.id}`);
   const includes = ruleset.conditions?.ref_name?.include ?? [];
+  const excludes = ruleset.conditions?.ref_name?.exclude ?? [];
   const ruleTypes = new Set(ruleset.rules?.map((rule) => rule.type));
-  const coversReleaseTags = includes.includes('~ALL') || includes.some((pattern) => ['refs/tags/v*', 'refs/tags/v*.*.*'].includes(pattern));
-  if (coversReleaseTags && ['creation', 'update', 'deletion'].every((type) => ruleTypes.has(type))) {
-    protectedReleaseTags = true;
-    break;
+  const coversReleaseTags = JSON.stringify(includes) === JSON.stringify(releaseTagProtection.includePatterns)
+    && excludes.length === 0;
+  if (!coversReleaseTags) continue;
+
+  const bypassActors = ruleset.bypass_actors ?? [];
+  const hasExactCreationBypass = bypassActors.length === 1
+    && bypassActors[0].actor_type === releaseTagProtection.creationBypassActorType
+    && bypassActors[0].actor_id === operator.id
+    && bypassActors[0].bypass_mode === releaseTagProtection.creationBypassMode;
+  if (ruleTypes.has('creation') && hasExactCreationBypass) {
+    operatorCanCreateReleaseTags = true;
+  }
+  if (bypassActors.length === 0 && ruleTypes.has('update')) {
+    releaseTagUpdatesAreImmutable = true;
+  }
+  if (bypassActors.length === 0 && ruleTypes.has('deletion')) {
+    releaseTagDeletionsAreImmutable = true;
   }
 }
-if (!protectedReleaseTags) throw new Error('An active ruleset must protect v-prefixed release tags.');
+if (!operatorCanCreateReleaseTags) {
+  throw new Error(`An active ruleset must allow only ${releaseTagProtection.operator} to create v-prefixed release tags.`);
+}
+if (!releaseTagUpdatesAreImmutable || !releaseTagDeletionsAreImmutable) {
+  throw new Error('Active no-bypass rulesets must prevent update and deletion of v-prefixed release tags.');
+}
 
 const manualEvidence = JSON.parse(await readFile(resolve(root, 'release/evidence', `${releaseVersion}.json`), 'utf8'));
 const runId = /\/actions\/runs\/(\d+)$/.exec(manualEvidence.automatedQualityRun.url)?.[1];

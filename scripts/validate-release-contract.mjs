@@ -103,6 +103,7 @@ const result = {
   bootstrap: releaseContract.bootstrap,
   npmOwnerRecovery: releaseContract.npmOwnerRecovery,
   githubReleaseEnvironment: releaseContract.githubReleaseEnvironment,
+  githubReleaseTagProtection: releaseContract.githubReleaseTagProtection,
   publicationState: packageContract.registry.publicationState,
   scopeControl: packageContract.registry.scopeControl,
   externalPrerequisites: releaseContract.externalPrerequisites,
@@ -160,6 +161,21 @@ function validateReleaseContract() {
     return Array.isArray(expected) ? JSON.stringify(actual) !== JSON.stringify(expected) : actual !== expected;
   })) {
     throw new Error('GitHub release publication must use the accepted no-reviewer single-operator npm environment policy.');
+  }
+  const expectedGithubReleaseTagProtection = {
+    model: 'operator-created-immutable-tags',
+    operator: 'marcmalerei',
+    includePatterns: ['refs/tags/v*'],
+    creationBypassActorType: 'User',
+    creationBypassMode: 'always',
+    updateBypassAllowed: false,
+    deletionBypassAllowed: false,
+  };
+  if (Object.entries(expectedGithubReleaseTagProtection).some(([field, expected]) => {
+    const actual = releaseContract.githubReleaseTagProtection?.[field];
+    return Array.isArray(expected) ? JSON.stringify(actual) !== JSON.stringify(expected) : actual !== expected;
+  })) {
+    throw new Error('GitHub release tags must be operator-created and immutable without update or deletion bypass.');
   }
   if (!prereleaseVersion(releaseContract.bootstrap?.version)
     || releaseContract.bootstrap.version === releaseContract.targetVersion
@@ -416,6 +432,10 @@ function validateWorkflow() {
     'environment.can_admins_bypass !== false',
     'deploymentPolicies.branch_policies.length !== 1',
     "deploymentPolicies.branch_policies[0].name !== 'v*'",
+    "ruleTypes.has('creation')",
+    "ruleTypes.has('update')",
+    "ruleTypes.has('deletion')",
+    'bypassActors.length === 0',
   ]) if (!hostingScript.includes(required)) {
     throw new Error(`Release hosting verification is missing single-operator environment control ${required}.`);
   }

@@ -16,6 +16,7 @@
     "bootstrap",
     "npmOwnerRecovery",
     "githubReleaseEnvironment",
+    "githubReleaseTagProtection",
     "spdxSchema",
     "artifacts",
     "publication",
@@ -129,6 +130,33 @@
         },
         "longLivedNpmSecretsAllowed": { "const": false },
         "singleOperatorImmutableStagingRiskAccepted": { "const": true }
+      }
+    },
+    "githubReleaseTagProtection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "operator",
+        "includePatterns",
+        "creationBypassActorType",
+        "creationBypassMode",
+        "updateBypassAllowed",
+        "deletionBypassAllowed"
+      ],
+      "properties": {
+        "model": { "const": "operator-created-immutable-tags" },
+        "operator": { "const": "marcmalerei" },
+        "includePatterns": {
+          "type": "array",
+          "minItems": 1,
+          "prefixItems": [{ "const": "refs/tags/v*" }],
+          "items": false
+        },
+        "creationBypassActorType": { "const": "User" },
+        "creationBypassMode": { "const": "always" },
+        "updateBypassAllowed": { "const": false },
+        "deletionBypassAllowed": { "const": false }
       }
     },
     "spdxSchema": {

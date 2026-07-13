@@ -39,6 +39,12 @@ tag that permanently publishes package versions under the staging dist-tag
 without another person's approval. Interactive-2FA promotion to `latest`
 remains a separate later step and does not reverse that publication.
 
+Two active tag rulesets cover exactly `refs/tags/v*`. Only `marcmalerei` may
+bypass the creation restriction, so the sole operator can cut a release. The
+separate update and deletion restrictions have no bypass actor; an existing
+release tag therefore cannot be rewritten or deleted, including by a repository
+administrator.
+
 Strict validation requires a machine-readable, reviewed release-cut record for
 all named branded browser/device and assistive-technology combinations.
 Placeholders, engine substitutions, and undocumented failures do not satisfy

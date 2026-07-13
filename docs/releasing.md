@@ -96,8 +96,11 @@ all of the following outside the source tree:
    and permits only the `v*` tag pattern. The project accepts that the operator
    who creates a release tag can publish immutable package versions under the
    staging dist-tag without another person's approval.
-7. An active GitHub tag ruleset covers `refs/tags/v*` and restricts tag
-   creation, update, and deletion.
+7. Two active GitHub tag rulesets cover exactly `refs/tags/v*`. The creation
+   rule gives only the `marcmalerei` user an `always` bypass so the sole
+   operator can cut a release. The update and deletion rules have no bypass
+   actor, making an existing release tag immutable for every user, including
+   repository administrators.
 8. GitHub immutable releases are enabled.
 9. The release-cut branded browser/device and assistive-technology protocols in
    [`browser-device-evidence.md`](browser-device-evidence.md) and
