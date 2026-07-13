@@ -56,7 +56,7 @@ if (evidencePendingCandidate) {
     throw new Error('Blocked artifact mode is only available for the current blocked development version.');
   }
 } else {
-  await run('node', ['scripts/validate-release-contract.mjs', '--candidate', version]);
+  await execFile(process.execPath, ['scripts/validate-release-contract.mjs', '--candidate', version], { cwd: root });
 }
 
 let sourceDateEpoch = Number(process.env.SOURCE_DATE_EPOCH || 0);
