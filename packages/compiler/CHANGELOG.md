@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.0.0
+## [Unreleased]
+
+## [1.0.0] - 2026-07-13
 
 - Added tagged-template locations, interpolation locations, diagnostics,
   high-resolution source maps, and development HMR transforms.

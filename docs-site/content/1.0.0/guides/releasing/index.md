@@ -1,7 +1,8 @@
 # Release readiness
 
-The `0.0.0` documentation describes the private development line. It is not a
-published npm release and does not claim control of the `@gluonjs` scope.
+The `1.0.0` documentation describes the first supported public release line.
+The `@gluonjs` scope, all 17 package records, and their trusted-publisher
+bindings are verified in the package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
@@ -19,16 +20,16 @@ package and the aggregate release, SHA-256 checksums, and machine-readable build
 evidence. The official SPDX schema is vendored with a pinned upstream commit and
 SHA-256.
 
-Publication remains blocked until an owner verifies public repository
-visibility, npm scope control, the accepted single-owner recovery and
-multi-factor-authentication controls, existing owner-controlled package
-records, trusted-publisher bindings, the single-operator `npm` environment and
-tag rules, and immutable GitHub releases. `marcmalerei` is the sole required npm
-owner; a second owner is not required. The owner must use `auth-and-writes` 2FA,
-keep the npm account linked to GitHub, and retain current recovery codes outside
-the second-factor device. Loss of the sole owner account can stop package
-administration and require npm Support account recovery. Repository validation
-does not prove that the recovery codes are stored.
+The release cut requires verified public repository visibility, npm scope
+control, the accepted single-owner recovery and multi-factor-authentication
+controls, existing owner-controlled package records, trusted-publisher
+bindings, the single-operator `npm` environment and tag rules, and immutable
+GitHub releases. `marcmalerei` is the sole required npm owner; a second owner is
+not required. The owner uses `auth-and-writes` 2FA, keeps the npm account linked
+to GitHub, and retains current recovery codes outside the second-factor device.
+Loss of the sole owner account can stop package administration and require npm
+Support account recovery. Repository validation does not prove where recovery
+codes are stored.
 
 The `npm` environment uses the accepted single-operator model. It has no
 required reviewers, independent human approval, self-review rule, or wait

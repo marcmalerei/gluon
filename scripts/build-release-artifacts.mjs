@@ -1,6 +1,6 @@
 import { execFile as execFileCallback } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import process from 'node:process';
@@ -26,8 +26,19 @@ for (const entry of packageContract.packages) {
 const version = option('--version') ?? rootManifest.version;
 const output = resolve(root, option('--output') ?? releaseContract.artifactDirectory);
 const checkState = process.argv.includes('--check-state');
+const releaseCutEvidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', version);
+const compatibilityManifestPath = releaseContract.compatibilityManifestPath.replace('{version}', version);
+const releaseCutEvidenceExists = await fileExists(releaseCutEvidencePath);
+const compatibilityManifestExists = await fileExists(compatibilityManifestPath);
+if (releaseCutEvidenceExists !== compatibilityManifestExists) {
+  throw new Error('Release-cut evidence and the compatibility manifest must be added together.');
+}
+const evidencePendingCandidate = checkState
+  && packageContract.registry.publicationState === 'ready'
+  && !releaseCutEvidenceExists;
 const allowBlocked = process.argv.includes('--allow-blocked')
-  || (checkState && packageContract.registry.publicationState === 'blocked');
+  || (checkState && packageContract.registry.publicationState === 'blocked')
+  || evidencePendingCandidate;
 const allowedArguments = new Set(['--version', version, '--output', option('--output'), '--allow-blocked', '--check-state']);
 
 if (process.argv.slice(2).some((argument) => argument !== undefined && !allowedArguments.has(argument))) {
@@ -37,7 +48,10 @@ if (process.argv.includes('--allow-blocked') && checkState) throw new Error('Cho
 if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version)) {
   throw new Error(`Invalid stable release version ${version}.`);
 }
-if (allowBlocked) {
+if (evidencePendingCandidate) {
+  if (version !== rootManifest.version) throw new Error('Evidence-pending candidate checks require the current package version.');
+  await execFile(process.execPath, ['scripts/validate-release-contract.mjs'], { cwd: root });
+} else if (allowBlocked) {
   if (packageContract.registry.publicationState !== 'blocked' || version !== rootManifest.version) {
     throw new Error('Blocked artifact mode is only available for the current blocked development version.');
   }
@@ -90,14 +104,12 @@ for (const entry of packageContract.packages) {
 }
 
 const changelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
-const releaseNotes = changelogSection(changelog, allowBlocked ? 'Unreleased' : version);
+const releaseNotes = changelogSection(changelog, allowBlocked && !evidencePendingCandidate ? 'Unreleased' : version);
 await writeFile(resolve(output, 'CHANGELOG.md'), changelog, 'utf8');
 await writeFile(resolve(output, 'RELEASE_NOTES.md'), `${releaseNotes.trim()}\n`, 'utf8');
 if (!allowBlocked) {
-  const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', version);
-  await writeFile(resolve(output, 'release-cut-evidence.json'), await readFile(resolve(root, evidencePath)));
-  const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', version);
-  await writeFile(resolve(output, 'compatibility-manifest.json'), await readFile(resolve(root, compatibilityPath)));
+  await writeFile(resolve(output, 'release-cut-evidence.json'), await readFile(resolve(root, releaseCutEvidencePath)));
+  await writeFile(resolve(output, 'compatibility-manifest.json'), await readFile(resolve(root, compatibilityManifestPath)));
 }
 
 const aggregateSpdx = JSON.parse(await run('npm', ['sbom', '--sbom-format', 'spdx']));
@@ -422,4 +434,14 @@ function sortObject(value) {
 
 async function readJson(path) {
   return JSON.parse(await readFile(resolve(root, path), 'utf8'));
+}
+
+async function fileExists(path) {
+  try {
+    await access(resolve(root, path));
+    return true;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false;
+    throw error;
+  }
 }

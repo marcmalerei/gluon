@@ -22,6 +22,7 @@ const spdxSchemaDigest = createHash('sha256')
   .update(await readFile(resolve(root, releaseContract.spdxSchema.path)))
   .digest('hex');
 const packageContract = await readJson('package-contract.json');
+const packageContractSchema = await readJson('schemas/package-contract.schema.json');
 const rootManifest = await readJson('package.json');
 const versions = await readJson('docs-site/versions.json');
 const lockfile = await readJson('package-lock.json');
@@ -38,11 +39,13 @@ const compatibilityManifestSchema = await readJson('release/compatibility-manife
 const schemaValidator = new Ajv2020({ allErrors: true, strict: false });
 addFormats(schemaValidator);
 const validateReleaseContractSchema = schemaValidator.compile(releaseContractSchema);
+const validatePackageContractSchema = schemaValidator.compile(packageContractSchema);
 const validateReleaseCutEvidenceSchema = schemaValidator.compile(releaseCutEvidenceSchema);
 const validateCompatibilityManifestSchema = schemaValidator.compile(compatibilityManifestSchema);
 const manifests = [];
 
 validateReleaseContract();
+validateJsonSchema('package-contract.json', packageContract, validatePackageContractSchema);
 validateEvidenceSchemaBoundary();
 
 for (const entry of packageContract.packages) {

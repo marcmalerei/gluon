@@ -7,8 +7,14 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13
+
 ### Added
 
+- The reviewed `1.0.0` release-candidate contract: 17 public lockstep manifests,
+  versioned documentation and diagnostics, schema-validated package metadata,
+  and a two-commit Quality Gates evidence flow whose intermediate artifacts are
+  explicitly non-publishable.
 - Machine-validated single-operator release-tag governance that lets only the
   named operator create `v*` tags while no-bypass rules make existing release
   tags immutable against update and deletion.

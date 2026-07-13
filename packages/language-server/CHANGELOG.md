@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.0.0
+## [Unreleased]
+
+## [1.0.0] - 2026-07-13
 
 - Add shared project diagnostics for Gluon HTML, SVG, and CSS templates.
 - Add completion, hover, definition, rename, and semantic token services.

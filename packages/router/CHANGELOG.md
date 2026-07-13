@@ -4,6 +4,8 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13
+
 ### Added
 
 - A complete `RouterOptions` usage example with memory history, routes, saved

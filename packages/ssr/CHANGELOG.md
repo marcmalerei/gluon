@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.0.0
+## [Unreleased]
+
+## [1.0.0] - 2026-07-13
 
 - Added DOM-independent template, functional component, application, async
   built-in, and Declarative Shadow DOM element serialization.

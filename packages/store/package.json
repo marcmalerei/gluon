@@ -1,8 +1,8 @@
 {
   "name": "@gluonjs/store",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Typed, application-scoped state management for Gluon.",
-  "private": true,
+  "private": false,
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -35,7 +35,7 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/reactivity": "0.0.0"
+    "@gluonjs/reactivity": "1.0.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

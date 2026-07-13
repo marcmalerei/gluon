@@ -91,8 +91,9 @@ The supported matrix is every independent Router, Store, testing, and UI
 selection, plus SSR with its required Router and Store selections. Repository
 fixture verification generates all 20 combinations. Each fixture is installed,
 typechecked, tested, and built against packed workspace artifacts. UI fixtures
-install packed `@gluonjs/quarks` and `@gluonjs/atoms` archives rather than
-resolving unpublished workspace versions from the registry.
+install packed `@gluonjs/quarks` and `@gluonjs/atoms` archives so the repository
+gate verifies the exact candidate artifacts rather than another registry
+version.
 
 The blocking component matrix separately generates all five kinds into clean
 universal starters, then installs, typechecks, template-checks, runs their

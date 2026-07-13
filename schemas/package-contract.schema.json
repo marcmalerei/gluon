@@ -5,6 +5,7 @@
   "type": "object",
   "required": ["version", "releaseGroup", "versioning", "registry", "packages"],
   "properties": {
+    "$schema": { "type": "string" },
     "version": { "const": 1 },
     "releaseGroup": { "type": "string", "minLength": 1 },
     "versioning": { "const": "lockstep" },
@@ -16,7 +17,7 @@
         "checkedAt": { "type": "string", "format": "date" },
         "scope": { "const": "@gluonjs" },
         "scopeControl": { "enum": ["unverified", "verified"] },
-        "publicationState": { "enum": ["blocked", "allowed"] },
+        "publicationState": { "enum": ["blocked", "ready"] },
         "observation": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false

@@ -1,4 +1,4 @@
-export const GLUON_DIAGNOSTIC_CATALOG_VERSION = '0.0.0';
+export const GLUON_DIAGNOSTIC_CATALOG_VERSION = '1.0.0';
 
 export type GluonDiagnosticSource = 'compiler' | 'devtools' | 'hydration' | 'language-server' | 'runtime' | 'ssr' | 'tooling';
 

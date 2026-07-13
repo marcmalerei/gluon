@@ -13,7 +13,7 @@ export default defineConfig({
     },
   })],
   root: import.meta.dirname,
-  base: '/gluon/0.0.0/examples/',
+  base: '/gluon/1.0.0/examples/',
   resolve: {
     alias: {
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
@@ -25,7 +25,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist/0.0.0/examples',
+    outDir: '../dist/1.0.0/examples',
     emptyOutDir: false,
     rollupOptions: {
       input: {
