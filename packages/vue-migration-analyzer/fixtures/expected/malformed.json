@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "analyzer": {
     "name": "@gluonjs/vue-migration-analyzer",
-    "version": "1.0.4"
+    "version": "1.0.5"
   },
   "root": ".",
   "input": {
@@ -152,7 +152,7 @@
         }
       },
       "migrationStage": "styles-universal",
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
     }
   ],
   "findings": [
@@ -165,7 +165,7 @@
       "location": null,
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1103:package.json:0:0:1",
@@ -176,7 +176,7 @@
       "location": null,
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1103:src/Broken.vue:56:56:1",
@@ -199,7 +199,7 @@
       },
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1103:src/Broken.vue:76:100:1",
@@ -222,7 +222,7 @@
       },
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1103:src/Broken.vue:94:94:1",
@@ -245,7 +245,7 @@
       },
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1103:src/Broken.vue:119:137:1",
@@ -268,7 +268,7 @@
       },
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.4/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.5/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     }
   ],
   "summary": {
