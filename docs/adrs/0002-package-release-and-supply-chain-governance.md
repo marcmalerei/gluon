@@ -198,8 +198,10 @@ Gluon follows Semantic Versioning:
   require a patch release.
 - A released version is immutable and is never rebuilt or republished. A defect
   is fixed in a new version.
-- `latest` points only to stable releases, `next` to release candidates or other
-  planned prereleases, and `canary` to explicitly unsupported commit previews.
+- After the first supported release, `latest` points only to stable releases,
+  `next` to release candidates or other planned prereleases, and `canary` to
+  explicitly unsupported commit previews. Before that release, npm may retain
+  only the exact reviewed bootstrap placeholders described below on `latest`.
 - The latest major and its latest minor receive regular fixes. The latest minor
   of the immediately preceding major receives critical security fixes. Older
   lines are unsupported unless a release notice explicitly extends support.
@@ -254,12 +256,19 @@ authentication. Existing package records are mandatory because npm does not
 allow trusted publishers to bootstrap brand-new package names.
 
 The package-record bootstrap is a distinct, owner-controlled operation. It
-publishes the minimal `0.0.0-bootstrap.0` placeholder under the
-`gluon-bootstrap` dist-tag with interactive 2FA, no `latest`, and no provenance
-claim. Each archive contains only its manifest, bootstrap notice, and MIT
-license; it exports no implementation. The executable release contract,
-artifact builder, and bootstrap publisher verify that boundary and make partial
-publication recoverable without replacing an immutable matching version.
+publishes the minimal `0.0.0-bootstrap.1` placeholder under the
+`gluon-bootstrap` dist-tag with interactive 2FA and no provenance claim. npm
+materialized `latest` while creating the first package record even though the
+publish used a non-`latest` tag, and rejected removal of that initial tag. Until
+the first supported release replaces it, `latest` may therefore be absent or
+point only to the current reviewed bootstrap or an exact contracted predecessor.
+The failed initial contract attempt created only
+`@gluonjs/reactivity@0.0.0-bootstrap.0`; its exact integrity and SHA-1 are
+retained as a superseded record. Each bootstrap archive contains only its
+manifest, bootstrap notice, and MIT license; it exports no implementation. The
+executable release contract, artifact builder, and bootstrap publisher verify
+that boundary and make partial publication recoverable without replacing an
+immutable matching version.
 
 ## Supply-chain evidence
 

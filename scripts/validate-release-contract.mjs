@@ -129,9 +129,15 @@ function validateReleaseContract() {
   if (!prereleaseVersion(releaseContract.bootstrap?.version)
     || releaseContract.bootstrap.version === releaseContract.targetVersion
     || releaseContract.bootstrap.distTag === releaseContract.publication.distTag
-    || releaseContract.bootstrap.latestAllowed !== false
+    || releaseContract.bootstrap.latestPolicy !== 'absent-or-reviewed-bootstrap-until-first-supported-release'
     || releaseContract.bootstrap.identity !== 'owner-interactive-2fa') {
-    throw new Error('npm bootstrap must use a distinct prerelease, a non-latest dist-tag, and owner-controlled interactive 2FA.');
+    throw new Error('npm bootstrap must use a distinct prerelease, a non-latest reviewed dist-tag, the temporary bootstrap latest policy, and owner-controlled interactive 2FA.');
+  }
+  if (!releaseContract.bootstrap.supersededRecords.every((entry) => packageContract.packages.some(({ name }) => name === entry.name)
+    && entry.version !== releaseContract.bootstrap.version
+    && entry.integrity.startsWith('sha512-')
+    && /^[a-f0-9]{40}$/.test(entry.shasum))) {
+    throw new Error('Superseded npm bootstrap records must identify an official package, a distinct version, and exact registry digests.');
   }
   if (JSON.stringify(releaseContract.bootstrap.packageFiles) !== JSON.stringify(['package.json', 'README.md', 'LICENSE'])) {
     throw new Error('npm bootstrap archives must contain only package.json, README.md, and LICENSE.');
@@ -347,7 +353,8 @@ function validateWorkflow() {
     'NPM_TOKEN',
     'NODE_AUTH_TOKEN',
     "'--tag', bootstrap.distTag",
-    'bootstrap.latestAllowed === false',
+    'bootstrap.supersededRecords',
+    'waiting for npm registry visibility',
     'requireCleanMain',
     'requireNpmOwner',
     'reproduceArtifacts',
