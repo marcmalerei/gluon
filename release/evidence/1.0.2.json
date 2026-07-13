@@ -1,0 +1,23 @@
+{
+  "$schema": "../release-cut-evidence.schema.json",
+  "schemaVersion": 1,
+  "releaseVersion": "1.0.2",
+  "testedCommit": "a12e4de23e5f87f989fb762f09786cd7ba9b415f",
+  "cutAt": "2026-07-13T15:04:33Z",
+  "automatedQualityRun": {
+    "url": "https://github.com/marcmalerei/gluon/actions/runs/29260080988",
+    "conclusion": "success"
+  },
+  "supportBoundary": {
+    "model": "automated-engine-evidence-only",
+    "brandedBrowserSupportClaimed": false,
+    "operatingSystemSupportClaimed": false,
+    "deviceSupportClaimed": false,
+    "assistiveTechnologySupportClaimed": false,
+    "manualBrowserDeviceEvidenceRequired": false,
+    "manualAssistiveTechnologyEvidenceRequired": false,
+    "singleOperatorRiskAccepted": true
+  },
+  "acceptedBy": "marcmalerei",
+  "acceptedAt": "2026-07-13T15:05:19Z"
+}
