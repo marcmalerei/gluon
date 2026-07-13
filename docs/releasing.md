@@ -8,8 +8,8 @@ and `.github/workflows/release.yml` is the only supported publication path.
 ## Current publication state
 
 The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the `1.0.1` release candidate. Every official
-manifest is public and lockstep at `1.0.1`. The candidate is not publishable
+`scopeControl: verified` for the `1.0.2` release candidate. Every official
+manifest is public and lockstep at `1.0.2`. The candidate is not publishable
 until its exact commit has a successful Quality Gates run and the two matching
 evidence files are committed. This is enforced by:
 
@@ -28,8 +28,16 @@ The immutable `v1.0.0` tag points to commit
 `8f52b4b98fe9e9f5182973cbf5a0655c879df7ea`. Its Release run
 `29252974864` failed in the clean-source UI typecheck before candidate artifact
 creation, npm publication, or GitHub draft creation. Registry verification
-after the failure found no official `1.0.0` package version. The tag remains
-unchanged; recovery uses the new `1.0.1` version and tag.
+after the failure found no official `1.0.0` package version.
+
+The immutable `v1.0.1` tag points to commit
+`045b1b0bbf111c06637a98f566245ae750b5bfa2`. Its Release run
+`29257905859` passed candidate, browser-engine, Node-runtime, and performance
+jobs, then failed reproducibility because the independently maintained build
+list omitted `@gluonjs/vue-migration-analyzer`. The publish job was skipped;
+registry verification found no official `1.0.1` package version, and no GitHub
+release draft existed. Both failed tags remain unchanged; recovery uses the new
+`1.0.2` version and tag.
 
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
@@ -77,7 +85,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.0.1` release commit, the repository owner must verify
+Before preparing the `1.0.2` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -207,13 +215,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.0.1` and `private: false`;
-- set every official implementation and peer dependency to exact `1.0.1`;
+- set every official manifest to version `1.0.2` and `private: false`;
+- set every official implementation and peer dependency to exact `1.0.2`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.0.1` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.0.1`, then make that version
+- add dated `1.0.2` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.0.2`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -224,8 +232,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm run release:validate -- --candidate 1.0.1
-npm run release:artifacts -- --version 1.0.1
+npm run release:validate -- --candidate 1.0.2
+npm run release:artifacts -- --version 1.0.2
 ```
 
 `release:artifacts` packs every package twice and compares canonical unpacked
@@ -259,7 +267,7 @@ prove that the recorded tested commit is an ancestor of the candidate commit.
 ## Protected publication
 
 After the candidate PR is merged and all gates are green, create the exact
-reviewed `v1.0.1` tag. The tag starts the `Release` workflow. Its candidate job
+reviewed `v1.0.2` tag. The tag starts the `Release` workflow. Its candidate job
 repeats the full repository check and artifact build. The single-operator `npm`
 environment then admits the publication job without independent approval. It
 permits only `v*` tags and disallows administrator bypass and long-lived npm
@@ -294,8 +302,10 @@ and public-type check, attaches the registry verification and final checksum
 manifest, and only then publishes the immutable GitHub release. A partial
 manual promotion makes finalization fail without publishing the GitHub release.
 
-A second fresh runner independently builds the same source commit and compares
-every canonical unpacked package-file digest with the candidate job. The
+A second fresh runner runs the complete root `npm run build` for the same source
+commit and compares every canonical unpacked package-file digest with the
+candidate job. Release-contract validation rejects a workflow that replaces
+this aggregate build with an incomplete manually maintained package list. The
 publication job cannot start unless this reproducibility job passes.
 
 A failed publication is never retried by rebuilding the same version. Preserve the run

@@ -434,6 +434,10 @@ function validateWorkflow() {
     '--draft',
     'gh release edit',
   ]) if (!workflow.includes(required)) throw new Error(`Release workflow is missing ${required}.`);
+  const reproducibilityJob = workflow.match(/\n  reproducibility:\n([\s\S]*?)\n  browser-engines:\n/)?.[1];
+  if (!/^\s*-\s+run:\s+npm run build\s*$/m.test(reproducibilityJob ?? '')) {
+    throw new Error('Release reproducibility must use the complete root build before rebuilding artifacts.');
+  }
   for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', stagingTag", 'requireExistingPackage']) {
     if (!publishScript.includes(required)) throw new Error(`Release publisher is missing ${required}.`);
   }

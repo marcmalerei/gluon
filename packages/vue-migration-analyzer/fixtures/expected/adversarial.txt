@@ -1,6 +1,6 @@
-Gluon Vue migration analysis 1.0.1
+Gluon Vue migration analysis 1.0.2
 Support: supported
 Files: 4; components: 1; findings: 1
 
 vite.config.ts:1:1 GVA1601 warning structural Vite build configuration requires a removal plan.
-  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.0.1/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
+  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.0.2/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue

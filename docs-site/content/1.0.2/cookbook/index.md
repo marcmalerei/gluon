@@ -32,5 +32,5 @@ translate the Gluon component into a Vue component.
 
 <<< ../../../examples/vue-host.ts
 
-Run the compiled [plain HTML host](/gluon/1.0.1/examples/plain.html) or the
-[Vue host](/gluon/1.0.1/examples/vue.html).
+Run the compiled [plain HTML host](/gluon/1.0.2/examples/plain.html) or the
+[Vue host](/gluon/1.0.2/examples/vue.html).
