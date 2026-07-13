@@ -34,6 +34,37 @@ authorization. Its automated run may be retained while `humanPasses` is empty,
 but it cannot satisfy the completed DX contract or replace any owner-controlled
 release, browser/device, assistive-technology, registry, or approval evidence.
 
+## Repository commit identity
+
+Repository-owned maintainer commits use the canonical Git identity
+`marcmalerei <post@marcmalerei.com>`. Before creating commits, verify the
+effective repository configuration rather than assuming that the global
+configuration applies:
+
+```sh
+git config user.name
+git config user.email
+git var GIT_AUTHOR_IDENT
+```
+
+The expected name is `marcmalerei`, and the expected email address is
+`post@marcmalerei.com`. GitHub-generated merge commits use the GitHub account
+identity instead of the local Git configuration. The account must therefore
+have the same address verified and selected before a merge. Verify the result
+immediately after merging:
+
+```sh
+git fetch origin main
+git show --no-patch --format='author=%an <%ae>%ncommitter=%cn <%ce>' origin/main
+```
+
+Do not merge a branch whose commits contain an unintended author, committer, or
+co-author identity. Correct unpublished branch commits before review. A repair
+of published history requires a dedicated issue, a complete recovery bundle,
+an inventory of every maintained remote reference, exact tree comparisons
+before and after rewriting, and verification from a fresh clone. Do not combine
+that operation with source changes.
+
 ## Owner-controlled prerequisites
 
 Before preparing the `1.0.0` release commit, the repository owner must verify
