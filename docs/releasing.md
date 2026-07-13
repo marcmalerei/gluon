@@ -79,8 +79,15 @@ all of the following outside the source tree:
    record. npm trusted publishing cannot create a brand-new package. Any
    bootstrap publication is an owner-controlled, interactive-2FA operation and
    is not performed by this workflow.
-4. npm recovery owners and multi-factor authentication satisfy the accepted
-   governance policy.
+4. npm account recovery and multi-factor authentication satisfy the accepted
+   single-owner governance policy. `marcmalerei` is the sole required npm
+   organization owner; a second owner is explicitly not required. The owner
+   must use `auth-and-writes` 2FA, keep the npm account linked to GitHub, and
+   retain current npm recovery codes outside the device used as the second
+   factor. This contract records the required controls, not evidence that the
+   recovery codes are currently stored. The project accepts that loss of the
+   sole owner account can suspend organization and package administration and
+   require npm Support account recovery.
 5. Every package has a trusted-publisher binding to this repository and the
    `Release` workflow. No long-lived npm publication token is configured.
 6. A protected GitHub environment named `npm` has named reviewers, prevents

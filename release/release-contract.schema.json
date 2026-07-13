@@ -14,6 +14,7 @@
     "manualEvidencePath",
     "compatibilityManifestPath",
     "bootstrap",
+    "npmOwnerRecovery",
     "spdxSchema",
     "artifacts",
     "publication",
@@ -66,6 +67,30 @@
           ],
           "items": false
         }
+      }
+    },
+    "npmOwnerRecovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "owner",
+        "secondOwnerRequired",
+        "mfaMode",
+        "linkedGitHubAccountRequired",
+        "recoveryCodesRequired",
+        "recoveryCodeStorage",
+        "npmSupportRecoveryRiskAccepted"
+      ],
+      "properties": {
+        "model": { "const": "single-owner" },
+        "owner": { "const": "marcmalerei" },
+        "secondOwnerRequired": { "const": false },
+        "mfaMode": { "const": "auth-and-writes" },
+        "linkedGitHubAccountRequired": { "const": true },
+        "recoveryCodesRequired": { "const": true },
+        "recoveryCodeStorage": { "const": "outside-second-factor-device" },
+        "npmSupportRecoveryRiskAccepted": { "const": true }
       }
     },
     "spdxSchema": {

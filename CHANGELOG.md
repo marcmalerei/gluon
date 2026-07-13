@@ -165,6 +165,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- npm release governance now explicitly accepts `marcmalerei` as the single
+  organization owner without requiring a second owner, while retaining
+  `auth-and-writes` 2FA, linked-GitHub, separately stored recovery-code, and
+  accepted npm Support recovery-risk requirements as machine-validated gates.
 - SSR style manifests now accept named Core selections and preserve their stable
   IDs and optional hydration scopes in emitted carriers.
 - Empty Core node parts insert a single new node directly while preserving

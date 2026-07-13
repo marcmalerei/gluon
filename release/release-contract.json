@@ -29,6 +29,16 @@
       "LICENSE"
     ]
   },
+  "npmOwnerRecovery": {
+    "model": "single-owner",
+    "owner": "marcmalerei",
+    "secondOwnerRequired": false,
+    "mfaMode": "auth-and-writes",
+    "linkedGitHubAccountRequired": true,
+    "recoveryCodesRequired": true,
+    "recoveryCodeStorage": "outside-second-factor-device",
+    "npmSupportRecoveryRiskAccepted": true
+  },
   "spdxSchema": {
     "path": "release/spdx-2.3.schema.json",
     "source": "https://raw.githubusercontent.com/spdx/spdx-spec/44ab76293754df4af5af700fd4abd5453b866c86/schemas/spdx-schema.json",
@@ -57,7 +67,7 @@
     "public-repository",
     "verified-npm-scope-control",
     "existing-npm-package-records",
-    "npm-recovery-owners-and-mfa",
+    "npm-single-owner-recovery-and-mfa",
     "verified-npm-trusted-publisher",
     "protected-npm-environment",
     "protected-release-tags",
