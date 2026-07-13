@@ -90,8 +90,12 @@ all of the following outside the source tree:
    require npm Support account recovery.
 5. Every package has a trusted-publisher binding to this repository and the
    `Release` workflow. No long-lived npm publication token is configured.
-6. A protected GitHub environment named `npm` has named reviewers, prevents
-   self-review and administrator bypass, and permits only `v*` tags.
+6. A GitHub environment named `npm` uses the accepted single-operator model:
+   it has no required reviewers, independent human approval, self-review rule,
+   or wait timer; disallows administrator bypass and long-lived npm secrets;
+   and permits only the `v*` tag pattern. The project accepts that the operator
+   who creates a release tag can publish immutable package versions under the
+   staging dist-tag without another person's approval.
 7. An active GitHub tag ruleset covers `refs/tags/v*` and restricts tag
    creation, update, and deletion.
 8. GitHub immutable releases are enabled.
@@ -236,15 +240,18 @@ the publisher rejects it.
 
 After the candidate PR is merged and all gates are green, create the exact
 reviewed `v1.0.0` tag. The tag starts the `Release` workflow. Its candidate job
-repeats the full repository check and artifact build. The protected `npm`
-environment must then approve the publication job.
+repeats the full repository check and artifact build. The single-operator `npm`
+environment then admits the publication job without independent approval. It
+permits only `v*` tags and disallows administrator bypass and long-lived npm
+secrets.
 
-The publication job verifies public repository visibility, required environment
-reviewers and tag policy, release-tag mutation rules, immutable GitHub releases,
-and the absence of long-lived npm token variables. All release-workflow actions
-are pinned to commit SHAs. It attests archives, SBOMs, checksums, the immutable
-compatibility manifest, and other evidence, then creates or updates a draft
-GitHub release.
+The publication job verifies public repository visibility, the absence of
+environment reviewers and an uncontracted wait timer, the exact `v*` tag policy,
+disabled administrator bypass, release-tag mutation rules, immutable GitHub
+releases, and the absence of long-lived npm token variables. All
+release-workflow actions are pinned to commit SHAs. It attests archives, SBOMs,
+checksums, the immutable compatibility manifest, and other evidence, then
+creates or updates a draft GitHub release.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance under `gluon-staging-v<version-with-dashes>`, never directly to

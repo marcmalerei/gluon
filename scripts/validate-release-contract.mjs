@@ -102,6 +102,7 @@ const result = {
   packagesPrivate,
   bootstrap: releaseContract.bootstrap,
   npmOwnerRecovery: releaseContract.npmOwnerRecovery,
+  githubReleaseEnvironment: releaseContract.githubReleaseEnvironment,
   publicationState: packageContract.registry.publicationState,
   scopeControl: packageContract.registry.scopeControl,
   externalPrerequisites: releaseContract.externalPrerequisites,
@@ -141,6 +142,25 @@ function validateReleaseContract() {
     .some(([field, expected]) => releaseContract.npmOwnerRecovery?.[field] !== expected)) {
     throw new Error('npm owner recovery must use the accepted single-owner, auth-and-writes MFA, linked-GitHub, separately stored recovery-code policy.');
   }
+  const expectedGithubReleaseEnvironment = {
+    name: 'npm',
+    approvalModel: 'single-operator',
+    requiredReviewers: 0,
+    independentHumanApprovalRequired: false,
+    selfReviewPreventionRequired: false,
+    waitTimerMinutes: 0,
+    administratorBypassAllowed: false,
+    deploymentBranchPatterns: [],
+    deploymentTagPatterns: ['v*'],
+    longLivedNpmSecretsAllowed: false,
+    singleOperatorImmutableStagingRiskAccepted: true,
+  };
+  if (Object.entries(expectedGithubReleaseEnvironment).some(([field, expected]) => {
+    const actual = releaseContract.githubReleaseEnvironment?.[field];
+    return Array.isArray(expected) ? JSON.stringify(actual) !== JSON.stringify(expected) : actual !== expected;
+  })) {
+    throw new Error('GitHub release publication must use the accepted no-reviewer single-operator npm environment policy.');
+  }
   if (!prereleaseVersion(releaseContract.bootstrap?.version)
     || releaseContract.bootstrap.version === releaseContract.targetVersion
     || releaseContract.bootstrap.distTag === releaseContract.publication.distTag
@@ -175,6 +195,10 @@ function validateReleaseContract() {
   if (!releaseContract.externalPrerequisites.includes('npm-single-owner-recovery-and-mfa')
     || releaseContract.externalPrerequisites.includes('npm-recovery-owners-and-mfa')) {
     throw new Error('Release contract must record the accepted single-owner npm recovery and MFA prerequisite.');
+  }
+  if (!releaseContract.externalPrerequisites.includes('verified-single-operator-npm-environment')
+    || releaseContract.externalPrerequisites.includes('protected-npm-environment')) {
+    throw new Error('Release contract must record the accepted single-operator GitHub npm environment prerequisite.');
   }
 }
 
@@ -385,6 +409,18 @@ function validateWorkflow() {
   }
   if (!hostingScript.includes('immutable-releases') || !hostingScript.includes("!== 'public'")) {
     throw new Error('Release hosting verification must require public, immutable GitHub releases.');
+  }
+  for (const required of [
+    "rule.type === 'required_reviewers'",
+    "rule.type === 'wait_timer'",
+    'environment.can_admins_bypass !== false',
+    'deploymentPolicies.branch_policies.length !== 1',
+    "deploymentPolicies.branch_policies[0].name !== 'v*'",
+  ]) if (!hostingScript.includes(required)) {
+    throw new Error(`Release hosting verification is missing single-operator environment control ${required}.`);
+  }
+  if (hostingScript.includes('requires named reviewers')) {
+    throw new Error('Release hosting verification must not retain the superseded second-person reviewer requirement.');
   }
   for (const forbidden of ['NPM_TOKEN', 'NODE_AUTH_TOKEN']) {
     if (workflow.includes(forbidden)) throw new Error(`Release workflow must not reference long-lived ${forbidden}.`);

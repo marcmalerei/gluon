@@ -22,14 +22,22 @@ SHA-256.
 Publication remains blocked until an owner verifies public repository
 visibility, npm scope control, the accepted single-owner recovery and
 multi-factor-authentication controls, existing owner-controlled package
-records, trusted-publisher bindings, the protected `npm` environment and tag
-rules, immutable GitHub releases, and the manual release-cut browser/device and
+records, trusted-publisher bindings, the single-operator `npm` environment and
+tag rules, immutable GitHub releases, and the manual release-cut browser/device and
 assistive-technology evidence. `marcmalerei` is the sole required npm owner; a
 second owner is not required. The owner must use `auth-and-writes` 2FA, keep the
 npm account linked to GitHub, and retain current recovery codes outside the
 second-factor device. Loss of the sole owner account can stop package
 administration and require npm Support account recovery. Repository validation
 does not prove that the recovery codes are stored.
+
+The `npm` environment uses the accepted single-operator model. It has no
+required reviewers, independent human approval, self-review rule, or wait
+timer; permits only the `v*` tag pattern; and disallows administrator bypass and
+long-lived npm secrets. This accepts that the sole operator can create a release
+tag that permanently publishes package versions under the staging dist-tag
+without another person's approval. Interactive-2FA promotion to `latest`
+remains a separate later step and does not reverse that publication.
 
 Strict validation requires a machine-readable, reviewed release-cut record for
 all named branded browser/device and assistive-technology combinations.

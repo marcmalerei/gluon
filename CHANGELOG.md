@@ -165,6 +165,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- GitHub release governance now explicitly uses a no-reviewer single-operator
+  `npm` environment, with the immutable staging-publication risk accepted and
+  machine-validated `v*`-only deployments, disabled administrator bypass, and
+  no long-lived npm secrets.
 - npm release governance now explicitly accepts `marcmalerei` as the single
   organization owner without requiring a second owner, while retaining
   `auth-and-writes` 2FA, linked-GitHub, separately stored recovery-code, and

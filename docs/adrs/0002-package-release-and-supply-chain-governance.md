@@ -242,7 +242,8 @@ moving a dist-tag may limit discovery but does not rewrite history.
 5. creates one protected `vX.Y.Z` tag for the reviewed source commit
 6. creates one immutable GitHub release containing packages, checksums,
    compatibility evidence, SBOMs, and attestations
-7. obtains required approval through a protected GitHub release environment
+7. enters the tag-restricted single-operator GitHub release environment without
+   independent human approval
 8. publishes through npm trusted publishing with public access and provenance
    under a release-specific staging dist-tag
 9. requires interactive-2FA owner promotion of the complete train to `latest`
@@ -263,6 +264,16 @@ administration dependency: loss of the sole owner account can stop organization
 and package administration and require npm Support account recovery. The
 release contract states these required controls but does not treat repository
 configuration as proof that recovery codes are stored.
+
+GitHub release publication uses the same single-operator governance choice. The
+`npm` environment has no required reviewers, independent human approval,
+self-review rule, or wait timer. It permits only `v*` tags, disallows
+administrator bypass and long-lived npm secrets, and relies on the complete
+automated release gates plus interactive-2FA `latest` promotion. The project
+accepts that the sole operator can create a release tag that permanently
+publishes package versions under the staging dist-tag without another person's
+approval; later `latest` promotion does not make that initial publication
+reversible.
 
 The package-record bootstrap is a distinct, owner-controlled operation. It
 publishes the minimal `0.0.0-bootstrap.1` placeholder under the
