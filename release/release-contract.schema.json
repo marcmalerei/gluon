@@ -13,6 +13,7 @@
     "artifactDirectory",
     "manualEvidencePath",
     "compatibilityManifestPath",
+    "bootstrap",
     "spdxSchema",
     "artifacts",
     "publication",
@@ -28,6 +29,28 @@
     "artifactDirectory": { "const": ".tmp/release" },
     "manualEvidencePath": { "const": "release/evidence/{version}.json" },
     "compatibilityManifestPath": { "const": "release/compatibility/{version}.json" },
+    "bootstrap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "artifactDirectory", "distTag", "access", "identity", "latestAllowed", "packageFiles"],
+      "properties": {
+        "version": { "const": "0.0.0-bootstrap.0" },
+        "artifactDirectory": { "const": ".tmp/npm-bootstrap" },
+        "distTag": { "const": "gluon-bootstrap" },
+        "access": { "const": "public" },
+        "identity": { "const": "owner-interactive-2fa" },
+        "latestAllowed": { "const": false },
+        "packageFiles": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "package.json" },
+            { "const": "README.md" },
+            { "const": "LICENSE" }
+          ],
+          "items": false
+        }
+      }
+    },
     "spdxSchema": {
       "type": "object",
       "additionalProperties": false,

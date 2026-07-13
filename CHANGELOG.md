@@ -9,6 +9,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- A machine-validated, owner-controlled npm bootstrap contract that produces
+  minimal non-runtime archives for all 17 package records, keeps the bootstrap
+  version off `latest`, rejects long-lived publication tokens, and makes the
+  later trusted publisher verify the exact bootstrap version.
 - GLUON GOODS production dogfooding for official Button, Icon, Input, Label,
   and FormField components plus app-local brand presets, a repeated delivery
   Molecule, a real checkout Organism, target-owned CSR/SSR/hydration/static

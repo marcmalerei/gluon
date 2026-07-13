@@ -253,6 +253,14 @@ trusted-publisher bindings, recovery owners, and account multi-factor
 authentication. Existing package records are mandatory because npm does not
 allow trusted publishers to bootstrap brand-new package names.
 
+The package-record bootstrap is a distinct, owner-controlled operation. It
+publishes the minimal `0.0.0-bootstrap.0` placeholder under the
+`gluon-bootstrap` dist-tag with interactive 2FA, no `latest`, and no provenance
+claim. Each archive contains only its manifest, bootstrap notice, and MIT
+license; it exports no implementation. The executable release contract,
+artifact builder, and bootstrap publisher verify that boundary and make partial
+publication recoverable without replacing an immutable matching version.
+
 ## Supply-chain evidence
 
 Public release jobs use GitHub-hosted runners, minimal job permissions, and
