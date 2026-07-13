@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/molecules",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Accessible reusable UI compositions for Gluon.",
   "private": false,
   "type": "module",
@@ -35,11 +35,11 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/quarks": "1.0.0",
-    "@gluonjs/atoms": "1.0.0"
+    "@gluonjs/quarks": "1.0.1",
+    "@gluonjs/atoms": "1.0.1"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.0"
+    "@gluonjs/core": "1.0.1"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {

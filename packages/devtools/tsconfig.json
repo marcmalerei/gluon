@@ -4,6 +4,7 @@
     "noEmit": true,
     "paths": {
       "@gluonjs/core": ["src/index.ts"],
+      "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
       "@gluonjs/devtools-api": ["packages/devtools-api/src/index.ts"]
     }
   },

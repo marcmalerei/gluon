@@ -1,6 +1,6 @@
 # Release readiness
 
-The `1.0.0` documentation describes the first supported public release line.
+The `1.0.1` documentation describes the first supported public release line.
 The `@gluonjs` scope, all 17 package records, and their trusted-publisher
 bindings are verified in the package contract.
 
@@ -61,6 +61,11 @@ reviewed versions under a temporary non-`latest` dist-tag and verifies registry
 integrity and provenance. An npm owner then promotes every package to `latest`
 with interactive 2FA. A protected finalizer verifies the complete train and a
 clean-room install before publishing the immutable GitHub release.
+
+The immutable `v1.0.0` tag failed its candidate gate before release artifacts,
+an npm publication, or a GitHub release draft existed. The `1.0.1` release line
+contains the clean-source typecheck repair and uses a new immutable tag; the
+failed tag is not moved or reused.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,

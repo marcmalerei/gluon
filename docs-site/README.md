@@ -62,7 +62,7 @@ at 1440×1000 and
 at 390×844.
 
 The versioned Migration entry links to the tested
-[Vue-to-Gluon cutover playbook](content/1.0.0/migration/vue-to-gluon-cutover/index.md).
+[Vue-to-Gluon cutover playbook](content/1.0.1/migration/vue-to-gluon-cutover/index.md).
 The guide keeps Vue and Gluon
 application ownership explicit for every stage and embeds the compiled Vue host
 sources instead of maintaining copied snippets. `validate-docs.mjs` requires the
@@ -71,7 +71,7 @@ The Migration index and analyzer guide document RFC 0003's implemented
 report-only package, CLI, schema, diagnostics, limits, and no-write boundary.
 Documentation validation requires the guide and its public package references.
 The versioned
-[codemod decision](content/1.0.0/migration/vue-codemod-decision/index.md)
+[codemod decision](content/1.0.1/migration/vue-codemod-decision/index.md)
 records the issue #92 no-go, corpus-only measurements, explicit candidate
 classifications, counterexamples, and the continuing manual-review boundary.
 The verified analyzer-guide renders are

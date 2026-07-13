@@ -5,6 +5,9 @@
       "@gluonjs/core": [
         "src/index.ts"
       ],
+      "@gluonjs/reactivity": [
+        "packages/reactivity/src/index.ts"
+      ],
       "@gluonjs/quarks": [
         "packages/quarks/src/index.ts"
       ],

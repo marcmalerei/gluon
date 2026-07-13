@@ -11,7 +11,7 @@
 </p>
 
 > [!IMPORTANT]
-> The repository carries the `1.0.0` release line. npm publication is performed only from an immutable `v1.0.0` tag through the protected release workflow.
+> The repository carries the `1.0.1` recovery release line. npm publication is performed only from an immutable release tag through the protected release workflow; `v1.0.0` failed before publication and remains unchanged.
 
 ## What works today
 
@@ -30,7 +30,7 @@
 - opt-in versioned Devtools with multi-application inspection and ordered runtime timelines
 - a shareable Gluon Playground with live diagnostics, reference lookup, and starter download
 - a living mobile-first GLUON GOODS reference shop built from public APIs
-- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.0.0/migration/vue-to-gluon-cutover/index.md)
+- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.0.1/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
