@@ -25,8 +25,12 @@ if (immutable.enabled !== true) throw new Error('GitHub immutable releases must 
 
 const environment = await githubJson(`repos/${repository}/environments/npm`);
 const reviewerRule = environment.protection_rules?.find((rule) => rule.type === 'required_reviewers');
-if (!reviewerRule || reviewerRule.prevent_self_review !== true || !Array.isArray(reviewerRule.reviewers) || reviewerRule.reviewers.length === 0) {
-  throw new Error('The npm environment requires named reviewers with self-review prevention.');
+if (reviewerRule) {
+  throw new Error('The accepted single-operator npm environment must not require a second-person reviewer.');
+}
+const waitTimerRule = environment.protection_rules?.find((rule) => rule.type === 'wait_timer');
+if (waitTimerRule) {
+  throw new Error('The accepted single-operator npm environment must not imply an uncontracted wait timer.');
 }
 if (environment.can_admins_bypass !== false) {
   throw new Error('The npm environment must disallow administrator bypass.');
@@ -35,8 +39,11 @@ if (environment.deployment_branch_policy?.custom_branch_policies !== true) {
   throw new Error('The npm environment requires a custom release-tag deployment policy.');
 }
 const deploymentPolicies = await githubJson(`repos/${repository}/environments/npm/deployment-branch-policies`);
-if (!deploymentPolicies.branch_policies?.some((policy) => policy.type === 'tag' && ['v*', 'v*.*.*'].includes(policy.name))) {
-  throw new Error('The npm environment must restrict deployments to v-prefixed release tags.');
+if (!Array.isArray(deploymentPolicies.branch_policies)
+  || deploymentPolicies.branch_policies.length !== 1
+  || deploymentPolicies.branch_policies[0].type !== 'tag'
+  || deploymentPolicies.branch_policies[0].name !== 'v*') {
+  throw new Error('The npm environment must permit only the exact v* release-tag pattern.');
 }
 
 const rulesets = await githubJson(`repos/${repository}/rulesets?includes_parents=true`);

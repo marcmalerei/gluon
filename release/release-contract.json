@@ -39,6 +39,19 @@
     "recoveryCodeStorage": "outside-second-factor-device",
     "npmSupportRecoveryRiskAccepted": true
   },
+  "githubReleaseEnvironment": {
+    "name": "npm",
+    "approvalModel": "single-operator",
+    "requiredReviewers": 0,
+    "independentHumanApprovalRequired": false,
+    "selfReviewPreventionRequired": false,
+    "waitTimerMinutes": 0,
+    "administratorBypassAllowed": false,
+    "deploymentBranchPatterns": [],
+    "deploymentTagPatterns": ["v*"],
+    "longLivedNpmSecretsAllowed": false,
+    "singleOperatorImmutableStagingRiskAccepted": true
+  },
   "spdxSchema": {
     "path": "release/spdx-2.3.schema.json",
     "source": "https://raw.githubusercontent.com/spdx/spdx-spec/44ab76293754df4af5af700fd4abd5453b866c86/schemas/spdx-schema.json",
@@ -69,7 +82,7 @@
     "existing-npm-package-records",
     "npm-single-owner-recovery-and-mfa",
     "verified-npm-trusted-publisher",
-    "protected-npm-environment",
+    "verified-single-operator-npm-environment",
     "protected-release-tags",
     "immutable-github-releases",
     "release-cut-browser-device-evidence",

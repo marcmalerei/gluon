@@ -15,6 +15,7 @@
     "compatibilityManifestPath",
     "bootstrap",
     "npmOwnerRecovery",
+    "githubReleaseEnvironment",
     "spdxSchema",
     "artifacts",
     "publication",
@@ -91,6 +92,43 @@
         "recoveryCodesRequired": { "const": true },
         "recoveryCodeStorage": { "const": "outside-second-factor-device" },
         "npmSupportRecoveryRiskAccepted": { "const": true }
+      }
+    },
+    "githubReleaseEnvironment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "approvalModel",
+        "requiredReviewers",
+        "independentHumanApprovalRequired",
+        "selfReviewPreventionRequired",
+        "waitTimerMinutes",
+        "administratorBypassAllowed",
+        "deploymentBranchPatterns",
+        "deploymentTagPatterns",
+        "longLivedNpmSecretsAllowed",
+        "singleOperatorImmutableStagingRiskAccepted"
+      ],
+      "properties": {
+        "name": { "const": "npm" },
+        "approvalModel": { "const": "single-operator" },
+        "requiredReviewers": { "const": 0 },
+        "independentHumanApprovalRequired": { "const": false },
+        "selfReviewPreventionRequired": { "const": false },
+        "waitTimerMinutes": { "const": 0 },
+        "administratorBypassAllowed": { "const": false },
+        "deploymentBranchPatterns": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "deploymentTagPatterns": {
+          "type": "array",
+          "prefixItems": [{ "const": "v*" }],
+          "items": false
+        },
+        "longLivedNpmSecretsAllowed": { "const": false },
+        "singleOperatorImmutableStagingRiskAccepted": { "const": true }
       }
     },
     "spdxSchema": {
