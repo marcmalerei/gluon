@@ -114,12 +114,23 @@ Do not change `package-contract.json` from `blocked`/`unverified` to
 
 npm package settings expose trusted-publisher configuration only after the
 package record exists. The one-time bootstrap therefore publishes a minimal
-`0.0.0-bootstrap.0` placeholder for every package under the
+`0.0.0-bootstrap.1` placeholder for every package under the
 `gluon-bootstrap` dist-tag. These placeholders contain only `package.json`,
 `README.md`, and `LICENSE`: they expose no runtime, executable, types, exports,
 dependencies, or supported API. They do not use provenance, because this is an
-interactive owner publication rather than the protected release workflow, and
-they must never receive `latest`.
+interactive owner publication rather than the protected release workflow.
+
+The first live bootstrap attempt created
+`@gluonjs/reactivity@0.0.0-bootstrap.0` with the reviewed archive integrity, but
+npm also materialized `latest` for that new package record and returned HTTP
+400 when the owner tried to remove it. The public packument was unavailable for
+several minutes after the successful publish response even though npm already
+reported the package as public and owner-controlled. Because published versions
+are immutable, the corrected bootstrap is `0.0.0-bootstrap.1`; the release
+contract retains the exact integrity and SHA-1 of the superseded Reactivity
+record. Until the first supported release replaces the temporary state,
+`latest` may be absent or point only to the reviewed current bootstrap or that
+exact contracted predecessor. Any other value blocks the bootstrap.
 
 Prepare and inspect the deterministic allowlisted archives from clean `main`:
 
@@ -142,7 +153,9 @@ artifact set that is not byte-identical to an independent rebuild, a dirty or
 non-`main` checkout, a source commit that is not the exact current
 `origin/main`, a user who is not an npm organization owner, a conflicting
 existing package record, any unexpected `latest`, and a rerun whose registry
-integrity differs from the reviewed archive.
+integrity differs from the reviewed archive. Registry visibility is allowed up
+to ten minutes after a successful publish before the operation stops; this wait
+does not weaken the exact integrity and dist-tag checks.
 
 The npm owner then runs this command in an interactive terminal and completes
 the registry's 2FA challenges without copying credentials or one-time codes
@@ -154,8 +167,11 @@ npm run release:bootstrap:publish -- --confirm-owner-controlled-bootstrap
 
 A matching partial run is recoverable: already-published immutable bootstrap
 versions are verified and skipped, while missing records continue. After all
-records exist, confirm that each package maps only `gluon-bootstrap` to
-`0.0.0-bootstrap.0` and has no `latest` tag.
+records exist, confirm that every package maps `gluon-bootstrap` to
+`0.0.0-bootstrap.1`. Any `latest` tag must resolve only to that reviewed
+bootstrap version or, for Reactivity, its exact contracted
+`0.0.0-bootstrap.0` predecessor. The first supported release replaces this
+temporary `latest` state for the complete package train.
 
 For each package, configure npm Trusted Publishing from its package settings
 with GitHub Actions, repository owner `marcmalerei`, repository `gluon`,

@@ -9,12 +9,20 @@
   "manualEvidencePath": "release/evidence/{version}.json",
   "compatibilityManifestPath": "release/compatibility/{version}.json",
   "bootstrap": {
-    "version": "0.0.0-bootstrap.0",
+    "version": "0.0.0-bootstrap.1",
     "artifactDirectory": ".tmp/npm-bootstrap",
     "distTag": "gluon-bootstrap",
     "access": "public",
     "identity": "owner-interactive-2fa",
-    "latestAllowed": false,
+    "latestPolicy": "absent-or-reviewed-bootstrap-until-first-supported-release",
+    "supersededRecords": [
+      {
+        "name": "@gluonjs/reactivity",
+        "version": "0.0.0-bootstrap.0",
+        "integrity": "sha512-/WfS45xyarkObJanK4IbQsyznDR60Fte+mvik1mh2SUm29D/ns1tqrQs2b21FYdjAQFyq62z0WDENNBDJ4472w==",
+        "shasum": "9a1ca1af75878ea5aebba3ac6139ac0beee3273b"
+      }
+    ],
     "packageFiles": [
       "package.json",
       "README.md",

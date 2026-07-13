@@ -44,16 +44,18 @@ const registryState = new Map();
 if (!dryRun) {
   for (const entry of evidence.packages) {
     const packument = await registryPackument(entry.name);
-    if (packument && !packument.versions?.[bootstrap.version]) {
-      throw new Error(`${entry.name} already exists without the reviewed ${bootstrap.version} bootstrap record; stop before publishing.`);
+    if (packument?.versions?.[bootstrap.version]) {
+      verifyBootstrapMetadata(entry, packument);
+      registryState.set(entry.name, true);
+      continue;
     }
-    if (packument) verifyBootstrapMetadata(entry, packument);
-    registryState.set(entry.name, packument);
+    if (packument) verifySupersededPackageRecord(entry.name, packument);
+    registryState.set(entry.name, false);
   }
 }
 
 for (const entry of evidence.packages) {
-  if (!dryRun && registryState.get(entry.name)) {
+  if (!dryRun && registryState.get(entry.name) === true) {
     console.log(`verified existing ${entry.name}@${bootstrap.version}; immutable matching bootstrap skipped`);
     continue;
   }
@@ -70,7 +72,7 @@ for (const entry of evidence.packages) {
   if (!dryRun) verifyBootstrapMetadata(entry, await waitForRegistry(entry.name));
 }
 
-console.log(`${dryRun ? 'bootstrap dry-run valid' : 'bootstrap publication verified'}: ${evidence.packages.length} packages at ${bootstrap.version} under ${bootstrap.distTag}; latest ${dryRun ? 'forbidden by contract' : 'absent'}`);
+console.log(`${dryRun ? 'bootstrap dry-run valid' : 'bootstrap publication verified'}: ${evidence.packages.length} packages at ${bootstrap.version} under ${bootstrap.distTag}; latest is absent or restricted to reviewed bootstrap placeholders until the first supported release`);
 
 function validateEvidence(evidenceValue) {
   const expectedNames = packageContract.packages.map(({ name }) => name);
@@ -78,7 +80,8 @@ function validateEvidence(evidenceValue) {
   if (evidenceValue.version !== bootstrap.version
     || evidenceValue.distTag !== bootstrap.distTag
     || evidenceValue.identity !== bootstrap.identity
-    || evidenceValue.latestAllowed !== false
+    || evidenceValue.latestPolicy !== bootstrap.latestPolicy
+    || JSON.stringify(evidenceValue.supersededRecords) !== JSON.stringify(bootstrap.supersededRecords)
     || JSON.stringify(actualNames) !== JSON.stringify(expectedNames)) {
     throw new Error('Bootstrap evidence does not match the reviewed release and package contracts.');
   }
@@ -128,12 +131,15 @@ async function registryPackument(name) {
 }
 
 async function waitForRegistry(name) {
-  for (let attempt = 0; attempt < 10; attempt += 1) {
+  for (let attempt = 0; attempt < 120; attempt += 1) {
     const packument = await registryPackument(name);
     if (packument?.versions?.[bootstrap.version]) return packument;
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 2_000));
+    if (attempt > 0 && attempt % 12 === 0) {
+      console.log(`waiting for npm registry visibility: ${name}@${bootstrap.version} (${attempt * 5}s)`);
+    }
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 5_000));
   }
-  throw new Error(`${name}@${bootstrap.version} was not visible on npm after publication.`);
+  throw new Error(`${name}@${bootstrap.version} was not visible on npm within 10 minutes after publication.`);
 }
 
 function verifyBootstrapMetadata(entry, packument) {
@@ -145,8 +151,33 @@ function verifyBootstrapMetadata(entry, packument) {
   if (packument['dist-tags']?.[bootstrap.distTag] !== bootstrap.version) {
     throw new Error(`${entry.name} does not map ${bootstrap.distTag} to ${bootstrap.version}.`);
   }
-  if (bootstrap.latestAllowed === false && packument['dist-tags']?.latest) {
-    throw new Error(`${entry.name} unexpectedly has latest=${packument['dist-tags'].latest} during bootstrap.`);
+  const latest = packument['dist-tags']?.latest;
+  const allowedLatest = new Set([
+    bootstrap.version,
+    ...bootstrap.supersededRecords
+      .filter(({ name }) => name === entry.name)
+      .map(({ version }) => version),
+  ]);
+  if (latest && !allowedLatest.has(latest)) {
+    throw new Error(`${entry.name} unexpectedly has latest=${latest}; only reviewed bootstrap placeholders are permitted before the first supported release.`);
+  }
+}
+
+function verifySupersededPackageRecord(name, packument) {
+  const reviewed = bootstrap.supersededRecords.filter((entry) => entry.name === name);
+  const versions = Object.keys(packument.versions ?? {});
+  if (reviewed.length === 0 || versions.some((version) => !reviewed.some((entry) => entry.version === version))) {
+    throw new Error(`${name} already exists without the reviewed ${bootstrap.version} bootstrap record and is not an exact contracted predecessor; stop before publishing.`);
+  }
+  for (const entry of reviewed) {
+    const metadata = packument.versions?.[entry.version];
+    if (metadata?.dist?.integrity !== entry.integrity || metadata.dist?.shasum !== entry.shasum) {
+      throw new Error(`${name}@${entry.version} does not match the contracted superseded bootstrap record.`);
+    }
+  }
+  const latest = packument['dist-tags']?.latest;
+  if (latest && !reviewed.some((entry) => entry.version === latest)) {
+    throw new Error(`${name} has unreviewed latest=${latest} before ${bootstrap.version} publication.`);
   }
 }
 

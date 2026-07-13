@@ -32,14 +32,31 @@
     "bootstrap": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["version", "artifactDirectory", "distTag", "access", "identity", "latestAllowed", "packageFiles"],
+      "required": ["version", "artifactDirectory", "distTag", "access", "identity", "latestPolicy", "supersededRecords", "packageFiles"],
       "properties": {
-        "version": { "const": "0.0.0-bootstrap.0" },
+        "version": { "const": "0.0.0-bootstrap.1" },
         "artifactDirectory": { "const": ".tmp/npm-bootstrap" },
         "distTag": { "const": "gluon-bootstrap" },
         "access": { "const": "public" },
         "identity": { "const": "owner-interactive-2fa" },
-        "latestAllowed": { "const": false },
+        "latestPolicy": { "const": "absent-or-reviewed-bootstrap-until-first-supported-release" },
+        "supersededRecords": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "version", "integrity", "shasum"],
+              "properties": {
+                "name": { "const": "@gluonjs/reactivity" },
+                "version": { "const": "0.0.0-bootstrap.0" },
+                "integrity": { "const": "sha512-/WfS45xyarkObJanK4IbQsyznDR60Fte+mvik1mh2SUm29D/ns1tqrQs2b21FYdjAQFyq62z0WDENNBDJ4472w==" },
+                "shasum": { "const": "9a1ca1af75878ea5aebba3ac6139ac0beee3273b" }
+              }
+            }
+          ],
+          "items": false
+        },
         "packageFiles": {
           "type": "array",
           "prefixItems": [
