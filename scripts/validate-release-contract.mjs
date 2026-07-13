@@ -28,20 +28,22 @@ const lockfile = await readJson('package-lock.json');
 const rootChangelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
 const workflow = await readFile(resolve(root, '.github/workflows/release.yml'), 'utf8');
 const publishScript = await readFile(resolve(root, 'scripts/publish-release.mjs'), 'utf8');
+const artifactBuildScript = await readFile(resolve(root, 'scripts/build-release-artifacts.mjs'), 'utf8');
 const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-bootstrap-artifacts.mjs'), 'utf8');
 const bootstrapPublishScript = await readFile(resolve(root, 'scripts/publish-npm-bootstrap.mjs'), 'utf8');
 const hostingScript = await readFile(resolve(root, 'scripts/verify-release-hosting.mjs'), 'utf8');
 const officialNames = new Set(packageContract.packages.map((entry) => entry.name));
-const manualEvidenceSchema = await readJson('release/manual-evidence.schema.json');
+const releaseCutEvidenceSchema = await readJson('release/release-cut-evidence.schema.json');
 const compatibilityManifestSchema = await readJson('release/compatibility-manifest.schema.json');
 const schemaValidator = new Ajv2020({ allErrors: true, strict: false });
 addFormats(schemaValidator);
 const validateReleaseContractSchema = schemaValidator.compile(releaseContractSchema);
-const validateManualEvidenceSchema = schemaValidator.compile(manualEvidenceSchema);
+const validateReleaseCutEvidenceSchema = schemaValidator.compile(releaseCutEvidenceSchema);
 const validateCompatibilityManifestSchema = schemaValidator.compile(compatibilityManifestSchema);
 const manifests = [];
 
 validateReleaseContract();
+validateEvidenceSchemaBoundary();
 
 for (const entry of packageContract.packages) {
   if (entry.state !== 'current') throw new Error(`${entry.name} is not current; every release-group package must be current.`);
@@ -104,6 +106,7 @@ const result = {
   npmOwnerRecovery: releaseContract.npmOwnerRecovery,
   githubReleaseEnvironment: releaseContract.githubReleaseEnvironment,
   githubReleaseTagProtection: releaseContract.githubReleaseTagProtection,
+  supportBoundary: releaseContract.supportBoundary,
   publicationState: packageContract.registry.publicationState,
   scopeControl: packageContract.registry.scopeControl,
   externalPrerequisites: releaseContract.externalPrerequisites,
@@ -177,6 +180,20 @@ function validateReleaseContract() {
   })) {
     throw new Error('GitHub release tags must be operator-created and immutable without update or deletion bypass.');
   }
+  const expectedSupportBoundary = {
+    model: 'automated-engine-evidence-only',
+    brandedBrowserSupportClaimed: false,
+    operatingSystemSupportClaimed: false,
+    deviceSupportClaimed: false,
+    assistiveTechnologySupportClaimed: false,
+    manualBrowserDeviceEvidenceRequired: false,
+    manualAssistiveTechnologyEvidenceRequired: false,
+    singleOperatorRiskAccepted: true,
+  };
+  if (Object.entries(expectedSupportBoundary)
+    .some(([field, expected]) => releaseContract.supportBoundary?.[field] !== expected)) {
+    throw new Error('Release support must remain limited to automated engine evidence without branded browser, platform, device, or assistive-technology claims.');
+  }
   if (!prereleaseVersion(releaseContract.bootstrap?.version)
     || releaseContract.bootstrap.version === releaseContract.targetVersion
     || releaseContract.bootstrap.distTag === releaseContract.publication.distTag
@@ -216,6 +233,72 @@ function validateReleaseContract() {
     || releaseContract.externalPrerequisites.includes('protected-npm-environment')) {
     throw new Error('Release contract must record the accepted single-operator GitHub npm environment prerequisite.');
   }
+  for (const superseded of ['release-cut-browser-device-evidence', 'release-cut-assistive-technology-evidence']) {
+    if (releaseContract.externalPrerequisites.includes(superseded)) {
+      throw new Error(`Release contract must not retain superseded manual evidence prerequisite ${superseded}.`);
+    }
+  }
+}
+
+function validateEvidenceSchemaBoundary() {
+  const automatedQualityRun = {
+    url: 'https://github.com/marcmalerei/gluon/actions/runs/1',
+    conclusion: 'success',
+  };
+  const releaseCutEvidenceFixture = {
+    schemaVersion: 1,
+    releaseVersion: releaseContract.targetVersion,
+    testedCommit: '0'.repeat(40),
+    cutAt: '2026-07-13T00:00:00.000Z',
+    automatedQualityRun,
+    supportBoundary: releaseContract.supportBoundary,
+    acceptedBy: releaseContract.npmOwnerRecovery.owner,
+    acceptedAt: '2026-07-13T00:00:00.000Z',
+  };
+  validateJsonSchema('release-cut evidence schema fixture', releaseCutEvidenceFixture, validateReleaseCutEvidenceSchema);
+  for (const forbidden of ['browserDeviceRows', 'assistiveTechnologyRows', 'approvedBy', 'approvedAt']) {
+    if (validateReleaseCutEvidenceSchema({ ...releaseCutEvidenceFixture, [forbidden]: [] })) {
+      throw new Error(`Release-cut evidence schema must reject superseded manual field ${forbidden}.`);
+    }
+  }
+
+  const evidence = ['https://github.com/marcmalerei/gluon/actions/runs/1'];
+  const compatibilityFixture = {
+    schemaVersion: 1,
+    releaseVersion: releaseContract.targetVersion,
+    sourceCommit: releaseCutEvidenceFixture.testedCommit,
+    cutAt: releaseCutEvidenceFixture.cutAt,
+    automatedQualityRun,
+    supportBoundary: {
+      model: 'playwright-engine-and-node-evidence',
+      brandedProductSupportClaimed: false,
+    },
+    engineTargets: [
+      ['playwright-chromium', 'Chromium', 'Blink'],
+      ['playwright-firefox', 'Firefox', 'Gecko'],
+      ['playwright-webkit', 'WebKit', 'WebKit'],
+    ].map(([id, browserBinary, engine]) => ({
+      id,
+      browserBinary,
+      browserVersion: '1.0.0',
+      engine,
+      engineVersion: '1.0.0',
+      runner: 'automated-fixture',
+      mode: 'headless-automated',
+      evidence,
+      outcome: 'pass',
+    })),
+    nodeTargets: [
+      { id: 'node-22-lts', version: '22.12.0', releaseStatus: 'maintenance-lts', evidence, outcome: 'pass' },
+      { id: 'node-24-lts', version: '24.0.0', releaseStatus: 'active-lts', evidence, outcome: 'pass' },
+    ],
+    surfaces: ['client-rendering', 'server-rendering', 'streaming', 'hydration', 'static-generation']
+      .map((id) => ({ id, evidence, outcome: 'pass' })),
+  };
+  validateJsonSchema('compatibility manifest schema fixture', compatibilityFixture, validateCompatibilityManifestSchema);
+  if (validateCompatibilityManifestSchema({ ...compatibilityFixture, browserTargets: [] })) {
+    throw new Error('Compatibility manifest schema must reject superseded branded browser targets.');
+  }
 }
 
 function validateDevelopmentState() {
@@ -249,47 +332,29 @@ async function validateCandidate(version) {
       throw new Error(`${entry.name} changelog has no dated ${version} release section.`);
     }
   }
-  await validateManualEvidence(version);
+  await validateReleaseCutEvidence(version);
   await validateCompatibilityManifest(version);
 }
 
-async function validateManualEvidence(version) {
-  const path = releaseContract.manualEvidencePath.replace('{version}', version);
+async function validateReleaseCutEvidence(version) {
+  const path = releaseContract.releaseCutEvidencePath.replace('{version}', version);
   const evidence = await readJson(path);
-  validateJsonSchema(path, evidence, validateManualEvidenceSchema);
+  validateJsonSchema(path, evidence, validateReleaseCutEvidenceSchema);
   if (evidence.schemaVersion !== 1 || evidence.releaseVersion !== version) {
     throw new Error(`${path} does not describe release ${version}.`);
   }
   if (!/^[a-f0-9]{40}$/.test(evidence.testedCommit ?? '')) throw new Error(`${path} requires an exact tested commit.`);
-  for (const field of ['cutAt', 'approvedAt']) {
+  for (const field of ['cutAt', 'acceptedAt']) {
     if (!Number.isFinite(Date.parse(evidence[field]))) throw new Error(`${path} has invalid ${field}.`);
   }
   if (evidence.automatedQualityRun?.conclusion !== 'success'
     || !/^https:\/\/github\.com\/marcmalerei\/gluon\/actions\/runs\/\d+$/.test(evidence.automatedQualityRun?.url ?? '')) {
     throw new Error(`${path} requires a successful Quality Gates run URL.`);
   }
-  const requiredBrowsers = new Set([
-    'chrome-windows',
-    'edge-windows',
-    'firefox-esr-windows',
-    'safari-macos',
-    'safari-ios',
-    'chrome-android',
-    'firefox-android',
-  ]);
-  const requiredAssistiveTechnology = new Set([
-    'voiceover-safari-macos',
-    'voiceover-safari-ios',
-    'nvda-chrome-windows',
-    'nvda-edge-windows',
-    'nvda-firefox-windows',
-    'talkback-chrome-android',
-    'talkback-firefox-android',
-  ]);
-  validateRows(path, 'browserDeviceRows', evidence.browserDeviceRows, requiredBrowsers);
-  validateRows(path, 'assistiveTechnologyRows', evidence.assistiveTechnologyRows, requiredAssistiveTechnology, true);
-  if (!Array.isArray(evidence.approvedBy) || evidence.approvedBy.length === 0 || evidence.approvedBy.some((entry) => !entry.trim())) {
-    throw new Error(`${path} requires at least one named approver.`);
+  if (Object.entries(releaseContract.supportBoundary)
+    .some(([field, expected]) => evidence.supportBoundary?.[field] !== expected)
+    || evidence.acceptedBy !== releaseContract.npmOwnerRecovery.owner) {
+    throw new Error(`${path} must record the contracted automated-only support boundary and sole operator acceptance.`);
   }
   try {
     execFileSync('git', ['merge-base', '--is-ancestor', evidence.testedCommit, 'HEAD'], { cwd: root, stdio: 'ignore' });
@@ -307,56 +372,27 @@ async function validateManualEvidence(version) {
   }
 }
 
-function validateRows(path, field, rows, expectedIds, requireAssistiveTechnology = false) {
-  if (!Array.isArray(rows)) throw new Error(`${path} requires ${field}.`);
-  const ids = new Set(rows.map((row) => row.id));
-  for (const id of expectedIds) if (!ids.has(id)) throw new Error(`${path} ${field} is missing ${id}.`);
-  if (ids.size !== rows.length) throw new Error(`${path} ${field} IDs must be unique.`);
-  for (const row of rows) {
-    for (const required of ['product', 'productVersion', 'engineVersion', 'operatingSystem', 'device', 'mode', 'input', 'executedAt', 'tester']) {
-      if (typeof row[required] !== 'string' || !row[required].trim()) throw new Error(`${path} ${row.id} requires ${required}.`);
-    }
-    if (row.outcome !== 'pass' || !Array.isArray(row.artifacts) || row.artifacts.length === 0) {
-      throw new Error(`${path} ${row.id} requires a passing outcome and artifacts.`);
-    }
-    if (!Number.isFinite(Date.parse(row.executedAt))) throw new Error(`${path} ${row.id} has invalid executedAt.`);
-    if (row.artifacts.some((artifact) => typeof artifact !== 'string' || !artifact.trim())) {
-      throw new Error(`${path} ${row.id} has an empty artifact identifier.`);
-    }
-    if (requireAssistiveTechnology && (
-      typeof row.assistiveTechnology !== 'string' || !row.assistiveTechnology.trim()
-      || typeof row.assistiveTechnologyVersion !== 'string' || !row.assistiveTechnologyVersion.trim()
-    )) {
-      throw new Error(`${path} ${row.id} requires a named assistive technology and its exact version.`);
-    }
-  }
-}
-
 async function validateCompatibilityManifest(version) {
   const path = releaseContract.compatibilityManifestPath.replace('{version}', version);
   const manifest = await readJson(path);
   validateJsonSchema(path, manifest, validateCompatibilityManifestSchema);
-  const evidencePath = releaseContract.manualEvidencePath.replace('{version}', version);
-  const manualEvidence = await readJson(evidencePath);
-  if (manifest.releaseVersion !== version || manifest.sourceCommit !== manualEvidence.testedCommit) {
-    throw new Error(`${path} must describe release ${version} and the manually tested commit.`);
+  const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', version);
+  const releaseCutEvidence = await readJson(evidencePath);
+  if (manifest.releaseVersion !== version || manifest.sourceCommit !== releaseCutEvidence.testedCommit) {
+    throw new Error(`${path} must describe release ${version} and the automated release-cut commit.`);
   }
-  if (manifest.automatedQualityRun.url !== manualEvidence.automatedQualityRun.url
+  if (manifest.automatedQualityRun.url !== releaseCutEvidence.automatedQualityRun.url
     || manifest.automatedQualityRun.conclusion !== 'success') {
-    throw new Error(`${path} must reference the manual evidence Quality Gates run.`);
+    throw new Error(`${path} must reference the release-cut Quality Gates run.`);
   }
-  requireUniqueIds(path, 'browserTargets', manifest.browserTargets, [
-    'chrome-desktop-stable',
-    'chrome-desktop-previous',
-    'edge-desktop-stable',
-    'edge-desktop-previous',
-    'firefox-desktop-stable',
-    'firefox-desktop-previous',
-    'firefox-desktop-esr',
-    'safari-macos-stable',
-    'safari-ios-stable',
-    'chrome-android-stable',
-    'firefox-android-stable',
+  if (manifest.supportBoundary?.model !== 'playwright-engine-and-node-evidence'
+    || manifest.supportBoundary?.brandedProductSupportClaimed !== false) {
+    throw new Error(`${path} must reject branded-product compatibility claims.`);
+  }
+  requireUniqueIds(path, 'engineTargets', manifest.engineTargets, [
+    'playwright-chromium',
+    'playwright-firefox',
+    'playwright-webkit',
   ]);
   requireUniqueIds(path, 'nodeTargets', manifest.nodeTargets, ['node-22-lts', 'node-24-lts']);
   requireUniqueIds(path, 'surfaces', manifest.surfaces, [
@@ -436,8 +472,22 @@ function validateWorkflow() {
     "ruleTypes.has('update')",
     "ruleTypes.has('deletion')",
     'bypassActors.length === 0',
+    'releaseCutEvidence.supportBoundary',
+    'releaseCutEvidence.acceptedBy',
   ]) if (!hostingScript.includes(required)) {
     throw new Error(`Release hosting verification is missing single-operator environment control ${required}.`);
+  }
+  for (const required of ['releaseCutEvidencePath', "'release-cut-evidence.json'", "'compatibility-manifest.json'"]) {
+    if (!artifactBuildScript.includes(required)) throw new Error(`Release artifact builder must retain ${required}.`);
+  }
+  if (artifactBuildScript.includes('manualEvidencePath') || artifactBuildScript.includes('manual-release-evidence.json')) {
+    throw new Error('Release artifact builder must not retain the superseded manual evidence contract.');
+  }
+  for (const required of ['release-cut-evidence.json', 'compatibility-manifest.json']) {
+    if (!workflow.includes(required)) throw new Error(`Release workflow must retain ${required}.`);
+  }
+  if (workflow.includes('manual-release-evidence.json')) {
+    throw new Error('Release workflow must not retain the superseded manual-release-evidence asset.');
   }
   if (hostingScript.includes('requires named reviewers')) {
     throw new Error('Release hosting verification must not retain the superseded second-person reviewer requirement.');

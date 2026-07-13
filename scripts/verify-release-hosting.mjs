@@ -84,31 +84,36 @@ if (!releaseTagUpdatesAreImmutable || !releaseTagDeletionsAreImmutable) {
   throw new Error('Active no-bypass rulesets must prevent update and deletion of v-prefixed release tags.');
 }
 
-const manualEvidence = JSON.parse(await readFile(resolve(root, 'release/evidence', `${releaseVersion}.json`), 'utf8'));
-const runId = /\/actions\/runs\/(\d+)$/.exec(manualEvidence.automatedQualityRun.url)?.[1];
-if (!runId) throw new Error('Manual release evidence has no exact Quality Gates run URL.');
+const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', releaseVersion);
+const releaseCutEvidence = JSON.parse(await readFile(resolve(root, evidencePath), 'utf8'));
+if (Object.entries(releaseContract.supportBoundary)
+  .some(([field, expected]) => releaseCutEvidence.supportBoundary?.[field] !== expected)
+  || releaseCutEvidence.acceptedBy !== releaseContract.npmOwnerRecovery.owner) {
+  throw new Error('Release-cut evidence must record the contracted automated-only support boundary and sole operator acceptance.');
+}
+const runId = /\/actions\/runs\/(\d+)$/.exec(releaseCutEvidence.automatedQualityRun.url)?.[1];
+if (!runId) throw new Error('Release-cut evidence has no exact Quality Gates run URL.');
 const qualityRun = JSON.parse((await execFile('gh', ['api', `repos/${repository}/actions/runs/${runId}`], {
   encoding: 'utf8',
   maxBuffer: 1024 * 1024,
 })).stdout);
-if (qualityRun.conclusion !== 'success' || qualityRun.head_sha !== manualEvidence.testedCommit
+if (qualityRun.conclusion !== 'success' || qualityRun.head_sha !== releaseCutEvidence.testedCommit
   || qualityRun.name !== 'Quality Gates' || !qualityRun.path?.endsWith('/quality-gates.yml')) {
-  throw new Error('Manual release evidence Quality Gates run does not prove the tested commit passed.');
+  throw new Error('Release-cut evidence Quality Gates run does not prove the tested commit passed.');
 }
 try {
-  await execFile('git', ['merge-base', '--is-ancestor', manualEvidence.testedCommit, 'HEAD'], { cwd: root });
+  await execFile('git', ['merge-base', '--is-ancestor', releaseCutEvidence.testedCommit, 'HEAD'], { cwd: root });
 } catch {
-  throw new Error('The manually tested commit is not an ancestor of the release tag.');
+  throw new Error('The automated release-cut commit is not an ancestor of the release tag.');
 }
-const changedAfterTesting = (await execFile('git', ['diff', '--name-only', manualEvidence.testedCommit, 'HEAD'], {
+const changedAfterTesting = (await execFile('git', ['diff', '--name-only', releaseCutEvidence.testedCommit, 'HEAD'], {
   cwd: root,
   encoding: 'utf8',
 })).stdout.trim().split('\n').filter(Boolean);
-const evidencePath = `release/evidence/${releaseVersion}.json`;
-const compatibilityPath = `release/compatibility/${releaseVersion}.json`;
+const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', releaseVersion);
 const permittedEvidenceChanges = new Set([evidencePath, compatibilityPath]);
 if (changedAfterTesting.some((path) => !permittedEvidenceChanges.has(path))) {
-  throw new Error(`Acceptance-relevant files changed after manual testing: ${changedAfterTesting.filter((path) => !permittedEvidenceChanges.has(path)).join(', ')}.`);
+  throw new Error(`Acceptance-relevant files changed after the automated Quality Gates run: ${changedAfterTesting.filter((path) => !permittedEvidenceChanges.has(path)).join(', ')}.`);
 }
 
 console.log(`release hosting valid: ${repository} is public, immutable releases enabled, npm environment active, tested commit verified`);

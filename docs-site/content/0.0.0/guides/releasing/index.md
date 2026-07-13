@@ -23,11 +23,10 @@ Publication remains blocked until an owner verifies public repository
 visibility, npm scope control, the accepted single-owner recovery and
 multi-factor-authentication controls, existing owner-controlled package
 records, trusted-publisher bindings, the single-operator `npm` environment and
-tag rules, immutable GitHub releases, and the manual release-cut browser/device and
-assistive-technology evidence. `marcmalerei` is the sole required npm owner; a
-second owner is not required. The owner must use `auth-and-writes` 2FA, keep the
-npm account linked to GitHub, and retain current recovery codes outside the
-second-factor device. Loss of the sole owner account can stop package
+tag rules, and immutable GitHub releases. `marcmalerei` is the sole required npm
+owner; a second owner is not required. The owner must use `auth-and-writes` 2FA,
+keep the npm account linked to GitHub, and retain current recovery codes outside
+the second-factor device. Loss of the sole owner account can stop package
 administration and require npm Support account recovery. Repository validation
 does not prove that the recovery codes are stored.
 
@@ -45,14 +44,16 @@ separate update and deletion restrictions have no bypass actor; an existing
 release tag therefore cannot be rewritten or deleted, including by a repository
 administrator.
 
-Strict validation requires a machine-readable, reviewed release-cut record for
-all named branded browser/device and assistive-technology combinations.
-Placeholders, engine substitutions, and undocumented failures do not satisfy
-that gate.
+Strict validation requires a machine-readable release-cut record containing the
+exact tested commit, its successful Quality Gates run, and the sole operator's
+acceptance of the automated-only support boundary. Gluon 1.0 makes no branded
+browser, operating-system, device, or assistive-technology support claim and
+does not require manual evidence for those combinations.
 
 The same release cut freezes an immutable compatibility manifest with exact
-branded browser, engine, OS/device, Node LTS, and CSR/SSR/streaming/hydration/SSG
-evidence. Both evidence files must describe the same tested commit.
+Playwright Chromium, Firefox, and WebKit binaries, Node LTS versions, and
+CSR/SSR/streaming/hydration/SSG evidence. Both evidence files must describe the
+same tested commit and explicitly reject branded-product support claims.
 
 Publication uses two recoverable phases. Trusted publishing first places all 17
 reviewed versions under a temporary non-`latest` dist-tag and verifies registry

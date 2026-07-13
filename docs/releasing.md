@@ -33,8 +33,9 @@ therefore includes the 20 generated application selections so a published
 
 Issue #107's weekly DX scorecard is release-adjacent evidence, not publication
 authorization. Its automated run may be retained while `humanPasses` is empty,
-but it cannot satisfy the completed DX contract or replace any owner-controlled
-release, browser/device, assistive-technology, registry, or approval evidence.
+but it cannot satisfy the completed DX contract, replace owner-controlled
+release, registry, or approval evidence, or establish a future browser/device or
+assistive-technology support claim.
 
 ## Repository commit identity
 
@@ -102,24 +103,24 @@ all of the following outside the source tree:
    actor, making an existing release tag immutable for every user, including
    repository administrators.
 8. GitHub immutable releases are enabled.
-9. The release-cut branded browser/device and assistive-technology protocols in
-   [`browser-device-evidence.md`](browser-device-evidence.md) and
-   [`accessibility.md`](accessibility.md) have dated evidence.
+9. The accepted support boundary is automated engine evidence only. Gluon 1.0
+   makes no branded-browser, operating-system, device, or assistive-technology
+   support claim and does not require the corresponding manual protocols.
 
-Record the final manual matrix in `release/evidence/<version>.json` using
-[`release/manual-evidence.schema.json`](../release/manual-evidence.schema.json).
-Strict candidate validation requires the seven branded browser/device rows, the
-seven named assistive-technology combinations with exact versions, a successful
-Quality Gates run, HTTPS evidence URLs, testers, dates, and at least one named
-approver. Do not commit placeholder or inferred results.
+Record the release-cut decision in `release/evidence/<version>.json` using
+[`release/release-cut-evidence.schema.json`](../release/release-cut-evidence.schema.json).
+Strict candidate validation requires the exact tested commit, its successful
+Quality Gates run, the contracted no-branded-support boundary, and acceptance
+by the sole operator. Do not commit placeholder or inferred results.
 
 Also freeze `release/compatibility/<version>.json` against
 [`release/compatibility-manifest.schema.json`](../release/compatibility-manifest.schema.json).
-It records the exact supported Chrome, Edge, Firefox, Safari, Android, and Node
-versions, engines, operating systems/devices, modes, evidence identifiers, and
-CSR/SSR/streaming/hydration/SSG results required by ADR 0001. Both evidence
-files must name the same tested commit and successful Quality Gates run. After
-that commit, strict validation permits only those two evidence files to change.
+It records the exact Playwright-managed Chromium, Firefox, and WebKit binaries,
+Node versions, runner, execution mode, evidence identifiers, and
+CSR/SSR/streaming/hydration/SSG results required by the amended ADR 0001. It
+explicitly rejects branded-product support claims. Both evidence files must name
+the same tested commit and successful Quality Gates run. After that commit,
+strict validation permits only those two evidence files to change.
 
 Do not change `package-contract.json` from `blocked`/`unverified` to
 `ready`/`verified` until those facts have been checked by an owner.
@@ -207,7 +208,7 @@ The reviewed release PR must make these changes together:
 - add dated `1.0.0` sections to the root and all package changelogs;
 - copy and review the versioned documentation as `1.0.0`, then make that version
   latest and supported;
-- attach the completed manual release-cut evidence.
+- attach the completed automated release-cut evidence;
 - attach the completed immutable compatibility manifest.
 
 Validate that commit before creating a tag:

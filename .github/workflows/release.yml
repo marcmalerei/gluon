@@ -110,7 +110,7 @@ jobs:
             .tmp/release/SHA256SUMS
             .tmp/release/CHANGELOG.md
             .tmp/release/RELEASE_NOTES.md
-            .tmp/release/manual-release-evidence.json
+            .tmp/release/release-cut-evidence.json
             .tmp/release/compatibility-manifest.json
             .tmp/release/reproducibility.json
             .tmp/release/performance/*
@@ -118,7 +118,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          assets=(.tmp/release/packages/*.tgz .tmp/release/sbom/*.json .tmp/release/performance/* .tmp/release/release-evidence.json .tmp/release/manual-release-evidence.json .tmp/release/compatibility-manifest.json .tmp/release/reproducibility.json .tmp/release/SHA256SUMS .tmp/release/CHANGELOG.md .tmp/release/RELEASE_NOTES.md)
+          assets=(.tmp/release/packages/*.tgz .tmp/release/sbom/*.json .tmp/release/performance/* .tmp/release/release-evidence.json .tmp/release/release-cut-evidence.json .tmp/release/compatibility-manifest.json .tmp/release/reproducibility.json .tmp/release/SHA256SUMS .tmp/release/CHANGELOG.md .tmp/release/RELEASE_NOTES.md)
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" "${assets[@]}" --clobber
           else

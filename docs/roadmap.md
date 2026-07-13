@@ -41,7 +41,7 @@ The target includes:
 - async components, loading boundaries, portals, cached views, and transitions
 - scaffolding, Vite integration, HMR, language tooling, Devtools, and test utilities
 - client rendering, server rendering, hydration, streaming, and static generation
-- published packages, stable APIs, documentation, browser support, and release policy
+- published packages, stable APIs, documentation, browser-engine evidence, and release policy
 - measured performance, accessibility, security, and memory behavior
 - Custom Element interoperability with plain HTML and third-party frameworks
 
@@ -155,7 +155,8 @@ browser and stylesheet support, package graph, licensing, and release policy.
 ### Exit gate
 
 - Accepted RFCs define the product, component, and interoperability contracts.
-- The supported browser/runtime matrix and unsupported-environment behavior exist.
+- The Playwright engine/Node runtime evidence matrix and
+  unsupported-environment behavior exist without branded-browser claims.
 - Initial server style delivery is compatible with the browser styling contract.
 - Package boundaries, license authority, SemVer, deprecation, and release rules exist.
 - Every later roadmap issue can be evaluated against these contracts.
@@ -305,8 +306,8 @@ engine lanes, Node 22/24 build and SSR lanes, the full repository check, and a
 GLUON GOODS bundle budget. The following evidence slice adds accessibility,
 security, property/fuzz, retention, customer-flow performance, and retained
 benchmark-artifact gates. Branded-browser/device and assistive-technology
-results are release-cut evidence and are not claimed for the private `0.0.0`
-line.
+manual evidence is not required for 1.0, and neither the private `0.0.0` line
+nor the first public release claims that product-level support.
 
 Issue #40 publishes a versioned documentation tree and release archive, generates
 reference pages from every current public package entry point, and compiles the
@@ -343,12 +344,13 @@ release settings are absent.
 property/fuzz cases for Router, compiler, and SSR serialization, repeated
 customer-flow retention checks, a validated machine-readable threat model,
 production customer-flow p95 budgets, and retained CI benchmark artifacts.
-Manual keyboard, assistive-technology, and branded-device evidence is defined as
-a release-cut protocol without making a `0.0.0` product-support claim.
+Manual keyboard, assistive-technology, and branded-device evidence remains a
+future support-claim protocol. It is not a 1.0 release gate; the release records
+only exact automated engine evidence and makes no product-level support claim.
 
 ### Exit gate
 
-- The accepted browser and runtime matrix is enforced in CI.
+- The accepted Playwright engine and Node runtime matrix is enforced in CI.
 - Unit, component, integration, end-to-end, SSR, hydration, property, fuzz,
   accessibility, security, and memory evidence covers the applicable contracts.
 - Vue, Lit, and Vanilla DOM benchmarks are reproducible and make no unsupported claims.
@@ -386,7 +388,7 @@ Gluon 1.0 must not be published until all of the following are verified:
 4. Language tooling and CLI checks identify public template and component errors.
 5. Devtools inspect applications, components, reactive dependencies, router,
    store, scheduler, events, errors, stylesheets, and render causes.
-6. The supported browser and runtime matrix is green.
+6. The accepted Playwright engine and Node runtime matrix is green.
 7. Performance, bundle, accessibility, security, memory, and hydration gates pass.
 8. Plain HTML and third-party framework interoperability is verified.
 9. Stable APIs and documentation match the exact release artifacts.
@@ -407,7 +409,8 @@ Verification is part of every milestone rather than a final cleanup phase:
 - hydration identity and mismatch fixtures
 - property and fuzz testing for compilers, routing, and serialization boundaries
 - memory-retention tests for components, effects, listeners, refs, and stores
-- automated accessibility checks plus documented manual keyboard protocols
+- automated accessibility checks; manual keyboard protocols retained for future
+  support claims
 - security review for HTML, URLs, styles, SSR state, CSP, and Trusted Types
 - bundle-size, startup, update, keyed-list, hydration, and memory benchmarks
 

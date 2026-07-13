@@ -551,10 +551,13 @@ const theme = css`
 adoptStyles(document, theme);
 ```
 
-Unsupported browsers fail with an explicit error instead of silently switching styling strategies.
+Browsers missing required capabilities fail with an explicit error instead of
+silently switching styling strategies. Gluon 1.0 does not turn this capability
+check into a branded-browser or platform support claim.
 
-The accepted browser matrix and the server-to-browser style handoff are defined
-by [ADR 0001](docs/adrs/0001-browser-runtime-and-style-transport.md). SSR may
+The accepted browser-engine evidence boundary and the server-to-browser style
+handoff are defined by
+[ADR 0001](docs/adrs/0001-browser-runtime-and-style-transport.md). SSR may
 serialize marked initial style carriers inside Declarative Shadow DOM; after a
 successful hydration handoff, Gluon removes those carriers and the hydrated
 runtime again contains adopted stylesheets only. The shared UI owner validates

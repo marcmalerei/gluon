@@ -168,6 +168,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Gluon 1.0 release evidence now stops at the exact automated Playwright
+  Chromium, Firefox, and WebKit engine lanes and Node LTS lanes; manual branded
+  browser/device and assistive-technology matrices are no longer release gates,
+  and no corresponding product or platform support is claimed.
 - GitHub release governance now explicitly uses a no-reviewer single-operator
   `npm` environment, with the immutable staging-publication risk accepted and
   machine-validated `v*`-only deployments, disabled administrator bypass, and

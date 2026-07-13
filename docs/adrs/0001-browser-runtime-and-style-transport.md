@@ -1,7 +1,8 @@
 # ADR 0001: Browser, runtime, and style transport contract
 
-- **Status:** Accepted
+- **Status:** Accepted; amended for the 1.0 release boundary
 - **Decision date:** 2026-07-10
+- **Amendment date:** 2026-07-13
 - **Tracking issue:** [#16](https://github.com/marcmalerei/gluon/issues/16)
 - **Roadmap tracker:** [#42](https://github.com/marcmalerei/gluon/issues/42)
 - **Depends on:** [RFC 0001](../rfcs/0001-gluon-1.0-product-scope.md), [RFC 0002](../rfcs/0002-unified-component-model.md)
@@ -9,10 +10,12 @@
 
 ## Decision summary
 
-Gluon 1.0 supports a release-relative set of current Chromium, Firefox, and
-Safari browser products that pass Gluon's complete capability and conformance
-suite. Node.js server rendering and build tooling support Active or Maintenance
-LTS release lines at or above Node 22.12.0.
+Gluon 1.0 publishes automated browser evidence for the exact Playwright-managed
+Chromium, Firefox, and WebKit binaries that pass Gluon's capability and
+conformance suite. It deliberately makes no branded-browser, operating-system,
+device, or assistive-technology support claim. Node.js server rendering and
+build tooling support Active or Maintenance LTS release lines at or above Node
+22.12.0.
 
 The browser runtime has one styling model: constructed `CSSStyleSheet` objects
 installed through `Document.adoptedStyleSheets` or
@@ -38,11 +41,12 @@ Gluon's current implementation already requires constructable stylesheets and
 tree has no SSR renderer, hydration runtime, style manifest, DSD handling, or
 release compatibility matrix.
 
-RFC 0001 requires supported browser/runtime targets and styled SSR, streaming,
-hydration, and SSG. RFC 0002 assigns every element component an open ShadowRoot
-and requires hydration to preserve matching owned nodes. Initial server styles
-must therefore work before JavaScript without introducing a second permanent
-runtime styling model or destroying the parsed ShadowRoot during upgrade.
+RFC 0001 requires evidence before browser/runtime compatibility claims and
+styled SSR, streaming, hydration, and SSG. RFC 0002 assigns every element
+component an open ShadowRoot and requires hydration to preserve matching owned
+nodes. Initial server styles must therefore work before JavaScript without
+introducing a second permanent runtime styling model or destroying the parsed
+ShadowRoot during upgrade.
 
 ## Contract and current prototype
 
@@ -51,7 +55,7 @@ current browser-only prototype has already implemented it.
 
 | Required contract | Current prototype on 2026-07-10 | Delivery |
 | --- | --- | --- |
-| Release-gated Chromium, Firefox, Safari, and mobile targets | Vitest runs one headless Chromium instance. | #38 |
+| Release-gated Playwright Chromium, Firefox, and WebKit engine targets without branded-product claims | Vitest runs one headless Chromium instance. | #38 |
 | Stable unsupported-environment diagnostics and capability report | Style helpers throw ordinary `Error` instances with descriptive text. | #21, #38 |
 | Supported Node LTS lines only | `package.json` allows Node 20.19 and every future version from 22.12 upward; Node 20 is EOL. | #17 |
 | Isomorphic, serializable style definitions | `css()` creates a browser sheet or DOM-free descriptor; `createStyleManifest()` produces ordered content IDs, digests, and CSS text. | Delivered in #37 |
@@ -61,55 +65,26 @@ current browser-only prototype has already implemented it.
 Closing this ADR records the architecture. The implementation issues above
 remain open until their own evidence passes.
 
-## Supported browser matrix
+## Automated browser evidence matrix
 
-### Version resolution
+Each Gluon 1.0 release freezes the exact Playwright-managed Chromium, Firefox,
+and WebKit binary and engine versions, runner, headless execution mode, tested
+commit, and successful Quality Gates run in an immutable compatibility
+manifest. All three engine lanes are release-blocking.
 
-Browser support is both product-based and capability-based. Each Gluon release
-freezes exact product, browser, engine, operating-system, and device versions in
-a versioned compatibility manifest at release-candidate cut. That manifest is
-immutable evidence for the release; words such as “current” below are resolved
-to exact versions in it.
-
-The manifest records one UTC cut timestamp. A browser version is eligible only
-when the vendor's public release source marks it generally available in the
-named stable/release channel no later than that timestamp and the recorded test
-environment can install or run it. Resolution uses Chrome for Testing and
-Chrome's channel documentation, the Microsoft Edge release schedule, Mozilla
-Release Management and release notes, and Apple's security release list.
-
-For Chrome, Edge, and Firefox, “immediately preceding” means the numerically
-preceding generally available major in the same product channel. For Apple
-products, the manifest selects the latest stable major plus at most one earlier
-major that Apple still lists as receiving security updates on the named OS at
-the cut. If no earlier Apple major remains security-supported, only the latest
-major is supported and the manifest records that fact.
-
-The release-relative policy avoids promising browser versions that do not yet
-exist while keeping every support claim reproducible.
-
-| Browser product | Supported window at release cut | Required evidence |
-| --- | --- | --- |
-| Google Chrome desktop | Stable major and immediately preceding stable major | Full browser conformance; reference-SPA E2E on stable |
-| Microsoft Edge desktop | Stable major and immediately preceding stable major | Full browser conformance on both supported versions |
-| Mozilla Firefox desktop | Stable, immediately preceding stable, and current ESR | Full browser conformance; reference-SPA E2E on stable and ESR |
-| Apple Safari on macOS | Latest stable major plus at most one earlier Apple-security-supported major | Full browser conformance in real Safari; reference-SPA E2E on latest |
-| Apple Safari on iOS/iPadOS | Latest stable major plus at most one earlier Apple-security-supported major | Full browser conformance on the recorded simulator or device |
-| Google Chrome on Android | Current stable | Full browser conformance on the recorded emulator or device |
-| Mozilla Firefox on Android | Current stable | Full browser conformance on the recorded emulator or device |
-
-Playwright Chromium and WebKit builds are useful automation targets but do not
-by themselves establish support for branded Chrome, Edge, or Safari. The
-compatibility manifest records the actual tested product and execution mode.
-
-Beta, Developer, Preview, and Nightly channels are non-blocking early-warning
-lanes. A regression there opens an issue but does not block a release until the
-affected version enters a supported window.
+This matrix is regression and conformance evidence, not a product support
+matrix. It does not establish compatibility commitments for Google Chrome,
+Microsoft Edge, branded Mozilla Firefox or Firefox ESR, Apple Safari, iOS,
+Android, any operating system, physical device, emulator, or assistive
+technology. A future release can add such claims only through a new accepted
+contract and the branded-product and manual evidence protocols retained in
+[`browser-device-evidence.md`](../browser-device-evidence.md) and
+[`accessibility.md`](../accessibility.md).
 
 ### Required browser capabilities
 
-Every target in the supported window must pass executable probes and behavior
-tests for all capabilities Gluon 1.0 exposes, including:
+Every Playwright engine target must pass executable probes and behavior tests
+for all capabilities Gluon 1.0 exposes, including:
 
 - ES modules and the ES2022 language/runtime features used by the build output
 - Custom Elements registration, upgrade, lifecycle reactions, and native events
@@ -121,16 +96,17 @@ tests for all capabilities Gluon 1.0 exposes, including:
 - `ElementInternals` and form-associated Custom Elements
 - the DOM, SVG, event, ref, and form behaviors in the renderer conformance suite
 
-A product version is not supported merely because its browser family appears in
-the table. Failure of a required probe or conformance test makes that exact
-target unsupported for the affected Gluon release.
+Failure of a required probe or conformance test blocks the release. Passing the
+probe does not turn the engine binary into a support claim for a branded product
+that embeds a related engine.
 
 ### Explicitly unsupported browser environments
 
 Gluon 1.0 does not claim support for:
 
+- any branded browser, operating system, device, emulator, or assistive
+  technology combination;
 - Internet Explorer or legacy Microsoft Edge
-- browsers outside the named product matrix
 - embedded webviews, in-app browsers, smart-TV browsers, or game-console browsers
 - Electron or other browser wrappers unless a future contract names and tests them
 - browsers that require a Custom Elements, Shadow DOM, DSD, constructable
@@ -148,7 +124,8 @@ DOM before definitions load. An application may design that light DOM as its
 own fallback, but Gluon does not claim component behavior or styling before the
 required capabilities and definitions are available.
 
-Universal output provides a stronger path inside the supported matrix: parsed
+Universal output provides a stronger path in environments with the required
+capabilities: parsed
 DSD and its server style carriers present the static result while JavaScript is
 disabled or delayed. Outside the supported DSD matrix, the application owns any
 separate fallback response; Gluon does not move shadow-owned markup into Light
@@ -316,7 +293,8 @@ weaken CSP or fall back to an unapproved external or inline delivery path.
 - Async boundaries carry their own manifest dependency set and deterministic order.
 - Request-local deduplication applies to document-level carriers, not across
   independent ShadowRoots that each require initial styles.
-- In a supported browser with JavaScript disabled or delayed, parsed DSD and its
+- In a capability-compatible browser with JavaScript disabled or delayed,
+  parsed DSD and its
   carrier styles render the static server result.
 
 ## Hydration style handoff
@@ -448,9 +426,9 @@ Issues #35 through #38 must implement these release-gating fixtures:
 | Final invariant | No Gluon `<style>` carrier or fallback remains after successful hydration |
 | Early warning | Non-blocking current Node and browser prerelease results retained as CI artifacts |
 
-The compatibility suite must test actual branded products where the support
-claim names one. Engine-only substitutions are recorded separately and cannot
-replace the release evidence.
+The 1.0 compatibility suite records engine-only evidence and makes no branded
+product claim. If a future contract names a branded product, that suite must
+test the actual product; engine substitutions cannot satisfy that future claim.
 
 ## Standards basis
 
@@ -473,7 +451,8 @@ same-mode declarative root. CSP defines the policy checks for style elements,
 and the Node.js project defines its LTS lifecycle.
 
 The presence of these standards is not compatibility evidence. The release
-manifest and tests above establish Gluon's actual support claim.
+manifest and tests above establish only Gluon's automated engine evidence and
+Node support boundary.
 
 ## Follow-up delivery
 
@@ -485,12 +464,13 @@ manifest and tests above establish Gluon's actual support claim.
   nested abortable progressive streaming.
 - #37 implements transactional style handoff, the production manifest,
   streaming/SSG assets, and CSP metadata.
-- #38 executes and publishes the browser, device, Node, CSP, accessibility,
-  security, performance, and memory evidence.
+- #38 executes and publishes the Playwright engine, Node, CSP, automated
+  accessibility, security, performance, and memory evidence.
 
 ## Acceptance checklist
 
-- [x] A release-relative supported browser and Node runtime matrix is explicit.
+- [x] The automated browser-engine evidence boundary, absence of branded-product
+  support claims, and supported Node runtime matrix are explicit.
 - [x] Required platform capabilities and unsupported targets are explicit.
 - [x] Missing capabilities have a stable, testable failure mode.
 - [x] The runtime stylesheet invariant and polyfill policy are explicit.

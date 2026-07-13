@@ -240,7 +240,7 @@
       "title": "SSR style transport is unsupported",
       "summary": "The browser cannot complete the required style handoff.",
       "why": "Constructable stylesheet or carrier requirements are not available.",
-      "remediation": "Use a supported browser and preserve server style carriers until hydration.",
+      "remediation": "Use a browser with the required capabilities and preserve server style carriers until hydration.",
       "source": "hydration"
     },
     {

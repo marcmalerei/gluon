@@ -18,8 +18,9 @@ GLUON_BROWSER=chromium npx vitest run tests/shop-example.spec.ts
 ```
 
 The browser assertions verify the maintained keyboard, dialog, alternative-text,
-and mobile interaction contracts. They are regression evidence, not a substitute
-for reviewing a visible change in the supported browsers.
+and mobile interaction contracts. They are automated engine regression evidence,
+not branded-browser, operating-system, device, or assistive-technology support
+evidence.
 
 The stable UI composition also has per-engine screenshot references. When a
 browser-matrix job fails that comparison, CI retains the Vitest actual and diff
@@ -61,4 +62,5 @@ the repository check. See the [analyzer guide](/gluon/0.0.0/migration/vue-analyz
 The repository [security threat model](https://github.com/marcmalerei/gluon/blob/main/docs/security.md),
 [accessibility protocol](https://github.com/marcmalerei/gluon/blob/main/docs/accessibility.md),
 and [browser/device protocol](https://github.com/marcmalerei/gluon/blob/main/docs/browser-device-evidence.md)
-define the reviewed automated and release-cut boundaries.
+define the automated 1.0 boundary and the manual evidence required before any
+future branded-product or assistive-technology support claim.
