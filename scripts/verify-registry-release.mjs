@@ -10,6 +10,8 @@ const version = option('--version');
 const output = resolve(root, option('--output') ?? '.tmp/release/registry-verification.json');
 const directory = resolve(root, option('--directory') ?? '.tmp/release');
 const packageContract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
+const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
+const registry = releaseContract.publication.registry;
 const fixture = resolve(root, '.tmp/registry-verification');
 
 if (!version) throw new Error('Usage: node scripts/verify-registry-release.mjs --version <version> [--directory <directory>] [--output <file>]');
@@ -30,7 +32,7 @@ await writeFile(resolve(fixture, 'package.json'), `${JSON.stringify({
   dependencies,
 }, null, 2)}\n`, 'utf8');
 
-await run('npm', ['install', '--ignore-scripts', '--package-lock=true', '--audit=false', '--fund=false'], fixture);
+await run('npm', ['install', '--ignore-scripts', '--package-lock=true', '--audit=false', '--fund=false', '--registry', registry], fixture);
 
 const imports = [];
 for (const entry of packageContract.packages) {
@@ -53,8 +55,8 @@ await run(resolve(root, 'node_modules/.bin/tsc'), ['-p', resolve(fixture, 'tscon
 
 const packages = [];
 for (const entry of packageContract.packages) {
-  const metadata = JSON.parse(await run('npm', ['view', `${entry.name}@${version}`, '--json'], fixture));
-  const latest = (await run('npm', ['view', `${entry.name}`, 'dist-tags.latest'], fixture)).trim();
+  const metadata = JSON.parse(await run('npm', ['view', `${entry.name}@${version}`, '--json', '--registry', registry], fixture));
+  const latest = (await run('npm', ['view', `${entry.name}`, 'dist-tags.latest', '--registry', registry], fixture)).trim();
   if (metadata.version !== version) throw new Error(`${entry.name} registry version is ${metadata.version}; expected ${version}.`);
   if (latest !== version) throw new Error(`${entry.name} latest tag is ${latest}; expected ${version}.`);
   if (metadata.dist?.integrity !== evidenceByName.get(entry.name)?.integrity) {

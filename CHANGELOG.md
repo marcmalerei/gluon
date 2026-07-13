@@ -7,6 +7,23 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-07-13
+
+### Fixed
+
+- Protected npm publication and finalization no longer ask `actions/setup-node`
+  to create token-backed registry authentication, so its placeholder
+  `NODE_AUTH_TOKEN` cannot conflict with the repository's no-token policy.
+- The publisher and final registry verifier now pass the contracted npm
+  registry explicitly, and release-contract validation rejects a protected job
+  that restores `setup-node` registry authentication.
+
+### Changed
+
+- Advanced the first supported release candidate to `1.0.3` after the immutable
+  `v1.0.2` tag passed all release gates but stopped before GitHub draft creation
+  or npm publication on the generated placeholder token.
+
 ## [1.0.2] - 2026-07-13
 
 ### Fixed

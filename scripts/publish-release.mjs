@@ -24,6 +24,7 @@ if (!dryRun && (process.env.GITHUB_REF_TYPE !== 'tag' || process.env.GITHUB_REF_
 
 const evidence = JSON.parse(await readFile(resolve(directory, 'release-evidence.json'), 'utf8'));
 const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
+const registry = releaseContract.publication.registry;
 if (evidence.version !== version || evidence.tag !== `v${version}` || evidence.blockedDevelopmentBuild) {
   throw new Error(`Release evidence is not a publishable ${version} candidate.`);
 }
@@ -48,6 +49,7 @@ for (const entry of evidence.packages) {
     '--access', 'public',
     '--provenance',
     '--tag', stagingTag,
+    '--registry', registry,
   ];
   if (dryRun) args.push('--dry-run');
   await execFile('npm', args, { cwd: root, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
@@ -75,7 +77,7 @@ async function requireExistingPackage(name) {
 
 async function registryMetadata(name, packageVersion) {
   try {
-    const { stdout } = await execFile('npm', ['view', `${name}@${packageVersion}`, '--json'], {
+    const { stdout } = await execFile('npm', ['view', `${name}@${packageVersion}`, '--json', '--registry', registry], {
       cwd: root,
       encoding: 'utf8',
       maxBuffer: 5 * 1024 * 1024,

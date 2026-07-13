@@ -30,6 +30,7 @@ const rootChangelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
 const workflow = await readFile(resolve(root, '.github/workflows/release.yml'), 'utf8');
 const qualityWorkflow = await readFile(resolve(root, '.github/workflows/quality-gates.yml'), 'utf8');
 const publishScript = await readFile(resolve(root, 'scripts/publish-release.mjs'), 'utf8');
+const registryVerificationScript = await readFile(resolve(root, 'scripts/verify-registry-release.mjs'), 'utf8');
 const artifactBuildScript = await readFile(resolve(root, 'scripts/build-release-artifacts.mjs'), 'utf8');
 const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-bootstrap-artifacts.mjs'), 'utf8');
 const bootstrapPublishScript = await readFile(resolve(root, 'scripts/publish-npm-bootstrap.mjs'), 'utf8');
@@ -438,8 +439,18 @@ function validateWorkflow() {
   if (!/^\s*-\s+run:\s+npm run build\s*$/m.test(reproducibilityJob ?? '')) {
     throw new Error('Release reproducibility must use the complete root build before rebuilding artifacts.');
   }
-  for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', stagingTag", 'requireExistingPackage']) {
+  const publishJob = workflow.match(/\n  publish:\n([\s\S]*?)\n  reproducibility:\n/)?.[1];
+  const finalizeJob = workflow.match(/\n  finalize:\n([\s\S]*?)$/)?.[1];
+  for (const [name, job] of [['publish', publishJob], ['finalize', finalizeJob]]) {
+    if (!job || /registry-url:/.test(job)) {
+      throw new Error(`Release ${name} must not ask setup-node to create token-backed registry authentication.`);
+    }
+  }
+  for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', stagingTag", "'--registry', registry", 'releaseContract.publication.registry', 'requireExistingPackage']) {
     if (!publishScript.includes(required)) throw new Error(`Release publisher is missing ${required}.`);
+  }
+  for (const required of ["'--registry', registry", 'releaseContract.publication.registry']) {
+    if (!registryVerificationScript.includes(required)) throw new Error(`Registry verifier is missing ${required}.`);
   }
   if (!publishScript.includes('releaseContract.bootstrap.version')) {
     throw new Error('Release publisher must verify the exact contracted bootstrap package record.');
