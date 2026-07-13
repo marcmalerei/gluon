@@ -28,6 +28,7 @@ const versions = await readJson('docs-site/versions.json');
 const lockfile = await readJson('package-lock.json');
 const rootChangelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
 const workflow = await readFile(resolve(root, '.github/workflows/release.yml'), 'utf8');
+const qualityWorkflow = await readFile(resolve(root, '.github/workflows/quality-gates.yml'), 'utf8');
 const publishScript = await readFile(resolve(root, 'scripts/publish-release.mjs'), 'utf8');
 const artifactBuildScript = await readFile(resolve(root, 'scripts/build-release-artifacts.mjs'), 'utf8');
 const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-bootstrap-artifacts.mjs'), 'utf8');
@@ -420,6 +421,9 @@ function validateJsonSchema(path, value, validator) {
 }
 
 function validateWorkflow() {
+  if (!qualityWorkflow.includes('- uses: actions/checkout@v7\n        with:\n          fetch-depth: 0')) {
+    throw new Error('Quality Gates repository validation must fetch full history for tested-commit ancestry checks.');
+  }
   for (const required of [
     'environment: npm',
     'id-token: write',

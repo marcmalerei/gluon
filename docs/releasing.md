@@ -245,7 +245,9 @@ During the two-commit release-cut PR, `npm run check` also permits the prepared
 `ready` commit to build a non-publishable artifact while both evidence files are
 still absent. That artifact has the same `blockedDevelopmentBuild: true` guard.
 Once the two evidence files exist, `--check-state` automatically switches to
-strict candidate validation; a partial evidence pair fails immediately.
+strict candidate validation; a partial evidence pair fails immediately. The
+Quality Gates repository job fetches full Git history so this strict pass can
+prove that the recorded tested commit is an ancestor of the candidate commit.
 
 ## Protected publication
 
