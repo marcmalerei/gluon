@@ -1,7 +1,7 @@
 import type { GluonFeatures } from './index.js';
 
 const versions = Object.freeze({
-  gluon: '1.0.5',
+  gluon: '1.0.6',
   nodeTypes: '^22.10.0',
   playwright: '^1.58.2',
   typescript: '^5.7.0',

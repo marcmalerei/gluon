@@ -7,6 +7,24 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-07-13
+
+### Fixed
+
+- Release-tag ruleset bypass actors are now captured in the versioned operator
+  preflight evidence; GitHub omits those administration-only fields from
+  responses authorized by the ephemeral Actions `GITHUB_TOKEN`.
+- Protected publication still verifies the exact ruleset IDs, active tag
+  enforcement, `refs/tags/v*` conditions, and creation/update/deletion rule
+  types live before any npm mutation.
+
+### Changed
+
+- Advanced the first supported release candidate to `1.0.6` after immutable
+  `v1.0.5` passed candidate and reproducibility gates but stopped before draft
+  creation, attestation, or npm publication while checking hidden ruleset
+  bypass actors.
+
 ## [1.0.5] - 2026-07-13
 
 ### Fixed

@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/vue-migration-analyzer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Static, report-only Vue 3.5 migration inventory for Gluon.",
   "private": false,
   "type": "module",

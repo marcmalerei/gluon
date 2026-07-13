@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/quarks",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Typed native-element factories and headless interaction primitives for Gluon.",
   "private": false,
   "type": "module",
@@ -35,7 +35,7 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.5"
+    "@gluonjs/core": "1.0.6"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {
