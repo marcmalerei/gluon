@@ -11,6 +11,15 @@ describe('template runtime', () => {
     document.body.replaceChildren();
   });
 
+  it('reuses one immutable empty component-style dependency list', () => {
+    const first = html`<p>${'first'}</p>`;
+    const second = html`<p>${'second'}</p>`;
+
+    expect(first.styleDependencies).toBe(second.styleDependencies);
+    expect(Object.isFrozen(first.styleDependencies)).toBe(true);
+    expect(Reflect.set(first.styleDependencies, 0, 'mutation')).toBe(false);
+  });
+
   it('mounts a template and reuses an unchanged text node on update', () => {
     const root = document.createElement('div');
     const view = (name: string) => html`<h1>Hello ${name}</h1>`;
@@ -125,6 +134,17 @@ describe('template runtime', () => {
     expect(firstRef.value).toBeUndefined();
     expect(secondRef.value).toBe(button);
     expect(firstClick).toHaveBeenCalledTimes(1);
+    expect(secondClick).toHaveBeenCalledTimes(1);
+
+    render(view({ title: 'Minimal' }), root);
+    button.click();
+
+    expect(button.title).toBe('Minimal');
+    expect(button.className).toBe('');
+    expect(button.getAttribute('style')).toBe('');
+    expect(button.dataset.trackId).toBeUndefined();
+    expect(button.getAttribute('aria-label')).toBeNull();
+    expect(secondRef.value).toBeUndefined();
     expect(secondClick).toHaveBeenCalledTimes(1);
   });
 

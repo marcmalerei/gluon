@@ -18,6 +18,7 @@ const eventBindingBrand = Symbol('gluon.event-binding');
 const unsafeHtmlBrand = Symbol('gluon.unsafe-html');
 const unsafeUrlBrand = Symbol('gluon.unsafe-url');
 const unsetValue = Symbol('gluon.unset');
+const emptyComponentStyles: readonly ComponentStyleDependency[] = Object.freeze([]);
 
 /** Explicitly renders no child content or removes an attribute value. */
 export const nothing = Symbol('gluon.nothing');
@@ -63,7 +64,7 @@ export class TemplateResult {
     readonly strings: TemplateStringsArray,
     readonly values: readonly TemplateValue[],
     readonly type: TemplateType = 'html',
-    readonly styleDependencies: readonly ComponentStyleDependency[] = Object.freeze([]),
+    readonly styleDependencies: readonly ComponentStyleDependency[] = emptyComponentStyles,
   ) {}
 
   /** Returns the same template value with immutable component-style metadata. */
@@ -398,7 +399,6 @@ interface PreviousKeyedChild {
 
 const emptyPartChildren: Array<PartChild | undefined> = [];
 const emptyKeyedChildren: KeyedChild[] = [];
-const emptyComponentStyles: readonly ComponentStyleDependency[] = Object.freeze([]);
 
 class RenderStyleTracker {
   readonly target: StyleTarget;
@@ -719,7 +719,6 @@ class NodePart implements Part {
     const flatValues = flattenValues(values);
     const nextNodes: Node[] = [];
     const nextChildren: Array<PartChild | undefined> = [];
-    const reused = new Set<PartChild>();
 
     for (let index = 0; index < flatValues.length; index += 1) {
       const value = flatValues[index]!;
@@ -727,13 +726,13 @@ class NodePart implements Part {
       const cached = this.arrayChildren[index];
       const instance = cached ?? this.createPartChild(value);
       if (cached) applyBindings([cached.binding], [value]);
-      reused.add(instance);
       nextChildren[index] = instance;
       nextNodes.push(instance.marker, ...instance.part.nodes);
     }
 
-    for (const previous of this.arrayChildren) {
-      if (previous && !reused.has(previous)) disconnectBindings([previous.binding]);
+    for (let index = 0; index < this.arrayChildren.length; index += 1) {
+      const previous = this.arrayChildren[index];
+      if (previous && previous !== nextChildren[index]) disconnectBindings([previous.binding]);
     }
 
     this.arrayChildren = nextChildren;
@@ -1177,7 +1176,7 @@ class SpreadPart implements Part {
   setValue(value: TemplateValue): void {
     const props = isObjectRecord(value) ? value : undefined;
 
-    for (const key of [...this.keys]) {
+    for (const key of this.keys) {
       if (!props || !(key in props)) {
         this.clearKey(key);
         this.keys.delete(key);
@@ -1193,7 +1192,7 @@ class SpreadPart implements Part {
   }
 
   disconnect(): void {
-    for (const key of [...this.keys]) this.clearKey(key);
+    for (const key of this.keys) this.clearKey(key);
     this.keys.clear();
   }
 

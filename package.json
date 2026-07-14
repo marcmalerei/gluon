@@ -142,6 +142,7 @@
     "test:watch": "vitest",
     "benchmark:keyed": "vitest bench --run benchmarks/keyed-list.bench.ts",
     "benchmark:rendering": "node scripts/run-rendering-benchmark.mjs",
+    "benchmark:allocations": "node scripts/run-renderer-allocation-benchmark.mjs",
     "benchmark:dx": "node scripts/run-dx-automation.mjs",
     "benchmark:shop-flow": "node scripts/run-shop-performance.mjs",
     "check:router-lazy": "node scripts/validate-router-lazy-build.mjs",
