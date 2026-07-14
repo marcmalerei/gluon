@@ -10,14 +10,6 @@ on:
         description: Existing lockstep version to validate without publication
         required: true
         type: string
-      phase:
-        description: Validate a candidate or finalize an owner-promoted draft
-        required: true
-        default: validate
-        type: choice
-        options:
-          - validate
-          - finalize
 
 concurrency:
   group: release-${{ github.ref }}-${{ inputs.version }}
@@ -28,7 +20,6 @@ permissions:
 
 jobs:
   candidate:
-    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -125,8 +116,23 @@ jobs:
           else
             gh release create "$GITHUB_REF_NAME" "${assets[@]}" --verify-tag --draft --title "Gluon $GITHUB_REF_NAME" --notes-file .tmp/release/RELEASE_NOTES.md
           fi
-      - name: Publish reviewed archives under the recoverable staging dist-tag
+      - name: Publish reviewed archives directly to latest through trusted publishing
         run: npm run release:publish -- --version "$RELEASE_VERSION"
+      - name: Verify latest registry train from a clean directory
+        run: npm run release:verify-registry -- --version "$RELEASE_VERSION" --directory .tmp/release --output .tmp/release/registry-verification.json
+      - run: npm run release:finalize-assets
+      - name: Attest registry verification
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: |
+            .tmp/release/registry-verification.json
+            .tmp/release/SHA256SUMS
+      - name: Attach verification and publish the immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" .tmp/release/registry-verification.json .tmp/release/SHA256SUMS --clobber
+          gh release edit "$GITHUB_REF_NAME" --draft=false --latest
 
   reproducibility:
     needs: candidate
@@ -167,7 +173,6 @@ jobs:
           include-hidden-files: true
 
   browser-engines:
-    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -186,7 +191,6 @@ jobs:
           GLUON_BROWSER: ${{ matrix.browser }}
 
   node-runtime:
-    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -203,7 +207,6 @@ jobs:
       - run: npm run test:ssr
 
   performance-evidence:
-    if: ${{ github.event_name == 'push' || inputs.phase != 'finalize' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -223,55 +226,3 @@ jobs:
           retention-days: 30
           if-no-files-found: error
           include-hidden-files: true
-
-  finalize:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.phase == 'finalize' }}
-    runs-on: ubuntu-latest
-    environment: npm
-    permissions:
-      contents: write
-      id-token: write
-      attestations: write
-    env:
-      GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
-      GLUON_RELEASE_ENVIRONMENT: npm
-      RELEASE_VERSION: ${{ inputs.version }}
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24.x
-          package-manager-cache: false
-      - run: npm install --global npm@11.18.0
-      - run: npm ci --ignore-scripts
-      - name: Require the exact release tag and draft
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          test "$GITHUB_REF_TYPE" = tag
-          test "$GITHUB_REF_NAME" = "v$RELEASE_VERSION"
-          test "$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft)" = true
-      - run: node scripts/verify-release-hosting.mjs
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - name: Download reviewed draft assets
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release download "$GITHUB_REF_NAME" --dir .tmp/release-assets
-      - name: Verify latest registry train from a clean directory
-        run: npm run release:verify-registry -- --version "$RELEASE_VERSION" --directory .tmp/release-assets --output .tmp/release-assets/registry-verification.json
-      - run: npm run release:finalize-assets -- --directory .tmp/release-assets
-      - name: Attest registry verification
-        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
-        with:
-          subject-path: |
-            .tmp/release-assets/registry-verification.json
-            .tmp/release-assets/SHA256SUMS
-      - name: Attach verification and publish the immutable release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release upload "$GITHUB_REF_NAME" .tmp/release-assets/registry-verification.json .tmp/release-assets/SHA256SUMS --clobber
-          gh release edit "$GITHUB_REF_NAME" --draft=false --latest

@@ -110,7 +110,7 @@
         "deploymentBranchPatterns",
         "deploymentTagPatterns",
         "longLivedNpmSecretsAllowed",
-        "singleOperatorImmutableStagingRiskAccepted"
+        "singleOperatorPartialLatestRiskAccepted"
       ],
       "properties": {
         "name": { "const": "npm" },
@@ -130,7 +130,7 @@
           "items": false
         },
         "longLivedNpmSecretsAllowed": { "const": false },
-        "singleOperatorImmutableStagingRiskAccepted": { "const": true }
+        "singleOperatorPartialLatestRiskAccepted": { "const": true }
       }
     },
     "githubReleaseTagProtection": {
@@ -226,14 +226,13 @@
     "publication": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["registry", "access", "provenance", "distTag", "stagingDistTagPrefix", "promotion", "identity", "longLivedTokenAllowed"],
+      "required": ["registry", "access", "provenance", "distTag", "promotion", "identity", "longLivedTokenAllowed"],
       "properties": {
         "registry": { "const": "https://registry.npmjs.org" },
         "access": { "const": "public" },
         "provenance": { "const": true },
         "distTag": { "const": "latest" },
-        "stagingDistTagPrefix": { "const": "gluon-staging-v" },
-        "promotion": { "const": "interactive-2fa" },
+        "promotion": { "const": "direct-trusted-publishing" },
         "identity": { "const": "npm-trusted-publishing" },
         "longLivedTokenAllowed": { "const": false }
       }

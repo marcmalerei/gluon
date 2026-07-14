@@ -30,7 +30,7 @@ if (evidence.version !== version || evidence.tag !== `v${version}` || evidence.b
 }
 
 await verifyChecksums();
-const stagingTag = `${releaseContract.publication.stagingDistTagPrefix}${version.replaceAll('.', '-')}`;
+const distTag = releaseContract.publication.distTag;
 if (!dryRun) {
   for (const entry of evidence.packages) await requireExistingPackage(entry.name);
 }
@@ -48,7 +48,7 @@ for (const entry of evidence.packages) {
     resolve(directory, 'packages', entry.filename),
     '--access', 'public',
     '--provenance',
-    '--tag', stagingTag,
+    '--tag', distTag,
     '--registry', registry,
   ];
   if (dryRun) args.push('--dry-run');
@@ -59,9 +59,10 @@ if (!dryRun) {
   for (const entry of evidence.packages) {
     const metadata = await waitForRegistry(entry.name, version);
     verifyPublishedMetadata(entry, metadata);
+    const latest = await waitForDistTag(entry.name, distTag, version);
+    if (latest !== version) throw new Error(`${entry.name} ${distTag} tag is ${latest}; expected ${version}.`);
   }
-  console.log(`staging publication verified: ${evidence.packages.length} packages at ${version} under ${stagingTag}`);
-  console.log('An authorized npm owner must now promote every package to latest with interactive 2FA before release finalization.');
+  console.log(`direct publication verified: ${evidence.packages.length} packages at ${version} under ${distTag}`);
 }
 
 async function requireExistingPackage(name) {
@@ -96,6 +97,25 @@ async function waitForRegistry(name, packageVersion) {
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 2_000));
   }
   throw new Error(`${name}@${packageVersion} was not visible on the public registry after publication.`);
+}
+
+async function waitForDistTag(name, tag, expectedVersion) {
+  let observed = null;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    observed = await registryDistTag(name, tag);
+    if (observed === expectedVersion) return observed;
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 2_000));
+  }
+  return observed;
+}
+
+async function registryDistTag(name, tag) {
+  const { stdout } = await execFile('npm', ['view', name, `dist-tags.${tag}`, '--registry', registry], {
+    cwd: root,
+    encoding: 'utf8',
+    maxBuffer: 5 * 1024 * 1024,
+  });
+  return stdout.trim();
 }
 
 function verifyPublishedMetadata(entry, metadata) {

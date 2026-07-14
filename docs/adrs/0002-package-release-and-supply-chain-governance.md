@@ -1,7 +1,7 @@
 # ADR 0002: Package, release, and supply-chain governance
 
 - **Status:** Accepted
-- **Decision date:** 2026-07-10
+- **Decision date:** 2026-07-10; amended 2026-07-14
 - **Tracking issue:** [#17](https://github.com/marcmalerei/gluon/issues/17)
 - **Roadmap tracker:** [#42](https://github.com/marcmalerei/gluon/issues/42)
 - **Depends on:** [RFC 0001](../rfcs/0001-gluon-1.0-product-scope.md), [RFC 0002](../rfcs/0002-unified-component-model.md), [ADR 0001](0001-browser-runtime-and-style-transport.md)
@@ -246,10 +246,11 @@ moving a dist-tag may limit discovery but does not rewrite history.
 7. enters the tag-restricted single-operator GitHub release environment without
    independent human approval
 8. publishes through npm trusted publishing with public access and provenance
-   under a release-specific staging dist-tag
-9. requires interactive-2FA owner promotion of the complete train to `latest`
-10. verifies registry installation, exports, types, provenance, and dist-tags
+   directly under `latest`
+9. verifies registry installation, exports, types, provenance, and dist-tags
    from an empty consumer project
+10. publishes the immutable GitHub release only after the complete registry
+    train passes verification
 
 The first public release additionally verifies the npm organization, package
 names, existing owner-controlled package records, public repository state,
@@ -270,11 +271,13 @@ GitHub release publication uses the same single-operator governance choice. The
 `npm` environment has no required reviewers, independent human approval,
 self-review rule, or wait timer. It permits only `v*` tags, disallows
 administrator bypass and long-lived npm secrets, and relies on the complete
-automated release gates plus interactive-2FA `latest` promotion. The project
-accepts that the sole operator can create a release tag that permanently
-publishes package versions under the staging dist-tag without another person's
-approval; later `latest` promotion does not make that initial publication
-reversible.
+automated release gates. The project accepts that the sole operator can create
+a release tag that permanently publishes package versions directly under
+`latest` without another person's approval. npm does not provide an atomic
+multi-package publish operation, so a failed train may temporarily leave only
+part of the 17-package train at the new `latest` version. The same protected job
+is safely repeatable for matching immutable versions and keeps the GitHub
+release in draft state until the complete train passes clean-room verification.
 
 Release-tag protection separates creation from later mutation. One active
 repository ruleset covers exactly `refs/tags/v*`, restricts creation, and gives
@@ -324,11 +327,11 @@ Public release jobs use GitHub-hosted runners, minimal job permissions, and
 `id-token: write` only where OIDC or attestations require it. npm trusted
 publishing is the only authorized publication identity; repository or
 organization secrets must not contain a long-lived npm publication token.
-Trusted publishing authorizes publication but not dist-tag mutation, so the
-reviewed release train is first published under a non-`latest` tag and an
-authorized owner performs the final `latest` promotion with interactive 2FA.
+The reviewed release train is published directly under `latest`, so the
+workflow needs neither a dist-tag mutation nor 17 interactive 2FA approvals.
 The immutable GitHub release remains a draft until the complete registry train
-passes clean-room verification.
+passes integrity, provenance, dist-tag, clean-install, and public-type
+verification.
 
 Each package and the aggregate release receive:
 

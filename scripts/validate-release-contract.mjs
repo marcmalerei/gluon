@@ -133,9 +133,9 @@ function validateReleaseContract() {
   if (releaseContract.publication?.identity !== 'npm-trusted-publishing' || releaseContract.publication?.longLivedTokenAllowed !== false) {
     throw new Error('Release publication must use npm trusted publishing without long-lived tokens.');
   }
-  if (releaseContract.publication?.stagingDistTagPrefix !== 'gluon-staging-v'
-    || releaseContract.publication?.promotion !== 'interactive-2fa') {
-    throw new Error('Release publication must stage under a non-latest dist-tag and require interactive 2FA promotion.');
+  if (releaseContract.publication?.distTag !== 'latest'
+    || releaseContract.publication?.promotion !== 'direct-trusted-publishing') {
+    throw new Error('Release publication must publish directly to latest through npm trusted publishing.');
   }
   const expectedNpmOwnerRecovery = {
     model: 'single-owner',
@@ -162,7 +162,7 @@ function validateReleaseContract() {
     deploymentBranchPatterns: [],
     deploymentTagPatterns: ['v*'],
     longLivedNpmSecretsAllowed: false,
-    singleOperatorImmutableStagingRiskAccepted: true,
+    singleOperatorPartialLatestRiskAccepted: true,
   };
   if (Object.entries(expectedGithubReleaseEnvironment).some(([field, expected]) => {
     const actual = releaseContract.githubReleaseEnvironment?.[field];
@@ -524,27 +524,34 @@ function validateWorkflow() {
     'id-token: write',
     'actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3',
     'release:publish',
-    'inputs.phase == \'finalize\'',
+    'release:verify-registry',
+    'release:finalize-assets',
     'gh release create',
     '--draft',
     'gh release edit',
   ]) if (!workflow.includes(required)) throw new Error(`Release workflow is missing ${required}.`);
+  if (workflow.includes('inputs.phase') || /^  finalize:/m.test(workflow)) {
+    throw new Error('Release workflow must publish, verify, and finalize the release in one trusted-publishing job.');
+  }
   const reproducibilityJob = workflow.match(/\n  reproducibility:\n([\s\S]*?)\n  browser-engines:\n/)?.[1];
   if (!/^\s*-\s+run:\s+npm run build\s*$/m.test(reproducibilityJob ?? '')) {
     throw new Error('Release reproducibility must use the complete root build before rebuilding artifacts.');
   }
   const publishJob = workflow.match(/\n  publish:\n([\s\S]*?)\n  reproducibility:\n/)?.[1];
-  const finalizeJob = workflow.match(/\n  finalize:\n([\s\S]*?)$/)?.[1];
-  for (const [name, job] of [['publish', publishJob], ['finalize', finalizeJob]]) {
-    if (!job || /registry-url:/.test(job)) {
-      throw new Error(`Release ${name} must not ask setup-node to create token-backed registry authentication.`);
-    }
-    if (!/- run: node scripts\/verify-release-hosting\.mjs\n\s+env:\n\s+GH_TOKEN: \$\{\{ github\.token \}\}/.test(job)) {
-      throw new Error(`Release ${name} must expose the ephemeral GitHub token only to hosting verification.`);
-    }
+  if (!publishJob || /registry-url:/.test(publishJob)) {
+    throw new Error('Release publish must not ask setup-node to create token-backed registry authentication.');
   }
-  for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', stagingTag", "'--registry', registry", 'releaseContract.publication.registry', 'requireExistingPackage']) {
+  if (!/- run: node scripts\/verify-release-hosting\.mjs\n\s+env:\n\s+GH_TOKEN: \$\{\{ github\.token \}\}/.test(publishJob)) {
+    throw new Error('Release publish must expose the ephemeral GitHub token to hosting verification.');
+  }
+  if (!/gh release create[\s\S]*release:publish[\s\S]*release:verify-registry[\s\S]*release:finalize-assets[\s\S]*gh release edit/.test(publishJob)) {
+    throw new Error('Release publish must create a draft before direct publication, then verify the registry before finalizing the GitHub release.');
+  }
+  for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', distTag", "'--registry', registry", 'releaseContract.publication.registry', 'releaseContract.publication.distTag', 'requireExistingPackage', 'waitForDistTag']) {
     if (!publishScript.includes(required)) throw new Error(`Release publisher is missing ${required}.`);
+  }
+  if (publishScript.includes('stagingDistTagPrefix') || publishScript.includes("'dist-tag'")) {
+    throw new Error('Release publisher must publish directly to latest without a staging or dist-tag mutation phase.');
   }
   for (const required of ["'--registry', registry", 'releaseContract.publication.registry']) {
     if (!registryVerificationScript.includes(required)) throw new Error(`Registry verifier is missing ${required}.`);

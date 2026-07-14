@@ -50,7 +50,7 @@
     "deploymentBranchPatterns": [],
     "deploymentTagPatterns": ["v*"],
     "longLivedNpmSecretsAllowed": false,
-    "singleOperatorImmutableStagingRiskAccepted": true
+    "singleOperatorPartialLatestRiskAccepted": true
   },
   "githubReleaseTagProtection": {
     "model": "operator-created-immutable-tags",
@@ -90,8 +90,7 @@
     "access": "public",
     "provenance": true,
     "distTag": "latest",
-    "stagingDistTagPrefix": "gluon-staging-v",
-    "promotion": "interactive-2fa",
+    "promotion": "direct-trusted-publishing",
     "identity": "npm-trusted-publishing",
     "longLivedTokenAllowed": false
   },
