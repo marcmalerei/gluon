@@ -44,7 +44,7 @@ stylesheet contract used by GLUON GOODS:
 
 <<< ../../../../examples/vue-host.ts
 
-The [compiled Vue host](/gluon/1.0.6/examples/vue.html) and the production shop
+The [compiled Vue host](/gluon/1.0.7/examples/vue.html) and the production shop
 are exercised by `tests/vue-migration-interop.spec.ts`,
 `tests/docs-examples.spec.ts`, `tests/shop-example.spec.ts`, and the shop
 SSR/hydration suite. Those tests are the evidence for every source snippet on

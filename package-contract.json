@@ -8,8 +8,8 @@
     "checkedAt": "2026-07-14",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "Gluon v1.0.6 is an immutable published GitHub release; all 17 contracted npm packages expose version 1.0.6, and marcmalerei remains a verified owner of the gluonjs npm organization."
+    "publicationState": "ready",
+    "observation": "All 17 contracted npm package records expose 1.0.6 as latest, version 1.0.7 is unpublished, and the existing GitHub Actions trusted-publisher bindings previously published the complete 1.0.6 train."
   },
   "packages": [
     {

@@ -5,7 +5,7 @@ const arguments_ = process.argv.slice(2);
 if (arguments_.includes('--help')) {
   process.stdout.write('Usage: gluon-vue-analyze [root] [--format human|json]\n');
 } else if (arguments_.includes('--version')) {
-  process.stdout.write('1.0.6\n');
+  process.stdout.write('1.0.7\n');
 } else {
   const formatIndex = arguments_.indexOf('--format');
   const format = formatIndex >= 0 ? arguments_[formatIndex + 1] : 'human';
