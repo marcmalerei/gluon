@@ -21,6 +21,12 @@ at 1440×1000,
 at 390×844, and the focused
 [`design/rendered-gluon-element-desktop.png`](design/rendered-gluon-element-desktop.png)
 API reference at 1440×1000.
+The shared package-header contract is verified on the rendered
+`@gluonjs/atoms` GitHub README by
+[`design/rendered-package-readme-desktop.png`](design/rendered-package-readme-desktop.png)
+at 1440×1000 and
+[`design/rendered-package-readme-mobile.png`](design/rendered-package-readme-mobile.png)
+at 390×844.
 
 ## Commands
 
