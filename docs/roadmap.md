@@ -334,9 +334,9 @@ The first #41 release-engineering slice adds a machine-readable release
 contract, lockstep candidate validation, reproducible package-content digests,
 aggregate and per-package SPDX 2.3 and CycloneDX 1.7 SBOM generation, checksums,
 schema-pinned SPDX validation, immutable compatibility evidence, SHA-pinned
-workflow actions, OIDC artifact attestation, recoverable staged-tag npm trusted
-publication, interactive-2FA `latest` promotion, and clean-room registry
-verification. It deliberately leaves publication blocked while the repository
+workflow actions, OIDC artifact attestation, direct `latest` npm trusted
+publication without long-lived tokens, and clean-room registry verification.
+It deliberately leaves publication blocked while the repository
 is private, npm scope control is unverified, and package records and protected
 release settings are absent.
 

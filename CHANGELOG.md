@@ -9,6 +9,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Changed future lockstep releases to publish all 17 packages directly under
+  `latest` through npm Trusted Publishing. The protected workflow now performs
+  publication, complete registry and clean-install verification, and GitHub
+  release finalization in one recoverable job, without long-lived npm tokens,
+  dist-tag mutation, or 17 interactive 2FA approvals.
 - Added opt-in standard and legacy TypeScript authoring decorators through
   `@gluonjs/core/decorators`: `@customElement()`, `@property()`, and `@state()`.
   The official Vite plugin transpiles them, preserves compatible Custom Element

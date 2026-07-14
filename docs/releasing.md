@@ -154,8 +154,10 @@ all of the following outside the source tree:
    it has no required reviewers, independent human approval, self-review rule,
    or wait timer; disallows administrator bypass and long-lived npm secrets;
    and permits only the `v*` tag pattern. The project accepts that the operator
-   who creates a release tag can publish immutable package versions under the
-   staging dist-tag without another person's approval.
+   who creates a release tag can publish immutable package versions directly
+   to `latest` without another person's approval. Because npm has no atomic
+   multi-package publish operation, a failed train may temporarily leave only
+   part of the 17-package train on the new `latest` version.
 7. Two active GitHub tag rulesets cover exactly `refs/tags/v*`. The creation
    rule gives only the `marcmalerei` user an `always` bypass so the sole
    operator can cut a release. The update and deletion rules have no bypass
@@ -343,15 +345,17 @@ long-lived npm token variables. All release-workflow actions are pinned to
 commit SHAs. It attests archives, SBOMs, checksums, the immutable compatibility
 manifest, and other evidence, then creates or updates a draft GitHub release.
 
-The protected publish and finalize jobs use `actions/setup-node` only to select
-Node; they do not provide its `registry-url` input because that input writes
+The protected publication job uses `actions/setup-node` only to select
+Node; it does not provide its `registry-url` input because that input writes
 token-backed npm configuration and exports a placeholder `NODE_AUTH_TOKEN` even
 when OIDC is intended. Publisher and registry-verification commands pass the
 registry from `release/release-contract.json` explicitly. Contract validation
-rejects either protected job if setup-node registry authentication returns.
-The hosting-verification step alone receives GitHub's ephemeral workflow token
-as `GH_TOKEN` for its live public environment, deployment-policy, public
-ruleset, operator, and Quality Gates queries. GitHub's immutable-releases
+rejects the protected job if setup-node registry authentication returns.
+Only the workflow steps that verify or update GitHub state receive GitHub's
+ephemeral workflow token as `GH_TOKEN`; npm publication receives no npm token.
+The hosting verifier uses that token for its live public environment,
+deployment-policy, public ruleset, operator, and Quality Gates queries.
+GitHub's immutable-releases
 endpoint requires repository Administration read access, and GitHub omits
 ruleset `bypass_actors` from non-administration responses. An Actions
 `GITHUB_TOKEN` cannot receive that access, so the sole operator records both
@@ -361,25 +365,20 @@ secret, and contract validation rejects either missing preflight evidence or a
 verifier without the ephemeral token.
 
 The workflow publishes every reviewed archive through npm trusted publishing
-with provenance under `gluon-staging-v<version-with-dashes>`, never directly to
-`latest`. Before the first publish it proves that all 17 npm package records
-already exist. After each publish it compares registry integrity and provenance
-with `release-evidence.json`. A rerun skips an already-existing version only
-when those facts match; a mismatch stops the train.
+with provenance directly under `latest`. Before the first publish it proves
+that all 17 npm package records already exist. After each publish it compares
+registry integrity and provenance with `release-evidence.json`. A rerun skips
+an already-existing version only when those facts match; a mismatch stops the
+train. No long-lived npm token, `npm dist-tag` mutation, or per-package 2FA
+approval is part of a supported release.
 
-After all 17 staging publications succeed, an authorized npm owner reviews the
-draft evidence and promotes every exact package version to `latest` with
-interactive 2FA using `npm dist-tag add <name>@<version> latest`. OIDC trusted
-publishing does not authorize dist-tag changes. The owner may remove the
-temporary staging tags after finalization with `npm dist-tag rm`.
-
-Finally, dispatch the `Release` workflow from the exact `v<version>` tag with
-`phase=finalize` and the matching version. The protected finalizer downloads
-the draft assets, requires every `latest` tag to point to the reviewed version,
-compares registry integrity and provenance, performs a clean-directory install
-and public-type check, attaches the registry verification and final checksum
-manifest, and only then publishes the immutable GitHub release. A partial
-manual promotion makes finalization fail without publishing the GitHub release.
+After all 17 direct publications succeed, the same protected job requires every
+`latest` tag to point to the reviewed version, compares registry integrity and
+provenance, performs a clean-directory install and public-type check, attaches
+the registry verification and final checksum manifest, and only then publishes
+the immutable GitHub release. A partial npm publication leaves the GitHub
+release as a draft. Rerunning the failed job verifies and skips matching
+immutable versions before continuing with the unpublished packages.
 
 A second fresh runner runs the complete root `npm run build` for the same source
 commit and compares every canonical unpacked package-file digest with the
@@ -387,8 +386,9 @@ candidate job. Release-contract validation rejects a workflow that replaces
 this aggregate build with an incomplete manually maintained package list. The
 publication job cannot start unless this reproducibility job passes.
 
-A failed publication is never retried by rebuilding the same version. Preserve the run
-and draft-release evidence and rerun the failed jobs with the same artifacts.
-Matching immutable registry versions are verified and skipped; unpublished
-packages continue. If any existing registry version has different integrity or
-lacks provenance, stop and follow the new-version policy in ADR 0002.
+A failed publication is never retried by rebuilding the same version. Preserve
+the run and draft-release evidence and rerun the failed job with the same
+artifacts. Matching immutable registry versions are verified and skipped;
+unpublished packages continue. If any existing registry version has different
+integrity or lacks provenance, stop and follow the new-version policy in ADR
+0002.
