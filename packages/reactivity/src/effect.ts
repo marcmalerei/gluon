@@ -213,8 +213,9 @@ export function track(
   dependency.add(reactiveEffect);
   reactiveEffect.dependencies.add(dependency);
 
-  if (isDevelopment()) {
-    reactiveEffect.options.onTrack?.({
+  const onTrack = reactiveEffect.options.onTrack;
+  if (onTrack && isDevelopment()) {
+    onTrack({
       effect: reactiveEffect.runner,
       target,
       type,
@@ -312,8 +313,9 @@ export function trigger(
 
   for (const reactiveEffect of effects) {
     if (reactiveEffect === activeEffect) continue;
-    if (isDevelopment()) {
-      reactiveEffect.options.onTrigger?.({
+    const onTrigger = reactiveEffect.options.onTrigger;
+    if (onTrigger && isDevelopment()) {
+      onTrigger({
         effect: reactiveEffect.runner,
         target,
         type,

@@ -15,6 +15,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Reduced renderer hot-path allocations by sharing immutable empty style
   metadata, reconciling unkeyed children by position without a temporary Set,
   and clearing spread keys through the existing live Set.
+- Skipped development-mode detection on reactive dependency tracking and
+  triggering paths when an effect has no corresponding debugger hook.
 
 ## [1.0.7] - 2026-07-14
 

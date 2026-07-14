@@ -154,6 +154,27 @@ describe('@gluonjs/reactivity', () => {
     }));
   });
 
+  it('does not read development mode when dependency debugger hooks are absent', () => {
+    const originalProcess = globalThis.process;
+    let environmentReads = 0;
+    vi.stubGlobal('process', {
+      get env() {
+        environmentReads += 1;
+        return originalProcess.env;
+      },
+    });
+    try {
+      const state = reactive({ count: 0 });
+      const runner = effect(() => state.count);
+      state.count = 1;
+      stop(runner);
+
+      expect(environmentReads).toBe(0);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('disables dependency debugger callbacks in production mode', () => {
     const previous = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
