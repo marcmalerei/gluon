@@ -29,7 +29,6 @@ export interface AllocationBenchmarkResult {
 }
 
 let retainedTemplates: TemplateResult[] = [];
-let templateSink: TemplateResult | undefined;
 
 export async function runRendererAllocationBenchmark(
   config: AllocationBenchmarkConfig = {},
@@ -82,7 +81,6 @@ export function retainTemplateResults(count: number): {
 
 export function releaseRetainedTemplateResults(): void {
   retainedTemplates = [];
-  templateSink = undefined;
 }
 
 interface Harness {
@@ -99,12 +97,15 @@ const initialBatchSizes: Record<AllocationScenario, number> = {
 
 function createHarness(scenario: AllocationScenario): Harness {
   if (scenario === 'template') {
+    const ring = new Array<TemplateResult>(1_024);
+    let index = 0;
     return {
       run() {
-        templateSink = html`<p>${'value'}</p>`;
+        ring[index % ring.length] = html`<p>${index}</p>`;
+        index += 1;
       },
       dispose() {
-        templateSink = undefined;
+        ring.length = 0;
       },
     };
   }
@@ -178,7 +179,7 @@ function createHarness(scenario: AllocationScenario): Harness {
 
 function calibrate(run: () => void, initialSize: number): number {
   let size = initialSize;
-  while (size <= 10_000_000) {
+  while (size <= 100_000_000) {
     const started = performance.now();
     runBatch(run, size);
     if (performance.now() - started >= 12) return size;
