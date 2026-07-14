@@ -194,6 +194,41 @@ the paired Markdown files summarize the same runs. These are separate runs, so
 the raw distributions are the evidence and the result is not generalized
 beyond the recorded environment.
 
+## Renderer allocation paths
+
+Issue #163 adds a production Chromium allocation benchmark for four focused
+paths that the comparative renderer matrix does not isolate: creating an
+unstyled `TemplateResult`, updating one stable text binding, reconciling a
+ten-property spread, and updating 100 unkeyed string children. Each scenario
+retains every timing sample after batch calibration and warm-up.
+
+Three temporary allocations were removed without changing the public API:
+
+- all unstyled `html` and `svg` results share one frozen empty component-style
+  dependency list instead of allocating and freezing a new empty array;
+- unkeyed children are reused only at the same array index, so cleanup compares
+  the previous and next positional entries directly instead of allocating a
+  `Set<PartChild>` on every update;
+- spread cleanup iterates its existing key `Set` directly. ECMAScript Set
+  iteration remains valid when the current entry is deleted, so stale
+  properties, attributes, events, styles, data, ARIA state, and refs retain the
+  same cleanup behavior without a copied key array.
+
+The benchmark also retains 100,000 reachable simple TemplateResults, forces
+Chromium garbage collection, and records `Runtime.getHeapUsage` before and
+after. This is a run-level Chromium diagnostic: it verifies the expected shared
+metadata effect but is not a portable object-size or cross-browser memory
+claim. The baseline and candidate distributions are retained in
+[`renderer-allocations-163-baseline.json`](../benchmarks/results/renderer-allocations-163-baseline.json)
+and
+[`renderer-allocations-163-candidate.json`](../benchmarks/results/renderer-allocations-163-candidate.json).
+
+Run the focused benchmark with:
+
+```bash
+npm run benchmark:allocations
+```
+
 ## Keyed reconciliation comparison
 
 Issue #95 compares the existing generic keyed path at baseline commit `4095745`

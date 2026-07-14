@@ -12,6 +12,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Cached each compiled template as an active-document `DocumentFragment` so
   new root and nested instances use a deep clone instead of repeating the
   inert template-content import for every instance.
+- Reduced renderer hot-path allocations by sharing immutable empty style
+  metadata, reconciling unkeyed children by position without a temporary Set,
+  and clearing spread keys through the existing live Set.
 
 ## [1.0.7] - 2026-07-14
 
