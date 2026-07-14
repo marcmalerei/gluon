@@ -7,6 +7,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Cached each compiled template as an active-document `DocumentFragment` so
+  new root and nested instances use a deep clone instead of repeating the
+  inert template-content import for every instance.
+
 ## [1.0.7] - 2026-07-14
 
 ### Changed
