@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Added Gluon decorator import detection, standard/legacy TypeScript decorator
+  transpilation, and the `@customElement()` development HMR transform.
 - Integrated the exact package name into dedicated generated README artwork.
 
 ## [1.0.6] - 2026-07-13

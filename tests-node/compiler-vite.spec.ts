@@ -11,6 +11,7 @@ import {
   gluonDiagnosticCatalog,
   gluonDiagnosticReferenceUrl,
   transformGluonModule,
+  transpileGluonDecorators,
 } from '@gluonjs/compiler';
 import gluon from '@gluonjs/vite';
 
@@ -123,6 +124,26 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.templates[1]?.start.line).toBe(3);
     expect(transformed.code).toContain('nest(Panel, {})`');
     expect(transformed.map.sourcesContent).toEqual([source]);
+  });
+
+  it('transforms aliased custom-element decorators for HMR and transpiles standard decorators', () => {
+    const source = [
+      "import { GluonElement } from '@gluonjs/core';",
+      "import { customElement as register, property } from '@gluonjs/core/decorators';",
+      "@register('decorated-card')",
+      'export class DecoratedCard extends GluonElement {',
+      '  @property({ reflect: true }) accessor active = false;',
+      '}',
+    ].join('\n');
+    const transformed = transformGluonModule(source, '/app/decorated-card.ts', { development: true });
+    expect(transformed.decorators).toBe(true);
+    expect(transformed.code).toContain('@__gluonHmrElementDecorator(register,');
+    expect(transformed.code).toContain('elementDecorator as __gluonHmrElementDecorator');
+    const transpiled = transpileGluonDecorators(transformed.code, '/app/decorated-card.ts');
+    expect(transpiled.code).not.toContain('@register');
+    expect(transpiled.code).not.toMatch(/\n\s*@property/);
+    expect(transpiled.code).toContain('__esDecorate');
+    expect(transpiled.map?.sourcesContent).toEqual([transformed.code]);
   });
 
   it('reports source-located functional element tag, cleanup, and lifecycle ownership mistakes', () => {
@@ -287,7 +308,8 @@ async function createFixture(version: string, increment: number, color: string):
 
 function componentSource(version: string, increment: number, color: string): string {
   return [
-    "import { compose, css, defineElement, GluonElement, html, type TemplateValue } from '@gluonjs/core';",
+    "import { compose, css, GluonElement, html, type TemplateValue } from '@gluonjs/core';",
+    "import { customElement, property } from '@gluonjs/core/decorators';",
     "import { defineStore, type Store } from '@gluonjs/store';",
     'export const counterDefinition = defineStore({',
     "  id: 'vite-counter',",
@@ -298,15 +320,14 @@ function componentSource(version: string, increment: number, color: string): str
     'type CounterStore = Store<\'vite-counter\', { count: number }, Record<never, never>, { increment(): void }>; ',
     'function StatusPanel(props: { children: TemplateValue }) { return html`<output>${props.children}</output>`; }',
     `export function Status(store: CounterStore) { return compose(StatusPanel, {})\`Function ${version}: \${store.count}\`; }`,
+    "@customElement('gluon-hmr-counter')",
     'export class HmrCounter extends GluonElement {',
-    '  static override readonly properties = { store: { attribute: false } };',
     '  static override readonly styles = counterStyles;',
-    '  declare store: CounterStore;',
+    '  @property({ attribute: false }) store!: CounterStore;',
     '  protected override render() {',
     `    return html\`<button @click=\${() => this.store.increment()}>Version ${version}: \${this.store.count}</button>\`;`,
     '  }',
     '}',
-    "defineElement('gluon-hmr-counter', HmrCounter);",
   ].join('\n');
 }
 
@@ -317,6 +338,7 @@ function viteConfig(root: string) {
     plugins: [gluon()],
     resolve: {
       alias: {
+        '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
         '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
         '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
         '@gluonjs/store': resolve(repositoryRoot, 'packages/store/src/index.ts'),

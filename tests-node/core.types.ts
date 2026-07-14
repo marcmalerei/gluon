@@ -41,6 +41,38 @@ import {
   type SlotDeclarations,
   type TemplateValue,
 } from '@gluonjs/core';
+import {
+  customElement,
+  property,
+  state,
+  type StateDeclaration,
+} from '@gluonjs/core/decorators';
+
+const internalState = { default: 'idle' } satisfies StateDeclaration<string>;
+
+@customElement('typed-decorated-element')
+class TypedDecoratedElement extends GluonElement {
+  @property({ type: Boolean, reflect: true })
+  isLoop = false;
+
+  @property({ type: Number, attribute: 'item-count', default: 1 })
+  accessor itemCount = 1;
+
+  @state(internalState)
+  private status = 'idle';
+
+  protected override render() {
+    return html`<p>${this.isLoop}:${this.itemCount}:${this.status}</p>`;
+  }
+}
+
+const typedDecoratedElement = new TypedDecoratedElement();
+typedDecoratedElement.isLoop = true;
+typedDecoratedElement.itemCount = 2;
+// @ts-expect-error decorated public properties keep their declared TypeScript type
+typedDecoratedElement.itemCount = 'invalid';
+// @ts-expect-error a Custom Element name requires a hyphen
+customElement('invalid');
 
 interface Row {
   readonly id: string;

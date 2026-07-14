@@ -95,6 +95,28 @@ export function element<Constructor extends GluonElementClass>(
   return installElement(tagName, next, _moduleId, _key, initializerSignature, hot);
 }
 
+export function elementDecorator<Constructor extends GluonElementClass>(
+  _customElement: (tagName: `${string}-${string}`) => (constructor: Constructor) => Constructor | void,
+  tagName: `${string}-${string}`,
+  moduleId: string,
+  key: string,
+  initializerSignature: string,
+  hot?: HotContext,
+): {
+  (constructor: Constructor): Constructor;
+  (constructor: Constructor, context: ClassDecoratorContext<Constructor>): void;
+} {
+  return ((next: Constructor, context?: ClassDecoratorContext<Constructor>) => {
+    if (!context) return installElement(tagName, next, moduleId, key, initializerSignature, hot);
+    context.addInitializer(() => {
+      installElement(tagName, next, moduleId, key, initializerSignature, hot);
+    });
+  }) as {
+    (constructor: Constructor): Constructor;
+    (constructor: Constructor, context: ClassDecoratorContext<Constructor>): void;
+  };
+}
+
 export function functionalElement<Constructor extends GluonElementClass>(
   define: (
     definition: FunctionalElementDefinitionLike,

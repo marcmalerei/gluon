@@ -89,7 +89,7 @@ interface, type-alias, and variable page, and compiles every snippet through a
 generated strict TypeScript project. Package and subpath imports are derived
 from `package-contract.json`; internal source and deep build paths are rejected.
 
-All 575 current symbol pages require a reviewed entry in
+All 584 current symbol pages require a reviewed entry in
 `docs-site/api-examples.json`. Each entry supplies symbol-specific purpose copy
 and either an inline scenario or a maintained package recipe that uses the
 documented symbol. The scenarios cover concrete inputs and observable results,

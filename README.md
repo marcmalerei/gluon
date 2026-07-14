@@ -405,6 +405,42 @@ class GreetingElement extends GluonElement {
 defineElement('gluon-greeting', GreetingElement);
 ```
 
+The opt-in decorator entry point expresses the same class contract without a
+separate registration call or duplicated property names:
+
+```ts
+import { GluonElement, css, html } from '@gluonjs/core';
+import { customElement, property, state } from '@gluonjs/core/decorators';
+
+@customElement('gluon-greeting-decorated')
+class DecoratedGreetingElement extends GluonElement {
+  static override readonly styles = css`:host { display: block; }`;
+
+  @property({ type: String, reflect: true, default: 'World' })
+  name!: string;
+
+  @state({ default: 'idle' })
+  private status!: string;
+
+  constructor() {
+    super();
+    this.onConnected(() => { this.status = 'ready'; });
+  }
+
+  protected override render() {
+    return html`<p data-status=${this.status}>Hello ${this.name}</p>`;
+  }
+}
+```
+
+`@property()` accepts the same conversion, attribute, reflection, default,
+change-detection, required, and validation options as `static properties`.
+`@state()` is reactive internal state with attribute transport disabled.
+Typed events continue to use `static events` and `emit()`; template
+`@event-name` bindings are listeners, not TypeScript decorators. The
+[component guide](docs-site/content/1.0.6/guides/components/index.md) shows the
+decorator and plain TypeScript forms side by side.
+
 `defineGluonElement()` is the concise path for the same autonomous boundary. It
 infers primitive and structured properties, native event details, slots, form
 APIs, and exposed host methods without a duplicate element interface plus

@@ -2,15 +2,14 @@ import {
   GluonElement,
   Suspense,
   css,
-  defineElement,
   html,
   repeat,
   type AsyncLoadContext,
   type EventDeclarations,
-  type PropertyDeclarations,
   type SlotDeclarations,
   type TemplateValue,
 } from '@gluonjs/core';
+import { customElement, property } from '@gluonjs/core/decorators';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction, ProductAddAction } from './ui-extensions.js';
 import {
@@ -223,29 +222,9 @@ interface InventoryResult {
 
 const inventoryCache = new Map<string, InventoryResult>();
 
+@customElement('gluon-product-configurator')
 export class ProductConfiguratorElement extends GluonElement<ProductConfiguratorEvents> {
   static readonly formAssociated = true;
-
-  static override readonly properties = {
-    product: {
-      attribute: false,
-      validate: (value) => value === undefined
-        || isProduct(value)
-        || 'product must be a complete Product value',
-    },
-    configuration: {
-      attribute: false,
-      default: createDefaultProductConfiguration,
-      validate: (value) => isProductConfiguration(value) || 'configuration is invalid',
-    },
-    required: { type: Boolean, reflect: true, default: true },
-    disabled: { type: Boolean, reflect: true, default: false },
-  } satisfies PropertyDeclarations<{
-    product: Product | undefined;
-    configuration: ProductConfiguration;
-    required: boolean;
-    disabled: boolean;
-  }>;
 
   static override readonly events = {
     'configuration-change': {},
@@ -260,10 +239,26 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
 
   static override readonly styles = productConfiguratorStyles;
 
-  declare product: Product | undefined;
-  declare configuration: ProductConfiguration;
-  declare required: boolean;
-  declare disabled: boolean;
+  @property({
+    attribute: false,
+    validate: (value) => value === undefined
+      || isProduct(value)
+      || 'product must be a complete Product value',
+  })
+  product!: Product | undefined;
+
+  @property({
+    attribute: false,
+    default: createDefaultProductConfiguration,
+    validate: (value) => isProductConfiguration(value) || 'configuration is invalid',
+  })
+  configuration!: ProductConfiguration;
+
+  @property({ type: Boolean, reflect: true, default: true })
+  required!: boolean;
+
+  @property({ type: Boolean, reflect: true, default: false })
+  disabled!: boolean;
 
   private readonly internals = typeof this.attachInternals === 'function'
     ? this.attachInternals()
@@ -457,7 +452,7 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
 }
 
 export function registerProductConfigurator(): typeof ProductConfiguratorElement {
-  return defineElement(productConfiguratorTag, ProductConfiguratorElement);
+  return ProductConfiguratorElement;
 }
 
 export function ProductConfigurator(options: ProductConfiguratorRenderOptions): TemplateValue {

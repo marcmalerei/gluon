@@ -113,7 +113,8 @@ in [`ui-extensibility.md`](ui-extensibility.md). `defineAtom`,
 Custom Element, create lifecycle/state ownership, adopt styles, install themes,
 validate props, add semantics, or arrange cleanup.
 
-Core builds only `@gluonjs/core` and `@gluonjs/core/styles`. The optional UI
+Core builds `@gluonjs/core`, the opt-in `@gluonjs/core/decorators` authoring
+entry, and `@gluonjs/core/styles`. The optional UI
 graph is separately consumable as `@gluonjs/quarks`, `@gluonjs/atoms`,
 `@gluonjs/molecules`, and `@gluonjs/organisms`, with dependencies pointing only
 downward as defined by the

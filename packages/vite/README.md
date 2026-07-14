@@ -16,6 +16,13 @@ export default defineConfig({
 });
 ```
 
+The plugin also transpiles standard TypeScript decorators imported from
+`@gluonjs/core/decorators`; no `experimentalDecorators` setting is required.
+`@customElement()` participates in the same compatible Custom Element HMR path
+as `defineElement()`. For an existing legacy-decorator codebase, configure
+`gluon({ decorators: 'legacy' })` together with `experimentalDecorators: true`
+and `useDefineForClassFields: false` in TypeScript.
+
 In development, the plugin keeps exported functions and components behind
 stable call proxies, preserves Store objects through `StoreManager.hotUpdate()`,
 keeps registered Custom Element constructors stable, preserves functional

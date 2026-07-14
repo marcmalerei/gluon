@@ -24,6 +24,11 @@ import {
   type AppErrorSource,
   type ApplicationContext,
 } from './application-context.js';
+import {
+  getOwnDecoratedProperties,
+  hasOwnDecoratedProperty,
+  synchronizeLegacyDecoratorProperties,
+} from './decorator-metadata.js';
 
 declare const __GLUON_DEV__: boolean;
 
@@ -1127,6 +1132,7 @@ function patchHotElementConstructor(
     const descriptor = Object.getOwnPropertyDescriptor(next, key);
     if (descriptor) Object.defineProperty(current, key, descriptor);
   }
+  synchronizeLegacyDecoratorProperties(current, next);
   Object.defineProperty(current, 'styles', {
     configurable: true,
     enumerable: true,
@@ -1173,7 +1179,8 @@ function finalizeProperties(constructor: GluonElementConstructor): void {
   if (parent?.prototype instanceof GluonElement) finalizeProperties(parent);
 
   for (const [name, definition] of Object.entries(getDeclarations(constructor))) {
-    if (Object.getOwnPropertyDescriptor(constructor.prototype, name)) continue;
+    if (Object.getOwnPropertyDescriptor(constructor.prototype, name)
+      && !hasOwnDecoratedProperty(constructor, name)) continue;
     const declaration = normalizeDeclaration(definition);
     Object.defineProperty(constructor.prototype, name, {
       configurable: true,
@@ -1194,9 +1201,13 @@ function getDeclarations(constructor: GluonElementConstructor): PropertyDeclarat
   const cached = declarationCache.get(constructor);
   if (cached) return cached;
   const parent = Object.getPrototypeOf(constructor) as GluonElementConstructor | undefined;
+  const ownProperties = Object.prototype.hasOwnProperty.call(constructor, 'properties')
+    ? constructor.properties
+    : undefined;
   const declarations = {
     ...(parent?.prototype instanceof GluonElement ? getDeclarations(parent) : {}),
-    ...(constructor.properties ?? {}),
+    ...(ownProperties ?? {}),
+    ...getOwnDecoratedProperties(constructor),
   };
   declarationCache.set(constructor, declarations);
   return declarations;

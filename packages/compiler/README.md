@@ -10,6 +10,10 @@ interpolation locations, produces high-resolution source maps, and supplies the
 development wrappers consumed by `@gluonjs/vite`.
 Aliased `compose(Component, props)\`body\`` calls are recorded as template
 boundaries with the same source-location and inline-style behavior as `html`.
+Imports from `@gluonjs/core/decorators` are detected explicitly. The compiler
+exposes the standard/legacy TypeScript decorator transpilation used by the Vite
+plugin and rewrites `@customElement()` to the registered-element HMR bridge in
+development.
 
 The compiler does not turn templates into a private renderer format. Runtime
 templates continue to use the public `html` and `css` APIs. Production

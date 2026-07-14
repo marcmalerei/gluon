@@ -103,6 +103,31 @@
         "}"
       ]
     },
+    "core-decorators": {
+      "module": "@gluonjs/core/decorators",
+      "code": [
+        "import { GluonElement, html } from '@gluonjs/core';",
+        "import {",
+        "  customElement,",
+        "  property,",
+        "  state,",
+        "  type CustomElementDecorator,",
+        "  type GluonPropertyDecorator,",
+        "  type StateDeclaration,",
+        "} from '@gluonjs/core/decorators';",
+        "",
+        "const register: CustomElementDecorator = customElement('decorated-counter');",
+        "const reflected: GluonPropertyDecorator = property({ type: Number, reflect: true, default: 0 });",
+        "const internal = { default: false } satisfies StateDeclaration<boolean>;",
+        "",
+        "@register",
+        "class DecoratedCounter extends GluonElement {",
+        "  @reflected count!: number;",
+        "  @state(internal) private busy!: boolean;",
+        "  protected render() { return html`<button ?disabled=${this.busy}>${this.count}</button>`; }",
+        "}"
+      ]
+    },
     "devtools-application": {
       "module": "@gluonjs/devtools",
       "code": [
@@ -896,13 +921,16 @@
       "code": [
         "import {",
         "  transformGluonModule,",
+        "  transpileGluonDecorators,",
         "  type GluonCompilerDiagnostic,",
+        "  type GluonDecoratorMode,",
         "  type GluonSourceMap,",
         "  type GluonTemplateLocation,",
         "  type GluonTemplatePart,",
         "  type GluonTemplateTag,",
         "  type GluonTransformOptions,",
         "  type GluonTransformResult,",
+        "  type GluonTranspileResult,",
         "  type SourceLocation,",
         "} from '@gluonjs/compiler';",
         "",
@@ -918,7 +946,9 @@
         "const part: GluonTemplatePart | undefined = template?.parts[0];",
         "const start: SourceLocation | undefined = part?.start;",
         "const diagnostic: GluonCompilerDiagnostic | undefined = result.diagnostics[0];",
-        "console.log(result.code, map.sources, tag, start, diagnostic?.message, result.hmr);"
+        "const mode: GluonDecoratorMode = 'standard';",
+        "const transpiled: GluonTranspileResult = transpileGluonDecorators(result.code, '/src/product.ts', mode);",
+        "console.log(result.code, transpiled.code, map.sources, tag, start, diagnostic?.message, result.hmr);"
       ]
     },
     "compiler-diagnostics": {
@@ -2213,6 +2243,42 @@
     }
   },
   "overrides": {
+    "packages/compiler/src/functions/transpileGluonDecorators.md": {
+      "recipe": "compiler-transform",
+      "description": "Transpile a Gluon module that imports the decorator entry point with explicit standard or legacy TypeScript semantics:"
+    },
+    "packages/compiler/src/interfaces/GluonTranspileResult.md": {
+      "recipe": "compiler-transform",
+      "description": "Inspect the emitted browser JavaScript and optional source map produced for a decorated Gluon module:"
+    },
+    "packages/compiler/src/type-aliases/GluonDecoratorMode.md": {
+      "recipe": "compiler-transform",
+      "description": "Select standard decorator semantics for new code or legacy semantics for an existing experimental-decorator project:"
+    },
+    "src/decorators/functions/customElement.md": {
+      "recipe": "core-decorators",
+      "description": "Register a decorated GluonElement subclass as an autonomous Custom Element:"
+    },
+    "src/decorators/functions/property.md": {
+      "recipe": "core-decorators",
+      "description": "Declare a public reactive element field with conversion, reflection, default, and validation options:"
+    },
+    "src/decorators/functions/state.md": {
+      "recipe": "core-decorators",
+      "description": "Declare component-owned reactive state that never crosses the HTML attribute boundary:"
+    },
+    "src/decorators/type-aliases/CustomElementDecorator.md": {
+      "recipe": "core-decorators",
+      "description": "Type a reusable class decorator that registers a GluonElement under one Custom Element tag:"
+    },
+    "src/decorators/type-aliases/GluonPropertyDecorator.md": {
+      "recipe": "core-decorators",
+      "description": "Type a property decorator that supports standard fields, standard auto-accessors, and legacy TypeScript fields:"
+    },
+    "src/decorators/type-aliases/StateDeclaration.md": {
+      "recipe": "core-decorators",
+      "description": "Configure the default, change detection, and validation of internal reactive state without attribute options:"
+    },
     "src/classes/AsyncTimeoutError.md": {
       "recipe": "core-async-components",
       "description": "Distinguish an asynchronous boundary timeout and inspect the configured millisecond deadline that expired:"

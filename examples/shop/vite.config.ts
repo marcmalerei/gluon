@@ -10,6 +10,7 @@ export default defineConfig({
   publicDir: false,
   resolve: {
     alias: {
+      '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
       '@gluonjs/quarks': resolve(repositoryRoot, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),

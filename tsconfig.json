@@ -10,6 +10,7 @@
       "@gluonjs/compiler": ["packages/compiler/src/index.ts"],
       "@gluonjs/compiler/diagnostics": ["packages/compiler/src/diagnostics.ts"],
       "@gluonjs/core": ["src/index.ts"],
+      "@gluonjs/core/decorators": ["src/decorators.ts"],
       "@gluonjs/quarks": ["packages/quarks/src/index.ts"],
       "@gluonjs/atoms": ["packages/atoms/src/index.ts"],
       "@gluonjs/molecules": ["packages/molecules/src/index.ts"],
