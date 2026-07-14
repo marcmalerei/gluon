@@ -1,9 +1,7 @@
 <!-- gluon-package-header:start -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/test-utils — native UI layers growing from a glowing core" width="100%">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers/test-utils.png" alt="@gluonjs/test-utils — Gluon package header" width="100%">
 </p>
-
-<h1 align="center">Gluon / <code>@gluonjs/test-utils</code></h1>
 <!-- gluon-package-header:end -->
 
 The official Gluon test utilities mount public components and applications in a

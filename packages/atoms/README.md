@@ -1,9 +1,7 @@
 <!-- gluon-package-header:start -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/atoms — native UI layers growing from a glowing core" width="100%">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers/atoms.png" alt="@gluonjs/atoms — Gluon package header" width="100%">
 </p>
-
-<h1 align="center">Gluon / <code>@gluonjs/atoms</code></h1>
 <!-- gluon-package-header:end -->
 
 Focused Gluon UI primitives plus the shared UI installation boundary, tokens,

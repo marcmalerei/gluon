@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Added the shared Gluon package header with the exact package name.
+- Integrated the exact package name into dedicated generated README artwork.
 
 ## [1.0.6] - 2026-07-13
 

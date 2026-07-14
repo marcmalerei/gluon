@@ -6,7 +6,7 @@ import process from 'node:process';
 const root = resolve(import.meta.dirname, '..');
 const contract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
 const selectedName = process.argv[2] === '--package' ? process.argv[3] : undefined;
-const packageHeroUrl = 'https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg';
+const packageHeaderBaseUrl = 'https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers';
 
 if (process.argv.length > 2 && (!selectedName || process.argv.length !== 4)) {
   throw new Error('Usage: node scripts/validate-package-contract.mjs [--package <package-name>]');
@@ -82,6 +82,10 @@ async function validateCurrentPackage(entry) {
   const directory = resolve(root, entry.directory);
   const packageJson = JSON.parse(await readFile(resolve(directory, 'package.json'), 'utf8'));
   const readme = await readFile(resolve(directory, 'README.md'), 'utf8');
+  const headerAssetName = entry.directory === '.' ? 'core' : entry.directory.split('/').at(-1);
+  const headerAssetPath = `docs/assets/package-headers/${headerAssetName}.png`;
+  const headerAssetUrl = `${packageHeaderBaseUrl}/${headerAssetName}.png`;
+  const headerAsset = await readFile(resolve(root, headerAssetPath));
 
   if (packageJson.name !== entry.name) {
     throw new Error(`${entry.name} does not match ${packageJson.name} in package.json.`);
@@ -89,14 +93,17 @@ async function validateCurrentPackage(entry) {
   if (packageJson.license !== 'MIT') {
     throw new Error(`${entry.name} must declare the authorized MIT license.`);
   }
+  if (headerAsset.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a'
+    || headerAsset.readUInt32BE(16) !== 1983
+    || headerAsset.readUInt32BE(20) !== 793) {
+    throw new Error(`${entry.name} package header must be a 1983×793 PNG at ${headerAssetPath}.`);
+  }
 
   const expectedHeader = [
     '<!-- gluon-package-header:start -->',
     '<p align="center">',
-    `  <img src="${packageHeroUrl}" alt="Gluon ${entry.name} — native UI layers growing from a glowing core" width="100%">`,
+    `  <img src="${headerAssetUrl}" alt="${entry.name} — Gluon package header" width="100%">`,
     '</p>',
-    '',
-    `<h1 align="center">Gluon / <code>${entry.name}</code></h1>`,
     '<!-- gluon-package-header:end -->',
   ].join('\n');
   if (!readme.startsWith(expectedHeader)) {
@@ -105,7 +112,7 @@ async function validateCurrentPackage(entry) {
   for (const token of [
     '<!-- gluon-package-header:start -->',
     '<!-- gluon-package-header:end -->',
-    packageHeroUrl,
+    headerAssetUrl,
   ]) {
     if (readme.split(token).length !== 2) {
       throw new Error(`${entry.name} README must contain exactly one ${token}.`);
