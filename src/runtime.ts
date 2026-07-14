@@ -365,7 +365,7 @@ interface ActiveDirective {
 }
 
 interface CompiledTemplate {
-  readonly element: HTMLTemplateElement;
+  readonly content: DocumentFragment;
   readonly strings: TemplateStringsArray;
   readonly descriptors: readonly PartDescriptor[];
   readonly traversalDescriptors: readonly PartDescriptor[];
@@ -1501,7 +1501,7 @@ export function render(
   }
 
   try {
-    const fragment = document.importNode(compiled.element.content, true);
+    const fragment = cloneTemplateContent(compiled);
     const bindings = instantiateBindings(fragment, compiled.traversalDescriptors, styles);
     applyBindings(bindings, result.values);
     const nodes = [...fragment.childNodes];
@@ -1700,7 +1700,7 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   }
 
   const compiled: CompiledTemplate = {
-    element,
+    content: document.importNode(element.content, true),
     strings: result.strings,
     descriptors,
     traversalDescriptors,
@@ -1794,6 +1794,10 @@ function instantiateBindings(
     walker.currentNode = document;
   }
   return bindings;
+}
+
+function cloneTemplateContent(template: CompiledTemplate): DocumentFragment {
+  return template.content.cloneNode(true) as DocumentFragment;
 }
 
 interface HydrationRange {
@@ -1898,7 +1902,7 @@ function createChildInstance(
   compiled = getCompiledTemplate(result),
   styles?: RenderStyleTracker,
 ): ChildInstance {
-  const fragment = document.importNode(compiled.element.content, true);
+  const fragment = cloneTemplateContent(compiled);
   const bindings = instantiateBindings(fragment, compiled.traversalDescriptors, styles);
   applyBindings(bindings, result.values);
   const nodes = [...fragment.childNodes];

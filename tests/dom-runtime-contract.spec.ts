@@ -42,6 +42,46 @@ describe('DOM runtime contract', () => {
     }
   });
 
+  it('imports each inert template once and clones independent active-document instances', () => {
+    const importNode = vi.spyOn(document, 'importNode');
+    const cloneNode = vi.spyOn(Node.prototype, 'cloneNode');
+    try {
+      const firstRoot = document.createElement('div');
+      const secondRoot = document.createElement('div');
+      const view = (label: string) => html`<article data-label=${label}><span>static</span></article>`;
+
+      render(view('first'), firstRoot);
+      render(view('second'), secondRoot);
+
+      expect(importNode).toHaveBeenCalledOnce();
+      expect(importNode.mock.calls[0]?.[0]).toBeInstanceOf(DocumentFragment);
+      expect(importNode.mock.calls[0]?.[0].ownerDocument).not.toBe(document);
+      expect(cloneNode).toHaveBeenCalledTimes(2);
+      expect(cloneNode.mock.contexts).toHaveLength(2);
+      expect(cloneNode.mock.contexts.every((context) => (
+        context instanceof DocumentFragment && context.ownerDocument === document
+      ))).toBe(true);
+
+      const firstArticle = firstRoot.querySelector('article')!;
+      const secondArticle = secondRoot.querySelector('article')!;
+      expect(firstArticle).not.toBe(secondArticle);
+      expect(firstArticle.ownerDocument).toBe(document);
+      expect(secondArticle.ownerDocument).toBe(document);
+
+      firstArticle.querySelector('span')!.textContent = 'changed externally';
+      expect(secondArticle.querySelector('span')?.textContent).toBe('static');
+
+      render(view('updated'), firstRoot);
+      expect(importNode).toHaveBeenCalledOnce();
+      expect(cloneNode).toHaveBeenCalledTimes(2);
+      expect(firstRoot.querySelector('article')).toBe(firstArticle);
+      expect(firstArticle.dataset.label).toBe('updated');
+    } finally {
+      importNode.mockRestore();
+      cloneNode.mockRestore();
+    }
+  });
+
   it('instantiates bindings in DOM traversal order while retaining expression order', () => {
     const root = document.createElement('div');
     const view = (child: string, fostered: string) => html`
