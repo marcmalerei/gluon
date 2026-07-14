@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-13",
+    "checkedAt": "2026-07-14",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "marcmalerei is a verified owner of the gluonjs npm organization; all 17 package records exist publicly with reviewed bootstrap integrity and verified GitHub Actions trusted-publisher bindings."
+    "publicationState": "released",
+    "observation": "Gluon v1.0.6 is an immutable published GitHub release; all 17 contracted npm packages expose version 1.0.6, and marcmalerei remains a verified owner of the gluonjs npm organization."
   },
   "packages": [
     {

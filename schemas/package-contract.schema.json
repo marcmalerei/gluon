@@ -17,7 +17,7 @@
         "checkedAt": { "type": "string", "format": "date" },
         "scope": { "const": "@gluonjs" },
         "scopeControl": { "enum": ["unverified", "verified"] },
-        "publicationState": { "enum": ["blocked", "ready"] },
+        "publicationState": { "enum": ["blocked", "ready", "released"] },
         "observation": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false

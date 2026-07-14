@@ -1,8 +1,9 @@
 # Release readiness
 
 The `1.0.6` documentation describes the first supported public release line.
-The `@gluonjs` scope, all 17 package records, and their trusted-publisher
-bindings are verified in the package contract.
+GitHub release `v1.0.6` was published on 2026-07-14, and all 17 contracted npm
+packages expose immutable version `1.0.6`. The `@gluonjs` scope, package
+records, and trusted-publisher bindings are verified in the package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
@@ -84,8 +85,8 @@ responses. The `1.0.6` release line uses the complete root build, leaves
 setup-node registry authentication disabled, passes the contracted registry
 explicitly to npm, records the operator's successful immutable-release and
 ruleset-bypass preflights in versioned release-cut evidence, and scopes the
-ephemeral GitHub token to the remaining live hosting checks. The failed tags
-are not moved or reused.
+ephemeral GitHub token to the remaining live hosting checks. It completed
+publication on 2026-07-14. The failed tags are not moved or reused.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,

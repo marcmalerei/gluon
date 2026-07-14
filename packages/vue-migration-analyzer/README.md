@@ -1,4 +1,10 @@
-# `@gluonjs/vue-migration-analyzer`
+<!-- gluon-package-header:start -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/vue-migration-analyzer — native UI layers growing from a glowing core" width="100%">
+</p>
+
+<h1 align="center">Gluon / <code>@gluonjs/vue-migration-analyzer</code></h1>
+<!-- gluon-package-header:end -->
 
 This Node-only package statically inventories the Vue 3.5 project surface
 accepted by [RFC 0003](../../docs/rfcs/0003-report-only-vue-migration-analyzer.md).

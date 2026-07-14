@@ -36,9 +36,12 @@ if (releaseCutEvidenceExists !== compatibilityManifestExists) {
 const evidencePendingCandidate = checkState
   && packageContract.registry.publicationState === 'ready'
   && !releaseCutEvidenceExists;
-const allowBlocked = process.argv.includes('--allow-blocked')
+const postReleaseDevelopment = checkState
+  && packageContract.registry.publicationState === 'released';
+const nonPublishableBuild = process.argv.includes('--allow-blocked')
   || (checkState && packageContract.registry.publicationState === 'blocked')
-  || evidencePendingCandidate;
+  || evidencePendingCandidate
+  || postReleaseDevelopment;
 const allowedArguments = new Set(['--version', version, '--output', option('--output'), '--allow-blocked', '--check-state']);
 
 if (process.argv.slice(2).some((argument) => argument !== undefined && !allowedArguments.has(argument))) {
@@ -48,10 +51,10 @@ if (process.argv.includes('--allow-blocked') && checkState) throw new Error('Cho
 if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version)) {
   throw new Error(`Invalid stable release version ${version}.`);
 }
-if (evidencePendingCandidate) {
-  if (version !== rootManifest.version) throw new Error('Evidence-pending candidate checks require the current package version.');
+if (evidencePendingCandidate || postReleaseDevelopment) {
+  if (version !== rootManifest.version) throw new Error('Repository-state artifact checks require the current package version.');
   await execFile(process.execPath, ['scripts/validate-release-contract.mjs'], { cwd: root });
-} else if (allowBlocked) {
+} else if (nonPublishableBuild) {
   if (packageContract.registry.publicationState !== 'blocked' || version !== rootManifest.version) {
     throw new Error('Blocked artifact mode is only available for the current blocked development version.');
   }
@@ -62,7 +65,7 @@ if (evidencePendingCandidate) {
 let sourceDateEpoch = Number(process.env.SOURCE_DATE_EPOCH || 0);
 const sourceCommit = (await run('git', ['rev-parse', 'HEAD'])).trim();
 const sourceTreeClean = !(await run('git', ['status', '--porcelain'])).trim();
-if (!allowBlocked && !sourceTreeClean) throw new Error('Release artifacts require a clean source tree.');
+if (!nonPublishableBuild && !sourceTreeClean) throw new Error('Release artifacts require a clean source tree.');
 sourceDateEpoch ||= Number((await run('git', ['show', '-s', '--format=%ct', 'HEAD'])).trim());
 if (!Number.isSafeInteger(sourceDateEpoch) || sourceDateEpoch <= 0) throw new Error('SOURCE_DATE_EPOCH must be a positive integer.');
 const created = new Date(sourceDateEpoch * 1000).toISOString();
@@ -104,10 +107,10 @@ for (const entry of packageContract.packages) {
 }
 
 const changelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
-const releaseNotes = changelogSection(changelog, allowBlocked && !evidencePendingCandidate ? 'Unreleased' : version);
+const releaseNotes = changelogSection(changelog, nonPublishableBuild && !evidencePendingCandidate ? 'Unreleased' : version);
 await writeFile(resolve(output, 'CHANGELOG.md'), changelog, 'utf8');
 await writeFile(resolve(output, 'RELEASE_NOTES.md'), `${releaseNotes.trim()}\n`, 'utf8');
-if (!allowBlocked) {
+if (!nonPublishableBuild) {
   await writeFile(resolve(output, 'release-cut-evidence.json'), await readFile(resolve(root, releaseCutEvidencePath)));
   await writeFile(resolve(output, 'compatibility-manifest.json'), await readFile(resolve(root, compatibilityManifestPath)));
 }
@@ -163,7 +166,7 @@ const evidence = {
   sourceTreeClean,
   sourceDateEpoch,
   created,
-  blockedDevelopmentBuild: allowBlocked,
+  blockedDevelopmentBuild: nonPublishableBuild,
   runtime: {
     node: process.version,
     npm: (await run('npm', ['--version'])).trim(),
@@ -179,8 +182,8 @@ const evidence = {
       `sbom/${fileSafe(entry.name)}.cdx.json`,
     ]),
   },
-  releaseCutEvidence: allowBlocked ? null : 'release-cut-evidence.json',
-  compatibilityManifest: allowBlocked ? null : 'compatibility-manifest.json',
+  releaseCutEvidence: nonPublishableBuild ? null : 'release-cut-evidence.json',
+  compatibilityManifest: nonPublishableBuild ? null : 'compatibility-manifest.json',
 };
 await writeJson(resolve(output, 'release-evidence.json'), evidence);
 

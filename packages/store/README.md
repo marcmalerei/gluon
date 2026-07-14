@@ -1,4 +1,10 @@
-# `@gluonjs/store`
+<!-- gluon-package-header:start -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/store — native UI layers growing from a glowing core" width="100%">
+</p>
+
+<h1 align="center">Gluon / <code>@gluonjs/store</code></h1>
+<!-- gluon-package-header:end -->
 
 The official Gluon store provides typed, application-scoped state without a
 DOM dependency. Store definitions infer state, computed getter values, action

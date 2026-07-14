@@ -1,4 +1,10 @@
-# `@gluonjs/devtools`
+<!-- gluon-package-header:start -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/devtools — native UI layers growing from a glowing core" width="100%">
+</p>
+
+<h1 align="center">Gluon / <code>@gluonjs/devtools</code></h1>
+<!-- gluon-package-header:end -->
 
 Gluon Devtools is explicitly opt-in. `createDevtoolsBridge()` defaults to
 `enabled: false`, installs no render hook, and exposes no global. Development

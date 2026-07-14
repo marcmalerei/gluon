@@ -7,11 +7,11 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the `1.0.6` release candidate. Every official
-manifest is public and lockstep at `1.0.6`. The candidate is not publishable
-until its exact commit has a successful Quality Gates run and the two matching
-evidence files are committed. This is enforced by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for the immutable `1.0.6` release. Every official
+manifest remains public and lockstep at `1.0.6`. GitHub release `v1.0.6` was
+published on 2026-07-14, and all 17 contracted npm packages expose immutable
+version `1.0.6`. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -22,7 +22,16 @@ lockstep manifest and lockfile versions, exact
 official-package dependency versions, public/provenance publish settings,
 license and archive allowlists, the documentation version, and the protected
 release workflow. Strict candidate validation additionally requires the exact
-tested commit and successful workflow run.
+tested commit and successful workflow run. Released-state validation instead
+proves that the immutable tag is an ancestor of the current branch and that its
+recorded release-cut changes contain only the two reviewed evidence files.
+
+Every current package README starts with the shared Gluon hero and its exact
+package name. The image uses the absolute `raw.githubusercontent.com` URL for
+`docs/assets/gluon-hero.jpg`, because npm archives contain the README but do not
+ship the repository `docs/` tree. `npm run check:packages` derives the README set
+from `package-contract.json` and rejects missing, duplicated, stale, or wrongly
+named package headers.
 
 The immutable `v1.0.0` tag points to commit
 `8f52b4b98fe9e9f5182973cbf5a0655c879df7ea`. Its Release run
@@ -305,6 +314,15 @@ Once the two evidence files exist, `--check-state` automatically switches to
 strict candidate validation; a partial evidence pair fails immediately. The
 Quality Gates repository job fetches full Git history so this strict pass can
 prove that the recorded tested commit is an ancestor of the candidate commit.
+
+After the immutable release is published, change the package contract state
+from `ready` to `released`. In this state, repository `--check-state` runs still
+pack the current tree twice and validate its SBOMs, but mark the result with
+`blockedDevelopmentBuild: true`, omit the release-cut evidence, and use the
+`Unreleased` changelog section. The publisher rejects that artifact, so later
+documentation or source changes cannot claim to reproduce or overwrite the
+published version. Preparing a later release requires a new target version and
+the normal reviewed `ready` candidate transition.
 
 ## Protected publication
 
