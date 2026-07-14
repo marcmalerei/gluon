@@ -9,6 +9,7 @@ const root = resolve(import.meta.dirname, '..');
 const repository = process.env.GITHUB_REPOSITORY;
 const expectedEnvironment = process.env.GLUON_RELEASE_ENVIRONMENT;
 const releaseVersion = process.env.RELEASE_VERSION;
+const releaseTag = process.env.RELEASE_TAG;
 const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
 
 if (!repository) throw new Error('GITHUB_REPOSITORY is required.');
@@ -20,6 +21,10 @@ if (expectedEnvironment !== 'npm') throw new Error('Release publication must run
 if (process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN) {
   throw new Error('Long-lived npm publication tokens are prohibited; use npm trusted publishing.');
 }
+if (releaseTag !== `v${releaseVersion}`) {
+  throw new Error(`Release hosting requires canonical tag v${releaseVersion}; found ${releaseTag ?? 'unset'}.`);
+}
+await execFile(process.execPath, ['scripts/validate-release-recovery.mjs', '--version', releaseVersion], { cwd: root });
 
 const environment = await githubJson(`repos/${repository}/environments/npm`);
 const reviewerRule = environment.protection_rules?.find((rule) => rule.type === 'required_reviewers');

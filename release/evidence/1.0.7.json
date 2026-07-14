@@ -2,10 +2,10 @@
   "$schema": "../release-cut-evidence.schema.json",
   "schemaVersion": 1,
   "releaseVersion": "1.0.7",
-  "testedCommit": "192d6473ee5c4dbcfe6c0c41e5f37ffc0e864557",
-  "cutAt": "2026-07-14T12:50:01Z",
+  "testedCommit": "52fe93a31049efc1f38ab41fad4af17050a5e17e",
+  "cutAt": "2026-07-14T13:37:00Z",
   "automatedQualityRun": {
-    "url": "https://github.com/marcmalerei/gluon/actions/runs/29333432953",
+    "url": "https://github.com/marcmalerei/gluon/actions/runs/29336967805",
     "conclusion": "success"
   },
   "hostingPreflight": {
@@ -13,7 +13,7 @@
       "enabled": true,
       "enforcedByOwner": false,
       "checkedBy": "marcmalerei",
-      "checkedAt": "2026-07-14T12:50:01Z"
+      "checkedAt": "2026-07-14T13:37:00Z"
     },
     "releaseTagRulesets": {
       "creationRulesetId": 18869893,
@@ -25,7 +25,7 @@
       },
       "immutabilityBypassActorCount": 0,
       "checkedBy": "marcmalerei",
-      "checkedAt": "2026-07-14T12:50:01Z"
+      "checkedAt": "2026-07-14T13:37:00Z"
     }
   },
   "supportBoundary": {
@@ -39,5 +39,5 @@
     "singleOperatorRiskAccepted": true
   },
   "acceptedBy": "marcmalerei",
-  "acceptedAt": "2026-07-14T12:50:01Z"
+  "acceptedAt": "2026-07-14T13:37:00Z"
 }

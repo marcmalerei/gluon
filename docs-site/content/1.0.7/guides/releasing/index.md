@@ -93,6 +93,18 @@ publication on 2026-07-14. The `1.0.7` line additionally publishes directly to
 `latest` through trusted publishing and verifies the complete train before
 finalizing the GitHub release. The failed tags are not moved or reused.
 
+The first immutable canonical `v1.0.7` tag passed its browser, Node, and
+performance jobs but stopped before reproducibility, npm publication, or a
+GitHub draft. PR #157 had been squash-merged, so the recorded tested commit was
+not an ancestor of the tagged commit even though the reviewed evidence commit
+and tag have the same tree. The canonical tag remains unchanged. Its one-time
+machine-verified recovery uses protected execution tag
+`v1.0.7-recovery.1`, which must merge both histories and may change only the
+release workflow, recovery validation, documentation, and renewed evidence
+paths. Package sources, manifests, READMEs, licenses, and changelogs cannot
+differ. Trusted Publishing still publishes version `1.0.7`, and the GitHub
+release remains attached to canonical tag `v1.0.7`.
+
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,
 and failure-handling procedure.

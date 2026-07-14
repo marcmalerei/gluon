@@ -11,8 +11,12 @@ The machine-readable package contract records `publicationState: ready` and
 `scopeControl: verified` for the prepared `1.0.7` candidate. Every official
 manifest is public and lockstep at `1.0.7`. GitHub release `v1.0.6` remains the
 current immutable release, all 17 contracted npm packages expose `1.0.6` as
-`latest`, and the `1.0.7` package versions were absent during the release
-preflight on 2026-07-14. This is enforced locally by:
+`latest`, and the `1.0.7` package versions remain absent. The first `v1.0.7`
+Release run `29335253064` stopped before reproducibility, publication, or draft
+creation because PR #157 had been squash-merged: tested commit `192d647` is not
+an ancestor of immutable tagged commit `6c1d95a`, although tagged and reviewed
+evidence commits have the identical tree `0395fab4`. This is enforced locally
+by:
 
 ```sh
 npm run check:release-contract
@@ -24,8 +28,11 @@ official-package dependency versions, public/provenance publish settings,
 license and archive allowlists, the documentation version, and the protected
 release workflow. Strict candidate validation additionally requires the exact
 tested commit and successful workflow run. Released-state validation instead
-proves that the immutable tag is an ancestor of the current branch and that its
-recorded release-cut changes contain only the two reviewed evidence files.
+proves that the immutable canonical tag is an ancestor of the current branch
+and that its recorded release-cut changes contain only the two reviewed
+evidence files. The one-time 1.0.7 recovery also requires its protected
+recovery tag to merge both the canonical-tag and tested release-branch
+histories and permits no package or application input changes.
 
 Every current package README starts with its own generated Gluon hero under
 `docs/assets/package-headers/`. The exact package name is part of the raster
@@ -83,6 +90,17 @@ attestation, or npm publication because GitHub omits ruleset `bypass_actors`
 from responses authorized by an Actions `GITHUB_TOKEN`. Registry verification
 found no official `1.0.5` package version. All six failed tags remain unchanged;
 recovery uses the new `1.0.6` version and tag.
+
+The immutable canonical `v1.0.7` tag points to commit
+`6c1d95a82ac0822f95550141564b93242d64d875`. Release run `29335253064`
+passed all browser, Node, and performance jobs, then failed its candidate gate
+because the squash merge removed the tested commit from the tag's ancestry.
+The publish and reproducibility jobs were skipped, no GitHub release draft was
+created, and registry verification found no official `1.0.7` package version.
+The exact one-time recovery manifest is `release/recovery/1.0.7.json`. It
+preserves the canonical tag, records the identical canonical and reviewed
+evidence tree, and permits only the recovery workflow, validation,
+documentation, and renewed evidence files to differ.
 
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
@@ -330,12 +348,23 @@ the normal reviewed `ready` candidate transition.
 
 ## Protected publication
 
-After the candidate PR is merged and all gates are green, create the exact
-reviewed `v1.0.7` tag. The tag starts the `Release` workflow. Its candidate job
-repeats the full repository check and artifact build. The single-operator `npm`
-environment then admits the publication job without independent approval. It
-permits only `v*` tags and disallows administrator bypass and long-lived npm
-secrets.
+After a normal candidate PR is merged with its tested commit preserved in
+history and all gates are green, create the exact reviewed `v<version>` tag.
+The tag starts the `Release` workflow. Its candidate job repeats the full
+repository check and artifact build. The single-operator `npm` environment then
+admits the publication job without independent approval. It permits only `v*`
+tags and disallows administrator bypass and long-lived npm secrets.
+
+The canonical `v1.0.7` tag cannot be moved or deleted after the squash-merge
+failure. Its only permitted recovery uses protected tag
+`v1.0.7-recovery.1`. Before that tag can publish, the recovery verifier requires
+the exact canonical tag commit and tree, the original tested and evidence
+commits, the failed run URL, renewed evidence from a successful Quality Gates
+commit, and a merge commit that contains both the canonical and reviewed branch
+histories. A hard-coded allowlist excludes every package source, manifest,
+README, license, and changelog path. The recovery workflow therefore publishes
+the unchanged `1.0.7` archives and creates the GitHub release against canonical
+tag `v1.0.7`; the recovery tag is only the protected OIDC execution ref.
 
 The publication job verifies public repository visibility, the absence of
 environment reviewers and an uncontracted wait timer, the exact `v*` tag policy,
