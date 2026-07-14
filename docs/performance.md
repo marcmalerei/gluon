@@ -223,6 +223,22 @@ claim. The baseline and candidate distributions are retained in
 and
 [`renderer-allocations-163-candidate.json`](../benchmarks/results/renderer-allocations-163-candidate.json).
 
+Both retained runs used the same production harness, Apple M4 environment,
+Chromium 149, 40 measured samples, and eight warm-up rounds:
+
+| Scenario | Baseline median / p95 ms/op | Optimized median / p95 ms/op |
+| --- | ---: | ---: |
+| TemplateResult creation | 0.0000213 / 0.0000223 | 0.0000053 / 0.0000061 |
+| Stable text render | 0.0001570 / 0.0002252 | 0.0001400 / 0.0001440 |
+| Ten-property spread | 0.0018200 / 0.0018610 | 0.0017800 / 0.0018210 |
+| 100 unkeyed strings | 0.0109 / 0.0112 | 0.0088125 / 0.0090031 |
+
+The optimized medians were lower by 75.1%, 10.8%, 2.2%, and 19.2%
+respectively in these runs. The retained TemplateResult heap delta fell from
+7,480,620 to 5,882,516 bytes, a 1,598,104-byte or 21.4% reduction for this
+Chromium diagnostic. Separate-run distributions and the explicit limitations,
+not the percentages alone, remain the evidence.
+
 Run the focused benchmark with:
 
 ```bash
