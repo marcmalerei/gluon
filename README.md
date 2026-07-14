@@ -1,20 +1,20 @@
-![Gluon — native UI layers growing from a glowing core](docs/assets/gluon-hero.jpg)
-
+<!-- gluon-package-header:start -->
 <p align="center">
-  <img src="docs/assets/gluon-logo.jpg" alt="Gluon logo — interface layers orbiting a glowing core" width="180">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/core — native UI layers growing from a glowing core" width="100%">
 </p>
 
-<h1 align="center">Gluon</h1>
+<h1 align="center">Gluon / <code>@gluonjs/core</code></h1>
+<!-- gluon-package-header:end -->
 
 <p align="center">
   A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.
 </p>
 
 > [!IMPORTANT]
-> The repository carries the `1.0.6` recovery release line. npm publication is
-> performed only from an immutable release tag through the protected release
-> workflow; `v1.0.0` through `v1.0.5` all failed before publication and remain
-> unchanged.
+> `1.0.6` is Gluon's first supported public release and is available for all 17
+> official packages. npm publication occurs only from an immutable release tag
+> through the protected release workflow; later repository commits cannot
+> replace the published `1.0.6` package contents.
 
 ## What works today
 

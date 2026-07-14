@@ -1,4 +1,10 @@
-# `@gluonjs/ssr`
+<!-- gluon-package-header:start -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/ssr — native UI layers growing from a glowing core" width="100%">
+</p>
+
+<h1 align="center">Gluon / <code>@gluonjs/ssr</code></h1>
+<!-- gluon-package-header:end -->
 
 The official DOM-independent Gluon server renderer consumes the same public
 `html`, functional component, application, Store, Router, async built-in, and

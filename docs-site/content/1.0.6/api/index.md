@@ -5,6 +5,10 @@ TypeDoc generates this reference from every current export in
 the documented entry-point count differs from the public package contract, or
 when an internal link is broken.
 
+New to Gluon? Start with [Components: properties, events, and lifecycle](../guides/components/)
+before using the signature reference. Its class map explains which public class
+to construct, subclass, receive as an error, or reserve for tooling.
+
 ## Runtime
 
 - [`@gluonjs/core`](generated/src/)

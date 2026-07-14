@@ -1,4 +1,10 @@
-# `@gluonjs/vite`
+<!-- gluon-package-header:start -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/vite — native UI layers growing from a glowing core" width="100%">
+</p>
+
+<h1 align="center">Gluon / <code>@gluonjs/vite</code></h1>
+<!-- gluon-package-header:end -->
 
 The official Vite plugin adds Gluon template source maps, development
 diagnostics, and compatible state-preserving HMR.

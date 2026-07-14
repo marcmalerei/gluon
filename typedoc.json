@@ -32,6 +32,7 @@
   "out": ".tmp/docs-api",
   "json": ".tmp/docs-api-reflections.json",
   "readme": "none",
+  "excludeExternals": true,
   "excludeInternal": true,
   "disableSources": true,
   "validation": {

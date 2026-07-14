@@ -7,6 +7,16 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Expanded the component authoring and generated API documentation with
+  junior-oriented property, event, lifecycle, and public-class guidance.
+- Standardized every official package README with the shared Gluon hero and
+  its exact package name.
+- Added an explicit released contract state so post-release repository checks
+  produce non-publishable development artifacts without weakening strict
+  immutable candidate validation.
+
 ## [1.0.6] - 2026-07-13
 
 ### Fixed

@@ -19,6 +19,9 @@ application, and the example disposes its Store manager from the same lifecycle.
 Properties use JavaScript property bindings for structured values, outputs are
 native `CustomEvent` instances, and projected content uses native slots.
 
+The [component authoring guide](../components/) explains each property option,
+event propagation and cancellation, class selection, and connection cleanup.
+
 ## Contracts
 
 - [Application runtime](https://github.com/marcmalerei/gluon/blob/main/docs/application-runtime.md)

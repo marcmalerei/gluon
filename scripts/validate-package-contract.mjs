@@ -6,6 +6,7 @@ import process from 'node:process';
 const root = resolve(import.meta.dirname, '..');
 const contract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
 const selectedName = process.argv[2] === '--package' ? process.argv[3] : undefined;
+const packageHeroUrl = 'https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg';
 
 if (process.argv.length > 2 && (!selectedName || process.argv.length !== 4)) {
   throw new Error('Usage: node scripts/validate-package-contract.mjs [--package <package-name>]');
@@ -80,12 +81,35 @@ for (const entry of packages) visit(entry.name);
 async function validateCurrentPackage(entry) {
   const directory = resolve(root, entry.directory);
   const packageJson = JSON.parse(await readFile(resolve(directory, 'package.json'), 'utf8'));
+  const readme = await readFile(resolve(directory, 'README.md'), 'utf8');
 
   if (packageJson.name !== entry.name) {
     throw new Error(`${entry.name} does not match ${packageJson.name} in package.json.`);
   }
   if (packageJson.license !== 'MIT') {
     throw new Error(`${entry.name} must declare the authorized MIT license.`);
+  }
+
+  const expectedHeader = [
+    '<!-- gluon-package-header:start -->',
+    '<p align="center">',
+    `  <img src="${packageHeroUrl}" alt="Gluon ${entry.name} — native UI layers growing from a glowing core" width="100%">`,
+    '</p>',
+    '',
+    `<h1 align="center">Gluon / <code>${entry.name}</code></h1>`,
+    '<!-- gluon-package-header:end -->',
+  ].join('\n');
+  if (!readme.startsWith(expectedHeader)) {
+    throw new Error(`${entry.name} README must start with its exact Gluon package header.`);
+  }
+  for (const token of [
+    '<!-- gluon-package-header:start -->',
+    '<!-- gluon-package-header:end -->',
+    packageHeroUrl,
+  ]) {
+    if (readme.split(token).length !== 2) {
+      throw new Error(`${entry.name} README must contain exactly one ${token}.`);
+    }
   }
 
   const actualOfficialDependencies = new Set(

@@ -14,6 +14,19 @@ The verified browser renders are
 [`design/rendered-docs-desktop.png`](design/rendered-docs-desktop.png) at
 1536×1024 and [`design/rendered-docs-mobile.png`](design/rendered-docs-mobile.png)
 at 390×844.
+The beginner component path is verified by
+[`design/rendered-components-desktop.png`](design/rendered-components-desktop.png)
+at 1440×1000,
+[`design/rendered-components-mobile.png`](design/rendered-components-mobile.png)
+at 390×844, and the focused
+[`design/rendered-gluon-element-desktop.png`](design/rendered-gluon-element-desktop.png)
+API reference at 1440×1000.
+The shared package-header contract is verified on the rendered
+`@gluonjs/atoms` GitHub README by
+[`design/rendered-package-readme-desktop.png`](design/rendered-package-readme-desktop.png)
+at 1440×1000 and
+[`design/rendered-package-readme-mobile.png`](design/rendered-package-readme-mobile.png)
+at 390×844.
 
 ## Commands
 
@@ -40,6 +53,10 @@ symbol coverage fail `npm run docs:api`.
 migration material, examples, and release archive. `validate-docs.mjs` verifies
 the version tree, public API entry-point count, one rendered example per public
 symbol page, required curated content, compiled examples, and internal links.
+The maintained component guide is the beginner entry point for properties,
+attributes, events, lifecycle ownership, and the complete public class map.
+TypeDoc excludes externally inherited DOM members so an API page keeps its
+Gluon-owned contract in view while still naming its platform base type.
 
 The reviewed catalog covers Core rendering and application ownership,
 reactivity, Router, Store, SSR/hydration/streaming/static generation, layered UI,

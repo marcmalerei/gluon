@@ -335,8 +335,62 @@ function validateDevelopmentState() {
     if (!rootChangelog.includes('## [Unreleased]')) throw new Error('Blocked development state requires an Unreleased changelog section.');
     return;
   }
+  if (packageContract.registry.publicationState === 'released') {
+    validateReleasedState();
+    return;
+  }
   if (packageContract.registry.publicationState !== 'ready') {
     throw new Error(`Unknown publication state ${packageContract.registry.publicationState}.`);
+  }
+}
+
+function validateReleasedState() {
+  const version = releaseContract.targetVersion;
+  const tag = `${releaseContract.tagPrefix}${version}`;
+  const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', version);
+  const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', version);
+  if (packagesPrivate) throw new Error('Released packages must remain public in their manifests.');
+  if (packageContract.registry.scopeControl !== 'verified') {
+    throw new Error('Released publication requires verified npm scope control.');
+  }
+  if (currentVersion !== version) {
+    throw new Error(`Released package version ${currentVersion} does not match contracted release ${version}.`);
+  }
+  if (!rootChangelog.includes('## [Unreleased]')) {
+    throw new Error('Post-release development requires an Unreleased changelog section.');
+  }
+  if (!new RegExp(`^## \\[${escapeRegExp(version)}\\] - \\d{4}-\\d{2}-\\d{2}$`, 'm').test(rootChangelog)) {
+    throw new Error(`Root changelog has no dated ${version} release section.`);
+  }
+
+  let tagCommit;
+  try {
+    tagCommit = execFileSync('git', ['rev-list', '-n', '1', tag], { cwd: root, encoding: 'utf8' }).trim();
+    execFileSync('git', ['merge-base', '--is-ancestor', tagCommit, 'HEAD'], { cwd: root, stdio: 'ignore' });
+  } catch {
+    throw new Error(`Released state requires immutable tag ${tag} to be an ancestor of HEAD.`);
+  }
+
+  const evidence = readJsonAtRef(tag, evidencePath);
+  const compatibility = readJsonAtRef(tag, compatibilityPath);
+  validateJsonSchema(`${tag}:${evidencePath}`, evidence, validateReleaseCutEvidenceSchema);
+  validateJsonSchema(`${tag}:${compatibilityPath}`, compatibility, validateCompatibilityManifestSchema);
+  if (evidence.releaseVersion !== version || compatibility.releaseVersion !== version
+    || compatibility.sourceCommit !== evidence.testedCommit) {
+    throw new Error(`${tag} release evidence does not consistently describe ${version}.`);
+  }
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', evidence.testedCommit, tagCommit], { cwd: root, stdio: 'ignore' });
+  } catch {
+    throw new Error(`${tag} does not descend from its recorded tested commit.`);
+  }
+  const permittedEvidenceChanges = new Set([evidencePath, compatibilityPath]);
+  const releaseCutChanges = execFileSync('git', ['diff', '--name-only', evidence.testedCommit, tagCommit], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim().split('\n').filter(Boolean);
+  if (releaseCutChanges.some((changed) => !permittedEvidenceChanges.has(changed))) {
+    throw new Error(`${tag} changed files other than its two reviewed evidence files after testing.`);
   }
 }
 
@@ -581,4 +635,12 @@ function escapeRegExp(value) {
 
 async function readJson(path) {
   return JSON.parse(await readFile(resolve(root, path), 'utf8'));
+}
+
+function readJsonAtRef(ref, path) {
+  try {
+    return JSON.parse(execFileSync('git', ['show', `${ref}:${path}`], { cwd: root, encoding: 'utf8' }));
+  } catch {
+    throw new Error(`${ref} must contain valid ${path}.`);
+  }
 }

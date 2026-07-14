@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Added the shared Gluon package header with the exact package name.
+
 ## [1.0.6] - 2026-07-13
 
 ### Changed

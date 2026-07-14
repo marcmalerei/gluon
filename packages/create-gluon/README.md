@@ -1,4 +1,10 @@
-# `create-gluon`
+<!-- gluon-package-header:start -->
+<p align="center">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon create-gluon — native UI layers growing from a glowing core" width="100%">
+</p>
+
+<h1 align="center">Gluon / <code>create-gluon</code></h1>
+<!-- gluon-package-header:end -->
 
 `create-gluon` scaffolds supported TypeScript applications that consume only
 public Gluon package entry points.
@@ -92,7 +98,7 @@ selection, plus SSR with its required Router and Store selections. Repository
 fixture verification generates all 20 combinations. Each fixture is installed,
 typechecked, tested, and built against packed workspace artifacts. UI fixtures
 install packed `@gluonjs/quarks` and `@gluonjs/atoms` archives so the repository
-gate verifies the exact candidate artifacts rather than another registry
+gate verifies the exact locally packed artifacts rather than another registry
 version.
 
 The blocking component matrix separately generates all five kinds into clean
