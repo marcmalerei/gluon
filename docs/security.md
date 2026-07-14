@@ -1,6 +1,6 @@
 # Security threat model
 
-This threat model applies to the supported `1.0.6` release line. Its
+This threat model applies to the prepared `1.0.7` release line. Its
 machine-readable source is
 [`quality/security-threat-model.json`](../quality/security-threat-model.json),
 and `npm run check:security` rejects missing threat areas or evidence paths.
@@ -14,7 +14,7 @@ application content or supplies an application security policy.
 | Styles | Constructable sheets are the browser runtime; SSR carriers are escaped and digest/order validated before adoption. | Treat `css()` input as author source; do not interpolate untrusted CSS. | `tests/styles-and-element.spec.ts`, `tests/hydration.spec.ts` |
 | SSR state | Only JSON-compatible state is accepted; script-breaking characters are escaped; resources are request-owned. | Keep secrets out of browser-visible state and authorize every serialized field. | `tests-node/ssr.spec.ts`, property/fuzz gate |
 | CSP | A request nonce is transported to initial style carriers without being generated or weakened by Gluon; module scripts use external asset URLs. | Generate unpredictable per-response nonces or hashes, emit policy/report headers, and reject violations. | `tests-node/ssr.spec.ts`, `docs/deployment.md` |
-| Trusted Types | Unsafe sinks are visible in public API names. No `1.0.6` enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
+| Trusted Types | Unsafe sinks are visible in public API names. No `1.0.7` enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
 | Vue source analysis | The Node analyzer realpath-checks one root, never follows symlinks or executes project code, enforces fixed worker/resource budgets, emits no source excerpts/absolute paths, and has no writer/network/plugin hook. | Treat findings as static inventory only; review indeterminate runtime, Router, Store, style, SSR, async, test, and build semantics. | `tests-node/vue-migration-analyzer.spec.ts`, retained adversarial fixtures, RFC 0003 |
 | Component generation | The planner validates the entire operation set before writes, rejects path/tag/manifest/symlink hazards, requires two-part overwrite intent, reports dry runs without mutation, and restores applied files if commit fails. | Review generated application code and retain ownership of architecture, dependencies, deployment policy, and any later manual edits. | `tests-node/create-gluon.spec.ts`, five-kind clean-install matrix, `docs/component-generator.md` |
 

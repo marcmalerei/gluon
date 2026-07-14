@@ -7,11 +7,12 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for the immutable `1.0.6` release. Every official
-manifest remains public and lockstep at `1.0.6`. GitHub release `v1.0.6` was
-published on 2026-07-14, and all 17 contracted npm packages expose immutable
-version `1.0.6`. This is enforced locally by:
+The machine-readable package contract records `publicationState: ready` and
+`scopeControl: verified` for the prepared `1.0.7` candidate. Every official
+manifest is public and lockstep at `1.0.7`. GitHub release `v1.0.6` remains the
+current immutable release, all 17 contracted npm packages expose `1.0.6` as
+`latest`, and the `1.0.7` package versions were absent during the release
+preflight on 2026-07-14. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -129,7 +130,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.0.6` release commit, the repository owner must verify
+Before preparing the `1.0.7` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -269,13 +270,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.0.6` and `private: false`;
-- set every official implementation and peer dependency to exact `1.0.6`;
+- set every official manifest to version `1.0.7` and `private: false`;
+- set every official implementation and peer dependency to exact `1.0.7`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.0.6` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.0.6`, then make that version
+- add dated `1.0.7` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.0.7`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -286,8 +287,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm run release:validate -- --candidate 1.0.6
-npm run release:artifacts -- --version 1.0.6
+npm run release:validate -- --candidate 1.0.7
+npm run release:artifacts -- --version 1.0.7
 ```
 
 `release:artifacts` packs every package twice and compares canonical unpacked
@@ -330,7 +331,7 @@ the normal reviewed `ready` candidate transition.
 ## Protected publication
 
 After the candidate PR is merged and all gates are green, create the exact
-reviewed `v1.0.6` tag. The tag starts the `Release` workflow. Its candidate job
+reviewed `v1.0.7` tag. The tag starts the `Release` workflow. Its candidate job
 repeats the full repository check and artifact build. The single-operator `npm`
 environment then admits the publication job without independent approval. It
 permits only `v*` tags and disallows administrator bypass and long-lived npm

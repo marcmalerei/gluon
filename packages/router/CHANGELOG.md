@@ -4,6 +4,8 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-14
+
 ### Changed
 
 - Integrated the exact package name into dedicated generated README artwork.

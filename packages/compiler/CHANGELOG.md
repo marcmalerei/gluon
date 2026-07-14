@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-14
+
 ### Changed
 
 - Added Gluon decorator import detection, standard/legacy TypeScript decorator

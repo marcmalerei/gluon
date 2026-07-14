@@ -1,9 +1,11 @@
 # Release readiness
 
-The `1.0.6` documentation describes the first supported public release line.
-GitHub release `v1.0.6` was published on 2026-07-14, and all 17 contracted npm
-packages expose immutable version `1.0.6`. The `@gluonjs` scope, package
-records, and trusted-publisher bindings are verified in the package contract.
+The `1.0.7` documentation describes one lockstep supported release line.
+Availability is established only when all 17 contracted npm packages expose
+the immutable `1.0.7` version under `latest` and GitHub release `v1.0.7` is
+published. The protected workflow enforces that boundary. The `@gluonjs`
+scope, package records, and trusted-publisher bindings are verified in the
+package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
@@ -36,9 +38,10 @@ The `npm` environment uses the accepted single-operator model. It has no
 required reviewers, independent human approval, self-review rule, or wait
 timer; permits only the `v*` tag pattern; and disallows administrator bypass and
 long-lived npm secrets. This accepts that the sole operator can create a release
-tag that permanently publishes package versions under the staging dist-tag
-without another person's approval. Interactive-2FA promotion to `latest`
-remains a separate later step and does not reverse that publication.
+tag that permanently publishes package versions directly under `latest`
+without another person's approval. npm does not provide an atomic
+multi-package publish operation, so a failed train can temporarily leave only
+part of the 17-package train on the new `latest` version.
 
 Two active tag rulesets cover exactly `refs/tags/v*`. Only `marcmalerei` may
 bypass the creation restriction, so the sole operator can cut a release. The
@@ -59,11 +62,12 @@ Playwright Chromium, Firefox, and WebKit binaries, Node LTS versions, and
 CSR/SSR/streaming/hydration/SSG evidence. Both evidence files must describe the
 same tested commit and explicitly reject branded-product support claims.
 
-Publication uses two recoverable phases. Trusted publishing first places all 17
-reviewed versions under a temporary non-`latest` dist-tag and verifies registry
-integrity and provenance. An npm owner then promotes every package to `latest`
-with interactive 2FA. A protected finalizer verifies the complete train and a
-clean-room install before publishing the immutable GitHub release.
+Publication uses one recoverable protected job. Trusted publishing places all
+17 reviewed versions directly under `latest` with provenance and without a
+long-lived npm token or per-package 2FA approval. A rerun verifies and skips
+matching immutable versions before continuing unpublished packages. The GitHub
+release remains a draft until the complete train passes integrity, provenance,
+dist-tag, clean-install, and public-type verification.
 
 The immutable `v1.0.0` tag failed its candidate gate before release artifacts,
 an npm publication, or a GitHub release draft existed. The immutable `v1.0.1`
@@ -81,12 +85,13 @@ because the immutable-releases endpoint requires Administration read access
 that an Actions `GITHUB_TOKEN` cannot receive. The immutable `v1.0.5` tag also
 passed every release and reproducibility gate, then stopped before draft or npm
 publication because GitHub omits ruleset `bypass_actors` from non-administration
-responses. The `1.0.6` release line uses the complete root build, leaves
-setup-node registry authentication disabled, passes the contracted registry
-explicitly to npm, records the operator's successful immutable-release and
-ruleset-bypass preflights in versioned release-cut evidence, and scopes the
-ephemeral GitHub token to the remaining live hosting checks. It completed
-publication on 2026-07-14. The failed tags are not moved or reused.
+responses. The `1.0.6` release line used the complete root build, left
+setup-node registry authentication disabled, passed the contracted registry
+explicitly to npm, recorded the operator's successful immutable-release and
+ruleset-bypass preflights in versioned release-cut evidence, and completed
+publication on 2026-07-14. The `1.0.7` line additionally publishes directly to
+`latest` through trusted publishing and verifies the complete train before
+finalizing the GitHub release. The failed tags are not moved or reused.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,

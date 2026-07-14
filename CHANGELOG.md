@@ -7,6 +7,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-14
+
 ### Changed
 
 - Changed future lockstep releases to publish all 17 packages directly under

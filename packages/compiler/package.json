@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/compiler",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Source transforms and template locations for Gluon tooling.",
   "private": false,
   "type": "module",

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-07-14
+
 ### Changed
 
 - Added standard TypeScript decorator transpilation by default, opt-in legacy

@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/devtools",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Opt-in Gluon development bridge, browser inspector, and Vite integration.",
   "private": false,
   "type": "module",
@@ -35,10 +35,10 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/devtools-api": "1.0.6"
+    "@gluonjs/devtools-api": "1.0.7"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.6",
+    "@gluonjs/core": "1.0.7",
     "vite": "^8.0.0"
   },
   "peerDependenciesMeta": {
