@@ -14,6 +14,13 @@ The verified browser renders are
 [`design/rendered-docs-desktop.png`](design/rendered-docs-desktop.png) at
 1536×1024 and [`design/rendered-docs-mobile.png`](design/rendered-docs-mobile.png)
 at 390×844.
+The beginner component path is verified by
+[`design/rendered-components-desktop.png`](design/rendered-components-desktop.png)
+at 1440×1000,
+[`design/rendered-components-mobile.png`](design/rendered-components-mobile.png)
+at 390×844, and the focused
+[`design/rendered-gluon-element-desktop.png`](design/rendered-gluon-element-desktop.png)
+API reference at 1440×1000.
 
 ## Commands
 
