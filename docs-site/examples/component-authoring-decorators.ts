@@ -1,23 +1,15 @@
 import {
   GluonElement,
-  defineElement,
   event,
   html,
   type ComponentEventMap,
   type EventDeclarations,
-  type PropertyDeclarations,
 } from '@gluonjs/core';
+import { customElement, property, state } from '@gluonjs/core/decorators';
 
 interface ProductSummary {
   readonly id: string;
   readonly name: string;
-}
-
-interface ProductCardProperties {
-  product: ProductSummary;
-  quantity: number;
-  featured: boolean;
-  accepted: boolean;
 }
 
 interface ProductCardEvents {
@@ -27,33 +19,34 @@ interface ProductCardEvents {
   };
 }
 
-export class ProductCard extends GluonElement<ProductCardEvents> {
-  static override readonly properties = {
-    product: {
-      type: Object,
-      attribute: false,
-      required: true,
-      validate: (value: ProductSummary) => value.id.length > 0 || 'A product id is required.',
-    },
-    quantity: {
-      type: Number,
-      default: 1,
-      reflect: true,
-      validate: (value: number) => Number.isInteger(value) && value > 0
-        || 'Quantity must be a positive integer.',
-    },
-    featured: Boolean,
-    accepted: { attribute: false, reflect: false, default: false },
-  } satisfies PropertyDeclarations<ProductCardProperties>;
-
+@customElement('product-card-decorated')
+export class DecoratedProductCard extends GluonElement<ProductCardEvents> {
   static override readonly events = {
     'add-to-bag': { cancelable: true },
   } satisfies EventDeclarations<ProductCardEvents>;
 
-  declare product: ProductSummary;
-  declare quantity: number;
-  declare featured: boolean;
-  private declare accepted: boolean;
+  @property({
+    type: Object,
+    attribute: false,
+    required: true,
+    validate: (value: ProductSummary) => value.id.length > 0 || 'A product id is required.',
+  })
+  product!: ProductSummary;
+
+  @property({
+    type: Number,
+    default: 1,
+    reflect: true,
+    validate: (value: number) => Number.isInteger(value) && value > 0
+      || 'Quantity must be a positive integer.',
+  })
+  quantity!: number;
+
+  @property({ type: Boolean })
+  featured!: boolean;
+
+  @state({ default: false })
+  private accepted!: boolean;
 
   private addToBag(): void {
     this.accepted = this.emit('add-to-bag', {
@@ -76,8 +69,6 @@ export class ProductCard extends GluonElement<ProductCardEvents> {
   }
 }
 
-defineElement('product-card', ProductCard);
-
 const inventory = new Set(['orbit-lamp']);
 
 function onAddToBag(nativeEvent: Event): void {
@@ -87,11 +78,11 @@ function onAddToBag(nativeEvent: Event): void {
 
 const product = { id: 'orbit-lamp', name: 'Orbit Lamp' } satisfies ProductSummary;
 
-export const card = html`
-  <product-card
+export const decoratedCard = html`
+  <product-card-decorated
     .product=${product}
     .quantity=${2}
     featured
     @add-to-bag=${event(onAddToBag, { once: true })}
-  ></product-card>
+  ></product-card-decorated>
 `;

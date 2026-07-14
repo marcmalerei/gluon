@@ -1,11 +1,12 @@
 import { resolve } from 'node:path';
 import vue from '@vitejs/plugin-vue';
+import gluon from '@gluonjs/vite';
 import { defineConfig } from 'vite';
 
 const repositoryRoot = resolve(import.meta.dirname, '../..');
 
 export default defineConfig({
-  plugins: [vue({
+  plugins: [gluon(), vue({
     template: {
       compilerOptions: {
         isCustomElement: (tag) => tag === 'gluon-product-configurator',
@@ -16,6 +17,7 @@ export default defineConfig({
   base: '/gluon/1.0.6/examples/',
   resolve: {
     alias: {
+      '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
       '@gluonjs/quarks': resolve(repositoryRoot, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),

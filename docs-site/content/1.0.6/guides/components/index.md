@@ -35,9 +35,11 @@ definition needs structured generic types that a constructor cannot infer.
 
 ## Declare properties
 
-A `GluonElement` subclass lists inputs in its static `properties` field and
-declares the matching TypeScript instance fields. Gluon installs the runtime
-accessors; the `declare` fields tell TypeScript what consumers can assign.
+A `GluonElement` subclass can declare an input with `@property()` directly on
+the field, or list it in the static `properties` object and add a matching
+TypeScript `declare` field. Both forms create the same Gluon property contract.
+Use one form consistently within a class. Decorators reduce duplication;
+`static properties` remains useful when a project does not compile decorators.
 
 | Declaration key | What it does | Default |
 | --- | --- | --- |
@@ -64,6 +66,44 @@ would cross the HTML string boundary instead.
 A reflected value must have a stable text representation and be useful to CSS,
 HTML inspection, or another platform consumer. Do not reflect application-owned
 objects merely to duplicate them in markup.
+
+### Decorator equivalents
+
+Import decorators from the explicit public subpath:
+
+```ts
+import { customElement, property, state } from '@gluonjs/core/decorators';
+```
+
+| Decorator | Use it for | Equivalent without decorators |
+| --- | --- | --- |
+| `@customElement('product-card')` | Register a `GluonElement` subclass under a Custom Element tag. | `defineElement('product-card', ProductCard)` after the class. |
+| `@property(options)` | Declare a public reactive field or `accessor`. It accepts the same options listed above. | An entry in `static properties` plus a matching `declare` field. |
+| `@state(options)` | Declare private component-owned reactive state. It never reads an attribute and never reflects one. | A `static properties` entry with `attribute: false` and `reflect: false`, plus a private field. |
+
+Prefer a normal class field such as `@property() label!: string` when Gluon
+should own the accessor. An auto-accessor such as
+`@property() accessor label = 'Ready'` is also supported. Use a `default`
+factory for mutable values; a field initializer is evaluated once for each
+element, while `default: () => value` follows the same explicit contract in
+both authoring forms.
+
+Standard TypeScript decorators are recommended. Do not enable
+`experimentalDecorators`; keep `useDefineForClassFields` enabled. The official
+Vite plugin performs the required browser transform:
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import gluon from '@gluonjs/vite';
+
+export default defineConfig({ plugins: [gluon()] });
+```
+
+An existing legacy-decorator project can use
+`gluon({ decorators: 'legacy' })`, `experimentalDecorators: true`, and
+`useDefineForClassFields: false`. Do not mix standard and legacy decorator
+semantics in one build.
 
 ## Declare and emit events
 
@@ -93,11 +133,24 @@ when their owner is replaced, suspended, or unmounted. For an imperative
 `addEventListener`, retain the callback and remove it during connection cleanup,
 or supply an `AbortSignal` owned by that connection.
 
+There is intentionally no event decorator. Event names and payloads form one
+component-wide public contract, so keep the generic `GluonElement<Events>`, the
+static `events` declaration, and `emit()` together. The `@event-name` syntax is
+a template listener binding; it is not a TypeScript decorator.
+
 ## Complete compiled example
 
-This example combines a structured property, primitive attributes, reflection,
+These two compiled examples implement the same public component boundary. The
+first uses decorators; the second uses plain TypeScript with static declaration
+objects. Both combine a structured property, primitive attributes, reflection,
 validation, a typed cancelable event, a template listener, and native listener
 options.
+
+### Decorator form
+
+<<< ../../../../examples/component-authoring-decorators.ts
+
+### Plain TypeScript form
 
 <<< ../../../../examples/component-authoring.ts
 

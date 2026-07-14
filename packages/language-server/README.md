@@ -14,6 +14,9 @@ events, and named light-DOM slots, ARIA names, invalid binding positions, void-e
 inline style elements. `defineElement()` declarations expose tag definitions,
 static `properties`, `events`, and `slots` metadata to completion, hover,
 definition, and workspace rename operations.
+Literal `@customElement()` declarations expose the same tag definition;
+`@property()` fields join the public property list while `@state()` remains
+internal. Aliased decorator imports are recognized.
 Literal `defineGluonElement()` definitions expose the same inferred tag,
 property, event, and slot contract and share the compiler's tag/setup ownership
 diagnostics.

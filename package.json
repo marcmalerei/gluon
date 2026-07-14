@@ -27,6 +27,10 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./decorators": {
+      "types": "./dist/types/decorators.d.ts",
+      "import": "./dist/decorators.js"
+    },
     "./styles": {
       "types": "./dist/types/styles/index.d.ts",
       "import": "./dist/styles.js"
@@ -76,8 +80,9 @@
     "dev:playground": "vite --config examples/playground/vite.config.ts",
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
-    "typecheck": "npm run typecheck:core && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
+    "typecheck": "npm run typecheck:core && npm run typecheck:decorators-legacy && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
+    "typecheck:decorators-legacy": "tsc -p tests-node/tsconfig.decorators-legacy.json",
     "typecheck:ui": "npm run typecheck --workspace @gluonjs/quarks && npm run typecheck --workspace @gluonjs/atoms && npm run typecheck --workspace @gluonjs/molecules && npm run typecheck --workspace @gluonjs/organisms",
     "typecheck:reactivity": "npm run typecheck --workspace @gluonjs/reactivity",
     "typecheck:router": "npm run typecheck --workspace @gluonjs/router",

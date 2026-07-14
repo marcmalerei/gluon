@@ -9,6 +9,14 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Added opt-in standard and legacy TypeScript authoring decorators through
+  `@gluonjs/core/decorators`: `@customElement()`, `@property()`, and `@state()`.
+  The official Vite plugin transpiles them, preserves compatible Custom Element
+  HMR, and the Language Server discovers decorated public contracts.
+- Documented every decorator beside its plain TypeScript equivalent and moved
+  the GLUON GOODS product configurator to the public decorator entry point.
+  Its measured production entry is 186,096 bytes (53,998 gzip), within the
+  updated 188,000-byte and 55,000-byte versioned shop budgets.
 - Expanded the component authoring and generated API documentation with
   junior-oriented property, event, lifecycle, and public-class guidance.
 - Replaced the shared package README hero with 17 generated header images that

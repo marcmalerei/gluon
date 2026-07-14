@@ -102,6 +102,30 @@ describe('Gluon template analysis', () => {
     expect(slotDiagnostic && textForRange(source, slotDiagnostic.range)).toBe('shipping');
   });
 
+  test('derives public properties from aliased decorators and keeps state internal', () => {
+    const source = `
+      import { GluonElement, html } from '@gluonjs/core';
+      import { customElement as element, property as prop, state } from '@gluonjs/core/decorators';
+      @element('decorated-status')
+      class DecoratedStatus extends GluonElement {
+        static events = { save: null };
+        static slots = { default: null };
+        @prop({ reflect: true }) status = 'ready';
+        @state() private renders = 0;
+        render() { return html\`<slot></slot><p>\${this.status}</p>\`; }
+      }
+      html\`<decorated-status .status=\${'saved'} .renders=\${1} @save=\${() => {}}></decorated-status>\`;
+    `;
+    const result = analyzeGluonDocument('file:///decorated-status.ts', source);
+    expect(result.declarations[0]).toMatchObject({
+      tagName: 'decorated-status',
+      props: ['status'],
+      events: ['save'],
+      slots: ['default'],
+    });
+    expect(result.diagnostics.map((entry) => entry.code)).toEqual(['GLUON_TEMPLATE_PROP_UNKNOWN']);
+  });
+
   test('accepts public Custom Elements Manifest metadata', () => {
     const declarations = declarationsFromCustomElementsManifest('file:///custom-elements.json', {
       modules: [{ declarations: [{

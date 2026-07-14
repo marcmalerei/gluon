@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Added declaration discovery for aliased `@customElement()` and `@property()`
+  decorators while keeping `@state()` internal.
 - Integrated the exact package name into dedicated generated README artwork.
 
 ## [1.0.6] - 2026-07-13

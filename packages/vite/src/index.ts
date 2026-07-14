@@ -1,12 +1,18 @@
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { transformGluonModule } from '@gluonjs/compiler';
+import {
+  transformGluonModule,
+  transpileGluonDecorators,
+  type GluonDecoratorMode,
+} from '@gluonjs/compiler';
 import { normalizePath, type Plugin, type ResolvedConfig } from 'vite';
 
 const publicVirtualId = 'virtual:gluon-hmr';
 const resolvedVirtualId = `\0${publicVirtualId}`;
 
 export interface GluonVitePluginOptions {
+  /** TypeScript decorator semantics. Standard decorators are the default. */
+  readonly decorators?: GluonDecoratorMode;
   readonly diagnostics?: boolean;
   readonly include?: RegExp | ((id: string) => boolean);
   readonly universal?: boolean | { readonly manifestFile?: string };
@@ -36,7 +42,7 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
     load(id) {
       if (id !== resolvedVirtualId) return null;
       const client = normalizePath(existsSync(sourceClient) ? sourceClient : builtClient);
-      return `export { accept, component, element, functionalElement, store, style } from ${JSON.stringify(client)};`;
+      return `export { accept, component, element, elementDecorator, functionalElement, store, style } from ${JSON.stringify(client)};`;
     },
     transform(code, id) {
       const cleanId = normalizePath(id.split('?', 1)[0]!);
@@ -53,6 +59,10 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
             pos: diagnostic.location.offset,
           });
         }
+      }
+      if (result.decorators) {
+        const transpiled = transpileGluonDecorators(result.code, cleanId, options.decorators);
+        return { code: transpiled.code, map: transpiled.map ?? result.map };
       }
       if (!result.hmr && result.templates.length === 0) return null;
       return { code: result.code, map: result.map };

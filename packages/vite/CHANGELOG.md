@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Added standard TypeScript decorator transpilation by default, opt-in legacy
+  semantics, and compatible `@customElement()` HMR.
 - Integrated the exact package name into dedicated generated README artwork.
 
 ## [1.0.6] - 2026-07-13

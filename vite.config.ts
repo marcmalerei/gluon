@@ -2,15 +2,24 @@ import { resolve } from 'node:path';
 import { playwright } from '@vitest/browser-playwright';
 import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vitest/config';
+import { transpileGluonDecorators } from './packages/compiler/src/index.js';
 import { browserTarget } from './vitest.browser-target.js';
 
 const entry = {
+  decorators: resolve(import.meta.dirname, 'src/decorators.ts'),
   index: resolve(import.meta.dirname, 'src/index.ts'),
   styles: resolve(import.meta.dirname, 'src/styles/index.ts'),
 };
 
 export default defineConfig({
-  plugins: [vue({
+  plugins: [{
+    name: 'gluon-decorator-tests',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!/from\s+['"][^'"]*\/decorators(?:\.js)?['"]/.test(code)) return null;
+      return transpileGluonDecorators(code, id);
+    },
+  }, vue({
     template: {
       compilerOptions: {
         isCustomElement: (tag) => tag === 'gluon-product-configurator',
@@ -28,6 +37,7 @@ export default defineConfig({
   resolve: {
     conditions: ['browser'],
     alias: {
+      '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/quarks': resolve(import.meta.dirname, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(import.meta.dirname, 'packages/atoms/src/index.ts'),

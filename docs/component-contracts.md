@@ -55,6 +55,31 @@ class GluonCounter extends GluonElement {
 }
 ```
 
+The opt-in `@gluonjs/core/decorators` entry point declares the same runtime
+contract directly on fields:
+
+```ts
+import { customElement, property, state } from '@gluonjs/core/decorators';
+
+@customElement('gluon-counter')
+class DecoratedGluonCounter extends GluonElement {
+  @property({ type: Number, required: true, reflect: true,
+    validate: (value: number) => value >= 0 || 'count must be non-negative' })
+  count!: number;
+
+  @property({ type: String, default: 'Count' })
+  label!: string;
+
+  @state({ default: false })
+  private editing!: boolean;
+}
+```
+
+`@customElement()` is equivalent to `defineElement()` after the class.
+`@property()` accepts `PropertyDefinition`; `@state()` is the equivalent of a
+property declaration with `attribute: false` and `reflect: false`. Event and
+slot declarations remain static component-wide contracts.
+
 Defaults, converters, attribute aliases, reflection, `hasChanged`, upgrade
 precedence, and disconnected writes retain the behavior defined by the
 [reactive element contract](reactive-elements.md). `required` checks whether a

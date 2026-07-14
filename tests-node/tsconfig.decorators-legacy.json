@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "noEmit": true,
+    "types": []
+  },
+  "include": ["decorators-legacy.types.ts"]
+}

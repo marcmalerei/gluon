@@ -52,6 +52,7 @@ export interface GluonTransformResult {
   readonly diagnostics: readonly GluonCompilerDiagnostic[];
   readonly templates: readonly GluonTemplateLocation[];
   readonly hmr: boolean;
+  readonly decorators: boolean;
 }
 
 export interface GluonSourceMap {
@@ -63,7 +64,14 @@ export interface GluonSourceMap {
   version: number;
 }
 
-type TransformKind = 'component' | 'element' | 'functional-element' | 'store' | 'style';
+export type GluonDecoratorMode = 'standard' | 'legacy';
+
+export interface GluonTranspileResult {
+  readonly code: string;
+  readonly map: GluonSourceMap | undefined;
+}
+
+type TransformKind = 'component' | 'element' | 'element-decorator' | 'functional-element' | 'store' | 'style';
 
 const coreTransforms = new Map<string, TransformKind>([
   ['css', 'style'],
@@ -88,6 +96,8 @@ export function transformGluonModule(
     scriptKindFor(id),
   );
   const transforms = collectImportedTransforms(sourceFile);
+  const decorators = [...transforms.values()].includes('element-decorator')
+    || hasGluonDecoratorImport(sourceFile);
   const htmlTags = collectImportedNames(sourceFile, '@gluonjs/core', 'html');
   const composeTags = collectImportedNames(sourceFile, '@gluonjs/core', 'compose');
   const magic = new MagicString(code);
@@ -98,6 +108,24 @@ export function transformGluonModule(
   let changed = false;
 
   const visit = (node: ts.Node): void => {
+    if (development && (ts.isClassDeclaration(node) || ts.isClassExpression(node))) {
+      for (const decorator of ts.canHaveDecorators(node) ? ts.getDecorators(node) ?? [] : []) {
+        const expression = decorator.expression;
+        if (!ts.isCallExpression(expression) || !ts.isIdentifier(expression.expression)
+          || transforms.get(expression.expression.text) !== 'element-decorator') continue;
+        const key = `element:${transformSequence++}`;
+        const initializerSignature = classInitializerSignature(sourceFile, node);
+        const argumentsStart = expression.arguments.pos;
+        magic.overwrite(expression.expression.getStart(sourceFile), expression.expression.end, '__gluonHmrElementDecorator');
+        magic.prependLeft(argumentsStart, `${expression.expression.text}, `);
+        magic.appendLeft(
+          expression.end - 1,
+          `, import.meta.url, ${JSON.stringify(key)}, ${JSON.stringify(initializerSignature)}, import.meta.hot`,
+        );
+        changed = true;
+      }
+    }
+
     if (ts.isTaggedTemplateExpression(node)) {
       const identifierTag = ts.isIdentifier(node.tag) ? node.tag : undefined;
       const compositionTag = ts.isCallExpression(node.tag)
@@ -199,7 +227,7 @@ export function transformGluonModule(
   visit(sourceFile);
 
   if (changed) {
-    magic.prepend('import { accept as __gluonHmrAccept, component as __gluonHmrComponent, element as __gluonHmrElement, functionalElement as __gluonHmrFunctionalElement, store as __gluonHmrStore, style as __gluonHmrStyle } from "virtual:gluon-hmr";\n');
+    magic.prepend('import { accept as __gluonHmrAccept, component as __gluonHmrComponent, element as __gluonHmrElement, elementDecorator as __gluonHmrElementDecorator, functionalElement as __gluonHmrFunctionalElement, store as __gluonHmrStore, style as __gluonHmrStyle } from "virtual:gluon-hmr";\n');
     if (exportStatements.length > 0) magic.append(`\n${exportStatements.join('\n')}\n`);
     magic.append('\nif (import.meta.hot) import.meta.hot.accept(() => __gluonHmrAccept(import.meta.url));\n');
   }
@@ -216,6 +244,34 @@ export function transformGluonModule(
     diagnostics: Object.freeze(diagnostics),
     templates: Object.freeze(templates),
     hmr: changed,
+    decorators,
+  });
+}
+
+/** Transpiles standard or legacy TypeScript decorators for Gluon's Vite integration. */
+export function transpileGluonDecorators(
+  code: string,
+  id: string,
+  mode: GluonDecoratorMode = 'standard',
+): GluonTranspileResult {
+  const output = ts.transpileModule(code, {
+    fileName: id,
+    compilerOptions: {
+      experimentalDecorators: mode === 'legacy',
+      inlineSources: true,
+      jsx: ts.JsxEmit.Preserve,
+      module: ts.ModuleKind.ESNext,
+      sourceMap: true,
+      target: ts.ScriptTarget.ES2022,
+      useDefineForClassFields: mode === 'standard',
+    },
+  });
+  const sourceMap = output.sourceMapText
+    ? JSON.parse(output.sourceMapText) as GluonSourceMap
+    : undefined;
+  return Object.freeze({
+    code: output.outputText.replace(/\n?\/\/# sourceMappingURL=.*(?:\n|$)/, '\n'),
+    map: sourceMap,
   });
 }
 
@@ -333,6 +389,8 @@ function collectImportedTransforms(sourceFile: ts.SourceFile): Map<string, Trans
       const imported = entry.propertyName?.text ?? entry.name.text;
       const kind = source === '@gluonjs/core'
         ? coreTransforms.get(imported)
+        : source === '@gluonjs/core/decorators' && imported === 'customElement'
+          ? 'element-decorator'
         : source === '@gluonjs/store' && imported === 'defineStore'
           ? 'store'
           : undefined;
@@ -340,6 +398,12 @@ function collectImportedTransforms(sourceFile: ts.SourceFile): Map<string, Trans
     }
   }
   return transforms;
+}
+
+function hasGluonDecoratorImport(sourceFile: ts.SourceFile): boolean {
+  return sourceFile.statements.some((statement) => ts.isImportDeclaration(statement)
+    && ts.isStringLiteral(statement.moduleSpecifier)
+    && statement.moduleSpecifier.text === '@gluonjs/core/decorators');
 }
 
 function collectImportedNames(
@@ -416,6 +480,13 @@ function elementInitializerSignature(
     }
   }
   if (!declaration) return '';
+  return classInitializerSignature(sourceFile, declaration);
+}
+
+function classInitializerSignature(
+  sourceFile: ts.SourceFile,
+  declaration: ts.ClassLikeDeclaration,
+): string {
   return declaration.members
     .filter((member) => ts.isConstructorDeclaration(member)
       || (ts.isPropertyDeclaration(member) && !hasModifier(member, ts.SyntaxKind.StaticKeyword)))

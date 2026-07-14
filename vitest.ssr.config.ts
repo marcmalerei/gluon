@@ -1,9 +1,19 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
+import { transpileGluonDecorators } from './packages/compiler/src/index.js';
 
 export default defineConfig({
+  plugins: [{
+    name: 'gluon-decorator-tests',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!/from\s+['"][^'"]*\/decorators(?:\.js)?['"]/.test(code)) return null;
+      return transpileGluonDecorators(code, id);
+    },
+  }],
   resolve: {
     alias: {
+      '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),

@@ -350,8 +350,31 @@ function collectTemplates(source: ts.SourceFile): TemplateSpan[] {
 function collectDeclarations(uri: string, source: ts.SourceFile): CustomElementDeclaration[] {
   const declarations: CustomElementDeclaration[] = [];
   const classes = new Map<string, ts.ClassLikeDeclaration>();
+  const decoratorImports = collectNamedImports(source, '@gluonjs/core/decorators');
+  const customElementNames = importedAliases(decoratorImports, 'customElement');
+  const propertyNames = importedAliases(decoratorImports, 'property');
   source.forEachChild((node) => { if (ts.isClassDeclaration(node) && node.name) classes.set(node.name.text, node); });
   const visit = (node: ts.Node): void => {
+    if (ts.isClassDeclaration(node)) {
+      for (const decorator of ts.canHaveDecorators(node) ? ts.getDecorators(node) ?? [] : []) {
+        const expression = decorator.expression;
+        if (!ts.isCallExpression(expression) || !ts.isIdentifier(expression.expression)
+          || !customElementNames.has(expression.expression.text)) continue;
+        const tagArgument = expression.arguments[0];
+        if (!tagArgument || !ts.isStringLiteral(tagArgument)) continue;
+        declarations.push(Object.freeze({
+          tagName: tagArgument.text,
+          uri,
+          range: rangeAt(source, tagArgument.getStart(source) + 1, tagArgument.end - 1),
+          props: Object.freeze(uniqueKeys([
+            ...staticKeys(node, 'properties'),
+            ...decoratedPropertyKeys(node, propertyNames),
+          ])),
+          events: Object.freeze(staticKeys(node, 'events')),
+          slots: Object.freeze(staticKeys(node, 'slots')),
+        }));
+      }
+    }
     if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'defineElement') {
       const [tagArgument, classArgument] = node.arguments;
       if (tagArgument && ts.isStringLiteral(tagArgument) && classArgument) {
@@ -386,6 +409,45 @@ function collectDeclarations(uri: string, source: ts.SourceFile): CustomElementD
   };
   visit(source);
   return declarations;
+}
+
+function collectNamedImports(source: ts.SourceFile, moduleName: string): Map<string, string> {
+  const imports = new Map<string, string>();
+  for (const statement of source.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)
+      || statement.moduleSpecifier.text !== moduleName) continue;
+    const bindings = statement.importClause?.namedBindings;
+    if (!bindings || !ts.isNamedImports(bindings)) continue;
+    for (const entry of bindings.elements) {
+      imports.set(entry.name.text, entry.propertyName?.text ?? entry.name.text);
+    }
+  }
+  return imports;
+}
+
+function importedAliases(imports: ReadonlyMap<string, string>, importedName: string): Set<string> {
+  return new Set([...imports].flatMap(([local, imported]) => imported === importedName ? [local] : []));
+}
+
+function decoratedPropertyKeys(
+  declaration: ts.ClassLikeDeclaration,
+  propertyNames: ReadonlySet<string>,
+): string[] {
+  return declaration.members.flatMap((member) => {
+    if ((!ts.isPropertyDeclaration(member) && !ts.isGetAccessorDeclaration(member)
+      && !ts.isSetAccessorDeclaration(member)) || !member.name) return [];
+    const decorators = ts.canHaveDecorators(member) ? ts.getDecorators(member) ?? [] : [];
+    const isProperty = decorators.some((decorator) => {
+      const expression = decorator.expression;
+      return ts.isCallExpression(expression) && ts.isIdentifier(expression.expression)
+        && propertyNames.has(expression.expression.text);
+    });
+    return isProperty ? [member.name.getText().replace(/^['"]|['"]$/g, '')] : [];
+  });
+}
+
+function uniqueKeys(keys: readonly string[]): string[] {
+  return [...new Set(keys)];
 }
 
 function objectPropertyInitializer(

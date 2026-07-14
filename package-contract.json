@@ -33,7 +33,7 @@
       "directory": ".",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./styles"],
+      "exports": [".", "./decorators", "./styles"],
       "currentDependencies": [
         "@gluonjs/reactivity"
       ],
