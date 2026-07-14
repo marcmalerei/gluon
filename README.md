@@ -1,9 +1,7 @@
 <!-- gluon-package-header:start -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/core — native UI layers growing from a glowing core" width="100%">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers/core.png" alt="@gluonjs/core — Gluon package header" width="100%">
 </p>
-
-<h1 align="center">Gluon / <code>@gluonjs/core</code></h1>
 <!-- gluon-package-header:end -->
 
 <p align="center">

@@ -1,9 +1,7 @@
 <!-- gluon-package-header:start -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/language-server — native UI layers growing from a glowing core" width="100%">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers/language-server.png" alt="@gluonjs/language-server — Gluon package header" width="100%">
 </p>
-
-<h1 align="center">Gluon / <code>@gluonjs/language-server</code></h1>
 <!-- gluon-package-header:end -->
 
 The Gluon language server analyzes imported `html`, `svg`, `css`, and aliased

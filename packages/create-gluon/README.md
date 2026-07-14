@@ -1,9 +1,7 @@
 <!-- gluon-package-header:start -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon create-gluon — native UI layers growing from a glowing core" width="100%">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers/create-gluon.png" alt="create-gluon — Gluon package header" width="100%">
 </p>
-
-<h1 align="center">Gluon / <code>create-gluon</code></h1>
 <!-- gluon-package-header:end -->
 
 `create-gluon` scaffolds supported TypeScript applications that consume only

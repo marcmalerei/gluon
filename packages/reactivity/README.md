@@ -1,9 +1,7 @@
 <!-- gluon-package-header:start -->
 <p align="center">
-  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/gluon-hero.jpg" alt="Gluon @gluonjs/reactivity — native UI layers growing from a glowing core" width="100%">
+  <img src="https://raw.githubusercontent.com/marcmalerei/gluon/main/docs/assets/package-headers/reactivity.png" alt="@gluonjs/reactivity — Gluon package header" width="100%">
 </p>
-
-<h1 align="center">Gluon / <code>@gluonjs/reactivity</code></h1>
 <!-- gluon-package-header:end -->
 
 DOM-free reactive state primitives for Gluon. The package is part of the

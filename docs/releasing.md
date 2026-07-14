@@ -26,12 +26,13 @@ tested commit and successful workflow run. Released-state validation instead
 proves that the immutable tag is an ancestor of the current branch and that its
 recorded release-cut changes contain only the two reviewed evidence files.
 
-Every current package README starts with the shared Gluon hero and its exact
-package name. The image uses the absolute `raw.githubusercontent.com` URL for
-`docs/assets/gluon-hero.jpg`, because npm archives contain the README but do not
-ship the repository `docs/` tree. `npm run check:packages` derives the README set
-from `package-contract.json` and rejects missing, duplicated, stale, or wrongly
-named package headers.
+Every current package README starts with its own generated Gluon hero under
+`docs/assets/package-headers/`. The exact package name is part of the raster
+artwork rather than a separate HTML heading. Each README uses an absolute
+`raw.githubusercontent.com` URL because npm archives contain the README but do
+not ship the repository `docs/` tree. `npm run check:packages` derives the asset
+name from `package-contract.json` and rejects missing, duplicated, stale,
+wrongly sized, or wrongly referenced package headers.
 
 The immutable `v1.0.0` tag points to commit
 `8f52b4b98fe9e9f5182973cbf5a0655c879df7ea`. Its Release run

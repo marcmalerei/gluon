@@ -11,8 +11,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 - Expanded the component authoring and generated API documentation with
   junior-oriented property, event, lifecycle, and public-class guidance.
-- Standardized every official package README with the shared Gluon hero and
-  its exact package name.
+- Replaced the shared package README hero with 17 generated header images that
+  integrate each exact package name directly into the artwork.
 - Added an explicit released contract state so post-release repository checks
   produce non-publishable development artifacts without weakening strict
   immutable candidate validation.
