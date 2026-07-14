@@ -40,6 +40,10 @@ symbol coverage fail `npm run docs:api`.
 migration material, examples, and release archive. `validate-docs.mjs` verifies
 the version tree, public API entry-point count, one rendered example per public
 symbol page, required curated content, compiled examples, and internal links.
+The maintained component guide is the beginner entry point for properties,
+attributes, events, lifecycle ownership, and the complete public class map.
+TypeDoc excludes externally inherited DOM members so an API page keeps its
+Gluon-owned contract in view while still naming its platform base type.
 
 The reviewed catalog covers Core rendering and application ownership,
 reactivity, Router, Store, SSR/hydration/streaming/static generation, layered UI,

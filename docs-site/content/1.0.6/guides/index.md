@@ -6,6 +6,7 @@ contracts exercised by GLUON GOODS.
 ## Start
 
 - [Getting started](getting-started/): install, author, check, and build a browser application.
+- [Components: properties, events, and lifecycle](components/): choose an authoring model and build typed component boundaries.
 - [Application architecture](application/): application ownership, Router, Store, and cleanup.
 - [Universal rendering](universal-rendering/): SSR, hydration, streaming, and SSG boundaries.
 - [Tooling workflow](tooling/): Vite, diagnostics, Devtools, testing, and Playground.

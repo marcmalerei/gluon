@@ -76,9 +76,13 @@ export interface ComponentErrorInfo {
 export type ComponentErrorBoundary = (info: ComponentErrorInfo) => boolean | void;
 
 export interface EventDeclaration<Detail = unknown> {
+  /** Whether the event travels through ancestor elements. Defaults to `true`. */
   readonly bubbles?: boolean;
+  /** Whether the event crosses a Shadow DOM boundary. Defaults to `true`. */
   readonly composed?: boolean;
+  /** Whether a listener can cancel the event with `preventDefault()`. Defaults to `false`. */
   readonly cancelable?: boolean;
+  /** Returns `true` for valid detail or a diagnostic message for invalid detail. */
   readonly validate?: (detail: Detail) => boolean | string;
 }
 
@@ -91,7 +95,9 @@ export type ComponentEventMap<Events extends object> = {
 };
 
 export interface SlotDeclaration {
+  /** Reports a diagnostic after the first render when no matching content was provided. */
   readonly required?: boolean;
+  /** Records that the component renders fallback content for this slot. */
   readonly fallback?: boolean;
 }
 
@@ -120,18 +126,28 @@ export type PropertyType =
   | ArrayConstructor;
 
 export interface PropertyConverter<Value = unknown> {
+  /** Converts an attribute string into the JavaScript property value. */
   fromAttribute?(value: string | null, type?: PropertyType): Value;
+  /** Converts a reflected JavaScript property value into an attribute string. */
   toAttribute?(value: Value, type?: PropertyType): string | null;
 }
 
 export interface PropertyDeclaration<Value = unknown> {
+  /** Selects the built-in String, Number, Boolean, Object, or Array attribute converter. */
   readonly type?: PropertyType;
+  /** Changes the attribute name, or disables attribute transport with `false`. */
   readonly attribute?: string | false;
+  /** Mirrors accepted property writes back to the matching attribute. Defaults to `false`. */
   readonly reflect?: boolean;
+  /** Supplies the initial value; use a factory for per-instance objects and arrays. */
   readonly default?: Value | (() => Value);
+  /** Replaces one or both built-in attribute conversion directions. */
   readonly converter?: PropertyConverter<Value>;
+  /** Decides whether a write schedules an update. The default is `!Object.is(value, oldValue)`. */
   readonly hasChanged?: (value: Value, oldValue: Value | undefined) => boolean;
+  /** Reports a diagnostic on connection when no value or default was provided. */
   readonly required?: boolean;
+  /** Returns `true` for a valid value or a diagnostic message for an invalid value. */
   readonly validate?: (value: Value) => boolean | string;
 }
 
@@ -183,14 +199,33 @@ const elementRenderDebugStates = compiledDevelopment === false
   ? undefined
   : new WeakMap<GluonElement<any>, ElementRenderDebugState>();
 
+/**
+ * Base class for a stateful Gluon Custom Element with a Shadow DOM render root.
+ *
+ * Subclasses declare their input properties, output events, slots, and adopted
+ * styles with static fields. Implement the protected `render()` method for the
+ * component template, register connection-owned work with the lifecycle hooks, and call
+ * {@link emit} for typed native `CustomEvent` output. Register the class once
+ * with {@link defineElement}.
+ *
+ * Prefer `defineGluonElement()` when a component does not need inheritance or
+ * protected lifecycle/render hooks.
+ *
+ * @typeParam Events Map from emitted event names to their `CustomEvent.detail` types.
+ */
 export abstract class GluonElement<
   Events extends object = Record<string, unknown>,
 > extends HTMLElementBase {
+  /** Declares reactive inputs and their attribute conversion, reflection, and validation rules. */
   static readonly properties: Readonly<Record<string, PropertyDefinition<any>>> = {};
+  /** Declares native output events and their propagation, cancellation, and validation rules. */
   static readonly events: Readonly<Record<string, EventDeclaration<any>>> = {};
+  /** Declares required named/default slots and whether the template supplies fallback content. */
   static readonly slots: SlotDeclarations = {};
+  /** Lists constructable stylesheets adopted into each instance's render root. */
   static readonly styles: CSSStyleSheet | readonly CSSStyleSheet[] = [];
 
+  /** Shadow root rendered by {@link update}; override {@link createRenderRoot} to customize it. */
   protected readonly renderRoot: ShadowRoot;
   private readonly [propertyValues] = new Map<string, unknown>();
   private readonly providedProperties = new Set<string>();
@@ -209,9 +244,11 @@ export abstract class GluonElement<
   private readonly updatedHooks: ComponentLifecycleCallback[] = [];
   private readonly disconnectedHooks: ComponentLifecycleCallback[] = [];
   private readonly errorBoundaries: ComponentErrorBoundary[] = [];
+  /** @internal */
   [publicInstance]?: Readonly<object>;
   private updatePromise: Promise<void> = Promise.resolve();
 
+  /** Creates the render root, finalizes declarations, captures pre-upgrade values, and applies defaults. */
   constructor() {
     super();
     elementUpdateSequence += 1;
@@ -224,6 +261,7 @@ export abstract class GluonElement<
     this.applyPropertyDefaults(constructor);
   }
 
+  /** Attribute names derived from {@link properties}; managed by Gluon for the Custom Elements platform. */
   static get observedAttributes(): string[] {
     const attributes: string[] = [];
     for (const [name, definition] of Object.entries(getDeclarations(
@@ -235,6 +273,7 @@ export abstract class GluonElement<
     return attributes;
   }
 
+  /** Starts connection-owned reactivity and queues the first render. Prefer {@link onConnected} in subclasses. */
   connectedCallback(): void {
     if (this.connected) return;
     this.connected = true;
@@ -247,6 +286,7 @@ export abstract class GluonElement<
     void this.queueUpdate({ type: 'connection' });
   }
 
+  /** Stops connection-owned work and suspends rendering. Prefer {@link onDisconnected} in subclasses. */
   disconnectedCallback(): void {
     if (!this.connected) return;
     this.connected = false;
@@ -276,6 +316,7 @@ export abstract class GluonElement<
     }
   }
 
+  /** Converts a changed declared attribute and writes the corresponding property. */
   attributeChangedCallback(
     name: string,
     oldValue: string | null,
@@ -300,76 +341,92 @@ export abstract class GluonElement<
     }
   }
 
+  /** Resolves after the currently scheduled render and its update hooks finish. */
   get updateComplete(): Promise<void> {
     return this.updatePromise;
   }
 
+  /** Creates the component render root. Override only when the default open ShadowRoot is unsuitable. */
   protected createRenderRoot(): ShadowRoot {
     return this.shadowRoot ?? this.attachShadow({ mode: 'open' });
   }
 
+  /** Schedules a deduplicated render and returns the same completion promise exposed by {@link updateComplete}. */
   protected requestUpdate(): Promise<void> {
     return this.queueUpdate({ type: 'request' });
   }
 
-  /** Requests a render pass after the official Vite runtime patches compatible logic. */
+  /** Requests a render pass after the official Vite runtime patches compatible logic. Application code should use normal reactive or property updates. */
   requestHotUpdate(): Promise<void> {
     return this.requestUpdate();
   }
 
-  /** Returns the component template without running browser connection lifecycle. */
+  /** Returns the component template without browser connection lifecycle for official server rendering. */
   renderForServer(): TemplateResult {
     return this.render();
   }
 
-  /** Defers the first connection render while declarative shadow DOM is bound. */
+  /** Defers the first connection render while official hydration binds declarative Shadow DOM. */
   beginHydration(): void {
     this.hydrationPending = true;
   }
 
-  /** Resumes connection rendering after the hydrated root instance is installed. */
+  /** Resumes connection rendering after official hydration installs the hydrated root. */
   endHydration(): void {
     if (!this.hydrationPending) return;
     this.hydrationPending = false;
     void this.queueUpdate({ type: 'request' });
   }
 
+  /** Runs a callback once after the first render of each connection. */
   protected onConnected(callback: ComponentLifecycleCallback): void {
     this.connectedHooks.push(callback);
   }
 
+  /** Runs a callback before every update after the first render. */
   protected onBeforeUpdate(callback: ComponentLifecycleCallback): void {
     this.beforeUpdateHooks.push(callback);
   }
 
+  /** Runs a callback after every successful render, including the first render. */
   protected onUpdated(callback: ComponentLifecycleCallback): void {
     this.updatedHooks.push(callback);
   }
 
+  /** Runs a callback during disconnection after scoped reactive cleanup and render suspension. */
   protected onDisconnected(callback: ComponentLifecycleCallback): void {
     this.disconnectedHooks.push(callback);
   }
 
+  /** Captures descendant component errors; return `true` to stop propagation to outer boundaries. */
   protected onErrorCaptured(callback: ComponentErrorBoundary): void {
     this.errorBoundaries.push(callback);
   }
 
-  /** Initializes resources owned by the current connection effect scope. */
+  /** Initializes work once per connection inside the connection's reactive effect scope. */
   protected setupConnection(): void {}
 
   /** Releases connection-local references after scoped cleanup and disconnect hooks. */
   protected teardownConnection(): void {}
 
+  /** Publishes a frozen, deliberately small public object for use with `exposedRef()`. */
   protected expose<Public extends object>(value: Public): Readonly<Public> {
     const exposed = Object.freeze(value);
     this[publicInstance] = exposed;
     return exposed;
   }
 
+  /** Commits the value returned by {@link render} into {@link renderRoot}. */
   protected update(): void {
     render(this.render(), this.renderRoot);
   }
 
+  /**
+   * Dispatches a typed native `CustomEvent` using the matching static event declaration.
+   *
+   * Events bubble and cross the Shadow DOM boundary by default. The return value
+   * is `false` only when a cancelable event was canceled by a listener.
+   */
   protected emit<Name extends keyof Events & string>(
     type: Name,
     detail: Events[Name],
@@ -397,8 +454,10 @@ export abstract class GluonElement<
     }));
   }
 
+  /** Returns the template for the current component state. */
   protected abstract render(): TemplateResult;
 
+  /** @internal */
   [setProperty](
     name: string,
     value: unknown,

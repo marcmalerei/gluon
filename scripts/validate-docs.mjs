@@ -1,5 +1,5 @@
 import { access, readFile, readdir } from 'node:fs/promises';
-import { dirname, relative, resolve, sep } from 'node:path';
+import { basename, dirname, relative, resolve, sep } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const siteRoot = resolve(root, 'docs-site');
@@ -17,6 +17,7 @@ for (const version of versions.supported) {
     'index.html',
     'guides/index.html',
     'guides/getting-started/index.html',
+    'guides/components/index.html',
     'guides/quality/index.html',
     'api/index.html',
     'cookbook/index.html',
@@ -52,6 +53,87 @@ const apiSymbolFiles = (await filesWithExtension(resolve(root, '.tmp/docs-api'),
   .map((file) => slash(relative(resolve(root, '.tmp/docs-api'), file)))
   .filter((file) => apiSymbolPattern.test(`/${file}`))
   .sort();
+
+const componentGuide = await readFile(resolve(
+  siteRoot,
+  'content',
+  versions.latest,
+  'guides/components/index.md',
+), 'utf8');
+for (const required of [
+  'The four terms to know',
+  'Choose an authoring model',
+  'Declare properties',
+  'Declare and emit events',
+  'Complete compiled example',
+  'Lifecycle and ownership',
+  'Public class map',
+  'property binding',
+  'preventDefault()',
+  'updateComplete',
+]) if (!componentGuide.includes(required)) throw new Error(`component authoring guide is missing: ${required}`);
+
+const publicClassFiles = apiSymbolFiles.filter((file) => file.includes('/classes/'));
+for (const classFile of publicClassFiles) {
+  const className = basename(classFile, '.md');
+  if (!componentGuide.includes(`\`${className}\``)) {
+    throw new Error(`component authoring class map is missing public class ${className}`);
+  }
+}
+
+const componentExample = await readFile(resolve(siteRoot, 'examples/component-authoring.ts'), 'utf8');
+for (const required of [
+  'satisfies PropertyDeclarations<ProductCardProperties>',
+  'satisfies EventDeclarations<ProductCardEvents>',
+  'attribute: false',
+  'reflect: true',
+  "this.emit('add-to-bag'",
+  '.product=${product}',
+  '@add-to-bag=${event(onAddToBag, { once: true })}',
+  'addEvent.preventDefault()',
+]) if (!componentExample.includes(required)) throw new Error(`compiled component authoring example is missing: ${required}`);
+
+const gluonElementReference = await readFile(resolve(
+  root,
+  '.tmp/docs-api/src/classes/GluonElement.md',
+), 'utf8');
+for (const required of [
+  'Base class for a stateful Gluon Custom Element',
+  'Declares reactive inputs',
+  'Declares native output events',
+  'Resolves after the currently scheduled render',
+  'Dispatches a typed native `CustomEvent`',
+  'Runs a callback once after the first render',
+]) if (!gluonElementReference.includes(required)) throw new Error(`GluonElement reference is missing: ${required}`);
+for (const inheritedPlatformMember of ['### accessKey', '### ariaLabel', '### onclick']) {
+  if (gluonElementReference.includes(inheritedPlatformMember)) {
+    throw new Error(`GluonElement reference includes inherited platform member: ${inheritedPlatformMember}`);
+  }
+}
+
+const propertyDeclarationReference = await readFile(resolve(
+  root,
+  '.tmp/docs-api/src/interfaces/PropertyDeclaration.md',
+), 'utf8');
+for (const required of [
+  'built-in String, Number, Boolean, Object, or Array',
+  'disables attribute transport',
+  'accepted property writes back',
+  'per-instance objects and arrays',
+  'whether a write schedules an update',
+  'when no value or default was provided',
+]) if (!propertyDeclarationReference.includes(required)) throw new Error(`PropertyDeclaration reference is missing: ${required}`);
+
+const eventDeclarationReference = await readFile(resolve(
+  root,
+  '.tmp/docs-api/src/interfaces/EventDeclaration.md',
+), 'utf8');
+for (const required of [
+  'travels through ancestor elements',
+  'crosses a Shadow DOM boundary',
+  'cancel the event with `preventDefault()`',
+  'diagnostic message for invalid detail',
+]) if (!eventDeclarationReference.includes(required)) throw new Error(`EventDeclaration reference is missing: ${required}`);
 if (apiExampleManifest.symbolPages !== apiSymbolFiles.length
   || apiExampleManifest.entries.length !== apiSymbolFiles.length) {
   throw new Error(`API examples cover ${apiExampleManifest.entries.length} pages; generated API has ${apiSymbolFiles.length} symbol pages`);
