@@ -35,6 +35,7 @@ const artifactBuildScript = await readFile(resolve(root, 'scripts/build-release-
 const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-bootstrap-artifacts.mjs'), 'utf8');
 const bootstrapPublishScript = await readFile(resolve(root, 'scripts/publish-npm-bootstrap.mjs'), 'utf8');
 const hostingScript = await readFile(resolve(root, 'scripts/verify-release-hosting.mjs'), 'utf8');
+const recoveryScript = await readFile(resolve(root, 'scripts/validate-release-recovery.mjs'), 'utf8');
 const officialNames = new Set(packageContract.packages.map((entry) => entry.name));
 const releaseCutEvidenceSchema = await readJson('release/release-cut-evidence.schema.json');
 const compatibilityManifestSchema = await readJson('release/compatibility-manifest.schema.json');
@@ -94,6 +95,12 @@ if (privateValues.size !== 1 || ![true, false].includes([...privateValues][0])) 
   throw new Error('Every release-group manifest must use one explicit private boolean.');
 }
 const packagesPrivate = [...privateValues][0];
+
+if (packageContract.registry.publicationState === 'ready') {
+  const recoveryArguments = ['scripts/validate-release-recovery.mjs', '--version', currentVersion];
+  if (!candidateVersion) recoveryArguments.push('--allow-pending-evidence');
+  execFileSync(process.execPath, recoveryArguments, { cwd: root, stdio: jsonOutput ? 'ignore' : 'inherit' });
+}
 
 if (candidateVersion) await validateCandidate(candidateVersion);
 else validateDevelopmentState();
@@ -347,6 +354,7 @@ function validateDevelopmentState() {
 function validateReleasedState() {
   const version = releaseContract.targetVersion;
   const tag = `${releaseContract.tagPrefix}${version}`;
+  const recoveryPath = `release/recovery/${version}.json`;
   const evidencePath = releaseContract.releaseCutEvidencePath.replace('{version}', version);
   const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', version);
   if (packagesPrivate) throw new Error('Released packages must remain public in their manifests.');
@@ -371,26 +379,54 @@ function validateReleasedState() {
     throw new Error(`Released state requires immutable tag ${tag} to be an ancestor of HEAD.`);
   }
 
-  const evidence = readJsonAtRef(tag, evidencePath);
-  const compatibility = readJsonAtRef(tag, compatibilityPath);
-  validateJsonSchema(`${tag}:${evidencePath}`, evidence, validateReleaseCutEvidenceSchema);
-  validateJsonSchema(`${tag}:${compatibilityPath}`, compatibility, validateCompatibilityManifestSchema);
+  const recovery = readOptionalJsonAtRef('HEAD', recoveryPath);
+  let releaseRef = tag;
+  let releaseCommit = tagCommit;
+  if (recovery) {
+    if (recovery.releaseVersion !== version
+      || recovery.canonicalTag !== tag
+      || recovery.canonicalTagCommit !== tagCommit
+      || recovery.recoveryTag !== `${tag}-recovery.1`
+      || JSON.stringify(recovery.allowedCanonicalDeltaPaths) !== JSON.stringify(expectedRecoveryPaths(version))) {
+      throw new Error(`${recoveryPath} does not match the exact ${version} recovery boundary.`);
+    }
+    releaseRef = recovery.recoveryTag;
+    try {
+      releaseCommit = execFileSync('git', ['rev-list', '-n', '1', releaseRef], { cwd: root, encoding: 'utf8' }).trim();
+      execFileSync('git', ['merge-base', '--is-ancestor', releaseCommit, 'HEAD'], { cwd: root, stdio: 'ignore' });
+    } catch {
+      throw new Error(`Released recovery state requires immutable tag ${releaseRef} to be an ancestor of HEAD.`);
+    }
+    const recoveryDelta = execFileSync('git', ['diff', '--name-only', tag, releaseRef], {
+      cwd: root,
+      encoding: 'utf8',
+    }).trim().split('\n').filter(Boolean);
+    const allowedRecoveryPaths = new Set(expectedRecoveryPaths(version));
+    if (recoveryDelta.some((changed) => !allowedRecoveryPaths.has(changed))) {
+      throw new Error(`${releaseRef} changes package or application inputs outside the exact recovery allowlist.`);
+    }
+  }
+
+  const evidence = readJsonAtRef(releaseRef, evidencePath);
+  const compatibility = readJsonAtRef(releaseRef, compatibilityPath);
+  validateJsonSchema(`${releaseRef}:${evidencePath}`, evidence, validateReleaseCutEvidenceSchema);
+  validateJsonSchema(`${releaseRef}:${compatibilityPath}`, compatibility, validateCompatibilityManifestSchema);
   if (evidence.releaseVersion !== version || compatibility.releaseVersion !== version
     || compatibility.sourceCommit !== evidence.testedCommit) {
-    throw new Error(`${tag} release evidence does not consistently describe ${version}.`);
+    throw new Error(`${releaseRef} release evidence does not consistently describe ${version}.`);
   }
   try {
-    execFileSync('git', ['merge-base', '--is-ancestor', evidence.testedCommit, tagCommit], { cwd: root, stdio: 'ignore' });
+    execFileSync('git', ['merge-base', '--is-ancestor', evidence.testedCommit, releaseCommit], { cwd: root, stdio: 'ignore' });
   } catch {
-    throw new Error(`${tag} does not descend from its recorded tested commit.`);
+    throw new Error(`${releaseRef} does not descend from its recorded tested commit.`);
   }
   const permittedEvidenceChanges = new Set([evidencePath, compatibilityPath]);
-  const releaseCutChanges = execFileSync('git', ['diff', '--name-only', evidence.testedCommit, tagCommit], {
+  const releaseCutChanges = execFileSync('git', ['diff', '--name-only', evidence.testedCommit, releaseCommit], {
     cwd: root,
     encoding: 'utf8',
   }).trim().split('\n').filter(Boolean);
   if (releaseCutChanges.some((changed) => !permittedEvidenceChanges.has(changed))) {
-    throw new Error(`${tag} changed files other than its two reviewed evidence files after testing.`);
+    throw new Error(`${releaseRef} changed files other than its two reviewed evidence files after testing.`);
   }
 }
 
@@ -529,6 +565,8 @@ function validateWorkflow() {
     'gh release create',
     '--draft',
     'gh release edit',
+    'RELEASE_TAG',
+    'validate-release-recovery.mjs',
   ]) if (!workflow.includes(required)) throw new Error(`Release workflow is missing ${required}.`);
   if (workflow.includes('inputs.phase') || /^  finalize:/m.test(workflow)) {
     throw new Error('Release workflow must publish, verify, and finalize the release in one trusted-publishing job.');
@@ -540,6 +578,14 @@ function validateWorkflow() {
   const publishJob = workflow.match(/\n  publish:\n([\s\S]*?)\n  reproducibility:\n/)?.[1];
   if (!publishJob || /registry-url:/.test(publishJob)) {
     throw new Error('Release publish must not ask setup-node to create token-backed registry authentication.');
+  }
+  if (!publishScript.includes('recovery?.recoveryTag')
+    || !publishScript.includes('validate-release-recovery.mjs')
+    || !hostingScript.includes('validate-release-recovery.mjs')) {
+    throw new Error('Release publication must validate the exact one-time recovery boundary before protected publication.');
+  }
+  for (const required of ['canonicalTagCommit', 'canonicalTagTree', 'failedEvidenceCommit', 'allowedCanonicalDeltaPaths']) {
+    if (!recoveryScript.includes(required)) throw new Error(`Release recovery verifier is missing ${required}.`);
   }
   if (!/- run: node scripts\/verify-release-hosting\.mjs\n\s+env:\n\s+GH_TOKEN: \$\{\{ github\.token \}\}/.test(publishJob)) {
     throw new Error('Release publish must expose the ephemeral GitHub token to hosting verification.');
@@ -650,4 +696,28 @@ function readJsonAtRef(ref, path) {
   } catch {
     throw new Error(`${ref} must contain valid ${path}.`);
   }
+}
+
+function readOptionalJsonAtRef(ref, path) {
+  try {
+    return JSON.parse(execFileSync('git', ['show', `${ref}:${path}`], { cwd: root, encoding: 'utf8' }));
+  } catch {
+    return null;
+  }
+}
+
+function expectedRecoveryPaths(version) {
+  return [
+    '.github/workflows/release.yml',
+    `docs-site/content/${version}/guides/releasing/index.md`,
+    'docs/releasing.md',
+    `release/compatibility/${version}.json`,
+    `release/evidence/${version}.json`,
+    'release/recovery-manifest.schema.json',
+    `release/recovery/${version}.json`,
+    'scripts/publish-release.mjs',
+    'scripts/validate-release-contract.mjs',
+    'scripts/validate-release-recovery.mjs',
+    'scripts/verify-release-hosting.mjs',
+  ];
 }

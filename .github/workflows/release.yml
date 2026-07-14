@@ -36,10 +36,20 @@ jobs:
           DISPATCH_VERSION: ${{ inputs.version }}
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+            package_version="$(node -p "require('./package.json').version")"
+            recovery_path="release/recovery/${package_version}.json"
+            if [[ -f "$recovery_path" ]] && [[ "$GITHUB_REF_NAME" == "$(node -p "require('./${recovery_path}').recoveryTag")" ]]; then
+              echo "RELEASE_VERSION=$package_version" >> "$GITHUB_ENV"
+              echo "RELEASE_TAG=$(node -p "require('./${recovery_path}').canonicalTag")" >> "$GITHUB_ENV"
+            else
+              echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+              echo "RELEASE_TAG=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+            fi
           else
             echo "RELEASE_VERSION=$DISPATCH_VERSION" >> "$GITHUB_ENV"
+            echo "RELEASE_TAG=v$DISPATCH_VERSION" >> "$GITHUB_ENV"
           fi
+      - run: node scripts/validate-release-recovery.mjs --version "$RELEASE_VERSION" --allow-pending-evidence
       - run: npm run check
       - run: npm run release:validate -- --candidate "$RELEASE_VERSION"
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION"
@@ -75,7 +85,16 @@ jobs:
       - run: npm install --global npm@11.18.0
       - run: npm ci --ignore-scripts
       - name: Resolve release version
-        run: echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+        run: |
+          package_version="$(node -p "require('./package.json').version")"
+          recovery_path="release/recovery/${package_version}.json"
+          if [[ -f "$recovery_path" ]] && [[ "$GITHUB_REF_NAME" == "$(node -p "require('./${recovery_path}').recoveryTag")" ]]; then
+            echo "RELEASE_VERSION=$package_version" >> "$GITHUB_ENV"
+            echo "RELEASE_TAG=$(node -p "require('./${recovery_path}').canonicalTag")" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+            echo "RELEASE_TAG=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+          fi
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: gluon-${{ github.sha }}-candidate
@@ -111,10 +130,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           assets=(.tmp/release/packages/*.tgz .tmp/release/sbom/*.json .tmp/release/performance/* .tmp/release/release-evidence.json .tmp/release/release-cut-evidence.json .tmp/release/compatibility-manifest.json .tmp/release/reproducibility.json .tmp/release/SHA256SUMS .tmp/release/CHANGELOG.md .tmp/release/RELEASE_NOTES.md)
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" --clobber
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
           else
-            gh release create "$GITHUB_REF_NAME" "${assets[@]}" --verify-tag --draft --title "Gluon $GITHUB_REF_NAME" --notes-file .tmp/release/RELEASE_NOTES.md
+            gh release create "$RELEASE_TAG" "${assets[@]}" --verify-tag --draft --title "Gluon $RELEASE_TAG" --notes-file .tmp/release/RELEASE_NOTES.md
           fi
       - name: Publish reviewed archives directly to latest through trusted publishing
         run: npm run release:publish -- --version "$RELEASE_VERSION"
@@ -131,8 +150,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "$GITHUB_REF_NAME" .tmp/release/registry-verification.json .tmp/release/SHA256SUMS --clobber
-          gh release edit "$GITHUB_REF_NAME" --draft=false --latest
+          gh release upload "$RELEASE_TAG" .tmp/release/registry-verification.json .tmp/release/SHA256SUMS --clobber
+          gh release edit "$RELEASE_TAG" --draft=false --latest
 
   reproducibility:
     needs: candidate
@@ -151,9 +170,18 @@ jobs:
           DISPATCH_VERSION: ${{ inputs.version }}
         run: |
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+            package_version="$(node -p "require('./package.json').version")"
+            recovery_path="release/recovery/${package_version}.json"
+            if [[ -f "$recovery_path" ]] && [[ "$GITHUB_REF_NAME" == "$(node -p "require('./${recovery_path}').recoveryTag")" ]]; then
+              echo "RELEASE_VERSION=$package_version" >> "$GITHUB_ENV"
+              echo "RELEASE_TAG=$(node -p "require('./${recovery_path}').canonicalTag")" >> "$GITHUB_ENV"
+            else
+              echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+              echo "RELEASE_TAG=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+            fi
           else
             echo "RELEASE_VERSION=$DISPATCH_VERSION" >> "$GITHUB_ENV"
+            echo "RELEASE_TAG=v$DISPATCH_VERSION" >> "$GITHUB_ENV"
           fi
       - run: npm run build
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION" --output .tmp/release-reproduced
