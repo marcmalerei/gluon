@@ -245,6 +245,32 @@ Run the focused benchmark with:
 npm run benchmark:allocations
 ```
 
+## Reactivity debugger fast path
+
+Reactive effects may opt into `onTrack` and `onTrigger` debugger hooks. Normal
+effects do not provide those hooks. Issue #165 moved the hook-presence check in
+front of development-mode detection, so ordinary dependency tracking and
+triggering no longer read `globalThis.process?.env?.NODE_ENV` for an event that
+cannot be observed. Hooked development effects and production suppression keep
+their existing behavior.
+
+A focused Node 22.22.0 benchmark alternated one reactive property and
+synchronously reran its one-property effect. Both runs used the production
+reactivity build on the same Apple M4 environment, with eight warm-up rounds,
+40 measured samples, and batches calibrated to at least 12 ms.
+
+| Run | Median ms/mutation + rerun | p95 ms/mutation + rerun |
+| --- | ---: | ---: |
+| Baseline | 0.000735725 | 0.000840135 |
+| Hook-first fast path | 0.000621116 | 0.000835321 |
+
+The candidate median was 15.6% lower and its p95 was 0.6% lower in these
+separate Node runs. The complete samples, calibrated batch sizes, source state,
+environment, and methodology are retained in
+[`reactivity-debugger-165.json`](../benchmarks/results/reactivity-debugger-165.json).
+This isolated synchronous Node workload does not establish a browser,
+asynchronous-scheduler, or application-wide performance improvement.
+
 ## Keyed reconciliation comparison
 
 Issue #95 compares the existing generic keyed path at baseline commit `4095745`
