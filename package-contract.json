@@ -8,8 +8,8 @@
     "checkedAt": "2026-07-14",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "All 17 contracted npm package records expose 1.0.6 as latest, version 1.0.7 is unpublished, and the existing GitHub Actions trusted-publisher bindings previously published the complete 1.0.6 train."
+    "publicationState": "released",
+    "observation": "All 17 contracted npm package records expose 1.0.7 as latest with SLSA provenance. Release workflow 29338710037 completed clean-install registry verification, and immutable GitHub release v1.0.7 was published on 2026-07-14."
   },
   "packages": [
     {

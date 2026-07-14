@@ -7,16 +7,14 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.0.7` candidate. Every official
-manifest is public and lockstep at `1.0.7`. GitHub release `v1.0.6` remains the
-current immutable release, all 17 contracted npm packages expose `1.0.6` as
-`latest`, and the `1.0.7` package versions remain absent. The first `v1.0.7`
-Release run `29335253064` stopped before reproducibility, publication, or draft
-creation because PR #157 had been squash-merged: tested commit `192d647` is not
-an ancestor of immutable tagged commit `6c1d95a`, although tagged and reviewed
-evidence commits have the identical tree `0395fab4`. This is enforced locally
-by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.0.7`. Every official manifest is public and
+lockstep at `1.0.7`. All 17 contracted npm packages expose `1.0.7` as `latest`
+with SLSA provenance, and immutable GitHub release `v1.0.7` was published on
+2026-07-14. Recovery workflow `29338710037` completed candidate,
+reproducibility, Trusted Publishing, clean-install registry verification, and
+release finalization from execution tag `v1.0.7-recovery.1` while preserving
+the canonical `v1.0.7` tag. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -100,7 +98,13 @@ created, and registry verification found no official `1.0.7` package version.
 The exact one-time recovery manifest is `release/recovery/1.0.7.json`. It
 preserves the canonical tag, records the identical canonical and reviewed
 evidence tree, and permits only the recovery workflow, validation,
-documentation, and renewed evidence files to differ.
+documentation, and renewed evidence files to differ. Recovery execution tag
+`v1.0.7-recovery.1` points to merge commit
+`16355e237134b664ec385e6caeb575093eb20251`, which retains both required
+histories. Release run `29338710037` passed every gate, published all 17
+packages directly to `latest` through Trusted Publishing with SLSA provenance,
+verified them from a clean install, and published the immutable canonical
+GitHub release `v1.0.7` on 2026-07-14.
 
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,

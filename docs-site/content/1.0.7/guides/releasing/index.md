@@ -1,11 +1,12 @@
 # Release readiness
 
-The `1.0.7` documentation describes one lockstep supported release line.
-Availability is established only when all 17 contracted npm packages expose
-the immutable `1.0.7` version under `latest` and GitHub release `v1.0.7` is
-published. The protected workflow enforces that boundary. The `@gluonjs`
-scope, package records, and trusted-publisher bindings are verified in the
-package contract.
+The `1.0.7` documentation describes one lockstep supported release line. All
+17 contracted npm packages expose immutable version `1.0.7` under `latest`
+with SLSA provenance, and immutable GitHub release `v1.0.7` was published on
+2026-07-14. Protected recovery workflow `29338710037` established that state
+through candidate, reproducibility, Trusted Publishing, clean-install registry
+verification, and release finalization. The `@gluonjs` scope, package records,
+and trusted-publisher bindings are verified in the package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
@@ -103,7 +104,12 @@ machine-verified recovery uses protected execution tag
 release workflow, recovery validation, documentation, and renewed evidence
 paths. Package sources, manifests, READMEs, licenses, and changelogs cannot
 differ. Trusted Publishing still publishes version `1.0.7`, and the GitHub
-release remains attached to canonical tag `v1.0.7`.
+release remains attached to canonical tag `v1.0.7`. Recovery execution tag
+`v1.0.7-recovery.1` retained both required histories at merge commit
+`16355e237134b664ec385e6caeb575093eb20251`; release run `29338710037` then
+passed every gate, published all 17 packages to `latest` with SLSA provenance,
+verified a clean install, and published the immutable canonical GitHub release
+on 2026-07-14.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,
