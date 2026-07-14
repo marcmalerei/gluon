@@ -18,14 +18,20 @@ if (!version || process.argv.slice(2).some((argument) => argument !== undefined 
 if (process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN) {
   throw new Error('Long-lived npm publication tokens are prohibited; use npm trusted publishing.');
 }
-if (!dryRun && (process.env.GITHUB_REF_TYPE !== 'tag' || process.env.GITHUB_REF_NAME !== `v${version}`)) {
-  throw new Error(`Publication requires the exact v${version} Git tag.`);
+const canonicalTag = `v${version}`;
+const recovery = await readOptionalJson(`release/recovery/${version}.json`);
+const allowedTag = recovery?.recoveryTag ?? canonicalTag;
+if (!dryRun && (process.env.GITHUB_REF_TYPE !== 'tag' || process.env.GITHUB_REF_NAME !== allowedTag)) {
+  throw new Error(`Publication requires the exact ${allowedTag} protected Git tag.`);
+}
+if (!dryRun && recovery) {
+  await execFile(process.execPath, ['scripts/validate-release-recovery.mjs', '--version', version], { cwd: root });
 }
 
 const evidence = JSON.parse(await readFile(resolve(directory, 'release-evidence.json'), 'utf8'));
 const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
 const registry = releaseContract.publication.registry;
-if (evidence.version !== version || evidence.tag !== `v${version}` || evidence.blockedDevelopmentBuild) {
+if (evidence.version !== version || evidence.tag !== canonicalTag || evidence.blockedDevelopmentBuild) {
   throw new Error(`Release evidence is not a publishable ${version} candidate.`);
 }
 
@@ -137,6 +143,15 @@ async function verifyChecksums() {
     if (!match) throw new Error(`Invalid checksum line: ${line}`);
     const actual = createHash('sha256').update(await readFile(resolve(directory, match[2]))).digest('hex');
     if (actual !== match[1]) throw new Error(`Checksum mismatch for ${match[2]}.`);
+  }
+}
+
+async function readOptionalJson(path) {
+  try {
+    return JSON.parse(await readFile(resolve(root, path), 'utf8'));
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    throw error;
   }
 }
 

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/marcmalerei/gluon/blob/main/release/recovery-manifest.schema.json",
+  "title": "Gluon immutable release recovery manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "releaseVersion",
+    "canonicalTag",
+    "canonicalTagCommit",
+    "canonicalTagTree",
+    "failedTestedCommit",
+    "failedEvidenceCommit",
+    "failedRunUrl",
+    "failureCategory",
+    "recoveryTag",
+    "allowedCanonicalDeltaPaths"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "releaseVersion": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "canonicalTag": { "type": "string", "pattern": "^v[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "canonicalTagCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "canonicalTagTree": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "failedTestedCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "failedEvidenceCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "failedRunUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://github.com/marcmalerei/gluon/actions/runs/[0-9]+$"
+    },
+    "failureCategory": { "const": "squash-merge-tested-commit-not-ancestor" },
+    "recoveryTag": {
+      "type": "string",
+      "pattern": "^v[1-9][0-9]*\\.[0-9]+\\.[0-9]+-recovery\\.[1-9][0-9]*$"
+    },
+    "allowedCanonicalDeltaPaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
