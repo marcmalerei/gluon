@@ -179,13 +179,14 @@ scenario that enters the template-instantiation path.
 
 | Browser | Per-instance import median / p95 ms/op | Cached prototype median / p95 ms/op |
 | --- | ---: | ---: |
-| Chromium | 1.1625 / 1.3292 | 1.0143 / 1.1476 |
-| Firefox | 1.8333 / 5.6667 | 1.8333 / 2.0000 |
-| WebKit | 1.2917 / 1.9167 | 1.2917 / 1.3333 |
+| Chromium | 1.1625 / 1.3292 | 1.0556 / 1.3028 |
+| Firefox | 1.8333 / 5.6667 | 1.8333 / 2.1667 |
+| WebKit | 1.2917 / 1.9167 | 1.2917 / 1.9583 |
 
-The Chromium median was 12.8% lower. Firefox and WebKit medians were unchanged
-at the benchmark's timer resolution, while their p95 values were lower in this
-run pair. The complete baseline and candidate distributions are retained in
+The Chromium median was 9.2% lower and its p95 was 2.0% lower. Firefox and
+WebKit medians were unchanged at the benchmark's timer resolution; Firefox's
+p95 was lower and WebKit's p95 was 2.2% higher in this run pair. The complete
+baseline and candidate distributions are retained in
 [`template-cloning-161-baseline.json`](../benchmarks/results/template-cloning-161-baseline.json)
 and
 [`template-cloning-161-candidate.json`](../benchmarks/results/template-cloning-161-candidate.json);
