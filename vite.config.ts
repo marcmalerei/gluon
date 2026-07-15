@@ -44,6 +44,8 @@ export default defineConfig({
       '@gluonjs/molecules': resolve(import.meta.dirname, 'packages/molecules/src/index.ts'),
       '@gluonjs/organisms': resolve(import.meta.dirname, 'packages/organisms/src/index.ts'),
       '@gluonjs/devtools-api': resolve(import.meta.dirname, 'packages/devtools-api/src/index.ts'),
+      '@gluonjs/reactivity/preact-signals': resolve(import.meta.dirname, 'packages/reactivity/src/preact-signals.ts'),
+      '@gluonjs/reactivity/signals': resolve(import.meta.dirname, 'packages/reactivity/src/signals/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),
       '@gluonjs/router': resolve(import.meta.dirname, 'packages/router/src/index.ts'),

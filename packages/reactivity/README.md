@@ -35,6 +35,20 @@ await nextTick();
 - scheduled `watch` and `watchEffect` with deterministic cleanup
 - global, scope-local, job-local, and effect-local error handlers
 
+## Optional external Signals
+
+The `@gluonjs/reactivity/signals` subpath bridges TC39 proposal Signals from
+`signal-polyfill@0.2.2`. The independent
+`@gluonjs/reactivity/preact-signals` subpath supports
+`@preact/signals-core >=1.14.4 <2`. Neither optional peer is imported by the
+stable Reactivity entry.
+
+Both adapters read the external graph directly, coalesce scheduled
+notifications, expose explicit `connect()`/`disconnect()` ownership, and remain
+disconnected for SSR unless the application opts in. See the
+[interoperability contract](../../docs/signals-interop.md) and the runnable
+[`examples/signals`](../../examples/signals) application.
+
 Deep reactive proxies support plain objects, arrays, `Map`, and `Set`. The
 package source compiles with the ES2022 library and no DOM or Node ambient
 types.

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added isolated `./signals` and `./preact-signals` adapters with explicit
+  subscription ownership, coalesced updates, SSR-safe reads, and optional
+  version-bounded peers.
+
 ## [1.0.10] - 2026-07-15
 
 ### Changed

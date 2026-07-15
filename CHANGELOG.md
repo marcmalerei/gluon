@@ -9,6 +9,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added optional `@gluonjs/reactivity/signals` and
+  `@gluonjs/reactivity/preact-signals` adapters with explicit lifecycle,
+  coalesced scheduling, realm validation, SSR-safe disconnected reads, a real
+  GLUON GOODS availability integration, and a runnable dual-implementation
+  example.
 - Added the public `createVirtualizer()` controller for accessible vertical
   lists and grids with stable keys, overscan, dynamic measurement, scroll
   anchoring, keyboard traversal, deterministic SSR/hydration, and owned cleanup.

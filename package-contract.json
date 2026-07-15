@@ -17,7 +17,7 @@
       "directory": "packages/reactivity",
       "state": "current",
       "environment": "universal",
-      "exports": ["."],
+      "exports": [".", "./signals", "./preact-signals"],
       "dependencies": []
     },
     {

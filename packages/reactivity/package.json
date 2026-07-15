@@ -24,6 +24,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./signals": {
+      "types": "./dist/signals/index.d.ts",
+      "import": "./dist/signals/index.js"
+    },
+    "./preact-signals": {
+      "types": "./dist/preact-signals.d.ts",
+      "import": "./dist/preact-signals.js"
     }
   },
   "files": [
@@ -35,6 +43,14 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "peerDependencies": {
+    "@preact/signals-core": ">=1.14.4 <2",
+    "signal-polyfill": "0.2.2"
+  },
+  "peerDependenciesMeta": {
+    "@preact/signals-core": { "optional": true },
+    "signal-polyfill": { "optional": true }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

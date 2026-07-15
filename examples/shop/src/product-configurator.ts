@@ -216,8 +216,10 @@ export const productConfiguratorStyles = css`
 `;
 
 interface InventoryResult {
-  readonly label: string;
-  readonly dispatch: string;
+  readonly availability: import('@gluonjs/reactivity/signals').SignalBridge<{
+    readonly label: string;
+    readonly dispatch: string;
+  }>;
 }
 
 const inventoryCache = new Map<string, InventoryResult>();
@@ -494,7 +496,7 @@ function renderInventoryStatus(product: Product): TemplateValue {
     timeout: 2_000,
     children: (inventory) => html`
       <span class=${`inventory-dot inventory-${product.availability}`} aria-hidden="true"></span>
-      <span>${inventory.label} · dispatches in ${inventory.dispatch}</span>
+      <span>${inventory.availability.value.label} · dispatches in ${inventory.availability.value.dispatch}</span>
     `,
     error: (_error, retry) => html`
       <span>Availability could not be checked.</span>
@@ -503,20 +505,26 @@ function renderInventoryStatus(product: Product): TemplateValue {
   })}</div>`;
 }
 
-function loadInventory(product: Product, { signal }: AsyncLoadContext): Promise<InventoryResult> {
+async function loadInventory(product: Product, { signal }: AsyncLoadContext): Promise<InventoryResult> {
   const cached = inventoryCache.get(product.slug);
-  if (cached) return Promise.resolve(cached);
+  if (cached) {
+    if (typeof window !== 'undefined') cached.availability.connect();
+    signal.addEventListener('abort', () => cached.availability.disconnect(), { once: true });
+    return cached;
+  }
+  const { inventorySignal, publishInventory } = await import('./inventory-signals.js');
+  const availability = inventorySignal(product);
+  if (typeof window !== 'undefined') availability.connect();
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      const result = {
-        label: product.availability === 'in-stock' ? 'In stock' : 'Low stock',
-        dispatch: product.dispatch,
-      };
+      publishInventory(product);
+      const result = { availability };
       inventoryCache.set(product.slug, result);
       resolve(result);
-    }, 320);
+    }, 200);
     signal.addEventListener('abort', () => {
       clearTimeout(timer);
+      availability.disconnect();
       reject(new DOMException('Inventory request aborted.', 'AbortError'));
     }, { once: true });
   });

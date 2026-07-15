@@ -225,6 +225,12 @@ effect(() => console.log(total.value));
 count.value = 2;
 ```
 
+Optional external graphs use isolated subpaths: TC39 proposal Signals through
+`@gluonjs/reactivity/signals` and Preact Signals through
+`@gluonjs/reactivity/preact-signals`. Their dependencies are optional peers and
+are never loaded by the stable Reactivity entry. See the
+[Signals interoperability contract](docs/signals-interop.md).
+
 Deep and shallow mutable or readonly proxies support plain objects, arrays,
 `Map`, and `Set`. Effects track only the properties and collection operations
 they read; computed values remain lazy and cached until a dependency changes.
