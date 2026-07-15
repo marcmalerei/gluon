@@ -1,12 +1,11 @@
 # Release readiness
 
-The `1.0.8` documentation describes one lockstep supported release line. All
-17 contracted npm packages expose immutable version `1.0.8` under `latest`
-with SLSA provenance, and immutable GitHub release `v1.0.8` was published on
-2026-07-15. Release workflow `29403576667` completed candidate,
-reproducibility, Trusted Publishing, clean-install registry verification, and
-release finalization from the canonical tag. The `@gluonjs` scope, package
-records, and trusted-publisher bindings are verified in the package contract.
+The `1.0.9` documentation describes the prepared lockstep release candidate.
+All 17 official manifests are at `1.0.9`. Registry preflight on 2026-07-15
+confirmed that `1.0.9` is absent while all contracted npm packages still expose
+`1.0.8` under `latest`; immutable GitHub release `v1.0.8` remains current. The
+`@gluonjs` scope, package records, and trusted-publisher bindings are verified
+in the package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,

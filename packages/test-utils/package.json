@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/test-utils",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Black-box component and application test helpers for Gluon.",
   "private": false,
   "type": "module",
@@ -35,10 +35,10 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.8",
-    "@gluonjs/reactivity": "1.0.8",
-    "@gluonjs/router": "1.0.8",
-    "@gluonjs/store": "1.0.8"
+    "@gluonjs/core": "1.0.9",
+    "@gluonjs/reactivity": "1.0.9",
+    "@gluonjs/router": "1.0.9",
+    "@gluonjs/store": "1.0.9"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {

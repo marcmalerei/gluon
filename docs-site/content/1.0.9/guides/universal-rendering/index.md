@@ -19,5 +19,5 @@ The browser restores Router and Store snapshots before `hydrateApplication()`.
 Static generation prerenders explicit public URLs and records dynamic fallbacks
 without forking application modules.
 
-Read the [hydration guide](/gluon/1.0.8/reference/hydration/) and
-[deployment guide](/gluon/1.0.8/guides/deployment/) for the complete handoff.
+Read the [hydration guide](/gluon/1.0.9/reference/hydration/) and
+[deployment guide](/gluon/1.0.9/guides/deployment/) for the complete handoff.

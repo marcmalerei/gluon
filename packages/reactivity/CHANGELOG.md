@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-07-15
+
+### Changed
+
+- Synchronous scheduler jobs now complete without an artificial microtask
+  boundary between every job while asynchronous jobs remain awaited in order.
+
 ## [1.0.8] - 2026-07-15
 
 ### Changed
