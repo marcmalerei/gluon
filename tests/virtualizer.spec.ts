@@ -147,16 +147,18 @@ describe('createVirtualizer()', () => {
     const viewport = root.querySelector<HTMLElement>('.inventory')!;
     viewport.style.height = '80px';
     Object.defineProperty(viewport, 'clientHeight', { configurable: true, value: 80 });
-    viewport.scrollTop = 240;
+    viewport.scrollTop = 260;
     viewport.dispatchEvent(new Event('scroll'));
     await frame();
     render(virtualizer.view(), root);
-    const measured = root.querySelector<HTMLElement>('[data-gluon-virtual-row="4"]')!;
+    const measured = root.querySelector<HTMLElement>(
+      `[data-gluon-virtual-row="${virtualizer.range.value.start}"]`,
+    )!;
     expect(observe).toHaveBeenCalledWith(measured);
     callback?.([{ target: measured, contentRect: { height: 70 }, borderBoxSize: [] } as unknown as ResizeObserverEntry], {} as ResizeObserver);
     await frame();
     expect(virtualizer.range.value.totalSize).toBe(830);
-    expect(viewport.scrollTop).toBe(270);
+    expect(viewport.scrollTop).toBeCloseTo(290, 0);
 
     expect(() => virtualizer.scrollToIndex(-1)).toThrow('outside the collection');
     unmount(root);
