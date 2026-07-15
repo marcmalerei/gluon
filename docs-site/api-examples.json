@@ -1546,6 +1546,41 @@
         "assertNoFixtureLeaks();"
       ]
     },
+    "test-ssr-fixture": {
+      "module": "@gluonjs/test-utils/ssr",
+      "code": [
+        "import type { SsrRequestResult } from '@gluonjs/ssr';",
+        "import {",
+        "  activeSsrFixtureNames,",
+        "  assertNoSsrFixtureLeaks,",
+        "  cleanupSsrFixtures,",
+        "  hydrateSsrFixture,",
+        "  renderSsrFixture,",
+        "  type HydratedSsrFixture,",
+        "  type HydrateSsrFixtureOptions,",
+        "  type HydrationFixtureContext,",
+        "  type RenderSsrFixtureOptions,",
+        "  type SsrFixture,",
+        "} from '@gluonjs/test-utils/ssr';",
+        "",
+        "async function verifyShopRequest(render: () => Promise<SsrRequestResult>) {",
+        "  const renderOptions = { name: 'shop-product' } satisfies RenderSsrFixtureOptions;",
+        "  const server: SsrFixture = await renderSsrFixture(render, renderOptions);",
+        "  const options = {",
+        "    hydrate: async (context: HydrationFixtureContext) => ({",
+        "      retained: context.container.querySelector('#product-title') !== null,",
+        "    }),",
+        "    dispose: () => undefined,",
+        "  } satisfies HydrateSsrFixtureOptions<{ retained: boolean }>;",
+        "  const fixture: HydratedSsrFixture<{ retained: boolean }> = await hydrateSsrFixture(server, options);",
+        "  console.log(server.contains('Orbit Lamp'), fixture.hydrated.retained, activeSsrFixtureNames());",
+        "  await fixture.cleanup();",
+        "  await cleanupSsrFixtures();",
+        "  assertNoSsrFixtureLeaks();",
+        "}",
+        "void verifyShopRequest;"
+      ]
+    },
     "core-application": {
       "module": "@gluonjs/core",
       "code": [
@@ -4334,6 +4369,46 @@
     "packages/store/src/type-aliases/StoreTransactionType.md": {
       "recipe": "store-runtime",
       "description": "Identify whether state changed through an action, hydration, HMR, object/function patch, or reset:"
+    },
+    "packages/test-utils/src/ssr/functions/activeSsrFixtureNames.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "List active server-to-browser hydration fixtures without exposing mutable ownership state:"
+    },
+    "packages/test-utils/src/ssr/functions/assertNoSsrFixtureLeaks.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Fail verification when an SSR hydration fixture still owns its DOM transport or hydrated application resources:"
+    },
+    "packages/test-utils/src/ssr/functions/cleanupSsrFixtures.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Dispose active hydrated applications and remove their exact server DOM transports in reverse creation order:"
+    },
+    "packages/test-utils/src/ssr/functions/hydrateSsrFixture.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Install one complete SSR response in a real document and invoke the application's public hydration boundary:"
+    },
+    "packages/test-utils/src/ssr/functions/renderSsrFixture.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Run a request-isolated public SSR function and retain its complete transport result for assertions and hydration:"
+    },
+    "packages/test-utils/src/ssr/interfaces/HydratedSsrFixture.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Use black-box DOM queries, hydration output, ownership state, and cleanup from one paired SSR fixture:"
+    },
+    "packages/test-utils/src/ssr/interfaces/HydrateSsrFixtureOptions.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Provide the public application hydration and disposal callbacks used by a real-document SSR fixture:"
+    },
+    "packages/test-utils/src/ssr/interfaces/HydrationFixtureContext.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Receive the installed server container, serialized-state root, and exact document in an application hydration callback:"
+    },
+    "packages/test-utils/src/ssr/interfaces/RenderSsrFixtureOptions.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Assign a stable diagnostic name to the retained result of one isolated server request:"
+    },
+    "packages/test-utils/src/ssr/interfaces/SsrFixture.md": {
+      "recipe": "test-ssr-fixture",
+      "description": "Inspect immutable server HTML, head carriers, serialized state, and the full public request result before hydration:"
     },
     "packages/test-utils/src/functions/mountComponent.md": {
       "recipe": "test-component-fixture",
