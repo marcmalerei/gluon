@@ -134,6 +134,8 @@ The latest verified renders are:
 - [issue #114 product flow at 320px](../../output/playwright/issue-114-shop-ui/product-320.png)
 - [issue #114 checkout at 390px](../../output/playwright/issue-114-shop-ui/checkout-390.png)
 - [issue #114 home at 320px](../../output/playwright/issue-114-shop-ui/home-320.png)
+- [scoped-registry product flow on desktop](../../output/playwright/issue-195-scoped-registries/product-desktop.png)
+- [scoped-registry product flow at 390px](../../output/playwright/issue-195-scoped-registries/product-390.png)
 
 ## Verification contract
 
