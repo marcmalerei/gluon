@@ -46,6 +46,9 @@ packages/store/
 └── src/index.ts        Definitions, managers, transactions, plugins, snapshots,
                         HMR, persistence, and testing isolation
 
+src/virtualizer.ts      Core accessible list/grid windowing, measurement,
+                        scroll anchoring, SSR window, and resource ownership
+
 packages/ssr/
 ├── src/index.ts        DOM-free serialization, DSD elements, request ownership,
 │                       Router/Store snapshots, and safe embedded state
@@ -104,6 +107,11 @@ examples/playground/
 ├── src/archive.ts      Downloadable maintained starter tar generation
 ├── src/styles.ts       Constructable Swiss-editorial developer-tool system
 └── design/             Accepted editor and diagnostic-reference concepts
+
+examples/virtualizer/
+├── src/app.ts          500-item accessible list/grid acceptance application
+├── src/styles.ts       Constructable responsive example stylesheet
+└── vite.config.ts      Public-package runnable and production build boundary
 ```
 
 The optional UI packages share the typed native extension boundary documented

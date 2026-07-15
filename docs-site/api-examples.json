@@ -125,6 +125,42 @@
         "console.log(card, size.entries.value, changes.supported.value);"
       ]
     },
+    "core-virtualizer": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import {",
+        "  createVirtualizer,",
+        "  html,",
+        "  type VirtualizerHandle,",
+        "  type VirtualizerLayout,",
+        "  type VirtualizerOptions,",
+        "  type VirtualizerRange,",
+        "} from '@gluonjs/core';",
+        "",
+        "interface Product { readonly id: string; readonly name: string }",
+        "const inventory: readonly Product[] = Array.from({ length: 100 }, (_, index) => ({",
+        "  id: `sku-${index}` ,",
+        "  name: `Product ${index + 1}` ,",
+        "}));",
+        "const layout: VirtualizerLayout = 'grid';",
+        "const options: VirtualizerOptions<Product> = {",
+        "  items: inventory,",
+        "  key: (product) => product.id,",
+        "  renderItem: (product) => html`<a href=${`/products/${product.id}`}>${product.name}</a>`,",
+        "  estimateSize: 72,",
+        "  layout,",
+        "  columns: 2,",
+        "  overscan: 2,",
+        "  ssrCount: 8,",
+        "  ariaLabel: 'Product inventory',",
+        "};",
+        "const products: VirtualizerHandle<Product> = createVirtualizer(options);",
+        "const view = products.view();",
+        "const range: VirtualizerRange = products.range.value;",
+        "products.scrollToIndex(40, { behavior: 'smooth', focus: true });",
+        "console.log(view, range);"
+      ]
+    },
     "core-decorators": {
       "module": "@gluonjs/core/decorators",
       "code": [
@@ -4770,6 +4806,26 @@
     "src/interfaces/PlatformObserverHandle.md": {
       "recipe": "core-observers",
       "description": "Share the typed reactive entries, support state, callback ref, and permanent stop contract common to platform observers:"
+    },
+    "src/functions/createVirtualizer.md": {
+      "recipe": "core-virtualizer",
+      "description": "Render a bounded product inventory with stable keys, semantic grid metadata, dynamic measurement, deterministic server content, and owned cleanup:"
+    },
+    "src/interfaces/VirtualizerHandle.md": {
+      "recipe": "core-virtualizer",
+      "description": "Own and update a virtual viewport, inspect its reactive range, navigate to logical items, and permanently release its resources:"
+    },
+    "src/interfaces/VirtualizerOptions.md": {
+      "recipe": "core-virtualizer",
+      "description": "Configure item identity, rendering, estimated sizing, layout, overscan, server window size, and accessible naming:"
+    },
+    "src/interfaces/VirtualizerRange.md": {
+      "recipe": "core-virtualizer",
+      "description": "Read the inclusive/exclusive item window and full estimated or measured scroll size:"
+    },
+    "src/type-aliases/VirtualizerLayout.md": {
+      "recipe": "core-virtualizer",
+      "description": "Select semantic vertical list or multi-column grid rendering:"
     },
     "src/type-aliases/GluonElementClass.md": {
       "module": "@gluonjs/core",

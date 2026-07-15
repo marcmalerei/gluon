@@ -50,7 +50,7 @@
     "@gluonjs/reactivity": "1.0.10"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:playground && npm run build:docs",
+    "build": "npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:playground && npm run build:virtualizer-example && npm run build:docs",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:ui": "npm run build:quarks && npm run build:atoms && npm run build:molecules && npm run build:organisms",
     "build:quarks": "npm run build --workspace @gluonjs/quarks",
@@ -73,11 +73,13 @@
     "build:shop:server": "vite build --config examples/shop/vite.config.ts --ssr src/server.ts --outDir dist-server",
     "build:shop:static": "node scripts/generate-shop-static.mjs",
     "build:playground": "vite build --config examples/playground/vite.config.ts",
+    "build:virtualizer-example": "vite build --config examples/virtualizer/vite.config.ts",
     "docs:api": "typedoc --options typedoc.json --treatWarningsAsErrors && node scripts/generate-api-examples.mjs",
     "build:docs": "npm run docs:api && node scripts/build-docs.mjs && npm run build:docs-examples",
     "build:docs-examples": "vite build --config docs-site/examples/vite.config.ts",
     "dev:shop": "vite --config examples/shop/vite.config.ts",
     "dev:playground": "vite --config examples/playground/vite.config.ts",
+    "dev:virtualizer-example": "vite --config examples/virtualizer/vite.config.ts",
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "dev:benchmark:components": "vite --config benchmarks/components/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",

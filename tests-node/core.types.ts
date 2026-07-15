@@ -9,6 +9,7 @@ import {
   createIntersectionObserver,
   createMutationObserver,
   createResizeObserver,
+  createVirtualizer,
   createInjectionKey,
   compose,
   directive,
@@ -43,6 +44,7 @@ import {
   type ScopedSlot,
   type SlotDeclarations,
   type TemplateValue,
+  type VirtualizerHandle,
 } from '@gluonjs/core';
 
 const intersection = createIntersectionObserver<HTMLDivElement>({ threshold: [0, 1] }, (entries) => {
@@ -55,6 +57,22 @@ intersection.stop();
 
 createResizeObserver<HTMLDivElement>({ box: 'border-box' }).ref(document.createElement('div'));
 createMutationObserver<HTMLDivElement>({ attributes: true }).ref(document.createElement('div'));
+
+const typedVirtualizer: VirtualizerHandle<{ readonly id: string; readonly label: string }> = createVirtualizer({
+  items: [{ id: 'lamp', label: 'Orbit Lamp' }],
+  key: (item) => item.id,
+  renderItem: (item, index) => html`<span data-index=${index}>${item.label}</span>`,
+  estimateSize: (item) => item.label.length * 4,
+  layout: 'grid',
+  columns: 2,
+  ariaLabel: 'Products',
+});
+typedVirtualizer.range.value.start satisfies number;
+typedVirtualizer.scrollToIndex(0, { behavior: 'smooth', focus: true });
+typedVirtualizer.update({
+  items: [], key: (item) => item.id, renderItem: (item) => item.label, estimateSize: 40, ariaLabel: 'Products',
+});
+typedVirtualizer.stop();
 import {
   customElement,
   property,

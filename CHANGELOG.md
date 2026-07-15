@@ -9,6 +9,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added the public `createVirtualizer()` controller for accessible vertical
+  lists and grids with stable keys, overscan, dynamic measurement, scroll
+  anchoring, keyboard traversal, deterministic SSR/hydration, and owned cleanup.
 - Added first-class SSR and hydration fixtures to `@gluonjs/test-utils/ssr` and
   moved the canonical GLUON GOODS request-to-interaction regression onto that
   public transport and cleanup boundary.

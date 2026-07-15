@@ -156,6 +156,14 @@ export {
 } from './observers.js';
 
 export {
+  createVirtualizer,
+  type VirtualizerHandle,
+  type VirtualizerLayout,
+  type VirtualizerOptions,
+  type VirtualizerRange,
+} from './virtualizer.js';
+
+export {
   AsyncTimeoutError,
   KeepAlive,
   Suspense,
