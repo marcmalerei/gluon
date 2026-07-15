@@ -48,6 +48,9 @@ as renderer state, event listeners and refs are installed, and the first
 application render records reactive dependencies without reapplying the DOM.
 Open declarative shadow roots use `hydrateElement()`; element connection render
 is deferred until the matching shadow tree has been adopted.
+`hydrateSsrFixture()` materializes declarative shadow templates before attaching
+its detached container, matching document parsing even though `innerHTML` does
+not enable declarative Shadow DOM.
 
 The successful result has `retained: true`. Temporary attribute and end markers
 are removed; child anchors remain as renderer ownership boundaries.

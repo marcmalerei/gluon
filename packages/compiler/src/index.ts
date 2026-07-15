@@ -194,7 +194,7 @@ export function transformGluonModule(
         magic.prependLeft(argumentsStart, `${node.expression.text}, `);
         magic.appendLeft(
           node.end - 1,
-          `, import.meta.url, ${JSON.stringify(key)}, ${JSON.stringify(initializerSignature)}, import.meta.hot`,
+          `${node.arguments.length < 3 ? ', undefined' : ''}, import.meta.url, ${JSON.stringify(key)}, ${JSON.stringify(initializerSignature)}, import.meta.hot`,
         );
         hmrChanged = true;
       } else if (kind === 'functional-element') {
@@ -205,7 +205,7 @@ export function transformGluonModule(
         magic.prependLeft(argumentsStart, `${node.expression.text}, `);
         magic.appendLeft(
           node.end - 1,
-          `, import.meta.url, ${JSON.stringify(key)}, import.meta.hot`,
+          `${node.arguments.length < 2 ? ', undefined' : ''}, import.meta.url, ${JSON.stringify(key)}, import.meta.hot`,
         );
         hmrChanged = true;
       } else if (kind === 'component' || kind === 'store') {

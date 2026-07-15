@@ -68,6 +68,8 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.code).toContain('__gluonHmrStore(storeDefinition(');
     expect(transformed.code).toContain('__gluonHmrElement(register,');
     expect(transformed.code).toContain('__gluonHmrFunctionalElement(registerFunctional,');
+    expect(transformed.code).toContain('ProductCard, undefined, import.meta.url');
+    expect(transformed.code).toContain('}) }, undefined, import.meta.url');
     expect(transformed.code).toContain('declare selected: boolean;');
     expect(transformed.code).toContain('import.meta.hot.accept');
     expect(transformed.code).toContain('Badge = __gluonHmrComponent(');
@@ -85,6 +87,24 @@ describe('@gluonjs/compiler', () => {
     expect(original.source).toBe('product-card.ts');
     expect(original.line).toBe(8);
     expect(original.column).toBe(26);
+  });
+
+  it('retains explicit scoped registry options through development HMR transforms', () => {
+    const source = [
+      "import { defineElement, defineGluonElement, GluonElement, html } from '@gluonjs/core';",
+      'const registry = globalThis.registry;',
+      'class ScopedCard extends GluonElement { protected render() { return html`Scoped`; } }',
+      "defineElement('scoped-card', ScopedCard, { registry });",
+      "defineGluonElement({ tagName: 'scoped-quantity', setup: () => ({ render: () => html`Quantity` }) }, { registry });",
+    ].join('\n');
+    const transformed = transformGluonModule(source, '/app/scoped-elements.ts', { development: true });
+    expect(transformed.code).toContain(
+      "__gluonHmrElement(defineElement, 'scoped-card', ScopedCard, { registry }, import.meta.url",
+    );
+    expect(transformed.code).toContain(
+      "__gluonHmrFunctionalElement(defineGluonElement, { tagName: 'scoped-quantity'",
+    );
+    expect(transformed.code).toContain('}, { registry }, import.meta.url');
   });
 
   it('reports inline style locations and leaves production modules free of HMR hooks', () => {

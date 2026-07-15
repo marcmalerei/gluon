@@ -3,6 +3,8 @@ import {
   refreshGluonApplications,
   refreshGluonElements,
   type GluonElementClass,
+  type DefineElementOptions,
+  type DefineGluonElementOptions,
 } from '@gluonjs/core';
 
 interface HotContext {
@@ -84,15 +86,20 @@ export function component<Implementation extends Function>(
 }
 
 export function element<Constructor extends GluonElementClass>(
-  _defineElement: (tagName: `${string}-${string}`, constructor: Constructor) => Constructor,
+  _defineElement: (
+    tagName: `${string}-${string}`,
+    constructor: Constructor,
+    options?: DefineElementOptions,
+  ) => Constructor,
   tagName: `${string}-${string}`,
   next: Constructor,
+  options: DefineElementOptions | undefined,
   _moduleId: string,
   _key: string,
   initializerSignature: string,
   hot?: HotContext,
 ): Constructor {
-  return installElement(tagName, next, _moduleId, _key, initializerSignature, hot);
+  return installElement(tagName, next, _moduleId, _key, initializerSignature, hot, options);
 }
 
 export function elementDecorator<Constructor extends GluonElementClass>(
@@ -120,15 +127,24 @@ export function elementDecorator<Constructor extends GluonElementClass>(
 export function functionalElement<Constructor extends GluonElementClass>(
   define: (
     definition: FunctionalElementDefinitionLike,
-    options: { readonly register: false },
+    options: DefineGluonElementOptions & { readonly register: false },
   ) => Constructor,
   definition: FunctionalElementDefinitionLike,
+  options: DefineGluonElementOptions | undefined,
   moduleId: string,
   key: string,
   hot?: HotContext,
 ): Constructor {
-  const next = define(definition, { register: false });
-  return installElement(definition.tagName, next, moduleId, key, 'functional-setup-v1', hot);
+  const next = define(definition, { ...options, register: false });
+  return installElement(
+    definition.tagName,
+    next,
+    moduleId,
+    key,
+    'functional-setup-v1',
+    hot,
+    { registry: options?.registry },
+  );
 }
 
 function installElement<Constructor extends GluonElementClass>(
@@ -138,6 +154,7 @@ function installElement<Constructor extends GluonElementClass>(
   key: string,
   initializerSignature: string,
   hot?: HotContext,
+  options: DefineElementOptions = {},
 ): Constructor {
   const id = recordId(moduleId, key);
   const existing = elementRecords.get(id);
@@ -148,7 +165,7 @@ function installElement<Constructor extends GluonElementClass>(
     hot?.invalidate(`Gluon HMR requires a reload: ${reason}.`);
     return existing.constructor as Constructor;
   }
-  const result = applyGluonElementHotUpdate(tagName, next);
+  const result = applyGluonElementHotUpdate(tagName, next, options);
   if (!result.compatible) {
     hot?.invalidate(`Gluon HMR requires a reload for ${tagName}: ${result.reason}.`);
   }

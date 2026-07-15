@@ -33,6 +33,14 @@ import {
   hasOwnDecoratedProperty,
   synchronizeLegacyDecoratorProperties,
 } from './decorator-metadata.js';
+import {
+  createRegistryShadowRoot,
+  defineRegistryElement,
+  getNodeCustomElementRegistry,
+  getRegistryDefinition,
+  type GluonElementDefinitionRegistry,
+  type GluonElementRegistry,
+} from './element-registry.js';
 
 declare const __GLUON_DEV__: boolean;
 
@@ -170,6 +178,7 @@ type GluonElementConstructor = GluonElementClass & {
   readonly events?: Readonly<Record<string, EventDeclaration<any>>>;
   readonly slots?: SlotDeclarations;
   readonly styles?: CSSStyleSheet | readonly CSSStyleSheet[];
+  readonly shadowRootRegistry?: GluonElementRegistry;
 };
 
 const finalizedConstructors = new WeakSet<Function>();
@@ -178,8 +187,12 @@ const styleCache = new WeakMap<Function, readonly CSSStyleSheet[]>();
 const eventDeclarationCache = new WeakMap<Function, EventDeclarations>();
 const slotDeclarationCache = new WeakMap<Function, SlotDeclarations>();
 const connectedElements = new Set<GluonElement<any>>();
-const hotElementDefinitions = new Map<string, GluonElementConstructor>();
-const definedElementNames = new WeakMap<GluonElementClass, `${string}-${string}`>();
+const hotElementDefinitions = new WeakMap<object, Map<string, GluonElementConstructor>>();
+const defaultRegistryIdentity = Object.freeze({ kind: 'gluon-default-element-registry' });
+const definedElementNames = new WeakMap<
+  GluonElementClass,
+  Map<object, `${string}-${string}`>
+>();
 const serverElementDefinitions = new Map<`${string}-${string}`, GluonElementClass>();
 const propertyValues = Symbol('gluon.property-values');
 const compiledTextBinding = Symbol('gluon.compiled-text-binding');
@@ -236,6 +249,8 @@ export abstract class GluonElement<
   static readonly slots: SlotDeclarations = {};
   /** Lists constructable stylesheets adopted into each instance's render root. */
   static readonly styles: CSSStyleSheet | readonly CSSStyleSheet[] = [];
+  /** Optional explicit registry associated with this element's ShadowRoot. */
+  static readonly shadowRootRegistry?: GluonElementRegistry;
 
   /** Shadow root rendered by {@link update}; override {@link createRenderRoot} to customize it. */
   protected readonly renderRoot: ShadowRoot;
@@ -374,7 +389,10 @@ export abstract class GluonElement<
 
   /** Creates the component render root. Override only when the default open ShadowRoot is unsuitable. */
   protected createRenderRoot(): ShadowRoot {
-    return this.shadowRoot ?? this.attachShadow({ mode: 'open' });
+    const registry = (this.constructor as GluonElementConstructor).shadowRootRegistry;
+    return registry
+      ? createRegistryShadowRoot(this, registry)
+      : this.shadowRoot ?? this.attachShadow({ mode: 'open' });
   }
 
   /** Schedules a deduplicated render and returns the same completion promise exposed by {@link updateComplete}. */
@@ -1067,7 +1085,8 @@ export function exposedRef<Public extends object>(
     };
     resolve();
     if (!attached) {
-      void customElements.whenDefined(element.localName).then(() => {
+      const registry = getNodeCustomElementRegistry(element);
+      void (registry?.whenDefined(element.localName) ?? Promise.resolve()).then(() => {
         queueMicrotask(resolve);
       });
     }
@@ -1081,44 +1100,70 @@ export type GluonElementClass<ElementType extends GluonElement<any> = GluonEleme
   readonly events?: Readonly<Record<string, EventDeclaration<any>>>;
   readonly slots?: SlotDeclarations;
   readonly styles?: CSSStyleSheet | readonly CSSStyleSheet[];
+  readonly shadowRootRegistry?: GluonElementRegistry;
 };
+
+export interface DefineElementOptions {
+  /** Registration target; omitting it preserves the global browser registry and server default. */
+  readonly registry?: GluonElementDefinitionRegistry;
+}
 
 export function defineElement<Constructor extends GluonElementClass>(
   tagName: `${string}-${string}`,
   constructor: Constructor,
+  options: DefineElementOptions = {},
 ): Constructor {
-  const constructorTag = definedElementNames.get(constructor);
+  const registry = options.registry
+    ?? (globalThis as { customElements?: CustomElementRegistry }).customElements;
+  const identity = (registry ?? defaultRegistryIdentity) as object;
+  const names = definedElementNames.get(constructor);
+  const constructorTag = names?.get(identity);
   if (constructorTag && constructorTag !== tagName) {
     throw new Error(`Custom element constructor is already registered as "${constructorTag}".`);
   }
-  const registry = (globalThis as { customElements?: CustomElementRegistry }).customElements;
-  const existing = registry?.get(tagName) ?? serverElementDefinitions.get(tagName);
+  const existing = registry
+    ? getRegistryDefinition(registry, tagName)
+    : serverElementDefinitions.get(tagName);
   if (existing && existing !== constructor) {
     throw new Error(`Custom element "${tagName}" is already defined with another constructor.`);
   }
   if (!existing) {
-    if (registry) registry.define(tagName, constructor);
+    if (registry) defineRegistryElement(registry, tagName, constructor);
     else serverElementDefinitions.set(tagName, constructor);
   }
-  definedElementNames.set(constructor, tagName);
+  const nextNames = names ?? new Map<object, `${string}-${string}`>();
+  nextNames.set(identity, tagName);
+  if (!names) definedElementNames.set(constructor, nextNames);
   return constructor;
 }
 
 export interface GluonElementServerRender {
   readonly tagName: `${string}-${string}`;
   readonly template: TemplateResult;
+  readonly scopedRegistry: boolean;
+}
+
+export interface GluonElementServerRenderOptions {
+  readonly registry?: GluonElementDefinitionRegistry;
 }
 
 /** Instantiates one registered element definition without connecting it to a DOM. */
 export function renderGluonElementForServer<Constructor extends GluonElementClass>(
   constructor: Constructor,
   properties: Readonly<Record<string, unknown>> = {},
+  options: GluonElementServerRenderOptions = {},
 ): GluonElementServerRender {
-  const tagName = definedElementNames.get(constructor);
+  const identity = (options.registry ?? defaultRegistryIdentity) as object;
+  const names = definedElementNames.get(constructor);
+  const tagName = names?.get(identity) ?? (names?.size === 1 ? names.values().next().value : undefined);
   if (!tagName) throw new Error('Server-rendered Gluon elements must be registered with defineElement().');
   const element = new constructor();
   Object.assign(element, properties);
-  return Object.freeze({ tagName, template: element.renderForServer() });
+  return Object.freeze({
+    tagName,
+    template: element.renderForServer(),
+    scopedRegistry: Boolean(constructor.shadowRootRegistry?.requestedScoped),
+  });
 }
 
 export interface GluonElementHotUpdateResult<Constructor extends GluonElementClass> {
@@ -1135,15 +1180,21 @@ export interface GluonElementHotUpdateResult<Constructor extends GluonElementCla
 export function applyGluonElementHotUpdate<Constructor extends GluonElementClass>(
   tagName: `${string}-${string}`,
   next: Constructor,
+  options: DefineElementOptions = {},
 ): GluonElementHotUpdateResult<Constructor> {
-  const recorded = hotElementDefinitions.get(tagName);
+  const registry = options.registry ?? customElements;
+  const identity = registry as object;
+  let definitions = hotElementDefinitions.get(identity);
+  const recorded = definitions?.get(tagName);
   if (!recorded) {
-    const registered = customElements.get(tagName);
+    const registered = getRegistryDefinition(registry, tagName);
     if (registered && registered !== next) {
       throw new Error(`Custom element "${tagName}" is already defined outside Gluon HMR.`);
     }
-    if (!registered) customElements.define(tagName, next);
-    hotElementDefinitions.set(tagName, next as GluonElementConstructor);
+    if (!registered) defineRegistryElement(registry, tagName, next);
+    definitions ??= new Map();
+    definitions.set(tagName, next as GluonElementConstructor);
+    hotElementDefinitions.set(identity, definitions);
     return Object.freeze({ compatible: true, constructor: next });
   }
 
@@ -1158,7 +1209,7 @@ export function applyGluonElementHotUpdate<Constructor extends GluonElementClass
 
   patchHotElementConstructor(recorded, next as GluonElementConstructor);
   for (const element of connectedElements) {
-    if (element.localName === tagName) void element.requestHotUpdate();
+    if (recorded.prototype.isPrototypeOf(element)) void element.requestHotUpdate();
   }
   return Object.freeze({ compatible: true, constructor: recorded as Constructor });
 }

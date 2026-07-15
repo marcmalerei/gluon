@@ -1,7 +1,10 @@
 import {
   GluonElement,
   Suspense,
+  createGluonElementRegistry,
   css,
+  defineGluonElement,
+  elementEvent,
   html,
   repeat,
   type AsyncLoadContext,
@@ -11,7 +14,7 @@ import {
 } from '@gluonjs/core';
 import { customElement, property } from '@gluonjs/core/decorators';
 import { formatPrice, type Product } from './data.js';
-import { InventoryRetryAction, ProductAddAction } from './ui-extensions.js';
+import { InventoryRetryAction } from './ui-extensions.js';
 import {
   cloneProductConfiguration,
   createDefaultProductConfiguration,
@@ -23,6 +26,24 @@ import {
 } from './product-configuration.js';
 
 export const productConfiguratorTag = 'gluon-product-configurator';
+
+export const productConfiguratorElementRegistry = createGluonElementRegistry();
+
+export const ProductAddActionElement = defineGluonElement({
+  tagName: 'gluon-product-add-action',
+  events: {
+    activate: elementEvent<void>(),
+  },
+  slots: { default: { required: true } },
+  setup(context) {
+    const activate = (): void => { context.emit('activate', undefined); };
+    context.onConnected(() => { context.host.addEventListener('click', activate); });
+    context.onCleanup(() => { context.host.removeEventListener('click', activate); });
+    return {
+      render: () => html`<slot></slot>`,
+    };
+  },
+}, { registry: productConfiguratorElementRegistry });
 
 export interface ProductConfiguratorEvents {
   readonly 'configuration-change': {
@@ -125,6 +146,11 @@ export const productConfiguratorStyles = css`
   .swatch-cobalt { background: var(--shop-cobalt, #173f91); }
   .swatch-bone { background: #ebe8de; }
 
+  .product-add-action {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+  }
   .add-to-bag {
     display: inline-flex;
     align-items: center;
@@ -133,7 +159,6 @@ export const productConfiguratorStyles = css`
     min-height: 54px;
     gap: 28px;
     padding: 14px 24px;
-    margin-top: 20px;
     border: 1px solid var(--shop-action, #c8ff00);
     border-radius: 3px;
     background: var(--shop-action, #c8ff00);
@@ -193,13 +218,15 @@ export const productConfiguratorStyles = css`
     .choice-group { padding: 10px 0 12px; }
     .choice-group legend { margin-bottom: 6px; }
     .choice-group label { min-height: 44px; }
-    .add-to-bag {
+    .product-add-action {
       position: sticky;
       bottom: 0;
       z-index: 12;
-      min-height: 58px;
       margin: 12px calc(var(--shop-gutter, 18px) * -1) 0;
       width: calc(100% + var(--shop-gutter, 18px) * 2);
+    }
+    .add-to-bag {
+      min-height: 58px;
       border-radius: 0;
       padding-bottom: max(14px, env(safe-area-inset-bottom));
     }
@@ -227,6 +254,7 @@ const inventoryCache = new Map<string, InventoryResult>();
 @customElement('gluon-product-configurator')
 export class ProductConfiguratorElement extends GluonElement<ProductConfiguratorEvents> {
   static readonly formAssociated = true;
+  static override readonly shadowRootRegistry = productConfiguratorElementRegistry;
 
   static override readonly events = {
     'configuration-change': {},
@@ -370,11 +398,12 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
         ${this.renderChoiceGroup('Finish', 'finish', productConfigurationChoices.finish, disabled)}
         ${this.renderChoiceGroup('Light temperature', 'temperature', productConfigurationChoices.temperature, disabled)}
         ${this.renderChoiceGroup('Cable length', 'cable', productConfigurationChoices.cable, disabled)}
-        ${ProductAddAction({
-          disabled,
-          label: `Add to bag — ${product ? formatPrice(product.price) : 'Select product'}`,
-          onClick: () => this.requestAddToBag(),
-        })}
+        <gluon-product-add-action
+          class="product-add-action"
+          @click=${() => this.requestAddToBag()}
+        ><button type="button" class="add-to-bag" ?disabled=${disabled}>
+          ${`Add to bag — ${product ? formatPrice(product.price) : 'Select product'}`}
+        </button></gluon-product-add-action>
         <slot><ul class="product-facts">
           <li>Ships in 2–3 days</li>
           <li>Repairable parts</li>

@@ -1,6 +1,5 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { defineElement } from '@gluonjs/core';
-import { buttonStyles } from '@gluonjs/atoms';
 import { products } from '../examples/shop/src/data.js';
 import {
   ProductConfiguratorElement,
@@ -136,11 +135,7 @@ test('preserves native slots, adopted styles, host identity, lifecycle retention
   expect(titleSlot.assignedNodes()).toEqual([title]);
   expect(defaultSlot.assignedNodes()).toEqual([facts]);
   expect(title.parentNode).toBe(element);
-  expect(shadow.adoptedStyleSheets).toEqual(expect.arrayContaining([
-    productConfiguratorStyles,
-    buttonStyles,
-  ]));
-  expect(shadow.adoptedStyleSheets).toHaveLength(2);
+  expect(shadow.adoptedStyleSheets).toEqual([productConfiguratorStyles]);
   expect(shadow.adoptedStyleSheets.every((sheet) => sheet.cssRules.length > 0)).toBe(true);
   expect(shadow.querySelector('style')).toBeNull();
 
@@ -221,7 +216,8 @@ test('transports typed properties, native events, and the platform form contract
   expect(input).toHaveBeenCalledOnce();
   expect(new FormData(form).get('configuration')).toContain('"finish":"Graphite"');
 
-  element.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')?.click();
+  element.shadowRoot?.querySelector<HTMLElement>('gluon-product-add-action')
+    ?.querySelector<HTMLButtonElement>('button')?.click();
   expect(add).toHaveBeenCalledOnce();
   const addEvent = add.mock.calls[0]![0];
   expect(addEvent.detail.configuration.finish).toBe('Graphite');

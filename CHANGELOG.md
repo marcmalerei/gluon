@@ -9,6 +9,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added universal scoped Custom Element registry handles, explicit class and
+  functional registration targets, ShadowRoot ownership, duplicate-name
+  isolation, DSD/SSR hydration transport, registry-partitioned HMR, and a
+  global fallback used by the GLUON GOODS product action boundary.
 - Added optional `@gluonjs/reactivity/signals` and
   `@gluonjs/reactivity/preact-signals` adapters with explicit lifecycle,
   coalesced scheduling, realm validation, SSR-safe disconnected reads, a real

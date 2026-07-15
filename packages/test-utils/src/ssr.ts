@@ -96,6 +96,7 @@ export async function hydrateSsrFixture<Hydrated>(
   const container = document.createElement('div');
   container.setAttribute('data-gluon-test-hydration', name);
   container.innerHTML = server.html;
+  materializeDeclarativeShadowRoots(container);
   (options.attachTo ?? document.body).append(container, stateRoot);
 
   let hydrated: Hydrated;
@@ -138,6 +139,21 @@ export async function hydrateSsrFixture<Hydrated>(
     },
     text: () => container.textContent ?? '',
   };
+}
+
+function materializeDeclarativeShadowRoots(container: ParentNode): void {
+  const templates = [...container.querySelectorAll<HTMLTemplateElement>('template[shadowrootmode]')];
+  for (const template of templates) {
+    const host = template.parentElement;
+    const mode = template.getAttribute('shadowrootmode');
+    if (!host || (mode !== 'open' && mode !== 'closed')) continue;
+    const scoped = template.hasAttribute('shadowrootcustomelementregistry');
+    const root = host.shadowRoot ?? (scoped
+      ? host.attachShadow({ mode, customElementRegistry: null } as unknown as ShadowRootInit)
+      : host.attachShadow({ mode }));
+    root.append(template.content.cloneNode(true));
+    template.remove();
+  }
 }
 
 async function cleanupHydrationFixture<Hydrated>(

@@ -1,6 +1,5 @@
 import { expect, test } from 'vitest';
 import { nextTick } from '@gluonjs/reactivity';
-import { buttonStyles } from '@gluonjs/atoms';
 import { GluonCounter } from '../docs-site/examples/custom-element.js';
 import { mountVueHost } from '../docs-site/examples/vue-host.js';
 import {
@@ -30,11 +29,7 @@ test('runs the Vue 3 migration host around the production Gluon product element'
   const element = root.querySelector('gluon-product-configurator') as ProductConfiguratorElement;
   await element.updateComplete;
   expect(element.product?.slug).toBe('orbit-lamp');
-  expect(element.shadowRoot?.adoptedStyleSheets).toEqual(expect.arrayContaining([
-    productConfiguratorStyles,
-    buttonStyles,
-  ]));
-  expect(element.shadowRoot?.adoptedStyleSheets).toHaveLength(2);
+  expect(element.shadowRoot?.adoptedStyleSheets).toEqual([productConfiguratorStyles]);
   expect(element.shadowRoot?.querySelector('style')).toBeNull();
   expect(element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="title"]')?.assignedNodes()).toHaveLength(1);
 
@@ -43,7 +38,8 @@ test('runs the Vue 3 migration host around the production Gluon product element'
   await element.updateComplete;
   expect(root.querySelector('[data-current-configuration]')?.textContent).toContain('Graphite');
 
-  element.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')?.click();
+  element.shadowRoot?.querySelector<HTMLElement>('gluon-product-add-action')
+    ?.querySelector<HTMLButtonElement>('button')?.click();
   await Promise.resolve();
   expect(root.querySelector('[data-added-line]')?.textContent)
     .toContain('Orbit Lamp · Graphite · Warm 2700K · 1.5 m');

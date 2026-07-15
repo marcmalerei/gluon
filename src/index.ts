@@ -67,6 +67,8 @@ export {
   type GluonElementClass,
   type GluonElementHotUpdateResult,
   type GluonElementServerRender,
+  type GluonElementServerRenderOptions,
+  type DefineElementOptions,
   type GluonRenderCause,
   type GluonRenderDebugEvent,
   type GluonRenderDebugHook,
@@ -81,9 +83,20 @@ export {
 } from './element.js';
 
 export {
+  createGluonElementRegistry,
+  createRegistryShadowRoot,
+  initializeRegistryShadowRoot,
+  supportsScopedCustomElementRegistries,
+  type CreateGluonElementRegistryOptions,
+  type GluonElementDefinitionRegistry,
+  type GluonElementRegistry,
+} from './element-registry.js';
+
+export {
   defineGluonElement,
   elementEvent,
   elementProperty,
+  type DefineGluonElementOptions,
 } from './functional-element.js';
 
 export {

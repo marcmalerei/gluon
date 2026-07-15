@@ -7,6 +7,8 @@ import {
   TransitionGroup,
   createApp,
   createIntersectionObserver,
+  createGluonElementRegistry,
+  createRegistryShadowRoot,
   createMutationObserver,
   createResizeObserver,
   createVirtualizer,
@@ -14,6 +16,7 @@ import {
   compose,
   directive,
   defineAsyncComponent,
+  defineElement,
   defineGluonElement,
   dynamicComponent,
   elementEvent,
@@ -33,6 +36,7 @@ import {
   unmount,
   unsafeHTML,
   unsafeURL,
+  type GluonElementRegistry,
   type DirectiveLifecycle,
   type EventBinding,
   type EventDeclarations,
@@ -97,6 +101,20 @@ class TypedDecoratedElement extends GluonElement {
     return html`<p>${this.isLoop}:${this.itemCount}:${this.status}</p>`;
   }
 }
+
+const typedScopedRegistry: GluonElementRegistry = createGluonElementRegistry();
+class TypedScopedElement extends GluonElement {
+  static override readonly shadowRootRegistry = typedScopedRegistry;
+  protected override render() { return html`Scoped`; }
+}
+defineElement('typed-scoped-element', TypedScopedElement, { registry: typedScopedRegistry });
+createRegistryShadowRoot(document.createElement('section'), typedScopedRegistry);
+defineGluonElement({
+  tagName: 'typed-functional-scoped-element',
+  setup: () => ({ render: () => html`Functional scoped` }),
+}, { registry: typedScopedRegistry, shadowRootRegistry: typedScopedRegistry });
+// @ts-expect-error registry options require a CustomElementRegistry-compatible target
+defineElement('typed-invalid-registry', TypedScopedElement, { registry: {} });
 
 const typedDecoratedElement = new TypedDecoratedElement();
 typedDecoratedElement.isLoop = true;

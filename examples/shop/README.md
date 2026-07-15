@@ -21,6 +21,9 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - keyboard-operable product configuration through the same typed,
   form-associated `gluon-product-configurator` Custom Element consumed by the
   maintained Vue 3 host
+- an internal `gluon-product-add-action` registered in the configurator's
+  explicit scoped registry, with a global fallback on unsupported browsers and
+  the same add-to-bag interaction in either mode
 - a reactive bag with configured line items and quantities
 - an app-local `gluon-bag-quantity` autonomous Custom Element authored through
   `defineGluonElement()`, with inferred properties/native events, cancelable
