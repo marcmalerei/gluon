@@ -317,6 +317,7 @@ export abstract class GluonElement<
     const scope = this.renderScope;
     this.renderScope = undefined;
     this.renderEffect = undefined;
+    /* v8 ignore next -- production-only job ownership is covered by the built Vite integration. */
     if (this.compiledPropertyUpdateJob) invalidateJob(this.compiledPropertyUpdateJob);
     try {
       scope?.stop();
@@ -510,12 +511,10 @@ export abstract class GluonElement<
       : Object.is(value, oldValue)) return;
 
     this[propertyValues].set(name, value);
-    if (!(compiledDevelopment === false && this[compiledTextBinding]?.property === name)) {
-      const functionalObserver = (this as GluonElement<Events> & {
-        [functionalElementPropertyChanged]?: (property: string) => void;
-      })[functionalElementPropertyChanged];
-      functionalObserver?.call(this, name);
-    }
+    const functionalObserver = (this as GluonElement<Events> & {
+      [functionalElementPropertyChanged]?: (property: string) => void;
+    })[functionalElementPropertyChanged];
+    functionalObserver?.call(this, name);
     if (reflect && declaration.reflect && this.connected) {
       this.reflectProperty(name, value, declaration);
     }
@@ -605,6 +604,7 @@ export abstract class GluonElement<
     else if (this.pendingPropertyUpdate !== name) this.pendingFullUpdate = true;
     this.pendingPropertyValue = value;
     const promise = this.ensurePendingUpdate();
+    /* v8 ignore next -- the production compiler path is covered by the built Vite integration. */
     if (
       compiledDevelopment === false
       && !this.pendingFullUpdate
@@ -621,6 +621,7 @@ export abstract class GluonElement<
     return promise;
   }
 
+  /* v8 ignore next -- exercised in the production Vite integration and comparative browser build. */
   private performCompiledPropertyUpdate(): void {
     if (!this.connected) return;
     const runner = this.renderEffect;
@@ -666,44 +667,26 @@ export abstract class GluonElement<
     const deferred = this.pendingUpdate ?? createUpdateDeferred();
     if (!this.pendingUpdate) this.updatePromise = deferred.promise;
     this.pendingUpdate = undefined;
-    const property = this.pendingPropertyUpdate;
-    const fullUpdate = this.pendingFullUpdate;
     this.pendingPropertyUpdate = undefined;
     this.pendingPropertyValue = undefined;
     this.pendingFullUpdate = false;
 
     if (compiledDevelopment !== false && isDevelopmentEnabled()) {
-      performElementUpdateWithDiagnostics(this, () => this.commitUpdate(deferred, property, fullUpdate));
+      performElementUpdateWithDiagnostics(this, () => this.commitUpdate(deferred));
       return;
     }
-    this.commitUpdate(deferred, property, fullUpdate);
+    this.commitUpdate(deferred);
   }
 
-  private commitUpdate(
-    deferred: UpdateDeferred,
-    property: string | undefined,
-    fullUpdate: boolean,
-  ): void {
+  private commitUpdate(deferred: UpdateDeferred): void {
     try {
       if (this.hydrationPending) {
         deferred.resolve();
         return;
       }
       if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
-      const compiledBinding = this[compiledTextBinding];
-      const usedCompiledBinding = compiledDevelopment === false
-        && !fullUpdate
-        && property !== undefined
-        && compiledBinding?.property === property
-        && updateCompiledPrimitiveTextBinding(
-          this.renderRoot,
-          compiledBinding.index,
-          this[propertyValues].get(property),
-        );
-      if (!usedCompiledBinding) {
-        this.releaseCompiledPrimitiveTextBinding();
-        this.runOwned(() => this.update());
-      }
+      this.releaseCompiledPrimitiveTextBinding();
+      this.runOwned(() => this.update());
       if (!this.connectionRendered) {
         this.validateDeclaredSlots();
         this.connectionRendered = true;
