@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { TraceMap, originalPositionFor } from '@jridgewell/trace-mapping';
 import { chromium, type Browser } from 'playwright';
 import { afterEach, describe, expect, it } from 'vitest';
-import { build, createServer, type Rollup } from 'vite';
+import { build, createServer, preview, type Rollup } from 'vite';
 import {
   formatGluonDiagnostic,
   getGluonDiagnostic,
@@ -108,6 +108,62 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.code).not.toContain('virtual:gluon-hmr');
     expect(transformed.code).not.toContain('import.meta.hot');
     expect(transformed.map.sourcesContent).toEqual([source]);
+  });
+
+  it('marks only compiler-proven declared-property text templates for direct updates', () => {
+    const eligible = transformGluonModule([
+      "import { GluonElement as Base, html as view } from '@gluonjs/core';",
+      'class LabelCard extends Base {',
+      "  static override readonly properties = { label: { type: String, default: 'A' } } as const;",
+      '  declare label: string;',
+      '  protected override render() {',
+      '    return view`<output>${this.label}</output>`;',
+      '  }',
+      '}',
+    ].join('\n'), '/app/label-card.ts', { development: false });
+    expect(eligible.hmr).toBe(false);
+    expect(eligible.code).toContain('markCompiledPrimitiveTextBinding as __gluonMarkPrimitiveText');
+    expect(eligible.code).toContain('__gluonMarkPrimitiveText(view`<output>${this.label}</output>`, "label", 0)');
+    expect(eligible.code).not.toContain('virtual:gluon-hmr');
+
+    const stableEvent = transformGluonModule([
+      "import { GluonElement, html as view } from '@gluonjs/core';",
+      'class CounterCard extends GluonElement {',
+      '  static properties = { count: { attribute: false, default: 0 } };',
+      '  declare count: number;',
+      '  private readonly click = () => { this.count += 1; };',
+      '  protected render() { return view`<button @click=${this.click}>${this.count}</button>`; }',
+      '}',
+    ].join('\n'), '/app/counter-card.ts', { development: false });
+    expect(stableEvent.code).toContain('__gluonMarkPrimitiveText(view`<button @click=${this.click}>${this.count}</button>`, "count", 1)');
+
+    const ineligibleBodies = [
+      'return view`<output title=${this.label}>fixed</output>`;',
+      'return this.active ? view`<output>${this.label}</output>` : view`<output>off</output>`;',
+      'return view`<output>${this.label}:${this.label}</output>`;',
+    ];
+    for (const body of ineligibleBodies) {
+      const transformed = transformGluonModule([
+        "import { GluonElement, html as view } from '@gluonjs/core';",
+        'class LabelCard extends GluonElement {',
+        "  static properties = { label: { default: 'A' } };",
+        '  declare label: string;',
+        `  protected render() { ${body} }`,
+        '}',
+      ].join('\n'), '/app/ineligible-card.ts', { development: false });
+      expect(transformed.code).not.toContain('__gluonMarkPrimitiveText');
+    }
+
+    const customUpdate = transformGluonModule([
+      "import { GluonElement, html as view } from '@gluonjs/core';",
+      'class LabelCard extends GluonElement {',
+      "  static properties = { label: { default: 'A' } };",
+      '  declare label: string;',
+      '  protected update() { super.update(); }',
+      '  protected render() { return view`<output>${this.label}</output>`; }',
+      '}',
+    ].join('\n'), '/app/custom-update-card.ts', { development: false });
+    expect(customUpdate.code).not.toContain('__gluonMarkPrimitiveText');
   });
 
   it('records compose template bodies and preserves their original source mappings', () => {
@@ -250,6 +306,49 @@ describe('@gluonjs/vite real server contract', () => {
     expect(code).not.toContain('GLUON_TEMPLATE_STYLE_ELEMENT');
   }, 30_000);
 
+  it('executes compiled primitive updates and recovers through the production render path', async () => {
+    const root = await createPrimitiveFixture();
+    await build({
+      ...viteConfig(root),
+      build: { outDir: resolve(root, 'dist') },
+    });
+    const server = await preview({
+      ...viteConfig(root),
+      preview: { host: '127.0.0.1', port: 0 },
+    });
+    try {
+      const browser = await chromium.launch({ headless: true });
+      browsers.push(browser);
+      const page = await browser.newPage();
+      const errors: string[] = [];
+      page.on('pageerror', (error) => errors.push(error.message));
+      await page.goto(server.resolvedUrls!.local[0]!);
+      const result = await page.evaluate(async () => {
+        const element = document.querySelector('compiled-label') as HTMLElement & {
+          label: string;
+          updateComplete: Promise<void>;
+          shadowRoot: ShadowRoot;
+        };
+        const prototype = Object.getPrototypeOf(element) as { render: () => unknown };
+        const render = prototype.render;
+        prototype.render = () => { throw new Error('compiled update rerendered'); };
+        element.label = 'B';
+        await element.updateComplete;
+        const compiledText = element.shadowRoot.textContent;
+
+        prototype.render = render;
+        element.shadowRoot.replaceChildren(document.createElement('i'));
+        element.label = 'C';
+        await element.updateComplete;
+        return { compiledText, recoveredText: element.shadowRoot.textContent };
+      });
+      expect(result).toEqual({ compiledText: 'B', recoveredText: 'C' });
+      expect(errors).toEqual([]);
+    } finally {
+      await server.close();
+    }
+  }, 30_000);
+
   it('emits a deterministic universal client asset manifest', async () => {
     const root = await createFixture('universal', 1, 'rgb(9, 8, 7)');
     const mainFile = resolve(root, 'main.ts');
@@ -303,6 +402,26 @@ async function createFixture(version: string, increment: number, color: string):
     'createApp(() => Status(store)).mount(document.querySelector(\'#functional\')!);',
   ].join('\n'));
   await writeFile(resolve(root, 'component.ts'), componentSource(version, increment, color));
+  return root;
+}
+
+async function createPrimitiveFixture(): Promise<string> {
+  const root = await mkdtemp(resolve(repositoryRoot, '.tmp-gluon-vite-'));
+  temporaryDirectories.push(root);
+  await writeFile(
+    resolve(root, 'index.html'),
+    '<script type="module" src="/main.ts"></script>',
+  );
+  await writeFile(resolve(root, 'main.ts'), [
+    "import { defineElement, GluonElement, html } from '@gluonjs/core';",
+    'class CompiledLabel extends GluonElement {',
+    "  static override readonly properties = { label: { type: String, default: 'A' } } as const;",
+    '  declare label: string;',
+    '  protected override render() { return html`<output>${this.label}</output>`; }',
+    '}',
+    "defineElement('compiled-label', CompiledLabel);",
+    "document.body.append(document.createElement('compiled-label'));",
+  ].join('\n'));
   return root;
 }
 

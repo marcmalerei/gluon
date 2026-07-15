@@ -36,4 +36,14 @@ describe('component comparison runner', () => {
       }
     }
   }, 60_000);
+
+  it('can isolate one scenario for a fresh browser-context measurement', async () => {
+    const result = await runComponentComparison({
+      samples: 1,
+      warmupRounds: 1,
+      scenarios: ['property'],
+    });
+
+    expect(result.scenarios.map((scenario) => scenario.scenario)).toEqual(['property']);
+  }, 30_000);
 });

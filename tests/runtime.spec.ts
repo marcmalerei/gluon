@@ -2,8 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   directive,
   event,
+  getCompiledPrimitiveTextBinding,
   html,
+  markCompiledPrimitiveTextBinding,
   render,
+  updateCompiledPrimitiveTextBinding,
   type PartController,
 } from '../src/index.js';
 
@@ -32,6 +35,43 @@ describe('template runtime', () => {
 
     expect(root.textContent).toBe('Hello Grace');
     expect(root.querySelector('h1')?.firstChild).toBe(text);
+  });
+
+  it('commits compiler-proven primitive text bindings and rejects unsafe fast paths', () => {
+    const root = document.createElement('div');
+    const view = (value: string) => markCompiledPrimitiveTextBinding(
+      html`<output>${value}</output>`,
+      'label',
+      0,
+    );
+    const result = view('A');
+
+    expect(getCompiledPrimitiveTextBinding(html`<output>${'plain'}</output>`)).toBeUndefined();
+    expect(getCompiledPrimitiveTextBinding(result)).toEqual({ property: 'label', index: 0 });
+
+    render(result, root);
+    const output = root.querySelector('output');
+    const text = output?.firstChild;
+
+    expect(updateCompiledPrimitiveTextBinding(root, 0, 'B')).toBe(true);
+    expect(output?.textContent).toBe('B');
+    expect(output?.firstChild).toBe(text);
+    expect(updateCompiledPrimitiveTextBinding(root, 0, 2)).toBe(true);
+    expect(output?.textContent).toBe('2');
+    expect(updateCompiledPrimitiveTextBinding(root, 0, { unsafe: true })).toBe(false);
+    expect(updateCompiledPrimitiveTextBinding(root, 1, 'wrong binding')).toBe(false);
+    expect(updateCompiledPrimitiveTextBinding(null, 0, 'missing root')).toBe(false);
+
+    root.replaceChildren(document.createElement('i'));
+    expect(updateCompiledPrimitiveTextBinding(root, 0, 'detached')).toBe(false);
+
+    const conflicting = (property: string) => markCompiledPrimitiveTextBinding(
+      html`<span>${'fixed'}</span>`,
+      property,
+      0,
+    );
+    conflicting('first');
+    expect(() => conflicting('second')).toThrow(/different primitive text bindings/i);
   });
 
   it('updates nested templates and arrays without replacing cached elements', () => {

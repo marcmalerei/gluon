@@ -26,6 +26,12 @@ dispatch. It uses the current Node 24-based `actions/checkout@v7` and
   Chromium/Firefox/WebKit rendering run retained for 30 days as JSON and
   Markdown workflow artifacts.
 
+The component comparison builds the compiler first and runs the harness through
+the official production Vite plugin. Compiler tests prove both the accepted
+primitive text/event shape and rejected conditional, attribute, multi-text, and
+custom-update shapes. Browser tests retain lifecycle hooks, reactive tracking,
+completion, and external-DOM recovery when compiled metadata is present.
+
 Package TypeScript configurations that replace the root path map retain every
 direct and transitive official source alias required by their typecheck. Their
 build configurations resolve those dependencies through built declarations.
@@ -246,10 +252,14 @@ gzip bytes. With issue #114's real Button/Input/FormField surfaces, app-local
 Molecule/Organism composition, and brand-token owner, the production entry
 measures 181,847 raw and 52,535 gzip bytes. That is 3,344 raw and 999 gzip bytes
 above the combined #112/#115 entry, and 23,695 raw and 6,852 gzip bytes above
-the issue #88 baseline of 158,152 raw and 45,683 gzip bytes. The reviewed regression ceilings
-are 182,000 raw bytes and 54,000 gzip bytes; HTML, image-byte, and image-count
-ceilings remain unchanged. These are composition measurements, not runtime-
-speed or framework-size claims. Vue is built only in the documentation host.
+the issue #88 baseline of 158,152 raw and 45,683 gzip bytes. Immediately before
+issue #179, the clean production graph measured 191,197 raw bytes and 55,385
+gzip bytes. The compiler-proven primitive text-update path in issue #179 raises
+that graph to 193,610 raw bytes and 55,897 gzip bytes. The reviewed regression
+ceilings are therefore 194,000 raw bytes and 56,000 gzip bytes; HTML,
+image-byte, and image-count ceilings remain unchanged. These are composition
+measurements, not runtime-speed or framework-size claims. Vue is built only in
+the documentation host.
 
 Issue #115 replaces aggregate component retention with usage-driven exact
 component sheets. `check:ui-contract` additionally

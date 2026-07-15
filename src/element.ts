@@ -1,7 +1,10 @@
 import {
+  getCompiledPrimitiveTextBinding,
   releaseRenderStyles,
   render,
   suspendRender,
+  updateCompiledPrimitiveTextBinding,
+  type CompiledPrimitiveTextBinding,
   type RefTarget,
   type TemplateResult,
   type TemplateValue,
@@ -10,6 +13,7 @@ import { adoptStyles } from './styles/index.js';
 import {
   effect,
   effectScope,
+  invalidateJob,
   queueJob,
   type EffectDebuggerEvent,
   type EffectScope,
@@ -178,6 +182,7 @@ const hotElementDefinitions = new Map<string, GluonElementConstructor>();
 const definedElementNames = new WeakMap<GluonElementClass, `${string}-${string}`>();
 const serverElementDefinitions = new Map<`${string}-${string}`, GluonElementClass>();
 const propertyValues = Symbol('gluon.property-values');
+const compiledTextBinding = Symbol('gluon.compiled-text-binding');
 const setProperty = Symbol('gluon.set-property');
 export const functionalElementPropertyChanged = Symbol('gluon.functional-element-property-changed');
 const publicInstance = Symbol('gluon.public-instance');
@@ -244,7 +249,12 @@ export abstract class GluonElement<
   private componentErrorReporter?: ComponentErrorReporter;
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
+  private [compiledTextBinding]?: CompiledPrimitiveTextBinding;
   private pendingUpdate?: UpdateDeferred;
+  private pendingPropertyUpdate?: string;
+  private pendingPropertyValue?: unknown;
+  private pendingFullUpdate = false;
+  private compiledPropertyUpdateJob?: () => void;
   private connectionRendered = false;
   private hydrationPending = false;
   private readonly connectedHooks: ComponentLifecycleCallback[] = [];
@@ -307,6 +317,8 @@ export abstract class GluonElement<
     const scope = this.renderScope;
     this.renderScope = undefined;
     this.renderEffect = undefined;
+    /* v8 ignore next -- production-only job ownership is covered by the built Vite integration. */
+    if (this.compiledPropertyUpdateJob) invalidateJob(this.compiledPropertyUpdateJob);
     try {
       scope?.stop();
     } finally {
@@ -440,7 +452,10 @@ export abstract class GluonElement<
 
   /** Commits the value returned by {@link render} into {@link renderRoot}. */
   protected update(): void {
-    render(this.render(), this.renderRoot);
+    const result = this.render();
+    render(result, this.renderRoot);
+    const binding = getCompiledPrimitiveTextBinding(result);
+    this[compiledTextBinding] = binding;
   }
 
   /**
@@ -486,13 +501,14 @@ export abstract class GluonElement<
     declaration: PropertyDeclaration,
     reflect = true,
   ): void {
-    this.providedProperties.add(name);
+    if (declaration.required) this.providedProperties.add(name);
     if (this.connected && declaration.validate) {
       this.validateContractValue('property', name, value, declaration.validate);
     }
     const oldValue = this[propertyValues].get(name);
-    const hasChanged = declaration.hasChanged ?? defaultHasChanged;
-    if (!hasChanged(value, oldValue)) return;
+    if (declaration.hasChanged
+      ? !declaration.hasChanged(value, oldValue)
+      : Object.is(value, oldValue)) return;
 
     this[propertyValues].set(name, value);
     const functionalObserver = (this as GluonElement<Events> & {
@@ -502,7 +518,9 @@ export abstract class GluonElement<
     if (reflect && declaration.reflect && this.connected) {
       this.reflectProperty(name, value, declaration);
     }
-    void this.queueUpdate(
+    void this.queuePropertyUpdate(
+      name,
+      value,
       compiledDevelopment !== false && isDevelopmentEnabled()
         ? {
             type: 'property',
@@ -541,7 +559,10 @@ export abstract class GluonElement<
         id: this.updateId,
         lazy: true,
         onSchedule: () => {
-          if (this.connected) this.ensurePendingUpdate();
+          if (this.connected) {
+            this.pendingFullUpdate = true;
+            this.ensurePendingUpdate();
+          }
         },
         ...(compiledDevelopment !== false && isDevelopmentEnabled() ? {
           onTrack: (dependency: EffectDebuggerEvent) => {
@@ -563,15 +584,92 @@ export abstract class GluonElement<
     if (compiledDevelopment !== false && isDevelopmentEnabled()) {
       if (cause) recordElementRenderCause(this, cause);
     }
+    this.pendingFullUpdate = true;
     const promise = this.ensurePendingUpdate();
     queueJob(runner, { phase: 'update', id: this.updateId });
     return promise;
+  }
+
+  private queuePropertyUpdate(
+    name: string,
+    value: unknown,
+    cause?: GluonRenderCause,
+  ): Promise<void> {
+    const runner = this.renderEffect;
+    if (!this.connected || !runner) return this.updatePromise;
+    if (compiledDevelopment !== false && isDevelopmentEnabled()) {
+      if (cause) recordElementRenderCause(this, cause);
+    }
+    if (this.pendingPropertyUpdate === undefined) this.pendingPropertyUpdate = name;
+    else if (this.pendingPropertyUpdate !== name) this.pendingFullUpdate = true;
+    this.pendingPropertyValue = value;
+    const promise = this.ensurePendingUpdate();
+    /* v8 ignore next -- the production compiler path is covered by the built Vite integration. */
+    if (
+      compiledDevelopment === false
+      && !this.pendingFullUpdate
+      && this.connectionRendered
+      && this[compiledTextBinding]?.property === name
+      && this.beforeUpdateHooks.length === 0
+      && this.updatedHooks.length === 0
+    ) {
+      const job = this.compiledPropertyUpdateJob ??= () => this.performCompiledPropertyUpdate();
+      queueJob(job, { phase: 'update', id: this.updateId });
+    } else {
+      queueJob(runner, { phase: 'update', id: this.updateId });
+    }
+    return promise;
+  }
+
+  /* v8 ignore next -- exercised in the production Vite integration and comparative browser build. */
+  private performCompiledPropertyUpdate(): void {
+    if (!this.connected) return;
+    const runner = this.renderEffect;
+    const property = this.pendingPropertyUpdate;
+    const value = this.pendingPropertyValue;
+    const binding = this[compiledTextBinding];
+    if (
+      !runner
+      || this.pendingFullUpdate
+      || this.hydrationPending
+      || !this.connectionRendered
+      || !property
+      || binding?.property !== property
+      || this.beforeUpdateHooks.length > 0
+      || this.updatedHooks.length > 0
+    ) {
+      if (runner) queueJob(runner, { phase: 'update', id: this.updateId });
+      return;
+    }
+
+    const deferred = this.pendingUpdate ?? createUpdateDeferred();
+    if (!this.pendingUpdate) this.updatePromise = deferred.promise;
+    this.pendingUpdate = undefined;
+    this.pendingPropertyUpdate = undefined;
+    this.pendingPropertyValue = undefined;
+    try {
+      if (!updateCompiledPrimitiveTextBinding(this.renderRoot, binding.index, value)) {
+        this.pendingUpdate = deferred;
+        this.pendingPropertyUpdate = property;
+        this.pendingPropertyValue = value;
+        this.pendingFullUpdate = true;
+        runner();
+        return;
+      }
+      deferred.resolve();
+    } catch (error) {
+      deferred.reject(error);
+      this.handleComponentError(error, 'render');
+    }
   }
 
   private performUpdate(): void {
     const deferred = this.pendingUpdate ?? createUpdateDeferred();
     if (!this.pendingUpdate) this.updatePromise = deferred.promise;
     this.pendingUpdate = undefined;
+    this.pendingPropertyUpdate = undefined;
+    this.pendingPropertyValue = undefined;
+    this.pendingFullUpdate = false;
 
     if (compiledDevelopment !== false && isDevelopmentEnabled()) {
       performElementUpdateWithDiagnostics(this, () => this.commitUpdate(deferred));
@@ -587,6 +685,7 @@ export abstract class GluonElement<
         return;
       }
       if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
+      this.releaseCompiledPrimitiveTextBinding();
       this.runOwned(() => this.update());
       if (!this.connectionRendered) {
         this.validateDeclaredSlots();
@@ -612,7 +711,14 @@ export abstract class GluonElement<
   private resolvePendingUpdate(): void {
     this.pendingUpdate?.resolve();
     this.pendingUpdate = undefined;
+    this.pendingPropertyUpdate = undefined;
+    this.pendingPropertyValue = undefined;
+    this.pendingFullUpdate = false;
     this.updatePromise = Promise.resolve();
+  }
+
+  private releaseCompiledPrimitiveTextBinding(): void {
+    this[compiledTextBinding] = undefined;
   }
 
   private runOwned<Result>(callback: () => Result): Result {
@@ -1302,8 +1408,4 @@ function toAttribute(value: unknown, type?: PropertyType): string | null {
   if (value == null) return null;
   if (type === Object || type === Array) return JSON.stringify(value);
   return String(value);
-}
-
-function defaultHasChanged(value: unknown, oldValue: unknown): boolean {
-  return !Object.is(value, oldValue);
 }

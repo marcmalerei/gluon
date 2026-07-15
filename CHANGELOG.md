@@ -22,6 +22,15 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The production compiler now marks only statically proven primitive
+  property-to-text templates. Matching `GluonElement` instances update that
+  Part through a guarded scheduler path while retaining property conversion,
+  validation, reflection, update ordering, `updateComplete`, DOM recovery, and
+  the general render fallback for lifecycle, hydration, reactive, structural,
+  or mutable-binding work.
+- Component property and state comparisons now use dedicated scenario classes
+  in all three frameworks, and the Gluon benchmark runs through the official
+  production Vite compiler rather than a source alias alone.
 - Synchronous Reactivity scheduler jobs now complete without an artificial
   microtask boundary between every job while real asynchronous jobs remain
   awaited in deterministic order.

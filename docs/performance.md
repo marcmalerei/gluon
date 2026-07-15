@@ -20,6 +20,15 @@ contiguous run, and move only the surrounding groups. These shortcuts retain
 the external-DOM recovery, cleanup, style, hydration, and keyed-identity
 contracts covered by the browser suite.
 
+Official production Vite builds also recognize a conservative component-level
+case: one fixed `GluonElement` template with one declared primitive property in
+a text Part and, optionally, one private readonly event handler. Property-only
+updates reuse the resolved Part and a smaller scheduler job. Lifecycle hooks,
+reactive or explicit concurrent updates, hydration, root disturbance,
+non-primitive values, and every unproven template shape use the full effect and
+renderer path. This optimization does not change standalone `html`/`render`
+behavior and is absent from development builds.
+
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
 medians and p95 values; the paired JSON file preserves every sample, invariant
@@ -65,7 +74,9 @@ npm run benchmark:components -- \
 ```
 
 Each command builds its benchmark with Vite in production mode and explicitly
-compiles aliased Gluon source with `__GLUON_DEV__` set to `false`. The runner
+compiles aliased Gluon source with `__GLUON_DEV__` set to `false`. The component
+matrix additionally builds `@gluonjs/compiler` and applies the official Gluon
+Vite plugin, so compiler-owned production paths are measured. The runner
 serves that exact output locally, launches each browser headlessly, rejects
 console errors or warnings, and writes JSON plus Markdown. Rendering uses a
 180-second per-browser timeout; components use 300 seconds. The JSON path
@@ -117,6 +128,8 @@ property includes only the label; state includes only the button; and list
 includes only the keyed list. This prevents a simple property or state cell
 from measuring unrelated reconciliation of 1,000 unchanged rows. Browser tests
 validate component count, scenario-specific output, and complete cleanup.
+Property and state use dedicated scenario classes in all three frameworks, so
+their render functions do not retain a benchmark-only scenario branch.
 
 One operation covers 50 component boundaries. List and lifecycle components own
 20 keyed rows each, so those scenarios cover 1,000 rows in total.
@@ -131,7 +144,11 @@ One operation covers 50 component boundaries. List and lifecycle components own
 Each framework settles through its public completion primitive before another
 operation begins. The shared batch is calibrated until the fastest framework
 takes at least 8 ms, and framework order rotates for warm-ups and measurements.
-Reported values are milliseconds per 50 components.
+The production runner gives every scenario a fresh browser context so lifecycle
+allocation and collection cannot carry into the property, state, or list
+cells. This isolation removes the cross-framework phase shifts observed when
+all four Firefox scenarios shared one long-lived context. Reported values are
+milliseconds per 50 components.
 
 ## Production-mode correction
 
@@ -147,7 +164,7 @@ with issues #172 and #174 supersede that framework-comparison interpretation.
 ## Current committed matrix
 
 The current rendering matrix measures clean source commit `4c7bdac`; the
-isolated-scenario component matrix measures clean source commit `47b1a0a`.
+isolated-scenario component matrix measures clean source commit `d006924`.
 Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
 Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
 JSON files retain every sample and invariant snapshot; the Markdown files
@@ -172,25 +189,28 @@ recorded workload results, not a general rendering ranking.
 ### Component matrix
 
 The complete
-[`component-production-47b1a0a.md`](../benchmarks/results/component-production-47b1a0a.md)
+[`component-production-d006924.md`](../benchmarks/results/component-production-d006924.md)
 matrix reports milliseconds per 50 component boundaries. Against Lit, Gluon
-wins lifecycle and keyed-list medians in Chromium and WebKit plus lifecycle in
-Firefox. Lit wins every isolated public-property and internal-state median plus
-Firefox keyed list. Lit median divided by Gluon median is
-1.31×/0.66×/0.82×/1.59× for Chromium lifecycle/property/state/list,
-1.38×/0.75×/0.65×/0.88× for Firefox, and
-1.38×/0.73×/0.92×/1.86× for WebKit.
+wins lifecycle and keyed-list medians in all three browsers. Lit wins property
+and state in all three. Lit median divided by Gluon median is
+1.33×/0.73×/0.91×/1.62× for Chromium lifecycle/property/state/list,
+1.25×/0.80×/0.82×/1.67× for Firefox, and
+1.57×/0.75×/0.88×/1.92× for WebKit.
 
-The remaining absolute Lit advantage per 50 components is 0.0080 ms for
-Chromium property and 0.0113 ms for Chromium state; 0.0500 ms and 0.2000 ms in
-Firefox; and 0.0050 ms and 0.0062 ms in WebKit. Gluon's state path now retains
-one native guarded event dispatcher while render callbacks change, but this
-matrix still records Lit as the faster simple-update implementation.
+The remaining absolute Lit advantage per 50 components is 0.0049 ms for
+Chromium property and 0.0048 ms for Chromium state; 0.0313 ms and 0.0468 ms in
+Firefox; and 0.0042 ms and 0.0084 ms in WebKit. Against the preceding clean
+`47b1a0a` Gluon matrix, the new Gluon property medians are 23.3%, 21.9%, and
+9.1% lower in Chromium, Firefox, and WebKit; state medians are 16.9%, 53.8%,
+and 11.1% lower. The new matrix also replaces the former scenario branch with
+dedicated property/state classes and isolates every scenario in a fresh browser
+context, so these separate-run deltas describe the complete compiler/runtime,
+fixture, and runner change and do not isolate one optimization.
 
-Against Vue, Gluon wins Chromium lifecycle/property/list while Vue wins state;
-wins Firefox list, ties lifecycle, and loses property/state; and wins WebKit
-property/state/list while lifecycle is equal. Across those 12 cells that is
-seven Gluon wins, two equal medians, and three Vue wins. This supports the
+Against Vue, Gluon wins all four Chromium cells; ties Firefox lifecycle, wins
+list, and loses property/state; and wins WebKit property/state/list while
+lifecycle is equal. Across those 12 cells that is eight Gluon wins, two equal
+medians, and two Vue wins. This supports the
 recorded lifecycle and keyed-list results without turning the matrix into a
 universal framework ranking.
 

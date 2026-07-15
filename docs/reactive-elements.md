@@ -88,6 +88,18 @@ preserve deterministic ordering within the update phase, while matching runner
 identity deduplicates declared-property and reactive invalidations that happen
 in the same synchronous turn.
 
+In an official production Vite build, the compiler can prove a narrower case:
+a direct fixed template whose only mutable rendered value is one declared
+primitive property in a text Part. An optional secondary event binding must be
+a private readonly function field. For that shape, a property-only batch can
+commit the recorded Part without rerunning the render method. The same update
+phase ordering and `updateComplete` promise remain in force. Registered
+`onBeforeUpdate()` or `onUpdated()` hooks, a simultaneous reactive or explicit
+update, hydration, a disturbed renderer root, a non-primitive value, or any
+unproven template shape uses the normal render effect in the same update.
+Development builds also retain the effect path so render diagnostics and
+dependency evidence remain complete.
+
 ## Connection ownership
 
 Connection creates a new detached effect scope and queues the lazy render
