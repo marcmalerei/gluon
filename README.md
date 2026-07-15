@@ -60,8 +60,8 @@ The repository includes two reproducible production comparisons:
 
 Both commands validate observable output, calibrate a shared batch, rotate
 framework order, retain every sample, and run Chromium, Firefox, and WebKit.
-The latest clean Apple M4 matrices use 40 measured samples after eight warm-up
-rounds:
+The latest clean Apple M4 matrices use 40 measured samples. Rendering uses
+eight warm-up rounds; the component matrix uses 40 to settle browser tiering:
 
 | Production matrix | Gluon median vs Lit | Gluon median vs Vue |
 | --- | --- | --- |

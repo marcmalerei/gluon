@@ -53,9 +53,10 @@ npm run benchmark:rendering
 npm run benchmark:components
 ```
 
-The default run uses Chromium, Firefox, and WebKit with eight warm-up rounds and
-40 measured samples. A shorter local diagnostic run can select browsers and
-sample counts explicitly:
+The default run uses Chromium, Firefox, and WebKit with 40 measured samples.
+Rendering uses eight warm-up rounds; components use 40 warm-up rounds to settle
+browser tiering before measurement. A shorter local diagnostic run can select
+browsers and sample counts explicitly:
 
 ```bash
 npm run benchmark:rendering -- \
@@ -144,7 +145,9 @@ One operation covers 50 component boundaries. List and lifecycle components own
 Each framework settles through its public completion primitive before another
 operation begins. The shared batch is calibrated until the fastest framework
 takes at least 8 ms, and framework order rotates for warm-ups and measurements.
-Reported values are milliseconds per 50 components.
+The component runner performs 40 warm-up rounds by default; repeated Firefox
+runs with eight rounds showed cross-framework timing phase shifts inside the
+measured window. Reported values are milliseconds per 50 components.
 
 ## Production-mode correction
 
@@ -161,10 +164,10 @@ with issues #172 and #174 supersede that framework-comparison interpretation.
 
 The current rendering matrix measures clean source commit `4c7bdac`; the
 isolated-scenario component matrix measures clean source commit `267533e`.
-Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
-Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
-JSON files retain every sample and invariant snapshot; the Markdown files
-expose every median and p95 value.
+Both use 40 samples and Playwright-managed Chromium 149, Firefox 151, and WebKit
+26.5 on the recorded Apple M4 environment. Rendering uses eight warm-up rounds;
+components use 40. The paired JSON files retain every sample and invariant
+snapshot; the Markdown files expose every median and p95 value.
 
 ### Template rendering matrix
 

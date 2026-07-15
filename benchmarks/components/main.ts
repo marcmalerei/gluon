@@ -64,7 +64,7 @@ export async function runComponentComparison(
   config: ComponentBenchmarkConfig = {},
 ): Promise<ComponentBenchmarkResult> {
   const samples = positiveInteger(config.samples ?? 40, 'samples');
-  const warmupRounds = positiveInteger(config.warmupRounds ?? 8, 'warmupRounds');
+  const warmupRounds = positiveInteger(config.warmupRounds ?? 40, 'warmupRounds');
   const scenarios: ComponentScenarioBenchmarkResult[] = [];
 
   for (const scenario of componentScenarios) {

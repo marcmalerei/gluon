@@ -131,7 +131,7 @@ function parseOptions(args) {
   }));
   const browsers = (values['--browsers'] ?? 'chromium,firefox,webkit').split(',');
   const samples = positiveInteger(values['--samples'] ?? '40', 'samples');
-  const warmupRounds = positiveInteger(values['--warmup'] ?? '8', 'warmup');
+  const warmupRounds = positiveInteger(values['--warmup'] ?? '40', 'warmup');
   const browserTimeoutMs = positiveInteger(values['--timeout'] ?? '300000', 'timeout');
   const output = values['--output'] ?? '.tmp/component-benchmark-results.json';
   if (extname(output) !== '.json') throw new Error('--output must end in .json.');
