@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-07-15
+
+### Changed
+
+- Skipped development-mode detection on dependency tracking and triggering
+  paths when an effect has no corresponding debugger hook.
+
 ## [1.0.7] - 2026-07-14
 
 ### Changed

@@ -7,6 +7,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-07-15
+
 ### Changed
 
 - Cached each compiled template as an active-document `DocumentFragment` so
