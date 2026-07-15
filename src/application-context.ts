@@ -102,7 +102,7 @@ export interface ApplicationContext {
   readonly components: Map<string, FunctionalComponent<unknown>>;
 }
 
-interface RuntimeFrame {
+export interface ApplicationRuntimeFrame {
   readonly context?: ApplicationContext;
   readonly element?: Element;
   readonly handleError: (error: unknown, source: AppErrorSource) => void;
@@ -110,7 +110,7 @@ interface RuntimeFrame {
 
 const applicationRoots = new WeakMap<Node, ApplicationContext>();
 const eventWrappers = new WeakMap<object, WeakMap<object, EventListener>>();
-let activeFrame: RuntimeFrame | undefined;
+let activeFrame: ApplicationRuntimeFrame | undefined;
 
 export function createInjectionKey<Value>(description?: string): InjectionKey<Value> {
   return Symbol(description) as InjectionKey<Value>;
@@ -143,11 +143,18 @@ export function resolveApplicationContext(node: Node): ApplicationContext | unde
 export function runWithApplicationContext<Result>(
   context: ApplicationContext | undefined,
   element: Element | undefined,
-  handleError: RuntimeFrame['handleError'],
+  handleError: ApplicationRuntimeFrame['handleError'],
+  callback: () => Result,
+): Result {
+  return runWithApplicationFrame({ context, element, handleError }, callback);
+}
+
+export function runWithApplicationFrame<Result>(
+  frame: ApplicationRuntimeFrame,
   callback: () => Result,
 ): Result {
   const previous = activeFrame;
-  activeFrame = { context, element, handleError };
+  activeFrame = frame;
   try {
     return callback();
   } finally {

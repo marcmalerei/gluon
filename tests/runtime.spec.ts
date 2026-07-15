@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   directive,
+  event,
   html,
   render,
   type PartController,
@@ -87,6 +88,31 @@ describe('template runtime', () => {
     expect(secondHandler).toHaveBeenCalledTimes(1);
   });
 
+  it('updates event callbacks without replacing the native listener', () => {
+    const root = document.createElement('div');
+    const first = vi.fn();
+    const second = vi.fn();
+    const view = (listener: EventListener, capture = false) => html`
+      <button @click=${event(listener, { capture })}>Run</button>
+    `;
+
+    render(view(first), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    const add = vi.spyOn(button, 'addEventListener');
+    const remove = vi.spyOn(button, 'removeEventListener');
+
+    render(view(second), root);
+    button.click();
+    expect(add).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledOnce();
+
+    render(view(first, true), root);
+    expect(remove).toHaveBeenCalledOnce();
+    expect(add).toHaveBeenCalledOnce();
+  });
+
   it('spreads and reconciles classes, styles, data, aria, refs, and events', () => {
     const root = document.createElement('div');
     const firstClick = vi.fn();
@@ -107,6 +133,8 @@ describe('template runtime', () => {
     }), root);
 
     const button = root.querySelector('button') as HTMLButtonElement;
+    const add = vi.spyOn(button, 'addEventListener');
+    const remove = vi.spyOn(button, 'removeEventListener');
     button.click();
     expect(button.className).toBe('action');
     expect(button.style.color).toBe('red');
@@ -135,6 +163,8 @@ describe('template runtime', () => {
     expect(secondRef.value).toBe(button);
     expect(firstClick).toHaveBeenCalledTimes(1);
     expect(secondClick).toHaveBeenCalledTimes(1);
+    expect(add).not.toHaveBeenCalled();
+    expect(remove).not.toHaveBeenCalled();
 
     render(view({ title: 'Minimal' }), root);
     button.click();
@@ -146,6 +176,7 @@ describe('template runtime', () => {
     expect(button.getAttribute('aria-label')).toBeNull();
     expect(secondRef.value).toBeUndefined();
     expect(secondClick).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalledOnce();
   });
 
   it('runs custom directives against a part controller', () => {

@@ -27,6 +27,7 @@ interface ComponentItem {
 }
 
 interface BenchmarkElement extends HTMLElement {
+  scenario: ComponentScenario;
   label: string;
   items: readonly ComponentItem[];
   readonly updateComplete?: Promise<void>;
@@ -56,6 +57,7 @@ const reversedItems = [...forwardItems].reverse();
 
 class GluonBenchmarkCard extends GluonElement {
   static override readonly properties = {
+    scenario: { type: String, default: 'lifecycle' },
     label: { type: String, default: 'Component 0 A' },
     items: {
       attribute: false,
@@ -63,27 +65,45 @@ class GluonBenchmarkCard extends GluonElement {
     },
   } as const;
 
+  declare scenario: ComponentScenario;
   declare label: string;
   declare items: readonly ComponentItem[];
   private count = 0;
 
   protected override render() {
+    if (this.scenario === 'property') {
+      return gluonHtml`<article><h2 data-role="label">${this.label}</h2></article>`;
+    }
+    if (this.scenario === 'state') {
+      return gluonHtml`<article>${this.renderButton()}</article>`;
+    }
+    if (this.scenario === 'list') {
+      return gluonHtml`<article>${this.renderList()}</article>`;
+    }
     return gluonHtml`
       <article>
         <h2 data-role="label">${this.label}</h2>
-        <button type="button" data-role="count" @click=${() => {
-          this.count += 1;
-          void this.requestUpdate();
-        }}>
-          Count: ${this.count}
-        </button>
-        <ul>${gluonRepeat(
-          this.items,
-          (item) => item.id,
-          (item) => gluonHtml`<li data-id=${item.id}>${item.label}</li>`,
-        )}</ul>
+        ${this.renderButton()}
+        ${this.renderList()}
       </article>
     `;
+  }
+
+  private renderButton() {
+    return gluonHtml`
+      <button type="button" data-role="count" @click=${() => {
+        this.count += 1;
+        void this.requestUpdate();
+      }}>Count: ${this.count}</button>
+    `;
+  }
+
+  private renderList() {
+    return gluonHtml`<ul>${gluonRepeat(
+      this.items,
+      (item) => item.id,
+      (item) => gluonHtml`<li data-id=${item.id}>${item.label}</li>`,
+    )}</ul>`;
   }
 }
 
@@ -91,36 +111,58 @@ defineElement('gluon-benchmark-card', GluonBenchmarkCard);
 
 class LitBenchmarkCard extends LitElement {
   static override readonly properties = {
+    scenario: { type: String },
     label: { type: String },
     items: { attribute: false },
     count: { state: true },
   };
 
+  declare scenario: ComponentScenario;
   declare label: string;
   declare items: readonly ComponentItem[];
   protected declare count: number;
 
   constructor() {
     super();
+    this.scenario = 'lifecycle';
     this.label = 'Component 0 A';
     this.items = forwardItems;
     this.count = 0;
   }
 
   protected override render() {
+    if (this.scenario === 'property') {
+      return litHtml`<article><h2 data-role="label">${this.label}</h2></article>`;
+    }
+    if (this.scenario === 'state') {
+      return litHtml`<article>${this.renderButton()}</article>`;
+    }
+    if (this.scenario === 'list') {
+      return litHtml`<article>${this.renderList()}</article>`;
+    }
     return litHtml`
       <article>
         <h2 data-role="label">${this.label}</h2>
-        <button type="button" data-role="count" @click=${() => { this.count += 1; }}>
-          Count: ${this.count}
-        </button>
-        <ul>${litRepeat(
-          this.items,
-          (item) => item.id,
-          (item) => litHtml`<li data-id=${item.id}>${item.label}</li>`,
-        )}</ul>
+        ${this.renderButton()}
+        ${this.renderList()}
       </article>
     `;
+  }
+
+  private renderButton() {
+    return litHtml`
+      <button type="button" data-role="count" @click=${() => { this.count += 1; }}>
+        Count: ${this.count}
+      </button>
+    `;
+  }
+
+  private renderList() {
+    return litHtml`<ul>${litRepeat(
+      this.items,
+      (item) => item.id,
+      (item) => litHtml`<li data-id=${item.id}>${item.label}</li>`,
+    )}</ul>`;
   }
 }
 
@@ -128,24 +170,34 @@ customElements.define('lit-benchmark-card', LitBenchmarkCard);
 
 const VueBenchmarkCard = defineVueCustomElement({
   props: {
+    scenario: { type: String, default: 'lifecycle' },
     label: { type: String, default: 'Component 0 A' },
     items: { type: Array, default: () => forwardItems },
   },
   setup(props) {
     const count = vueRef(0);
-    return () => vueH('article', null, [
-      vueH('h2', { 'data-role': 'label' }, props.label),
-      vueH('button', {
-        type: 'button',
-        'data-role': 'count',
-        onClick: () => { count.value += 1; },
-      }, `Count: ${count.value}`),
-      vueH('ul', null, (props.items as ComponentItem[]).map((item) => vueH(
-        'li',
-        { key: item.id, 'data-id': String(item.id) },
-        item.label,
-      ))),
-    ]);
+    const button = () => vueH('button', {
+      type: 'button',
+      'data-role': 'count',
+      onClick: () => { count.value += 1; },
+    }, `Count: ${count.value}`);
+    const list = () => vueH('ul', null, (props.items as ComponentItem[]).map((item) => vueH(
+      'li',
+      { key: item.id, 'data-id': String(item.id) },
+      item.label,
+    )));
+    return () => {
+      if (props.scenario === 'property') {
+        return vueH('article', null, [vueH('h2', { 'data-role': 'label' }, props.label)]);
+      }
+      if (props.scenario === 'state') return vueH('article', null, [button()]);
+      if (props.scenario === 'list') return vueH('article', null, [list()]);
+      return vueH('article', null, [
+        vueH('h2', { 'data-role': 'label' }, props.label),
+        button(),
+        list(),
+      ]);
+    };
   },
 });
 
@@ -157,7 +209,7 @@ export async function createComponentHarness(
 ): Promise<ComponentHarness> {
   if (scenario === 'lifecycle') return createLifecycleHarness(framework);
 
-  const mounted = await mountComponents(framework);
+  const mounted = await mountComponents(framework, scenario);
   let alternate = false;
   return {
     async run() {
@@ -185,14 +237,14 @@ export async function createComponentHarness(
 }
 
 async function createLifecycleHarness(framework: ComponentFramework): Promise<ComponentHarness> {
-  const baseline = await mountComponents(framework);
+  const baseline = await mountComponents(framework, 'lifecycle');
   const snapshot = readSnapshot(baseline.elements);
   baseline.root.remove();
   await settleDisconnect();
 
   return {
     async run() {
-      const mounted = await mountComponents(framework);
+      const mounted = await mountComponents(framework, 'lifecycle');
       mounted.root.remove();
       await settleDisconnect();
     },
@@ -201,7 +253,10 @@ async function createLifecycleHarness(framework: ComponentFramework): Promise<Co
   };
 }
 
-async function mountComponents(framework: ComponentFramework): Promise<{
+async function mountComponents(
+  framework: ComponentFramework,
+  scenario: ComponentScenario,
+): Promise<{
   readonly root: HTMLDivElement;
   readonly elements: readonly BenchmarkElement[];
 }> {
@@ -212,6 +267,7 @@ async function mountComponents(framework: ComponentFramework): Promise<{
   const elements: BenchmarkElement[] = [];
   for (let index = 0; index < COMPONENT_COUNT; index += 1) {
     const element = document.createElement(`${framework}-benchmark-card`) as BenchmarkElement;
+    element.scenario = scenario;
     element.label = `Component ${index} A`;
     element.items = forwardItems;
     elements.push(element);

@@ -164,7 +164,9 @@ function validateSnapshots(
   if (snapshots[0]?.componentCount !== COMPONENT_COUNT) {
     throw new Error(`${scenario} produced ${snapshots[0]?.componentCount ?? 0} components instead of ${COMPONENT_COUNT}.`);
   }
-  const expectedRows = COMPONENT_COUNT * ITEMS_PER_COMPONENT;
+  const expectedRows = scenario === 'lifecycle' || scenario === 'list'
+    ? COMPONENT_COUNT * ITEMS_PER_COMPONENT
+    : 0;
   if (snapshots[0]?.rowCount !== expectedRows) {
     throw new Error(`${scenario} produced ${snapshots[0]?.rowCount ?? 0} rows instead of ${expectedRows}.`);
   }

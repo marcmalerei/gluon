@@ -54,14 +54,27 @@ The repository includes two reproducible production comparisons:
   Vue, and optimized Vanilla DOM workloads.
 - `npm run benchmark:components` measures 50 autonomous Gluon, Lit, and Vue
   Custom Elements with open Shadow DOM across lifecycle, public property,
-  internal state, and keyed-list work. Each component owns 20 keyed rows, so a
-  list operation updates 1,000 rows through 50 real component boundaries.
+  internal state, and keyed-list work. Each scenario renders only its relevant
+  surface; list and lifecycle own 20 keyed rows per component, so their list
+  work covers 1,000 rows through 50 real component boundaries.
 
 Both commands validate observable output, calibrate a shared batch, rotate
 framework order, retain every sample, and run Chromium, Firefox, and WebKit.
-The latest clean Apple M4 matrices and exact interpretation boundaries are in
-[Rendering and component performance evidence](docs/performance.md). They do
-not establish universal superiority and do not establish M1 results.
+The latest clean Apple M4 matrices use 40 measured samples after eight warm-up
+rounds:
+
+| Production matrix | Gluon median vs Lit | Gluon median vs Vue |
+| --- | --- | --- |
+| Template rendering | faster in 12/12 browser/scenario cells | faster in 11/12; Vue wins WebKit create |
+| Custom Element components | clean isolated-scenario matrix generated below | clean isolated-scenario matrix generated below |
+
+The paired raw evidence is retained for
+[template rendering](benchmarks/results/rendering-production-4c7bdac.md) and
+[components](benchmarks/results/). Exact
+medians, p95 values, methodology, and interpretation boundaries are in
+[Rendering and component performance evidence](docs/performance.md). These
+recorded M4 results do not establish universal superiority and do not establish
+M1 results.
 
 ## Repository development
 

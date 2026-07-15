@@ -15,7 +15,10 @@ const outputPath = resolve(root, options.output);
 const markdownPath = outputPath.slice(0, -extname(outputPath).length) + '.md';
 
 await build({ configFile });
-const server = await preview({ configFile });
+const server = await preview({
+  configFile,
+  preview: { host: '127.0.0.1', port: 0, strictPort: false },
+});
 const url = server.resolvedUrls?.local[0];
 if (!url) throw new Error('Vite preview did not expose a local component benchmark URL.');
 
@@ -106,6 +109,7 @@ const evidence = {
     productionBuild: true,
     headless: true,
     componentBoundary: 'autonomous Custom Elements with open Shadow DOM for Gluon, Lit, and Vue',
+    scenarioIsolation: 'property renders label only; state renders button only; list renders keyed rows only; lifecycle renders all three',
     frameworkOrder: 'rotated for every warm-up and measured sample',
     unit: 'milliseconds per 50 components; lower is faster',
   },
@@ -180,7 +184,7 @@ function renderMarkdown(evidence) {
     '',
     `Packages: Gluon ${evidence.environment.packages.gluon}, Lit ${evidence.environment.packages.lit}, Vue ${evidence.environment.packages.vue}, Playwright ${evidence.environment.packages.playwright}, Vite ${evidence.environment.packages.vite}`,
     '',
-    `Method: production build; 50 autonomous Custom Elements with open Shadow DOM per operation; 20 keyed rows per component; batches calibrated to at least ${evidence.methodology.minimumBatchDurationMs} ms for the fastest framework; ${evidence.methodology.warmupRounds} warm-up rounds; and ${evidence.methodology.samples} interleaved samples per framework and scenario. Lower latency is faster. Ratios are framework median ÷ Gluon median; values above 1 mean Gluon was faster in that browser/scenario.`,
+    `Method: production build; 50 autonomous Custom Elements with open Shadow DOM per operation; scenario-specific component surfaces; 20 keyed rows per component in lifecycle/list; batches calibrated to at least ${evidence.methodology.minimumBatchDurationMs} ms for the fastest framework; ${evidence.methodology.warmupRounds} warm-up rounds; and ${evidence.methodology.samples} interleaved samples per framework and scenario. Lower latency is faster. Ratios are framework median ÷ Gluon median; values above 1 mean Gluon was faster in that browser/scenario.`,
     '',
   ];
   for (const run of evidence.runs) {

@@ -15,7 +15,10 @@ const outputPath = resolve(root, options.output);
 const markdownPath = outputPath.slice(0, -extname(outputPath).length) + '.md';
 
 await build({ configFile });
-const server = await preview({ configFile });
+const server = await preview({
+  configFile,
+  preview: { host: '127.0.0.1', port: 0, strictPort: false },
+});
 const url = server.resolvedUrls?.local[0];
 if (!url) throw new Error('Vite preview did not expose a local benchmark URL.');
 

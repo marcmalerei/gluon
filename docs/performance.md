@@ -111,12 +111,15 @@ above 1 means Gluon was faster for only that browser and workload.
 
 Gluon uses the public `GluonElement` class, Lit uses `LitElement`, and Vue uses
 `defineCustomElement`. Every implementation is an autonomous Custom Element
-with open Shadow DOM and the same observable `<article>`, label, button count,
-and keyed list. Browser tests validate component count, total row count, labels,
-state, boundary row IDs, and complete sandbox cleanup.
+with open Shadow DOM. Each scenario renders the same focused observable surface
+in all three frameworks: lifecycle includes label, button, and keyed list;
+property includes only the label; state includes only the button; and list
+includes only the keyed list. This prevents a simple property or state cell
+from measuring unrelated reconciliation of 1,000 unchanged rows. Browser tests
+validate component count, scenario-specific output, and complete cleanup.
 
-One operation covers 50 component boundaries. Every component owns 20 keyed
-rows, so the list scenario reconciles 1,000 rows in total.
+One operation covers 50 component boundaries. List and lifecycle components own
+20 keyed rows each, so those scenarios cover 1,000 rows in total.
 
 | Scenario | Work per operation |
 | --- | --- |
@@ -143,11 +146,38 @@ with issues #172 and #174 supersede that framework-comparison interpretation.
 
 ## Current committed matrix
 
-The current clean production-mode rendering and component matrices are retained
-as paired JSON and Markdown files under
-[`benchmarks/results/`](../benchmarks/results/). The evidence commit, exact
-medians, p95 values, and run-specific interpretation are recorded in the next
-evidence commit after the full 40-sample runs complete.
+Both current matrices measure clean source commit `4c7bdac` with 40 samples,
+eight warm-up rounds, and Playwright-managed Chromium 149, Firefox 151, and
+WebKit 26.5 on the recorded Apple M4 environment. The paired JSON files retain
+every sample and invariant snapshot; the Markdown files expose every median and
+p95 value.
+
+### Template rendering matrix
+
+The complete
+[`rendering-production-4c7bdac.md`](../benchmarks/results/rendering-production-4c7bdac.md)
+matrix shows Gluon faster than Lit in all 12 browser/scenario median
+comparisons. Lit median divided by Gluon median is
+1.02×/2.66×/1.45×/1.96× for Chromium text/create/update/reverse,
+1.08×/2.73×/1.67×/1.94× for Firefox, and
+1.09×/2.45×/1.33×/2.11× for WebKit.
+
+Gluon is faster than Vue in 11 of 12 cells. Vue wins WebKit `create` at
+0.4167 ms/op versus Gluon's 0.4583 ms/op. The optimized Vanilla DOM harness is
+faster for Chromium reverse, Firefox text/update/reverse, and WebKit reverse;
+Gluon is faster in the other seven Vanilla comparisons. This supports the
+recorded workload results, not a general rendering ranking.
+
+### Component matrix
+
+The clean isolated-scenario component matrix is generated from the next clean
+implementation commit and retained beside the rendering evidence. It reports
+milliseconds per 50 component boundaries and must keep Lit's remaining simple
+update advantage explicit instead of averaging it into lifecycle or list work.
+
+Neither matrix measures an Apple M1. Hardware model, operating system, browser,
+thermal state, and other load are part of the evidence boundary; an M1 result
+requires its own retained output from the same command.
 
 ## Historical rendering diagnostics
 
