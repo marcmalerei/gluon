@@ -6,7 +6,7 @@ import { chromium, firefox, webkit } from 'playwright';
 import { build, preview } from 'vite';
 
 const root = resolve(import.meta.dirname, '..');
-const configFile = resolve(root, 'benchmarks/rendering/vite.config.ts');
+const configFile = resolve(root, 'benchmarks/components/vite.config.ts');
 const options = parseOptions(process.argv.slice(2));
 const browserTypes = { chromium, firefox, webkit };
 const packageJson = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
@@ -20,7 +20,7 @@ const server = await preview({
   preview: { host: '127.0.0.1', port: 0, strictPort: false },
 });
 const url = server.resolvedUrls?.local[0];
-if (!url) throw new Error('Vite preview did not expose a local benchmark URL.');
+if (!url) throw new Error('Vite preview did not expose a local component benchmark URL.');
 
 const runs = [];
 try {
@@ -47,14 +47,14 @@ try {
       await page.goto(url, { waitUntil: 'networkidle' });
       const result = await withTimeout(
         page.evaluate(
-          (config) => window.runRenderingComparison(config),
+          (config) => window.runComponentComparison(config),
           { samples: options.samples, warmupRounds: options.warmupRounds },
         ),
         options.browserTimeoutMs,
-        `${browserName} benchmark`,
+        `${browserName} component benchmark`,
       );
       if (consoleProblems.length > 0) {
-        throw new Error(`${browserName} logged benchmark errors: ${JSON.stringify(consoleProblems)}`);
+        throw new Error(`${browserName} logged component benchmark errors: ${JSON.stringify(consoleProblems)}`);
       }
       runs.push({
         browser: browserName,
@@ -88,7 +88,6 @@ const evidence = {
     packages: {
       gluon: packageJson.version,
       lit: installedVersion('lit'),
-      litHtml: installedVersion('lit-html'),
       vue: installedVersion('vue'),
       playwright: installedVersion('playwright'),
       vite: installedVersion('vite'),
@@ -96,19 +95,23 @@ const evidence = {
   },
   methodology: {
     workloads: {
-      text: 'alternate one text binding in an otherwise stable template',
-      create: 'create a fresh detached root with 1,000 keyed rows',
-      update: 'alternate all text values across 1,000 keyed rows',
-      reverse: 'reverse and restore 1,000 keyed rows',
+      lifecycle: 'create, connect, render, disconnect, and clean up 50 autonomous Custom Elements',
+      property: 'update one public string property across 50 mounted Custom Elements',
+      state: 'dispatch one internal button interaction across 50 mounted Custom Elements',
+      list: 'reverse and restore 20 keyed rows inside each of 50 mounted Custom Elements',
     },
+    componentCount: 50,
+    itemsPerComponent: 20,
     samples: options.samples,
     warmupRounds: options.warmupRounds,
     minimumBatchDurationMs: 8,
     browserTimeoutMs: options.browserTimeoutMs,
     productionBuild: true,
     headless: true,
+    componentBoundary: 'autonomous Custom Elements with open Shadow DOM for Gluon, Lit, and Vue',
+    scenarioIsolation: 'property renders label only; state renders button only; list renders keyed rows only; lifecycle renders all three',
     frameworkOrder: 'rotated for every warm-up and measured sample',
-    unit: 'milliseconds per operation; lower is faster',
+    unit: 'milliseconds per 50 components; lower is faster',
   },
   runs,
 };
@@ -129,8 +132,8 @@ function parseOptions(args) {
   const browsers = (values['--browsers'] ?? 'chromium,firefox,webkit').split(',');
   const samples = positiveInteger(values['--samples'] ?? '40', 'samples');
   const warmupRounds = positiveInteger(values['--warmup'] ?? '8', 'warmup');
-  const browserTimeoutMs = positiveInteger(values['--timeout'] ?? '180000', 'timeout');
-  const output = values['--output'] ?? '.tmp/rendering-benchmark-results.json';
+  const browserTimeoutMs = positiveInteger(values['--timeout'] ?? '300000', 'timeout');
+  const output = values['--output'] ?? '.tmp/component-benchmark-results.json';
   if (extname(output) !== '.json') throw new Error('--output must end in .json.');
   return { browsers, samples, warmupRounds, browserTimeoutMs, output };
 }
@@ -171,7 +174,7 @@ async function withTimeout(promise, timeoutMs, label) {
 
 function renderMarkdown(evidence) {
   const lines = [
-    '# Rendering benchmark evidence',
+    '# Component benchmark evidence',
     '',
     `Generated: ${evidence.generatedAt}`,
     '',
@@ -179,14 +182,14 @@ function renderMarkdown(evidence) {
     '',
     `Environment: ${evidence.environment.cpu}, ${evidence.environment.logicalCpus} logical CPUs, ${formatBytes(evidence.environment.totalMemoryBytes)} memory, ${evidence.environment.platform} ${evidence.environment.release}`,
     '',
-    `Packages: Gluon ${evidence.environment.packages.gluon}, Lit ${evidence.environment.packages.lit} / lit-html ${evidence.environment.packages.litHtml}, Vue ${evidence.environment.packages.vue}, Playwright ${evidence.environment.packages.playwright}, Vite ${evidence.environment.packages.vite}`,
+    `Packages: Gluon ${evidence.environment.packages.gluon}, Lit ${evidence.environment.packages.lit}, Vue ${evidence.environment.packages.vue}, Playwright ${evidence.environment.packages.playwright}, Vite ${evidence.environment.packages.vite}`,
     '',
-    `Method: production build, batches calibrated to at least ${evidence.methodology.minimumBatchDurationMs} ms for the fastest renderer, ${evidence.methodology.warmupRounds} warm-up rounds, and ${evidence.methodology.samples} interleaved samples per renderer and scenario. The text scenario updates one binding; create, update, and reverse operate on 1,000 keyed rows. Lower latency is faster. Ratios are renderer median ÷ Gluon median; values above 1 mean Gluon was faster in that browser/scenario.`,
+    `Method: production build; 50 autonomous Custom Elements with open Shadow DOM per operation; scenario-specific component surfaces; 20 keyed rows per component in lifecycle/list; batches calibrated to at least ${evidence.methodology.minimumBatchDurationMs} ms for the fastest framework; ${evidence.methodology.warmupRounds} warm-up rounds; and ${evidence.methodology.samples} interleaved samples per framework and scenario. Lower latency is faster. Ratios are framework median ÷ Gluon median; values above 1 mean Gluon was faster in that browser/scenario.`,
     '',
   ];
   for (const run of evidence.runs) {
     lines.push(`## ${run.browser} ${run.browserVersion}`, '');
-    lines.push('| Scenario | Renderer | Batch | Median ms/op | p95 ms/op | vs Gluon |', '| --- | --- | ---: | ---: | ---: | ---: |');
+    lines.push('| Scenario | Framework | Batch | Median ms/50 components | p95 ms/50 components | vs Gluon |', '| --- | --- | ---: | ---: | ---: | ---: |');
     for (const scenario of run.result.scenarios) {
       for (const result of scenario.results) {
         lines.push(`| ${scenario.scenario} | ${result.framework} | ${result.batchSize} | ${formatMilliseconds(result.statistics.median)} | ${formatMilliseconds(result.statistics.p95)} | ${result.relativeToGluonMedian.toFixed(2)}× |`);
@@ -194,7 +197,7 @@ function renderMarkdown(evidence) {
     }
     lines.push('');
   }
-  lines.push('Every individual measured sample is preserved in the accompanying JSON file.', '');
+  lines.push('Every individual measured sample and validated output snapshot is preserved in the accompanying JSON file.', '');
   return `${lines.join('\n')}\n`;
 }
 

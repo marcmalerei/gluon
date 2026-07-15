@@ -221,9 +221,10 @@ phases. Each phase sorts ascending numeric IDs before insertion order, providing
 an explicit parent-before-child mechanism. A phase queued after that phase has
 already completed runs in the next cycle; one flush drains all cycles before
 `nextTick` resolves. Promise-returning jobs are awaited within their phase and
-their rejections use the same error channel. A recursion limit routes
-self-queueing failures through the error channel without rejecting the flush
-promise.
+their rejections use the same error channel. Synchronous jobs run back-to-back
+inside the phase without one artificial microtask per job. A recursion limit
+routes self-queueing failures through the error channel without rejecting the
+flush promise.
 
 Effects remain synchronous unless they select `pre`, `update`, or `post`. Lazy
 effects can defer their first execution and expose an eager scheduling hook for
@@ -269,7 +270,11 @@ The runtime currently has three Part types:
 - `AttributePart` handles attributes plus `.property`, `?boolean`, and `@event` prefixes.
 - `SpreadPart` reconciles prop objects, including classes, style maps, `data`, `aria`, events, and refs.
 
-Event listeners and refs are disconnected when a binding changes or a template is replaced. Spread sub-maps remove only attributes or style properties previously owned by that Part.
+Event Parts retain one native guarded dispatcher while callbacks change and
+the event-options value stays identical. They replace the native listener when
+that options value changes, and disconnect it when the binding or template is
+removed. Refs follow their normal change/removal lifecycle. Spread sub-maps
+remove only attributes or style properties previously owned by that Part.
 
 Root and nested template instances refresh their rendered top-level node sets
 after every successful update. This keeps renderer ownership accurate when a
@@ -545,3 +550,14 @@ order, runs in Chromium, Firefox, and WebKit, and retains raw samples plus exact
 environment metadata. [`performance.md`](performance.md) defines the workloads,
 interpretation rules, and measurement limits. The benchmark has no application
 runtime dependency and is intentionally not a GLUON GOODS customer route.
+
+`npm run benchmark:components` applies the same production and evidence
+contract to 50 autonomous Custom Elements per framework. Gluon uses the public
+`GluonElement` class, Lit uses `LitElement`, and Vue uses
+`defineCustomElement`; all three render open Shadow DOM and identical
+scenario-specific surfaces. Lifecycle includes label, internal button state,
+and 20 keyed rows; property renders only the label; state only the button; and
+list only the 20 keyed rows. Operations settle through each framework's public
+completion API before the next operation. The comparative Vite configs
+explicitly compile aliased Gluon source with `__GLUON_DEV__` disabled, and
+`npm run check:benchmark-builds` enforces that production-mode boundary.

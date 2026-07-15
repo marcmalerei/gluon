@@ -48,7 +48,8 @@ IDs retain insertion order. Work queued for a phase that already completed runs
 in the next cycle of the same flush. `nextTick()` resolves only after every
 cycle, including post-flush work, is complete. A queued job may return a promise;
 the current phase waits for it and routes rejection through the same error
-channel.
+channel. Synchronous jobs in one phase run back-to-back without an inserted
+microtask; an actual promise pauses later jobs until it settles.
 
 Effects are synchronous by default. `flush: 'pre'`, `flush: 'update'`, and
 `flush: 'post'` opt into the matching shared microtask phase. `lazy: true`

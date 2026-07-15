@@ -46,9 +46,35 @@
   definitions across the optional UI layers
 - TypeScript declarations, an ESM library build, and real-browser tests
 
-The repository includes a reproducible production comparison with Lit, Vue,
-and optimized Vanilla DOM. The retained baseline does not establish that Gluon
-is generally faster; see [Rendering performance evidence](docs/performance.md).
+## Performance evidence
+
+The repository includes two reproducible production comparisons:
+
+- `npm run benchmark:rendering` measures identical template-level Gluon, Lit,
+  Vue, and optimized Vanilla DOM workloads.
+- `npm run benchmark:components` measures 50 autonomous Gluon, Lit, and Vue
+  Custom Elements with open Shadow DOM across lifecycle, public property,
+  internal state, and keyed-list work. Each scenario renders only its relevant
+  surface; list and lifecycle own 20 keyed rows per component, so their list
+  work covers 1,000 rows through 50 real component boundaries.
+
+Both commands validate observable output, calibrate a shared batch, rotate
+framework order, retain every sample, and run Chromium, Firefox, and WebKit.
+The latest clean Apple M4 matrices use 40 measured samples after eight warm-up
+rounds:
+
+| Production matrix | Gluon median vs Lit | Gluon median vs Vue |
+| --- | --- | --- |
+| Template rendering | faster in 12/12 browser/scenario cells | faster in 11/12; Vue wins WebKit create |
+| Custom Element components | faster in 5/12; Lit wins all 6 isolated property/state cells plus Firefox list | faster in 7/12, equal in 2/12; Vue wins Chromium state and Firefox property/state |
+
+The paired raw evidence is retained for
+[template rendering](benchmarks/results/rendering-production-4c7bdac.md) and
+[components](benchmarks/results/component-production-47b1a0a.md). Exact
+medians, p95 values, methodology, and interpretation boundaries are in
+[Rendering and component performance evidence](docs/performance.md). These
+recorded M4 results do not establish universal superiority and do not establish
+M1 results.
 
 ## Repository development
 
@@ -699,7 +725,9 @@ npm test
 npm run test:coverage
 npm run benchmark:keyed
 npm run benchmark:rendering
+npm run benchmark:components
 npm run dev:benchmark
+npm run dev:benchmark:components
 npm run build
 npm run check:router-lazy
 npm run check:packages
@@ -722,8 +750,11 @@ optimized Vanilla DOM workloads, validates their output, then records 40
 interleaved samples in Chromium, Firefox, and WebKit. Install the managed
 engines with `npx playwright install chromium firefox webkit`. The methodology,
 result format, limits, and interactive `dev:benchmark` page are documented in
-[Rendering performance evidence](docs/performance.md). Current evidence must
-not be generalized into an unsupported superiority claim.
+[Rendering and component performance evidence](docs/performance.md).
+`npm run benchmark:components` applies the same evidence contract to real
+Custom Element component boundaries; `dev:benchmark:components` serves its
+interactive page on port 4175. Current evidence must not be generalized into
+an unsupported superiority claim or an unmeasured hardware claim.
 
 ## Contributing
 

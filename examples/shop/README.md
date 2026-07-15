@@ -185,6 +185,13 @@ regression headroom. The rendering comparison remains separate evidence; this
 bundle measurement records the delivery-size trade-off rather than treating it
 as rendering latency.
 
+Issues #172 and #177 add the component benchmark plus stable guarded event
+dispatchers. The complete production entry now measures 191,197 raw bytes and
+55,385 level-9 gzip bytes. The reviewed ceilings are 191,500 / 55,500 bytes,
+leaving 303 raw bytes and 115 gzip bytes of explicit regression headroom. This
+records the delivery-size cost beside the component-latency evidence instead of
+hiding it in a relaxed unmeasured ceiling.
+
 That comparison is now available through `npm run benchmark:rendering` and
 documented in [`docs/performance.md`](../../docs/performance.md). It remains a
 separate performance surface rather than a shop route because running renderer

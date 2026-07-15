@@ -1,0 +1,9 @@
+.component-benchmark-sandbox {
+  position: fixed;
+  inset: auto auto 0 -100000px;
+  width: 1px;
+  height: 1px;
+  contain: strict;
+  overflow: hidden;
+  visibility: hidden;
+}

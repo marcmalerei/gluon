@@ -1,8 +1,9 @@
-# Rendering performance evidence
+# Rendering and component performance evidence
 
-Gluon's comparative rendering benchmark measures the current repository source
-against pinned Lit, Vue, and optimized Vanilla DOM implementations. It exists to
-produce inspectable evidence, not to guarantee that one renderer wins.
+Gluon's comparative benchmarks measure the current repository source against
+pinned Lit and Vue versions. The template-level matrix also includes optimized
+Vanilla DOM. They exist to produce inspectable evidence, not to guarantee that
+one renderer or component model wins.
 
 The runtime's measured hot paths include direct unstyled string-root updates,
 seeded primitive text slots, direct single-root cloning, fragment batching for
@@ -25,11 +26,12 @@ medians and p95 values; the paired JSON file preserves every sample, invariant
 snapshot, calibrated batch size, source commit, working-tree state, package and
 browser versions, Node and npm versions, operating system, CPU, and memory.
 
-Every pull request and `main` run additionally retains a ten-sample
-Chromium/Firefox/WebKit comparison plus the production GLUON GOODS customer-flow
-budget output for 30 days in the `quality-evidence-<commit>` workflow artifact.
-Those shorter CI runs detect regressions but do not replace the larger committed
-matrix used by the comparative text below.
+Every pull request and `main` run additionally retains ten-sample template and
+component Chromium/Firefox/WebKit comparisons plus the production GLUON GOODS
+customer-flow budget output for 30 days in the
+`quality-evidence-<commit>` workflow artifact. Those shorter CI runs detect
+regressions but do not replace the larger committed matrices used by the
+comparative text below.
 
 ## Run the benchmark
 
@@ -39,6 +41,7 @@ production comparison:
 ```bash
 npx playwright install chromium firefox webkit
 npm run benchmark:rendering
+npm run benchmark:components
 ```
 
 The default run uses Chromium, Firefox, and WebKit with eight warm-up rounds and
@@ -52,25 +55,36 @@ npm run benchmark:rendering -- \
   --warmup=4 \
   --timeout=180000 \
   --output=.tmp/rendering-diagnostic.json
+
+npm run benchmark:components -- \
+  --browsers=chromium,firefox \
+  --samples=10 \
+  --warmup=4 \
+  --timeout=300000 \
+  --output=.tmp/component-diagnostic.json
 ```
 
-The command builds the benchmark with Vite in production mode, serves that
-exact output locally, launches each browser headlessly, rejects console errors
-or warnings, applies a 180-second per-browser evaluation timeout by default,
-and writes both JSON and Markdown results. The JSON path supplied with
-`--output` must end in `.json`; the Markdown summary uses the same basename.
+Each command builds its benchmark with Vite in production mode and explicitly
+compiles aliased Gluon source with `__GLUON_DEV__` set to `false`. The runner
+serves that exact output locally, launches each browser headlessly, rejects
+console errors or warnings, and writes JSON plus Markdown. Rendering uses a
+180-second per-browser timeout; components use 300 seconds. The JSON path
+supplied with `--output` must end in `.json`; the Markdown summary uses the same
+basename. `npm run check:benchmark-builds` rejects a comparative config that
+does not compile Gluon's production branch.
 
 For an interactive demonstration in a browser:
 
 ```bash
 npm run dev:benchmark
+npm run dev:benchmark:components
 ```
 
-The development server listens on `0.0.0.0:4174` and prints local and LAN URLs.
-Interactive results are useful for exploration but are not retained evidence;
-use the production CLI command for a reviewable result.
+The template development server listens on `0.0.0.0:4174`; the component page
+uses port 4175. Interactive results are useful for exploration but are not
+retained evidence; use the production CLI commands for reviewable results.
 
-## Workloads
+## Template workloads
 
 All implementations produce the same `<main>` and `<p data-id>` output. Browser
 tests verify the row count, boundary IDs, and text before performance evidence
@@ -93,30 +107,102 @@ sample. Reported values are milliseconds per operation, so lower is faster. A
 ratio is the comparison renderer's median divided by Gluon's median; a ratio
 above 1 means Gluon was faster for only that browser and workload.
 
+## Component workloads
+
+Gluon uses the public `GluonElement` class, Lit uses `LitElement`, and Vue uses
+`defineCustomElement`. Every implementation is an autonomous Custom Element
+with open Shadow DOM. Each scenario renders the same focused observable surface
+in all three frameworks: lifecycle includes label, button, and keyed list;
+property includes only the label; state includes only the button; and list
+includes only the keyed list. This prevents a simple property or state cell
+from measuring unrelated reconciliation of 1,000 unchanged rows. Browser tests
+validate component count, scenario-specific output, and complete cleanup.
+
+One operation covers 50 component boundaries. List and lifecycle components own
+20 keyed rows each, so those scenarios cover 1,000 rows in total.
+
+| Scenario | Work per operation |
+| --- | --- |
+| `lifecycle` | Create, connect, render, disconnect, and clean up 50 elements. |
+| `property` | Update one public string property on 50 mounted elements. |
+| `state` | Dispatch one internal button interaction on 50 mounted elements. |
+| `list` | Reverse or restore 20 keyed rows inside each of 50 elements. |
+
+Each framework settles through its public completion primitive before another
+operation begins. The shared batch is calibrated until the fastest framework
+takes at least 8 ms, and framework order rotates for warm-ups and measurements.
+Reported values are milliseconds per 50 components.
+
+## Production-mode correction
+
+Comparative Vite configs before issue #174 aliased Gluon directly to repository
+source without defining `__GLUON_DEV__`. Those builds were minified, but Gluon
+selected its development diagnostic fallback while Lit and Vue selected their
+production paths. Earlier retained comparison files remain inspectable
+historical diagnostics and same-mode Gluon baseline/candidate comparisons, but
+they do not satisfy the current production comparison contract and must not
+support a Lit/Vue superiority claim. The clean production-mode matrices added
+with issues #172 and #174 supersede that framework-comparison interpretation.
+
 ## Current committed matrix
 
-The retained matrix for clean commit `7d1fff0` uses 40 measured samples, eight
-warm-up rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit
-26.5 engines on the recorded Apple M4 environment. The paired
-[`rendering-comparison-7d1fff0.md`](../benchmarks/results/rendering-comparison-7d1fff0.md)
-file contains every median and p95 value; its JSON file retains every sample.
+The current rendering matrix measures clean source commit `4c7bdac`; the
+isolated-scenario component matrix measures clean source commit `47b1a0a`.
+Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
+Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
+JSON files retain every sample and invariant snapshot; the Markdown files
+expose every median and p95 value.
 
-Gluon is faster than or equal to both framework comparators in all 24
-browser/scenario comparisons. The Lit median divided by the Gluon median is
-1.00×/2.69×/1.43×/1.92× for Chromium text/create/update/reverse,
-1.06×/3.00×/1.78×/2.19× in Firefox, and
-1.11×/2.70×/1.33×/2.22× in WebKit. Gluon also beats Vue in every cell except
-WebKit create, where both medians are 0.4167 ms/op.
+### Template rendering matrix
 
-The optimized Vanilla DOM harness remains a lower bound rather than a framework
-parity target. Gluon beats it for Chromium text/create/update, Firefox create,
-and WebKit text/create/update. Vanilla remains faster for reverse in all three
-engines and for Firefox text/update. The evidence therefore supports complete
-Lit/Vue parity for these workloads, not a universal claim that Gluon beats
-hand-written DOM operations.
+The complete
+[`rendering-production-4c7bdac.md`](../benchmarks/results/rendering-production-4c7bdac.md)
+matrix shows Gluon faster than Lit in all 12 browser/scenario median
+comparisons. Lit median divided by Gluon median is
+1.02×/2.66×/1.45×/1.96× for Chromium text/create/update/reverse,
+1.08×/2.73×/1.67×/1.94× for Firefox, and
+1.09×/2.45×/1.33×/2.11× for WebKit.
 
-Issue #81 also retained a controlled Chromium confirmation with 40 interleaved
-samples and 12 warm-up rounds. Both runs used the production build, Chromium
+Gluon is faster than Vue in 11 of 12 cells. Vue wins WebKit `create` at
+0.4167 ms/op versus Gluon's 0.4583 ms/op. The optimized Vanilla DOM harness is
+faster for Chromium reverse, Firefox text/update/reverse, and WebKit reverse;
+Gluon is faster in the other seven Vanilla comparisons. This supports the
+recorded workload results, not a general rendering ranking.
+
+### Component matrix
+
+The complete
+[`component-production-47b1a0a.md`](../benchmarks/results/component-production-47b1a0a.md)
+matrix reports milliseconds per 50 component boundaries. Against Lit, Gluon
+wins lifecycle and keyed-list medians in Chromium and WebKit plus lifecycle in
+Firefox. Lit wins every isolated public-property and internal-state median plus
+Firefox keyed list. Lit median divided by Gluon median is
+1.31×/0.66×/0.82×/1.59× for Chromium lifecycle/property/state/list,
+1.38×/0.75×/0.65×/0.88× for Firefox, and
+1.38×/0.73×/0.92×/1.86× for WebKit.
+
+The remaining absolute Lit advantage per 50 components is 0.0080 ms for
+Chromium property and 0.0113 ms for Chromium state; 0.0500 ms and 0.2000 ms in
+Firefox; and 0.0050 ms and 0.0062 ms in WebKit. Gluon's state path now retains
+one native guarded event dispatcher while render callbacks change, but this
+matrix still records Lit as the faster simple-update implementation.
+
+Against Vue, Gluon wins Chromium lifecycle/property/list while Vue wins state;
+wins Firefox list, ties lifecycle, and loses property/state; and wins WebKit
+property/state/list while lifecycle is equal. Across those 12 cells that is
+seven Gluon wins, two equal medians, and three Vue wins. This supports the
+recorded lifecycle and keyed-list results without turning the matrix into a
+universal framework ranking.
+
+Neither matrix measures an Apple M1. Hardware model, operating system, browser,
+thermal state, and other load are part of the evidence boundary; an M1 result
+requires its own retained output from the same command.
+
+## Historical rendering diagnostics
+
+Issue #81 retained a controlled Chromium confirmation with 40 interleaved
+samples and 12 warm-up rounds. Both runs used the same minified benchmark mode,
+Chromium
 149.0.7827.55, Node 22.22.0, and the same recorded Apple M4 environment. The
 [clean `main` baseline at `09e921a`](../benchmarks/results/rendering-comparison-09e921a-chromium.md)
 and [clean optimized run at `3c17ec4`](../benchmarks/results/rendering-comparison-3c17ec4-chromium.md)
@@ -150,7 +236,7 @@ with every distribution retained rather than selected by outcome.
 
 A separate [Chromium CPU-profile summary](../benchmarks/results/template-binding-instantiation-34cd49a.json)
 and its [raw `.cpuprofile`](../benchmarks/results/template-binding-instantiation-34cd49a.cpuprofile)
-cover the production comparison at a 100 µs sampling interval, four warm-up
+cover that historical minified comparison at a 100 µs sampling interval, four warm-up
 rounds, and ten measured samples. The clean `34cd49a` run records zero
 `walkPath()` self samples and zero native `childNodes.item()` self samples;
 `TreeWalker.nextNode()` accounts for 402 self samples. The profile covers all
@@ -177,10 +263,11 @@ on the cached prototype. Updating an already mounted instance of the same
 template does not clone at all.
 
 Issue #161 compared the previous per-instance import with the cached
-active-document prototype on the same Apple M4 environment. Both production
-runs used 20 measured samples, eight warm-up rounds, Chromium 149, Firefox 151,
-and WebKit 26.5. The timed `create` scenario creates 1,000 keyed rows; it is the
-scenario that enters the template-instantiation path.
+active-document prototype on the same Apple M4 environment. Both runs used the
+same historical minified benchmark mode, 20 measured samples, eight warm-up
+rounds, Chromium 149, Firefox 151, and WebKit 26.5. The timed `create` scenario
+creates 1,000 keyed rows; it is the scenario that enters the
+template-instantiation path.
 
 | Browser | Per-instance import median / p95 ms/op | Cached prototype median / p95 ms/op |
 | --- | ---: | ---: |
@@ -201,7 +288,7 @@ beyond the recorded environment.
 
 ## Renderer allocation paths
 
-Issue #163 adds a production Chromium allocation benchmark for four focused
+Issue #163 added a Chromium allocation benchmark for four focused
 paths that the comparative renderer matrix does not isolate: creating an
 unstyled `TemplateResult`, updating one stable text binding, reconciling a
 ten-property spread, and updating 100 unkeyed string children. Each scenario
@@ -228,7 +315,7 @@ claim. The baseline and candidate distributions are retained in
 and
 [`renderer-allocations-163-candidate.json`](../benchmarks/results/renderer-allocations-163-candidate.json).
 
-Both retained runs used the same production harness, Apple M4 environment,
+Both retained runs used the same historical minified harness, Apple M4 environment,
 Chromium 149, 40 measured samples, and eight warm-up rounds:
 
 | Scenario | Baseline median / p95 ms/op | Optimized median / p95 ms/op |

@@ -2,8 +2,8 @@ import type { GluonElementClass, PropertyDefinition } from './element.js';
 
 type DecoratedDeclarations = Readonly<Record<string, PropertyDefinition<any>>>;
 
-const symbolWithMetadata = Symbol as SymbolConstructor & { metadata?: symbol };
-export const decoratorMetadataSymbol = symbolWithMetadata.metadata ??= Symbol('Symbol.metadata');
+const symbolWithMetadata = Symbol as unknown as { metadata?: symbol };
+export const decoratorMetadataSymbol: symbol = symbolWithMetadata.metadata ??= Symbol('Symbol.metadata');
 
 const standardDeclarations = new WeakMap<object, Map<string, PropertyDefinition<any>>>();
 const legacyDeclarations = new WeakMap<Function, Map<string, PropertyDefinition<any>>>();

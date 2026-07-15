@@ -1195,7 +1195,7 @@ class NodePart implements Part {
 
 class AttributePart implements Part {
   private lastValue: unknown;
-  private event?: ResolvedEvent;
+  private event?: RetainedEvent;
 
   constructor(
     private readonly element: Element,
@@ -1267,18 +1267,25 @@ class AttributePart implements Part {
 
   private setEvent(value: TemplateValue): void {
     const eventName = this.name.slice(1);
-    if (this.event) {
-      this.element.removeEventListener(eventName, this.event.listener, this.event.options);
+    const next = resolveEvent(value);
+    if (this.event && next && this.event.options === next.options) {
+      this.event.current = next.listener;
+      return;
     }
-    this.event = resolveEvent(value);
-    if (this.event) {
-      this.element.addEventListener(eventName, this.event.listener, this.event.options);
-    }
+    if (this.event) this.element.removeEventListener(eventName, this.event.listener, this.event.options);
+    this.event = next ? retainEvent(next) : undefined;
+    if (this.event) this.element.addEventListener(eventName, this.event.listener, this.event.options);
   }
 }
 
 interface ResolvedEvent {
   readonly listener: EventListenerOrEventListenerObject;
+  readonly options?: boolean | AddEventListenerOptions;
+}
+
+interface RetainedEvent {
+  current: EventListenerOrEventListenerObject;
+  readonly listener: EventListener;
   readonly options?: boolean | AddEventListenerOptions;
 }
 
@@ -1294,7 +1301,7 @@ export function elementRef<ElementType extends Element = Element>(): {
 
 class SpreadPart implements Part {
   private readonly keys = new Set<string>();
-  private readonly events = new Map<string, ResolvedEvent & { readonly eventName: string }>();
+  private readonly events = new Map<string, RetainedEvent & { readonly eventName: string }>();
   private readonly dataAttributes = new Set<string>();
   private readonly ariaAttributes = new Set<string>();
   private readonly styleProperties = new Set<string>();
@@ -1443,17 +1450,18 @@ class SpreadPart implements Part {
       : key.slice(2).toLowerCase();
     const previous = this.events.get(key);
 
-    if (
-      previous?.listener === event?.listener
-      && previous?.options === event?.options
-    ) return;
+    if (previous && event && previous.options === event.options) {
+      previous.current = event.listener;
+      return;
+    }
     if (previous) {
       this.element.removeEventListener(previous.eventName, previous.listener, previous.options);
     }
 
     if (event) {
-      this.element.addEventListener(eventName, event.listener, event.options);
-      this.events.set(key, { eventName, ...event });
+      const retained = Object.assign(retainEvent(event), { eventName });
+      this.element.addEventListener(eventName, retained.listener, retained.options);
+      this.events.set(key, retained);
     } else {
       this.events.delete(key);
     }
@@ -2502,11 +2510,26 @@ function isEventBinding(value: unknown): value is EventBinding {
 function resolveEvent(value: unknown): ResolvedEvent | undefined {
   if (isEventBinding(value)) {
     return {
-      listener: guardEventListener(value.listener),
+      listener: value.listener,
       options: value.options,
     };
   }
-  return isEventListener(value) ? { listener: guardEventListener(value) } : undefined;
+  return isEventListener(value) ? { listener: value } : undefined;
+}
+
+function retainEvent(event: ResolvedEvent): RetainedEvent {
+  const retained = {
+    current: event.listener,
+    listener: undefined as unknown as EventListener,
+    options: event.options,
+  };
+  const dispatch = function retainedEventListener(this: EventTarget, value: Event): void {
+    const current = retained.current;
+    if (typeof current === 'function') return current.call(this, value);
+    return current.handleEvent(value);
+  };
+  retained.listener = guardEventListener(dispatch) as EventListener;
+  return retained;
 }
 
 function isUnsafeHtmlResult(value: unknown): value is UnsafeHtmlResult {

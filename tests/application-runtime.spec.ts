@@ -492,10 +492,7 @@ describe('application runtime', () => {
     const errors: AppErrorInfo[] = [];
     let eventThis: EventTarget | undefined;
     let injectedFromEvent: string | undefined;
-    const directListener = function (this: EventTarget) {
-      eventThis = this;
-      injectedFromEvent = inject(eventContext);
-    };
+    let listenerRevision = -1;
     const objectListener: EventListenerObject = {
       handleEvent() {
         throw new Error('object event failed');
@@ -503,6 +500,12 @@ describe('application runtime', () => {
     };
     const app = createApp(() => {
       warn('root warning', 'ROOT_WARNING');
+      const renderedRevision = state.revision;
+      const directListener = function (this: EventTarget) {
+        eventThis = this;
+        injectedFromEvent = inject(eventContext);
+        listenerRevision = renderedRevision;
+      };
       return html`
         <button id="direct" @click=${directListener}>${state.revision}</button>
         <button id="object" @click=${objectListener}>object</button>
@@ -520,11 +523,13 @@ describe('application runtime', () => {
     direct.click();
     expect(eventThis).toBe(direct);
     expect(injectedFromEvent).toBe('owned');
+    expect(listenerRevision).toBe(0);
     (root.querySelector('#object') as HTMLButtonElement).click();
 
     state.revision += 1;
     await nextTick();
     direct.click();
+    expect(listenerRevision).toBe(1);
     expect(root.textContent).toContain('direct');
 
     const guardedResult = app.run(() => runWithErrorHandling(() => {
