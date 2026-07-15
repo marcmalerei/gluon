@@ -12,6 +12,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added first-class SSR and hydration fixtures to `@gluonjs/test-utils/ssr` and
   moved the canonical GLUON GOODS request-to-interaction regression onto that
   public transport and cleanup boundary.
+- Added realm-correct reactive wrappers for intersection, resize, and mutation
+  observers with callback-ref ownership, retargeting, stale-callback rejection,
+  unsupported-environment fallback, and deterministic stop behavior. GLUON
+  GOODS uses the intersection wrapper to prioritize approaching product media.
 
 ## [1.0.10] - 2026-07-15
 

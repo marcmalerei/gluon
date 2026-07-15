@@ -192,6 +192,12 @@ leaving 303 raw bytes and 115 gzip bytes of explicit regression headroom. This
 records the delivery-size cost beside the component-latency evidence instead of
 hiding it in a relaxed unmeasured ceiling.
 
+Issue #190 integrates the public reactive platform-observer APIs into product
+discovery. The clean CI production graph measures 194,440 raw bytes and 56,251
+level-9 gzip bytes. The reviewed ceilings are 194,500 / 56,300 bytes, leaving
+60 raw bytes and 49 gzip bytes of explicit regression headroom. This records
+the customer-flow composition cost without making a runtime-speed claim.
+
 That comparison is now available through `npm run benchmark:rendering` and
 documented in [`docs/performance.md`](../../docs/performance.md). It remains a
 separate performance surface rather than a shop route because running renderer

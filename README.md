@@ -232,6 +232,15 @@ The package also provides deduplicated pre/update/post scheduling, `batch`,
 `nextTick`, untracked reads, effect scopes, scheduled watchers, deterministic
 cleanup, and a contained error channel.
 
+## Reactive platform observers
+
+Core wraps `IntersectionObserver`, `ResizeObserver`, and `MutationObserver` in
+callback-ref-owned handles. Their latest callback batches and support state are
+readonly reactive refs; retargeting, renderer ref cleanup, and `stop()`
+disconnect the underlying observer deterministically. Constructors are resolved
+from the target element's document realm and unsupported environments retain
+the unenhanced content. See the [observer contract](docs/observers.md).
+
 ## Application-scoped stores
 
 `@gluonjs/store` defines typed state, computed getter values, and actions without

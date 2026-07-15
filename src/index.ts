@@ -149,6 +149,13 @@ export {
 } from './props.js';
 
 export {
+  createIntersectionObserver,
+  createMutationObserver,
+  createResizeObserver,
+  type PlatformObserverHandle,
+} from './observers.js';
+
+export {
   AsyncTimeoutError,
   KeepAlive,
   Suspense,
