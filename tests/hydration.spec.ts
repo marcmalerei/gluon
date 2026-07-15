@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   compose,
   createComponentStyleSelection,
@@ -29,6 +29,11 @@ import {
 } from '@gluonjs/ssr/hydration';
 import { createStyleManifest, prepareForHydration, renderProgressively, renderStyleCarriers } from '@gluonjs/ssr';
 import { renderShopRequest } from '../examples/shop/src/server.js';
+import {
+  cleanupSsrFixtures,
+  hydrateSsrFixture,
+  renderSsrFixture,
+} from '../packages/test-utils/src/ssr.js';
 import { hydrateShop } from '../examples/shop/src/hydrate.js';
 import type { ProductConfiguratorElement } from '../examples/shop/src/product-configurator.js';
 import {
@@ -37,6 +42,8 @@ import {
 } from '../examples/shop/src/styles.js';
 
 describe('SSR hydration', () => {
+  afterEach(cleanupSsrFixtures);
+
   it('retains the server DOM produced by a composed functional template', async () => {
     const Panel = (props: { readonly title: string; readonly children: import('@gluonjs/core').TemplateValue }) => html`
       <section><h2>${props.title}</h2>${props.children}</section>
@@ -121,16 +128,23 @@ describe('SSR hydration', () => {
 
   it('hydrates GLUON GOODS route and Store snapshots into an interactive product flow', async () => {
     history.replaceState({}, '', '/products/orbit-lamp');
-    const response = await renderShopRequest('/products/orbit-lamp');
+    const server = await renderSsrFixture(
+      () => renderShopRequest('/products/orbit-lamp'),
+      { name: 'shop-product' },
+    );
     const previousSheets = [...document.adoptedStyleSheets];
-    document.head.insertAdjacentHTML('beforeend', response.head);
-    const root = document.createElement('div');
-    root.innerHTML = response.html;
-    document.body.append(root);
-    const stateRoot = document.createElement('div');
-    stateRoot.innerHTML = response.stateScript;
-    const heading = root.querySelector('#product-title');
-    const hydrated = await hydrateShop(root, stateRoot);
+    const fixture = await hydrateSsrFixture(server, {
+      hydrate: ({ container, stateRoot }) => hydrateShop(container, stateRoot),
+      dispose: (hydrated) => {
+        hydrated.mount.unmount();
+        hydrated.uiOwner.dispose();
+        hydrated.router.destroy();
+        hydrated.storeManager.dispose();
+      },
+    });
+    const root = fixture.container;
+    const hydrated = fixture.hydrated;
+    const heading = fixture.query('#product-title');
     expect(hydrated.hydration.mismatches).toEqual([]);
     expect(hydrated.hydration.retained).toBe(true);
     expect(root.querySelector('#product-title')).toBe(heading);
@@ -146,16 +160,12 @@ describe('SSR hydration', () => {
     expect(hydrated.store.bagCount).toBe(1);
     expect(hydrated.store.bagOpen).toBe(true);
 
-    hydrated.mount.unmount();
+    await fixture.cleanup();
     expect(hydrated.uiOwner.disposed).toBe(true);
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopStyles);
-    hydrated.uiOwner.dispose();
-    hydrated.router.destroy();
-    hydrated.storeManager.dispose();
     document.adoptedStyleSheets = previousSheets;
-    root.remove();
   });
 
   it('preserves an existing open declarative shadow root through element upgrade', async () => {

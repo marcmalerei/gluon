@@ -10,11 +10,13 @@ export default defineConfig({
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router': resolve(import.meta.dirname, 'packages/router/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
+      '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
+      '@gluonjs/test-utils/ssr': resolve(import.meta.dirname, 'packages/test-utils/src/ssr.ts'),
       '@gluonjs/test-utils': resolve(import.meta.dirname, 'packages/test-utils/src/index.ts'),
     },
   },
   test: {
-    include: ['tests/test-utils.spec.ts'],
+    include: ['tests/test-utils.spec.ts', 'tests/test-utils-ssr.spec.ts'],
     browser: {
       enabled: true,
       headless: true,

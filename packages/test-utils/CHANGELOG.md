@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the optional `@gluonjs/test-utils/ssr` entry for complete public SSR
+  transport assertions, real-document hydration setup, application-specific
+  disposal, rollback, reverse-order cleanup, and leak diagnostics.
+
 ## [1.0.10] - 2026-07-15
 
 ### Changed

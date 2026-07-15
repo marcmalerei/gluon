@@ -77,8 +77,8 @@
       "directory": "packages/test-utils",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/store"]
+      "exports": [".", "./ssr"],
+      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/ssr", "@gluonjs/store"]
     },
     {
       "name": "@gluonjs/devtools-api",
