@@ -1,20 +1,20 @@
-Gluon Vue migration analysis 1.0.9
+Gluon Vue migration analysis 1.0.10
 Support: partial
 Files: 4; components: 1; findings: 8
 
 . GVA1001 error exact Vue version 2.7.16 is unsupported; expected >=3.5.0 <3.6.0.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 . GVA1003 warning indeterminate yarn lock data is not a supported exact version source.
-  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
+  Stage: baseline — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline
 src/Legacy.vue:1:20 GVA1101 error indeterminate Script language tsx is unsupported.
-  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
+  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
 src/Legacy.vue:4:11 GVA1201 warning indeterminate Dynamic component identity requires review.
-  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
+  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
 src/Legacy.vue:4:33 GVA1202 error indeterminate Custom directive v-legacy is unsupported.
-  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
+  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
 src/Legacy.vue:5:20 GVA1403 error indeterminate Style language scss or external style source is unsupported.
-  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
+  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
 src/Legacy.vue:6:7 GVA1102 error indeterminate External and custom SFC blocks are unsupported.
-  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
+  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
 src/runtime.ts:3:1 GVA1203 warning indeterminate Runtime component registration requires review.
-  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.9/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element
+  Stage: leaf-boundary — https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element

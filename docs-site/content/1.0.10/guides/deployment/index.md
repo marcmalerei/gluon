@@ -26,5 +26,5 @@ Load `examples/shop/dist-server/server.js`, read the immutable client manifest
 once, and call `renderShopRequest(requestUrl, { assets, nonce })` for each
 request. Gluon accepts a request nonce but never creates one.
 
-The repository [deployment contract](/gluon/1.0.9/reference/deployment/) names
+The repository [deployment contract](/gluon/1.0.10/reference/deployment/) names
 the exact output, style-carrier, CSP, and verification behavior.

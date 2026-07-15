@@ -8,11 +8,12 @@ and `.github/workflows/release.yml` is the only supported publication path.
 ## Current publication state
 
 The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.0.9` candidate. Every official
-manifest is public and lockstep at `1.0.9`. Registry preflight on 2026-07-15
-confirmed that all 17 contracted npm packages still expose `1.0.8` as `latest`
-and that `1.0.9` is absent. Immutable GitHub release `v1.0.8` remains the
-current release. This is enforced locally by:
+`scopeControl: verified` for the prepared `1.0.10` candidate. Every official
+manifest is public and lockstep at `1.0.10`. Registry preflight on 2026-07-15
+confirmed that all 17 contracted npm packages expose `1.0.9` as `latest` with
+SLSA provenance and that `1.0.10` is absent. Immutable GitHub release `v1.0.8`
+remains the current finalized release; the `v1.0.9` GitHub release remains a
+draft after its public-type verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -104,6 +105,16 @@ packages directly to `latest` through Trusted Publishing with SLSA provenance,
 verified them from a clean install, and published the immutable canonical
 GitHub release `v1.0.7` on 2026-07-14.
 
+The immutable `v1.0.9` tag points to commit
+`2be2dc684bb6e65de54130ea3e662d6568085d58`. Release run `29422302132`
+passed its candidate, browser-engine, Node-runtime, performance, and
+reproducibility jobs and published all 17 packages to `latest` with SLSA
+provenance. Its clean-room public-type verification then found that the packed
+Core index declaration re-exported four compiler-owned primitive-text helpers
+whose declarations had been removed by `stripInternal`. The GitHub release
+therefore remains a draft. Published npm versions and the protected tag are
+immutable; recovery uses `1.0.10` and does not rebuild or reuse `1.0.9`.
+
 `create-gluon` is part of the same lockstep group even though it has no runtime
 dependency. Its generated UI manifest pins `@gluonjs/core`, `@gluonjs/atoms`,
 `@gluonjs/reactivity`, and any selected Router, Store, SSR, test-utils, Vite, and
@@ -150,7 +161,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.0.9` release commit, the repository owner must verify
+Before preparing the `1.0.10` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -290,13 +301,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.0.9` and `private: false`;
-- set every official implementation and peer dependency to exact `1.0.9`;
+- set every official manifest to version `1.0.10` and `private: false`;
+- set every official implementation and peer dependency to exact `1.0.10`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.0.9` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.0.9`, then make that version
+- add dated `1.0.10` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.0.10`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -307,14 +318,16 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm run release:validate -- --candidate 1.0.9
-npm run release:artifacts -- --version 1.0.9
+npm run release:validate -- --candidate 1.0.10
+npm run release:artifacts -- --version 1.0.10
 ```
 
 `release:artifacts` packs every package twice and compares canonical unpacked
-file SHA-256 digests. It produces the package archives, aggregate and
-per-package SPDX 2.3 and CycloneDX 1.7 SBOMs, `release-evidence.json`, and a
-`SHA256SUMS` manifest under `.tmp/release`.
+file SHA-256 digests. It then clean-installs all 17 local archives and
+typechecks every contracted public export with `skipLibCheck: false` before
+producing the package archives, aggregate and per-package SPDX 2.3 and
+CycloneDX 1.7 SBOMs, `release-evidence.json`, and a `SHA256SUMS` manifest under
+`.tmp/release`.
 
 SPDX output is validated against the vendored official SPDX 2.3 JSON schema.
 The release contract pins its upstream commit, source URL, and SHA-256; a schema

@@ -9,4 +9,4 @@ default recovery replaces the root once; `recovery: 'throw'` aborts before DOM
 mutation. Suppression affects reporting, not recovery.
 
 See the repository [hydration contract](https://github.com/marcmalerei/gluon/blob/main/docs/hydration.md)
-and generated [`@gluonjs/ssr/hydration` API](/gluon/1.0.9/api/generated/packages/ssr/src/hydration/).
+and generated [`@gluonjs/ssr/hydration` API](/gluon/1.0.10/api/generated/packages/ssr/src/hydration/).

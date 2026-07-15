@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-07-15
+
+### Changed
+
+- Retained the primitive-text compiler transform and its runtime helper
+  contract while keeping compiler-owned helpers out of public declarations.
+
 ## [1.0.9] - 2026-07-15
 
 ### Changed

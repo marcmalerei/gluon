@@ -1,11 +1,13 @@
 # Release readiness
 
-The `1.0.9` documentation describes the prepared lockstep release candidate.
-All 17 official manifests are at `1.0.9`. Registry preflight on 2026-07-15
-confirmed that `1.0.9` is absent while all contracted npm packages still expose
-`1.0.8` under `latest`; immutable GitHub release `v1.0.8` remains current. The
-`@gluonjs` scope, package records, and trusted-publisher bindings are verified
-in the package contract.
+The `1.0.10` documentation describes the prepared lockstep release candidate.
+All 17 official manifests are at `1.0.10`. Registry preflight on 2026-07-15
+confirmed that `1.0.10` is absent while all contracted npm packages expose
+`1.0.9` under `latest` with SLSA provenance. Immutable GitHub release `v1.0.8`
+remains the current finalized release; the `v1.0.9` GitHub release remains a
+draft after its public-type verification failure. The `@gluonjs` scope,
+package records, and trusted-publisher bindings are verified in the package
+contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
@@ -18,10 +20,11 @@ npm run check:release-contract
 
 A release-candidate commit must additionally pass the complete repository check
 and strict candidate validation. The release artifact builder creates
-reproducible package-content digests, SPDX 2.3 and CycloneDX 1.7 SBOMs for each
-package and the aggregate release, SHA-256 checksums, and machine-readable build
-evidence. The official SPDX schema is vendored with a pinned upstream commit and
-SHA-256.
+reproducible package-content digests, clean-installs all 17 local archives,
+typechecks every contracted public export, and creates SPDX 2.3 and CycloneDX
+1.7 SBOMs for each package and the aggregate release, SHA-256 checksums, and
+machine-readable build evidence. The official SPDX schema is vendored with a
+pinned upstream commit and SHA-256.
 
 The release cut requires verified public repository visibility, npm scope
 control, the accepted single-owner recovery and multi-factor-authentication
@@ -109,6 +112,15 @@ release remains attached to canonical tag `v1.0.7`. Recovery execution tag
 passed every gate, published all 17 packages to `latest` with SLSA provenance,
 verified a clean install, and published the immutable canonical GitHub release
 on 2026-07-14.
+
+The immutable `v1.0.9` tag points to commit
+`2be2dc684bb6e65de54130ea3e662d6568085d58`. Release run `29422302132`
+passed its candidate, browser, Node, performance, and reproducibility gates and
+published all 17 packages to `latest` with SLSA provenance. Clean-room public
+type verification then found a broken Core declaration re-export, so the
+GitHub release remains a draft. The immutable npm versions and tag are not
+reused; `1.0.10` contains the corrected declaration bundle and a prepublication
+archive typecheck.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,

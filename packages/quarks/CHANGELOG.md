@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-07-15
+
+### Changed
+
+- Advanced the lockstep release with declaration-safe package artifacts while
+  retaining the existing public package contract.
+
 ## [1.0.9] - 2026-07-15
 
 ### Changed
