@@ -103,6 +103,28 @@
         "}"
       ]
     },
+    "core-observers": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import {",
+        "  createIntersectionObserver,",
+        "  createMutationObserver,",
+        "  createResizeObserver,",
+        "  html,",
+        "  type PlatformObserverHandle,",
+        "} from '@gluonjs/core';",
+        "",
+        "const visibility: PlatformObserverHandle<HTMLAnchorElement, IntersectionObserverEntry> =",
+        "  createIntersectionObserver({ rootMargin: '240px' }, (entries) => {",
+        "    if (entries.some((entry) => entry.isIntersecting)) visibility.stop();",
+        "  });",
+        "const size = createResizeObserver<HTMLAnchorElement>({ box: 'border-box' });",
+        "const changes = createMutationObserver<HTMLAnchorElement>({ attributes: true });",
+        "",
+        "const card = html`<a ...=${{ ref: visibility.ref }} href=\"/products/orbit-lamp\">Orbit Lamp</a>`;",
+        "console.log(card, size.entries.value, changes.supported.value);"
+      ]
+    },
     "core-decorators": {
       "module": "@gluonjs/core/decorators",
       "code": [
@@ -4657,6 +4679,22 @@
         "  applyGluonElementHotUpdate('product-card', ProductCard);",
         "console.log(update.compatible, update.reason);"
       ]
+    },
+    "src/functions/createIntersectionObserver.md": {
+      "recipe": "core-observers",
+      "description": "Raise the priority of product media as its card approaches the viewport and stop observing after the first intersection:"
+    },
+    "src/functions/createMutationObserver.md": {
+      "recipe": "core-observers",
+      "description": "Observe owned element attribute changes through a callback ref and publish each callback batch as reactive state:"
+    },
+    "src/functions/createResizeObserver.md": {
+      "recipe": "core-observers",
+      "description": "Measure an owned product surface through a realm-correct ResizeObserver that disconnects when its callback ref clears:"
+    },
+    "src/interfaces/PlatformObserverHandle.md": {
+      "recipe": "core-observers",
+      "description": "Share the typed reactive entries, support state, callback ref, and permanent stop contract common to platform observers:"
     },
     "src/type-aliases/GluonElementClass.md": {
       "module": "@gluonjs/core",

@@ -50,6 +50,7 @@ describe('GLUON GOODS reference shop', () => {
 
     expect(root.querySelector('h1')?.textContent).toBe('Objects that work the way you do.');
     expect(root.querySelectorAll('.product-card')).toHaveLength(4);
+    expect(root.querySelectorAll('.product-card img[loading="lazy"][decoding="async"]')).toHaveLength(4);
     root.querySelector<HTMLAnchorElement>('[aria-label^="Orbit Lamp"]')!.click();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');

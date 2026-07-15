@@ -7,6 +7,13 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added realm-correct reactive wrappers for intersection, resize, and mutation
+  observers with callback-ref ownership, retargeting, stale-callback rejection,
+  unsupported-environment fallback, and deterministic stop behavior. GLUON
+  GOODS uses the intersection wrapper to prioritize approaching product media.
+
 ## [1.0.10] - 2026-07-15
 
 ### Fixed

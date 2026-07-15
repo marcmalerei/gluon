@@ -3,6 +3,7 @@ import {
   Transition,
   TransitionGroup,
   compose,
+  createIntersectionObserver,
   html,
   nothing,
   repeat,
@@ -92,11 +93,28 @@ export function ProductRail(items: readonly Product[] = products): TemplateValue
 }
 
 export function ProductCard(product: Product): TemplateValue {
+  let visibility: ReturnType<typeof createIntersectionObserver<HTMLAnchorElement>>;
+  visibility = createIntersectionObserver<HTMLAnchorElement>(
+    { rootMargin: '240px 0px', threshold: 0.01 },
+    (entries) => {
+      const visible = entries.find((entry) => entry.isIntersecting);
+      if (!visible) return;
+      const card = visible.target;
+      const image = card?.querySelector('img');
+      if (image) image.fetchPriority = 'high';
+      card?.setAttribute('data-product-visible', '');
+      visibility.stop();
+    },
+  );
   return compose(RouterLink, {
     to: `/products/${product.slug}`,
-    attributes: { class: 'product-card', 'aria-label': `${product.name}, ${formatPrice(product.price)}` },
+    attributes: {
+      class: 'product-card',
+      ref: visibility.ref,
+      'aria-label': `${product.name}, ${formatPrice(product.price)}`,
+    },
   })`
-      <span class="product-media"><img src=${product.image} alt=${product.alt}></span>
+      <span class="product-media"><img src=${product.image} alt=${product.alt} loading="lazy" decoding="async"></span>
       <span class="product-copy">
         <span><strong>${product.name}</strong><small>${formatPrice(product.price)}</small></span>
         <span class="product-arrow">${ArrowIcon()}</span>

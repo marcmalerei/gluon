@@ -6,6 +6,9 @@ import {
   Transition,
   TransitionGroup,
   createApp,
+  createIntersectionObserver,
+  createMutationObserver,
+  createResizeObserver,
   createInjectionKey,
   compose,
   directive,
@@ -41,6 +44,17 @@ import {
   type SlotDeclarations,
   type TemplateValue,
 } from '@gluonjs/core';
+
+const intersection = createIntersectionObserver<HTMLDivElement>({ threshold: [0, 1] }, (entries) => {
+  entries[0]?.intersectionRatio.toFixed(2);
+});
+intersection.ref(document.createElement('div'));
+intersection.entries.value[0]?.isIntersecting;
+intersection.supported.value satisfies boolean;
+intersection.stop();
+
+createResizeObserver<HTMLDivElement>({ box: 'border-box' }).ref(document.createElement('div'));
+createMutationObserver<HTMLDivElement>({ attributes: true }).ref(document.createElement('div'));
 import {
   customElement,
   property,
