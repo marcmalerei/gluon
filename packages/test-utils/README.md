@@ -139,6 +139,9 @@ retained DOM with no recovery.
 
 ## Verification
 
+- Package typechecking resolves the public `@gluonjs/router/memory` entry from
+  source, while declaration builds resolve its emitted declaration. This keeps
+  a clean checkout authoritative instead of depending on stale workspace output.
 - `npm run test:test-utils:coverage`
 - `npm run typecheck:test-utils-api`
 - `npm run build:test-utils`
