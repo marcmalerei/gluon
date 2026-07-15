@@ -10,6 +10,7 @@ import {
   Transition,
   createApp,
   createInjectionKey,
+  createVirtualizer,
   compose,
   css,
   defineElement,
@@ -70,6 +71,27 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(globalThis).not.toHaveProperty('HTMLElement');
     expect(globalThis).not.toHaveProperty('CSSStyleSheet');
     expect(css`:host { display: block; }`).toBeTypeOf('object');
+  });
+
+  it('renders a deterministic useful virtualizer window without browser globals', async () => {
+    const items = Array.from({ length: 20 }, (_, index) => ({ id: `item-${index}`, label: `Item ${index}` }));
+    const virtualizer = createVirtualizer({
+      items,
+      key: (item) => item.id,
+      renderItem: (item) => html`<a href=${`/items/${item.id}`}>${item.label}</a>`,
+      estimateSize: 40,
+      ssrCount: 6,
+      ariaLabel: 'Inventory',
+    });
+
+    const rendered = withoutHydrationMarkers(await renderToString(virtualizer.view()));
+
+    expect(rendered).toContain('aria-label="Inventory"');
+    expect(rendered).toContain('Item 0');
+    expect(rendered).toContain('Item 5');
+    expect(rendered).not.toContain('Item 6');
+    expect(rendered).toContain('height:800px');
+    virtualizer.stop();
   });
 
   it('serializes public templates, attributes, spreads, repeats, SVG, and explicit unsafe HTML', async () => {

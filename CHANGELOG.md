@@ -9,6 +9,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added the public `createVirtualizer()` controller for accessible vertical
+  lists and grids with stable keys, overscan, dynamic measurement, scroll
+  anchoring, keyboard traversal, deterministic SSR/hydration, and owned cleanup.
 - Added realm-correct reactive wrappers for intersection, resize, and mutation
   observers with callback-ref ownership, retargeting, stale-callback rejection,
   unsupported-environment fallback, and deterministic stop behavior. GLUON

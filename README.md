@@ -241,6 +241,15 @@ disconnect the underlying observer deterministically. Constructors are resolved
 from the target element's document realm and unsupported environments retain
 the unenhanced content. See the [observer contract](docs/observers.md).
 
+## Viewport virtualization
+
+Core's `createVirtualizer()` renders bounded accessible vertical lists and
+grids with stable keys, overscan, dynamic row measurements, scroll anchoring,
+keyboard traversal, programmatic `scrollToIndex()`, deterministic SSR content,
+identity-preserving hydration, and callback-ref cleanup. The current four-item
+GLUON GOODS catalog intentionally remains complete because virtualization would
+not reduce meaningful DOM work there. See the [virtualizer contract](docs/virtualizer.md).
+
 ## Application-scoped stores
 
 `@gluonjs/store` defines typed state, computed getter values, and actions without
