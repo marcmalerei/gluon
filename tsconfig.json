@@ -21,6 +21,8 @@
       "@gluonjs/vue-migration-analyzer": ["packages/vue-migration-analyzer/src/index.ts"],
       "@gluonjs/vue-migration-analyzer/schema": ["packages/vue-migration-analyzer/src/schema.ts"],
       "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
+      "@gluonjs/reactivity/signals": ["packages/reactivity/src/signals/index.ts"],
+      "@gluonjs/reactivity/preact-signals": ["packages/reactivity/src/preact-signals.ts"],
       "@gluonjs/router": ["packages/router/src/index.ts"],
       "@gluonjs/router/memory": ["packages/router/src/memory.ts"],
       "@gluonjs/ssr": ["packages/ssr/src/index.ts"],
