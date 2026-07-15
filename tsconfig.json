@@ -29,6 +29,7 @@
       "@gluonjs/ssr/streaming": ["packages/ssr/src/streaming.ts"],
       "@gluonjs/store": ["packages/store/src/index.ts"],
       "@gluonjs/test-utils": ["packages/test-utils/src/index.ts"],
+      "@gluonjs/test-utils/ssr": ["packages/test-utils/src/ssr.ts"],
       "@gluonjs/vite": ["packages/vite/src/index.ts"]
     },
     "types": ["node"],

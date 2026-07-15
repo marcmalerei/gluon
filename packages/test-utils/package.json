@@ -22,6 +22,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./ssr": {
+      "types": "./dist/ssr.d.ts",
+      "import": "./dist/ssr.js"
     }
   },
   "files": [
@@ -38,10 +42,14 @@
     "@gluonjs/core": "1.0.10",
     "@gluonjs/reactivity": "1.0.10",
     "@gluonjs/router": "1.0.10",
+    "@gluonjs/ssr": "1.0.10",
     "@gluonjs/store": "1.0.10"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {
+      "optional": true
+    },
+    "@gluonjs/ssr": {
       "optional": true
     }
   },

@@ -20,6 +20,7 @@
     "packages/ssr/src/streaming.ts",
     "packages/vite/src/index.ts",
     "packages/test-utils/src/index.ts",
+    "packages/test-utils/src/ssr.ts",
     "packages/devtools-api/src/index.ts",
     "packages/devtools/src/index.ts",
     "packages/language-server/src/index.ts",

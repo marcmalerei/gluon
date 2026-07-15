@@ -41,6 +41,7 @@ import {
 import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
 import { renderShopRequest } from '../examples/shop/src/server.js';
+import { renderSsrFixture } from '../packages/test-utils/src/ssr.js';
 import { ClassQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-class.js';
 import { FunctionalQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-functional.js';
 import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-control/react.js';
@@ -294,15 +295,19 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
 
 describe('@gluonjs/ssr request ownership and state', () => {
   it('renders a deep GLUON GOODS product URL through public server APIs', async () => {
-    const response = await renderShopRequest('/products/orbit-lamp');
-    const visible = withoutHydrationMarkers(response.html);
+    const fixture = await renderSsrFixture(
+      () => renderShopRequest('/products/orbit-lamp'),
+      { name: 'shop-product-request' },
+    );
+    const visible = withoutHydrationMarkers(fixture.html);
     expect(visible).toContain('<h1 id="product-title">Orbit Lamp</h1>');
+    expect(fixture.contains('Orbit Lamp')).toBe(true);
     expect(visible).toContain('In stock · dispatches in 2–3 days');
-    expect(response.html).toContain('href="/products/stack-tray"');
-    expect(response.router.location).toBe('/products/orbit-lamp');
-    expect(response.store.stores.shop).toEqual(expect.objectContaining({ bag: [] }));
-    expect(response.stateScript.startsWith('<script type="application/json" data-gluon-state>')).toBe(true);
-    expect(response.styles.entries.map((entry) => entry.id)).toEqual([
+    expect(fixture.html).toContain('href="/products/stack-tray"');
+    expect(fixture.router.location).toBe('/products/orbit-lamp');
+    expect(fixture.store.stores.shop).toEqual(expect.objectContaining({ bag: [] }));
+    expect(fixture.stateScript.startsWith('<script type="application/json" data-gluon-state>')).toBe(true);
+    expect(fixture.styles.entries.map((entry) => entry.id)).toEqual([
       'gluon-ui-layer-order',
       'gluon-ui-foundation',
       'gluon-ui-tokens',
@@ -322,7 +327,7 @@ describe('@gluonjs/ssr request ownership and state', () => {
     const unmounted = vi.fn();
     const cleanups: string[] = [];
 
-    const createRequest = (id: string, delay: number) => renderRequest({
+    const createRequest = (id: string, delay: number) => renderSsrFixture(() => renderRequest({
       url: `/reports/${id}`,
       routes: [{ path: '/reports/:id', name: 'report' }],
       async load({ store }) {
@@ -342,7 +347,7 @@ describe('@gluonjs/ssr request ownership and state', () => {
         return app;
       },
       state: { requestId: id },
-    });
+    }), { name: `request-${id}` });
 
     const [first, second] = await Promise.all([
       createRequest('alpha', 10),

@@ -7,6 +7,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added first-class SSR and hydration fixtures to `@gluonjs/test-utils/ssr` and
+  moved the canonical GLUON GOODS request-to-interaction regression onto that
+  public transport and cleanup boundary.
+
 ## [1.0.10] - 2026-07-15
 
 ### Fixed

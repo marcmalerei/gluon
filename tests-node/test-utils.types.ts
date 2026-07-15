@@ -14,6 +14,31 @@ import {
   type ElementFixture,
   type TestFixture,
 } from '../packages/test-utils/dist/index.js';
+import type { SsrRequestResult } from '../packages/ssr/dist/index.js';
+import {
+  activeSsrFixtureNames,
+  assertNoSsrFixtureLeaks,
+  cleanupSsrFixtures,
+  hydrateSsrFixture,
+  renderSsrFixture,
+  type HydratedSsrFixture,
+  type HydrationFixtureContext,
+  type SsrFixture,
+} from '../packages/test-utils/dist/ssr.js';
+
+const renderServer = async (): Promise<SsrRequestResult> => { throw new Error('type fixture'); };
+const serverFixture: Promise<SsrFixture> = renderSsrFixture(renderServer, { name: 'shop' });
+const hydrationContext: HydrationFixtureContext | undefined = undefined;
+void hydrationContext;
+const hydratedFixture: Promise<HydratedSsrFixture<{ retained: boolean }>> = serverFixture.then((server) =>
+  hydrateSsrFixture(server, {
+    hydrate: async ({ container }) => ({ retained: container.childNodes.length > 0 }),
+    dispose: (hydrated) => { void hydrated.retained; },
+  }));
+void hydratedFixture;
+void cleanupSsrFixtures();
+activeSsrFixtureNames().map((name) => name.toUpperCase());
+assertNoSsrFixtureLeaks();
 
 const messageKey = createInjectionKey<string>('message');
 const plugin: GluonPlugin<{ enabled: boolean }> = { install: () => undefined };

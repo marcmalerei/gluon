@@ -88,10 +88,47 @@ store state.
 `settle({ cycles, timers })` repeats that boundary and can include one zero-delay
 timer turn per cycle for async UI tests.
 
-Server rendering tests use the public `@gluonjs/ssr` package directly. Browser
-hydration assertions use `hydrateTemplate()` or `hydrateApplication()` from the
-public `@gluonjs/ssr/hydration` entry point; this package does not emulate
-marker, mismatch, or recovery behavior privately.
+## SSR and hydration fixtures
+
+The optional `@gluonjs/test-utils/ssr` entry pairs a complete public SSR result
+with a real browser hydration boundary:
+
+```ts
+import { afterEach, expect, it } from 'vitest';
+import { renderRequest } from '@gluonjs/ssr';
+import { hydrateApplication } from '@gluonjs/ssr/hydration';
+import {
+  cleanupSsrFixtures,
+  hydrateSsrFixture,
+  renderSsrFixture,
+} from '@gluonjs/test-utils/ssr';
+
+afterEach(cleanupSsrFixtures);
+
+it('retains the server DOM', async () => {
+  const server = await renderSsrFixture(() => renderRequest(requestOptions));
+  const fixture = await hydrateSsrFixture(server, {
+    hydrate: ({ container }) => hydrateApplication(app, container),
+    dispose: ({ mount }) => mount.unmount(),
+  });
+
+  expect(fixture.hydrated.hydration.retained).toBe(true);
+});
+```
+
+`renderSsrFixture()` retains HTML, head carriers, serialized state, Router and
+Store snapshots, and the complete immutable response. The SSR package itself
+owns and disposes request application, Router, Store, and effect-scope state.
+
+`hydrateSsrFixture()` installs that exact markup, head transport, and state
+script into a real `Document`, then invokes the application's public hydration
+function. It does not emulate markers, mismatch detection, style handoff,
+snapshot restoration, or recovery. The caller's `dispose` callback releases
+application-specific resources before the fixture removes its container, state
+carrier, and exact head nodes. Failed hydration rolls back all installed DOM.
+`cleanupSsrFixtures()` cleans active fixtures in reverse creation order;
+`activeSsrFixtureNames()` and `assertNoSsrFixtureLeaks()` expose ownership
+failures.
 
 `create-gluon --ui --testing` generates a complete application-level Chromium
 test rather than an isolated markup sample. It mounts the real starter owner,
