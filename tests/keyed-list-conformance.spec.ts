@@ -3,7 +3,9 @@ import {
   html,
   repeat,
   render,
+  suspendRender,
   type Key,
+  type TemplateValue,
 } from '../src/index.js';
 
 interface Row {
@@ -107,6 +109,86 @@ describe('keyed list renderer conformance', () => {
     expect(moved).toBe(instance);
     expect(moved.localState).toBe(42);
     expect(moved.textContent?.trim()).toBe('Bee');
+  });
+
+  it('updates lazy primitive rows in place and materializes structural bindings on demand', () => {
+    const root = document.createElement('div');
+    const view = (item: {
+      key: string;
+      id: string | bigint | true | null;
+      content: TemplateValue;
+    }) => html`<ul>${repeat(
+      [item],
+      (current) => current.key,
+      (current) => html`<li data-id=${current.id}>${current.content}</li>`,
+    )}</ul>`;
+
+    render(view({ key: 'stable', id: 'a', content: 'Alpha' }), root);
+    const item = root.querySelector('li')!;
+    expect([...item.childNodes].map((node) => node.nodeType)).toEqual([Node.TEXT_NODE]);
+
+    render(view({ key: 'stable', id: 'b', content: 'Beta' }), root);
+    expect(root.querySelector('li')).toBe(item);
+    expect(item.dataset.id).toBe('b');
+    expect(item.textContent).toBe('Beta');
+
+    render(view({ key: 'stable', id: null, content: 'No attribute' }), root);
+    expect(item.hasAttribute('data-id')).toBe(false);
+
+    render(view({ key: 'stable', id: 1n, content: 'BigInt attribute' }), root);
+    expect(item.dataset.id).toBe('1');
+
+    render(view({ key: 'stable', id: true, content: 'Boolean attribute' }), root);
+    expect(item.dataset.id).toBe('true');
+
+    render(view({ key: 'stable', id: 'c', content: 42 }), root);
+    expect(item.textContent).toBe('42');
+
+    render(view({ key: 'stable', id: 'd', content: html`<strong>Structured</strong>` }), root);
+    expect(root.querySelector('li')).toBe(item);
+    expect(item.dataset.id).toBe('d');
+    expect(item.textContent).toBe('Structured');
+    expect(item.querySelector('strong')?.textContent).toBe('Structured');
+
+    render(view({ key: 'stable', id: 'e', content: 'Text again' }), root);
+    expect(item.textContent).toBe('Text again');
+
+    const nested = repeat(
+      ['Nested repeat'],
+      (label) => label,
+      (label) => html`<em>${label}</em>`,
+    );
+    render(view({ key: 'stable', id: 'f', content: nested }), root);
+    expect(item.querySelector('em')?.textContent).toBe('Nested repeat');
+    suspendRender(root);
+    render(view({ key: 'stable', id: 'f', content: nested }), root);
+    expect(item.querySelector('em')?.textContent).toBe('Nested repeat');
+
+    render(view({ key: 'stable', id: 'g', content: null }), root);
+    expect(root.querySelector('li')).toBe(item);
+    expect(item.dataset.id).toBe('g');
+    expect(item.textContent).toBe('');
+  });
+
+  it('clones pristine primitive prototypes without sharing mounted DOM mutations', () => {
+    const firstRoot = document.createElement('div');
+    const secondRoot = document.createElement('div');
+    const view = () => html`<ul>${repeat(
+      [row('cached', 'Pristine')],
+      (item) => item.id,
+      (item) => html`<li data-id=${item.id}>${item.label}</li>`,
+    )}</ul>`;
+
+    render(view(), firstRoot);
+    const first = firstRoot.querySelector('li')!;
+    first.dataset.id = 'mutated';
+    first.textContent = 'Mutated';
+
+    render(view(), secondRoot);
+    const second = secondRoot.querySelector('li')!;
+    expect(second).not.toBe(first);
+    expect(second.dataset.id).toBe('cached');
+    expect(second.textContent).toBe('Pristine');
   });
 
   it('moves only displaced keyed groups around the longest stable run', () => {

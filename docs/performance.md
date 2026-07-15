@@ -4,14 +4,19 @@ Gluon's comparative rendering benchmark measures the current repository source
 against pinned Lit, Vue, and optimized Vanilla DOM implementations. It exists to
 produce inspectable evidence, not to guarantee that one renderer wins.
 
-The runtime's measured hot paths include direct string-binding updates,
-direct insertion when a new part contains one node, fragment batching when it
-contains multiple nodes, one element/comment traversal for every cloned
-template's bindings, precomputed binding priorities, parallel key/value storage
-for keyed repeats, detached keyed-child anchors, and keyed-list fast paths for
-unchanged and reversed order. Generic keyed changes trim stable heads and tails,
-retain their longest unchanged contiguous run, and move only the surrounding
-groups. These shortcuts retain the external-DOM recovery and keyed-identity
+The runtime's measured hot paths include direct unstyled string-root updates,
+seeded primitive text slots, direct single-root cloning, fragment batching for
+multi-node replacements, filtered element/comment traversal for general
+templates, precomputed binding priorities, parallel key/value storage for keyed
+repeats, and keyed-list fast paths for unchanged and reversed order. Safe
+primitive keyed rows defer their structural comment anchor and full Part graph
+until a value becomes empty, styled, directive-backed, nested, or otherwise
+structural. A per-template cache retains at most 1,024 never-mounted primitive
+row prototypes by key and exact rendered values; every root receives a deep
+clone, so mounted DOM mutations cannot contaminate later roots. Generic keyed
+changes still trim stable heads and tails, retain their longest unchanged
+contiguous run, and move only the surrounding groups. These shortcuts retain
+the external-DOM recovery, cleanup, style, hydration, and keyed-identity
 contracts covered by the browser suite.
 
 The retained baseline is stored in
@@ -90,25 +95,25 @@ above 1 means Gluon was faster for only that browser and workload.
 
 ## Current committed matrix
 
-The retained matrix for commit `e8c4e9a` uses 20 measured samples, eight warm-up
-rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit 26.5
-engines on the recorded Apple M4 environment. The paired
-[`rendering-comparison-e8c4e9a.md`](../benchmarks/results/rendering-comparison-e8c4e9a.md)
-file contains the medians and p95 values; its JSON file retains every sample.
+The retained matrix for clean commit `7d1fff0` uses 40 measured samples, eight
+warm-up rounds, and the Playwright-managed Chromium 149, Firefox 151, and WebKit
+26.5 engines on the recorded Apple M4 environment. The paired
+[`rendering-comparison-7d1fff0.md`](../benchmarks/results/rendering-comparison-7d1fff0.md)
+file contains every median and p95 value; its JSON file retains every sample.
 
-Gluon is faster than Lit for keyed `update` and `reverse` in all three engines:
-1.16×/1.74× in Chromium, 1.23×/1.94× in Firefox, and 1.14×/2.05× in WebKit.
-Text is at parity in Firefox and WebKit; Lit is faster in Chromium. Fresh
-1,000-row `create` remains faster in Lit in this matrix, so the evidence does
-not support a universal “Gluon is faster” claim or the historical 6× claim.
+Gluon is faster than or equal to both framework comparators in all 24
+browser/scenario comparisons. The Lit median divided by the Gluon median is
+1.00×/2.69×/1.43×/1.92× for Chromium text/create/update/reverse,
+1.06×/3.00×/1.78×/2.19× in Firefox, and
+1.11×/2.70×/1.33×/2.22× in WebKit. Gluon also beats Vue in every cell except
+WebKit create, where both medians are 0.4167 ms/op.
 
-The single-node insertion fast path removes one renderer-created
-`DocumentFragment` and its `append()` call for each newly committed text node.
-Compared with the previous retained `4c0f0b9` matrix, the `create` median is
-lower by 5% in Chromium (1.2083 to 1.1472 ms/op), 6% in Firefox (2.0417 to
-1.9167 ms/op), and 15% in WebKit (1.7083 to 1.4583 ms/op). These are separate
-benchmark runs, so the distributions remain the evidence; the percentages are
-not a browser-independent speedup claim.
+The optimized Vanilla DOM harness remains a lower bound rather than a framework
+parity target. Gluon beats it for Chromium text/create/update, Firefox create,
+and WebKit text/create/update. Vanilla remains faster for reverse in all three
+engines and for Firefox text/update. The evidence therefore supports complete
+Lit/Vue parity for these workloads, not a universal claim that Gluon beats
+hand-written DOM operations.
 
 Issue #81 also retained a controlled Chromium confirmation with 40 interleaved
 samples and 12 warm-up rounds. Both runs used the production build, Chromium

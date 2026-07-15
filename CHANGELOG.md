@@ -17,6 +17,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   and clearing spread keys through the existing live Set.
 - Skipped development-mode detection on reactive dependency tracking and
   triggering paths when an effect has no corresponding debugger hook.
+- Optimized stable unstyled text roots and primitive keyed rows with seeded
+  text slots, direct single-root cloning, lazy structural anchors, compact
+  attribute/text updates, and a bounded pristine keyed-prototype cache while
+  retaining the general style, directive, hydration, and cleanup paths.
 
 ## [1.0.7] - 2026-07-14
 
