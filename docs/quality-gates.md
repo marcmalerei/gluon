@@ -261,11 +261,13 @@ above the combined #112/#115 entry, and 23,695 raw and 6,852 gzip bytes above
 the issue #88 baseline of 158,152 raw and 45,683 gzip bytes. Immediately before
 issue #179, the clean production graph measured 191,197 raw bytes and 55,385
 gzip bytes. The compiler-proven primitive text-update path in issue #179 raises
-that graph to 193,610 raw bytes and 55,897 gzip bytes. The reviewed regression
-ceilings are therefore 194,000 raw bytes and 56,000 gzip bytes; HTML,
-image-byte, and image-count ceilings remain unchanged. These are composition
-measurements, not runtime-speed or framework-size claims. Vue is built only in
-the documentation host.
+that graph to 193,610 raw bytes and 55,897 gzip bytes. Issue #190's reactive
+platform-observer integration raises the clean CI graph to 194,440 raw bytes
+and 56,251 gzip bytes. The reviewed regression ceilings are therefore 194,500
+raw bytes and 56,300 gzip bytes, leaving 60 raw bytes and 49 gzip bytes of
+explicit headroom; HTML, image-byte, and image-count ceilings remain unchanged.
+These are composition measurements, not runtime-speed or framework-size claims.
+Vue is built only in the documentation host.
 
 Issue #115 replaces aggregate component retention with usage-driven exact
 component sheets. `check:ui-contract` additionally
