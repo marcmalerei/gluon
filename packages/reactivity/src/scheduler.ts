@@ -50,12 +50,24 @@ function ensureFlush(): void {
   currentFlushPromise ??= resolvedPromise.then(flushJobs);
 }
 
-async function runJob(entry: QueuedJob): Promise<void> {
+function runJob(entry: QueuedJob): void | Promise<void> {
   try {
-    await entry.job();
+    const result = entry.job();
+    if (isPromiseLike(result)) {
+      return Promise.resolve(result).then(
+        () => undefined,
+        (error) => reportReactivityError(error, 'scheduler', entry.job, entry.onError),
+      );
+    }
   } catch (error) {
     reportReactivityError(error, 'scheduler', entry.job, entry.onError);
   }
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return value !== null
+    && (typeof value === 'object' || typeof value === 'function')
+    && typeof (value as PromiseLike<unknown>).then === 'function';
 }
 
 async function flushPhase(
@@ -82,7 +94,8 @@ async function flushPhase(
         );
         continue;
       }
-      await runJob(entry);
+      const result = runJob(entry);
+      if (result) await result;
     }
   }
 }

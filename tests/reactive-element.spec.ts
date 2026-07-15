@@ -138,6 +138,66 @@ describe('reactive GluonElement rendering', () => {
     expect(element.click).toHaveBeenCalledTimes(2);
   });
 
+  it('rebuilds cached error routing after moving between connected boundaries', async () => {
+    const childTag = `gluon-error-child-${reactiveElementSequence += 1}` as `${string}-${string}`;
+    const boundaryTag = `gluon-error-boundary-${reactiveElementSequence += 1}` as `${string}-${string}`;
+    const captured: string[] = [];
+
+    class ErrorChild extends GluonElement {
+      private failing = false;
+
+      fail(): Promise<void> {
+        this.failing = true;
+        return this.requestUpdate();
+      }
+
+      recover(): void {
+        this.failing = false;
+      }
+
+      protected override render() {
+        if (this.failing) throw new Error('moved child failed');
+        return html`<span>ready</span>`;
+      }
+    }
+
+    class ErrorBoundary extends GluonElement {
+      name = '';
+
+      constructor() {
+        super();
+        this.onErrorCaptured(() => {
+          captured.push(this.name);
+          return true;
+        });
+      }
+
+      protected override render() {
+        return html`<slot></slot>`;
+      }
+    }
+
+    defineElement(childTag, ErrorChild);
+    defineElement(boundaryTag, ErrorBoundary);
+    const first = document.createElement(boundaryTag) as ErrorBoundary;
+    const second = document.createElement(boundaryTag) as ErrorBoundary;
+    const child = document.createElement(childTag) as ErrorChild;
+    first.name = 'first';
+    second.name = 'second';
+    first.append(child);
+    document.body.append(first, second);
+    await Promise.all([first.updateComplete, second.updateComplete, child.updateComplete]);
+
+    await expect(child.fail()).rejects.toThrow('moved child failed');
+    expect(captured).toEqual(['first']);
+
+    child.recover();
+    second.append(child);
+    await child.updateComplete;
+    await expect(child.fail()).rejects.toThrow('moved child failed');
+    expect(captured).toEqual(['first', 'second']);
+  });
+
   it('reports batched render causes, tracked dependencies, and timings', async () => {
     const tagName = `gluon-debug-${reactiveElementSequence += 1}` as `${string}-${string}`;
     const events: GluonRenderDebugEvent[] = [];

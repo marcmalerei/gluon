@@ -14,14 +14,21 @@ export default defineConfig({
   },
   define: {
     __GLUON_DEV__: JSON.stringify(false),
+    __VUE_OPTIONS_API__: true,
+    __VUE_PROD_DEVTOOLS__: false,
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
   },
   build: {
-    outDir: resolve(repositoryRoot, '.tmp/renderer-allocation-benchmark'),
+    outDir: resolve(repositoryRoot, '.tmp/component-benchmark'),
     emptyOutDir: true,
+  },
+  server: {
+    host: '0.0.0.0',
+    port: 4175,
   },
   preview: {
     host: '127.0.0.1',
-    port: 4176,
+    port: 4175,
     strictPort: true,
   },
 });

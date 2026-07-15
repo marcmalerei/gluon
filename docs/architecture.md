@@ -545,3 +545,14 @@ order, runs in Chromium, Firefox, and WebKit, and retains raw samples plus exact
 environment metadata. [`performance.md`](performance.md) defines the workloads,
 interpretation rules, and measurement limits. The benchmark has no application
 runtime dependency and is intentionally not a GLUON GOODS customer route.
+
+`npm run benchmark:components` applies the same production and evidence
+contract to 50 autonomous Custom Elements per framework. Gluon uses the public
+`GluonElement` class, Lit uses `LitElement`, and Vue uses
+`defineCustomElement`; all three render open Shadow DOM with identical labels,
+internal button state, and 20 keyed rows per component. Lifecycle, public
+property, internal state, and list-reorder operations settle through each
+framework's public completion API before the next operation. The comparative
+Vite configs explicitly compile aliased Gluon source with `__GLUON_DEV__`
+disabled, and `npm run check:benchmark-builds` enforces that production-mode
+boundary.

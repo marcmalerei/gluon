@@ -96,6 +96,18 @@ describe('reactivity scheduler', () => {
     expect(order).toEqual(['pre', 'update', 'post', 'late-pre']);
   });
 
+  it('runs synchronous jobs without inserting a microtask between them', async () => {
+    const order: string[] = [];
+    queueJob(() => {
+      order.push('first');
+      queueMicrotask(() => order.push('microtask'));
+    }, { id: 1 });
+    queueJob(() => order.push('second'), { id: 2 });
+
+    await nextTick(() => order.push('tick'));
+    expect(order).toEqual(['first', 'second', 'microtask', 'tick']);
+  });
+
   it('resolves nextTick after post-flush work and immediately without pending work', async () => {
     const order: string[] = [];
     queuePostFlushCallback(() => order.push('post'));
@@ -240,9 +252,10 @@ describe('reactivity scheduler', () => {
         await Promise.resolve();
         order.push('end');
         throw new Error('async job failed');
-      });
+      }, { id: 1 });
+      queueJob(() => order.push('later'), { id: 2 });
       await nextTick(() => order.push('tick'));
-      expect(order).toEqual(['start', 'end', 'tick']);
+      expect(order).toEqual(['start', 'end', 'later', 'tick']);
       expect(errors).toEqual([
         expect.objectContaining({ phase: 'scheduler' }),
       ]);

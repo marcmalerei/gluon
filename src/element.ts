@@ -189,6 +189,8 @@ interface UpdateDeferred {
   readonly reject: (reason?: unknown) => void;
 }
 
+type ComponentErrorReporter = (error: unknown, source: AppErrorSource) => void;
+
 interface CapturedComponentBoundary {
   readonly element: GluonElement<any>;
   readonly context?: ApplicationContext;
@@ -239,6 +241,7 @@ export abstract class GluonElement<
   private reflectingAttribute?: string;
   private readonly initialAttributePrecedence = new Map<string, string>();
   private applicationContext?: ApplicationContext;
+  private componentErrorReporter?: ComponentErrorReporter;
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
   private pendingUpdate?: UpdateDeferred;
@@ -283,6 +286,7 @@ export abstract class GluonElement<
     if (this.connected) return;
     this.connected = true;
     this.applicationContext = resolveApplicationContext(this);
+    this.componentErrorReporter = this.createComponentErrorReporter();
     this.validateDeclaredProperties();
     adoptStyles(this.renderRoot, ...getStyles(this.constructor as GluonElementConstructor));
     this.reflectCurrentProperties();
@@ -315,6 +319,7 @@ export abstract class GluonElement<
         } finally {
           this.teardownConnection();
           this.connectionRendered = false;
+          this.componentErrorReporter = undefined;
           this.applicationContext = undefined;
         }
       }
@@ -595,7 +600,7 @@ export abstract class GluonElement<
   }
 
   private runOwned<Result>(callback: () => Result): Result {
-    const reportError = this.createComponentErrorReporter();
+    const reportError = this.componentErrorReporter ??= this.createComponentErrorReporter();
     return runWithApplicationContext(
       this.applicationContext,
       this,
@@ -606,7 +611,7 @@ export abstract class GluonElement<
 
   private invokeLifecycle(callbacks: readonly ComponentLifecycleCallback[]): void {
     for (const callback of callbacks) {
-      const reportError = this.createComponentErrorReporter();
+      const reportError = this.componentErrorReporter ??= this.createComponentErrorReporter();
       try {
         const result = runWithApplicationContext(
           this.applicationContext,
@@ -635,13 +640,10 @@ export abstract class GluonElement<
   }
 
   private handleComponentError(error: unknown, source: AppErrorSource): void {
-    this.createComponentErrorReporter()(error, source);
+    (this.componentErrorReporter ??= this.createComponentErrorReporter())(error, source);
   }
 
-  private createComponentErrorReporter(): (
-    error: unknown,
-    source: AppErrorSource,
-  ) => void {
+  private createComponentErrorReporter(): ComponentErrorReporter {
     const applicationContext = this.applicationContext;
     const boundaries: CapturedComponentBoundary[] = [];
     let current = getComposedParent(this);

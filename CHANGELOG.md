@@ -7,6 +7,29 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Kept the shared decorator metadata key typed as `symbol`, allowing the
+  lockfile-pinned TypeScript 5.9 standard-library `Symbol.metadata` declaration
+  and the runtime fallback to typecheck through the same exported contract.
+
+### Added
+
+- Added a production-built component comparison for Gluon, Lit, and Vue across
+  Custom Element lifecycle, public property, internal state, and keyed-list
+  workloads, with identical Shadow DOM output checks, calibrated interleaved
+  samples, three-browser evidence, exact environment metadata, and CI retention.
+
+### Changed
+
+- Synchronous Reactivity scheduler jobs now complete without an artificial
+  microtask boundary between every job while real asynchronous jobs remain
+  awaited in deterministic order.
+- `GluonElement` now reuses its captured application/error-boundary reporter
+  for one connection and rebuilds it after reconnecting under a new owner.
+- Comparative benchmark builds now compile aliased Gluon source with
+  `__GLUON_DEV__` disabled, matching their documented production-build contract.
+
 ## [1.0.8] - 2026-07-15
 
 ### Changed
