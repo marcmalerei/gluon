@@ -66,11 +66,11 @@ rounds:
 | Production matrix | Gluon median vs Lit | Gluon median vs Vue |
 | --- | --- | --- |
 | Template rendering | faster in 12/12 browser/scenario cells | faster in 11/12; Vue wins WebKit create |
-| Custom Element components | clean isolated-scenario matrix generated below | clean isolated-scenario matrix generated below |
+| Custom Element components | faster in all 6 lifecycle/list cells; Lit wins all 6 isolated property/state cells | faster in 7/12, equal in 2/12; Vue wins Firefox lifecycle/property/state |
 
 The paired raw evidence is retained for
 [template rendering](benchmarks/results/rendering-production-4c7bdac.md) and
-[components](benchmarks/results/). Exact
+[components](benchmarks/results/component-production-c3668bb.md). Exact
 medians, p95 values, methodology, and interpretation boundaries are in
 [Rendering and component performance evidence](docs/performance.md). These
 recorded M4 results do not establish universal superiority and do not establish

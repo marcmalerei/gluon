@@ -146,11 +146,12 @@ with issues #172 and #174 supersede that framework-comparison interpretation.
 
 ## Current committed matrix
 
-Both current matrices measure clean source commit `4c7bdac` with 40 samples,
-eight warm-up rounds, and Playwright-managed Chromium 149, Firefox 151, and
-WebKit 26.5 on the recorded Apple M4 environment. The paired JSON files retain
-every sample and invariant snapshot; the Markdown files expose every median and
-p95 value.
+The current rendering matrix measures clean source commit `4c7bdac`; the
+isolated-scenario component matrix measures clean source commit `c3668bb`.
+Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
+Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
+JSON files retain every sample and invariant snapshot; the Markdown files
+expose every median and p95 value.
 
 ### Template rendering matrix
 
@@ -170,10 +171,27 @@ recorded workload results, not a general rendering ranking.
 
 ### Component matrix
 
-The clean isolated-scenario component matrix is generated from the next clean
-implementation commit and retained beside the rendering evidence. It reports
-milliseconds per 50 component boundaries and must keep Lit's remaining simple
-update advantage explicit instead of averaging it into lifecycle or list work.
+The complete
+[`component-production-c3668bb.md`](../benchmarks/results/component-production-c3668bb.md)
+matrix reports milliseconds per 50 component boundaries. Against Lit, Gluon
+wins lifecycle and keyed-list medians in all three browsers; Lit wins isolated
+public-property and internal-state medians in all three browsers. Lit median
+divided by Gluon median is 1.31×/0.65×/0.83×/1.59× for Chromium
+lifecycle/property/state/list, 1.11×/0.55×/0.78×/1.17× for Firefox, and
+1.50×/0.73×/0.92×/1.92× for WebKit.
+
+The remaining absolute Lit advantage per 50 components is 0.0084 ms for
+Chromium property and 0.0110 ms for Chromium state; 0.1125 ms and 0.1000 ms in
+Firefox; and 0.0050 ms and 0.0062 ms in WebKit. Gluon's state path now retains
+one native guarded event dispatcher while render callbacks change, but this
+matrix still records Lit as the faster simple-update implementation.
+
+Against Vue, Gluon wins Chromium lifecycle/property/list and ties state; wins
+Firefox list while Vue wins Firefox lifecycle/property/state; and wins WebKit
+property/state/list while lifecycle is equal. Across those 12 cells that is
+seven Gluon wins, two equal medians, and three Vue wins. This supports strong
+lifecycle and keyed-list results without turning the matrix into a universal
+framework ranking.
 
 Neither matrix measures an Apple M1. Hardware model, operating system, browser,
 thermal state, and other load are part of the evidence boundary; an M1 result
