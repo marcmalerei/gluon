@@ -67,11 +67,11 @@ collection from one scenario cannot leak into the next:
 | Production matrix | Gluon median vs Lit | Gluon median vs Vue |
 | --- | --- | --- |
 | Template rendering | faster in 12/12 browser/scenario cells | faster in 11/12; Vue wins WebKit create |
-| Custom Element components | faster in 6/12, equal in 2/12; Lit wins Chromium/Firefox property and state | faster in 8/12, equal in 2/12; Vue wins Firefox property/state |
+| Custom Element components | faster in 6/12; Lit wins all 6 isolated property/state cells | faster in 8/12, equal in 2/12; Vue wins Firefox property/state |
 
 The paired raw evidence is retained for
 [template rendering](benchmarks/results/rendering-production-4c7bdac.md) and
-[components](benchmarks/results/component-production-267533e.md). Exact
+[components](benchmarks/results/component-production-d006924.md). Exact
 medians, p95 values, methodology, and interpretation boundaries are in
 [Rendering and component performance evidence](docs/performance.md). These
 recorded M4 results do not establish universal superiority and do not establish

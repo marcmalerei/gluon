@@ -164,7 +164,7 @@ with issues #172 and #174 supersede that framework-comparison interpretation.
 ## Current committed matrix
 
 The current rendering matrix measures clean source commit `4c7bdac`; the
-isolated-scenario component matrix measures clean source commit `267533e`.
+isolated-scenario component matrix measures clean source commit `d006924`.
 Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
 Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
 JSON files retain every sample and invariant snapshot; the Markdown files
@@ -189,26 +189,25 @@ recorded workload results, not a general rendering ranking.
 ### Component matrix
 
 The complete
-[`component-production-267533e.md`](../benchmarks/results/component-production-267533e.md)
+[`component-production-d006924.md`](../benchmarks/results/component-production-d006924.md)
 matrix reports milliseconds per 50 component boundaries. Against Lit, Gluon
-wins lifecycle and keyed-list medians in all three browsers. WebKit property
-and state are equal at the recorded timer resolution. Lit wins property and
-state in Chromium and Firefox. Lit median divided by Gluon median is
-1.32×/0.85×/0.94×/1.59× for Chromium lifecycle/property/state/list,
-1.43×/0.90×/0.87×/1.60× for Firefox, and
-1.50×/1.00×/1.00×/1.85× for WebKit.
+wins lifecycle and keyed-list medians in all three browsers. Lit wins property
+and state in all three. Lit median divided by Gluon median is
+1.33×/0.73×/0.91×/1.62× for Chromium lifecycle/property/state/list,
+1.25×/0.80×/0.82×/1.67× for Firefox, and
+1.57×/0.75×/0.88×/1.92× for WebKit.
 
-The remaining absolute Lit advantage per 50 components is 0.0026 ms for
-Chromium property and 0.0031 ms for Chromium state, and 0.0167 ms and 0.0500 ms
-in Firefox. WebKit records no median gap in either simple cell. Against the
-preceding clean `47b1a0a` Gluon matrix, the new Gluon property medians are
-23.3%, 16.7%, and 18.0% lower in Chromium, Firefox, and WebKit; state medians
-are 16.8%, 32.6%, and 8.3% lower. The new matrix also replaces the former
-scenario branch with dedicated property/state classes in every framework, so
-these separate-run deltas describe the complete compiler/runtime plus fixture
-change and do not isolate one optimization.
+The remaining absolute Lit advantage per 50 components is 0.0049 ms for
+Chromium property and 0.0048 ms for Chromium state; 0.0313 ms and 0.0468 ms in
+Firefox; and 0.0042 ms and 0.0084 ms in WebKit. Against the preceding clean
+`47b1a0a` Gluon matrix, the new Gluon property medians are 23.3%, 21.9%, and
+9.1% lower in Chromium, Firefox, and WebKit; state medians are 16.9%, 53.8%,
+and 11.1% lower. The new matrix also replaces the former scenario branch with
+dedicated property/state classes and isolates every scenario in a fresh browser
+context, so these separate-run deltas describe the complete compiler/runtime,
+fixture, and runner change and do not isolate one optimization.
 
-Against Vue, Gluon wins all four Chromium cells; wins Firefox lifecycle, ties
+Against Vue, Gluon wins all four Chromium cells; ties Firefox lifecycle, wins
 list, and loses property/state; and wins WebKit property/state/list while
 lifecycle is equal. Across those 12 cells that is eight Gluon wins, two equal
 medians, and two Vue wins. This supports the
