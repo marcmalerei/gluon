@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-14",
+    "checkedAt": "2026-07-15",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "All 17 contracted npm package records expose 1.0.7 as latest with SLSA provenance. Release workflow 29338710037 completed clean-install registry verification, and immutable GitHub release v1.0.7 was published on 2026-07-14."
+    "publicationState": "ready",
+    "observation": "Registry preflight on 2026-07-15 confirmed that all 17 contracted npm package records still expose 1.0.7 as latest and that version 1.0.8 is absent. Existing trusted-publisher bindings successfully published the complete 1.0.7 train with SLSA provenance."
   },
   "packages": [
     {

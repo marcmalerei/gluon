@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/vite",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Official Vite integration and state-preserving HMR for Gluon.",
   "private": false,
   "type": "module",
@@ -35,10 +35,10 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/compiler": "1.0.7"
+    "@gluonjs/compiler": "1.0.8"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.7",
+    "@gluonjs/core": "1.0.8",
     "vite": "^8.0.0"
   },
   "peerDependenciesMeta": {

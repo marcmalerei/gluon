@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-07-15
+
+### Changed
+
+- Reported lockstep framework version `1.0.8` while retaining the existing
+  protocol and public diagnostics contract.
+
 ## [1.0.7] - 2026-07-14
 
 ### Changed

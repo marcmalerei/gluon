@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/devtools-api",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Versioned environment-neutral Gluon Devtools protocol.",
   "private": false,
   "type": "module",
