@@ -7,12 +7,14 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.0.8` candidate. Every official
-manifest is public and lockstep at `1.0.8`. Registry preflight on 2026-07-15
-confirmed that all 17 contracted npm packages still expose `1.0.7` as `latest`
-and that `1.0.8` is absent. Immutable GitHub release `v1.0.7` remains the
-current release. This is enforced locally by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.0.8`. Every official manifest is public and
+lockstep at `1.0.8`. All 17 contracted npm packages expose `1.0.8` as `latest`
+with SLSA provenance, and immutable GitHub release `v1.0.8` was published on
+2026-07-15. Release workflow `29403576667` completed candidate,
+reproducibility, Trusted Publishing, clean-install registry verification, and
+release finalization from the canonical `v1.0.8` tag. This is enforced locally
+by:
 
 ```sh
 npm run check:release-contract
