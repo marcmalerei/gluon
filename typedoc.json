@@ -9,6 +9,8 @@
     "packages/molecules/src/index.ts",
     "packages/organisms/src/index.ts",
     "packages/reactivity/src/index.ts",
+    "packages/reactivity/src/signals/index.ts",
+    "packages/reactivity/src/preact-signals.ts",
     "packages/compiler/src/index.ts",
     "packages/compiler/src/diagnostics.ts",
     "packages/router/src/index.ts",

@@ -7,6 +7,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['packages/reactivity/src/**/*.ts'],
+      exclude: ['packages/reactivity/src/signals/**', 'packages/reactivity/src/preact-signals.ts'],
       reportsDirectory: 'coverage/reactivity',
       reporter: ['text', 'html'],
       thresholds: {

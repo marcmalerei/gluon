@@ -16,6 +16,7 @@ export default defineConfig({
       '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),
       '@gluonjs/molecules': resolve(repositoryRoot, 'packages/molecules/src/index.ts'),
       '@gluonjs/organisms': resolve(repositoryRoot, 'packages/organisms/src/index.ts'),
+      '@gluonjs/reactivity/signals': resolve(repositoryRoot, 'packages/reactivity/src/signals/index.ts'),
       '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router/memory': resolve(repositoryRoot, 'packages/router/src/memory.ts'),
       '@gluonjs/router': resolve(repositoryRoot, 'packages/router/src/index.ts'),

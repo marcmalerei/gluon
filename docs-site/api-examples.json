@@ -161,6 +161,52 @@
         "console.log(view, range);"
       ]
     },
+    "reactivity-standard-signals": {
+      "module": "@gluonjs/reactivity/signals",
+      "code": [
+        "import {",
+        "  Signal,",
+        "  fromStandardSignal,",
+        "  type BridgeOptions,",
+        "  type SignalBridge,",
+        "  type StandardSignal,",
+        "  type StandardSignalBridgeOptions,",
+        "  type StandardSignalImplementation,",
+        "  type StandardSignalWatcher,",
+        "  type WritableSignalBridge,",
+        "  type WritableStandardSignal,",
+        "} from '@gluonjs/reactivity/signals';",
+        "",
+        "const implementation: StandardSignalImplementation = Signal;",
+        "const quantity: WritableStandardSignal<number> = new Signal.State(1);",
+        "const totalSource: StandardSignal<number> = new Signal.Computed(() => quantity.get() * 48);",
+        "const options: StandardSignalBridgeOptions = { implementation, connect: true };",
+        "const scheduling: BridgeOptions = { schedule: (job) => queueMicrotask(job) };",
+        "const quantityBridge: WritableSignalBridge<number> = fromStandardSignal(quantity, scheduling);",
+        "const total: SignalBridge<number> = fromStandardSignal(totalSource, options);",
+        "const watcher: StandardSignalWatcher = new implementation.subtle.Watcher(() => undefined);",
+        "watcher.watch(totalSource);",
+        "quantityBridge.value = 2;",
+        "console.log(total.value);",
+        "watcher.unwatch(totalSource);",
+        "quantityBridge.disconnect();",
+        "total.disconnect();"
+      ]
+    },
+    "reactivity-preact-signals": {
+      "module": "@gluonjs/reactivity/preact-signals",
+      "code": [
+        "import { computed, signal } from '@preact/signals-core';",
+        "import { fromPreactSignal } from '@gluonjs/reactivity/preact-signals';",
+        "",
+        "const quantity = signal(1);",
+        "const total = computed(() => quantity.value * 48);",
+        "const bridge = fromPreactSignal(total, { connect: true });",
+        "quantity.value = 2;",
+        "console.log(bridge.value);",
+        "bridge.disconnect();"
+      ]
+    },
     "core-decorators": {
       "module": "@gluonjs/core/decorators",
       "code": [
@@ -2336,6 +2382,46 @@
     }
   },
   "overrides": {
+    "packages/reactivity/src/preact-signals/functions/fromPreactSignal.md": {
+      "recipe": "reactivity-preact-signals",
+      "description": "Connect a real Preact computed signal to Gluon without making Preact part of the stable Reactivity entry:"
+    },
+    "packages/reactivity/src/signals/functions/fromStandardSignal.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Bridge writable and computed TC39 proposal Signals with explicit implementation and subscription ownership:"
+    },
+    "packages/reactivity/src/signals/interfaces/BridgeOptions.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Choose explicit connection and scheduling behavior for an external signal bridge:"
+    },
+    "packages/reactivity/src/signals/interfaces/SignalBridge.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Read an external signal graph through a lifecycle-owned reactive Gluon boundary:"
+    },
+    "packages/reactivity/src/signals/interfaces/StandardSignal.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Type the proposal-compatible readonly source consumed by the standard adapter:"
+    },
+    "packages/reactivity/src/signals/interfaces/StandardSignalBridgeOptions.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Pair lifecycle scheduling with the exact Signal implementation that owns a source:"
+    },
+    "packages/reactivity/src/signals/interfaces/StandardSignalImplementation.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Describe the State, Computed, and Watcher namespace used for realm-safe validation:"
+    },
+    "packages/reactivity/src/signals/interfaces/StandardSignalWatcher.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Type the proposal Watcher used to connect and release one external dependency:"
+    },
+    "packages/reactivity/src/signals/interfaces/WritableSignalBridge.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Write through to an external state signal while retaining the bridge lifecycle:"
+    },
+    "packages/reactivity/src/signals/interfaces/WritableStandardSignal.md": {
+      "recipe": "reactivity-standard-signals",
+      "description": "Type a proposal State-like source with read and write operations:"
+    },
     "packages/compiler/src/functions/transpileGluonDecorators.md": {
       "recipe": "compiler-transform",
       "description": "Transpile a Gluon module that imports the decorator entry point with explicit standard or legacy TypeScript semantics:"

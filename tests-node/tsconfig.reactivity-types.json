@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "ESNext.Disposable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "types": [],
@@ -9,5 +9,5 @@
     "noEmit": true,
     "skipLibCheck": false
   },
-  "include": ["reactivity.types.ts"]
+  "include": ["reactivity.types.ts", "reactivity-signals.types.ts"]
 }

@@ -210,7 +210,8 @@ ownership; functional Buttons compose inside those boundaries.
 
 ## Standalone reactivity
 
-`@gluonjs/reactivity` is compiled with `lib: ["ES2022"]` and no ambient DOM or
+`@gluonjs/reactivity` is compiled with `lib: ["ES2022", "ESNext.Disposable"]`
+and no ambient DOM or
 Node types. Its dependency graph is keyed by raw target and accessed property or
 collection operation. Effects clear and rebuild their subscriptions on every
 run, so conditional dependencies stop receiving updates when they are no longer

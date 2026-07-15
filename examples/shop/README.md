@@ -28,6 +28,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - a labeled checkout form, exact order summary, and URL-addressable confirmation
 - one isolated Store manager per shop application and persisted configured bag lines
 - abortable product availability with explicit loading, error, timeout, and retry UI
+- TC39 Signal-driven workshop availability through the optional Reactivity adapter
 - cached route views across back/forward traversal
 - an application-owned teleported bag with cancellable enter/leave transitions
 - keyed bag-line transitions with system reduced-motion handling

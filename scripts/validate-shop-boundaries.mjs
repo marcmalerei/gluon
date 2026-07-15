@@ -13,6 +13,7 @@ const allowedPackages = new Set([
   '@gluonjs/molecules',
   '@gluonjs/organisms',
   '@gluonjs/reactivity',
+  '@gluonjs/reactivity/signals',
   '@gluonjs/router',
   '@gluonjs/ssr',
   '@gluonjs/ssr/hydration',
