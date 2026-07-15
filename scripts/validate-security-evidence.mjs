@@ -7,7 +7,7 @@ const requiredAreas = ['html', 'urls', 'styles', 'ssr-state', 'csp', 'trusted-ty
 const allowedStatuses = new Set(['mitigated', 'accepted-boundary', 'not-claimed']);
 
 if (model.schemaVersion !== 1) throw new Error('security threat model schemaVersion must be 1');
-if (model.releaseLine !== '1.0.9') throw new Error('security threat model releaseLine must match 1.0.9');
+if (model.releaseLine !== '1.0.10') throw new Error('security threat model releaseLine must match 1.0.10');
 if (!/^\d{4}-\d{2}-\d{2}$/.test(model.reviewedAt)) throw new Error('security threat model reviewedAt must be YYYY-MM-DD');
 
 const ids = model.areas.map((area) => area.id);

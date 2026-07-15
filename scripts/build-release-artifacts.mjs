@@ -72,9 +72,11 @@ const created = new Date(sourceDateEpoch * 1000).toISOString();
 const packageOutput = resolve(output, 'packages');
 const sbomOutput = resolve(output, 'sbom');
 const reproductionOutput = resolve(root, '.tmp/release-reproduction');
+const packageTypeFixture = resolve(root, '.tmp/release-package-types');
 
 await rm(output, { recursive: true, force: true });
 await rm(reproductionOutput, { recursive: true, force: true });
+await rm(packageTypeFixture, { recursive: true, force: true });
 await mkdir(packageOutput, { recursive: true });
 await mkdir(sbomOutput, { recursive: true });
 await mkdir(reproductionOutput, { recursive: true });
@@ -105,6 +107,8 @@ for (const entry of packageContract.packages) {
     fileCount: firstDigest.files.length,
   });
 }
+
+await verifyPackedPackageTypes(packageResults);
 
 const changelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
 const releaseNotes = changelogSection(changelog, nonPublishableBuild && !evidencePendingCandidate ? 'Unreleased' : version);
@@ -195,8 +199,9 @@ for (const path of assets.filter((path) => basename(path) !== 'SHA256SUMS')) {
 }
 await writeFile(resolve(output, 'SHA256SUMS'), `${checksumLines.sort().join('\n')}\n`, 'utf8');
 await rm(reproductionOutput, { recursive: true, force: true });
+await rm(packageTypeFixture, { recursive: true, force: true });
 
-console.log(`release artifacts built: ${packageResults.length} packages, ${packageResults.length * 2 + 2} schema-valid SBOMs at ${output}`);
+console.log(`release artifacts built: ${packageResults.length} packages with verified public types, ${packageResults.length * 2 + 2} schema-valid SBOMs at ${output}`);
 
 function option(name) {
   const index = process.argv.indexOf(name);
@@ -222,6 +227,53 @@ async function canonicalPackageDigest(archive, files) {
   }
   const digest = sha256(Buffer.from(entries.map((entry) => `${entry.path}\0${entry.sha256}\n`).join('')));
   return { digest, files: entries };
+}
+
+async function verifyPackedPackageTypes(packages) {
+  await mkdir(packageTypeFixture, { recursive: true });
+  const dependencies = Object.fromEntries(packages.map((entry) => [
+    entry.name,
+    `file:${resolve(packageOutput, entry.filename)}`,
+  ]));
+  await writeJson(resolve(packageTypeFixture, 'package.json'), {
+    name: 'gluon-packed-type-verification',
+    version: '0.0.0',
+    private: true,
+    type: 'module',
+    dependencies,
+  });
+  await run('npm', [
+    'install',
+    '--ignore-scripts',
+    '--package-lock=false',
+    '--audit=false',
+    '--fund=false',
+  ], { cwd: packageTypeFixture });
+
+  const imports = [];
+  for (const entry of packageContract.packages) {
+    for (const exportName of entry.exports) {
+      const specifier = exportName === '.' ? entry.name : `${entry.name}/${exportName.slice(2)}`;
+      imports.push(`import type * as Package${imports.length} from '${specifier}';`);
+    }
+  }
+  imports.push('export type PackedPackageTypes = unknown;');
+  await writeFile(resolve(packageTypeFixture, 'index.ts'), `${imports.join('\n')}\n`, 'utf8');
+  await writeJson(resolve(packageTypeFixture, 'tsconfig.json'), {
+    compilerOptions: {
+      target: 'ES2023',
+      module: 'NodeNext',
+      moduleResolution: 'NodeNext',
+      strict: true,
+      noEmit: true,
+      skipLibCheck: false,
+    },
+    files: ['index.ts'],
+  });
+  await run(resolve(root, 'node_modules/.bin/tsc'), [
+    '-p',
+    resolve(packageTypeFixture, 'tsconfig.json'),
+  ], { cwd: packageTypeFixture });
 }
 
 function normalizeSpdx(document, packageName, packageVersion, timestamp, commit) {

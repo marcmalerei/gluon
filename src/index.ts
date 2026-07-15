@@ -15,11 +15,7 @@ export {
   unsafeURL,
   getTemplateValueServerContract,
   createComponentStyleSelection,
-  getCompiledPrimitiveTextBinding,
-  markCompiledPrimitiveTextBinding,
   releaseRenderStyles,
-  updateCompiledPrimitiveTextBinding,
-  type CompiledPrimitiveTextBinding,
   type DirectiveDefinition,
   type DirectiveFactory,
   type DirectiveLifecycle,
@@ -43,6 +39,14 @@ export {
   type UnsafeHtmlResult,
   type UnsafeUrlResult,
   elementRef,
+} from './runtime.js';
+
+/** @internal Compiler-generated modules use these runtime helpers through the package root. */
+export {
+  getCompiledPrimitiveTextBinding,
+  markCompiledPrimitiveTextBinding,
+  updateCompiledPrimitiveTextBinding,
+  type CompiledPrimitiveTextBinding,
 } from './runtime.js';
 
 export {

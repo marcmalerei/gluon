@@ -25,7 +25,7 @@ producing a successful run status. Share encodes
 both files into a URL-safe `#p=` payload, so reload and copying retain the exact
 reproduction. Download creates an uncompressed, runnable Vite project with an
 HTML entry, typed Gluon mount, constructable stylesheet adoption, TypeScript
-configuration, aligned `1.0.9` Gluon dependencies, and the template checker.
+configuration, aligned `1.0.10` Gluon dependencies, and the template checker.
 The default project also exercises `compose(Component, props)\`body\`` so the
 browser analyzer and downloaded project retain template-native functional
 composition at original TypeScript locations.

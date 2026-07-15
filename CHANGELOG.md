@@ -7,6 +7,19 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-07-15
+
+### Fixed
+
+- Kept compiler-owned primitive-text helpers available to generated runtime
+  modules while excluding their internal re-export from the public Core
+  declaration bundle, so packed Core declarations typecheck cleanly.
+
+### Added
+
+- Release artifact construction now clean-installs all 17 local package
+  archives and typechecks every contracted public export before publication.
+
 ## [1.0.9] - 2026-07-15
 
 ### Fixed

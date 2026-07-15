@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/organisms",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Accessible larger interface structures for Gluon.",
   "private": false,
   "type": "module",
@@ -35,12 +35,12 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/quarks": "1.0.9",
-    "@gluonjs/atoms": "1.0.9",
-    "@gluonjs/molecules": "1.0.9"
+    "@gluonjs/quarks": "1.0.10",
+    "@gluonjs/atoms": "1.0.10",
+    "@gluonjs/molecules": "1.0.10"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.0.9"
+    "@gluonjs/core": "1.0.10"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {

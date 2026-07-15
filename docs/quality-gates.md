@@ -121,7 +121,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.0.9/examples/ui.html` with the other versioned documentation examples.
+`/1.0.10/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 15 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
@@ -141,6 +141,12 @@ source dependency map. That map includes both Core and Reactivity because the
 Core source program imports the public Reactivity entry point. The clean
 repository gate runs before any workspace build so an omitted transitive source
 alias fails in the same state used by the release candidate job.
+
+The release-artifact gate packs every official package twice, compares its
+canonical contents, then installs all 17 local archives into an empty fixture.
+It typechecks every contracted package export with `skipLibCheck: false` before
+publication can start. This catches declaration-bundle defects in the exact
+package archives rather than relying only on source-tree typechecks.
 
 ## Report-only Vue analyzer gate
 
