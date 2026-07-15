@@ -9,6 +9,7 @@ const root = resolve(import.meta.dirname, '..');
 const configFile = resolve(root, 'benchmarks/components/vite.config.ts');
 const options = parseOptions(process.argv.slice(2));
 const browserTypes = { chromium, firefox, webkit };
+const componentScenarios = ['lifecycle', 'property', 'state', 'list'];
 const packageJson = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const packageLock = JSON.parse(await readFile(resolve(root, 'package-lock.json'), 'utf8'));
 const outputPath = resolve(root, options.output);
@@ -37,29 +38,45 @@ try {
       );
     }
     try {
-      const page = await browser.newPage();
-      const consoleProblems = [];
-      page.on('console', (message) => {
-        if (message.type() === 'error' || message.type() === 'warning') {
-          consoleProblems.push({ type: message.type(), text: message.text() });
+      let browserResult;
+      const scenarioResults = [];
+      for (const scenario of componentScenarios) {
+        const context = await browser.newContext();
+        try {
+          const page = await context.newPage();
+          const consoleProblems = [];
+          page.on('console', (message) => {
+            if (message.type() === 'error' || message.type() === 'warning') {
+              consoleProblems.push({ type: message.type(), text: message.text() });
+            }
+          });
+          await page.goto(url, { waitUntil: 'networkidle' });
+          const result = await withTimeout(
+            page.evaluate(
+              (config) => window.runComponentComparison(config),
+              {
+                samples: options.samples,
+                warmupRounds: options.warmupRounds,
+                scenarios: [scenario],
+              },
+            ),
+            options.browserTimeoutMs,
+            `${browserName} ${scenario} component benchmark`,
+          );
+          if (consoleProblems.length > 0) {
+            throw new Error(`${browserName} ${scenario} logged component benchmark errors: ${JSON.stringify(consoleProblems)}`);
+          }
+          browserResult ??= result;
+          scenarioResults.push(...result.scenarios);
+        } finally {
+          await context.close();
         }
-      });
-      await page.goto(url, { waitUntil: 'networkidle' });
-      const result = await withTimeout(
-        page.evaluate(
-          (config) => window.runComponentComparison(config),
-          { samples: options.samples, warmupRounds: options.warmupRounds },
-        ),
-        options.browserTimeoutMs,
-        `${browserName} component benchmark`,
-      );
-      if (consoleProblems.length > 0) {
-        throw new Error(`${browserName} logged component benchmark errors: ${JSON.stringify(consoleProblems)}`);
       }
+      if (!browserResult) throw new Error(`${browserName} produced no component benchmark result.`);
       runs.push({
         browser: browserName,
         browserVersion: browser.version(),
-        result,
+        result: { ...browserResult, scenarios: scenarioResults },
       });
     } finally {
       await browser.close();
@@ -108,8 +125,9 @@ const evidence = {
     browserTimeoutMs: options.browserTimeoutMs,
     productionBuild: true,
     headless: true,
+    scenarioIsolation: 'fresh browser context per scenario',
     componentBoundary: 'autonomous Custom Elements with open Shadow DOM for Gluon, Lit, and Vue',
-    scenarioIsolation: 'property renders label only; state renders button only; list renders keyed rows only; lifecycle renders all three',
+    scenarioSurfaceIsolation: 'property renders label only; state renders button only; list renders keyed rows only; lifecycle renders all three',
     frameworkOrder: 'rotated for every warm-up and measured sample',
     unit: 'milliseconds per 50 components; lower is faster',
   },
@@ -131,7 +149,7 @@ function parseOptions(args) {
   }));
   const browsers = (values['--browsers'] ?? 'chromium,firefox,webkit').split(',');
   const samples = positiveInteger(values['--samples'] ?? '40', 'samples');
-  const warmupRounds = positiveInteger(values['--warmup'] ?? '40', 'warmup');
+  const warmupRounds = positiveInteger(values['--warmup'] ?? '8', 'warmup');
   const browserTimeoutMs = positiveInteger(values['--timeout'] ?? '300000', 'timeout');
   const output = values['--output'] ?? '.tmp/component-benchmark-results.json';
   if (extname(output) !== '.json') throw new Error('--output must end in .json.');

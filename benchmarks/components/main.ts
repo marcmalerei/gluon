@@ -15,6 +15,7 @@ import './styles.css';
 export interface ComponentBenchmarkConfig {
   readonly samples?: number;
   readonly warmupRounds?: number;
+  readonly scenarios?: readonly ComponentScenario[];
 }
 
 export interface ComponentSampleStatistics {
@@ -64,10 +65,11 @@ export async function runComponentComparison(
   config: ComponentBenchmarkConfig = {},
 ): Promise<ComponentBenchmarkResult> {
   const samples = positiveInteger(config.samples ?? 40, 'samples');
-  const warmupRounds = positiveInteger(config.warmupRounds ?? 40, 'warmupRounds');
+  const warmupRounds = positiveInteger(config.warmupRounds ?? 8, 'warmupRounds');
+  const selectedScenarios = validateScenarioSelection(config.scenarios);
   const scenarios: ComponentScenarioBenchmarkResult[] = [];
 
-  for (const scenario of componentScenarios) {
+  for (const scenario of selectedScenarios) {
     const harnesses = new Map<ComponentFramework, ComponentHarness>();
     for (const framework of componentFrameworks) {
       harnesses.set(framework, await createComponentHarness(framework, scenario));
@@ -126,6 +128,20 @@ export async function runComponentComparison(
     userAgent: navigator.userAgent,
     scenarios,
   };
+}
+
+function validateScenarioSelection(
+  scenarios: readonly ComponentScenario[] | undefined,
+): readonly ComponentScenario[] {
+  if (scenarios === undefined) return componentScenarios;
+  if (
+    scenarios.length === 0
+    || new Set(scenarios).size !== scenarios.length
+    || scenarios.some((scenario) => !componentScenarios.includes(scenario))
+  ) {
+    throw new TypeError('scenarios must contain unique supported component scenarios.');
+  }
+  return scenarios;
 }
 
 async function runBatch(harness: ComponentHarness, size: number): Promise<void> {
