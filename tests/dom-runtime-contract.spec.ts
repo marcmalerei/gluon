@@ -581,6 +581,13 @@ describe('DOM runtime contract', () => {
     render(dynamicView(), dynamicRoot);
     expect(dynamicRoot.querySelector('strong')).toBe(strong);
 
+    const textRoot = document.createElement('div');
+    const textView = (value: string) => html`<p>${value}</p>`;
+    render(textView('first'), textRoot);
+    textRoot.querySelector('p')!.lastChild!.remove();
+    render(textView('second'), textRoot);
+    expect(textRoot.querySelector('p')?.textContent).toBe('second');
+
     const attributeRoot = document.createElement('div');
     const attributeView = () => html`<button title=${'owned'} ?disabled=${true}>Owned</button>`;
     render(attributeView(), attributeRoot);

@@ -348,7 +348,7 @@ function isDirectiveLifecycle(
 }
 
 type PartDescriptor =
-  | { readonly kind: 'node'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number }
+  | { readonly kind: 'node'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number; readonly seededText: true }
   | { readonly kind: 'attribute'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number; readonly name: string }
   | { readonly kind: 'spread'; readonly index: number; readonly path: readonly number[]; readonly traversalIndex: number };
 
@@ -367,10 +367,20 @@ interface ActiveDirective {
 
 interface CompiledTemplate {
   readonly content: DocumentFragment;
+  readonly singleRoot?: Node;
+  readonly anchorlessPrimitiveRoot?: Element;
   readonly strings: TemplateStringsArray;
+  readonly type: TemplateType;
   readonly descriptors: readonly PartDescriptor[];
   readonly traversalDescriptors: readonly PartDescriptor[];
   readonly rootNodesStable: boolean;
+  primitiveKeyedPrototypes?: Map<Key, PrimitiveKeyedPrototype>;
+}
+
+interface PrimitiveKeyedPrototype {
+  readonly attributeValue: TemplateValue;
+  readonly textValue: string;
+  readonly element: Element;
 }
 
 interface ChildInstance {
@@ -385,16 +395,36 @@ interface PartChild {
   readonly binding: Binding;
 }
 
-interface KeyedChild {
+interface PartKeyedChild {
   readonly key: Key;
-  readonly part: NodePart;
+  part: NodePart;
   binding?: Binding;
 }
+
+interface LazyPrimitiveKeyedChild {
+  readonly key: Key;
+  readonly lazyPrimitive: true;
+  readonly template: CompiledTemplate;
+  nodes?: Node[];
+  readonly element: Element;
+  readonly text: Text;
+  values: readonly TemplateValue[];
+  part?: NodePart;
+  binding?: Binding;
+}
+
+type KeyedChild = PartKeyedChild | LazyPrimitiveKeyedChild;
 
 interface PreviousKeyedChild {
   readonly child: KeyedChild;
   readonly index: number;
   readonly nodes: readonly Node[];
+}
+
+interface LazyPrimitivePlan {
+  readonly compiled: CompiledTemplate;
+  readonly prototype: Element;
+  readonly attributeName: string;
 }
 
 const emptyPartChildren: Array<PartChild | undefined> = [];
@@ -411,6 +441,10 @@ class RenderStyleTracker {
   constructor(target: StyleTarget) {
     this.target = target;
     this.owner = createComponentStyleOwner(target);
+  }
+
+  get isActiveAndEmpty(): boolean {
+    return !this.suspended && !this.disposed && this.active.size === 0;
   }
 
   claim(token: object, dependencies: readonly ComponentStyleDependency[]): void {
@@ -489,7 +523,7 @@ function sameComponentStyles(
 }
 
 class NodePart implements Part {
-  private nodes: Node[] = [];
+  nodes: Node[] = [];
   private textNode?: Text;
   private lastPrimitive: PrimitiveValue | typeof unsetValue = unsetValue;
   private child?: ChildInstance;
@@ -498,12 +532,20 @@ class NodePart implements Part {
   private detachedKeyMarker?: Comment;
   private unsafeMarkup?: string;
   private styleDependencies: readonly ComponentStyleDependency[] = emptyComponentStyles;
+  private seededText = false;
 
   constructor(
     private readonly marker: Comment,
     private readonly contextMarker: Comment = marker,
     private readonly styles?: RenderStyleTracker,
-  ) {}
+    seededText?: Text,
+  ) {
+    if (!seededText) return;
+    this.seededText = true;
+    this.nodes = [seededText];
+    this.textNode = seededText;
+    this.lastPrimitive = '';
+  }
 
   hydrateValue(value: TemplateValue, end: Comment, context: HydrationAdoptionContext): void {
     this.updateStyleClaim(value);
@@ -573,6 +615,17 @@ class NodePart implements Part {
     }
     if (!assumeInPlace && this.textNode.previousSibling !== this.marker) {
       this.replaceNodes([this.textNode]);
+    }
+  }
+
+  setStableStringValue(value: string): void {
+    if (!this.textNode || this.textNode.previousSibling !== this.marker) {
+      this.setStringValue(value);
+      return;
+    }
+    if (value !== this.lastPrimitive) {
+      this.textNode.data = value;
+      this.lastPrimitive = value;
     }
   }
 
@@ -657,7 +710,7 @@ class NodePart implements Part {
     }
     for (const child of this.keyedChildren) {
       if (child.binding) suspendBindings([child.binding]);
-      else child.part.suspend();
+      else if (child.part) child.part.suspend();
     }
   }
 
@@ -775,9 +828,10 @@ class NodePart implements Part {
         const child = this.keyedChildren[keys.length - index - 1]!;
         const value = values[index]!;
         this.updateKeyedChild(child, value, true);
-        if (child.part.nodes[0] !== reference) moveNodesBefore(parent, child.part.nodes, reference);
+        const childNodes = keyedChildNodes(child);
+        if (childNodes[0] !== reference) moveNodesBefore(parent, childNodes, reference);
         nextChildren.push(child);
-        nextNodes.push(...child.part.nodes);
+        nextNodes.push(...childNodes);
       }
 
       this.keyedChildren = nextChildren;
@@ -788,17 +842,21 @@ class NodePart implements Part {
     }
 
     if (this.keyedChildren.length === 0) {
+      const lazyPlan = createLazyPrimitivePlan(values[0]);
       const nextChildren: KeyedChild[] = new Array(keys.length);
       const nextNodes: Node[] = [];
       for (let index = 0; index < keys.length; index += 1) {
-        const child = this.createKeyedChild(keys[index]!, values[index]!);
+        const child = this.createKeyedChild(keys[index]!, values[index]!, lazyPlan);
         nextChildren[index] = child;
-        nextNodes.push(...child.part.nodes);
+        if (isLazyPrimitiveKeyedChild(child) && !child.part && !child.nodes) {
+          nextNodes.push(child.element);
+        } else {
+          nextNodes.push(...keyedChildNodes(child));
+        }
       }
       this.keyedChildren = nextChildren;
       this.textNode = undefined;
       this.lastPrimitive = unsetValue;
-      this.nodes = [];
       this.replaceNodes(nextNodes);
       return;
     }
@@ -820,7 +878,7 @@ class NodePart implements Part {
 
     while (start < previousEnd && start < nextEnd && previousChildren[start]!.key === keys[start]) {
       const child = previousChildren[start]!;
-      reused[start] = { child, index: start, nodes: child.part.nodes };
+      reused[start] = { child, index: start, nodes: keyedChildNodes(child) };
       this.updateKeyedChild(child, values[start]!, true);
       nextChildren[start] = child;
       start += 1;
@@ -834,7 +892,7 @@ class NodePart implements Part {
       previousEnd -= 1;
       nextEnd -= 1;
       const child = previousChildren[previousEnd]!;
-      reused[nextEnd] = { child, index: previousEnd, nodes: child.part.nodes };
+      reused[nextEnd] = { child, index: previousEnd, nodes: keyedChildNodes(child) };
       this.updateKeyedChild(child, values[nextEnd]!, true);
       nextChildren[nextEnd] = child;
     }
@@ -842,7 +900,7 @@ class NodePart implements Part {
     const previousByKey = new Map<Key, PreviousKeyedChild>();
     for (let index = start; index < previousEnd; index += 1) {
       const child = previousChildren[index]!;
-      previousByKey.set(child.key, { child, index, nodes: child.part.nodes });
+      previousByKey.set(child.key, { child, index, nodes: keyedChildNodes(child) });
     }
 
     const nextMiddleKeys = new Set<Key>();
@@ -850,7 +908,7 @@ class NodePart implements Part {
     for (const [key, { child: removed }] of previousByKey) {
       if (nextMiddleKeys.has(key)) continue;
       if (removed.binding) disconnectBindings([removed.binding]);
-      else removed.part.disconnect();
+      else if (removed.part) removed.part.disconnect();
       previousByKey.delete(key);
     }
 
@@ -869,7 +927,7 @@ class NodePart implements Part {
       nextChildren[index] = child;
     }
 
-    const nextNodeGroups = nextChildren.map((child) => child.part.nodes);
+    const nextNodeGroups = nextChildren.map(keyedChildNodes);
     for (const nodes of nextNodeGroups) nextNodes.push(...nodes);
     this.keyedChildren = nextChildren;
     this.textNode = undefined;
@@ -917,25 +975,66 @@ class NodePart implements Part {
       applyBinding(child.binding, value, assumeInPlace);
       return;
     }
+    if (!child.part && isLazyPrimitiveKeyedChild(child)) {
+      const attributeName = (child.template.descriptors[0] as Extract<PartDescriptor, { kind: 'attribute' }>).name;
+      if (
+        value instanceof TemplateResult
+        && value.styleDependencies.length === 0
+        && child.template.strings === value.strings
+        && child.template.type === value.type
+        && typeof value.values[1] === 'string'
+        && (isEmptyValue(value.values[0]) || isFastAttributePrimitive(value.values[0]))
+      ) {
+        const previousAttribute = child.values[0];
+        const nextAttribute = value.values[0];
+        if (!Object.is(previousAttribute, nextAttribute)) {
+          if (isEmptyValue(nextAttribute)) removeOwnedAttribute(child.element, attributeName);
+          else child.element.setAttribute(attributeName, String(nextAttribute));
+        }
+        if (value.values[1] !== child.values[1]) child.text.data = value.values[1];
+        child.values = value.values;
+        return;
+      }
+      const attributePart = new AttributePart(
+        child.element,
+        attributeName,
+        child.values[0],
+      );
+      const marker = document.createComment('gluon:lazy');
+      child.element.insertBefore(marker, child.text);
+      const textPart = new NodePart(marker, marker, this.styles, child.text);
+      const templateChild: ChildInstance = {
+        template: child.template,
+        bindings: [
+          { index: 0, part: attributePart, priority: 0 },
+          { index: 1, part: textPart, priority: 0 },
+        ],
+        nodes: child.nodes ??= [child.element],
+      };
+      const part = new NodePart(this.detachedKeyMarker ??= document.createComment('gluon:key'), this.contextMarker, this.styles);
+      part.adoptTemplateChild(templateChild);
+      child.part = part;
+    }
+    const part = child.part!;
     if (value instanceof TemplateResult) {
-      child.part.setTemplateResult(value, assumeInPlace);
+      part.setTemplateResult(value, assumeInPlace);
       return;
     }
     if (typeof value === 'string') {
-      child.part.setStringValue(value, assumeInPlace);
+      part.setStringValue(value, assumeInPlace);
       return;
     }
     if (isRepeatResult(value)) {
-      child.part.setRepeatResult(value);
+      part.setRepeatResult(value);
       return;
     }
     if (isDirectiveValue(value)) {
-      const binding: Binding = { index: 0, part: child.part, priority: 0 };
+      const binding: Binding = { index: 0, part, priority: 0 };
       child.binding = binding;
       applyDirective(binding, value);
       return;
     }
-    child.part.setValue(value, assumeInPlace);
+    part.setValue(value, assumeInPlace);
   }
 
   setRepeatResult(result: InternalRepeatResult): void {
@@ -943,7 +1042,26 @@ class NodePart implements Part {
     this.setKeyed(result);
   }
 
-  private createKeyedChild(key: Key, value: TemplateValue): KeyedChild {
+  private createKeyedChild(
+    key: Key,
+    value: TemplateValue,
+    lazyPlan?: LazyPrimitivePlan,
+  ): KeyedChild {
+    if (
+      lazyPlan
+      && value instanceof TemplateResult
+      && value.styleDependencies.length === 0
+      && value.strings === lazyPlan.compiled.strings
+      && value.type === lazyPlan.compiled.type
+      && typeof value.values[1] === 'string'
+      && (isEmptyValue(value.values[0]) || isFastAttributePrimitive(value.values[0]))
+    ) {
+      return createLazyPrimitiveKeyedChild(key, value, lazyPlan);
+    }
+    if (value instanceof TemplateResult && value.styleDependencies.length === 0) {
+      const plan = createLazyPrimitivePlan(value);
+      if (plan) return createLazyPrimitiveKeyedChild(key, value, plan);
+    }
     const marker = this.detachedKeyMarker ??= document.createComment('gluon:key');
     const part = new NodePart(marker, this.contextMarker, this.styles);
     const child = { key, part };
@@ -977,6 +1095,14 @@ class NodePart implements Part {
     if (!parent) {
       this.nodes = nextNodes;
       return;
+    }
+
+    if (this.seededText && nextNodes[0] !== this.nodes[0]) {
+      const seededNode = this.nodes[0];
+      seededNode?.parentNode?.removeChild(seededNode);
+      this.nodes = [];
+      this.textNode = undefined;
+      this.seededText = false;
     }
 
     if (this.nodes.length === 0) {
@@ -1045,13 +1171,18 @@ class NodePart implements Part {
     if (this.keyedChildren.length === 0) return;
     for (const child of this.keyedChildren) {
       if (child.binding) disconnectBindings([child.binding]);
-      else child.part.disconnect();
+      else if (child.part) child.part.disconnect();
     }
     this.keyedChildren = emptyKeyedChildren;
   }
 
   clearStyleClaim(): void {
     this.updateStyleClaim(nothing);
+  }
+
+  adoptTemplateChild(child: ChildInstance): void {
+    this.child = child;
+    this.nodes = child.nodes;
   }
 
   private updateStyleClaim(value: TemplateValue): void {
@@ -1063,13 +1194,16 @@ class NodePart implements Part {
 }
 
 class AttributePart implements Part {
-  private lastValue: unknown = unsetValue;
+  private lastValue: unknown;
   private event?: ResolvedEvent;
 
   constructor(
     private readonly element: Element,
     private readonly name: string,
-  ) {}
+    initialValue: unknown = unsetValue,
+  ) {
+    this.lastValue = initialValue;
+  }
 
   get commitPriority(): number {
     return this.name.startsWith('.') && isNativeFormControl(this.element) ? 1 : 0;
@@ -1417,6 +1551,8 @@ interface RootInstance {
   readonly bindings: readonly Binding[];
   readonly styles: RenderStyleTracker;
   readonly styleClaim: object;
+  readonly fastStringBinding?: Binding & { readonly part: NodePart };
+  rootStyleDependenciesEmpty: boolean;
   nodes: Node[];
   suspended: boolean;
   hydrated?: boolean;
@@ -1453,9 +1589,46 @@ export function render(
     throw new TypeError('render() expects a TemplateResult created by html or svg.');
   }
 
-  const compiled = getCompiledTemplate(result);
-  const styleTarget = resolveRenderStyleTarget(container);
   let current = getRootInstance(container);
+  const currentTemplateMatches = current?.template.strings === result.strings
+    && current.template.type === result.type;
+  const currentNodesInPlace = Boolean(current && currentTemplateMatches
+    && rootNodesAreInPlace(container, current.nodes));
+  const fastStringBinding = current?.fastStringBinding;
+  const fastStringValue = fastStringBinding && fastStringBinding.index < result.values.length
+    ? result.values[fastStringBinding.index]
+    : undefined;
+  if (
+    current
+    && currentNodesInPlace
+    && !current.hydrated
+    && current.rootStyleDependenciesEmpty
+    && result.styleDependencies.length === 0
+    && fastStringBinding
+    && typeof fastStringValue === 'string'
+    && !fastStringBinding.directive
+  ) {
+    fastStringBinding.part.setStableStringValue(fastStringValue);
+    current.suspended = false;
+    return;
+  }
+  if (
+    current
+    && currentNodesInPlace
+    && !current.suspended
+    && !current.hydrated
+    && result.styleDependencies.length === 0
+    && current.styles.isActiveAndEmpty
+  ) {
+    applyBindings(current.bindings, result.values);
+    if (!current.template.rootNodesStable && !rootNodesAreInPlace(container, current.nodes)) {
+      current.nodes = [...container.childNodes];
+    }
+    return;
+  }
+
+  const compiled = currentTemplateMatches ? current!.template : getCompiledTemplate(result);
+  const styleTarget = resolveRenderStyleTarget(container);
   if (current && current.styles.target !== styleTarget) {
     clearRootInstance(container);
     disconnectBindings(current.bindings);
@@ -1465,10 +1638,11 @@ export function render(
 
   if (
     current?.template === compiled
-    && rootNodesAreInPlace(container, current.nodes)
+    && (currentNodesInPlace || rootNodesAreInPlace(container, current.nodes))
   ) {
     current.styles.resume();
     current.styles.claim(current.styleClaim, result.styleDependencies);
+    current.rootStyleDependenciesEmpty = result.styleDependencies.length === 0;
     if (current.hydrated) {
       current.hydrated = false;
       current.suspended = false;
@@ -1479,7 +1653,7 @@ export function render(
       ? result.values[binding.index]
       : undefined;
     if (binding && typeof value === 'string' && binding.part instanceof NodePart && !binding.directive) {
-      binding.part.setStringValue(value, true);
+      binding.part.setStringValue(value);
     } else {
       applyBindings(current.bindings, result.values);
     }
@@ -1510,6 +1684,8 @@ export function render(
       bindings,
       styles,
       styleClaim,
+      fastStringBinding: findFastStringBinding(bindings),
+      rootStyleDependenciesEmpty: result.styleDependencies.length === 0,
       nodes,
       suspended: false,
     });
@@ -1591,6 +1767,8 @@ export function hydrate(
       bindings,
       styles,
       styleClaim,
+      fastStringBinding: findFastStringBinding(bindings),
+      rootStyleDependenciesEmpty: result.styleDependencies.length === 0,
       nodes: [...container.childNodes],
       suspended: false,
       hydrated: true,
@@ -1698,9 +1876,34 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
     );
   }
 
+  const content = document.importNode(element.content, true);
+  const singleRoot = content.childNodes.length === 1 ? content.firstChild! : undefined;
+  const fastAttributeStringBindings = descriptors.length === 2
+    && descriptors[0]?.kind === 'attribute'
+    && !descriptors[0].name.startsWith('.')
+    && descriptors[0].index === 0
+    && descriptors[1]?.kind === 'node'
+    && descriptors[1].index === 1;
+  const canUseAnchorlessPrimitive = Boolean(
+    fastAttributeStringBindings
+    && singleRoot instanceof Element
+    && descriptors[0]!.path.length === 1
+    && descriptors[1]!.path.length === 2
+    && descriptors[0]!.path[0] === descriptors[1]!.path[0]
+    && singleRoot.childNodes.length === 2
+    && singleRoot.firstChild instanceof Comment
+    && singleRoot.lastChild instanceof Text,
+  );
+  const anchorlessPrimitiveRoot = canUseAnchorlessPrimitive
+    ? singleRoot!.cloneNode(true) as Element
+    : undefined;
+  if (anchorlessPrimitiveRoot) anchorlessPrimitiveRoot.firstChild!.remove();
   const compiled: CompiledTemplate = {
-    content: document.importNode(element.content, true),
+    content,
+    singleRoot,
+    anchorlessPrimitiveRoot,
     strings: result.strings,
+    type: result.type,
     descriptors,
     traversalDescriptors,
     rootNodesStable: descriptors.every((descriptor) => descriptor.kind !== 'node' || descriptor.path.length > 1),
@@ -1730,11 +1933,14 @@ function buildDescriptors(
     if (node.nodeType === Node.COMMENT_NODE) {
       const match = (node as Comment).data.match(/^gluon:(\d+)$/);
       if (match?.[1]) {
+        const seededText = document.createTextNode('');
+        node.parentNode!.insertBefore(seededText, node.nextSibling);
         descriptors.push({
           kind: 'node',
           index: Number(match[1]),
           path: pathFromRoot(content, node),
           traversalIndex,
+          seededText: true,
         });
       }
       continue;
@@ -1761,38 +1967,54 @@ function buildDescriptors(
 }
 
 function instantiateBindings(
-  root: DocumentFragment,
+  root: Node,
   descriptors: readonly PartDescriptor[],
   styles?: RenderStyleTracker,
+  includeRoot = false,
 ): Binding[] {
   if (descriptors.length === 0) return [];
   const bindings = new Array<Binding>(descriptors.length);
-  const walker = getBindingWalker();
-  walker.currentNode = root;
-  let node = walker.nextNode();
+  let node = includeRoot ? root : nextBindingNode(root, root);
   let traversalIndex = 0;
 
-  try {
-    for (const descriptor of descriptors) {
-      while (node && traversalIndex < descriptor.traversalIndex) {
-        node = walker.nextNode();
-        traversalIndex += 1;
-      }
-      if (!node || traversalIndex !== descriptor.traversalIndex) {
-        throw new Error('A cached Gluon template traversal index is no longer valid.');
-      }
-      let part: Part;
-
-      if (descriptor.kind === 'node') part = new NodePart(node as Comment, node as Comment, styles);
-      else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
-      else part = new AttributePart(node as Element, descriptor.name);
-
-      bindings[descriptor.index] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
+  for (const descriptor of descriptors) {
+    while (node && traversalIndex < descriptor.traversalIndex) {
+      node = nextBindingNode(root, node);
+      traversalIndex += 1;
     }
-  } finally {
-    walker.currentNode = document;
+    if (!node || traversalIndex !== descriptor.traversalIndex) {
+      throw new Error('A cached Gluon template traversal index is no longer valid.');
+    }
+    let part: Part;
+
+    if (descriptor.kind === 'node') {
+      part = new NodePart(
+        node as Comment,
+        node as Comment,
+        styles,
+        descriptor.seededText ? node.nextSibling as Text : undefined,
+      );
+    }
+    else if (descriptor.kind === 'spread') part = new SpreadPart(node as Element);
+    else part = new AttributePart(node as Element, descriptor.name);
+
+    bindings[descriptor.index] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
   }
   return bindings;
+}
+
+function nextBindingNode(root: Node, current: Node): Node | null {
+  let node = current;
+  while (true) {
+    if (node.firstChild) {
+      node = node.firstChild;
+    } else {
+      while (node !== root && !node.nextSibling) node = node.parentNode!;
+      if (node === root) return null;
+      node = node.nextSibling!;
+    }
+    if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.COMMENT_NODE) return node;
+  }
 }
 
 function cloneTemplateContent(template: CompiledTemplate): DocumentFragment {
@@ -1901,11 +2123,98 @@ function createChildInstance(
   compiled = getCompiledTemplate(result),
   styles?: RenderStyleTracker,
 ): ChildInstance {
-  const fragment = cloneTemplateContent(compiled);
-  const bindings = instantiateBindings(fragment, compiled.traversalDescriptors, styles);
+  const clone = compiled.singleRoot
+    ? compiled.singleRoot.cloneNode(true)
+    : cloneTemplateContent(compiled);
+  const bindings = instantiateBindings(
+    clone,
+    compiled.traversalDescriptors,
+    styles,
+    Boolean(compiled.singleRoot),
+  );
   applyBindings(bindings, result.values);
-  const nodes = [...fragment.childNodes];
+  const nodes = compiled.singleRoot ? [clone] : [...clone.childNodes];
   return { template: compiled, bindings, nodes };
+}
+
+function findFastStringBinding(
+  bindings: readonly Binding[],
+): Binding & { readonly part: NodePart } | undefined {
+  const binding = bindings.length === 1 ? bindings[0] : undefined;
+  return binding?.part instanceof NodePart
+    ? binding as Binding & { readonly part: NodePart }
+    : undefined;
+}
+
+function keyedChildNodes(child: KeyedChild): Node[] {
+  if (!isLazyPrimitiveKeyedChild(child)) return child.part.nodes;
+  return child.part?.nodes ?? (child.nodes ??= [child.element]);
+}
+
+function isLazyPrimitiveKeyedChild(child: KeyedChild): child is LazyPrimitiveKeyedChild {
+  return 'lazyPrimitive' in child;
+}
+
+function createLazyPrimitivePlan(
+  value: TemplateValue | undefined,
+  knownCompiled?: CompiledTemplate,
+): LazyPrimitivePlan | undefined {
+  if (!(value instanceof TemplateResult) || value.styleDependencies.length !== 0) return undefined;
+  const compiled = knownCompiled ?? getCompiledTemplate(value);
+  const prototype = compiled.anchorlessPrimitiveRoot;
+  const descriptor = compiled.descriptors[0];
+  if (
+    !prototype
+    || descriptor?.kind !== 'attribute'
+    || descriptor.name.startsWith('@')
+    || descriptor.name.startsWith('?')
+    || /^on/i.test(descriptor.name)
+    || getAttributeNamespace(descriptor.name)
+    || urlAttributes.has(descriptor.name.toLowerCase())
+    || typeof value.values[1] !== 'string'
+    || (!isEmptyValue(value.values[0]) && !isFastAttributePrimitive(value.values[0]))
+  ) return undefined;
+  return { compiled, prototype, attributeName: descriptor.name };
+}
+
+function createLazyPrimitiveKeyedChild(
+  key: Key,
+  value: TemplateResult,
+  plan: LazyPrimitivePlan,
+): LazyPrimitiveKeyedChild {
+  const attributeValue = value.values[0];
+  const textValue = value.values[1] as string;
+  const cached = plan.compiled.primitiveKeyedPrototypes?.get(key);
+  const cacheHit = cached
+    && (Object.is(cached.attributeValue, attributeValue)
+      || (isEmptyValue(cached.attributeValue) && isEmptyValue(attributeValue)))
+    && cached.textValue === textValue;
+  const element = (cacheHit ? cached.element : plan.prototype).cloneNode(true) as Element;
+  const text = element.firstChild as Text;
+  if (!cacheHit) {
+    if (!isEmptyValue(attributeValue)) {
+      element.setAttribute(plan.attributeName, String(attributeValue));
+    }
+    text.data = textValue;
+    const cache = plan.compiled.primitiveKeyedPrototypes ??= new Map();
+    if (!cache.has(key) && cache.size >= 1_024) cache.delete(cache.keys().next().value!);
+    cache.set(key, { attributeValue, textValue, element: element.cloneNode(true) as Element });
+  }
+  return {
+    key,
+    lazyPrimitive: true,
+    template: plan.compiled,
+    values: value.values,
+    element,
+    text,
+  };
+}
+
+function isFastAttributePrimitive(value: unknown): value is string | number | bigint | true {
+  return typeof value === 'string'
+    || typeof value === 'number'
+    || typeof value === 'bigint'
+    || value === true;
 }
 
 function resolveRenderStyleTarget(container: Element | DocumentFragment): StyleTarget {
@@ -2136,15 +2445,6 @@ function pathFromRoot(root: Node, descendant: Node): number[] {
   }
 
   return path;
-}
-
-let bindingWalker: TreeWalker | undefined;
-
-function getBindingWalker(): TreeWalker {
-  return bindingWalker ??= document.createTreeWalker(
-    document,
-    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
-  );
 }
 
 function updateMarkupState(
@@ -2507,7 +2807,7 @@ function rootNodesAreInPlace(
   nodes: readonly Node[],
 ): boolean {
   if (nodes.length === 1) {
-    return container.childNodes.length === 1 && container.firstChild === nodes[0];
+    return container.firstChild === nodes[0] && nodes[0]!.nextSibling === null;
   }
   if (container.childNodes.length !== nodes.length) return false;
   for (let index = 0; index < nodes.length; index += 1) {

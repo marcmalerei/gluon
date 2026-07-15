@@ -4,14 +4,19 @@ Gluon's comparative rendering benchmark measures the current repository source
 against pinned Lit, Vue, and optimized Vanilla DOM implementations. It exists to
 produce inspectable evidence, not to guarantee that one renderer wins.
 
-The runtime's measured hot paths include direct string-binding updates,
-direct insertion when a new part contains one node, fragment batching when it
-contains multiple nodes, one element/comment traversal for every cloned
-template's bindings, precomputed binding priorities, parallel key/value storage
-for keyed repeats, detached keyed-child anchors, and keyed-list fast paths for
-unchanged and reversed order. Generic keyed changes trim stable heads and tails,
-retain their longest unchanged contiguous run, and move only the surrounding
-groups. These shortcuts retain the external-DOM recovery and keyed-identity
+The runtime's measured hot paths include direct unstyled string-root updates,
+seeded primitive text slots, direct single-root cloning, fragment batching for
+multi-node replacements, filtered element/comment traversal for general
+templates, precomputed binding priorities, parallel key/value storage for keyed
+repeats, and keyed-list fast paths for unchanged and reversed order. Safe
+primitive keyed rows defer their structural comment anchor and full Part graph
+until a value becomes empty, styled, directive-backed, nested, or otherwise
+structural. A per-template cache retains at most 1,024 never-mounted primitive
+row prototypes by key and exact rendered values; every root receives a deep
+clone, so mounted DOM mutations cannot contaminate later roots. Generic keyed
+changes still trim stable heads and tails, retain their longest unchanged
+contiguous run, and move only the surrounding groups. These shortcuts retain
+the external-DOM recovery, cleanup, style, hydration, and keyed-identity
 contracts covered by the browser suite.
 
 The retained baseline is stored in

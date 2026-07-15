@@ -178,6 +178,13 @@ comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results
 before the repository makes a speed claim.
 
+Issue #167's renderer hot paths bring the same complete production entry to
+190,536 raw bytes and 55,262 level-9 gzip bytes. The reviewed ceilings are
+191,000 / 55,500 bytes, leaving 464 raw bytes and 238 gzip bytes of explicit
+regression headroom. The rendering comparison remains separate evidence; this
+bundle measurement records the delivery-size trade-off rather than treating it
+as rendering latency.
+
 That comparison is now available through `npm run benchmark:rendering` and
 documented in [`docs/performance.md`](../../docs/performance.md). It remains a
 separate performance surface rather than a shop route because running renderer
