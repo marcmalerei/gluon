@@ -19,6 +19,13 @@ const unsafeHtmlBrand = Symbol('gluon.unsafe-html');
 const unsafeUrlBrand = Symbol('gluon.unsafe-url');
 const unsetValue = Symbol('gluon.unset');
 const emptyComponentStyles: readonly ComponentStyleDependency[] = Object.freeze([]);
+const compiledPrimitiveTextBindings = new WeakMap<TemplateStringsArray, CompiledPrimitiveTextBinding>();
+
+/** @internal Compiler-owned metadata for a proven direct string-property text binding. */
+export interface CompiledPrimitiveTextBinding {
+  readonly property: string;
+  readonly index: number;
+}
 
 /** Explicitly renders no child content or removes an attribute value. */
 export const nothing = Symbol('gluon.nothing');
@@ -102,6 +109,28 @@ export function html(
   ...values: TemplateValue[]
 ): TemplateResult {
   return new TemplateResult(strings, values, 'html');
+}
+
+/** @internal Used only by the official compiler for conservative element text updates. */
+export function markCompiledPrimitiveTextBinding(
+  result: TemplateResult,
+  property: string,
+  index: number,
+): TemplateResult {
+  const current = compiledPrimitiveTextBindings.get(result.strings);
+  if (!current) {
+    compiledPrimitiveTextBindings.set(result.strings, Object.freeze({ property, index }));
+  } else if (current.property !== property || current.index !== index) {
+    throw new Error('One compiled template identity cannot describe different primitive text bindings.');
+  }
+  return result;
+}
+
+/** @internal Returns compiler metadata associated with one stable template callsite. */
+export function getCompiledPrimitiveTextBinding(
+  result: TemplateResult,
+): CompiledPrimitiveTextBinding | undefined {
+  return compiledPrimitiveTextBindings.get(result.strings);
 }
 
 /**
@@ -1586,6 +1615,42 @@ function setRootInstance(container: Element | DocumentFragment, instance: RootIn
 
 function clearRootInstance(container: Element | DocumentFragment): void {
   delete (container as OwnedRoot)[rootInstanceProperty];
+}
+
+/** @internal Commits one compiler-proven primitive binding without recreating its TemplateResult. */
+export function updateCompiledPrimitiveTextBinding(
+  container: Element | DocumentFragment | null,
+  index: number,
+  value: unknown,
+): boolean {
+  if (!container || !isRenderablePrimitive(value)) return false;
+  const current = getRootInstance(container);
+  let binding = current?.fastStringBinding?.index === index
+    ? current.fastStringBinding
+    : undefined;
+  if (!binding && current) {
+    for (const candidate of current.bindings) {
+      if (candidate.index !== index) continue;
+      binding = candidate.part instanceof NodePart
+        ? candidate as Binding & { readonly part: NodePart }
+        : undefined;
+      break;
+    }
+  }
+  if (
+    !current
+    || current.suspended
+    || current.hydrated
+    || !current.rootStyleDependenciesEmpty
+    || !current.styles.isActiveAndEmpty
+    || !rootNodesAreInPlace(container, current.nodes)
+    || !binding
+    || !(binding.part instanceof NodePart)
+    || binding.directive
+  ) return false;
+  if (typeof value === 'string') binding.part.setStableStringValue(value);
+  else binding.part.setValue(value);
+  return true;
 }
 
 export function render(

@@ -16,8 +16,15 @@ plugin and rewrites `@customElement()` to the registered-element HMR bridge in
 development.
 
 The compiler does not turn templates into a private renderer format. Runtime
-templates continue to use the public `html` and `css` APIs. Production
-transforms retain source mappings and diagnostics without adding HMR imports.
+templates continue to use the public `html` and `css` APIs. In production it
+may attach internal metadata to one statically proven `GluonElement` shape: a
+direct fixed `html` return with exactly one declared primitive property in text
+position and, optionally, a private readonly event-handler field. This lets the
+runtime update that text Part without recreating the TemplateResult. Conditions,
+attributes, directives, multiple dynamic text values, mutable/public secondary
+bindings, inherited element bases, and custom `update()` methods are not marked.
+All production transforms retain source mappings and diagnostics without
+adding HMR imports.
 
 Imported `defineGluonElement()` calls receive the functional Custom Element HMR
 bridge. The compiler also reports source-located invalid autonomous tags,

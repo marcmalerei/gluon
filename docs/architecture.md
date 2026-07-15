@@ -441,6 +441,28 @@ They have no host, state instance, or lifecycle of their own. Stateful and
 publicly interoperable components use `GluonElement`; their render methods may
 compose any of these functional layers.
 
+### Compiler-proven primitive element updates
+
+The production compiler recognizes one intentionally narrow element shape: a
+class that directly extends the imported `GluonElement`, declares the rendered
+property in a static object literal, does not override `update()`, and returns
+one fixed `html` template directly. Exactly one interpolation must read that
+property in child-text position. Any additional interpolation must be an event
+binding to a private readonly function field. The compiler wraps the unchanged
+public TemplateResult with internal callsite metadata; it does not emit a
+second template representation.
+
+After the first general render resolves the actual `NodePart`, a production
+property-only update may queue a smaller element-owned job. The job retains the
+element ID, shared update phase, deduplication, completion promise, primitive
+value semantics, and root-identity checks. It never runs when update lifecycle
+hooks are registered. Reactive triggers, explicit requests, multiple property
+names, hydration, suspension, style ownership, changed root nodes, or a missing
+Part promote the same pending work to the full render effect. This keeps
+conditional dependency rebuilding, application/error ownership, renderer
+recovery, HMR, reconnect, and user-defined update behavior on their established
+paths.
+
 `@gluonjs/atoms` owns the optional UI installation boundary because dependency
 direction already points from Atoms to Core. `installUi()` creates no new
 package edge: one call retains Core's layer order and foundation plus Atom-owned

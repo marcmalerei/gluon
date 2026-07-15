@@ -109,6 +109,37 @@ class GluonBenchmarkCard extends GluonElement {
 
 defineElement('gluon-benchmark-card', GluonBenchmarkCard);
 
+class GluonPropertyBenchmarkCard extends GluonElement {
+  static override readonly properties = {
+    label: { type: String, default: 'Component 0 A' },
+  } as const;
+
+  declare label: string;
+
+  protected override render() {
+    return gluonHtml`<article><h2 data-role="label">${this.label}</h2></article>`;
+  }
+}
+
+defineElement('gluon-property-benchmark-card', GluonPropertyBenchmarkCard);
+
+class GluonStateBenchmarkCard extends GluonElement {
+  static override readonly properties = {
+    count: { attribute: false, default: 0 },
+  } as const;
+
+  declare count: number;
+  private readonly handleClick = () => {
+    this.count += 1;
+  };
+
+  protected override render() {
+    return gluonHtml`<article><button type="button" data-role="count" @click=${this.handleClick}>Count: ${this.count}</button></article>`;
+  }
+}
+
+defineElement('gluon-state-benchmark-card', GluonStateBenchmarkCard);
+
 class LitBenchmarkCard extends LitElement {
   static override readonly properties = {
     scenario: { type: String },
@@ -168,6 +199,44 @@ class LitBenchmarkCard extends LitElement {
 
 customElements.define('lit-benchmark-card', LitBenchmarkCard);
 
+class LitPropertyBenchmarkCard extends LitElement {
+  static override readonly properties = {
+    label: { type: String },
+  };
+
+  declare label: string;
+
+  constructor() {
+    super();
+    this.label = 'Component 0 A';
+  }
+
+  protected override render() {
+    return litHtml`<article><h2 data-role="label">${this.label}</h2></article>`;
+  }
+}
+
+customElements.define('lit-property-benchmark-card', LitPropertyBenchmarkCard);
+
+class LitStateBenchmarkCard extends LitElement {
+  static override readonly properties = {
+    count: { state: true },
+  };
+
+  protected declare count: number;
+
+  constructor() {
+    super();
+    this.count = 0;
+  }
+
+  protected override render() {
+    return litHtml`<article><button type="button" data-role="count" @click=${() => { this.count += 1; }}>Count: ${this.count}</button></article>`;
+  }
+}
+
+customElements.define('lit-state-benchmark-card', LitStateBenchmarkCard);
+
 const VueBenchmarkCard = defineVueCustomElement({
   props: {
     scenario: { type: String, default: 'lifecycle' },
@@ -202,6 +271,34 @@ const VueBenchmarkCard = defineVueCustomElement({
 });
 
 customElements.define('vue-benchmark-card', VueBenchmarkCard);
+
+const VuePropertyBenchmarkCard = defineVueCustomElement({
+  props: {
+    label: { type: String, default: 'Component 0 A' },
+  },
+  setup(props) {
+    return () => vueH('article', null, [
+      vueH('h2', { 'data-role': 'label' }, props.label),
+    ]);
+  },
+});
+
+customElements.define('vue-property-benchmark-card', VuePropertyBenchmarkCard);
+
+const VueStateBenchmarkCard = defineVueCustomElement({
+  setup() {
+    const count = vueRef(0);
+    return () => vueH('article', null, [
+      vueH('button', {
+        type: 'button',
+        'data-role': 'count',
+        onClick: () => { count.value += 1; },
+      }, `Count: ${count.value}`),
+    ]);
+  },
+});
+
+customElements.define('vue-state-benchmark-card', VueStateBenchmarkCard);
 
 export async function createComponentHarness(
   framework: ComponentFramework,
@@ -266,7 +363,10 @@ async function mountComponents(
   const fragment = document.createDocumentFragment();
   const elements: BenchmarkElement[] = [];
   for (let index = 0; index < COMPONENT_COUNT; index += 1) {
-    const element = document.createElement(`${framework}-benchmark-card`) as BenchmarkElement;
+    const tagName = scenario === 'property' || scenario === 'state'
+      ? `${framework}-${scenario}-benchmark-card`
+      : `${framework}-benchmark-card`;
+    const element = document.createElement(tagName) as BenchmarkElement;
     element.scenario = scenario;
     element.label = `Component ${index} A`;
     element.items = forwardItems;

@@ -3,6 +3,7 @@ import {
   GluonElement,
   defineElement,
   html,
+  markCompiledPrimitiveTextBinding,
   setGluonRenderDebugHook,
   type GluonRenderDebugEvent,
   type PropertyDeclarations,
@@ -61,6 +62,72 @@ describe('reactive GluonElement rendering', () => {
     element.state.count = 4;
     await nextTick();
     expect(element.renders).toBe(3);
+  });
+
+  it('retains lifecycle, reactive tracking, completion, and DOM recovery with compiled metadata', async () => {
+    const tagName = `gluon-compiled-text-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class CompiledTextElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      readonly state = reactive({ version: 0 });
+      renders = 0;
+      beforeUpdates = 0;
+      updatedCalls = 0;
+
+      constructor() {
+        super();
+        this.onBeforeUpdate(() => {
+          this.state.version;
+          this.beforeUpdates += 1;
+        });
+        this.onUpdated(() => {
+          this.updatedCalls += 1;
+        });
+      }
+
+      refresh(): Promise<void> {
+        return this.requestUpdate();
+      }
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, CompiledTextElement);
+    const element = document.createElement(tagName) as CompiledTextElement;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('A');
+    expect([element.renders, element.beforeUpdates, element.updatedCalls]).toEqual([1, 0, 1]);
+
+    element.label = 'B';
+    const compiledUpdate = element.updateComplete;
+    await expect(compiledUpdate).resolves.toBeUndefined();
+    expect(element.shadowRoot?.textContent).toBe('B');
+    expect([element.renders, element.beforeUpdates, element.updatedCalls]).toEqual([2, 1, 2]);
+
+    element.state.version = 1;
+    await element.updateComplete;
+    expect([element.renders, element.beforeUpdates, element.updatedCalls]).toEqual([3, 2, 3]);
+
+    element.shadowRoot!.replaceChildren(document.createElement('i'));
+    element.label = 'C';
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('C');
+    expect([element.renders, element.beforeUpdates, element.updatedCalls]).toEqual([4, 3, 4]);
+
+    await element.refresh();
+    expect(element.renders).toBe(5);
   });
 
   it('stops scoped work on disconnect and recreates it while retaining state and DOM', async () => {

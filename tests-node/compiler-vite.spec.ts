@@ -110,6 +110,62 @@ describe('@gluonjs/compiler', () => {
     expect(transformed.map.sourcesContent).toEqual([source]);
   });
 
+  it('marks only compiler-proven declared-property text templates for direct updates', () => {
+    const eligible = transformGluonModule([
+      "import { GluonElement as Base, html as view } from '@gluonjs/core';",
+      'class LabelCard extends Base {',
+      "  static override readonly properties = { label: { type: String, default: 'A' } } as const;",
+      '  declare label: string;',
+      '  protected override render() {',
+      '    return view`<output>${this.label}</output>`;',
+      '  }',
+      '}',
+    ].join('\n'), '/app/label-card.ts', { development: false });
+    expect(eligible.hmr).toBe(false);
+    expect(eligible.code).toContain('markCompiledPrimitiveTextBinding as __gluonMarkPrimitiveText');
+    expect(eligible.code).toContain('__gluonMarkPrimitiveText(view`<output>${this.label}</output>`, "label", 0)');
+    expect(eligible.code).not.toContain('virtual:gluon-hmr');
+
+    const stableEvent = transformGluonModule([
+      "import { GluonElement, html as view } from '@gluonjs/core';",
+      'class CounterCard extends GluonElement {',
+      '  static properties = { count: { attribute: false, default: 0 } };',
+      '  declare count: number;',
+      '  private readonly click = () => { this.count += 1; };',
+      '  protected render() { return view`<button @click=${this.click}>${this.count}</button>`; }',
+      '}',
+    ].join('\n'), '/app/counter-card.ts', { development: false });
+    expect(stableEvent.code).toContain('__gluonMarkPrimitiveText(view`<button @click=${this.click}>${this.count}</button>`, "count", 1)');
+
+    const ineligibleBodies = [
+      'return view`<output title=${this.label}>fixed</output>`;',
+      'return this.active ? view`<output>${this.label}</output>` : view`<output>off</output>`;',
+      'return view`<output>${this.label}:${this.label}</output>`;',
+    ];
+    for (const body of ineligibleBodies) {
+      const transformed = transformGluonModule([
+        "import { GluonElement, html as view } from '@gluonjs/core';",
+        'class LabelCard extends GluonElement {',
+        "  static properties = { label: { default: 'A' } };",
+        '  declare label: string;',
+        `  protected render() { ${body} }`,
+        '}',
+      ].join('\n'), '/app/ineligible-card.ts', { development: false });
+      expect(transformed.code).not.toContain('__gluonMarkPrimitiveText');
+    }
+
+    const customUpdate = transformGluonModule([
+      "import { GluonElement, html as view } from '@gluonjs/core';",
+      'class LabelCard extends GluonElement {',
+      "  static properties = { label: { default: 'A' } };",
+      '  declare label: string;',
+      '  protected update() { super.update(); }',
+      '  protected render() { return view`<output>${this.label}</output>`; }',
+      '}',
+    ].join('\n'), '/app/custom-update-card.ts', { development: false });
+    expect(customUpdate.code).not.toContain('__gluonMarkPrimitiveText');
+  });
+
   it('records compose template bodies and preserves their original source mappings', () => {
     const id = '/app/checkout.ts';
     const source = [

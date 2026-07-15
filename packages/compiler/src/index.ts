@@ -71,6 +71,12 @@ export interface GluonTranspileResult {
   readonly map: GluonSourceMap | undefined;
 }
 
+interface PrimitiveTextOptimization {
+  readonly template: ts.TaggedTemplateExpression;
+  readonly property: string;
+  readonly index: number;
+}
+
 type TransformKind = 'component' | 'element' | 'element-decorator' | 'functional-element' | 'store' | 'style';
 
 const coreTransforms = new Map<string, TransformKind>([
@@ -99,15 +105,37 @@ export function transformGluonModule(
   const decorators = [...transforms.values()].includes('element-decorator')
     || hasGluonDecoratorImport(sourceFile);
   const htmlTags = collectImportedNames(sourceFile, '@gluonjs/core', 'html');
+  const gluonElementNames = collectImportedNames(sourceFile, '@gluonjs/core', 'GluonElement');
   const composeTags = collectImportedNames(sourceFile, '@gluonjs/core', 'compose');
   const magic = new MagicString(code);
   const templates: GluonTemplateLocation[] = [];
   const diagnostics: GluonCompilerDiagnostic[] = [];
   const exportStatements: string[] = [];
   let transformSequence = 0;
-  let changed = false;
+  let hmrChanged = false;
+  let needsPrimitiveTextHelper = false;
 
   const visit = (node: ts.Node): void => {
+    if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
+      const optimization = primitiveTextOptimization(
+        sourceFile,
+        node,
+        gluonElementNames,
+        htmlTags,
+      );
+      if (optimization) {
+        magic.prependLeft(
+          optimization.template.getStart(sourceFile),
+          '__gluonMarkPrimitiveText(',
+        );
+        magic.appendRight(
+          optimization.template.end,
+          `, ${JSON.stringify(optimization.property)}, ${optimization.index})`,
+        );
+        needsPrimitiveTextHelper = true;
+      }
+    }
+
     if (development && (ts.isClassDeclaration(node) || ts.isClassExpression(node))) {
       for (const decorator of ts.canHaveDecorators(node) ? ts.getDecorators(node) ?? [] : []) {
         const expression = decorator.expression;
@@ -122,7 +150,7 @@ export function transformGluonModule(
           expression.end - 1,
           `, import.meta.url, ${JSON.stringify(key)}, ${JSON.stringify(initializerSignature)}, import.meta.hot`,
         );
-        changed = true;
+        hmrChanged = true;
       }
     }
 
@@ -150,7 +178,7 @@ export function transformGluonModule(
           const key = `style:${transformSequence++}`;
           magic.prependLeft(node.getStart(sourceFile), '__gluonHmrStyle(');
           magic.appendRight(node.end, `, import.meta.url, ${JSON.stringify(key)})`);
-          changed = true;
+          hmrChanged = true;
         }
       }
     }
@@ -168,7 +196,7 @@ export function transformGluonModule(
           node.end - 1,
           `, import.meta.url, ${JSON.stringify(key)}, ${JSON.stringify(initializerSignature)}, import.meta.hot`,
         );
-        changed = true;
+        hmrChanged = true;
       } else if (kind === 'functional-element') {
         const key = `functional-element:${transformSequence++}`;
         const expressionStart = node.expression.getStart(sourceFile);
@@ -179,13 +207,13 @@ export function transformGluonModule(
           node.end - 1,
           `, import.meta.url, ${JSON.stringify(key)}, import.meta.hot`,
         );
-        changed = true;
+        hmrChanged = true;
       } else if (kind === 'component' || kind === 'store') {
         const helper = kind === 'component' ? '__gluonHmrComponent' : '__gluonHmrStore';
         const key = `${kind}:${transformSequence++}`;
         magic.prependLeft(node.getStart(sourceFile), `${helper}(`);
         magic.appendRight(node.end, `, import.meta.url, ${JSON.stringify(key)})`);
-        changed = true;
+        hmrChanged = true;
       }
     }
 
@@ -204,7 +232,7 @@ export function transformGluonModule(
         exportStatements.push(
           `const ${local} = __gluonHmrComponent(${node.name.text}, import.meta.url, ${JSON.stringify(`export:${node.name.text}`)});\nexport { ${local} as ${node.name.text} };`,
         );
-        changed = true;
+        hmrChanged = true;
       }
     }
 
@@ -219,14 +247,17 @@ export function transformGluonModule(
           declaration.initializer.end,
           `, import.meta.url, ${JSON.stringify(`export:${declaration.name.text}`)})`,
         );
-        changed = true;
+        hmrChanged = true;
       }
     }
     ts.forEachChild(node, visit);
   };
   visit(sourceFile);
 
-  if (changed) {
+  if (needsPrimitiveTextHelper) {
+    magic.prepend('import { markCompiledPrimitiveTextBinding as __gluonMarkPrimitiveText } from "@gluonjs/core";\n');
+  }
+  if (hmrChanged) {
     magic.prepend('import { accept as __gluonHmrAccept, component as __gluonHmrComponent, element as __gluonHmrElement, elementDecorator as __gluonHmrElementDecorator, functionalElement as __gluonHmrFunctionalElement, store as __gluonHmrStore, style as __gluonHmrStyle } from "virtual:gluon-hmr";\n');
     if (exportStatements.length > 0) magic.append(`\n${exportStatements.join('\n')}\n`);
     magic.append('\nif (import.meta.hot) import.meta.hot.accept(() => __gluonHmrAccept(import.meta.url));\n');
@@ -243,7 +274,7 @@ export function transformGluonModule(
     map: JSON.parse(map.toString()) as GluonSourceMap,
     diagnostics: Object.freeze(diagnostics),
     templates: Object.freeze(templates),
-    hmr: changed,
+    hmr: hmrChanged,
     decorators,
   });
 }
@@ -423,6 +454,140 @@ function collectImportedNames(
     }
   }
   return names;
+}
+
+function primitiveTextOptimization(
+  sourceFile: ts.SourceFile,
+  declaration: ts.ClassLikeDeclaration,
+  gluonElementNames: ReadonlySet<string>,
+  htmlTags: ReadonlySet<string>,
+): PrimitiveTextOptimization | undefined {
+  const extendsClause = declaration.heritageClauses?.find(
+    (clause) => clause.token === ts.SyntaxKind.ExtendsKeyword,
+  );
+  const base = extendsClause?.types[0]?.expression;
+  if (!base || !ts.isIdentifier(base) || !gluonElementNames.has(base.text)) return undefined;
+  if (declaration.members.some((member) => memberName(member, sourceFile) === 'update')) return undefined;
+
+  const propertiesMember = declaration.members.find((member): member is ts.PropertyDeclaration => (
+    ts.isPropertyDeclaration(member)
+    && hasModifier(member, ts.SyntaxKind.StaticKeyword)
+    && memberName(member, sourceFile) === 'properties'
+  ));
+  const properties = propertiesMember?.initializer
+    ? unwrapExpression(propertiesMember.initializer)
+    : undefined;
+  if (!properties || !ts.isObjectLiteralExpression(properties)) return undefined;
+
+  const renderMethod = declaration.members.find((member): member is ts.MethodDeclaration => (
+    ts.isMethodDeclaration(member) && memberName(member, sourceFile) === 'render'
+  ));
+  if (!renderMethod?.body || renderMethod.body.statements.length !== 1) return undefined;
+  const statement = renderMethod.body.statements[0];
+  if (!statement || !ts.isReturnStatement(statement) || !statement.expression) return undefined;
+  const template = unwrapExpression(statement.expression);
+  if (!ts.isTaggedTemplateExpression(template)
+    || !ts.isIdentifier(template.tag)
+    || !htmlTags.has(template.tag.text)
+    || !ts.isTemplateExpression(template.template)) return undefined;
+
+  const declaredProperties = new Set(
+    properties.properties.map((entry) => memberName(entry, sourceFile)).filter(Boolean),
+  );
+  const contexts = templateExpressionContexts(template.template);
+  let optimized: { readonly property: string; readonly index: number } | undefined;
+  for (const [index, span] of template.template.templateSpans.entries()) {
+    const expression = unwrapExpression(span.expression);
+    const member = ts.isPropertyAccessExpression(expression)
+      && expression.expression.kind === ts.SyntaxKind.ThisKeyword
+      ? expression.name.text
+      : undefined;
+    if (!contexts[index]!.inTag && member && declaredProperties.has(member)) {
+      if (optimized) return undefined;
+      optimized = { property: member, index };
+      continue;
+    }
+    if (!isStableCompiledBinding(declaration, sourceFile, contexts[index]!, member)) return undefined;
+  }
+  if (!optimized) return undefined;
+  const { property, index } = optimized;
+  const shadowsProperty = declaration.members.some((member) => (
+    member !== propertiesMember
+    && memberName(member, sourceFile) === property
+    && !ts.isPropertyDeclaration(member)
+  ));
+  if (shadowsProperty) return undefined;
+  return { template, property, index };
+}
+
+function unwrapExpression(expression: ts.Expression): ts.Expression {
+  let current = expression;
+  while (
+    ts.isAsExpression(current)
+    || ts.isSatisfiesExpression(current)
+    || ts.isParenthesizedExpression(current)
+    || ts.isTypeAssertionExpression(current)
+    || ts.isNonNullExpression(current)
+  ) current = current.expression;
+  return current;
+}
+
+function memberName(node: ts.NamedDeclaration, sourceFile: ts.SourceFile): string | undefined {
+  const name = node.name;
+  if (!name) return undefined;
+  if (ts.isIdentifier(name) || ts.isStringLiteral(name) || ts.isNumericLiteral(name)) return name.text;
+  return name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+}
+
+function isStableCompiledBinding(
+  declaration: ts.ClassLikeDeclaration,
+  sourceFile: ts.SourceFile,
+  context: { readonly inTag: boolean; readonly chunk: string },
+  member: string | undefined,
+): boolean {
+  if (!context.inTag || !member) return false;
+  const attribute = context.chunk.match(/(?:^|[\s<])([^\s"'<>/=]+)=\s*["']?$/)?.[1];
+  if (!attribute?.startsWith('@')) return false;
+  return declaration.members.some((candidate) => {
+    if (memberName(candidate, sourceFile) !== member) return false;
+    return ts.isPropertyDeclaration(candidate)
+      && hasModifier(candidate, ts.SyntaxKind.PrivateKeyword)
+      && hasModifier(candidate, ts.SyntaxKind.ReadonlyKeyword)
+      && Boolean(candidate.initializer)
+      && (ts.isArrowFunction(candidate.initializer!) || ts.isFunctionExpression(candidate.initializer!));
+  });
+}
+
+function templateExpressionContexts(
+  template: ts.TemplateExpression,
+): Array<{ readonly inTag: boolean; readonly chunk: string }> {
+  const contexts: Array<{ readonly inTag: boolean; readonly chunk: string }> = [];
+  const state = { inTag: false, quote: '' };
+  let chunk = template.head.text;
+  for (const span of template.templateSpans) {
+    updateTemplateMarkupState(state, chunk);
+    contexts.push({ inTag: state.inTag, chunk });
+    chunk = span.literal.text;
+  }
+  return contexts;
+}
+
+function updateTemplateMarkupState(
+  state: { inTag: boolean; quote: string },
+  chunk: string,
+): void {
+  for (const character of chunk) {
+    if (!state.inTag) {
+      if (character === '<') state.inTag = true;
+      continue;
+    }
+    if (state.quote) {
+      if (character === state.quote) state.quote = '';
+      continue;
+    }
+    if (character === '"' || character === "'") state.quote = character;
+    else if (character === '>') state.inTag = false;
+  }
 }
 
 function templateLocation(

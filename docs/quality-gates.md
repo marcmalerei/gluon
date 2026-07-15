@@ -26,6 +26,12 @@ dispatch. It uses the current Node 24-based `actions/checkout@v7` and
   Chromium/Firefox/WebKit rendering run retained for 30 days as JSON and
   Markdown workflow artifacts.
 
+The component comparison builds the compiler first and runs the harness through
+the official production Vite plugin. Compiler tests prove both the accepted
+primitive text/event shape and rejected conditional, attribute, multi-text, and
+custom-update shapes. Browser tests retain lifecycle hooks, reactive tracking,
+completion, and external-DOM recovery when compiled metadata is present.
+
 Package TypeScript configurations that replace the root path map retain every
 direct and transitive official source alias required by their typecheck. Their
 build configurations resolve those dependencies through built declarations.

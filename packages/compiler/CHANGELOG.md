@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Added a conservative production transform for direct declared-property text
+  bindings in fixed `GluonElement` templates. Unsupported or mutable template
+  shapes remain on the general runtime path.
+
 ## [1.0.8] - 2026-07-15
 
 ### Changed

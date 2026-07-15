@@ -20,6 +20,15 @@ contiguous run, and move only the surrounding groups. These shortcuts retain
 the external-DOM recovery, cleanup, style, hydration, and keyed-identity
 contracts covered by the browser suite.
 
+Official production Vite builds also recognize a conservative component-level
+case: one fixed `GluonElement` template with one declared primitive property in
+a text Part and, optionally, one private readonly event handler. Property-only
+updates reuse the resolved Part and a smaller scheduler job. Lifecycle hooks,
+reactive or explicit concurrent updates, hydration, root disturbance,
+non-primitive values, and every unproven template shape use the full effect and
+renderer path. This optimization does not change standalone `html`/`render`
+behavior and is absent from development builds.
+
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
 medians and p95 values; the paired JSON file preserves every sample, invariant
@@ -65,7 +74,9 @@ npm run benchmark:components -- \
 ```
 
 Each command builds its benchmark with Vite in production mode and explicitly
-compiles aliased Gluon source with `__GLUON_DEV__` set to `false`. The runner
+compiles aliased Gluon source with `__GLUON_DEV__` set to `false`. The component
+matrix additionally builds `@gluonjs/compiler` and applies the official Gluon
+Vite plugin, so compiler-owned production paths are measured. The runner
 serves that exact output locally, launches each browser headlessly, rejects
 console errors or warnings, and writes JSON plus Markdown. Rendering uses a
 180-second per-browser timeout; components use 300 seconds. The JSON path
@@ -117,6 +128,8 @@ property includes only the label; state includes only the button; and list
 includes only the keyed list. This prevents a simple property or state cell
 from measuring unrelated reconciliation of 1,000 unchanged rows. Browser tests
 validate component count, scenario-specific output, and complete cleanup.
+Property and state use dedicated scenario classes in all three frameworks, so
+their render functions do not retain a benchmark-only scenario branch.
 
 One operation covers 50 component boundaries. List and lifecycle components own
 20 keyed rows each, so those scenarios cover 1,000 rows in total.
