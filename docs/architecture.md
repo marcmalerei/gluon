@@ -270,12 +270,11 @@ The runtime currently has three Part types:
 - `AttributePart` handles attributes plus `.property`, `?boolean`, and `@event` prefixes.
 - `SpreadPart` reconciles prop objects, including classes, style maps, `data`, `aria`, events, and refs.
 
-Event Parts retain one native guarded dispatcher while callbacks change with
-equivalent capture, once, passive, and signal options. They replace the native
-listener only when those options change, and disconnect it when the binding or
-template is removed. Refs follow their normal change/removal lifecycle. Spread
-sub-maps remove only attributes or style properties previously owned by that
-Part.
+Event Parts retain one native guarded dispatcher while callbacks change and
+the event-options value stays identical. They replace the native listener when
+that options value changes, and disconnect it when the binding or template is
+removed. Refs follow their normal change/removal lifecycle. Spread sub-maps
+remove only attributes or style properties previously owned by that Part.
 
 Root and nested template instances refresh their rendered top-level node sets
 after every successful update. This keeps renderer ownership accurate when a

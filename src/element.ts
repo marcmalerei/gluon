@@ -20,10 +20,8 @@ import {
   reportApplicationError,
   reportApplicationWarning,
   resolveApplicationContext,
-  runWithApplicationFrame,
   runWithApplicationContext,
   type AppErrorSource,
-  type ApplicationRuntimeFrame,
   type ApplicationContext,
 } from './application-context.js';
 import {
@@ -243,7 +241,6 @@ export abstract class GluonElement<
   private reflectingAttribute?: string;
   private readonly initialAttributePrecedence = new Map<string, string>();
   private applicationContext?: ApplicationContext;
-  private applicationFrame?: ApplicationRuntimeFrame;
   private componentErrorReporter?: ComponentErrorReporter;
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
@@ -327,7 +324,6 @@ export abstract class GluonElement<
           this.teardownConnection();
           this.connectionRendered = false;
           this.componentErrorReporter = undefined;
-          this.applicationFrame = undefined;
           this.applicationContext = undefined;
         }
       }
@@ -621,12 +617,12 @@ export abstract class GluonElement<
 
   private runOwned<Result>(callback: () => Result): Result {
     const reportError = this.componentErrorReporter ??= this.createComponentErrorReporter();
-    const frame = this.applicationFrame ??= {
-      context: this.applicationContext,
-      element: this,
-      handleError: reportError,
-    };
-    return runWithApplicationFrame(frame, callback);
+    return runWithApplicationContext(
+      this.applicationContext,
+      this,
+      reportError,
+      callback,
+    );
   }
 
   private invokeLifecycle(callbacks: readonly ComponentLifecycleCallback[]): void {

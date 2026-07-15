@@ -277,10 +277,11 @@ Browser assertions that cross a reactive transition poll for the resulting DOM
 state with a bounded timeout. They do not assume that the render and a 140-ms
 transition always finish within one fixed wall-clock delay on every engine.
 
-The current ceilings allow 153 raw bytes and 1,465 gzip bytes above the
-measured initial graph while preventing unreviewed large regressions. Changing a
-ceiling requires an evidence-backed documentation update in the same pull
-request.
+After issues #172 and #177, the measured initial graph is 191,197 raw bytes and
+55,385 level-9 gzip bytes. The current 191,500 / 55,500 ceilings leave 303 raw
+bytes and 115 gzip bytes of explicit headroom while preventing unreviewed large
+regressions. Changing a ceiling requires an evidence-backed documentation
+update in the same pull request.
 
 ## Customer-flow performance and retained evidence
 

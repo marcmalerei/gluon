@@ -94,10 +94,9 @@ Connection creates a new detached effect scope and queues the lazy render
 effect. The scope is active while the element's update executes, so effects,
 watchers, and `onScopeDispose()` callbacks created during that execution are
 owned by the current connection. The element also captures its application and
-ancestor error-boundary routing once for that connection, reuses it across
-updates, and captures the new ancestry after a disconnect/reconnect move.
-Resource creation must still be guarded so a component does not create a
-duplicate watcher on every render.
+ancestor error-boundary reporter once for that connection and captures the new
+ancestry after a disconnect/reconnect move. Resource creation must still be
+guarded so a component does not create a duplicate watcher on every render.
 
 Disconnection performs reversible cleanup:
 

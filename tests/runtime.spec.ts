@@ -92,8 +92,9 @@ describe('template runtime', () => {
     const root = document.createElement('div');
     const first = vi.fn();
     const second = vi.fn();
-    const view = (listener: EventListener, capture = false) => html`
-      <button @click=${event(listener, { capture })}>Run</button>
+    const captureOptions = { capture: true } as const;
+    const view = (listener: EventListener, options?: AddEventListenerOptions) => html`
+      <button @click=${options ? event(listener, options) : listener}>Run</button>
     `;
 
     render(view(first), root);
@@ -108,7 +109,7 @@ describe('template runtime', () => {
     expect(first).not.toHaveBeenCalled();
     expect(second).toHaveBeenCalledOnce();
 
-    render(view(first, true), root);
+    render(view(first, captureOptions), root);
     expect(remove).toHaveBeenCalledOnce();
     expect(add).toHaveBeenCalledOnce();
   });

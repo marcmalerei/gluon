@@ -1268,7 +1268,7 @@ class AttributePart implements Part {
   private setEvent(value: TemplateValue): void {
     const eventName = this.name.slice(1);
     const next = resolveEvent(value);
-    if (this.event && next && sameEventOptions(this.event.options, next.options)) {
+    if (this.event && next && this.event.options === next.options) {
       this.event.current = next.listener;
       return;
     }
@@ -1450,7 +1450,7 @@ class SpreadPart implements Part {
       : key.slice(2).toLowerCase();
     const previous = this.events.get(key);
 
-    if (previous && event && sameEventOptions(previous.options, event.options)) {
+    if (previous && event && previous.options === event.options) {
       previous.current = event.listener;
       return;
     }
@@ -2530,33 +2530,6 @@ function retainEvent(event: ResolvedEvent): RetainedEvent {
   };
   retained.listener = guardEventListener(dispatch) as EventListener;
   return retained;
-}
-
-function sameEventOptions(
-  left: boolean | AddEventListenerOptions | undefined,
-  right: boolean | AddEventListenerOptions | undefined,
-): boolean {
-  return eventCapture(left) === eventCapture(right)
-    && eventOption(left, 'once') === eventOption(right, 'once')
-    && eventOption(left, 'passive') === eventOption(right, 'passive')
-    && eventSignal(left) === eventSignal(right);
-}
-
-function eventCapture(options: boolean | AddEventListenerOptions | undefined): boolean {
-  return typeof options === 'boolean' ? options : options?.capture ?? false;
-}
-
-function eventOption(
-  options: boolean | AddEventListenerOptions | undefined,
-  name: 'once' | 'passive',
-): boolean {
-  return typeof options === 'object' ? options[name] ?? false : false;
-}
-
-function eventSignal(
-  options: boolean | AddEventListenerOptions | undefined,
-): AbortSignal | undefined {
-  return typeof options === 'object' ? options.signal ?? undefined : undefined;
 }
 
 function isUnsafeHtmlResult(value: unknown): value is UnsafeHtmlResult {
