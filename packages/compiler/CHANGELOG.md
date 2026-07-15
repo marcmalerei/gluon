@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-07-15
+
 ### Changed
 
 - Added a conservative production transform for direct declared-property text

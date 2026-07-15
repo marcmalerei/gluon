@@ -7,14 +7,12 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for `1.0.8`. Every official manifest is public and
-lockstep at `1.0.8`. All 17 contracted npm packages expose `1.0.8` as `latest`
-with SLSA provenance, and immutable GitHub release `v1.0.8` was published on
-2026-07-15. Release workflow `29403576667` completed candidate,
-reproducibility, Trusted Publishing, clean-install registry verification, and
-release finalization from the canonical `v1.0.8` tag. This is enforced locally
-by:
+The machine-readable package contract records `publicationState: ready` and
+`scopeControl: verified` for the prepared `1.0.9` candidate. Every official
+manifest is public and lockstep at `1.0.9`. Registry preflight on 2026-07-15
+confirmed that all 17 contracted npm packages still expose `1.0.8` as `latest`
+and that `1.0.9` is absent. Immutable GitHub release `v1.0.8` remains the
+current release. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -152,7 +150,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.0.8` release commit, the repository owner must verify
+Before preparing the `1.0.9` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -292,13 +290,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.0.8` and `private: false`;
-- set every official implementation and peer dependency to exact `1.0.8`;
+- set every official manifest to version `1.0.9` and `private: false`;
+- set every official implementation and peer dependency to exact `1.0.9`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.0.8` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.0.8`, then make that version
+- add dated `1.0.9` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.0.9`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -309,8 +307,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts
 npm run check
-npm run release:validate -- --candidate 1.0.8
-npm run release:artifacts -- --version 1.0.8
+npm run release:validate -- --candidate 1.0.9
+npm run release:artifacts -- --version 1.0.9
 ```
 
 `release:artifacts` packs every package twice and compares canonical unpacked

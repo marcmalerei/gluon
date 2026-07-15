@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-07-15
+
+### Changed
+
+- Reported lockstep framework version `1.0.9` in analyzer output while
+  retaining the existing report-only analysis contract.
+
 ## [1.0.8] - 2026-07-15
 
 ### Changed

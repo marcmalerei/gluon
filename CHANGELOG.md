@@ -7,6 +7,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-07-15
+
 ### Fixed
 
 - Kept the shared decorator metadata key typed as `symbol`, allowing the

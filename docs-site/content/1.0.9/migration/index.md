@@ -2,7 +2,7 @@
 
 Gluon is an alternative application platform, not a Vue compatibility layer.
 There is no automatic Vue-to-Gluon source converter, production SFC compiler,
-compatibility runtime, or migration codemod in version `1.0.8`.
+compatibility runtime, or migration codemod in version `1.0.9`.
 
 ## Automation boundary
 
@@ -68,7 +68,7 @@ submission/reset/state restore/validation/labels/focus/disabled behavior, and
 the configured line item delivered to the bag. The existing ShadowRoot owns
 both the product configurator sheet and the usage-derived official Button sheet;
 Vue does not adopt or duplicate either sheet. Run the compiled
-[Vue host](/gluon/1.0.8/examples/vue.html) or execute:
+[Vue host](/gluon/1.0.9/examples/vue.html) or execute:
 
 ```sh
 npx vitest run tests/vue-migration-interop.spec.ts tests/docs-examples.spec.ts tests/shop-example.spec.ts

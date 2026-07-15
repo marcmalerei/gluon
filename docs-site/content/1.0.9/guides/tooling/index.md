@@ -18,4 +18,4 @@ and leak diagnostics without renderer internals.
 <<< ../../../../examples/testing.ts
 
 Open the [public Playground](/gluon/playground/) or browse the
-[versioned diagnostic reference](/gluon/1.0.8/reference/diagnostics/).
+[versioned diagnostic reference](/gluon/1.0.9/reference/diagnostics/).
