@@ -8,8 +8,8 @@
     "checkedAt": "2026-07-15",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Registry preflight on 2026-07-15 confirmed that all 17 contracted npm package records expose 1.0.9 as latest with SLSA provenance and that version 1.0.10 is absent. Release run 29422302132 preserved a GitHub draft after the published Core declaration bundle failed clean-room type verification; 1.0.10 supersedes the immutable 1.0.9 npm packages."
+    "publicationState": "released",
+    "observation": "Release run 29426558738 attempt 2 completed on 2026-07-15. All 17 contracted npm packages expose 1.0.10 as latest with SLSA provenance; clean-room installation and public-type verification passed, and GitHub release v1.0.10 is published and immutable."
   },
   "packages": [
     {
