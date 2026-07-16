@@ -52,6 +52,7 @@ src/virtualizer.ts      Core accessible list/grid windowing, measurement,
 packages/ssr/
 ├── src/index.ts        DOM-free serialization, DSD elements, request ownership,
 │                       Router/Store snapshots, and safe embedded state
+├── src/eleventy.ts     Optional request-isolated Eleventy custom format adapter
 ├── src/streaming.ts    Ordered and progressive async chunks plus stream adapters
 ├── src/hydration.ts    Browser binding reconstruction and style/state handoff
 └── src/static.ts       Route-aware static output and mixed deployment manifest

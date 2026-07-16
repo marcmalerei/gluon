@@ -82,6 +82,11 @@ Vite SSR request bundle, and five route-aware static documents with one recorded
 dynamic product family plus stateful checkout and order fallbacks. See [static
 and server deployment](../../docs/deployment.md).
 
+`npm run build:shop:eleventy` additionally runs the optional public Eleventy
+adapter against URL-only route inputs. It renders home, catalog, and Orbit Lamp
+through the same built server module, copies the same hashed assets, and keeps
+the product, checkout, and order families as explicit dynamic fallbacks.
+
 ## Run
 
 ```bash

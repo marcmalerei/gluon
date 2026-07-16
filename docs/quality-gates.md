@@ -100,6 +100,15 @@ configured Playwright engine.
 
 ## Generated API example gate
 
+The Eleventy adapter gate pins the real `@11ty/eleventy@3.1.6` development
+runtime, builds three canonical shop routes from URL-only `.gluon` inputs, and
+compares customer-visible markers with the Vite static output. SSR coverage
+proves concurrent request isolation, success/failure disposal, route/data
+mapping, dynamic fallback metadata, path/asset validation, CSP/nonce inputs,
+and custom documents. The browser hydration suite transports the real product
+request through `renderEleventyPage()` and requires identity-preserving shop
+hydration. The adapter package subpath itself has no Eleventy dependency.
+
 `npm run docs:api` generates TypeDoc Markdown for every public package entry
 point, appends one verified `Example` section to every public function, class,
 interface, type-alias, and variable page, and compiles every snippet through a

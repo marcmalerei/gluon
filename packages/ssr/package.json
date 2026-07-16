@@ -31,6 +31,10 @@
       "types": "./dist/hydration.d.ts",
       "import": "./dist/hydration.js"
     },
+    "./eleventy": {
+      "types": "./dist/eleventy.d.ts",
+      "import": "./dist/eleventy.js"
+    },
     "./static": {
       "types": "./dist/static.d.ts",
       "import": "./dist/static.js"

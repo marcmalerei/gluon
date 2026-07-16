@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the optional `@gluonjs/ssr/eleventy` request-isolated prerendering
+  adapter with route/data mapping, asset and CSP transport, cleanup, and
+  dynamic fallback metadata.
+
 ## [1.0.10] - 2026-07-15
 
 ### Changed

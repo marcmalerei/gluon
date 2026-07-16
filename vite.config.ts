@@ -50,6 +50,7 @@ export default defineConfig({
       '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),
       '@gluonjs/router': resolve(import.meta.dirname, 'packages/router/src/index.ts'),
       '@gluonjs/ssr/hydration': resolve(import.meta.dirname, 'packages/ssr/src/hydration.ts'),
+      '@gluonjs/ssr/eleventy': resolve(import.meta.dirname, 'packages/ssr/src/eleventy.ts'),
       '@gluonjs/ssr/streaming': resolve(import.meta.dirname, 'packages/ssr/src/streaming.ts'),
       '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),

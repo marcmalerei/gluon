@@ -1438,6 +1438,50 @@
         "console.log(generated.pages, generated.dynamicRoutes);"
       ]
     },
+    "ssr-eleventy": {
+      "module": "@gluonjs/ssr/eleventy",
+      "code": [
+        "import { createApp, html } from '@gluonjs/core';",
+        "import { renderRequest } from '@gluonjs/ssr';",
+        "import {",
+        "  gluonEleventyPlugin,",
+        "  renderEleventyPage,",
+        "  type EleventyConfiguration,",
+        "  type EleventyData,",
+        "  type EleventyExtension,",
+        "  type GluonEleventyAdapterOptions,",
+        "  type GluonEleventyDocumentContext,",
+        "  type GluonEleventyRenderContext,",
+        "  type GluonEleventyRequest,",
+        "  type GluonEleventyRoute,",
+        "} from '@gluonjs/ssr/eleventy';",
+        "",
+        "type PageData = EleventyData & { readonly locale: string };",
+        "const options = {",
+        "  assets: { entry: '/assets/app.js', imports: ['/assets/vendor.js'] },",
+        "  dynamicFallbacks: ['/products/:slug'],",
+        "  route: (content: string): GluonEleventyRoute => ({ url: content.trim() }),",
+        "  createRequest: (context: GluonEleventyRenderContext<PageData>): GluonEleventyRequest => ({",
+        "    render: () => renderRequest({",
+        "      url: context.url,",
+        "      state: { locale: context.data.locale },",
+        "      createApp: () => createApp(() => html`<main>${context.url}</main>`),",
+        "    }),",
+        "  }),",
+        "  document: (context: GluonEleventyDocumentContext<PageData>) =>",
+        "    `<!doctype html><head>${context.result.head}</head><body>${context.result.html}${context.result.stateScript}</body>`,",
+        "} satisfies GluonEleventyAdapterOptions<PageData>;",
+        "",
+        "let extension: EleventyExtension | undefined;",
+        "const config: EleventyConfiguration = {",
+        "  addTemplateFormats() {},",
+        "  addExtension(_name, value) { extension = value; },",
+        "};",
+        "gluonEleventyPlugin(config, options);",
+        "const output = await renderEleventyPage(options, '/', 'index.gluon', { locale: 'en' });",
+        "console.log(extension?.outputFileExtension, output);"
+      ]
+    },
     "ssr-serialization": {
       "module": "@gluonjs/ssr",
       "code": [
@@ -4240,6 +4284,46 @@
     "packages/ssr/src/functions/renderRequest.md": {
       "recipe": "ssr-request",
       "description": "Own one isolated Router, Store, effect scope, data load, application render, serialized state, and cleanup cycle for an incoming URL:"
+    },
+    "packages/ssr/src/eleventy/functions/gluonEleventyPlugin.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Register the request-isolated Gluon renderer as an Eleventy custom template format with dynamic fallback metadata:"
+    },
+    "packages/ssr/src/eleventy/functions/renderEleventyPage.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Render one route through the same adapter contract without starting Eleventy, while retaining failure abort and cleanup semantics:"
+    },
+    "packages/ssr/src/eleventy/interfaces/EleventyConfiguration.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Supply the minimal Eleventy plugin hooks used to register a format, extension compiler, and optional fallback global data:"
+    },
+    "packages/ssr/src/eleventy/interfaces/EleventyData.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Carry Eleventy page and application data into route mapping, request creation, and document serialization:"
+    },
+    "packages/ssr/src/eleventy/interfaces/EleventyExtension.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Describe the asynchronous custom-format compiler installed by the Gluon Eleventy plugin:"
+    },
+    "packages/ssr/src/eleventy/interfaces/GluonEleventyAdapterOptions.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Configure assets, route/data mapping, request ownership, nonce and CSP input, hydration entry, document output, and dynamic fallbacks:"
+    },
+    "packages/ssr/src/eleventy/interfaces/GluonEleventyDocumentContext.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Build a custom document from the complete SSR result and the resolved route, data, asset, CSP, nonce, and hydration inputs:"
+    },
+    "packages/ssr/src/eleventy/interfaces/GluonEleventyRenderContext.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Create one request from an isolated route, Eleventy data record, asset manifest, nonce, and abort signal:"
+    },
+    "packages/ssr/src/eleventy/interfaces/GluonEleventyRequest.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Expose one SSR render operation and its deterministic optional disposal boundary to the adapter:"
+    },
+    "packages/ssr/src/eleventy/interfaces/GluonEleventyRoute.md": {
+      "recipe": "ssr-eleventy",
+      "description": "Map an Eleventy input and data record to one public URL or explicitly classify it as a dynamic deployment fallback:"
     },
     "packages/ssr/src/hydration/functions/hydrateApplication.md": {
       "recipe": "ssr-hydration",

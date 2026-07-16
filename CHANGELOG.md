@@ -9,6 +9,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added the optional Eleventy prerendering adapter and a canonical GLUON GOODS
+  build proving route parity, assets, SSR styles/state, and browser hydration.
 - Added `LayoutTransition()` for render-to-render direct-root geometry,
   shared layout identity, cancellation, reduced-motion, and stable SSR output.
 - Added universal scoped Custom Element registry handles, explicit class and

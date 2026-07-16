@@ -17,6 +17,7 @@
     "packages/router/src/memory.ts",
     "packages/store/src/index.ts",
     "packages/ssr/src/index.ts",
+    "packages/ssr/src/eleventy.ts",
     "packages/ssr/src/hydration.ts",
     "packages/ssr/src/static.ts",
     "packages/ssr/src/streaming.ts",
