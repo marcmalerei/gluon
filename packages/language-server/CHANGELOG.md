@@ -6,6 +6,7 @@
 
 - Added the versioned, deterministic `analyzeStaticGluonProject()` API,
   machine-readable schema, and zero-write `gluon-project-analyze` CLI.
+- Added cataloged input and analysis-failure diagnostics for the project CLI.
 
 ## [1.0.10] - 2026-07-15
 

@@ -25,7 +25,7 @@ dependencies, literal routes and stores, SSR/hydration boundaries, and the
 shared diagnostics. Each record carries `exact`, `structural`, or
 `indeterminate` confidence plus a project-relative file and line. Input is
 realpath-contained, symlinks are not followed, and fixed file and byte limits
-bound analysis. `GLUON_PROJECT_ANALYSIS_SCHEMA` is the public machine-readable
+bound analysis. `PROJECT_ANALYSIS_SCHEMA` is the public machine-readable
 schema; `analyzeStaticGluonProject()` is the equivalent zero-I/O API.
 
 The server implements LSP `Content-Length` framing and full-document sync. Its
@@ -68,6 +68,8 @@ virtual proprietary document.
 | `GLUON_TEMPLATE_SLOT_UNKNOWN` | Literal named light-DOM `slot` is absent from a literal element slot declaration |
 | `GLUON_TEMPLATE_STYLE_ELEMENT` | Browser template contains an inline style element |
 | `GLUON_TEMPLATE_VOID_CHILDREN` | Void HTML element has children or a closing tag |
+| `GLUON_PROJECT_INPUT_INVALID` | Project analyzer receives an unsupported option or more than one root |
+| `GLUON_PROJECT_ANALYSIS_FAILED` | Project input is unreadable, unsafe, over budget, or cannot be analyzed |
 
 These codes are emitted by both the LSP and CLI. They are development and CI
 diagnostics; TypeScript remains responsible for JavaScript expression types.

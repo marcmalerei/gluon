@@ -1123,7 +1123,7 @@
       "code": [
         "import {",
         "  GluonLanguageService,",
-        "  GLUON_PROJECT_ANALYSIS_SCHEMA,",
+        "  PROJECT_ANALYSIS_SCHEMA,",
         "  analyzeGluonDocument,",
         "  analyzeGluonProject,",
         "  analyzeStaticGluonProject,",
@@ -1165,7 +1165,7 @@
         "const confidence: AnalysisConfidence | undefined = inventory.files[0]?.confidence;",
         "const evidence: ProjectEvidence<{ readonly language: 'javascript' | 'typescript' }> | undefined = inventory.files[0];",
         "const projectDiagnostic: ProjectAnalysisDiagnostic | undefined = inventory.diagnostics[0];",
-        "const schemaVersion = GLUON_PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const;",
+        "const schemaVersion = PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const;",
         "const direct = analyzeGluonDocument(page.uri, page.text, project[0]?.declarations);",
         "const declaration: CustomElementDeclaration | undefined = project[0]?.declarations[0];",
         "const diagnostic: TemplateDiagnostic | undefined = direct.diagnostics[0];",
@@ -3150,7 +3150,7 @@
       "recipe": "language-service-analysis",
       "description": "Distinguish literal exact facts, structurally inferred facts, and dynamic evidence that remains indeterminate:"
     },
-    "packages/language-server/src/variables/GLUON_PROJECT_ANALYSIS_SCHEMA.md": {
+    "packages/language-server/src/variables/PROJECT_ANALYSIS_SCHEMA.md": {
       "recipe": "language-service-analysis",
       "description": "Validate or advertise the machine-readable version-1 project-analysis report contract:"
     },

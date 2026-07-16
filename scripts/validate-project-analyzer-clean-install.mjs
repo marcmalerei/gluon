@@ -30,7 +30,7 @@ try {
     throw new Error('clean consumer project report failed');
   }
   await execFile(process.execPath, ['--input-type=module', '-e',
-    "import { GLUON_PROJECT_ANALYSIS_SCHEMA, analyzeStaticGluonProject } from '@gluonjs/language-server'; if (GLUON_PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const !== 1 || analyzeStaticGluonProject([]).schemaVersion !== 1) process.exit(1);"],
+    "import { PROJECT_ANALYSIS_SCHEMA, analyzeStaticGluonProject } from '@gluonjs/language-server'; if (PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const !== 1 || analyzeStaticGluonProject([]).schemaVersion !== 1) process.exit(1);"],
   { cwd: consumer });
   const manifest = JSON.parse(await readFile(resolve(consumer, 'node_modules/@gluonjs/language-server/package.json'), 'utf8'));
   if (!manifest.bin['gluon-project-analyze']) throw new Error('clean consumer project analyzer bin is missing');

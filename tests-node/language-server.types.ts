@@ -1,7 +1,7 @@
 import {
   GluonLanguageService,
   GluonProtocolServer,
-  GLUON_PROJECT_ANALYSIS_SCHEMA,
+  PROJECT_ANALYSIS_SCHEMA,
   analyzeGluonProject,
   analyzeStaticGluonProject,
   type DocumentAnalysis,
@@ -18,4 +18,4 @@ void edit;
 new GluonProtocolServer().handle({ jsonrpc: '2.0', id: 1, method: 'initialize' });
 const project: GluonProjectAnalysis = analyzeStaticGluonProject([{ uri: 'src/app.ts', text: '' }]);
 void project.files;
-void GLUON_PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const;
+void PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const;

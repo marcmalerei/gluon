@@ -32,7 +32,7 @@ export interface GluonProjectAnalysis {
 }
 
 /** Machine-readable JSON Schema for the versioned static project report. */
-export const GLUON_PROJECT_ANALYSIS_SCHEMA = Object.freeze({
+export const PROJECT_ANALYSIS_SCHEMA = Object.freeze({
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'https://gluonjs.dev/schemas/project-analysis-v1.json',
   title: 'Gluon static project analysis',

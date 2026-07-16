@@ -354,6 +354,26 @@
       "source": "tooling"
     },
     {
+      "id": 1407,
+      "code": "GLUON_PROJECT_INPUT_INVALID",
+      "compactCode": "G1407",
+      "title": "Project analyzer input is invalid",
+      "summary": "gluon-project-analyze received an unsupported option or more than one project root.",
+      "why": "The project analyzer accepts one local root and has no project-owned configuration surface.",
+      "remediation": "Pass zero or one project directory and write the JSON stdout stream where needed.",
+      "source": "tooling"
+    },
+    {
+      "id": 1408,
+      "code": "GLUON_PROJECT_ANALYSIS_FAILED",
+      "compactCode": "G1408",
+      "title": "Project analysis failed",
+      "summary": "The static project analyzer could not safely read or inventory the requested root.",
+      "why": "The root is unreadable, escaping, over a fixed resource limit, or contains malformed source input.",
+      "remediation": "Correct the reported filesystem or source condition and rerun the zero-write analyzer.",
+      "source": "tooling"
+    },
+    {
       "id": 1501,
       "code": "GLUON_DEVTOOLS_APPLICATION_ID_EMPTY",
       "compactCode": "G1501",

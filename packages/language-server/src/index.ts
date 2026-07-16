@@ -2,7 +2,7 @@ import ts from 'typescript';
 import { getGluonDiagnostic, transformGluonModule } from '@gluonjs/compiler';
 
 export {
-  GLUON_PROJECT_ANALYSIS_SCHEMA,
+  PROJECT_ANALYSIS_SCHEMA,
   analyzeStaticGluonProject,
   type AnalysisConfidence,
   type GluonProjectAnalysis,
