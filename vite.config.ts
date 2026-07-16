@@ -118,6 +118,7 @@ export default defineConfig({
         'packages/reactivity/**',
         'packages/router/**',
         'packages/ssr/src/index.ts',
+        'packages/ssr/src/eleventy.ts',
         'packages/ssr/src/static.ts',
         'packages/ssr/src/streaming.ts',
         'packages/store/**',
