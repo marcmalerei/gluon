@@ -15,6 +15,9 @@ import { Dialog, Listbox, createFocusScope, q } from '@gluonjs/quarks';
 `q.<tag>()`, `quark()`, and `fragment()` preserve native HTML semantics. A
 factory never invents a role or accessible name; the caller owns every semantic
 requirement of the native element it selects. Void elements reject children.
+`q.textarea()` maps primitive `children` to the native `defaultValue` property
+because HTML parses textarea contents as raw text; use `.value` for controlled
+content. Template, Node, directive, and collection children are rejected.
 
 `QuarkProps<ElementType>` has no general string index signature. It derives
 native scalar values and explicit property/boolean bindings from the target DOM

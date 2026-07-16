@@ -19,6 +19,7 @@ export interface ShopOrder {
   readonly lines: readonly BagLine[];
   readonly total: number;
   readonly email: string;
+  readonly deliveryInstructions: string;
 }
 
 export const shopStoreDefinition = defineStore('shop', () => ({
@@ -28,7 +29,7 @@ export const shopStoreDefinition = defineStore('shop', () => ({
   searchQuery: '',
   configuration: createDefaultProductConfiguration(),
   bag: [] as BagLine[],
-  checkout: { email: '', name: '', address: '', city: '', postalCode: '' },
+  checkout: { email: '', name: '', address: '', city: '', postalCode: '', deliveryInstructions: '' },
   order: null as ShopOrder | null,
 }), {
   getters: (state) => ({
@@ -75,6 +76,7 @@ export const shopStoreDefinition = defineStore('shop', () => ({
         lines: store.bag.map((line) => ({ ...line, configuration: { ...line.configuration } })),
         total: store.bagTotal,
         email: store.checkout.email,
+        deliveryInstructions: store.checkout.deliveryInstructions,
       };
       store.order = order;
       store.bag = [];

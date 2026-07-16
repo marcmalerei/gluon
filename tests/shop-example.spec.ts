@@ -146,8 +146,8 @@ describe('GLUON GOODS reference shop', () => {
     expect(purchase.querySelector('svg')?.getAttribute('role')).toBe('img');
     expect(purchase.querySelector('svg')?.getAttribute('aria-label')).toBe('Secure checkout');
     expect(root.querySelectorAll('form')).toHaveLength(1);
-    expect(root.querySelectorAll('.checkout-field')).toHaveLength(5);
-    expect([...root.querySelectorAll<HTMLInputElement>('.checkout-input')].every((input) => (
+    expect(root.querySelectorAll('.checkout-field')).toHaveLength(6);
+    expect([...root.querySelectorAll<HTMLInputElement>('input.checkout-input')].every((input) => (
       input.required && input.closest('label')?.classList.contains('checkout-field')
     ))).toBe(true);
     expect(document.adoptedStyleSheets).toContain(formFieldStyles);
@@ -165,6 +165,9 @@ describe('GLUON GOODS reference shop', () => {
       input.value = value;
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }
+    const deliveryInstructions = root.querySelector<HTMLTextAreaElement>('textarea[name="deliveryInstructions"]')!;
+    deliveryInstructions.value = 'Leave with the workshop concierge.';
+    deliveryInstructions.dispatchEvent(new Event('input', { bubbles: true }));
     purchase.click();
     await settleShop();
     expect(router.currentRoute.value.path).toMatch(/^\/orders\/GG-/);
@@ -172,6 +175,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(root.querySelector('.order-confirmation')?.textContent).toContain('€189');
     expect(store.bagCount).toBe(0);
     expect(store.order?.lines[0]?.configuration.finish).toBe('Cobalt');
+    expect(store.order?.deliveryInstructions).toBe('Leave with the workshop concierge.');
     app.unmount();
   });
 
