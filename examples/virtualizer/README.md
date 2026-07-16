@@ -23,8 +23,11 @@ Run it from the repository root:
 
 ```sh
 npm run dev:virtualizer-example
+npm run build:virtualizer-example
+npm run preview:virtualizer-example
 ```
 
-Build verification is available through `npm run build:virtualizer-example`.
+The production preview is available at
+`http://127.0.0.1:4175/gluon/examples/virtualizer/`.
 Browser, SSR, hydration, public type, documentation, and cleanup evidence lives
 in the repository quality suite.

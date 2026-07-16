@@ -86,6 +86,7 @@ npm run dev:shop
 npm run build:shop
 npm run build:shop:server
 npm run build:shop:static
+npm run preview:shop
 npm run measure:shop
 ```
 
@@ -97,6 +98,9 @@ Compatible edits to exported page/components, the shop Store definition,
 `shopStyles`, `productConfiguratorStyles`, and functional bag-control setup
 update without a full reload;
 public-schema or constructor changes use the documented reload boundary.
+After `build:shop`, `preview:shop` serves the production client output at
+`http://127.0.0.1:4173/`. Use `npm run preview:examples` to list every supported
+production preview or `npm run preview:examples -- --all` to run them together.
 
 ## Design system
 
