@@ -13,6 +13,11 @@ other referenced assets. The server build emits the DOM-independent request
 renderer. The static build consumes both outputs and writes route directories
 under `examples/shop/dist-static`.
 
+`npm run check:shop-static` rebuilds the client, SSR server, and static output
+in that order inside Node without a browser `document`, then verifies the five
+static pages, three dynamic fallbacks, asset files, and hydratable state. This
+is the retained regression for browser-only code leaking into static generation.
+
 ## Static mode
 
 `generateStaticSite()` accepts explicit public URLs, an asset manifest, and the

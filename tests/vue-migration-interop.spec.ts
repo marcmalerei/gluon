@@ -135,7 +135,9 @@ test('preserves native slots, adopted styles, host identity, lifecycle retention
   expect(titleSlot.assignedNodes()).toEqual([title]);
   expect(defaultSlot.assignedNodes()).toEqual([facts]);
   expect(title.parentNode).toBe(element);
-  expect(shadow.adoptedStyleSheets).toEqual([productConfiguratorStyles]);
+  expect(shadow.adoptedStyleSheets).toHaveLength(1);
+  expect([...shadow.adoptedStyleSheets[0]!.cssRules].map((rule) => rule.cssText))
+    .toEqual([...productConfiguratorStyles.cssRules].map((rule) => rule.cssText));
   expect(shadow.adoptedStyleSheets.every((sheet) => sheet.cssRules.length > 0)).toBe(true);
   expect(shadow.querySelector('style')).toBeNull();
 

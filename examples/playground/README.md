@@ -8,7 +8,11 @@ imports repository internals; monorepo aliases live only in Vite/test config.
 ```sh
 npm run dev:playground
 npm run build:playground
+npm run preview:playground
 ```
+
+`preview:playground` serves the production build at
+`http://127.0.0.1:4174/gluon/playground/`.
 
 The default reproduction defines and renders a stateful Custom Element with the
 public `defineGluonElement` and `elementEvent` APIs. Re-running edited source

@@ -405,6 +405,7 @@ export const shopStyles = css`
     .shop-purchase-button svg { margin-inline-end: 0.35rem; }
     .checkout-field { display: grid; gap: 7px; font-size: 12px; }
     .checkout-input { min-height: 52px; padding: 0 14px; border: 1px solid var(--shop-rule); border-radius: 0; background: white; }
+    .checkout-textarea { min-height: 96px; padding-block: 14px; resize: vertical; font: inherit; }
     .checkout-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px; }
     .place-order { width: 100%; margin-top: 12px; }
     .order-summary { align-self: start; padding: 28px; border: 1px solid var(--shop-rule); }

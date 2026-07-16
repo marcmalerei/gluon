@@ -16,7 +16,7 @@ unchanged, Gluon does not reset a dirty live property.
 | Control | Controlled binding | Uncontrolled binding | Contract |
 | --- | --- | --- | --- |
 | Text-like `input` | `.value=${value}` | `value=${initial}` | A render restores the controlled value; a user edit survives an unchanged uncontrolled render. |
-| `textarea` | `.value=${value}` | `.defaultValue=${initial}` | Dynamic textarea child interpolation is unsupported because the HTML parser treats its contents as raw text. |
+| `textarea` | `.value=${value}` | `.defaultValue=${initial}` | Dynamic textarea child interpolation is unsupported because the HTML parser treats its contents as raw text. `q.textarea({ children: initial })` maps primitive text to `.defaultValue`. |
 | Checkbox | `.checked=${boolean}` | `?checked=${initial}` | Controlled state is restored; uncontrolled dirty state is preserved. |
 | Radio group | `.checked=${boolean}` on every member | `?checked=${initial}` | Native name/group exclusivity remains browser behavior. |
 | Single select | `.value=${string}` | `?selected=${initial}` on options | Controlled selection is restored; dirty uncontrolled selection is preserved. |

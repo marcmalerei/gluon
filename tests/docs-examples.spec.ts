@@ -29,7 +29,10 @@ test('runs the Vue 3 migration host around the production Gluon product element'
   const element = root.querySelector('gluon-product-configurator') as ProductConfiguratorElement;
   await element.updateComplete;
   expect(element.product?.slug).toBe('orbit-lamp');
-  expect(element.shadowRoot?.adoptedStyleSheets).toEqual([productConfiguratorStyles]);
+  const adoptedSheets = element.shadowRoot?.adoptedStyleSheets ?? [];
+  expect(adoptedSheets).toHaveLength(1);
+  expect([...adoptedSheets[0]!.cssRules].map((rule) => rule.cssText))
+    .toEqual([...productConfiguratorStyles.cssRules].map((rule) => rule.cssText));
   expect(element.shadowRoot?.querySelector('style')).toBeNull();
   expect(element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="title"]')?.assignedNodes()).toHaveLength(1);
 

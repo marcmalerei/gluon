@@ -82,6 +82,11 @@
     "dev:playground": "vite --config examples/playground/vite.config.ts",
     "dev:virtualizer-example": "vite --config examples/virtualizer/vite.config.ts",
     "dev:signals-example": "vite --config examples/signals/vite.config.ts",
+    "preview:shop": "node scripts/preview-examples.mjs shop",
+    "preview:playground": "node scripts/preview-examples.mjs playground",
+    "preview:virtualizer-example": "node scripts/preview-examples.mjs virtualizer",
+    "preview:signals-example": "node scripts/preview-examples.mjs signals",
+    "preview:examples": "node scripts/preview-examples.mjs",
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "dev:benchmark:components": "vite --config benchmarks/components/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
@@ -155,6 +160,8 @@
     "benchmark:shop-flow": "node scripts/run-shop-performance.mjs",
     "check:router-lazy": "node scripts/validate-router-lazy-build.mjs",
     "check:shop-boundaries": "node scripts/validate-shop-boundaries.mjs",
+    "check:shop-static": "npm run build:shop && npm run build:shop:server && npm run build:shop:static && node scripts/validate-shop-static-output.mjs",
+    "check:example-previews": "npm run build:shop && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && node scripts/validate-example-previews.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
     "check:create-gluon-fixtures": "node scripts/validate-create-gluon-fixtures.mjs",
     "check:vue-analyzer-fixtures": "npm run build:vue-analyzer && node scripts/generate-vue-analyzer-fixtures.mjs --check",
@@ -185,7 +192,7 @@
     "check:release-bootstrap": "node scripts/build-npm-bootstrap-artifacts.mjs --check",
     "check:release-contract": "node scripts/validate-release-contract.mjs",
     "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state",
-    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
+    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:example-previews && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
   },
   "devDependencies": {
     "@cyclonedx/cdxgen": "12.7.1",

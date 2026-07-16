@@ -142,6 +142,20 @@ describe('typed UI extensions', () => {
     expect(document.querySelector('button')?.getAttribute('vendor-future-key')).toBe('reviewed');
   });
 
+  it('renders textarea Quarks without raw-text child expressions', () => {
+    render(q.div({ children: [
+      q.textarea({ required: false, '.value': 'Controlled' }),
+      q.textarea({ children: 'Initial value' }),
+    ] }), document.body);
+
+    const textareas = document.querySelectorAll('textarea');
+    expect(textareas).toHaveLength(2);
+    expect(textareas[0]?.value).toBe('Controlled');
+    expect(textareas[1]?.defaultValue).toBe('Initial value');
+    expect(textareas[1]?.value).toBe('Initial value');
+    expect(() => q.textarea({ children: q.span({ children: 'Invalid' }) })).toThrow(/primitive text/i);
+  });
+
   it('forwards native extensions through the composed layers and preserves keyboard behavior', () => {
     const refs = {
       overlay: {} as { value?: HTMLDivElement },
