@@ -18,6 +18,28 @@ in that order inside Node without a browser `document`, then verifies the five
 static pages, three dynamic fallbacks, asset files, and hydratable state. This
 is the retained regression for browser-only code leaking into static generation.
 
+The optional `@gluonjs/ssr/eleventy` subpath registers a `.gluon` custom
+template format with Eleventy 3.1.6. The retained `build:shop:eleventy` fixture
+uses the same built `renderShopRequest()`, asset manifest, and hydration entry
+for `/`, `/shop`, and `/products/orbit-lamp`; it compares required visible
+content with Vite SSG and validates emitted assets, style carriers, resource
+hints, state, CSP nonce input, and hydration transport. Stateful product,
+checkout, and order families remain declared dynamic fallbacks.
+
+```js
+import { gluonEleventyPlugin } from '@gluonjs/ssr/eleventy';
+
+export default function (eleventyConfig) {
+  eleventyConfig.addPlugin(gluonEleventyPlugin, {
+    assets,
+    dynamicFallbacks: ['/products/:slug'],
+    createRequest: ({ url, assets, nonce }) => ({
+      render: () => renderShopRequest(url, { assets, nonce }),
+    }),
+  });
+}
+```
+
 ## Static mode
 
 `generateStaticSite()` accepts explicit public URLs, an asset manifest, and the

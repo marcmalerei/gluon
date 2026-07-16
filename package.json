@@ -50,7 +50,7 @@
     "@gluonjs/reactivity": "1.0.10"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
+    "build": "npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:ui": "npm run build:quarks && npm run build:atoms && npm run build:molecules && npm run build:organisms",
     "build:quarks": "npm run build --workspace @gluonjs/quarks",
@@ -72,6 +72,7 @@
     "build:shop": "vite build --config examples/shop/vite.config.ts",
     "build:shop:server": "vite build --config examples/shop/vite.config.ts --ssr src/server.ts --outDir dist-server",
     "build:shop:static": "node scripts/generate-shop-static.mjs",
+    "build:shop:eleventy": "node scripts/validate-eleventy-shop.mjs",
     "build:playground": "vite build --config examples/playground/vite.config.ts",
     "build:virtualizer-example": "vite build --config examples/virtualizer/vite.config.ts",
     "build:signals-example": "vite build --config examples/signals/vite.config.ts",
@@ -161,6 +162,7 @@
     "check:router-lazy": "node scripts/validate-router-lazy-build.mjs",
     "check:shop-boundaries": "node scripts/validate-shop-boundaries.mjs",
     "check:shop-static": "npm run build:shop && npm run build:shop:server && npm run build:shop:static && node scripts/validate-shop-static-output.mjs",
+    "check:eleventy-clean-install": "npm run build:ssr && node scripts/validate-eleventy-clean-install.mjs",
     "check:example-previews": "npm run build:shop && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && node scripts/validate-example-previews.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
     "check:create-gluon-fixtures": "node scripts/validate-create-gluon-fixtures.mjs",
@@ -194,9 +196,10 @@
     "check:release-bootstrap": "node scripts/build-npm-bootstrap-artifacts.mjs --check",
     "check:release-contract": "node scripts/validate-release-contract.mjs",
     "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state",
-    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:example-previews && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
+    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:eleventy-clean-install && npm run check:example-previews && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
   },
   "devDependencies": {
+    "@11ty/eleventy": "3.1.6",
     "@cyclonedx/cdxgen": "12.7.1",
     "@jridgewell/trace-mapping": "^0.3.31",
     "@preact/signals-core": "1.14.4",

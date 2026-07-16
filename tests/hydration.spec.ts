@@ -28,6 +28,8 @@ import {
   hydrateTemplate,
 } from '@gluonjs/ssr/hydration';
 import { createStyleManifest, prepareForHydration, renderProgressively, renderStyleCarriers } from '@gluonjs/ssr';
+import { renderEleventyPage } from '@gluonjs/ssr/eleventy';
+import type { SsrRequestResult } from '@gluonjs/ssr';
 import {
   injectProductConfiguratorShadow,
   renderShopRequest,
@@ -192,6 +194,35 @@ describe('SSR hydration', () => {
     expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopStyles);
     document.adoptedStyleSheets = previousSheets;
+  });
+
+  it('hydrates the canonical product route transported through the Eleventy adapter', async () => {
+    history.replaceState({}, '', '/products/orbit-lamp');
+    let response: SsrRequestResult | undefined;
+    const documentHtml = await renderEleventyPage({
+      assets: { entry: '/assets/app.js', imports: ['/assets/vendor.js'] },
+      createRequest: ({ url, assets, nonce }) => ({
+        render: () => renderShopRequest(url, { assets, nonce }),
+      }),
+      document: (context) => {
+        response = context.result;
+        return `<!doctype html><head>${context.result.head}</head><body><div id="app">${context.result.html}</div>${context.result.stateScript}</body>`;
+      },
+    }, '/products/orbit-lamp', 'products/orbit-lamp/index.gluon', {});
+    expect(documentHtml).toContain('Orbit Lamp');
+    expect(documentHtml).toContain('data-gluon-state');
+    const server = await renderSsrFixture(async () => response!, { name: 'shop-eleventy-product' });
+    const fixture = await hydrateSsrFixture(server, {
+      hydrate: ({ container, stateRoot }) => hydrateShop(container, stateRoot),
+      dispose: (hydrated) => {
+        hydrated.mount.unmount();
+        hydrated.uiOwner.dispose();
+        hydrated.router.destroy();
+        hydrated.storeManager.dispose();
+      },
+    });
+    expect(fixture.hydrated.hydration).toMatchObject({ retained: true, recovered: false });
+    expect(fixture.get('#product-title').textContent).toContain('Orbit Lamp');
   });
 
   it('preserves an existing open declarative shadow root through element upgrade', async () => {

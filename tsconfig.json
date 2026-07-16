@@ -26,6 +26,7 @@
       "@gluonjs/router": ["packages/router/src/index.ts"],
       "@gluonjs/router/memory": ["packages/router/src/memory.ts"],
       "@gluonjs/ssr": ["packages/ssr/src/index.ts"],
+      "@gluonjs/ssr/eleventy": ["packages/ssr/src/eleventy.ts"],
       "@gluonjs/ssr/hydration": ["packages/ssr/src/hydration.ts"],
       "@gluonjs/ssr/static": ["packages/ssr/src/static.ts"],
       "@gluonjs/ssr/streaming": ["packages/ssr/src/streaming.ts"],

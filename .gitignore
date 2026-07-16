@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist-server/
 dist-static/
+dist-eleventy/
 coverage/
 playwright-report/
 test-results/

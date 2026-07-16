@@ -40,9 +40,11 @@ import {
   renderToChunks,
   renderToString,
   serializeSsrState,
+  type SsrRequestResult,
 } from '@gluonjs/ssr';
 import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
+import { gluonEleventyPlugin, renderEleventyPage } from '@gluonjs/ssr/eleventy';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 import { renderSsrFixture } from '../packages/test-utils/src/ssr.js';
 import { ClassQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-class.js';
@@ -54,6 +56,104 @@ import { Button } from '@gluonjs/atoms';
 import { Card } from '@gluonjs/molecules';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
+  it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {
+    const disposed: string[] = [];
+    const assets = { entry: '/assets/app.js', imports: ['/assets/vendor.js'] };
+    const options = {
+      assets: async () => assets,
+      nonce: (data: { readonly nonce: string }) => data.nonce,
+      csp: "default-src 'self'",
+      hydrationEntry: '/assets/hydrate.js',
+      createRequest: ({ url, signal }: { readonly url: string; readonly signal: AbortSignal }) => ({
+        render: async () => {
+          await Promise.resolve();
+          if (url === '/failure') throw new Error('render failed');
+          return renderShopRequest(url, { assets, nonce: 'request-nonce' });
+        },
+        dispose: () => disposed.push(`${url}:${signal.aborted}`),
+      }),
+    };
+    const [home, product] = await Promise.all([
+      renderEleventyPage(options, '/', 'index.gluon', { nonce: 'home' }),
+      renderEleventyPage(options, '/products/orbit-lamp', 'product.gluon', { nonce: 'product' }),
+    ]);
+    expect(home).toContain('Objects that work the way you do.');
+    expect(product).toContain('Orbit Lamp');
+    expect(product).toContain('data-gluon-style=');
+    expect(product).toContain('Content-Security-Policy');
+    expect(product).toContain('src="/assets/hydrate.js"');
+    expect(disposed).toEqual(expect.arrayContaining(['/:false', '/products/orbit-lamp:false']));
+    await expect(renderEleventyPage(options, '/failure', 'failure.gluon', { nonce: 'failure' }))
+      .rejects.toThrow('render failed');
+    expect(disposed).toContain('/failure:true');
+
+    const external = new AbortController();
+    let requestReady!: () => void;
+    const ready = new Promise<void>((resolve) => { requestReady = resolve; });
+    const aborted = renderEleventyPage({
+      assets,
+      signal: external.signal,
+      createRequest: ({ signal }) => ({
+        render: () => new Promise<SsrRequestResult>((_resolve, reject) => {
+          requestReady();
+          signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+        }),
+        dispose: () => disposed.push(`external:${signal.aborted}`),
+      }),
+    }, '/', 'abort.gluon', {});
+    await ready;
+    external.abort(new Error('build aborted'));
+    await expect(aborted).rejects.toThrow('build aborted');
+    expect(disposed).toContain('external:true');
+  });
+
+  it('registers the Eleventy extension, route mapping, fallbacks, and validation boundaries', async () => {
+    let extension: import('@gluonjs/ssr/eleventy').EleventyExtension | undefined;
+    const formats: string[] = [];
+    const globals = new Map<string, unknown>();
+    gluonEleventyPlugin({
+      addTemplateFormats: (format) => formats.push(format),
+      addExtension: (_format, definition) => { extension = definition; },
+      addGlobalData: (name, value) => globals.set(name, value),
+    }, {
+      inputExtension: '.gluon',
+      assets: { entry: '/app.js' },
+      dynamicFallbacks: ['/products/:slug'],
+      route: (_content, _path, data) => ({ url: String(data.route), dynamic: data.dynamic === true }),
+      createRequest: () => ({ render: () => renderShopRequest('/') }),
+      document: ({ result, url }) => `<main data-route="${url}">${result.html}</main>`,
+    });
+    expect(formats).toEqual(['gluon']);
+    expect(globals.get('gluonDynamicFallbacks')).toEqual(['/products/:slug']);
+    const render = await extension!.compile('ignored', 'page.gluon');
+    expect(await render({ route: '/' })).toContain('data-route="/"');
+    await expect(render({ route: '/products/one', dynamic: true })).rejects.toThrow('deployment fallback');
+    expect(() => gluonEleventyPlugin({ addTemplateFormats() {}, addExtension() {} }, {
+      inputExtension: '../bad', assets: { entry: '/app.js' }, createRequest: () => ({ render: () => renderShopRequest('/') }),
+    })).toThrow('Invalid Eleventy input extension');
+    await expect(renderEleventyPage({
+      assets: { entry: 'https://outside.test/app.js' }, createRequest: () => ({ render: () => renderShopRequest('/') }),
+    }, '/', 'bad.gluon', {})).rejects.toThrow('root-relative');
+
+    const snapshotResult = {
+      html: '<main>Snapshot</main>', state: '{}',
+      stateScript: '<script type="application/json" data-gluon-state>{}</script>',
+      head: '<style data-gluon-style="app">main{display:block}</style>',
+      styles: { version: 1, entries: [] }, router: { location: '/' }, store: { version: 1, stores: {} },
+    } as unknown as SsrRequestResult;
+    expect(await renderEleventyPage({
+      assets: { entry: '/assets/app.js' }, nonce: 'nonce', csp: "default-src 'self'",
+      hydrationEntry: '/assets/hydrate.js', createRequest: () => ({ render: () => snapshotResult }),
+    }, '/', 'snapshot.gluon', {})).toBe(
+      '<!doctype html><html lang="en"><head><meta charset="UTF-8">'
+      + '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'">'
+      + '<style data-gluon-style="app">main{display:block}</style></head>'
+      + '<body><div id="app"><main>Snapshot</main></div>'
+      + '<script type="application/json" data-gluon-state>{}</script>'
+      + '<script type="module" src="/assets/hydrate.js"></script></body></html>',
+    );
+  });
+
   it('serializes composed functional templates through the unchanged public template contract', async () => {
     const Panel = (props: { readonly title: string; readonly children: import('@gluonjs/core').TemplateValue }) => html`
       <section><h2>${props.title}</h2>${props.children}</section>

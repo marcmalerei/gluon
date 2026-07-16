@@ -69,6 +69,17 @@
       "evidence": ["src/runtime.ts", "docs/dom-runtime.md", "docs/security.md"]
     },
     {
+      "id": "eleventy-prerendering",
+      "status": "accepted-boundary",
+      "controls": [
+        "The optional adapter accepts only absolute same-origin route paths and root-relative asset and hydration URLs.",
+        "Every render receives an isolated AbortSignal and request owner; success, failure, and external abort all execute deterministic disposal.",
+        "The adapter transports SSR style carriers, state, and resource hints unchanged and escapes optional CSP and hydration-entry attributes."
+      ],
+      "residualRisk": "Applications own Eleventy data trust, CSP policy correctness, custom document output, deployment fallback routing, and asset-manifest provenance.",
+      "evidence": ["tests-node/ssr.spec.ts", "tests/hydration.spec.ts", "scripts/validate-eleventy-shop.mjs", "scripts/validate-eleventy-clean-install.mjs", "docs/deployment.md"]
+    },
+    {
       "id": "gluon-project-analysis",
       "status": "accepted-boundary",
       "controls": [

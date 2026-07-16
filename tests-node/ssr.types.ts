@@ -13,6 +13,7 @@ import {
 import { hydrateApplication, hydrateTemplate } from '../packages/ssr/dist/hydration.js';
 import { renderProgressiveReadableStream, renderToReadableStream } from '../packages/ssr/dist/streaming.js';
 import { generateStaticSite } from '../packages/ssr/dist/static.js';
+import { gluonEleventyPlugin, renderEleventyPage } from '../packages/ssr/dist/eleventy.js';
 
 class GreetingElement extends GluonElement {
   static override readonly properties = { name: String };
@@ -58,6 +59,19 @@ void generateStaticSite({
   assets: { entry: '/assets/app.js' },
   render: async () => request,
 });
+gluonEleventyPlugin({
+  addTemplateFormats() {},
+  addExtension() {},
+}, {
+  assets: { entry: '/assets/app.js' },
+  createRequest: ({ url, signal }) => ({
+    render: () => renderRequest({ url, createApp: () => createApp(() => html`${signal.aborted}`) }),
+  }),
+});
+void renderEleventyPage({
+  assets: { entry: '/assets/app.js' },
+  createRequest: () => ({ render: async () => request }),
+}, '/', 'index.gluon', {});
 
 // @ts-expect-error url is required for request ownership
 renderRequest({ createApp: () => createApp(() => html`Missing URL`) });

@@ -9,6 +9,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added the optional Eleventy prerendering adapter and a canonical GLUON GOODS
+  build proving route parity, assets, SSR styles/state, and browser hydration.
 - Added a complete static Gluon project inventory API and CLI with explicit
   evidence confidence, retained GLUON GOODS output, and clean-install gates.
 - Added `LayoutTransition()` for render-to-render direct-root geometry,

@@ -20,6 +20,7 @@ export default defineConfig({
       '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),
       '@gluonjs/ssr/streaming': resolve(import.meta.dirname, 'packages/ssr/src/streaming.ts'),
       '@gluonjs/ssr/static': resolve(import.meta.dirname, 'packages/ssr/src/static.ts'),
+      '@gluonjs/ssr/eleventy': resolve(import.meta.dirname, 'packages/ssr/src/eleventy.ts'),
       '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
     },
@@ -29,7 +30,7 @@ export default defineConfig({
     include: ['tests-node/ssr.spec.ts'],
     coverage: {
       provider: 'v8',
-      include: ['packages/ssr/src/index.ts', 'packages/ssr/src/static.ts', 'packages/ssr/src/streaming.ts'],
+      include: ['packages/ssr/src/eleventy.ts', 'packages/ssr/src/index.ts', 'packages/ssr/src/static.ts', 'packages/ssr/src/streaming.ts'],
       reportsDirectory: 'coverage/ssr',
       reporter: ['text', 'html'],
       thresholds: {

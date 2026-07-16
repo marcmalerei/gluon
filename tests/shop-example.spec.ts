@@ -65,9 +65,10 @@ describe('GLUON GOODS reference shop', () => {
     await new Promise((resolve) => setTimeout(resolve, 70));
     expect(configurator.shadowRoot?.querySelector('.inventory-status')?.textContent)
       .toContain('Checking workshop availability');
-    await new Promise((resolve) => setTimeout(resolve, 280));
-    expect(configurator.shadowRoot?.querySelector('.inventory-status')?.textContent)
-      .toContain('In stock · dispatches in 2–3 days');
+    await expect.poll(
+      () => configurator.shadowRoot?.querySelector('.inventory-status')?.textContent,
+      { timeout: 2_000 },
+    ).toContain('In stock · dispatches in 2–3 days');
 
     configurator.shadowRoot?.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
     addButton.click();

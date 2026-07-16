@@ -60,7 +60,7 @@
       "directory": "packages/ssr",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./hydration", "./static", "./streaming"],
+      "exports": [".", "./eleventy", "./hydration", "./static", "./streaming"],
       "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/store"]
     },
     {

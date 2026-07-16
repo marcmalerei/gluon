@@ -75,6 +75,15 @@ validates component carrier count, identity, order, digest, content, and target,
 then lets the renderer adopt exact client sheet objects before removing
 carriers. Component sheets release with the hydrated render owner.
 
+`@gluonjs/ssr/eleventy` registers a custom Eleventy template format through
+`gluonEleventyPlugin()`. Route files contain only public URLs; every page calls
+an application-supplied request factory with route data, the asset manifest,
+nonce, and an isolated abort signal. The adapter transports the unchanged SSR
+result, optional CSP input and hydration entry, always disposes the request,
+and publishes configured dynamic fallbacks as Eleventy global data. It has no
+runtime dependency on Eleventy and can be tested directly with
+`renderEleventyPage()`.
+
 The maintained `create-gluon --ui --ssr` application composes these ownership
 paths without a second aggregate manifest: `createUiStyleSelection()` supplies
 the shared carriers, request rendering derives the exact Button carrier, and a
