@@ -9,6 +9,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added deterministic production preview commands for every runnable example,
+  an all-examples launcher, HTTP smoke verification, and a Node-only static
+  shop build gate covering routes, fallbacks, assets, and hydration state.
 - Added optional `@gluonjs/reactivity/signals` and
   `@gluonjs/reactivity/preact-signals` adapters with explicit lifecycle,
   coalesced scheduling, realm validation, SSR-safe disconnected reads, a real

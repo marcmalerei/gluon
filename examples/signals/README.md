@@ -8,7 +8,10 @@ unmounting the Gluon application disconnects both subscriptions.
 ```sh
 npm install
 npm run dev:signals-example
+npm run build:signals-example
+npm run preview:signals-example
 ```
 
-Open the printed Vite URL. `npm run build:signals-example` produces the
-production build, and `tests/signals-example.spec.ts` verifies both controls.
+Open the printed Vite URL. The production preview uses
+`http://127.0.0.1:4176/gluon/examples/signals/`, and
+`tests/signals-example.spec.ts` verifies both controls.

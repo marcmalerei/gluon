@@ -1,5 +1,16 @@
 # Quality gates
 
+## Production example previews
+
+`npm run preview:examples` lists the supported production previews and their
+deterministic URLs. Pass one or more names, or `--all`; `--host` overrides the
+listen host and `--port` selects the single port or multi-preview base port.
+`npm run check:example-previews` builds and serves the shop, Playground,
+virtualizer, and Signals examples and fetches each production HTML entry.
+
+`npm run check:shop-static` separately proves that the complete shop client,
+SSR-server, and static-generation sequence remains Node-safe and hydratable.
+
 Issue #38 established blocking repository, Playwright engine, Node runtime,
 security, accessibility, retention, performance-evidence, and shop-budget jobs.
 
