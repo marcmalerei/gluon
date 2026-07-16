@@ -278,7 +278,8 @@ export function quark<TagName extends string>(
   if (cached) return cached as unknown as QuarkFactory<TagName, ElementFor<TagName>>;
 
   const isVoid = voidTags.has(tagName);
-  const strings = createQuarkStrings(tagName, isVoid);
+  const isTextarea = tagName === 'textarea';
+  const strings = createQuarkStrings(tagName, isVoid, isTextarea);
   const factory = ((props: QuarkProps<Element> = {}) => {
     const { children, ...attributes } = props;
     if (isVoid && children != null && children !== false && children !== nothing) {
@@ -286,12 +287,17 @@ export function quark<TagName extends string>(
     }
 
     const merged = mergeProps(
-      { class: { gluon: true, quark: true } },
+      {
+        class: { gluon: true, quark: true },
+        ...(isTextarea && hasQuarkChildren(children)
+          ? { '.defaultValue': textareaDefaultValue(children) }
+          : {}),
+      },
       attributes,
     );
     return new TemplateResult(
       strings,
-      isVoid ? [merged] : [merged, children ?? nothing],
+      isVoid || isTextarea ? [merged] : [merged, children ?? nothing],
     );
   }) as QuarkFactory<string, Element>;
 
@@ -324,10 +330,32 @@ function createFragmentStrings(): TemplateStringsArray {
   return fragmentStrings;
 }
 
-function createQuarkStrings(tagName: string, isVoid: boolean): TemplateStringsArray {
+function createQuarkStrings(
+  tagName: string,
+  isVoid: boolean,
+  isTextarea: boolean,
+): TemplateStringsArray {
   return isVoid
     ? createTemplateStrings([`<${tagName} ...=`, '>'])
+    : isTextarea
+      ? createTemplateStrings([`<${tagName} ...=`, `></${tagName}>`])
     : createTemplateStrings([`<${tagName} ...=`, '>', `</${tagName}>`]);
+}
+
+function hasQuarkChildren(children: TemplateValue | undefined): boolean {
+  return children != null && children !== false && children !== nothing;
+}
+
+function textareaDefaultValue(children: TemplateValue): string {
+  if (
+    typeof children === 'string'
+    || typeof children === 'number'
+    || typeof children === 'bigint'
+    || children === true
+  ) {
+    return String(children);
+  }
+  throw new TypeError('Textarea quark children must be primitive text; use .value for controlled content.');
 }
 
 function createTemplateStrings(parts: readonly string[]): TemplateStringsArray {

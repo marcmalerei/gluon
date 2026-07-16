@@ -8,6 +8,7 @@ import {
 import { html, svg, type TemplateResult } from '@gluonjs/core';
 import { FormField, defineMolecule } from '@gluonjs/molecules';
 import { defineOrganism } from '@gluonjs/organisms';
+import { q } from '@gluonjs/quarks';
 
 const checkoutLock = defineIcon({
   name: 'checkout-lock',
@@ -85,7 +86,7 @@ export const PurchaseAction = defineMolecule(({
   ],
 }), 'PurchaseAction');
 
-export type CheckoutFieldName = 'email' | 'name' | 'address' | 'postalCode' | 'city';
+export type CheckoutFieldName = 'email' | 'name' | 'address' | 'postalCode' | 'city' | 'deliveryInstructions';
 
 export interface CheckoutExperienceProps {
   readonly values: Readonly<Record<CheckoutFieldName, string>>;
@@ -122,6 +123,22 @@ export const CheckoutExperience = defineOrganism((props: CheckoutExperienceProps
             autocomplete: 'address-level2',
           })}
         </div>
+        ${q.label({
+          class: 'checkout-field',
+          children: [
+            'Delivery instructions (optional)',
+            q.textarea({
+              class: ['checkout-input', 'checkout-textarea'],
+              name: 'deliveryInstructions',
+              rows: 3,
+              '.value': props.values.deliveryInstructions,
+              onInput: (event) => props.onFieldInput(
+                'deliveryInstructions',
+                (event.currentTarget as HTMLTextAreaElement).value,
+              ),
+            }),
+          ],
+        })}
         ${PurchaseAction({ totalLabel: props.totalLabel })}
       </form>
     </div>
