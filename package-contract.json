@@ -102,7 +102,7 @@
       "state": "current",
       "environment": "node",
       "exports": ["."],
-      "bins": ["gluon-language-server", "gluon-template-check"],
+      "bins": ["gluon-language-server", "gluon-project-analyze", "gluon-template-check"],
       "dependencies": ["@gluonjs/compiler"]
     },
     {

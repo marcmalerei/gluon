@@ -69,6 +69,17 @@
       "evidence": ["src/runtime.ts", "docs/dom-runtime.md", "docs/security.md"]
     },
     {
+      "id": "gluon-project-analysis",
+      "status": "accepted-boundary",
+      "controls": [
+        "The CLI realpath-checks one root, skips symbolic links and generated or dependency directories, and applies fixed file and byte limits.",
+        "Application modules are parsed as inert source and are never imported, executed, transformed, or written.",
+        "The report contains project-relative locations and explicit exact, structural, or indeterminate confidence without timestamps or host data."
+      ],
+      "residualRisk": "Static evidence cannot prove dynamic route, Store, style, SSR, or runtime behavior; indeterminate records require application review.",
+      "evidence": ["tests-node/language-server.spec.ts", "scripts/generate-shop-project-analysis.mjs", "scripts/validate-project-analyzer-clean-install.mjs", "docs/language-tooling.md"]
+    },
+    {
       "id": "vue-source-analysis",
       "status": "accepted-boundary",
       "controls": [
