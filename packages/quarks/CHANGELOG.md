@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-16
+
+### Fixed
+
 - Render `q.textarea()` without a raw-text child expression, map primitive
   children to `defaultValue`, and preserve explicit controlled `.value`
   bindings.

@@ -108,6 +108,11 @@ mapping, dynamic fallback metadata, path/asset validation, CSP/nonce inputs,
 and custom documents. The browser hydration suite transports the real product
 request through `renderEleventyPage()` and requires identity-preserving shop
 hydration. The adapter package subpath itself has no Eleventy dependency.
+The clean-install gate installs packed local Core, Reactivity, Router, Store,
+and SSR release archives together so an unpublished lockstep candidate never
+resolves its exact internal dependencies from the public registry.
+The project-analyzer clean-install gate applies the same release-candidate
+boundary to its packed local Compiler and Language Server archives.
 The canonical shop flow waits for the observable settled inventory copy with a
 bounded diagnostic deadline; it does not treat a fixed scheduler delay as
 proof that the async availability request completed.
@@ -144,7 +149,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.0.10/examples/ui.html` with the other versioned documentation examples.
+`/1.1.0/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 15 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,

@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/language-server",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "Gluon template language service, LSP server, and CI checker.",
   "private": false,
   "type": "module",
@@ -40,7 +40,7 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/compiler": "1.0.10",
+    "@gluonjs/compiler": "1.1.0",
     "typescript": "^5.7.0"
   },
   "scripts": {
