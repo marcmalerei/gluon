@@ -1,6 +1,15 @@
 import ts from 'typescript';
 import { getGluonDiagnostic, transformGluonModule } from '@gluonjs/compiler';
 
+export {
+  GLUON_PROJECT_ANALYSIS_SCHEMA,
+  analyzeStaticGluonProject,
+  type AnalysisConfidence,
+  type GluonProjectAnalysis,
+  type ProjectAnalysisDiagnostic,
+  type ProjectEvidence,
+} from './project-analyzer.js';
+
 export type TemplateDiagnosticCode =
   | 'GLUON_ELEMENT_SETUP_CLEANUP_MISSING'
   | 'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED'

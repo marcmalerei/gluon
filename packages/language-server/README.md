@@ -9,6 +9,13 @@ The Gluon language server analyzes imported `html`, `svg`, `css`, and aliased
 code. The public service and the
 `gluon-template-check` CI command share the same two-pass project analyzer.
 
+`analyzeStaticGluonProject()` and `gluon-project-analyze` expose the broader
+versioned project report. It inventories source files, component shapes,
+public Custom Element contracts, templates and bindings, constructable style
+dependencies, literal routes and stores, SSR/hydration API boundaries, and the
+same diagnostics used by the editor. Every evidence record is marked `exact`,
+`structural`, or `indeterminate`; the analyzer never imports application code.
+
 Diagnostics cover unknown Custom Elements, declared Custom Element properties,
 events, and named light-DOM slots, ARIA names, invalid binding positions, void-element children, and
 inline style elements. `defineElement()` declarations expose tag definitions,
@@ -29,6 +36,7 @@ diagnostic catalog shared with the Playground and Devtools reference.
 
 ```sh
 gluon-template-check src
+gluon-project-analyze src > project-analysis.json
 gluon-language-server --stdio
 ```
 

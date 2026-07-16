@@ -20,6 +20,7 @@
   "sideEffects": false,
   "bin": {
     "gluon-language-server": "./dist/server-cli.js",
+    "gluon-project-analyze": "./dist/project-analyze-cli.js",
     "gluon-template-check": "./dist/check-cli.js"
   },
   "exports": {

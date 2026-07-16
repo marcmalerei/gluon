@@ -161,6 +161,15 @@ package archives rather than relying only on source-tree typechecks.
 
 ## Report-only Vue analyzer gate
 
+The preceding `npm run check:project-analysis` gate builds the public language
+tooling package, analyzes `examples/shop/src` without executing it, and requires
+the retained version-1 JSON report to remain byte-for-byte current with files,
+Custom Elements, templates, bindings, styles, routes, stores, SSR boundaries,
+shared diagnostics, and evidence confidence. The language-server suite covers
+determinism and indeterminate dynamic evidence. The clean-install gate packs
+the package, installs it in an empty consumer, runs `gluon-project-analyze`,
+and imports the public API and schema.
+
 `npm run test:vue-analyzer` builds the Node package and verifies deterministic
 human/JSON output, schema validation, supported/unsupported/malformed input,
 the production Vue host, exact CLI exit codes, invalid UTF-8, fixed file limits,

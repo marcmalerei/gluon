@@ -1123,21 +1123,27 @@
       "code": [
         "import {",
         "  GluonLanguageService,",
+        "  GLUON_PROJECT_ANALYSIS_SCHEMA,",
         "  analyzeGluonDocument,",
         "  analyzeGluonProject,",
+        "  analyzeStaticGluonProject,",
         "  declarationsFromCustomElementsManifest,",
         "  type CompletionItem,",
         "  type CustomElementDeclaration,",
         "  type DocumentAnalysis,",
+        "  type GluonProjectAnalysis,",
         "  type Hover,",
         "  type Location,",
         "  type Position,",
         "  type ProjectDocument,",
+        "  type ProjectAnalysisDiagnostic,",
+        "  type ProjectEvidence,",
         "  type Range,",
         "  type TemplateDiagnostic,",
         "  type TemplateDiagnosticCode,",
         "  type TextEdit,",
         "  type WorkspaceEdit,",
+        "  type AnalysisConfidence,",
         "} from '@gluonjs/language-server';",
         "",
         "const component = {",
@@ -1155,6 +1161,11 @@
         "  text: `import { html } from '@gluonjs/core'; export const Page = () => html\\`<product-card .name=\\${'Lamp'}></product-card>\\`;`,",
         "} satisfies ProjectDocument;",
         "const project: readonly DocumentAnalysis[] = analyzeGluonProject([component, page]);",
+        "const inventory: GluonProjectAnalysis = analyzeStaticGluonProject([component, page]);",
+        "const confidence: AnalysisConfidence | undefined = inventory.files[0]?.confidence;",
+        "const evidence: ProjectEvidence<{ readonly language: 'javascript' | 'typescript' }> | undefined = inventory.files[0];",
+        "const projectDiagnostic: ProjectAnalysisDiagnostic | undefined = inventory.diagnostics[0];",
+        "const schemaVersion = GLUON_PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const;",
         "const direct = analyzeGluonDocument(page.uri, page.text, project[0]?.declarations);",
         "const declaration: CustomElementDeclaration | undefined = project[0]?.declarations[0];",
         "const diagnostic: TemplateDiagnostic | undefined = direct.diagnostics[0];",
@@ -1173,7 +1184,7 @@
         "const locations: readonly Location[] = service.definition(page.uri, position);",
         "const edit: WorkspaceEdit | undefined = service.rename(page.uri, position, 'catalog-card');",
         "const textEdit: TextEdit = { range, newText: 'catalog-card' };",
-        "console.log(declaration, code, manifestDeclarations, completions, hover, locations, edit, textEdit);"
+        "console.log(declaration, code, manifestDeclarations, completions, hover, locations, edit, textEdit, confidence, evidence, projectDiagnostic, schemaVersion);"
       ]
     },
     "language-service-protocol": {
@@ -3071,6 +3082,10 @@
       "recipe": "language-service-analysis",
       "description": "Run two-pass declaration discovery and cross-file template validation over an explicit in-memory project:"
     },
+    "packages/language-server/src/functions/analyzeStaticGluonProject.md": {
+      "recipe": "language-service-analysis",
+      "description": "Produce a deterministic versioned inventory of verified project files, components, elements, templates, bindings, styles, routes, stores, SSR boundaries, and shared diagnostics without executing modules:"
+    },
     "packages/language-server/src/functions/declarationsFromCustomElementsManifest.md": {
       "recipe": "language-service-analysis",
       "description": "Convert supported Custom Elements Manifest declarations into tags, properties, events, and slots usable by editor analysis:"
@@ -3086,6 +3101,10 @@
     "packages/language-server/src/interfaces/DocumentAnalysis.md": {
       "recipe": "language-service-analysis",
       "description": "Consume the immutable URI, template diagnostics, and Custom Element declarations produced for one document:"
+    },
+    "packages/language-server/src/interfaces/GluonProjectAnalysis.md": {
+      "recipe": "language-service-analysis",
+      "description": "Consume the complete immutable version-1 static project inventory grouped by supported evidence category:"
     },
     "packages/language-server/src/interfaces/Hover.md": {
       "recipe": "language-service-analysis",
@@ -3110,6 +3129,22 @@
     "packages/language-server/src/interfaces/ProjectDocument.md": {
       "recipe": "language-service-analysis",
       "description": "Supply one URI and in-memory source text to project-wide CI or editor analysis:"
+    },
+    "packages/language-server/src/interfaces/ProjectAnalysisDiagnostic.md": {
+      "recipe": "language-service-analysis",
+      "description": "Link one shared template diagnostic to its project-relative file, line, and exact evidence confidence:"
+    },
+    "packages/language-server/src/interfaces/ProjectEvidence.md": {
+      "recipe": "language-service-analysis",
+      "description": "Read one inventory value together with its explicit confidence and project-relative source location:"
+    },
+    "packages/language-server/src/type-aliases/AnalysisConfidence.md": {
+      "recipe": "language-service-analysis",
+      "description": "Distinguish literal exact facts, structurally inferred facts, and dynamic evidence that remains indeterminate:"
+    },
+    "packages/language-server/src/variables/GLUON_PROJECT_ANALYSIS_SCHEMA.md": {
+      "recipe": "language-service-analysis",
+      "description": "Validate or advertise the machine-readable version-1 project-analysis report contract:"
     },
     "packages/language-server/src/interfaces/Range.md": {
       "recipe": "language-service-analysis",

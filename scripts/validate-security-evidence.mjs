@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const model = JSON.parse(await readFile(resolve(root, 'quality/security-threat-model.json'), 'utf8'));
-const requiredAreas = ['html', 'urls', 'styles', 'ssr-state', 'csp', 'trusted-types', 'vue-source-analysis', 'component-generation'];
+const requiredAreas = ['html', 'urls', 'styles', 'ssr-state', 'csp', 'trusted-types', 'gluon-project-analysis', 'vue-source-analysis', 'component-generation'];
 const allowedStatuses = new Set(['mitigated', 'accepted-boundary', 'not-claimed']);
 
 if (model.schemaVersion !== 1) throw new Error('security threat model schemaVersion must be 1');

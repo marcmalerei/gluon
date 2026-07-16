@@ -70,9 +70,11 @@ packages/test-utils/
 
 packages/language-server/
 ├── src/index.ts        Shared HTML/SVG/CSS analysis and editor operations
+├── src/project-analyzer.ts Versioned static project inventory and confidence
 ├── src/protocol.ts     VS Code-independent LSP request and notification handling
 ├── src/server-cli.ts   Content-Length framed stdio server
-└── src/check-cli.ts    Project-level CI diagnostic command
+├── src/check-cli.ts    Project-level CI diagnostic command
+└── src/project-analyze-cli.ts Bounded zero-write JSON inventory command
 
 packages/vue-migration-analyzer/
 ├── src/index.ts        Root-bounded discovery, deterministic reports, formatting
@@ -99,6 +101,7 @@ examples/shop/
 ├── src/state.ts        Official per-application Store definition and bag actions
 ├── src/styles.ts       Document-level constructable stylesheet design system
 ├── assets/             Production product and editorial imagery
+├── project-analysis.json Retained static project acceptance report
 └── design/             Accepted concepts and verified browser renders
 
 examples/playground/

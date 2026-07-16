@@ -1,0 +1,2287 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "data.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "hydrate.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "inventory-signals.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "main.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "product-configuration.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "server.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "state.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "styles.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 1
+    }
+  ],
+  "components": [
+    {
+      "value": {
+        "name": "ProductConfiguratorElement",
+        "kind": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 255
+    }
+  ],
+  "elements": [
+    {
+      "value": {
+        "tagName": "gluon-product-add-action",
+        "properties": [],
+        "events": [
+          "activate"
+        ],
+        "slots": [
+          "default"
+        ]
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 33
+    },
+    {
+      "value": {
+        "tagName": "gluon-product-configurator",
+        "properties": [
+          "product",
+          "configuration",
+          "required",
+          "disabled"
+        ],
+        "events": [],
+        "slots": []
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 254
+    }
+  ],
+  "templates": [
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 86
+    },
+    {
+      "value": {
+        "kind": "css"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 23
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 65
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 109
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 41
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 43
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 48
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 49
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 54
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 73
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 88
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 109
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 126
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 128
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 149
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 164
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 167
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 172
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 178
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 202
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 211
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 215
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 216
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 217
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 231
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 267
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 284
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 292
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 293
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 4
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 10
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 17
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 23
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 29
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "icons.ts",
+      "line": 33
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 26
+    },
+    {
+      "value": {
+        "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 31
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 62
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 94
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 148
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 173
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 177
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 178
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 197
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 204
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 215
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 219
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 43
+    },
+    {
+      "value": {
+        "kind": "css"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 76
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 387
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 389
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 394
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 395
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 422
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 425
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 436
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 491
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 505
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 520
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 523
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 526
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 530
+    },
+    {
+      "value": {
+        "kind": "css"
+      },
+      "confidence": "exact",
+      "file": "styles.ts",
+      "line": 14
+    },
+    {
+      "value": {
+        "kind": "css"
+      },
+      "confidence": "exact",
+      "file": "styles.ts",
+      "line": 38
+    },
+    {
+      "value": {
+        "kind": "svg"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 16
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 98
+    }
+  ],
+  "bindings": [
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 88
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "id"
+      },
+      "confidence": "structural",
+      "file": "app.ts",
+      "line": 89
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 94
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 95
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 66
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 67
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-live"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 72
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 73
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 78
+    },
+    {
+      "value": {
+        "kind": "property",
+        "name": "lineKey"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 111
+    },
+    {
+      "value": {
+        "kind": "property",
+        "name": "productName"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 112
+    },
+    {
+      "value": {
+        "kind": "property",
+        "name": "quantity"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 113
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "quantity-change"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 114
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "remove"
+      },
+      "confidence": "structural",
+      "file": "bag-quantity-control.ts",
+      "line": 115
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 43
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "a-label"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 48
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 49
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 53
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 61
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 72
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 82
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 83
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 90
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "alt"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 117
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 117
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 119
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 119
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 120
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 128
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 131
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 131
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "click"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 150
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "keydown"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 153
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "id"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 157
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 158
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 164
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 167
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 174
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 180
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 183
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 184
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 186
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 186
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 186
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 187
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 200
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 202
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "ia-label"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 215
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 216
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 217
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "keydown"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 232
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 237
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "ss"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 237
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 250
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 257
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 257
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 258
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "click"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 268
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "keydown"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 271
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 276
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "-label"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 283
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 292
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 292
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "sort"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 293
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 293
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "click"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 294
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "click"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 294
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "components.ts",
+      "line": 296
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 31
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 34
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 37
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 43
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 49
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "alt"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 52
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 66
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 66
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 69
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 74
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 81
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 97
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 99
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-current"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 104
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 107
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 110
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 111
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 131
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 140
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 152
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 175
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 178
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 178
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 178
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 178
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 179
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 198
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 199
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 199
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 200
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 205
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "alt"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 206
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 206
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 207
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 208
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 217
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 218
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 219
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 219
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 388
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "name"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 389
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 391
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 391
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 392
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "name"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 395
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 398
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 399
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 400
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "click"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 403
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "disabled"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 404
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "disabled"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 405
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 423
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "disabled"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 423
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "disabled"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 424
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 425
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 426
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "name"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 429
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "value"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 430
+    },
+    {
+      "value": {
+        "kind": "property",
+        "name": "checked"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 431
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "disabled"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 432
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "change"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 433
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 435
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 436
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 438
+    },
+    {
+      "value": {
+        "kind": "property",
+        "name": "product"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 496
+    },
+    {
+      "value": {
+        "kind": "property",
+        "name": "configuration"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 497
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "configuration-change"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 498
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "add-to-bag"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 499
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 500
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "id"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 507
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 507
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 508
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 510
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-live"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 520
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 527
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "ria-hidden"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 528
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 528
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 532
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "submit"
+      },
+      "confidence": "structural",
+      "file": "ui-extensions.ts",
+      "line": 103
+    },
+    {
+      "value": {
+        "kind": "event",
+        "name": "submit"
+      },
+      "confidence": "structural",
+      "file": "ui-extensions.ts",
+      "line": 104
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "ui-extensions.ts",
+      "line": 106
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 112
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 119
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 135
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 138
+    }
+  ],
+  "styles": [
+    {
+      "value": {
+        "kind": "module-import",
+        "source": "./styles.js"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 41
+    },
+    {
+      "value": {
+        "kind": "constructable-template"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 23
+    },
+    {
+      "value": {
+        "kind": "module-import",
+        "source": "./styles.js"
+      },
+      "confidence": "exact",
+      "file": "hydrate.ts",
+      "line": 6
+    },
+    {
+      "value": {
+        "kind": "constructable-template"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 76
+    },
+    {
+      "value": {
+        "kind": "module-import",
+        "source": "./styles.js"
+      },
+      "confidence": "exact",
+      "file": "server.ts",
+      "line": 16
+    },
+    {
+      "value": {
+        "kind": "constructable-template"
+      },
+      "confidence": "exact",
+      "file": "styles.ts",
+      "line": 14
+    },
+    {
+      "value": {
+        "kind": "constructable-template"
+      },
+      "confidence": "exact",
+      "file": "styles.ts",
+      "line": 38
+    }
+  ],
+  "routes": [
+    {
+      "value": {
+        "path": "/"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 122
+    },
+    {
+      "value": {
+        "path": "/shop"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 123
+    },
+    {
+      "value": {
+        "path": "/products/:slug"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 125
+    },
+    {
+      "value": {
+        "path": "/shipping"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 129
+    },
+    {
+      "value": {
+        "path": "/returns"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 130
+    },
+    {
+      "value": {
+        "path": "/checkout"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 131
+    },
+    {
+      "value": {
+        "path": "/orders/:id"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 132
+    },
+    {
+      "value": {
+        "path": "/:path*"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 133
+    }
+  ],
+  "stores": [
+    {
+      "value": {
+        "name": "shop"
+      },
+      "confidence": "exact",
+      "file": "state.ts",
+      "line": 25
+    }
+  ],
+  "ssrBoundaries": [
+    {
+      "value": {
+        "api": "readHydrationState"
+      },
+      "confidence": "structural",
+      "file": "hydrate.ts",
+      "line": 17
+    },
+    {
+      "value": {
+        "api": "hydrateRequestState"
+      },
+      "confidence": "structural",
+      "file": "hydrate.ts",
+      "line": 24
+    },
+    {
+      "value": {
+        "api": "hydrateApplication"
+      },
+      "confidence": "structural",
+      "file": "hydrate.ts",
+      "line": 33
+    },
+    {
+      "value": {
+        "api": "renderToString"
+      },
+      "confidence": "structural",
+      "file": "server.ts",
+      "line": 30
+    },
+    {
+      "value": {
+        "api": "renderRequest"
+      },
+      "confidence": "structural",
+      "file": "server.ts",
+      "line": 39
+    }
+  ],
+  "diagnostics": [
+    {
+      "value": {
+        "code": "GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN",
+        "message": "Custom Element <gluon-bag-quantity> has no Gluon declaration or supplied manifest entry.",
+        "range": {
+          "start": {
+            "line": 109,
+            "character": 5
+          },
+          "end": {
+            "line": 109,
+            "character": 23
+          }
+        },
+        "severity": 1,
+        "source": "gluon"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 110
+    },
+    {
+      "value": {
+        "code": "GLUON_TEMPLATE_CUSTOM_ELEMENT_UNKNOWN",
+        "message": "Custom Element <gluon-bag-quantity> has no Gluon declaration or supplied manifest entry.",
+        "range": {
+          "start": {
+            "line": 115,
+            "character": 7
+          },
+          "end": {
+            "line": 115,
+            "character": 25
+          }
+        },
+        "severity": 1,
+        "source": "gluon"
+      },
+      "confidence": "exact",
+      "file": "bag-quantity-control.ts",
+      "line": 116
+    },
+    {
+      "value": {
+        "code": "GLUON_TEMPLATE_EVENT_UNKNOWN",
+        "message": "<gluon-product-add-action> does not declare event @click.",
+        "range": {
+          "start": {
+            "line": 402,
+            "character": 10
+          },
+          "end": {
+            "line": 402,
+            "character": 16
+          }
+        },
+        "severity": 1,
+        "source": "gluon"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 403
+    },
+    {
+      "value": {
+        "code": "GLUON_TEMPLATE_EVENT_UNKNOWN",
+        "message": "<gluon-product-configurator> does not declare event @configuration-change.",
+        "range": {
+          "start": {
+            "line": 497,
+            "character": 6
+          },
+          "end": {
+            "line": 497,
+            "character": 27
+          }
+        },
+        "severity": 1,
+        "source": "gluon"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 498
+    },
+    {
+      "value": {
+        "code": "GLUON_TEMPLATE_EVENT_UNKNOWN",
+        "message": "<gluon-product-configurator> does not declare event @add-to-bag.",
+        "range": {
+          "start": {
+            "line": 498,
+            "character": 6
+          },
+          "end": {
+            "line": 498,
+            "character": 17
+          }
+        },
+        "severity": 1,
+        "source": "gluon"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 499
+    }
+  ]
+}

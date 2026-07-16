@@ -82,6 +82,10 @@ Vite SSR request bundle, and five route-aware static documents with one recorded
 dynamic product family plus stateful checkout and order fallbacks. See [static
 and server deployment](../../docs/deployment.md).
 
+`project-analysis.json` is the retained version-1 static inventory of the same
+shop source. `npm run check:project-analysis` regenerates it through the public
+language-tooling package and rejects drift without executing application code.
+
 ## Run
 
 ```bash

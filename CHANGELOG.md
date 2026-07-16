@@ -9,6 +9,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added a complete static Gluon project inventory API and CLI with explicit
+  evidence confidence, retained GLUON GOODS output, and clean-install gates.
 - Added universal scoped Custom Element registry handles, explicit class and
   functional registration targets, ShadowRoot ownership, duplicate-name
   isolation, DSD/SSR hydration transport, registry-partitioned HMR, and a
