@@ -1,10 +1,10 @@
 # Release readiness
 
 The `1.1.0` documentation describes the completed lockstep release. All 17
-official manifests and npm packages are at `1.1.0`. Release run `29426558738`
-attempt 2 published every package under `latest` with SLSA provenance, passed
-clean-room installation and public-type verification, and published immutable
-GitHub release `v1.1.0` on 2026-07-15. The `v1.0.9` GitHub release remains a
+official manifests and npm packages are at `1.1.0`. Release run `29496068214`
+published every package under `latest` with SLSA provenance, passed clean-room
+installation and public-type verification, and published immutable GitHub
+release `v1.1.0` on 2026-07-16. The `v1.0.9` GitHub release remains a
 draft after its public-type verification failure. The `@gluonjs` scope,
 package records, and trusted-publisher bindings are verified in the package
 contract.
