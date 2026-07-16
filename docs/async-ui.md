@@ -99,6 +99,13 @@ Both APIs accept custom enter/leave keyframes, duration, and easing.
 `reducedMotion: true` disables animation explicitly; the default and
 `'system'` read `prefers-reduced-motion: reduce` and commit immediately.
 
+`LayoutTransition()` measures its direct element root before and after a render.
+The same non-empty `layoutId` receives a FLIP translate/scale animation even
+when `transitionKey` replaces the rendered element; changed layout identities
+use leave and enter keyframes. Rapid updates cancel prior animations and clones.
+Reduced motion commits immediately. SSR and hydration expose only stable child
+content and never serialize geometry or animation state.
+
 ## Server contract
 
 Built-in directive markers remain private to the browser renderer.
