@@ -49,7 +49,7 @@ export type BuiltinServerContract =
       readonly target: Element | ShadowRoot | string;
     }
   | {
-      readonly kind: 'keep-alive' | 'transition' | 'transition-group';
+      readonly kind: 'keep-alive' | 'transition' | 'transition-group' | 'layout-transition';
       readonly content: TemplateValue;
     };
 
@@ -581,6 +581,129 @@ export function Transition(props: TransitionProps): TemplateValue {
   return value;
 }
 
+export interface LayoutTransitionProps extends TransitionOptions {
+  readonly children: TemplateValue;
+  readonly layoutId: string;
+  readonly transitionKey?: Key;
+}
+
+interface LayoutTransitionState extends TransitionState {
+  layoutId: string;
+  clones: HTMLElement[];
+}
+
+const layoutTransitionStates = new WeakMap<PartController, LayoutTransitionState>();
+const layoutTransitionDirective = directive<readonly [LayoutTransitionProps]>({
+  mount(part, [props]) {
+    validateTransitionOptions(props);
+    validateLayoutId(props.layoutId);
+    const state: LayoutTransitionState = {
+      ...createOwnedHost('gluon-layout-transition'),
+      generation: 0,
+      animations: [],
+      clones: [],
+      activeKey: props.transitionKey,
+      layoutId: props.layoutId,
+    };
+    layoutTransitionStates.set(part, state);
+    part.setValue(state.host);
+    renderOwnedValue(state.host, props.children);
+    const element = directLayoutElement(state.host);
+    if (element && !prefersReducedMotion(state.host, props.reducedMotion)) {
+      state.animations.push(playAnimation(element, props.enter ?? defaultEnter, props));
+    }
+  },
+  update(part, [props]) {
+    validateTransitionOptions(props);
+    validateLayoutId(props.layoutId);
+    const state = layoutTransitionStates.get(part);
+    if (state) updateLayoutTransition(part, props, state);
+  },
+  cleanup(part) {
+    const state = layoutTransitionStates.get(part);
+    if (state) cancelLayoutTransition(state);
+  },
+  disconnect(part) {
+    const state = layoutTransitionStates.get(part);
+    if (!state) return;
+    cancelLayoutTransition(state);
+    releaseOwnedHost(state);
+    layoutTransitionStates.delete(part);
+  },
+});
+
+/** Animates direct-root geometry changes across renders through shared layout identity. */
+export function LayoutTransition(props: LayoutTransitionProps): TemplateValue {
+  const value = layoutTransitionDirective(props);
+  builtinServerContracts.set(value, { kind: 'layout-transition', content: props.children });
+  return value;
+}
+
+function updateLayoutTransition(
+  part: PartController,
+  props: LayoutTransitionProps,
+  state: LayoutTransitionState,
+): void {
+  cancelLayoutTransition(state);
+  const previousElement = directLayoutElement(state.host);
+  const previousRect = previousElement?.getBoundingClientRect();
+  const previousSnapshot = previousElement?.cloneNode(true) as HTMLElement | undefined;
+  const previousId = state.layoutId;
+  const keyChanged = props.transitionKey !== undefined && !Object.is(props.transitionKey, state.activeKey);
+  state.activeKey = props.transitionKey;
+  state.layoutId = props.layoutId;
+  renderOwnedValue(state.host, props.children);
+  part.setValue(state.host);
+  if (prefersReducedMotion(state.host, props.reducedMotion)) return;
+
+  const currentElement = directLayoutElement(state.host);
+  const currentRect = currentElement?.getBoundingClientRect();
+  if (previousRect && currentElement && currentRect && previousId === props.layoutId) {
+    const keyframes = layoutKeyframes(previousRect, currentRect);
+    if (keyframes) state.animations.push(playAnimation(currentElement, keyframes, props));
+    else if (keyChanged) state.animations.push(playAnimation(currentElement, props.enter ?? defaultEnter, props));
+    return;
+  }
+  if (previousSnapshot && previousRect) createLayoutLeavingClone(state, previousSnapshot, previousRect, props);
+  if (currentElement) state.animations.push(playAnimation(currentElement, props.enter ?? defaultEnter, props));
+}
+
+function directLayoutElement(host: HTMLElement): HTMLElement | undefined {
+  return [...host.children].find((child): child is HTMLElement => child instanceof HTMLElement);
+}
+
+function createLayoutLeavingClone(
+  state: LayoutTransitionState,
+  clone: HTMLElement,
+  rect: DOMRect,
+  options: TransitionOptions,
+): void {
+  Object.assign(clone.style, {
+    position: 'fixed', left: `${rect.left}px`, top: `${rect.top}px`,
+    width: `${rect.width}px`, height: `${rect.height}px`, margin: '0',
+    pointerEvents: 'none', zIndex: '2147483647',
+  });
+  state.host.ownerDocument.body.append(clone);
+  state.clones.push(clone);
+  const animation = playAnimation(clone, options.leave ?? defaultLeave, options);
+  state.animations.push(animation);
+  void animation.finished.catch(() => undefined).finally(() => {
+    clone.remove();
+    const index = state.clones.indexOf(clone);
+    if (index >= 0) state.clones.splice(index, 1);
+  });
+}
+
+function cancelLayoutTransition(state: LayoutTransitionState): void {
+  cancelAnimations(state);
+  for (const clone of state.clones) clone.remove();
+  state.clones.length = 0;
+}
+
+function validateLayoutId(layoutId: string): void {
+  if (!layoutId.trim()) throw new TypeError('LayoutTransition layoutId cannot be empty.');
+}
+
 async function updateTransition(
   part: PartController,
   props: TransitionProps,
@@ -711,14 +834,8 @@ function updateTransitionGroup(
       state.animations.push(playAnimation(element, args.options.enter ?? defaultEnter, args.options));
       continue;
     }
-    const x = previous.left - current.left;
-    const y = previous.top - current.top;
-    if (x || y) {
-      state.animations.push(playAnimation(element, [
-        { transform: `translate(${x}px, ${y}px)` },
-        { transform: 'translate(0, 0)' },
-      ], args.options));
-    }
+    const keyframes = layoutKeyframes(previous, current);
+    if (keyframes) state.animations.push(playAnimation(element, keyframes, args.options));
   }
 }
 
@@ -791,6 +908,18 @@ function groupElements(host: HTMLElement): HTMLElement[] {
 
 function groupRects(host: HTMLElement): Map<Key, DOMRect> {
   return new Map(groupEntries(host).map(([key, element]) => [key, element.getBoundingClientRect()]));
+}
+
+function layoutKeyframes(previous: DOMRect, current: DOMRect): readonly Keyframe[] | undefined {
+  const x = previous.left - current.left;
+  const y = previous.top - current.top;
+  const scaleX = current.width > 0 ? previous.width / current.width : 1;
+  const scaleY = current.height > 0 ? previous.height / current.height : 1;
+  if (!x && !y && scaleX === 1 && scaleY === 1) return undefined;
+  return [
+    { transformOrigin: 'top left', transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})` },
+    { transformOrigin: 'top left', transform: 'translate(0, 0) scale(1, 1)' },
+  ];
 }
 
 function createOwnedHost(tagName: string): TeleportState {

@@ -2091,6 +2091,7 @@
       "code": [
         "import {",
         "  KeepAlive,",
+        "  LayoutTransition,",
         "  Suspense,",
         "  Teleport,",
         "  Transition,",
@@ -2098,6 +2099,7 @@
         "  html,",
         "  type BuiltinServerContract,",
         "  type KeepAliveProps,",
+        "  type LayoutTransitionProps,",
         "  type SuspenseProps,",
         "  type TeleportProps,",
         "  type TransitionOptions,",
@@ -2110,10 +2112,12 @@
         "const teleport = Teleport(teleportProps);",
         "const keepAliveProps = { cacheKey: '/shop', children: html`<main>Shop</main>`, max: 4 } satisfies KeepAliveProps;",
         "const cached = KeepAlive(keepAliveProps);",
+        "const layoutProps = { layoutId: 'catalog-grid', transitionKey: 'Lighting', children: html`<section>Lighting</section>` } satisfies LayoutTransitionProps;",
+        "const layout = LayoutTransition(layoutProps);",
         "const transitionOptions = { duration: 180, easing: 'ease-out', reducedMotion: 'system' } satisfies TransitionOptions;",
         "const transitionProps = { ...transitionOptions, transitionKey: 'product', children: html`<article>Orbit Lamp</article>` } satisfies TransitionProps;",
         "const transitioned = Transition(transitionProps);",
-        "const contracts: Array<BuiltinServerContract | undefined> = [suspense, teleport, cached, transitioned].map(getBuiltinServerContract);",
+        "const contracts: Array<BuiltinServerContract | undefined> = [suspense, teleport, cached, transitioned, layout].map(getBuiltinServerContract);",
         "console.log(contracts);"
       ]
     },
@@ -2662,6 +2666,10 @@
     "src/interfaces/KeepAliveProps.md": {
       "recipe": "core-builtins",
       "description": "Choose a cache key, rendered content, LRU limit, and activation/deactivation/eviction observers for a retained view:"
+    },
+    "src/interfaces/LayoutTransitionProps.md": {
+      "recipe": "core-builtins",
+      "description": "Configure direct-root layout identity, render identity, content, animation timing, keyframes, and reduced-motion behavior:"
     },
     "src/interfaces/KeyedItem.md": {
       "recipe": "core-template-values",
@@ -4767,6 +4775,10 @@
     "src/functions/html.md": {
       "recipe": "core-template-rendering",
       "description": "Create an HTML template whose static strings are compiled once and whose dynamic values update through Gluon's renderer:"
+    },
+    "src/functions/LayoutTransition.md": {
+      "recipe": "core-builtins",
+      "description": "Animate one direct element root between measured render geometries while retaining shared layout identity and reduced-motion behavior:"
     },
     "src/functions/hydrate.md": {
       "recipe": "core-template-rendering",

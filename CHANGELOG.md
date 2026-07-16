@@ -9,6 +9,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added `LayoutTransition()` for render-to-render direct-root geometry,
+  shared layout identity, cancellation, reduced-motion, and stable SSR output.
 - Added universal scoped Custom Element registry handles, explicit class and
   functional registration targets, ShadowRoot ownership, duplicate-name
   isolation, DSD/SSR hydration transport, registry-partitioned HMR, and a

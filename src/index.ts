@@ -179,6 +179,7 @@ export {
 export {
   AsyncTimeoutError,
   KeepAlive,
+  LayoutTransition,
   Suspense,
   Teleport,
   Transition,
@@ -191,6 +192,7 @@ export {
   type AsyncSource,
   type BuiltinServerContract,
   type KeepAliveProps,
+  type LayoutTransitionProps,
   type SuspenseProps,
   type TeleportProps,
   type TransitionGroupProps,

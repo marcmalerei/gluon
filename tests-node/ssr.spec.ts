@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import {
   GluonElement,
   KeepAlive,
+  LayoutTransition,
   Suspense,
   Teleport,
   Transition,
@@ -187,9 +188,10 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       ${Teleport({ target: '#overlay', children: html`<aside>teleported</aside>` })}
       ${KeepAlive({ cacheKey: 'page', children: html`<article>cached</article>` })}
       ${Transition({ transitionKey: 'visible', children: html`<div>stable</div>` })}
+      ${LayoutTransition({ layoutId: 'server-layout', children: html`<section>layout</section>` })}
     `;
     expect(withoutHydrationMarkers(await renderToString(value))).toContain(
-      '<p>ready</p>\n      <aside>teleported</aside>\n      <article>cached</article>\n      <div>stable</div>',
+      '<p>ready</p>\n      <aside>teleported</aside>\n      <article>cached</article>\n      <div>stable</div>\n      <section>layout</section>',
     );
   });
 

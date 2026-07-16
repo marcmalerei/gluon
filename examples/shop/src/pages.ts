@@ -1,4 +1,4 @@
-import { compose, html, repeat, type TemplateValue } from '@gluonjs/core';
+import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -77,9 +77,14 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
           attributes: { class: selected === category ? 'is-selected' : '' },
         }))}
       </nav>
-      <div class="catalog-grid">
-        ${repeat(visible, (product) => product.slug, ProductCard)}
-      </div>
+      ${LayoutTransition({
+        layoutId: 'catalog-grid',
+        transitionKey: selected,
+        duration: 180,
+        children: html`<div class="catalog-grid">
+          ${repeat(visible, (product) => product.slug, ProductCard)}
+        </div>`,
+      })}
     </section>
   `;
 }
