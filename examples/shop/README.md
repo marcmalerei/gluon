@@ -87,6 +87,10 @@ adapter against URL-only route inputs. It renders home, catalog, and Orbit Lamp
 through the same built server module, copies the same hashed assets, and keeps
 the product, checkout, and order families as explicit dynamic fallbacks.
 
+`project-analysis.json` is the retained version-1 static inventory of the same
+shop source. `npm run check:project-analysis` regenerates it through the public
+language-tooling package and rejects drift without executing application code.
+
 ## Run
 
 ```bash

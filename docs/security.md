@@ -17,6 +17,7 @@ application content or supplies an application security policy.
 | Trusted Types | Unsafe sinks are visible in public API names. No `1.0.10` enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
 | Eleventy prerendering | The optional adapter validates route and asset URL boundaries, isolates abort/disposal ownership, escapes default-document attributes, and transports existing SSR carriers unchanged. | Trust and validate Eleventy data, asset manifests, custom document functions, CSP policy, and deployment fallbacks. | `tests-node/ssr.spec.ts`, `tests/hydration.spec.ts`, real and clean Eleventy build gates |
 | Vue source analysis | The Node analyzer realpath-checks one root, never follows symlinks or executes project code, enforces fixed worker/resource budgets, emits no source excerpts/absolute paths, and has no writer/network/plugin hook. | Treat findings as static inventory only; review indeterminate runtime, Router, Store, style, SSR, async, test, and build semantics. | `tests-node/vue-migration-analyzer.spec.ts`, retained adversarial fixtures, RFC 0003 |
+| Gluon project analysis | The CLI realpath-contains one root, skips symlinks and generated/dependency directories, caps source files and bytes, never imports application modules, and writes only JSON to stdout. | Treat exact and structural records as static evidence and review every indeterminate record against runtime behavior. | `tests-node/language-server.spec.ts`, `check:project-analysis`, clean-install fixture |
 | Component generation | The planner validates the entire operation set before writes, rejects path/tag/manifest/symlink hazards, requires two-part overwrite intent, reports dry runs without mutation, and restores applied files if commit fails. | Review generated application code and retain ownership of architecture, dependencies, deployment policy, and any later manual edits. | `tests-node/create-gluon.spec.ts`, five-kind clean-install matrix, `docs/component-generator.md` |
 
 ## Trust boundaries
@@ -30,6 +31,8 @@ application content or supplies an application security policy.
   stream chunks cross the server-to-browser boundary.
 - Vue project bytes cross into a Node parser worker as untrusted inert input;
   only normalized report data crosses back.
+- Gluon project bytes cross into the language-tooling parser as inert input;
+  only bounded confidence-marked inventory data crosses back.
 - Add-component names, paths, project manifests, existing barrel text, and file
   collisions cross into a local filesystem planner; no remote template or
   project code is executed.

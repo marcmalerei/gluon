@@ -4,6 +4,7 @@ import {
   GluonProtocolServer,
   analyzeGluonDocument,
   analyzeGluonProject,
+  analyzeStaticGluonProject,
   declarationsFromCustomElementsManifest,
 } from '../packages/language-server/src/index.js';
 
@@ -29,6 +30,44 @@ export const page = view\`
 `;
 
 describe('Gluon template analysis', () => {
+  test('emits a deterministic versioned project inventory with explicit confidence', () => {
+    const documents = [
+      { uri: 'src/server.ts', text: `
+        import { html, css, GluonElement } from '@gluonjs/core';
+        import { defineStore } from '@gluonjs/store';
+        import { renderRequest } from '@gluonjs/ssr';
+        import './shop-styles.js';
+        export class ProductCard extends GluonElement { render() { return html\`<button @click=\${() => {}}>Buy</button>\`; } }
+        export const ProductGrid = () => html\`<section class=\${'grid'}>Grid</section>\`;
+        export const sheet = css\`:host { display: block; }\`;
+        export const store = defineStore('shop', () => ({}));
+        export const routes = [{ path: '/shop' }, { path: getDynamicPath() }];
+        void renderRequest;
+      ` },
+      { uri: 'src/element.ts', text: declaration },
+    ];
+    const first = analyzeStaticGluonProject(documents);
+    const second = analyzeStaticGluonProject([...documents].reverse());
+    expect(second).toEqual(first);
+    expect(first.schemaVersion).toBe(1);
+    expect(first.files.map((entry) => entry.file)).toEqual(['src/element.ts', 'src/server.ts']);
+    expect(first.components).toEqual(expect.arrayContaining([
+      expect.objectContaining({ confidence: 'structural', value: { name: 'ProductCard', kind: 'class' } }),
+      expect.objectContaining({ confidence: 'structural', value: { name: 'ProductGrid', kind: 'function' } }),
+    ]));
+    expect(first.elements[0]?.value.tagName).toBe('status-card');
+    expect(first.bindings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ confidence: 'structural', value: { kind: 'event', name: 'click' } }),
+      expect.objectContaining({ confidence: 'structural', value: { kind: 'attribute', name: 'class' } }),
+    ]));
+    expect(first.styles.map((entry) => entry.value.kind)).toEqual(expect.arrayContaining(['constructable-template', 'module-import']));
+    expect(first.routes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ confidence: 'exact', value: { path: '/shop' } }),
+      expect.objectContaining({ confidence: 'indeterminate', value: {} }),
+    ]));
+    expect(first.stores[0]).toEqual(expect.objectContaining({ confidence: 'exact', value: { name: 'shop' } }));
+  });
+
   test('infers declarations and reports stable template diagnostics', () => {
     const analyses = analyzeGluonProject([
       { uri: 'file:///component.ts', text: declaration },
