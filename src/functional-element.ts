@@ -29,6 +29,10 @@ import {
   type SlotDeclaration,
 } from './element.js';
 import type { TemplateResult } from './runtime.js';
+import type {
+  GluonElementDefinitionRegistry,
+  GluonElementRegistry,
+} from './element-registry.js';
 
 declare const elementPropertyValue: unique symbol;
 declare const elementEventDetail: unique symbol;
@@ -196,6 +200,10 @@ export type FunctionalElementClass<
 export interface DefineGluonElementOptions {
   /** @internal The official Vite HMR bridge creates an unregistered next constructor. */
   readonly register?: boolean;
+  /** Explicit registration target; the global registry remains the default. */
+  readonly registry?: GluonElementDefinitionRegistry;
+  /** Explicit registry associated with every instance ShadowRoot. */
+  readonly shadowRootRegistry?: GluonElementRegistry;
 }
 
 interface ConnectionCallbacks {
@@ -250,6 +258,7 @@ export function defineGluonElement<
     static override readonly slots = (definition.slots ?? {}) as Slots;
     static override readonly styles = definition.styles ?? [];
     static readonly formAssociated = (definition.formAssociated ?? false) as FormAssociated;
+    static override readonly shadowRootRegistry = options.shadowRootRegistry;
 
     private readonly retainedState = new Map<string, unknown>();
     private connectionCallbacks = createConnectionCallbacks();
@@ -536,7 +545,7 @@ export function defineGluonElement<
     Public
   >;
   if (options.register === false) return constructor;
-  return defineElement(definition.tagName, constructor) as typeof constructor;
+  return defineElement(definition.tagName, constructor, { registry: options.registry }) as typeof constructor;
 }
 
 function createConnectionCallbacks(): ConnectionCallbacks {

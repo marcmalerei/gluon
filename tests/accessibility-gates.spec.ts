@@ -25,7 +25,8 @@ test('keeps the GLUON GOODS customer journey free of automated WCAG A/AA violati
   await settle();
   await expectNoViolations('product detail');
   root.querySelector('gluon-product-configurator')!
-    .shadowRoot!.querySelector<HTMLButtonElement>('.add-to-bag')!.click();
+    .shadowRoot!.querySelector<HTMLElement>('gluon-product-add-action')!
+    .querySelector<HTMLButtonElement>('button')!.click();
   await settle();
   await expectNoViolations('bag dialog');
   document.querySelector<HTMLAnchorElement>('.bag-summary a')!.click();

@@ -3,6 +3,8 @@ import {
   GluonElement,
   applyGluonElementHotUpdate,
   createApp,
+  createGluonElementRegistry,
+  createRegistryShadowRoot,
   createComponentStyleDependency,
   createStyleSheetOwner,
   css,
@@ -208,6 +210,36 @@ describe('Gluon Core HMR bridge', () => {
     element.increment();
     await element.updateComplete;
     expect(element.shadowRoot?.querySelector('output')?.textContent).toBe('Updated 4');
+  });
+
+  it('keeps scoped functional registrations inside their selected HMR registry', async () => {
+    const registry = createGluonElementRegistry();
+    const Initial = defineGluonElement({
+      tagName: 'gluon-scoped-hot-status',
+      setup() {
+        return { render: () => html`<p>Initial scoped status</p>` };
+      },
+    }, { register: false });
+    applyGluonElementHotUpdate('gluon-scoped-hot-status', Initial, { registry });
+    const host = document.createElement('section');
+    document.body.append(host);
+    const root = createRegistryShadowRoot(host, registry);
+    render(html`<gluon-scoped-hot-status></gluon-scoped-hot-status>`, root);
+    const element = root.querySelector('gluon-scoped-hot-status') as InstanceType<typeof Initial>;
+    await element.updateComplete;
+
+    const Updated = defineGluonElement({
+      tagName: 'gluon-scoped-hot-status',
+      setup() {
+        return { render: () => html`<p>Updated scoped status</p>` };
+      },
+    }, { register: false });
+    const result = applyGluonElementHotUpdate('gluon-scoped-hot-status', Updated, { registry });
+    await element.updateComplete;
+    expect(result.constructor).toBe(Initial);
+    expect(element.shadowRoot?.textContent).toContain('Updated scoped status');
+    expect(registry.get('gluon-scoped-hot-status')).toBe(Initial);
+    if (registry.scoped) expect(customElements.get('gluon-scoped-hot-status')).toBeUndefined();
   });
 
   it('surfaces incompatible superclass, form, schema, and sheet-list edits', () => {

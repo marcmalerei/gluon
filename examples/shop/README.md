@@ -21,6 +21,9 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - keyboard-operable product configuration through the same typed,
   form-associated `gluon-product-configurator` Custom Element consumed by the
   maintained Vue 3 host
+- an internal `gluon-product-add-action` registered in the configurator's
+  explicit scoped registry, with a global fallback on unsupported browsers and
+  the same add-to-bag interaction in either mode
 - a reactive bag with configured line items and quantities
 - an app-local `gluon-bag-quantity` autonomous Custom Element authored through
   `defineGluonElement()`, with inferred properties/native events, cancelable
@@ -135,6 +138,8 @@ The latest verified renders are:
 - [issue #114 product flow at 320px](../../output/playwright/issue-114-shop-ui/product-320.png)
 - [issue #114 checkout at 390px](../../output/playwright/issue-114-shop-ui/checkout-390.png)
 - [issue #114 home at 320px](../../output/playwright/issue-114-shop-ui/home-320.png)
+- [scoped-registry product flow on desktop](../../output/playwright/issue-195-scoped-registries/product-desktop.png)
+- [scoped-registry product flow at 390px](../../output/playwright/issue-195-scoped-registries/product-390.png)
 
 ## Verification contract
 

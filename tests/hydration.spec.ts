@@ -28,7 +28,10 @@ import {
   hydrateTemplate,
 } from '@gluonjs/ssr/hydration';
 import { createStyleManifest, prepareForHydration, renderProgressively, renderStyleCarriers } from '@gluonjs/ssr';
-import { renderShopRequest } from '../examples/shop/src/server.js';
+import {
+  injectProductConfiguratorShadow,
+  renderShopRequest,
+} from '../examples/shop/src/server.js';
 import {
   cleanupSsrFixtures,
   hydrateSsrFixture,
@@ -43,6 +46,27 @@ import {
 
 describe('SSR hydration', () => {
   afterEach(cleanupSsrFixtures);
+
+  it('rejects malformed configurator DSD and leaves unrelated routes unchanged', () => {
+    expect(() => injectProductConfiguratorShadow(
+      '<gluon-product-configurator></gluon-product-configurator>',
+      '<gluon-product-configurator></gluon-product-configurator>',
+    )).toThrow('did not emit declarative Shadow DOM');
+    expect(() => injectProductConfiguratorShadow(
+      '<gluon-product-configurator></gluon-product-configurator>',
+      '<gluon-product-configurator><template shadowrootmode="open">',
+    )).toThrow('did not emit declarative Shadow DOM');
+    expect(injectProductConfiguratorShadow(
+      '<main>Home</main>',
+      '<gluon-product-configurator><template shadowrootmode="open"></template></gluon-product-configurator>',
+    )).toBe('<main>Home</main>');
+  });
+
+  it('renders non-product shop routes without a configurator shadow payload', async () => {
+    const response = await renderShopRequest('/');
+    expect(response.html).toContain('Objects that work the way you do.');
+    expect(response.html).not.toContain('shadowrootcustomelementregistry');
+  });
 
   it('retains the server DOM produced by a composed functional template', async () => {
     const Panel = (props: { readonly title: string; readonly children: import('@gluonjs/core').TemplateValue }) => html`
@@ -155,7 +179,9 @@ describe('SSR hydration', () => {
 
     const configurator = root.querySelector('gluon-product-configurator');
     await (configurator as ProductConfiguratorElement | null)?.updateComplete;
-    configurator?.shadowRoot?.querySelector<HTMLButtonElement>('.add-to-bag')?.click();
+    configurator?.shadowRoot
+      ?.querySelector<HTMLElement>('gluon-product-add-action')
+      ?.querySelector<HTMLButtonElement>('button')?.click();
     await nextTick();
     expect(hydrated.store.bagCount).toBe(1);
     expect(hydrated.store.bagOpen).toBe(true);

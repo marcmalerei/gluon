@@ -9,6 +9,7 @@ import {
   Teleport,
   Transition,
   createApp,
+  createGluonElementRegistry,
   createInjectionKey,
   createVirtualizer,
   compose,
@@ -257,6 +258,38 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(cleanup).toHaveBeenCalledOnce();
   });
 
+  it('serializes scoped class and functional definitions for declarative registry hydration', async () => {
+    const registry = createGluonElementRegistry();
+    class ScopedServerStatus extends GluonElement {
+      static override readonly shadowRootRegistry = registry;
+      protected override render() { return html`<p>Scoped class status</p>`; }
+    }
+    defineElement('server-scoped-status', ScopedServerStatus, { registry });
+    const FunctionalScopedStatus = defineGluonElement({
+      tagName: 'server-functional-scoped-status',
+      setup() {
+        return { render: () => html`<p>Scoped functional status</p>` };
+      },
+    }, { registry, shadowRootRegistry: registry });
+
+    const classHtml = withoutHydrationMarkers(await renderToString(renderElement(
+      ScopedServerStatus,
+      { registry },
+    )));
+    const functionalHtml = withoutHydrationMarkers(await renderToString(renderElement(
+      FunctionalScopedStatus,
+      { registry },
+    )));
+    expect(classHtml).toBe(
+      '<server-scoped-status><template shadowrootmode="open" shadowrootcustomelementregistry>'
+      + '<p>Scoped class status</p></template></server-scoped-status>',
+    );
+    expect(functionalHtml).toBe(
+      '<server-functional-scoped-status><template shadowrootmode="open" shadowrootcustomelementregistry>'
+      + '<p>Scoped functional status</p></template></server-functional-scoped-status>',
+    );
+  });
+
   it('retains equivalent stateful form-control server output for Gluon, Vue, and React', async () => {
     const children = html`Orbit Lamp<span slot="help">Choose one to five.</span>`;
     for (const definition of [ClassQuantityControl, FunctionalQuantityControl]) {
@@ -325,6 +358,11 @@ describe('@gluonjs/ssr request ownership and state', () => {
     expect(visible).toContain('<h1 id="product-title">Orbit Lamp</h1>');
     expect(fixture.contains('Orbit Lamp')).toBe(true);
     expect(visible).toContain('In stock · dispatches in 2–3 days');
+    expect(visible).toContain('shadowrootcustomelementregistry');
+    expect(visible).toContain('<gluon-product-add-action');
+    expect(visible).toMatch(
+      /<button type="button" class="add-to-bag">\s*Add to bag — €189\s*<\/button>/,
+    );
     expect(fixture.html).toContain('href="/products/stack-tray"');
     expect(fixture.router.location).toBe('/products/orbit-lamp');
     expect(fixture.store.stores.shop).toEqual(expect.objectContaining({ bag: [] }));

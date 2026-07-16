@@ -9,6 +9,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added universal scoped Custom Element registry handles, explicit class and
+  functional registration targets, ShadowRoot ownership, duplicate-name
+  isolation, DSD/SSR hydration transport, registry-partitioned HMR, and a
+  global fallback used by the GLUON GOODS product action boundary.
 - Added deterministic production preview commands for every runnable example,
   an all-examples launcher, HTTP smoke verification, and a Node-only static
   shop build gate covering routes, fallbacks, assets, and hydration state.

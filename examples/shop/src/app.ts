@@ -37,6 +37,7 @@ import {
   ShippingPage,
 } from './pages.js';
 import { createShopStore, type ShopStore } from './state.js';
+import type { ProductConfiguratorRenderer } from './product-configurator.js';
 import { installShopUi } from './styles.js';
 
 export interface ShopApplication {
@@ -113,11 +114,18 @@ export function createShopApplication(
   return { app, router, storeManager, store, ...(uiOwner ? { uiOwner } : {}) };
 }
 
-export function createShopRoutes(store: ShopStore): readonly RouteRecordRaw[] {
+export function createShopRoutes(
+  store: ShopStore,
+  renderProductConfigurator?: ProductConfiguratorRenderer,
+): readonly RouteRecordRaw[] {
   return [
     { path: '/', name: 'home', component: () => HomePage(store) },
     { path: '/shop', name: 'shop', component: () => CatalogPage(store) },
-    { path: '/products/:slug', name: 'product', component: () => ProductPage(store) },
+    {
+      path: '/products/:slug',
+      name: 'product',
+      component: () => ProductPage(store, renderProductConfigurator),
+    },
     { path: '/shipping', name: 'shipping', component: () => ShippingPage(store) },
     { path: '/returns', name: 'returns', component: () => ReturnsPage(store) },
     { path: '/checkout', name: 'checkout', component: () => CheckoutPage(store) },

@@ -24,7 +24,9 @@ test('releases repeated customer-flow apps, caches, listeners, refs, Router, and
     app.mount(root);
     const configurator = root.querySelector<ProductConfiguratorElement>('gluon-product-configurator')!;
     await configurator.updateComplete;
-    const addButton = configurator.shadowRoot!.querySelector<HTMLButtonElement>('.add-to-bag')!;
+    const addButton = configurator.shadowRoot!
+      .querySelector<HTMLElement>('gluon-product-add-action')!
+      .querySelector<HTMLButtonElement>('button')!;
     addButton.click();
     await nextTick();
     expect(store.bagCount).toBe(1);

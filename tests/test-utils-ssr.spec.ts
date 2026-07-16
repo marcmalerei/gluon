@@ -84,6 +84,35 @@ describe('SSR and hydration fixtures', () => {
     expect(document.head.querySelector('[data-gluon-style]')).toBeNull();
   });
 
+  it('materializes ordinary, scoped, existing, and invalid declarative shadow templates', async () => {
+    if (!customElements.get('gluon-existing-shadow-fixture')) {
+      customElements.define('gluon-existing-shadow-fixture', class extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+      });
+    }
+    const dsdResponse: SsrRequestResult = {
+      ...response,
+      html: `
+        <section id="ordinary"><template shadowrootmode="open"><p>Ordinary</p></template></section>
+        <section id="scoped"><template shadowrootmode="open" shadowrootcustomelementregistry><p>Scoped</p></template></section>
+        <gluon-existing-shadow-fixture><template shadowrootmode="open"><p>Existing</p></template></gluon-existing-shadow-fixture>
+        <section id="invalid"><template shadowrootmode="invalid"><p>Invalid</p></template></section>
+      `,
+    };
+    const fixture = await hydrateSsrFixture(
+      await renderSsrFixture(async () => dsdResponse),
+      { hydrate: async () => undefined },
+    );
+    expect(fixture.get<HTMLElement>('#ordinary').shadowRoot?.textContent).toContain('Ordinary');
+    expect(fixture.get<HTMLElement>('#scoped').shadowRoot?.textContent).toContain('Scoped');
+    expect(fixture.get<HTMLElement>('gluon-existing-shadow-fixture').shadowRoot?.textContent)
+      .toContain('Existing');
+    expect(fixture.get('#invalid').querySelector('template')).not.toBeNull();
+  });
+
   it('cleans multiple fixtures in reverse order and aggregates disposal failures', async () => {
     const order: string[] = [];
     const first = await hydrateSsrFixture(await renderSsrFixture(async () => response, { name: 'first' }), {

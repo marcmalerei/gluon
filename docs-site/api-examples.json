@@ -161,6 +161,47 @@
         "console.log(view, range);"
       ]
     },
+    "core-scoped-element-registry": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import {",
+        "  GluonElement,",
+        "  createGluonElementRegistry,",
+        "  createRegistryShadowRoot,",
+        "  defineElement,",
+        "  defineGluonElement,",
+        "  html,",
+        "  initializeRegistryShadowRoot,",
+        "  supportsScopedCustomElementRegistries,",
+        "  type CreateGluonElementRegistryOptions,",
+        "  type DefineElementOptions,",
+        "  type DefineGluonElementOptions,",
+        "  type GluonElementDefinitionRegistry,",
+        "  type GluonElementRegistry,",
+        "  type GluonElementServerRenderOptions,",
+        "} from '@gluonjs/core';",
+        "",
+        "const config: CreateGluonElementRegistryOptions = { fallback: 'global' };",
+        "const registry: GluonElementRegistry = createGluonElementRegistry(config);",
+        "const target: GluonElementDefinitionRegistry = registry;",
+        "class ProductStatus extends GluonElement {",
+        "  static override readonly shadowRootRegistry = registry;",
+        "  protected override render() { return html`<p>Ready</p>`; }",
+        "}",
+        "const definition: DefineElementOptions = { registry: target };",
+        "const serverOptions: GluonElementServerRenderOptions = { registry: target };",
+        "defineElement('shop-product-status', ProductStatus, definition);",
+        "const functionalOptions: DefineGluonElementOptions = { registry };",
+        "defineGluonElement({",
+        "  tagName: 'shop-functional-status',",
+        "  setup: () => ({ render: () => html`<p>Functional ready</p>` }),",
+        "}, functionalOptions);",
+        "const host = document.createElement('section');",
+        "const root = createRegistryShadowRoot(host, registry);",
+        "initializeRegistryShadowRoot(root, registry);",
+        "console.log(supportsScopedCustomElementRegistries(), registry.scoped, serverOptions);"
+      ]
+    },
     "reactivity-standard-signals": {
       "module": "@gluonjs/reactivity/signals",
       "code": [
@@ -4933,6 +4974,46 @@
         "const ProductCardElement: GluonElementClass<ProductCard> = ProductCard;",
         "defineElement('product-card', ProductCardElement);"
       ]
+    },
+    "src/functions/createGluonElementRegistry.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Create one universal Custom Element definition boundary with native ShadowRoot isolation, global browser fallback, and an SSR table:"
+    },
+    "src/functions/createRegistryShadowRoot.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Attach or reuse a component ShadowRoot and associate the selected Gluon registry when the platform supports it:"
+    },
+    "src/functions/initializeRegistryShadowRoot.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Associate a selected registry with an existing declarative ShadowRoot before hydration upgrades its internal elements:"
+    },
+    "src/functions/supportsScopedCustomElementRegistries.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Detect constructable registries and actual ShadowRoot association without mutating the document registry:"
+    },
+    "src/interfaces/CreateGluonElementRegistryOptions.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Choose whether unsupported browsers preserve the flow through the global registry or fail immediately:"
+    },
+    "src/interfaces/DefineElementOptions.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Select an explicit definition registry for one class-authored Gluon Custom Element:"
+    },
+    "src/interfaces/DefineGluonElementOptions.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Select functional element registration and ShadowRoot registries while retaining the internal HMR registration switch:"
+    },
+    "src/interfaces/GluonElementRegistry.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Own definitions across native scoped browsers, global fallback browsers, and isolated server rendering:"
+    },
+    "src/type-aliases/GluonElementDefinitionRegistry.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Accept either Gluon's universal registry handle or a directly supplied platform CustomElementRegistry:"
+    },
+    "src/interfaces/GluonElementServerRenderOptions.md": {
+      "recipe": "core-scoped-element-registry",
+      "description": "Select the server definition table used to resolve an explicitly scoped element constructor:"
     }
   }
 }

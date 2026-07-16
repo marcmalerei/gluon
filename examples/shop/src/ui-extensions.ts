@@ -43,13 +43,6 @@ export const ShopMenuAction = defineButtonPreset({
   class: 'menu-search-action',
 });
 
-export const ProductAddAction = defineButtonPreset({
-  displayName: 'ProductAddAction',
-  variant: 'primary',
-  size: 'large',
-  class: 'add-to-bag',
-});
-
 export const InventoryRetryAction = defineButtonPreset({
   displayName: 'InventoryRetryAction',
   variant: 'ghost',

@@ -15,6 +15,7 @@ import {
   TemplateResult,
   type GluonApp,
   type GluonElementClass,
+  type GluonElementDefinitionRegistry,
   type ComponentStyleDependency,
   type StyleSheetSelection,
   type TemplateValue,
@@ -52,6 +53,7 @@ export class SsrRenderError extends Error {
 export interface ServerElementOptions {
   readonly properties?: Readonly<Record<string, unknown>>;
   readonly children?: TemplateValue;
+  readonly registry?: GluonElementDefinitionRegistry;
 }
 
 interface ServerElementValue {
@@ -60,6 +62,7 @@ interface ServerElementValue {
   readonly properties: Readonly<Record<string, unknown>>;
   readonly shadow: TemplateResult;
   readonly children: TemplateValue;
+  readonly scopedRegistry: boolean;
 }
 
 /** Uses the same registered GluonElement class without running connection hooks. */
@@ -68,13 +71,14 @@ export function renderElement<Constructor extends GluonElementClass>(
   options: ServerElementOptions = {},
 ): TemplateValue {
   const properties = options.properties ?? {};
-  const rendered = renderGluonElementForServer(constructor, properties);
+  const rendered = renderGluonElementForServer(constructor, properties, { registry: options.registry });
   return Object.freeze({
     [serverElementBrand]: true as const,
     tagName: rendered.tagName,
     properties,
     shadow: rendered.template,
     children: options.children ?? nothing,
+    scopedRegistry: rendered.scopedRegistry,
   }) as unknown as TemplateValue;
 }
 
@@ -364,7 +368,9 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
   }
   if (isServerElementValue(value)) {
     yield `<${value.tagName}${serializeSpread(value.properties)}>`;
-    yield '<template shadowrootmode="open">';
+    yield value.scopedRegistry
+      ? '<template shadowrootmode="open" shadowrootcustomelementregistry>'
+      : '<template shadowrootmode="open">';
     yield* serializeTemplate(value.shadow, context);
     yield '</template>';
     yield* serializeValue(value.children, context);

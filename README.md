@@ -456,6 +456,13 @@ class GreetingElement extends GluonElement {
 defineElement('gluon-greeting', GreetingElement);
 ```
 
+Explicit version-isolation boundaries use `createGluonElementRegistry()` plus
+the `registry` registration option and `static shadowRootRegistry`. Native
+support keeps definitions out of `window.customElements`; unsupported browsers
+retain the same flow through the documented global fallback, while SSR emits
+the declarative registry marker for hydration. See
+[Scoped Custom Element registries](docs/scoped-element-registries.md).
+
 The opt-in decorator entry point expresses the same class contract without a
 separate registration call or duplicated property names:
 

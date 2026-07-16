@@ -398,6 +398,15 @@ prototype gaps and the required Gluon 1.0 contract.
 
 Every instance renders into an open ShadowRoot. Component styles are always adopted `CSSStyleSheet` instances.
 
+An element may declare `static shadowRootRegistry` with a handle created by
+`createGluonElementRegistry()`. The handle owns definitions independently of
+hosts and selects a native scoped registry when the platform supports complete
+ShadowRoot association. Unsupported browsers intentionally use the global
+registry; SSR uses an isolated definition table and emits the declarative
+registry marker. Registration identity also partitions HMR records, so equal
+tag names in separate native roots never share patched constructors. See
+[Scoped Custom Element registries](scoped-element-registries.md).
+
 `defineGluonElement()` generates a subclass with the same declarations and
 protected hooks. Setup runs in a child of the connection render scope;
 explicitly keyed ref/reactive state is instance-retained, while computed values,
