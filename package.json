@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/core",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
   "private": false,
   "workspaces": [
@@ -47,7 +47,7 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/reactivity": "1.0.10"
+    "@gluonjs/reactivity": "1.1.0"
   },
   "scripts": {
     "build": "npm run build:core && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",

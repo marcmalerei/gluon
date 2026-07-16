@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-16
+
 ### Added
 
 - Added the optional `@gluonjs/test-utils/ssr` entry for complete public SSR

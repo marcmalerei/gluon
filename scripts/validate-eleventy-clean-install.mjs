@@ -9,9 +9,20 @@ const root = resolve(import.meta.dirname, '..');
 const directory = await mkdtemp(resolve(tmpdir(), 'gluon-eleventy-clean-'));
 
 try {
-  const packed = JSON.parse((await execFile('npm', [
-    'pack', '--json', '--ignore-scripts', '--pack-destination', directory,
-  ], { cwd: resolve(root, 'packages/ssr') })).stdout)[0];
+  const packageDirectories = [
+    'packages/reactivity',
+    '.',
+    'packages/router',
+    'packages/store',
+    'packages/ssr',
+  ];
+  const archives = [];
+  for (const packageDirectory of packageDirectories) {
+    const packed = JSON.parse((await execFile('npm', [
+      'pack', '--json', '--ignore-scripts', '--pack-destination', directory,
+    ], { cwd: resolve(root, packageDirectory) })).stdout)[0];
+    archives.push(resolve(directory, packed.filename));
+  }
   const consumer = resolve(directory, 'consumer');
   await mkdir(resolve(consumer, 'routes'), { recursive: true });
   await writeFile(resolve(consumer, 'package.json'), JSON.stringify({ name: 'gluon-eleventy-clean-consumer', private: true, type: 'module' }, null, 2));
@@ -30,7 +41,7 @@ try {
       });
     }
   `);
-  await execFile('npm', ['install', resolve(directory, packed.filename), '@11ty/eleventy@3.1.6', '--ignore-scripts', '--no-audit', '--no-fund'], {
+  await execFile('npm', ['install', ...archives, '@11ty/eleventy@3.1.6', '--ignore-scripts', '--no-audit', '--no-fund'], {
     cwd: consumer, maxBuffer: 20 * 1024 * 1024,
   });
   await execFile(resolve(consumer, 'node_modules/.bin/eleventy'), [
@@ -40,7 +51,7 @@ try {
   if (!output.includes('<main>/clean</main>') || !output.includes('data-gluon-state')) {
     throw new Error('clean Eleventy consumer output is incomplete');
   }
-  console.log('Eleventy adapter clean install valid: packed SSR subpath, real Eleventy build, and hydratable output');
+  console.log('Eleventy adapter clean install valid: packed local release train, SSR subpath, real Eleventy build, and hydratable output');
 } finally {
   await rm(directory, { recursive: true, force: true });
 }

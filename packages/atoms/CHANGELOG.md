@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-16
+
+### Changed
+
+- Advanced the lockstep release with the current verified capability set while
+  retaining the existing public package contract.
+
 ## [1.0.10] - 2026-07-15
 
 ### Changed

@@ -1,6 +1,6 @@
 {
   "name": "create-gluon",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "Scaffold Gluon TypeScript applications and verified app-local components.",
   "private": false,
   "type": "module",

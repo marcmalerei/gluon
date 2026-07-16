@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "analyzer": {
     "name": "@gluonjs/vue-migration-analyzer",
-    "version": "1.0.10"
+    "version": "1.1.0"
   },
   "root": ".",
   "input": {
@@ -191,7 +191,7 @@
         }
       },
       "migrationStage": "shell-removal",
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue"
     },
     {
       "id": "inventory:component-element:src/Legacy.vue:89:130:1",
@@ -216,7 +216,7 @@
         }
       },
       "migrationStage": "leaf-boundary",
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "inventory:directive:src/Legacy.vue:100:110:1",
@@ -241,7 +241,7 @@
         }
       },
       "migrationStage": "leaf-boundary",
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "inventory:directive:src/Legacy.vue:111:127:1",
@@ -266,7 +266,7 @@
         }
       },
       "migrationStage": "leaf-boundary",
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "inventory:style-block:src/Legacy.vue:161:196:1",
@@ -291,7 +291,7 @@
         }
       },
       "migrationStage": "styles-universal",
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
     }
   ],
   "findings": [
@@ -304,7 +304,7 @@
       "location": null,
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1003:.:0:0:1",
@@ -315,7 +315,7 @@
       "location": null,
       "migrationStage": "baseline",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-0-establish-the-baseline"
     },
     {
       "id": "finding:GVA1101:src/Legacy.vue:19:69:1",
@@ -338,7 +338,7 @@
       },
       "migrationStage": "leaf-boundary",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "finding:GVA1201:src/Legacy.vue:89:130:1",
@@ -361,7 +361,7 @@
       },
       "migrationStage": "leaf-boundary",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "finding:GVA1202:src/Legacy.vue:111:127:1",
@@ -384,7 +384,7 @@
       },
       "migrationStage": "leaf-boundary",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "finding:GVA1403:src/Legacy.vue:161:196:1",
@@ -407,7 +407,7 @@
       },
       "migrationStage": "styles-universal",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering"
     },
     {
       "id": "finding:GVA1102:src/Legacy.vue:211:229:1",
@@ -430,7 +430,7 @@
       },
       "migrationStage": "leaf-boundary",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     },
     {
       "id": "finding:GVA1203:src/runtime.ts:105:118:1",
@@ -453,7 +453,7 @@
       },
       "migrationStage": "leaf-boundary",
       "relatedStages": [],
-      "guideUrl": "https://marcmalerei.github.io/gluon/1.0.10/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
+      "guideUrl": "https://marcmalerei.github.io/gluon/1.1.0/migration/vue-to-gluon-cutover/#stage-1-replace-one-leaf-with-a-production-custom-element"
     }
   ],
   "summary": {

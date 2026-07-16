@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-16
+
 ### Added
 
 - Added isolated `./signals` and `./preact-signals` adapters with explicit
