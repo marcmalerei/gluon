@@ -398,6 +398,44 @@ describe('Transition and TransitionGroup', () => {
     animate.mockRestore();
   });
 
+  it('animates keyed replacements without geometry changes and cleans up layout-id clones', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+    const animate = vi.spyOn(Element.prototype, 'animate');
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect');
+    const view = (layoutId: string, key: string) => html`${LayoutTransition({
+      layoutId,
+      transitionKey: key,
+      duration: 1,
+      children: html`<article data-layout-item>${key}</article>`,
+    })}`;
+
+    render(view('catalog', 'all'), root);
+    animate.mockClear();
+    rect.mockReturnValue(new DOMRect(10, 20, 200, 100));
+    render(view('catalog', 'lighting'), root);
+    expect(animate).toHaveBeenCalledOnce();
+    expect(animate.mock.calls[0]?.[0]).toEqual([
+      { opacity: 0, transform: 'translateY(4px)' },
+      { opacity: 1, transform: 'translateY(0)' },
+    ]);
+
+    animate.mockClear();
+    render(view('featured-catalog', 'featured'), root);
+    const clone = [...document.body.children].find((element): element is HTMLElement =>
+      element instanceof HTMLElement && element.matches('[data-layout-item]') && element.style.position === 'fixed');
+    expect(clone?.textContent).toBe('lighting');
+    expect(clone?.style.position).toBe('fixed');
+    expect(animate).toHaveBeenCalledTimes(2);
+    await Promise.all(animate.mock.results.map(({ value }) => value.finished.catch(() => undefined)));
+    expect(clone?.isConnected).toBe(false);
+
+    unmount(root);
+    root.remove();
+    rect.mockRestore();
+    animate.mockRestore();
+  });
+
   it('cancels replaced animations and applies the latest transition content', async () => {
     const root = document.createElement('div');
     const cancel = vi.spyOn(Animation.prototype, 'cancel');

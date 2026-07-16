@@ -647,6 +647,7 @@ function updateLayoutTransition(
   cancelLayoutTransition(state);
   const previousElement = directLayoutElement(state.host);
   const previousRect = previousElement?.getBoundingClientRect();
+  const previousSnapshot = previousElement?.cloneNode(true) as HTMLElement | undefined;
   const previousId = state.layoutId;
   const keyChanged = props.transitionKey !== undefined && !Object.is(props.transitionKey, state.activeKey);
   state.activeKey = props.transitionKey;
@@ -663,7 +664,7 @@ function updateLayoutTransition(
     else if (keyChanged) state.animations.push(playAnimation(currentElement, props.enter ?? defaultEnter, props));
     return;
   }
-  if (previousElement && previousRect) createLayoutLeavingClone(state, previousElement, previousRect, props);
+  if (previousSnapshot && previousRect) createLayoutLeavingClone(state, previousSnapshot, previousRect, props);
   if (currentElement) state.animations.push(playAnimation(currentElement, props.enter ?? defaultEnter, props));
 }
 
@@ -673,11 +674,10 @@ function directLayoutElement(host: HTMLElement): HTMLElement | undefined {
 
 function createLayoutLeavingClone(
   state: LayoutTransitionState,
-  element: HTMLElement,
+  clone: HTMLElement,
   rect: DOMRect,
   options: TransitionOptions,
 ): void {
-  const clone = element.cloneNode(true) as HTMLElement;
   Object.assign(clone.style, {
     position: 'fixed', left: `${rect.left}px`, top: `${rect.top}px`,
     width: `${rect.width}px`, height: `${rect.height}px`, margin: '0',
