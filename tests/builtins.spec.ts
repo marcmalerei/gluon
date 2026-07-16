@@ -7,6 +7,7 @@ import {
   Teleport,
   Transition,
   TransitionGroup,
+  LayoutTransition,
   createApp,
   createInjectionKey,
   defineAsyncComponent,
@@ -242,12 +243,14 @@ describe('async UI built-ins', () => {
       KeepAlive({ cacheKey: 'route', children: 'cached' }),
       Transition({ children: 'transitioned' }),
       TransitionGroup({ items: ['a'], key: String, children: String }),
+      LayoutTransition({ layoutId: 'shared', children: 'layout' }),
     ];
     expect(values.map((value) => getBuiltinServerContract(value)?.kind)).toEqual([
       'teleport',
       'keep-alive',
       'transition',
       'transition-group',
+      'layout-transition',
     ]);
     expect(getBuiltinServerContract('ordinary')).toBeUndefined();
   });
@@ -353,6 +356,86 @@ describe('Teleport and KeepAlive', () => {
 });
 
 describe('Transition and TransitionGroup', () => {
+  it('animates render-to-render layout geometry and preserves reduced-motion content', () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+    const animate = vi.spyOn(Element.prototype, 'animate');
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect');
+    const view = (key: string, reducedMotion = false) => html`${LayoutTransition({
+      layoutId: 'catalog-grid',
+      transitionKey: key,
+      reducedMotion,
+      duration: 2,
+      children: html`<section data-layout>${key}</section>`,
+    })}`;
+
+    render(view('all'), root);
+    animate.mockClear();
+    rect
+      .mockReturnValueOnce(new DOMRect(10, 20, 200, 100))
+      .mockReturnValueOnce(new DOMRect(30, 40, 100, 50));
+    render(view('lighting'), root);
+    expect(root.textContent).toBe('lighting');
+    expect(animate).toHaveBeenCalledOnce();
+    expect(animate.mock.calls[0]?.[0]).toEqual([
+      { transformOrigin: 'top left', transform: 'translate(-20px, -20px) scale(2, 2)' },
+      { transformOrigin: 'top left', transform: 'translate(0, 0) scale(1, 1)' },
+    ]);
+
+    animate.mockClear();
+    render(view('seating', true), root);
+    expect(root.textContent).toBe('seating');
+    expect(animate).not.toHaveBeenCalled();
+    expect(() => render(
+      html`${LayoutTransition({ layoutId: ' ', children: '' })}`,
+      document.createElement('div'),
+    )).toThrow(/cannot be empty/i);
+    expect(getBuiltinServerContract(LayoutTransition({ layoutId: 'server', children: 'Stable' })))
+      .toEqual({ kind: 'layout-transition', content: 'Stable' });
+    unmount(root);
+    root.remove();
+    rect.mockRestore();
+    animate.mockRestore();
+  });
+
+  it('animates keyed replacements without geometry changes and cleans up layout-id clones', async () => {
+    const root = document.createElement('div');
+    document.body.append(root);
+    const animate = vi.spyOn(Element.prototype, 'animate');
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect');
+    const view = (layoutId: string, key: string) => html`${LayoutTransition({
+      layoutId,
+      transitionKey: key,
+      duration: 1,
+      children: html`<article data-layout-item>${key}</article>`,
+    })}`;
+
+    render(view('catalog', 'all'), root);
+    animate.mockClear();
+    rect.mockReturnValue(new DOMRect(10, 20, 200, 100));
+    render(view('catalog', 'lighting'), root);
+    expect(animate).toHaveBeenCalledOnce();
+    expect(animate.mock.calls[0]?.[0]).toEqual([
+      { opacity: 0, transform: 'translateY(4px)' },
+      { opacity: 1, transform: 'translateY(0)' },
+    ]);
+
+    animate.mockClear();
+    render(view('featured-catalog', 'featured'), root);
+    const clone = [...document.body.children].find((element): element is HTMLElement =>
+      element instanceof HTMLElement && element.matches('[data-layout-item]') && element.style.position === 'fixed');
+    expect(clone?.textContent).toBe('lighting');
+    expect(clone?.style.position).toBe('fixed');
+    expect(animate).toHaveBeenCalledTimes(2);
+    await Promise.all(animate.mock.results.map(({ value }) => value.finished.catch(() => undefined)));
+    expect(clone?.isConnected).toBe(false);
+
+    unmount(root);
+    root.remove();
+    rect.mockRestore();
+    animate.mockRestore();
+  });
+
   it('cancels replaced animations and applies the latest transition content', async () => {
     const root = document.createElement('div');
     const cancel = vi.spyOn(Animation.prototype, 'cancel');

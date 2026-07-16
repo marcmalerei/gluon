@@ -1,6 +1,7 @@
 import {
   GluonElement,
   KeepAlive,
+  LayoutTransition,
   Suspense,
   Teleport,
   Transition,
@@ -193,6 +194,7 @@ TransitionGroup({
   key: (row) => row.id,
   children: (row) => html`<p>${row.label}</p>`,
 });
+LayoutTransition({ layoutId: 'catalog-grid', transitionKey: 'lighting', children: html`<section></section>` });
 
 const lifecycleDefinition: DirectiveLifecycle<[string]> = {
   mount(part, [value]) {

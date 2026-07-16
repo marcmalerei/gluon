@@ -11,6 +11,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 - Added a complete static Gluon project inventory API and CLI with explicit
   evidence confidence, retained GLUON GOODS output, and clean-install gates.
+- Added `LayoutTransition()` for render-to-render direct-root geometry,
+  shared layout identity, cancellation, reduced-motion, and stable SSR output.
 - Added universal scoped Custom Element registry handles, explicit class and
   functional registration targets, ShadowRoot ownership, duplicate-name
   isolation, DSD/SSR hydration transport, registry-partitioned HMR, and a

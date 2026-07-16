@@ -303,13 +303,15 @@ const availability = Suspense({
 Teleport({ to: document.body, children: dialog });
 KeepAlive({ cacheKey: route.fullPath, max: 4, children: RouterView() });
 Transition({ transitionKey: open, children: open ? dialog : nothing });
+LayoutTransition({ layoutId: 'catalog-grid', transitionKey: category, children: catalog });
 ```
 
 Async components add cached loading, failure, timeout, retry, and `preload()`
 behavior. Teleport retains application context and cleans its external host.
 KeepAlive suspends cached renderer resources and evicts least-recently-used
-entries. Transition and TransitionGroup cancel stale Web Animations and honor
-reduced-motion preferences. A public DOM-free descriptor is available to the
+entries. Transition, TransitionGroup, and LayoutTransition cancel stale Web
+Animations and honor reduced-motion preferences; LayoutTransition uses shared
+identity to animate direct-root geometry between renders. A public DOM-free descriptor is available to the
 server renderer and progressive boundary coordinator. See [Async UI and
 rendering built-ins](docs/async-ui.md).
 
