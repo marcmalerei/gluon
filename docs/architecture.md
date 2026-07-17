@@ -542,6 +542,12 @@ itself remains developer tooling.
 
 ## Developer-experience evidence boundary
 
+Optional third-party component libraries use the versioned public manifest
+contract in [`component-library-contract.md`](component-library-contract.md).
+That contract names public module, export, stylesheet, dependency, accessibility,
+and optional custom-element-tag metadata without making imports, registrations,
+or style adoption implicit runtime behavior.
+
 The issue #107 comparison is an evidence system, not a framework runtime or an
 application dependency. Its versioned task contract and completed-run JSON
 schema live under `benchmarks/dx`; they do not enter Core, UI, Router, Store,

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '../src/index.js';
-import { fragment, htmlTagNames, q, quark } from '@gluonjs/quarks';
+import { fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
 
 describe('quarks', () => {
   beforeEach(() => {
@@ -56,5 +56,42 @@ describe('quarks', () => {
 
   it('rejects children for void elements', () => {
     expect(() => q.input({ children: 'invalid' })).toThrow(/cannot receive children/i);
+  });
+
+  it('validates a serializable public component-library manifest without importing it', () => {
+    const result = validateComponentLibraryManifest({
+      schemaVersion: 1,
+      name: '@acme/shop-components',
+      entries: [{
+        id: 'product-configurator',
+        module: '@acme/shop-components/product-configurator',
+        exportName: 'ProductConfigurator',
+        layer: 'element',
+        tag: 'acme-product-configurator',
+        styles: ['acme-product-configurator'],
+        dependencies: ['purchase-action'],
+        accessibility: 'Uses labelled native choices.',
+      }],
+    });
+
+    expect(result).toEqual({ valid: true, errors: [] });
+  });
+
+  it('rejects unsafe module targets and duplicate element registration names in a manifest', () => {
+    const result = validateComponentLibraryManifest({
+      schemaVersion: 1,
+      name: 'example',
+      entries: [
+        { id: 'one', module: './private', exportName: 'One', layer: 'element', tag: 'acme-panel', styles: [], dependencies: [], accessibility: 'A.' },
+        { id: 'one', module: '@acme/library/two', exportName: 'Two', layer: 'element', tag: 'acme-panel', styles: [], dependencies: [], accessibility: 'B.' },
+      ],
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(expect.arrayContaining([
+      'Entry 0 module must be a bare public ESM specifier.',
+      'Entry 1 duplicates id one.',
+      'Entry 1 duplicates tag acme-panel.',
+    ]));
   });
 });

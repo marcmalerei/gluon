@@ -37,3 +37,9 @@ export {
   type UiContractEntry,
   type UiPackageManifest,
 } from './manifest.js';
+export {
+  validateComponentLibraryManifest,
+  type ComponentLibraryEntry,
+  type ComponentLibraryManifest,
+  type ComponentLibraryManifestValidation,
+} from './component-library.js';
