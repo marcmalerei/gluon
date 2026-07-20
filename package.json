@@ -94,6 +94,7 @@
     "dev:benchmark": "vite --config benchmarks/rendering/vite.config.ts",
     "dev:benchmark:components": "vite --config benchmarks/components/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
+    "benchmark:bundle": "node scripts/run-bundle-matrix.mjs",
     "typecheck": "npm run typecheck:core && npm run typecheck:decorators-legacy && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:decorators-legacy": "tsc -p tests-node/tsconfig.decorators-legacy.json",

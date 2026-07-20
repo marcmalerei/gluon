@@ -426,3 +426,10 @@ The shop flow has its own non-comparative p95 budgets in
 navigation, bag opening, and checkout navigation in the production build and
 preserves all raw samples. The thresholds are regression ceilings, not user
 experience guarantees across networks or devices.
+# Bundle-size matrix
+
+`npm run benchmark:bundle` produces a reproducible, production-mode size matrix
+for a deliberately small equivalent Gluon, Lit, Vue, and React fixture. It
+records raw, gzip, and Brotli bytes together with Node, npm, and lockfile
+metadata. See [the fixture contract](../benchmarks/bundle/README.md). This is
+scenario evidence only; it does not establish a universal bundle-size ranking.
