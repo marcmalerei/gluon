@@ -1,6 +1,27 @@
 {
   "version": 1,
   "recipes": {
+    "component-library-manifest": {
+      "module": "@gluonjs/quarks",
+      "code": [
+        "import { validateComponentLibraryManifest, type ComponentLibraryEntry, type ComponentLibraryManifest, type ComponentLibraryManifestValidation } from '@gluonjs/quarks';",
+        "",
+        "const entry = {",
+        "  id: 'product-configurator',",
+        "  module: '@acme/shop-components/product-configurator',",
+        "  exportName: 'ProductConfigurator',",
+        "  layer: 'element',",
+        "  tag: 'acme-product-configurator',",
+        "  styles: ['acme-product-configurator'],",
+        "  dependencies: [],",
+        "  accessibility: 'Uses labelled native choices.',",
+        "} as const satisfies ComponentLibraryEntry;",
+        "const manifest = { schemaVersion: 1, name: '@acme/shop-components', entries: [entry] } as const satisfies ComponentLibraryManifest;",
+        "const result: ComponentLibraryManifestValidation = validateComponentLibraryManifest(manifest);",
+        "if (!result.valid) throw new Error(result.errors.join('\\n'));",
+        "console.log(manifest.entries[0]?.module);"
+      ]
+    },
     "create-gluon-io": {
       "module": "create-gluon",
       "code": [
@@ -3722,6 +3743,10 @@
       "recipe": "quark-headless",
       "description": "Contain Tab focus inside an owned panel, choose its initial target, and restore the connected trigger when the scope closes:"
     },
+    "packages/quarks/src/functions/validateComponentLibraryManifest.md": {
+      "recipe": "component-library-manifest",
+      "description": "Validate a serializable component-library manifest before a consumer resolves any requested public module:"
+    },
     "packages/quarks/src/functions/Field.md": {
       "recipe": "quark-headless",
       "description": "Render a native label around form content and show either helper text or an announced error message:"
@@ -3757,6 +3782,18 @@
     "packages/quarks/src/interfaces/FieldProps.md": {
       "recipe": "quark-headless",
       "description": "Supply required visible label and form content plus optional helper, error, and native label attributes:"
+    },
+    "packages/quarks/src/interfaces/ComponentLibraryEntry.md": {
+      "recipe": "component-library-manifest",
+      "description": "Describe a requested public component module, its styles, dependencies, accessibility contract, and optional custom-element tag:"
+    },
+    "packages/quarks/src/interfaces/ComponentLibraryManifest.md": {
+      "recipe": "component-library-manifest",
+      "description": "Publish a versioned, serializable inventory without importing modules or registering elements as a side effect:"
+    },
+    "packages/quarks/src/interfaces/ComponentLibraryManifestValidation.md": {
+      "recipe": "component-library-manifest",
+      "description": "Inspect all structural manifest errors before handing records to an explicit consumer-owned loader:"
     },
     "packages/quarks/src/interfaces/FocusScope.md": {
       "recipe": "quark-headless",

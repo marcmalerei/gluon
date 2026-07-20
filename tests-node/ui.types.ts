@@ -27,6 +27,8 @@ import {
   unsafeQuarkProps,
   type FocusScope,
   type QuarkProps,
+  type ComponentLibraryManifest,
+  validateComponentLibraryManifest,
 } from '@gluonjs/quarks';
 
 const buttonProps: ButtonProps = { label: 'Save', variant: 'primary' };
@@ -56,6 +58,12 @@ owner.setTheme('light');
 owner.styleOwner.retain(theme);
 owner.dispose();
 const manifests = [quarkManifest, atomManifest, moleculeManifest, organismManifest] as const;
+const componentLibraryManifest = {
+  schemaVersion: 1,
+  name: '@acme/shop-components',
+  entries: [{ id: 'purchase-action', module: '@acme/shop-components/purchase-action', exportName: 'PurchaseAction', layer: 'molecule', styles: ['acme-purchase-action'], dependencies: [], accessibility: 'Renders a named purchase action.', storyId: 'purchase-action--default' }],
+} as const satisfies ComponentLibraryManifest;
+const componentLibraryValidation: boolean = validateComponentLibraryManifest(componentLibraryManifest).valid;
 const buttonRef: { value?: HTMLButtonElement } = {};
 const svgRef: { value?: SVGSVGElement } = {};
 const nativeButton = {
@@ -100,6 +108,7 @@ void theme;
 void selection;
 void manifests;
 void buttonStyleId;
+void componentLibraryValidation;
 
 // @ts-expect-error component style metadata is immutable
 Button.styles.push(Button.styles[0]!);
