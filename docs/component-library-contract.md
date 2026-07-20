@@ -57,9 +57,12 @@ use a `<style>` fallback. SSR must retain the selected stylesheet ids in its
 request-local manifest; hydration must validate and hand off the same ordered
 ids without replacing retained DOM.
 
-The loader is intentionally separate from this schema so that package authors,
-bundlers, SSR adapters, and applications retain explicit authority over imports,
-registries, style roots, cache lifetime, error reporting, and disposal.
+`createComponentLibraryLoader(manifest, resolver)` is the public loader core.
+The consumer-owned resolver receives only the requested validated record; this
+keeps bundler import maps explicit and makes cache state observable through
+`status(id)`. Package authors, bundlers, SSR adapters, and applications retain
+authority over imports, registries, style roots, cache lifetime, error
+reporting, and disposal.
 
 ## Verification boundary
 

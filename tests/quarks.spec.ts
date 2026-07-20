@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '../src/index.js';
-import { fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
+import { createComponentLibraryLoader, fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
 
 describe('quarks', () => {
   beforeEach(() => {
@@ -131,5 +131,22 @@ describe('quarks', () => {
       'Entry 1 only an element may declare tag.',
       'Entry 2 only an element may declare tag.',
     ]));
+  });
+
+  it('loads only the requested public entry and its declared dependencies with observable cache state', async () => {
+    const load = vi.fn(async (entry: { id: string }) => ({ id: entry.id }));
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'base', module: '@acme/components/base', exportName: 'Base', layer: 'atom', styles: [], dependencies: [], accessibility: 'Base.' },
+      { id: 'picker', module: '@acme/components/picker', exportName: 'Picker', layer: 'molecule', styles: [], dependencies: ['base'], accessibility: 'Picker.' },
+    ] }, { load });
+
+    expect(loader.status('picker')).toBe('idle');
+    const first = loader.load('picker');
+    expect(loader.status('picker')).toBe('loading');
+    expect(await first).toMatchObject({ entry: { id: 'picker' }, value: { id: 'picker' } });
+    expect(loader.status('picker')).toBe('loaded');
+    await loader.load('picker');
+    expect(load.mock.calls.map(([entry]) => entry.id)).toEqual(['base', 'picker']);
+    expect(() => loader.load('missing')).toThrow('Unknown component-library entry: missing.');
   });
 });
