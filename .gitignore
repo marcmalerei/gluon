@@ -1,5 +1,6 @@
 node_modules/
 dist/
+examples/component-library/storybook-static/
 dist-server/
 dist-static/
 dist-eleventy/
