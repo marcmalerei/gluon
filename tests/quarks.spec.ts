@@ -149,4 +149,28 @@ describe('quarks', () => {
     expect(load.mock.calls.map(([entry]) => entry.id)).toEqual(['base', 'picker']);
     expect(() => loader.load('missing')).toThrow('Unknown component-library entry: missing.');
   });
+
+  it('reports failed, cyclic, and conflicting element loads without retaining a bad cache entry', async () => {
+    const failed = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'broken', module: '@acme/components/broken', exportName: 'Broken', layer: 'atom', styles: [], dependencies: [], accessibility: 'Broken.' },
+    ] }, { load: async () => { throw new Error('network failure'); } });
+    await expect(failed.load('broken')).rejects.toThrow('network failure');
+    await Promise.resolve();
+    expect(failed.status('broken')).toBe('failed');
+
+    const cyclic = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'first', module: '@acme/components/first', exportName: 'First', layer: 'atom', styles: [], dependencies: ['second'], accessibility: 'First.' },
+      { id: 'second', module: '@acme/components/second', exportName: 'Second', layer: 'atom', styles: [], dependencies: ['first'], accessibility: 'Second.' },
+    ] }, { load: async () => null });
+    await expect(cyclic.load('first')).rejects.toThrow('Component dependency cycle includes first.');
+
+    const tag = `acme-loader-${Math.random().toString(36).slice(2)}`;
+    class RegisteredElement extends HTMLElement {}
+    class DifferentElement extends HTMLElement {}
+    customElements.define(tag, RegisteredElement);
+    const elements = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'element', module: '@acme/components/element', exportName: 'Element', layer: 'element', tag, styles: [], dependencies: [], accessibility: 'Element.' },
+    ] }, { load: async () => DifferentElement });
+    await expect(elements.load('element')).rejects.toThrow(`Duplicate custom-element registration for ${tag}.`);
+  });
 });
