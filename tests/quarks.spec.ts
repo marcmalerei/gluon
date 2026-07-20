@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render } from '../src/index.js';
+import { css, render } from '../src/index.js';
 import { createComponentLibraryLoader, fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
 
 describe('quarks', () => {
@@ -172,5 +172,18 @@ describe('quarks', () => {
       { id: 'element', module: '@acme/components/element', exportName: 'Element', layer: 'element', tag, styles: [], dependencies: [], accessibility: 'Element.' },
     ] }, { load: async () => DifferentElement });
     await expect(elements.load('element')).rejects.toThrow(`Duplicate custom-element registration for ${tag}.`);
+  });
+
+  it('retains and releases only the requested component-library sheets', async () => {
+    const sheet = css`:host { display: block; }`;
+    const target = document.createElement('div').attachShadow({ mode: 'open' });
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'styled', module: '@acme/components/styled', exportName: 'Styled', layer: 'atom', styles: ['styled'], dependencies: [], accessibility: 'Styled.' },
+    ] }, { load: async () => null }, { styleTarget: target, styles: { resolve: () => [sheet] } });
+
+    await loader.load('styled');
+    expect(target.adoptedStyleSheets).toContain(sheet);
+    loader.release('styled');
+    expect(target.adoptedStyleSheets).not.toContain(sheet);
   });
 });

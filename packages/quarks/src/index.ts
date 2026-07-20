@@ -47,6 +47,8 @@ export {
   ComponentLibraryLoader,
   createComponentLibraryLoader,
   type ComponentLibraryModuleResolver,
+  type ComponentLibraryStyleResolver,
+  type ComponentLibraryLoaderOptions,
   type ComponentLoadResult,
   type ComponentLoadStatus,
 } from './component-loader.js';
