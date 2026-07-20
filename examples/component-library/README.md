@@ -11,3 +11,7 @@ quantity.
 
 Run `npm run build:component-library` to build the consumer. Loader and
 Storybook integration are intentionally delivered by issues #214 and #215.
+
+`library/` is the separately buildable package boundary. Run
+`npm run check:component-library-package` to build it and inspect the exact
+tarball contents before a clean-consumer install.

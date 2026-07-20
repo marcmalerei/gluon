@@ -77,6 +77,8 @@
     "build:virtualizer-example": "vite build --config examples/virtualizer/vite.config.ts",
     "build:signals-example": "vite build --config examples/signals/vite.config.ts",
     "build:component-library": "vite build --config examples/component-library/vite.config.ts",
+    "build:component-library-package": "npm run build --prefix examples/component-library/library",
+    "check:component-library-package": "npm run build:component-library-package && npm run pack:check --prefix examples/component-library/library",
     "docs:api": "typedoc --options typedoc.json --treatWarningsAsErrors && node scripts/generate-api-examples.mjs",
     "build:docs": "npm run docs:api && node scripts/build-docs.mjs && npm run build:docs-examples",
     "build:docs-examples": "vite build --config docs-site/examples/vite.config.ts",
