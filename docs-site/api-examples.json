@@ -22,6 +22,19 @@
         "console.log(manifest.entries[0]?.module);"
       ]
     },
+    "component-library-loader": {
+      "module": "@gluonjs/quarks",
+      "code": [
+        "import { createComponentLibraryLoader, type ComponentLibraryLoader, type ComponentLibraryManifest, type ComponentLibraryModuleResolver, type ComponentLoadResult, type ComponentLoadStatus } from '@gluonjs/quarks';",
+        "",
+        "const manifest = { schemaVersion: 1, name: '@acme/shop-components', entries: [{ id: 'purchase-action', module: '@acme/shop-components/purchase-action', exportName: 'PurchaseAction', layer: 'atom', styles: [], dependencies: [], accessibility: 'Renders a labelled native button.' }] } as const satisfies ComponentLibraryManifest;",
+        "const resolver: ComponentLibraryModuleResolver = { load: async (entry) => ({ entry: entry.id }) };",
+        "const loader: ComponentLibraryLoader = createComponentLibraryLoader(manifest, resolver);",
+        "const component: ComponentLoadResult = await loader.load('purchase-action');",
+        "const status: ComponentLoadStatus = loader.status('purchase-action');",
+        "console.log(status, component.entry.exportName);"
+      ]
+    },
     "create-gluon-io": {
       "module": "create-gluon",
       "code": [
@@ -3746,6 +3759,26 @@
     "packages/quarks/src/functions/validateComponentLibraryManifest.md": {
       "recipe": "component-library-manifest",
       "description": "Validate a serializable component-library manifest before a consumer resolves any requested public module:"
+    },
+    "packages/quarks/src/classes/ComponentLibraryLoader.md": {
+      "recipe": "component-library-loader",
+      "description": "Load exactly one requested manifest entry and observe its explicit cache state:"
+    },
+    "packages/quarks/src/functions/createComponentLibraryLoader.md": {
+      "recipe": "component-library-loader",
+      "description": "Create a consumer-owned loader with an explicit public-module resolver:"
+    },
+    "packages/quarks/src/interfaces/ComponentLibraryModuleResolver.md": {
+      "recipe": "component-library-loader",
+      "description": "Resolve only the already validated, consumer-requested public manifest entry:"
+    },
+    "packages/quarks/src/interfaces/ComponentLoadResult.md": {
+      "recipe": "component-library-loader",
+      "description": "Read the loaded public value together with its manifest record:"
+    },
+    "packages/quarks/src/type-aliases/ComponentLoadStatus.md": {
+      "recipe": "component-library-loader",
+      "description": "Observe whether a requested entry is idle, loading, loaded, or failed:"
     },
     "packages/quarks/src/functions/Field.md": {
       "recipe": "quark-headless",
