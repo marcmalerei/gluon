@@ -1,0 +1,5 @@
+{
+  "name": "@gluonjs/example-component-library",
+  "private": true,
+  "type": "module"
+}

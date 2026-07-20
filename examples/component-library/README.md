@@ -1,0 +1,13 @@
+# Component-library consumer
+
+This is a deliberately separate component-library and consumer example. It is
+not a GLUON GOODS route or a replacement for the shop acceptance application.
+
+The library uses only `@gluonjs/core` and `@gluonjs/quarks` public entry points:
+`ProductBadge` is a stateless Atom and `example-product-picker` is a stateful
+Custom Element. Its ShadowRoot owns a constructable stylesheet, native buttons
+remain keyboard-operable, and its typed `change` event reports the exact new
+quantity.
+
+Run `npm run build:component-library` to build the consumer. Loader and
+Storybook integration are intentionally delivered by issues #214 and #215.
