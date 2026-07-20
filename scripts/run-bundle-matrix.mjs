@@ -19,14 +19,15 @@ for (const fixture of fixtures) {
   execFileSync('npx', ['vite', 'build', source, '--outDir', target, '--manifest'], { cwd: root, stdio: 'inherit' });
   const files = await collect(target);
   const manifest = JSON.parse(await readFile(resolve(target, '.vite/manifest.json'), 'utf8'));
-  await verifyParity(target, fixture);
+  const browser = await verifyParity(target, fixture);
   results[fixture] = {
     bytes: files.filter((file) => /\.(?:js|css)$/.test(file.path)).reduce((total, file) => ({ raw: total.raw + file.raw, gzip: total.gzip + file.gzip, brotli: total.brotli + file.brotli }), { raw: 0, gzip: 0, brotli: 0 }),
     moduleGraph: Object.fromEntries(Object.entries(manifest).map(([entry, value]) => [entry, { file: value.file, imports: value.imports ?? [], dynamicImports: value.dynamicImports ?? [], css: value.css ?? [] }])),
+    parity: { browser },
   };
 }
 const packageLock = JSON.parse(await readFile(resolve(root, 'package-lock.json'), 'utf8'));
-const report = { schemaVersion: 1, node: process.version, npm: execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim(), lockfileVersion: packageLock.lockfileVersion, fixtures: results, scope: 'Equivalent labelled counter fixture; results are per production entry and are not a universal framework ranking.' };
+const report = { schemaVersion: 1, node: process.version, npm: execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim(), vite: execFileSync('npx', ['vite', '--version'], { encoding: 'utf8' }).trim(), lockfileVersion: packageLock.lockfileVersion, fixtures: results, scope: 'Equivalent labelled counter fixture; results are per production entry and are not a universal framework ranking.' };
 await writeFile(resolve(output, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify(report, null, 2));
 
@@ -56,6 +57,7 @@ async function verifyParity(directory, fixture) {
   const { port } = server.address();
   const browser = await chromium.launch({ headless: true });
   try {
+    const version = browser.version();
     const page = await browser.newPage();
     await page.goto(`http://127.0.0.1:${port}`);
     await page.getByRole('heading', { name: 'Bundle fixture' }).waitFor();
@@ -63,6 +65,7 @@ async function verifyParity(directory, fixture) {
     await button.click();
     const output = page.locator('output[aria-live="polite"]');
     if (await output.textContent() !== '1') throw new Error(`${fixture} did not preserve the required counter interaction.`);
+    return version;
   } finally {
     await browser.close();
     await new Promise((resolveClose, rejectClose) => server.close((error) => error ? rejectClose(error) : resolveClose()));
