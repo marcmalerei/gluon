@@ -43,3 +43,10 @@ export {
   type ComponentLibraryManifest,
   type ComponentLibraryManifestValidation,
 } from './component-library.js';
+export {
+  ComponentLibraryLoader,
+  createComponentLibraryLoader,
+  type ComponentLibraryModuleResolver,
+  type ComponentLoadResult,
+  type ComponentLoadStatus,
+} from './component-loader.js';
