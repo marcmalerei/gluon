@@ -164,7 +164,7 @@ describe('quarks', () => {
     ] }, { load: async () => null });
     await expect(cyclic.load('first')).rejects.toThrow('Component dependency cycle includes first.');
 
-    const tag = `acme-loader-${Math.random().toString(36).slice(2)}`;
+    const tag: `${string}-${string}` = `acme-loader-${Math.random().toString(36).slice(2)}`;
     class RegisteredElement extends HTMLElement {}
     class DifferentElement extends HTMLElement {}
     customElements.define(tag, RegisteredElement);
