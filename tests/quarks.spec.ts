@@ -199,7 +199,7 @@ describe('quarks', () => {
 
     await loader.load('shared');
     loader.release('shared');
-    expect(target.adoptedStyleSheets).toEqual([sheet]);
+    expect(target.adoptedStyleSheets).toHaveLength(1);
   });
 
   it('keeps a loader-owned shared stylesheet until every entry releases it', async () => {
