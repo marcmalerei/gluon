@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Changed
+
+- Advanced the lockstep release with component-loader SSR snapshot evidence
+  while retaining the existing public rendering and hydration contracts.
+
 ## [1.1.0] - 2026-07-16
 
 ### Added

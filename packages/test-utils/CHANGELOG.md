@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Changed
+
+- Advanced the lockstep release with packed component-library consumer and SSR
+  lifecycle evidence while retaining the existing public test contracts.
+
 ## [1.1.0] - 2026-07-16
 
 ### Added

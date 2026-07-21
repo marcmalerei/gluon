@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Changed
+
+- Generated applications and components now pin the complete selected Gluon
+  package set to lockstep version `1.2.0`.
+
 ## [1.1.0] - 2026-07-16
 
 ### Changed

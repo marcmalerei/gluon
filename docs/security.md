@@ -1,6 +1,6 @@
 # Security threat model
 
-This threat model applies to the released `1.1.0` release line. Its
+This threat model applies to the prepared `1.2.0` release line. Its
 machine-readable source is
 [`quality/security-threat-model.json`](../quality/security-threat-model.json),
 and `npm run check:security` rejects missing threat areas or evidence paths.
@@ -14,7 +14,7 @@ application content or supplies an application security policy.
 | Styles | Constructable sheets are the browser runtime; SSR carriers are escaped and digest/order validated before adoption. | Treat `css()` input as author source; do not interpolate untrusted CSS. | `tests/styles-and-element.spec.ts`, `tests/hydration.spec.ts` |
 | SSR state | Only JSON-compatible state is accepted; script-breaking characters are escaped; resources are request-owned. | Keep secrets out of browser-visible state and authorize every serialized field. | `tests-node/ssr.spec.ts`, property/fuzz gate |
 | CSP | A request nonce is transported to initial style carriers without being generated or weakened by Gluon; module scripts use external asset URLs. | Generate unpredictable per-response nonces or hashes, emit policy/report headers, and reject violations. | `tests-node/ssr.spec.ts`, `docs/deployment.md` |
-| Trusted Types | Unsafe sinks are visible in public API names. No `1.1.0` enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
+| Trusted Types | Unsafe sinks are visible in public API names. No `1.2.0` enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
 | Eleventy prerendering | The optional adapter validates route and asset URL boundaries, isolates abort/disposal ownership, escapes default-document attributes, and transports existing SSR carriers unchanged. | Trust and validate Eleventy data, asset manifests, custom document functions, CSP policy, and deployment fallbacks. | `tests-node/ssr.spec.ts`, `tests/hydration.spec.ts`, real and clean Eleventy build gates |
 | Vue source analysis | The Node analyzer realpath-checks one root, never follows symlinks or executes project code, enforces fixed worker/resource budgets, emits no source excerpts/absolute paths, and has no writer/network/plugin hook. | Treat findings as static inventory only; review indeterminate runtime, Router, Store, style, SSR, async, test, and build semantics. | `tests-node/vue-migration-analyzer.spec.ts`, retained adversarial fixtures, RFC 0003 |
 | Gluon project analysis | The CLI realpath-contains one root, skips symlinks and generated/dependency directories, caps source files and bytes, never imports application modules, and writes only JSON to stdout. | Treat exact and structural records as static evidence and review every indeterminate record against runtime behavior. | `tests-node/language-server.spec.ts`, `check:project-analysis`, clean-install fixture |

@@ -28,6 +28,29 @@ images for seven days in a `browser-differences-<engine>-<commit>` artifact.
 Review those images before accepting a new reference or changing the allowed
 pixel difference.
 
+## Component-library and performance evidence
+
+The component-library gate packs the real library, installs it with local Gluon
+release archives in an empty consumer, typechecks and production-builds it, and
+verifies interaction plus teardown in Chromium. A separate loader build proves
+that only requested entry chunks and styles are loaded, while the Storybook
+gate retains interaction, accessibility, and visual evidence for the picker and
+loading, cached, and failed loader states.
+
+```sh
+npm run check:component-library-clean-install
+npm run check:component-library-loader-build
+npm run check:storybook:component-library
+npm run benchmark:bundle
+npm run benchmark:components
+npm run benchmark:runtime
+```
+
+Bundle and performance reports retain raw samples, exact package/browser
+versions, source identity, environment metadata, and observable parity. They
+state results per workload and engine; they do not establish a universal
+framework ranking.
+
 ## Security workflow
 
 Universal rendering never invents a Content Security Policy nonce. A server may
@@ -49,7 +72,7 @@ npm run check:security
 npm run check:shop-performance
 ```
 
-Review the [deployment reference](/gluon/1.1.0/reference/deployment/) before
+Review the [deployment reference](/gluon/1.2.0/reference/deployment/) before
 changing CSP, asset, or server behavior. Diagnostics and runtime failures remain
 visible; production code does not report a successful state after a failed
 compile, import, hydration, or render step.
@@ -57,7 +80,7 @@ compile, import, hydration, or render step.
 The report-only Vue analyzer treats source, SFCs, tests, and Vite configuration
 as untrusted inert input. Its adversarial fixtures fail if any project code is
 executed, and its fixed path/resource limits plus schema validation are part of
-the repository check. See the [analyzer guide](/gluon/1.1.0/migration/vue-analyzer/).
+the repository check. See the [analyzer guide](/gluon/1.2.0/migration/vue-analyzer/).
 
 The repository [security threat model](https://github.com/marcmalerei/gluon/blob/main/docs/security.md),
 [accessibility protocol](https://github.com/marcmalerei/gluon/blob/main/docs/accessibility.md),

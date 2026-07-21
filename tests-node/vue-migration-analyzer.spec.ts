@@ -108,7 +108,7 @@ test('implements the exact CLI formats and exit codes', () => {
   expect(spawnSync(process.execPath, [cli, unsupported]).status).toBe(1);
   expect(spawnSync(process.execPath, [cli, resolve(root, 'missing')]).status).toBe(2);
   expect(spawnSync(process.execPath, [cli, '--format', 'yaml']).status).toBe(2);
-  expect(execFileSync(process.execPath, [cli, '--version'], { encoding: 'utf8' })).toBe('1.1.0\n');
+  expect(execFileSync(process.execPath, [cli, '--version'], { encoding: 'utf8' })).toBe('1.2.0\n');
 });
 
 test('exports one deeply frozen schema and rejects unreadable roots', async () => {

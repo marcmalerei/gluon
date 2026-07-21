@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Added
+
+- Added `ComponentLibraryManifest`, validation, and the explicit
+  `ComponentLibraryLoader` API with dependency loading, cache/error state,
+  scoped registration, target-owned constructable styles, SSR style snapshots,
+  release, and disposal.
+
 ## [1.1.0] - 2026-07-16
 
 ### Fixed
