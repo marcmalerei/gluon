@@ -29,9 +29,16 @@ screenshot.
 
 Run `npm run storybook:component-library` for the separate developer catalog
 or `npm run build:storybook:component-library` for its build smoke check.
-Stories use the package entry point, expose controls, execute the real picker
-interaction, and enable the accessibility addon. The catalog is not a
-replacement for GLUON GOODS.
+Stories use public package entry points, expose controls, execute the real
+picker interaction, cover loading, cache-hit, and failed loader states, and
+enable the accessibility addon. `npm run check:storybook:component-library`
+builds the catalog, runs every retained interaction in Chromium, compares the
+four story surfaces with the committed visual baselines, checks WCAG A/AA rules
+with axe-core, and writes screenshots plus a machine-readable report to
+`.tmp/quality-evidence`. The verifier removes its generated `storybook-static`
+directory before later repository analysis runs. Set
+`UPDATE_STORYBOOK_SCREENSHOTS=1` only when intentionally reviewing and updating
+those baselines. The catalog is not a replacement for GLUON GOODS.
 
 `library/` is the separately buildable `@gluonjs/example-component-library`
 package boundary. Its implementation imports only the public Core and Quarks

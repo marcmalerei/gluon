@@ -1,7 +1,63 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import { ProductBadge } from '@gluonjs/example-component-library';
-import { render } from '@gluonjs/core';
-const meta = { title: 'Component library/Product picker', render: (args) => { const root = document.createElement('section'); root.setAttribute('aria-label', 'Product picker story'); root.innerHTML = '<example-product-picker value="1"></example-product-picker>'; const badge = document.createElement('p'); root.prepend(badge); render(ProductBadge(String(args.label)), badge); return root; }, args: { label: 'In stock' }, argTypes: { label: { control: 'text' } } } satisfies Meta<{ label: string }>;
+import {
+  css,
+  html,
+  render,
+} from '@gluonjs/core';
+import {
+  ProductBadge,
+  productBadgeStyles,
+} from '@gluonjs/example-component-library/product-badge';
+import { ProductPicker } from '@gluonjs/example-component-library/product-picker';
+
+const storyStyles = css`
+  :host { display: block; color: #101010; font: 16px/1.5 system-ui, sans-serif; }
+  section { inline-size: 28rem; padding: 2rem; border: 1px solid #d8d8d8; }
+  h2 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+  p { margin: 0 0 1rem; }
+`;
+
+const meta = {
+  title: 'Component library/Product picker',
+  render: (args) => {
+    if (customElements.get('example-product-picker') !== ProductPicker) {
+      throw new Error('The public ProductPicker export must own its registered tag.');
+    }
+    const host = document.createElement('div');
+    const root = host.attachShadow({ mode: 'open' });
+    root.adoptedStyleSheets = [storyStyles, productBadgeStyles];
+    render(html`
+      <section aria-labelledby="product-picker-story-heading">
+        <h2 id="product-picker-story-heading">Product quantity</h2>
+        <p>${ProductBadge(String(args.label))}</p>
+        <example-product-picker value="1"></example-product-picker>
+      </section>
+    `, root);
+    return host;
+  },
+  args: { label: 'In stock' },
+  argTypes: { label: { control: 'text' } },
+} satisfies Meta<{ label: string }>;
+
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = { play: async ({ canvasElement }) => { const increment = canvasElement.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]'); increment?.click(); if (canvasElement.querySelector('output')?.textContent !== '2') throw new Error('Product picker did not update its public interaction.'); } };
+
+export const Default: Story = {
+  play: async ({ canvasElement }) => {
+    const storyRoot = canvasElement.querySelector('div')?.shadowRoot;
+    const pickerRoot = storyRoot?.querySelector('example-product-picker')?.shadowRoot;
+    const increment = pickerRoot?.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]');
+    const output = pickerRoot?.querySelector('output');
+    if (!increment || !output) throw new Error('Product picker story did not render its public controls.');
+    increment.click();
+    await waitFor(() => output.textContent === '2');
+  },
+};
+
+async function waitFor(assertion: () => boolean): Promise<void> {
+  const deadline = Date.now() + 2_000;
+  while (!assertion()) {
+    if (Date.now() >= deadline) throw new Error('Product picker story interaction timed out.');
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 10));
+  }
+}

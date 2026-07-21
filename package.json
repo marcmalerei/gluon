@@ -90,6 +90,7 @@
     "dev:signals-example": "vite --config examples/signals/vite.config.ts",
     "storybook:component-library": "storybook dev --config-dir examples/component-library/storybook --port 6006",
     "build:storybook:component-library": "storybook build --config-dir examples/component-library/storybook --output-dir examples/component-library/storybook-static",
+    "check:storybook:component-library": "npm run build:storybook:component-library && node scripts/validate-component-library-storybook.mjs",
     "preview:shop": "node scripts/preview-examples.mjs shop",
     "preview:playground": "node scripts/preview-examples.mjs playground",
     "preview:virtualizer-example": "node scripts/preview-examples.mjs virtualizer",
@@ -204,7 +205,7 @@
     "check:release-bootstrap": "node scripts/build-npm-bootstrap-artifacts.mjs --check",
     "check:release-contract": "node scripts/validate-release-contract.mjs",
     "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state",
-    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:eleventy-clean-install && npm run check:example-previews && npm run check:component-library-clean-install && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
+    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:eleventy-clean-install && npm run check:example-previews && npm run check:component-library-clean-install && npm run check:storybook:component-library && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.6",
@@ -228,7 +229,9 @@
     "lit": "3.3.3",
     "lit-html": "3.3.3",
     "markdown-it": "^14.3.0",
+    "pixelmatch": "^7.2.0",
     "playwright": "^1.58.2",
+    "pngjs": "^7.0.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "signal-polyfill": "0.2.2",
