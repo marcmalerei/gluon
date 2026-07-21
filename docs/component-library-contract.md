@@ -40,7 +40,7 @@ surface; a breaking rename requires a major version.
 
 ## Loader requirements
 
-A future loader resolves only a consumer-requested entry and its declared
+The public loader resolves only a consumer-requested entry and its declared
 dependencies. It exposes its load state, cached result, and failure explicitly;
 it must not register an entire library as an import side effect. It may resolve
 only declared bare public module specifiers and named public exports.
@@ -69,8 +69,20 @@ those retained references. Package authors, bundlers, SSR adapters, and applicat
 authority over imports, registries, style roots, cache lifetime, error
 reporting, and disposal.
 
+`styleSnapshot()` returns the request-local library name and ordered style ids
+for successfully loaded entries without requiring a DOM. SSR serializes that
+value alongside its own request state. After the client loads the same entries
+and adopts their sheets at the explicit target, `validateStyleSnapshot()` must
+accept the server value before hydration proceeds. A library mismatch, schema
+mismatch, missing, extra, or reordered style id aborts the handoff; the loader
+does not replace server DOM as recovery.
+
 ## Verification boundary
 
 `npm run typecheck:ui` compiles the public manifest API. `npm run
-check:ui-contract` retains the existing official UI inventory; the library and
-loader implementation slices add their own packed-consumer and browser gates.
+check:ui-contract` retains the existing official UI inventory. `npm run
+check:component-library-loader-build` first builds the Core, Compiler, and Vite
+workspace prerequisites so the check is reproducible from a clean checkout,
+then retains the exact dynamic entry chunks,
+the initial and post-request browser resource lists, one cache hit, the public
+interaction result, browser metadata, and a rendered screenshot.

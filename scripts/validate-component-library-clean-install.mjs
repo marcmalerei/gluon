@@ -31,9 +31,18 @@ try {
   await writeFile(resolve(consumer, 'index.html'), '<main id="app"></main><script type="module" src="/src/main.ts"></script>');
   await writeFile(resolve(consumer, 'src/main.ts'), `
     import { createApp, html } from '@gluonjs/core';
-    import { ProductBadge } from '@gluonjs/example-component-library';
+    import { createComponentLibraryLoader } from '@gluonjs/quarks';
+    import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
+    const loader = createComponentLibraryLoader(componentLibraryManifest, { load: async (entry) => {
+      const module: Record<string, unknown> = entry.id === 'product-badge'
+        ? await import('@gluonjs/example-component-library/product-badge')
+        : await import('@gluonjs/example-component-library/product-picker');
+      return module[entry.exportName];
+    } });
+    const ProductBadge = (await loader.load('product-badge')).value as (label: string) => ReturnType<typeof html>;
+    await loader.load('product-picker');
     const app = createApp(() => html\`<section><p>\${ProductBadge('In stock')}</p><example-product-picker value="1"></example-product-picker></section>\`).mount(document.querySelector('#app')!);
-    Object.assign(window, { componentLibraryUnmount: () => app.unmount() });
+    Object.assign(window, { componentLibraryUnmount: () => { app.unmount(); loader.dispose(); } });
   `);
   await execFile('npm', ['install', ...archives, 'vite@8.1.4', 'typescript@5.9.3', '--ignore-scripts', '--no-audit', '--no-fund'], {
     cwd: consumer, maxBuffer: 20 * 1024 * 1024,

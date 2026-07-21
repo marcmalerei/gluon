@@ -3,13 +3,25 @@
   "version": "0.0.0",
   "private": false,
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": ["./dist/product-picker.js"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js"
+    },
+    "./product-badge": {
+      "types": "./dist/product-badge.d.ts",
+      "import": "./dist/product-badge.js"
+    },
+    "./product-picker": {
+      "types": "./dist/product-picker.d.ts",
+      "import": "./dist/product-picker.js"
     }
   },
   "files": ["dist"],

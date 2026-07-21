@@ -34,6 +34,7 @@ export interface ComponentLoadResult {
  * public module import for each manifest record.
  */
 export class ComponentLibraryLoader {
+  readonly #libraryName: string;
   readonly #entries: ReadonlyMap<string, ComponentLibraryEntry>;
   readonly #resolver: ComponentLibraryModuleResolver;
   readonly #states = new Map<string, ComponentLoadStatus>();
@@ -43,12 +44,17 @@ export class ComponentLibraryLoader {
   readonly #styleReferences = new Map<CSSStyleSheet, number>();
   readonly #installedStyles = new Set<CSSStyleSheet>();
   readonly #entryStyles = new Map<string, readonly CSSStyleSheet[]>();
+  readonly #styleIdOrder: readonly string[];
+  readonly #styleIdReferences = new Map<string, number>();
+  readonly #entryStyleIds = new Map<string, readonly string[]>();
   #disposed = false;
 
   constructor(manifest: ComponentLibraryManifest, resolver: ComponentLibraryModuleResolver, options: ComponentLibraryLoaderOptions = {}) {
     const validation = validateComponentLibraryManifest(manifest);
     if (!validation.valid) throw new TypeError(`Invalid component-library manifest: ${validation.errors.join(' ')}`);
+    this.#libraryName = manifest.name;
     this.#entries = new Map(manifest.entries.map((entry) => [entry.id, entry]));
+    this.#styleIdOrder = [...new Set(manifest.entries.flatMap((entry) => entry.styles))];
     this.#resolver = resolver;
     this.#styleTarget = options.styleTarget;
     this.#styles = options.styles;
@@ -76,6 +82,15 @@ export class ComponentLibraryLoader {
   }
 
   release(id: string): void {
+    const styleIds = this.#entryStyleIds.get(id);
+    if (styleIds) {
+      this.#entryStyleIds.delete(id);
+      for (const styleId of styleIds) {
+        const count = this.#styleIdReferences.get(styleId) ?? 0;
+        if (count > 1) this.#styleIdReferences.set(styleId, count - 1);
+        else this.#styleIdReferences.delete(styleId);
+      }
+    }
     const sheets = this.#entryStyles.get(id);
     if (!sheets || !this.#styleTarget) return;
     this.#entryStyles.delete(id);
@@ -85,8 +100,32 @@ export class ComponentLibraryLoader {
   dispose(): void {
     if (this.#disposed) return;
     this.#disposed = true;
-    for (const id of [...this.#entryStyles.keys()]) this.release(id);
+    for (const id of [...this.#entryStyleIds.keys()]) this.release(id);
     this.#cache.clear();
+  }
+
+  /** Serializable request-local style ids retained by successfully loaded entries. */
+  styleSnapshot(): Readonly<{ schemaVersion: 1; library: string; styles: readonly string[] }> {
+    return Object.freeze({
+      schemaVersion: 1 as const,
+      library: this.#libraryName,
+      styles: Object.freeze(this.#styleIdOrder.filter((styleId) => this.#styleIdReferences.has(styleId))),
+    });
+  }
+
+  /** Rejects a hydration handoff unless the library and ordered style ids match exactly. */
+  validateStyleSnapshot(snapshot: unknown): void {
+    const expected = this.styleSnapshot();
+    if (!snapshot || typeof snapshot !== 'object') throw new TypeError('Component-library style snapshot must be an object.');
+    const candidate = snapshot as Partial<typeof expected>;
+    if (candidate.schemaVersion !== 1) throw new Error('Component-library style snapshot schemaVersion must be 1.');
+    if (candidate.library !== expected.library) throw new Error(`Component-library style snapshot library must be ${expected.library}.`);
+    if (!Array.isArray(candidate.styles) || candidate.styles.some((styleId) => typeof styleId !== 'string')) {
+      throw new TypeError('Component-library style snapshot styles must be a string array.');
+    }
+    if (candidate.styles.length !== expected.styles.length || candidate.styles.some((styleId, index) => styleId !== expected.styles[index])) {
+      throw new Error('Component-library style snapshot does not match the loaded style ids.');
+    }
   }
 
   async #load(entry: ComponentLibraryEntry, ancestors: Set<string>): Promise<ComponentLoadResult> {
@@ -96,7 +135,14 @@ export class ComponentLibraryLoader {
     const value = await this.#resolver.load(entry);
     if (entry.layer === 'element') this.#validateElement(entry, value);
     this.#retainStyles(entry);
+    this.#retainStyleIds(entry);
     return { entry, value };
+  }
+
+  #retainStyleIds(entry: ComponentLibraryEntry): void {
+    if (this.#entryStyleIds.has(entry.id)) return;
+    for (const styleId of entry.styles) this.#styleIdReferences.set(styleId, (this.#styleIdReferences.get(styleId) ?? 0) + 1);
+    this.#entryStyleIds.set(entry.id, entry.styles);
   }
 
   #retainStyles(entry: ComponentLibraryEntry): void {

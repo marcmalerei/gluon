@@ -22,6 +22,7 @@ import {
   Overlay,
   Popover,
   createFocusScope,
+  createComponentLibraryLoader,
   q,
   quarkManifest,
   unsafeQuarkProps,
@@ -64,6 +65,9 @@ const componentLibraryManifest = {
   entries: [{ id: 'purchase-action', module: '@acme/shop-components/purchase-action', exportName: 'PurchaseAction', layer: 'molecule', styles: ['acme-purchase-action'], dependencies: [], accessibility: 'Renders a named purchase action.', storyId: 'purchase-action--default' }],
 } as const satisfies ComponentLibraryManifest;
 const componentLibraryValidation: boolean = validateComponentLibraryManifest(componentLibraryManifest).valid;
+const componentLibraryLoader = createComponentLibraryLoader(componentLibraryManifest, { load: async () => null });
+const componentLibraryStyleSnapshot: Readonly<{ schemaVersion: 1; library: string; styles: readonly string[] }> = componentLibraryLoader.styleSnapshot();
+componentLibraryLoader.validateStyleSnapshot(componentLibraryStyleSnapshot);
 const buttonRef: { value?: HTMLButtonElement } = {};
 const svgRef: { value?: SVGSVGElement } = {};
 const nativeButton = {

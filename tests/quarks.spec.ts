@@ -183,8 +183,17 @@ describe('quarks', () => {
 
     await loader.load('styled');
     expect(target.adoptedStyleSheets).toContain(sheet);
+    const snapshot = loader.styleSnapshot();
+    expect(snapshot).toEqual({ schemaVersion: 1, library: 'example', styles: ['styled'] });
+    loader.validateStyleSnapshot(JSON.parse(JSON.stringify(snapshot)));
+    expect(() => loader.validateStyleSnapshot(null)).toThrow('must be an object');
+    expect(() => loader.validateStyleSnapshot({ ...snapshot, schemaVersion: 2 })).toThrow('schemaVersion must be 1');
+    expect(() => loader.validateStyleSnapshot({ ...snapshot, library: 'other' })).toThrow('library must be example');
+    expect(() => loader.validateStyleSnapshot({ ...snapshot, styles: [1] })).toThrow('styles must be a string array');
+    expect(() => loader.validateStyleSnapshot({ ...snapshot, styles: ['other'] })).toThrow('does not match');
     loader.dispose();
     expect(target.adoptedStyleSheets).not.toContain(sheet);
+    expect(loader.styleSnapshot().styles).toEqual([]);
     loader.dispose();
     expect(() => loader.load('styled')).toThrow('A disposed component-library loader cannot load entries.');
   });
