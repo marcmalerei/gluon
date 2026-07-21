@@ -15,6 +15,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
+      '@gluonjs/example-component-library': resolve(import.meta.dirname, 'examples/component-library/library/src/index.ts'),
       '@gluonjs/reactivity/signals': resolve(import.meta.dirname, 'packages/reactivity/src/signals/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
       '@gluonjs/router/memory': resolve(import.meta.dirname, 'packages/router/src/memory.ts'),

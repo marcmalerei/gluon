@@ -29,3 +29,9 @@ build it and inspect the exact tarball contents before a clean-consumer install.
 Gluon dependencies, installs them in an empty temporary consumer, typechecks
 and production-builds that consumer, then verifies its browser interaction and
 teardown flow.
+
+Repository SSR coverage renders both public exports, including the picker's
+declarative Shadow DOM. Browser coverage retains the Atom's server nodes during
+hydration, confirms that picker styles remain owned by its ShadowRoot, verifies
+repeat imports keep the identical registered constructor, and removes the
+element during consumer teardown.
