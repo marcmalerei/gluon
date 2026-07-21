@@ -12,6 +12,14 @@ quantity.
 Run `npm run build:component-library` to build the consumer. Loader and
 Storybook integration are intentionally delivered by issues #214 and #215.
 
+## Storybook
+
+Run `npm run storybook:component-library` for the separate developer catalog
+or `npm run build:storybook:component-library` for its build smoke check.
+Stories use the package entry point, expose controls, execute the real picker
+interaction, and enable the accessibility addon. The catalog is not a
+replacement for GLUON GOODS.
+
 `library/` is the separately buildable package boundary. Run
 `npm run check:component-library-package` to build it and inspect the exact
 tarball contents before a clean-consumer install.
