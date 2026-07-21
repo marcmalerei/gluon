@@ -100,6 +100,7 @@ jobs:
       - run: npm run check:storybook:component-library
       - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
       - run: npm run benchmark:components -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/components.json
+      - run: npm run benchmark:runtime -- --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard.json
       - run: npm run check:shop-performance
       - name: Retain quality evidence
         if: ${{ !cancelled() }}

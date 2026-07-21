@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "samples": 20,
+  "warmupRounds": 5,
+  "teardownCycles": 30,
+  "metrics": {
+    "ssrRenderMs": { "maxP95": 50 },
+    "hydrationMs": { "maxP95": 100 },
+    "routeTransitionMs": { "maxP95": 100 },
+    "loaderCachedModuleLoadMs": { "maxP95": 100 },
+    "styleOwnershipMs": { "maxP95": 10 },
+    "teardownThirtyCyclesMs": { "maxP95": 250 },
+    "interactionMs": { "maxP95": 100 }
+  },
+  "invariants": {
+    "hydrationRetainsServerDom": true,
+    "routeMatchesRequestedLocation": true,
+    "loaderReusesCachedModule": true,
+    "stylesReleasedAfterOwnershipEnds": true,
+    "retainedDomNodesAfterTeardown": 0,
+    "detachedListenersAfterTeardown": 0,
+    "longTasksWhenObservable": 0
+  }
+}

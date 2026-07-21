@@ -37,10 +37,47 @@ browser versions, Node and npm versions, operating system, CPU, and memory.
 
 Every pull request and `main` run additionally retains ten-sample template and
 component Chromium/Firefox/WebKit comparisons plus the production GLUON GOODS
-customer-flow budget output for 30 days in the
+customer-flow budget output and the expanded runtime scorecard for 30 days in the
 `quality-evidence-<commit>` workflow artifact. Those shorter CI runs detect
 regressions but do not replace the larger committed matrices used by the
 comparative text below.
+
+## Expanded runtime scorecard
+
+`npm run benchmark:runtime` production-builds the measured code and records
+seven separate lanes: Node SSR, browser hydration, memory-router transitions,
+manifest-driven component loading, constructable stylesheet ownership,
+application teardown, and reactive interaction latency. Chromium, Firefox,
+and WebKit run in separate fresh contexts; their values are never averaged.
+Where an engine exposes `PerformanceObserver` long-task entries, the same run
+also retains their count and raw durations.
+
+The versioned pass criteria live in
+[`quality/runtime-performance-criteria.json`](../quality/runtime-performance-criteria.json).
+They declare sample counts, warm-ups, p95 latency ceilings, thirty teardown
+cycles, retained-resource invariants, and the supported-engine long-task limit
+before measurement. Every warm-up and measured operation validates observable
+correctness. A failed invariant or missing metric criterion rejects the run.
+
+```bash
+npx playwright install chromium firefox webkit
+npm run benchmark:runtime
+
+# Short diagnostic; not a replacement for committed full evidence
+npm run benchmark:runtime -- \
+  --browsers=chromium \
+  --samples=5 \
+  --warmup=2 \
+  --output=.tmp/runtime-scorecard-diagnostic.json
+```
+
+The paired JSON and Markdown output defaults to
+`.tmp/quality-evidence/runtime-scorecard.{json,md}`. JSON preserves every raw
+sample, source state, hardware, OS, Node/npm, package and exact browser
+versions, correctness values, and long-task observations. The scorecard is a
+Gluon production regression gate. It has no equivalent-framework fixtures, so
+it does not extend the Lit/Vue comparisons below and cannot support a universal
+framework-performance ranking.
 
 ## Run the benchmark
 
@@ -51,6 +88,7 @@ production comparison:
 npx playwright install chromium firefox webkit
 npm run benchmark:rendering
 npm run benchmark:components
+npm run benchmark:runtime
 ```
 
 The default run uses Chromium, Firefox, and WebKit with eight warm-up rounds and
