@@ -241,6 +241,47 @@ const elementRenderDebugStates = compiledDevelopment === false
 export abstract class GluonElement<
   Events extends object = Record<string, unknown>,
 > extends HTMLElementBase {
+  /* v8 ignore start -- production-only shared compiler queue is covered by the built Vite integration. */
+  private static readonly compiledPropertyUpdates = new Set<GluonElement<any>>();
+  private static compiledPropertyUpdatesScheduled = false;
+  private static compiledPropertyUpdatesOrdered = true;
+  private static compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
+  private static readonly flushCompiledPropertyUpdates = (): void => {
+    GluonElement.compiledPropertyUpdatesScheduled = false;
+    const elements = [...GluonElement.compiledPropertyUpdates];
+    GluonElement.compiledPropertyUpdates.clear();
+    if (!GluonElement.compiledPropertyUpdatesOrdered) {
+      elements.sort((left, right) => left.updateId - right.updateId);
+    }
+    GluonElement.compiledPropertyUpdatesOrdered = true;
+    GluonElement.compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
+    for (const element of elements) element.performCompiledPropertyUpdate();
+    if (GluonElement.compiledPropertyUpdates.size > 0) {
+      GluonElement.scheduleCompiledPropertyUpdateFlush();
+    }
+  };
+
+  private static scheduleCompiledPropertyUpdateFlush(): void {
+    if (GluonElement.compiledPropertyUpdatesScheduled) return;
+    GluonElement.compiledPropertyUpdatesScheduled = true;
+    queueMicrotask(GluonElement.flushCompiledPropertyUpdates);
+  }
+
+  private static queueCompiledPropertyUpdate(element: GluonElement<any>): void {
+    if (GluonElement.compiledPropertyUpdates.has(element)) return;
+    if (element.updateId < GluonElement.compiledPropertyUpdateLastId) {
+      GluonElement.compiledPropertyUpdatesOrdered = false;
+    }
+    GluonElement.compiledPropertyUpdateLastId = element.updateId;
+    GluonElement.compiledPropertyUpdates.add(element);
+    GluonElement.scheduleCompiledPropertyUpdateFlush();
+  }
+  /* v8 ignore stop */
+
+  private static cancelCompiledPropertyUpdate(element: GluonElement<any>): void {
+    GluonElement.compiledPropertyUpdates.delete(element);
+  }
+
   /** Declares reactive inputs and their attribute conversion, reflection, and validation rules. */
   static readonly properties: Readonly<Record<string, PropertyDefinition<any>>> = {};
   /** Declares native output events and their propagation, cancellation, and validation rules. */
@@ -269,7 +310,6 @@ export abstract class GluonElement<
   private pendingPropertyUpdate?: string;
   private pendingPropertyValue?: unknown;
   private pendingFullUpdate = false;
-  private compiledPropertyUpdateJob?: () => void;
   private connectionRendered = false;
   private hydrationPending = false;
   private readonly connectedHooks: ComponentLifecycleCallback[] = [];
@@ -333,7 +373,7 @@ export abstract class GluonElement<
     this.renderScope = undefined;
     this.renderEffect = undefined;
     /* v8 ignore next -- production-only job ownership is covered by the built Vite integration. */
-    if (this.compiledPropertyUpdateJob) invalidateJob(this.compiledPropertyUpdateJob);
+    GluonElement.cancelCompiledPropertyUpdate(this);
     try {
       scope?.stop();
     } finally {
@@ -631,8 +671,7 @@ export abstract class GluonElement<
       && this.beforeUpdateHooks.length === 0
       && this.updatedHooks.length === 0
     ) {
-      const job = this.compiledPropertyUpdateJob ??= () => this.performCompiledPropertyUpdate();
-      queueJob(job, { phase: 'update', id: this.updateId });
+      GluonElement.queueCompiledPropertyUpdate(this);
     } else {
       queueJob(runner, { phase: 'update', id: this.updateId });
     }

@@ -23,7 +23,8 @@ contracts covered by the browser suite.
 Official production Vite builds also recognize a conservative component-level
 case: one fixed `GluonElement` template with one declared primitive property in
 a text Part and, optionally, one private readonly event handler. Property-only
-updates reuse the resolved Part and a smaller scheduler job. Lifecycle hooks,
+updates reuse the resolved Part and a shared microtask queue that preserves
+element update order, sorting only when enqueue order differs. Lifecycle hooks,
 reactive or explicit concurrent updates, hydration, root disturbance,
 non-primitive values, and every unproven template shape use the full effect and
 renderer path. This optimization does not change standalone `html`/`render`

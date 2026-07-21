@@ -344,25 +344,42 @@ describe('@gluonjs/vite real server contract', () => {
       page.on('pageerror', (error) => errors.push(error.message));
       await page.goto(server.resolvedUrls!.local[0]!);
       const result = await page.evaluate(async () => {
-        const element = document.querySelector('compiled-label') as HTMLElement & {
+        const elements = [...document.querySelectorAll('compiled-label')] as Array<HTMLElement & {
           label: string;
           updateComplete: Promise<void>;
           shadowRoot: ShadowRoot;
-        };
+        }>;
+        const element = elements[0]!;
+        const second = elements[1]!;
         const prototype = Object.getPrototypeOf(element) as { render: () => unknown };
         const render = prototype.render;
         prototype.render = () => { throw new Error('compiled update rerendered'); };
+        second.label = 'Second B';
         element.label = 'B';
-        await element.updateComplete;
-        const compiledText = element.shadowRoot.textContent;
+        await Promise.all([element.updateComplete, second.updateComplete]);
+        const compiledText = [element.shadowRoot.textContent, second.shadowRoot.textContent];
 
         prototype.render = render;
         element.shadowRoot.replaceChildren(document.createElement('i'));
         element.label = 'C';
         await element.updateComplete;
-        return { compiledText, recoveredText: element.shadowRoot.textContent };
+        second.label = 'Disconnected';
+        const disconnectedUpdate = second.updateComplete;
+        second.remove();
+        await disconnectedUpdate;
+        document.body.append(second);
+        await second.updateComplete;
+        return {
+          compiledText,
+          recoveredText: element.shadowRoot.textContent,
+          reconnectedText: second.shadowRoot.textContent,
+        };
       });
-      expect(result).toEqual({ compiledText: 'B', recoveredText: 'C' });
+      expect(result).toEqual({
+        compiledText: ['B', 'Second B'],
+        recoveredText: 'C',
+        reconnectedText: 'Disconnected',
+      });
       expect(errors).toEqual([]);
     } finally {
       await server.close();
@@ -440,7 +457,7 @@ async function createPrimitiveFixture(): Promise<string> {
     '  protected override render() { return html`<output>${this.label}</output>`; }',
     '}',
     "defineElement('compiled-label', CompiledLabel);",
-    "document.body.append(document.createElement('compiled-label'));",
+    "document.body.append(document.createElement('compiled-label'), document.createElement('compiled-label'));",
   ].join('\n'));
   return root;
 }

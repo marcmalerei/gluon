@@ -13,6 +13,7 @@ import {
   html,
   hydrate,
   inject,
+  markCompiledPrimitiveTextBinding,
   repeat,
   renderGluonApplicationForServer,
   Suspense,
@@ -288,6 +289,38 @@ describe('SSR hydration', () => {
     expect(upgraded.shadowRoot).toBe(shadow);
     expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
     upgraded.remove();
+  });
+
+  it('retains hydrated DOM before compiler-marked property updates and cleanup', async () => {
+    const prepared = await prepareForHydration(html`<p>${'Server label'}</p>`);
+    const host = document.createElement('hydrated-compiled-label');
+    const shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = prepared.html;
+    const paragraph = shadow.querySelector('p');
+    document.body.append(host);
+
+    class HydratedCompiledLabel extends GluonElement {
+      static override readonly properties = {
+        label: { type: String, default: 'Server label' },
+      } as const;
+      declare label: string;
+      protected override render() {
+        return markCompiledPrimitiveTextBinding(html`<p>${this.label}</p>`, 'label', 0);
+      }
+    }
+    defineElement('hydrated-compiled-label', HydratedCompiledLabel);
+    const upgraded = host as HydratedCompiledLabel;
+    const result = await hydrateElement(upgraded);
+    await upgraded.updateComplete;
+    expect(result.retained).toBe(true);
+    expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
+
+    upgraded.label = 'Client label';
+    await upgraded.updateComplete;
+    expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
+    expect(paragraph?.textContent).toBe('Client label');
+    upgraded.remove();
+    await nextTick();
   });
 
   it('hydrates a functional GluonElement through the same identity-preserving path', async () => {
