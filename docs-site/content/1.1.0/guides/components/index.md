@@ -195,6 +195,12 @@ they are not alternative component bases.
 | [`EffectScope`](/gluon/1.1.0/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
 | [`StoreManager`](/gluon/1.1.0/api/generated/packages/store/src/classes/StoreManager.html) | Own Store definitions and live Store instances for one application, request, or test; create it with `createStoreManager()` and call `dispose()`. |
 
+### Component-library classes
+
+| Class | Use it for |
+| --- | --- |
+| [`ComponentLibraryLoader`](/gluon/1.1.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe its cache state, and release its target-owned constructable stylesheets. |
+
 ### Tooling classes
 
 | Class | Use it for |
