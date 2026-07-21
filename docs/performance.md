@@ -224,10 +224,24 @@ they do not satisfy the current production comparison contract and must not
 support a Lit/Vue superiority claim. The clean production-mode matrices added
 with issues #172 and #174 supersede that framework-comparison interpretation.
 
+## Property/state profile evidence
+
+The clean Chromium
+[`component-property-state-profile-b461353.json`](../benchmarks/results/component-property-state-profile-b461353.json)
+profile records 20,000 measured iterations across 50 mounted Gluon components
+after 1,000 warm-ups. Before the shared component queue, property updates spent
+20.98% of sampled self time in the scheduler phase flush and 8.26% in its
+per-element queue path. State updates spent 6.83% and 4.27% in those same
+frames; native button `click` dispatch accounted for 52.93% of state self time.
+The paired property and state `.cpuprofile` files retain the raw Chrome DevTools
+samples. This identified repeated per-element scheduling as the actionable
+Gluon-owned hot path; it does not treat native event dispatch as framework work
+that Gluon can remove.
+
 ## Current committed matrix
 
 The current rendering matrix measures clean source commit `4c7bdac`; the
-isolated-scenario component matrix measures clean source commit `d006924`.
+isolated-scenario component matrix measures clean source commit `6ee04e7`.
 Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
 Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
 JSON files retain every sample and invariant snapshot; the Markdown files
@@ -252,30 +266,25 @@ recorded workload results, not a general rendering ranking.
 ### Component matrix
 
 The complete
-[`component-production-d006924.md`](../benchmarks/results/component-production-d006924.md)
+[`component-production-6ee04e7.md`](../benchmarks/results/component-production-6ee04e7.md)
 matrix reports milliseconds per 50 component boundaries. Against Lit, Gluon
-wins lifecycle and keyed-list medians in all three browsers. Lit wins property
-and state in all three. Lit median divided by Gluon median is
-1.33×/0.73×/0.91×/1.62× for Chromium lifecycle/property/state/list,
-1.25×/0.80×/0.82×/1.67× for Firefox, and
-1.57×/0.75×/0.88×/1.92× for WebKit.
+wins seven median cells, ties four, and loses one. Lit median divided by Gluon
+median is 1.22×/0.97×/1.00×/1.56× for Chromium
+lifecycle/property/state/list, 1.00×/1.11×/1.00×/1.27× for Firefox, and
+1.27×/1.14×/1.00×/1.60× for WebKit. Property is faster in Gluon on
+Firefox and WebKit; state is equal in all three engines; lifecycle is faster in
+Chromium and WebKit and equal in Firefox; and keyed list is faster in all three.
 
-The remaining absolute Lit advantage per 50 components is 0.0049 ms for
-Chromium property and 0.0048 ms for Chromium state; 0.0313 ms and 0.0468 ms in
-Firefox; and 0.0042 ms and 0.0084 ms in WebKit. Against the preceding clean
-`47b1a0a` Gluon matrix, the new Gluon property medians are 23.3%, 21.9%, and
-9.1% lower in Chromium, Firefox, and WebKit; state medians are 16.9%, 53.8%,
-and 11.1% lower. The new matrix also replaces the former scenario branch with
-dedicated property/state classes and isolates every scenario in a fresh browser
-context, so these separate-run deltas describe the complete compiler/runtime,
-fixture, and runner change and do not isolate one optimization.
+The remaining Lit median advantage is the Chromium property cell: 0.0143 ms
+per 50 components versus Gluon's 0.0147 ms, an absolute 0.0004 ms. Its p95 is
+0.0151 ms versus Gluon's 0.0159 ms. The matrix therefore records near parity in
+that cell rather than claiming complete cross-engine superiority.
 
-Against Vue, Gluon wins all four Chromium cells; ties Firefox lifecycle, wins
-list, and loses property/state; and wins WebKit property/state/list while
-lifecycle is equal. Across those 12 cells that is eight Gluon wins, two equal
-medians, and two Vue wins. This supports the
-recorded lifecycle and keyed-list results without turning the matrix into a
-universal framework ranking.
+Against Vue, Gluon wins all four Chromium cells; wins Firefox property, ties
+list, and loses lifecycle/state; and wins WebKit property/state/list while Vue
+wins lifecycle. Across those 12 cells that is eight Gluon wins, one equal
+median, and three Vue wins. This supports only the recorded component workloads,
+not a universal framework ranking.
 
 Neither matrix measures an Apple M1. Hardware model, operating system, browser,
 thermal state, and other load are part of the evidence boundary; an M1 result
