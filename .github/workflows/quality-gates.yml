@@ -97,6 +97,7 @@ jobs:
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run benchmark:bundle
       - run: npm run check:component-library-loader-build
+      - run: npm run check:storybook:component-library
       - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
       - run: npm run benchmark:components -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/components.json
       - run: npm run check:shop-performance
