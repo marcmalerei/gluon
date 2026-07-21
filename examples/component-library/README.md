@@ -35,7 +35,8 @@ enable the accessibility addon. `npm run check:storybook:component-library`
 builds the catalog, runs every retained interaction in Chromium, compares the
 four story surfaces with the committed visual baselines, checks WCAG A/AA rules
 with axe-core, and writes screenshots plus a machine-readable report to
-`.tmp/quality-evidence`. Set
+`.tmp/quality-evidence`. The verifier removes its generated `storybook-static`
+directory before later repository analysis runs. Set
 `UPDATE_STORYBOOK_SCREENSHOTS=1` only when intentionally reviewing and updating
 those baselines. The catalog is not a replacement for GLUON GOODS.
 

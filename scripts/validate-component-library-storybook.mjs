@@ -2,6 +2,7 @@ import { createServer } from 'node:http';
 import {
   mkdir,
   readFile,
+  rm,
   writeFile,
 } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
@@ -119,8 +120,12 @@ try {
   await writeFile(resolve(evidenceDirectory, 'storybook-component-library.json'), `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify(report, null, 2));
 } finally {
-  await browser.close();
-  await new Promise((resolveServer, rejectServer) => server.close((error) => error ? rejectServer(error) : resolveServer()));
+  try {
+    await browser.close();
+    await new Promise((resolveServer, rejectServer) => server.close((error) => error ? rejectServer(error) : resolveServer()));
+  } finally {
+    await rm(dist, { recursive: true, force: true });
+  }
 }
 
 function contentType(path) {

@@ -92,4 +92,6 @@ catalog and opens the published Product Picker plus loading, cache-hit, and
 failed loader stories in Chromium. Every story executes its public interaction
 before WCAG A/AA analysis and a pixel comparison against the committed
 baseline; the resulting images, diffs, and JSON report remain quality evidence
-rather than production runtime dependencies.
+rather than production runtime dependencies. The verifier removes its generated
+static catalog after capture so later whole-repository analyzers see source and
+retained baselines only.
