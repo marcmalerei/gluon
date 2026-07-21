@@ -79,6 +79,16 @@ Gluon production regression gate. It has no equivalent-framework fixtures, so
 it does not extend the Lit/Vue comparisons below and cannot support a universal
 framework-performance ranking.
 
+The current full
+[`runtime-scorecard-50c6448.md`](../benchmarks/results/runtime-scorecard-50c6448.md)
+run measures clean source commit `50c6448` with 20 samples and five warm-ups on
+the recorded Apple M4 environment. All declared p95 criteria and deterministic
+resource invariants passed in Chromium 149, Firefox 151, and WebKit 26.5.
+Chromium exposed the long-task entry type and recorded zero entries; Firefox
+and WebKit did not expose that observer entry type, which is recorded as an
+unsupported observation rather than a zero measurement. The paired JSON keeps
+all raw values and exact environment metadata.
+
 ## Run the benchmark
 
 Install the three Playwright-managed browser engines once, then run the
