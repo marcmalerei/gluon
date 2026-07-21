@@ -21,6 +21,7 @@ import {
 } from '@gluonjs/core';
 import { Button, buttonStyles } from '@gluonjs/atoms';
 import { Card, cardStyles } from '@gluonjs/molecules';
+import { ProductBadge } from '@gluonjs/example-component-library';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   hydrateApplication,
@@ -82,6 +83,19 @@ describe('SSR hydration', () => {
     const result = await hydrateTemplate(value, root);
     expect(result.retained).toBe(true);
     expect(root.querySelector('section')).toBe(section);
+  });
+
+  it('retains the server DOM produced by the component-library public Atom', async () => {
+    const value = html`<section>${ProductBadge('In stock')}</section>`;
+    const prepared = await prepareForHydration(value);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const badge = root.querySelector('.example-product-badge');
+
+    const result = await hydrateTemplate(value, root);
+
+    expect(result).toMatchObject({ retained: true, recovered: false });
+    expect(root.querySelector('.example-product-badge')).toBe(badge);
   });
 
   it('retains matching nodes while activating refs, events, context, and reactive updates', async () => {

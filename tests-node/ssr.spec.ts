@@ -54,6 +54,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
 import { Card } from '@gluonjs/molecules';
+import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {
@@ -358,6 +359,20 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     );
     expect(connected).not.toHaveBeenCalled();
     expect(cleanup).toHaveBeenCalledOnce();
+  });
+
+  it('server-renders the packed component-library public exports', async () => {
+    const atom = withoutHydrationMarkers(await renderToString(ProductBadge('In stock')));
+    expect(atom).toBe('<span class="gluon quark example-product-badge">In stock</span>');
+
+    const element = withoutHydrationMarkers(await renderToString(renderElement(
+      ProductPicker as import('@gluonjs/core').GluonElementClass,
+      { properties: { value: 2 } },
+    )));
+    expect(element).toContain('<example-product-picker value="2">');
+    expect(element).toContain('<template shadowrootmode="open">');
+    expect(element).toContain('aria-label="Increase quantity"');
+    expect(element).toContain('<output aria-live="polite">2</output>');
   });
 
   it('serializes scoped class and functional definitions for declarative registry hydration', async () => {
