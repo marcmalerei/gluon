@@ -1,0 +1,709 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-21T08:52:10.517Z",
+  "source": {
+    "commit": "50c64480d1b9acac450a3fc6c08bb09c97363ab9",
+    "branch": "codex/217-runtime-performance-scorecard",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "packages": {
+      "gluon": "1.1.0",
+      "playwright": "1.61.1",
+      "vite": "8.1.4"
+    }
+  },
+  "methodology": {
+    "productionBuild": true,
+    "headless": true,
+    "samples": 20,
+    "warmupRounds": 5,
+    "teardownCycles": 30,
+    "browserTimeoutMs": 300000,
+    "lanes": {
+      "ssr": "Node renderToString of one 100-row Gluon template",
+      "hydration": "retain marker-bearing server DOM in place",
+      "routing": "await one public memory-router transition",
+      "loader": "load one cached dynamic module through a fresh manifest-driven loader",
+      "styles": "retain and release one constructable stylesheet through 100 owners; milliseconds per owner",
+      "memory": "mount, interact with, unmount, and probe detached listeners for 30 application roots",
+      "interaction": "dispatch one application-owned button interaction and await the reactive update",
+      "longTasks": "record PerformanceObserver longtask entries only in engines that expose that entry type"
+    },
+    "correctnessGate": "every warm-up and measured operation validates its observable output before evidence is accepted",
+    "isolation": "one fresh browser context per engine; engine results are never averaged together",
+    "unit": "milliseconds; lower is faster"
+  },
+  "criteria": {
+    "schemaVersion": 1,
+    "samples": 20,
+    "warmupRounds": 5,
+    "teardownCycles": 30,
+    "metrics": {
+      "ssrRenderMs": {
+        "maxP95": 50
+      },
+      "hydrationMs": {
+        "maxP95": 100
+      },
+      "routeTransitionMs": {
+        "maxP95": 100
+      },
+      "loaderCachedModuleLoadMs": {
+        "maxP95": 100
+      },
+      "styleOwnershipMs": {
+        "maxP95": 10
+      },
+      "teardownThirtyCyclesMs": {
+        "maxP95": 250
+      },
+      "interactionMs": {
+        "maxP95": 100
+      }
+    },
+    "invariants": {
+      "hydrationRetainsServerDom": true,
+      "routeMatchesRequestedLocation": true,
+      "loaderReusesCachedModule": true,
+      "stylesReleasedAfterOwnershipEnds": true,
+      "retainedDomNodesAfterTeardown": 0,
+      "detachedListenersAfterTeardown": 0,
+      "longTasksWhenObservable": 0
+    }
+  },
+  "ssr": {
+    "metric": "ssrRenderMs",
+    "samples": [
+      0.7339579999999728,
+      0.9277500000000032,
+      0.8447500000000332,
+      1.7532079999999723,
+      0.4755000000000109,
+      0.4742500000000405,
+      0.47604200000000674,
+      0.4863330000000019,
+      0.4914590000000203,
+      0.5593749999999886,
+      0.6330000000000382,
+      0.7830000000000155,
+      0.7763749999999732,
+      0.758542000000034,
+      0.6644999999999754,
+      0.6747500000000173,
+      1.6959999999999695,
+      1.3176669999999717,
+      0.9434170000000108,
+      0.5202919999999835
+    ],
+    "correctness": {
+      "rowCount": 100,
+      "markupBytes": 12608
+    },
+    "statistics": {
+      "min": 0.4742500000000405,
+      "median": 0.6747500000000173,
+      "p95": 1.6959999999999695,
+      "max": 1.7532079999999723
+    }
+  },
+  "browsers": [
+    {
+      "browser": "chromium",
+      "browserVersion": "149.0.7827.55",
+      "result": {
+        "schemaVersion": 1,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+        "samples": 20,
+        "warmupRounds": 5,
+        "teardownCycles": 30,
+        "metrics": {
+          "hydrationMs": [
+            0.10000000894069672,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.09999999403953552,
+            0.19999998807907104,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.09999999403953552,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.19999998807907104,
+            0.20000000298023224,
+            0.10000000894069672,
+            0.09999999403953552,
+            0.20000000298023224,
+            0.19999998807907104,
+            0.20000000298023224,
+            0.29999999701976776
+          ],
+          "routeTransitionMs": [
+            0.29999999701976776,
+            0.09999999403953552,
+            0.10000000894069672,
+            0.10000000894069672,
+            0.09999999403953552,
+            0,
+            0,
+            0,
+            0,
+            0.10000000894069672,
+            0.09999999403953552,
+            0,
+            0.10000000894069672,
+            0,
+            0.09999999403953552,
+            0.20000000298023224,
+            0.09999999403953552,
+            0.10000000894069672,
+            0.19999998807907104,
+            0.10000000894069672
+          ],
+          "loaderCachedModuleLoadMs": [
+            0.20000000298023224,
+            0.29999999701976776,
+            0.20000000298023224,
+            0.29999999701976776,
+            0.10000000894069672,
+            0.20000000298023224,
+            0.09999999403953552,
+            0.29999999701976776,
+            0.20000000298023224,
+            0.19999998807907104,
+            0.09999999403953552,
+            0.29999999701976776,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0.19999998807907104
+          ],
+          "styleOwnershipMs": [
+            0.0009999999403953552,
+            0.001000000089406967,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0029999999701976776,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0019999998807907105,
+            0.0020000000298023225,
+            0.0020000000298023225,
+            0.0009999999403953552,
+            0.0029999999701976776,
+            0.0020000000298023225,
+            0.0019999998807907105,
+            0.0029999999701976776,
+            0.0030000001192092896
+          ],
+          "teardownThirtyCyclesMs": [
+            0.9000000059604645,
+            1.0999999940395355,
+            0.5,
+            0.5999999940395355,
+            0.5,
+            0.4000000059604645,
+            0.5999999940395355,
+            0.699999988079071,
+            0.7000000029802322,
+            1.3999999910593033,
+            0.5999999940395355,
+            0.7000000029802322,
+            0.7000000029802322,
+            0.4000000059604645,
+            0.5999999940395355,
+            0.4000000059604645,
+            0.5,
+            0.7000000029802322,
+            0.4000000059604645,
+            0.3999999910593033
+          ],
+          "interactionMs": [
+            0,
+            0,
+            0,
+            0.10000000894069672,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.09999999403953552,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.09999999403953552,
+            0
+          ]
+        },
+        "correctness": {
+          "hydrationRetainsServerDom": true,
+          "routeMatchesRequestedLocation": true,
+          "loaderReusesCachedModule": true,
+          "stylesReleasedAfterOwnershipEnds": true,
+          "retainedDomNodesAfterTeardown": 0,
+          "detachedListenersAfterTeardown": 0
+        },
+        "longTasks": {
+          "supported": true,
+          "count": 0,
+          "durationsMs": []
+        }
+      },
+      "statistics": {
+        "hydrationMs": {
+          "min": 0.09999999403953552,
+          "median": 0.20000000298023224,
+          "p95": 0.20000000298023224,
+          "max": 0.29999999701976776
+        },
+        "routeTransitionMs": {
+          "min": 0,
+          "median": 0.09999999403953552,
+          "p95": 0.20000000298023224,
+          "max": 0.29999999701976776
+        },
+        "loaderCachedModuleLoadMs": {
+          "min": 0.09999999403953552,
+          "median": 0.20000000298023224,
+          "p95": 0.29999999701976776,
+          "max": 0.29999999701976776
+        },
+        "styleOwnershipMs": {
+          "min": 0.0009999999403953552,
+          "median": 0.0020000000298023225,
+          "p95": 0.0029999999701976776,
+          "max": 0.0030000001192092896
+        },
+        "teardownThirtyCyclesMs": {
+          "min": 0.3999999910593033,
+          "median": 0.5999999940395355,
+          "p95": 1.0999999940395355,
+          "max": 1.3999999910593033
+        },
+        "interactionMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 0.09999999403953552,
+          "max": 0.10000000894069672
+        }
+      }
+    },
+    {
+      "browser": "firefox",
+      "browserVersion": "151.0",
+      "result": {
+        "schemaVersion": 1,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:151.0) Gecko/20100101 Firefox/151.0",
+        "samples": 20,
+        "warmupRounds": 5,
+        "teardownCycles": 30,
+        "metrics": {
+          "hydrationMs": [
+            1,
+            1,
+            2,
+            2,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            2,
+            1,
+            0,
+            1,
+            1,
+            0
+          ],
+          "routeTransitionMs": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1
+          ],
+          "loaderCachedModuleLoadMs": [
+            0,
+            1,
+            0,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            2,
+            0,
+            1
+          ],
+          "styleOwnershipMs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.01,
+            0.01,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "teardownThirtyCyclesMs": [
+            1,
+            2,
+            1,
+            1,
+            2,
+            4,
+            2,
+            1,
+            1,
+            2,
+            1,
+            2,
+            8,
+            3,
+            1,
+            1,
+            1,
+            1,
+            2,
+            3
+          ],
+          "interactionMs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "correctness": {
+          "hydrationRetainsServerDom": true,
+          "routeMatchesRequestedLocation": true,
+          "loaderReusesCachedModule": true,
+          "stylesReleasedAfterOwnershipEnds": true,
+          "retainedDomNodesAfterTeardown": 0,
+          "detachedListenersAfterTeardown": 0
+        },
+        "longTasks": {
+          "supported": false,
+          "count": 0,
+          "durationsMs": []
+        }
+      },
+      "statistics": {
+        "hydrationMs": {
+          "min": 0,
+          "median": 1,
+          "p95": 2,
+          "max": 2
+        },
+        "routeTransitionMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 1
+        },
+        "loaderCachedModuleLoadMs": {
+          "min": 0,
+          "median": 1,
+          "p95": 1,
+          "max": 2
+        },
+        "styleOwnershipMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 0.01,
+          "max": 0.01
+        },
+        "teardownThirtyCyclesMs": {
+          "min": 1,
+          "median": 1,
+          "p95": 4,
+          "max": 8
+        },
+        "interactionMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 1
+        }
+      }
+    },
+    {
+      "browser": "webkit",
+      "browserVersion": "26.5",
+      "result": {
+        "schemaVersion": 1,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+        "samples": 20,
+        "warmupRounds": 5,
+        "teardownCycles": 30,
+        "metrics": {
+          "hydrationMs": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "routeTransitionMs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "loaderCachedModuleLoadMs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "styleOwnershipMs": [
+            0,
+            0,
+            0.01,
+            0,
+            0.01,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.01,
+            0,
+            0,
+            0,
+            0
+          ],
+          "teardownThirtyCyclesMs": [
+            2,
+            1,
+            1,
+            2,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            2
+          ],
+          "interactionMs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "correctness": {
+          "hydrationRetainsServerDom": true,
+          "routeMatchesRequestedLocation": true,
+          "loaderReusesCachedModule": true,
+          "stylesReleasedAfterOwnershipEnds": true,
+          "retainedDomNodesAfterTeardown": 0,
+          "detachedListenersAfterTeardown": 0
+        },
+        "longTasks": {
+          "supported": false,
+          "count": 0,
+          "durationsMs": []
+        }
+      },
+      "statistics": {
+        "hydrationMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 1
+        },
+        "routeTransitionMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 1
+        },
+        "loaderCachedModuleLoadMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 1,
+          "max": 1
+        },
+        "styleOwnershipMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 0.01,
+          "max": 0.01
+        },
+        "teardownThirtyCyclesMs": {
+          "min": 0,
+          "median": 1,
+          "p95": 2,
+          "max": 2
+        },
+        "interactionMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        }
+      }
+    }
+  ],
+  "passed": true,
+  "failures": []
+}

@@ -18,3 +18,11 @@ ownership after teardown in Chromium, Firefox, and WebKit. They do not claim a
 fixed process heap, absence of browser-internal caches, or deterministic garbage
 collection. Heap-growth claims require a separate browser/version-specific
 profile with raw samples and an explicit collection protocol.
+
+The production [`runtime scorecard`](performance.md#expanded-runtime-scorecard)
+adds a timed retention lane. Every sample mounts, interacts with, unmounts, and
+probes 30 application roots. Acceptance requires zero retained root DOM nodes
+and zero mutations from detached button listeners in Chromium, Firefox, and
+WebKit. It reports teardown latency independently per engine. This remains
+deterministic ownership evidence; it does not convert the gate into a browser
+heap-size or garbage-collection claim.
