@@ -7,6 +7,34 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Added
+
+- Added public Quarks component-library manifest validation and an explicit
+  dependency-aware loader with observable state, caching, scoped Custom Element
+  registration, constructable stylesheet ownership, SSR style snapshots, and
+  deterministic release/disposal.
+- Added a separately packed component-library and production consumer example,
+  plus a Storybook catalog whose real controls, loader states, interactions,
+  WCAG A/AA checks, and visual baselines are retained by CI.
+- Added reproducible Gluon/Lit/Vue/React bundle fixtures and an expanded runtime
+  scorecard for SSR, hydration, routing, component loading, styles, teardown,
+  interaction latency, memory, and supported long-task observations.
+- Added a production component property/state CPU profiler with retained raw
+  Chrome DevTools profiles and exact environment metadata.
+
+### Changed
+
+- Compiler-proven primitive component property updates now share one ordered
+  microtask queue while lifecycle, hydration, cleanup, disturbed DOM, and all
+  unproven shapes retain the full scheduler and renderer path.
+- Browser coverage files now run serially so the shop's real two-second async
+  inventory timeout is measured without concurrent cold-transform contention;
+  the same files and global thresholds remain enforced.
+- Updated the release SBOM generator to `@cyclonedx/cdxgen` 12.8.0, removing
+  the vulnerable `tar` dependency reported by the release security audit.
+
 ## [1.1.0] - 2026-07-16
 
 ### Added

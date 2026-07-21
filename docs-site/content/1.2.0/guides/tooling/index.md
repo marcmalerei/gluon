@@ -17,5 +17,18 @@ and leak diagnostics without renderer internals.
 
 <<< ../../../../examples/testing.ts
 
+The separate component-library reference includes a Storybook catalog built
+from public package exports. Its four retained story states execute real
+interactions, run WCAG A/AA analysis, and compare committed visual baselines:
+
+```sh
+npm run storybook:component-library
+npm run check:storybook:component-library
+```
+
+The production consumer and clean-install package checks remain the authority
+for code splitting, loader cache, registration, stylesheet ownership, SSR,
+hydration, and teardown behavior.
+
 Open the [public Playground](/gluon/playground/) or browse the
-[versioned diagnostic reference](/gluon/1.1.0/reference/diagnostics/).
+[versioned diagnostic reference](/gluon/1.2.0/reference/diagnostics/).

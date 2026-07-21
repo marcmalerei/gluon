@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Changed
+
+- Reported lockstep framework version `1.2.0` while retaining the existing
+  language-server, template-diagnostic, and project-analysis contracts.
+
 ## [1.1.0] - 2026-07-16
 
 ### Added

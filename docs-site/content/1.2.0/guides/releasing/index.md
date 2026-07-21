@@ -1,13 +1,13 @@
 # Release readiness
 
-The `1.1.0` documentation describes the completed lockstep release. All 17
-official manifests and npm packages are at `1.1.0`. Release run `29496068214`
-published every package under `latest` with SLSA provenance, passed clean-room
-installation and public-type verification, and published immutable GitHub
-release `v1.1.0` on 2026-07-16. The `v1.0.9` GitHub release remains a
-draft after its public-type verification failure. The `@gluonjs` scope,
-package records, and trusted-publisher bindings are verified in the package
-contract.
+The `1.2.0` documentation describes the prepared lockstep candidate. All 17
+official manifests are at `1.2.0`. Registry preflight on 2026-07-21 confirmed
+that every contracted package still exposes `1.1.0` as `latest` with SLSA
+provenance and that `1.2.0` is absent. Immutable GitHub release `v1.1.0` remains
+the current finalized release while the candidate is reviewed. The `v1.0.9`
+GitHub release remains a draft after its public-type verification failure. The
+`@gluonjs` scope, package records, and trusted-publisher bindings are verified
+in the package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
@@ -119,8 +119,8 @@ passed its candidate, browser, Node, performance, and reproducibility gates and
 published all 17 packages to `latest` with SLSA provenance. Clean-room public
 type verification then found a broken Core declaration re-export, so the
 GitHub release remains a draft. The immutable npm versions and tag are not
-reused; `1.1.0` contains the corrected declaration bundle and a prepublication
-archive typecheck.
+reused; `1.1.0` contained the corrected declaration bundle and a
+prepublication archive typecheck.
 
 The maintained [release operations runbook](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md)
 defines the exact candidate, tag, protected publication, registry verification,

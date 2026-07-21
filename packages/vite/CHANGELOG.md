@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Changed
+
+- Advanced the lockstep release with production component-library chunk and
+  profiler evidence while retaining the existing public plugin contract.
+
 ## [1.1.0] - 2026-07-16
 
 ### Changed

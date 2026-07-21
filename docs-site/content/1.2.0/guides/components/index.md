@@ -2,7 +2,7 @@
 
 This guide starts with the component boundary instead of the TypeScript type
 list. It explains what data crosses that boundary, who owns it, and which Gluon
-API to use. All examples import public `1.1.0` package entry points and are
+API to use. All examples import public `1.2.0` package entry points and are
 compiled by the documentation quality gate.
 
 ## The four terms to know
@@ -32,6 +32,35 @@ Use `defineGluonElement()` for a new stateful component unless the component
 needs one of the class extension points in the second row. Use
 `elementProperty<Value>()` and `elementEvent<Detail>()` when a setup-based
 definition needs structured generic types that a constructor cannot infer.
+
+## Package and load a component library
+
+A separately published library exposes ordinary public ESM exports plus a
+serializable `ComponentLibraryManifest` from `@gluonjs/quarks`. Each manifest
+entry names its public module, named export, layer, stylesheet ids,
+dependencies, accessibility contract, and optional Custom Element tag and
+Storybook story id. Validate untrusted JSON with
+`validateComponentLibraryManifest()` before a consumer resolves any module.
+
+Create the consumer-owned boundary with `createComponentLibraryLoader()`.
+Its resolver imports only the requested declared entry and dependencies;
+`status()` and `result()` expose loading, loaded, and failed state without
+implicitly registering the whole library. Element entries register against the
+selected registry, and duplicate tags with a different constructor fail.
+Functional entries remain unregistered render functions.
+
+When a loader receives both a style resolver and an explicit target, it retains
+only the loaded entries' constructable sheets. `release()` and `dispose()`
+release exactly those references while preserving sheets the target already
+owned. `styleSnapshot()` and `validateStyleSnapshot()` carry the same ordered
+style ids through SSR and hydration without replacing retained DOM. The loader
+never introduces a `<style>` fallback.
+
+The repository's `examples/component-library` package, clean consumer, and
+Storybook catalog are the complete runnable reference. Storybook uses the
+published exports for controls, interactions, accessibility checks, and visual
+baselines; it is developer evidence, not a replacement for the GLUON GOODS
+application acceptance flow.
 
 ## Declare properties
 
@@ -190,44 +219,44 @@ they are not alternative component bases.
 
 | Class | Use it for |
 | --- | --- |
-| [`GluonElement`](/gluon/1.1.0/api/generated/src/classes/GluonElement.html) | Subclass it for a stateful Custom Element that needs protected class extension points. |
-| [`TemplateResult`](/gluon/1.1.0/api/generated/src/classes/TemplateResult.html) | This is the immutable result returned by `html`; return it from render code rather than constructing it directly. |
-| [`EffectScope`](/gluon/1.1.0/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
-| [`StoreManager`](/gluon/1.1.0/api/generated/packages/store/src/classes/StoreManager.html) | Own Store definitions and live Store instances for one application, request, or test; create it with `createStoreManager()` and call `dispose()`. |
+| [`GluonElement`](/gluon/1.2.0/api/generated/src/classes/GluonElement.html) | Subclass it for a stateful Custom Element that needs protected class extension points. |
+| [`TemplateResult`](/gluon/1.2.0/api/generated/src/classes/TemplateResult.html) | This is the immutable result returned by `html`; return it from render code rather than constructing it directly. |
+| [`EffectScope`](/gluon/1.2.0/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
+| [`StoreManager`](/gluon/1.2.0/api/generated/packages/store/src/classes/StoreManager.html) | Own Store definitions and live Store instances for one application, request, or test; create it with `createStoreManager()` and call `dispose()`. |
 
 ### Component-library classes
 
 | Class | Use it for |
 | --- | --- |
-| [`ComponentLibraryLoader`](/gluon/1.1.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe cache state, retain target-owned constructable stylesheets, and validate request-local SSR style snapshots before hydration. |
+| [`ComponentLibraryLoader`](/gluon/1.2.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe cache state, retain target-owned constructable stylesheets, and validate request-local SSR style snapshots before hydration. |
 
 ### Tooling classes
 
 | Class | Use it for |
 | --- | --- |
-| [`DevtoolsProtocol`](/gluon/1.1.0/api/generated/packages/devtools-api/src/classes/DevtoolsProtocol.html) | Register inspectable applications, record serializable timeline events, take snapshots, and subscribe a Devtools client. |
-| [`GluonDevtoolsBridge`](/gluon/1.1.0/api/generated/packages/devtools/src/classes/GluonDevtoolsBridge.html) | Connect application, Router, Store, render, event, and error signals to `DevtoolsProtocol`; dispose it with its owner. |
-| [`GluonLanguageService`](/gluon/1.1.0/api/generated/packages/language-server/src/classes/GluonLanguageService.html) | Analyze open TypeScript documents for Gluon diagnostics, completion, hover, definitions, rename edits, and semantic tokens. |
-| [`GluonProtocolServer`](/gluon/1.1.0/api/generated/packages/language-server/src/classes/GluonProtocolServer.html) | Adapt `GluonLanguageService` to the repository's JSON-RPC/LSP message contract. |
+| [`DevtoolsProtocol`](/gluon/1.2.0/api/generated/packages/devtools-api/src/classes/DevtoolsProtocol.html) | Register inspectable applications, record serializable timeline events, take snapshots, and subscribe a Devtools client. |
+| [`GluonDevtoolsBridge`](/gluon/1.2.0/api/generated/packages/devtools/src/classes/GluonDevtoolsBridge.html) | Connect application, Router, Store, render, event, and error signals to `DevtoolsProtocol`; dispose it with its owner. |
+| [`GluonLanguageService`](/gluon/1.2.0/api/generated/packages/language-server/src/classes/GluonLanguageService.html) | Analyze open TypeScript documents for Gluon diagnostics, completion, hover, definitions, rename edits, and semantic tokens. |
+| [`GluonProtocolServer`](/gluon/1.2.0/api/generated/packages/language-server/src/classes/GluonProtocolServer.html) | Adapt `GluonLanguageService` to the repository's JSON-RPC/LSP message contract. |
 
 ### Error classes
 
 | Class | Where it comes from |
 | --- | --- |
-| [`AsyncTimeoutError`](/gluon/1.1.0/api/generated/src/classes/AsyncTimeoutError.html) | An async component exceeded its configured timeout; inspect `timeout`. |
-| [`HydrationMismatchError`](/gluon/1.1.0/api/generated/src/classes/HydrationMismatchError.html) | Core hydration found mismatches while recovery was configured as `throw`; inspect `mismatches`. |
-| [`LegacyComponentStyleConflictError`](/gluon/1.1.0/api/generated/src/styles/classes/LegacyComponentStyleConflictError.html) | A legacy component stylesheet conflicts with usage-driven style ownership; inspect `componentStyleId`. |
-| [`UiHydrationError`](/gluon/1.1.0/api/generated/packages/atoms/src/classes/UiHydrationError.html) | UI stylesheet hydration found missing, duplicate, reordered, or mismatched carriers; inspect `mismatch`. |
-| [`SsrRenderError`](/gluon/1.1.0/api/generated/packages/ssr/src/classes/SsrRenderError.html) | SSR received an invalid value or unsupported directive; inspect `code`. |
-| [`ComponentStyleHydrationError`](/gluon/1.1.0/api/generated/packages/ssr/src/hydration/classes/ComponentStyleHydrationError.html) | Component stylesheet hydration reported a typed mismatch; inspect `mismatch`. |
-| [`SsrTransportError`](/gluon/1.1.0/api/generated/packages/ssr/src/hydration/classes/SsrTransportError.html) | The hydration style transport is unsupported, malformed, or conflicts with recovery; inspect `code`. |
-| [`AddComponentError`](/gluon/1.1.0/api/generated/packages/create-gluon/src/classes/AddComponentError.html) | `create-gluon` component generation rejected input or a filesystem safety condition; inspect `code`. |
-| [`ScaffoldError`](/gluon/1.1.0/api/generated/packages/create-gluon/src/classes/ScaffoldError.html) | Project scaffolding rejected CLI options, a project name, or the target directory; inspect `code`. |
-| [`VueMigrationAnalyzerError`](/gluon/1.1.0/api/generated/packages/vue-migration-analyzer/src/classes/VueMigrationAnalyzerError.html) | Vue migration analysis could not start or exceeded a resource budget; inspect `exitCode`. |
+| [`AsyncTimeoutError`](/gluon/1.2.0/api/generated/src/classes/AsyncTimeoutError.html) | An async component exceeded its configured timeout; inspect `timeout`. |
+| [`HydrationMismatchError`](/gluon/1.2.0/api/generated/src/classes/HydrationMismatchError.html) | Core hydration found mismatches while recovery was configured as `throw`; inspect `mismatches`. |
+| [`LegacyComponentStyleConflictError`](/gluon/1.2.0/api/generated/src/styles/classes/LegacyComponentStyleConflictError.html) | A legacy component stylesheet conflicts with usage-driven style ownership; inspect `componentStyleId`. |
+| [`UiHydrationError`](/gluon/1.2.0/api/generated/packages/atoms/src/classes/UiHydrationError.html) | UI stylesheet hydration found missing, duplicate, reordered, or mismatched carriers; inspect `mismatch`. |
+| [`SsrRenderError`](/gluon/1.2.0/api/generated/packages/ssr/src/classes/SsrRenderError.html) | SSR received an invalid value or unsupported directive; inspect `code`. |
+| [`ComponentStyleHydrationError`](/gluon/1.2.0/api/generated/packages/ssr/src/hydration/classes/ComponentStyleHydrationError.html) | Component stylesheet hydration reported a typed mismatch; inspect `mismatch`. |
+| [`SsrTransportError`](/gluon/1.2.0/api/generated/packages/ssr/src/hydration/classes/SsrTransportError.html) | The hydration style transport is unsupported, malformed, or conflicts with recovery; inspect `code`. |
+| [`AddComponentError`](/gluon/1.2.0/api/generated/packages/create-gluon/src/classes/AddComponentError.html) | `create-gluon` component generation rejected input or a filesystem safety condition; inspect `code`. |
+| [`ScaffoldError`](/gluon/1.2.0/api/generated/packages/create-gluon/src/classes/ScaffoldError.html) | Project scaffolding rejected CLI options, a project name, or the target directory; inspect `code`. |
+| [`VueMigrationAnalyzerError`](/gluon/1.2.0/api/generated/packages/vue-migration-analyzer/src/classes/VueMigrationAnalyzerError.html) | Vue migration analysis could not start or exceeded a resource budget; inspect `exitCode`. |
 
 ## Next references
 
 - [Application architecture](../application/) for application, Router, and Store ownership.
 - [Component contracts](https://github.com/marcmalerei/gluon/blob/main/docs/component-contracts.md) for the normative property, event, slot, model, and ref behavior.
 - [Reactive Custom Elements](https://github.com/marcmalerei/gluon/blob/main/docs/reactive-elements.md) for scheduler and reconnection semantics.
-- [API reference](/gluon/1.1.0/api/) for exact signatures and one compiled example per public symbol.
+- [API reference](/gluon/1.2.0/api/) for exact signatures and one compiled example per public symbol.

@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-21
+
+### Changed
+
+- Advanced the lockstep release with the component-library and verified
+  performance capability set while retaining the existing public contract.
+
 ## [1.1.0] - 2026-07-16
 
 ### Changed
