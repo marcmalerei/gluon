@@ -43,6 +43,7 @@ export default defineConfig({
       '@gluonjs/atoms': resolve(import.meta.dirname, 'packages/atoms/src/index.ts'),
       '@gluonjs/molecules': resolve(import.meta.dirname, 'packages/molecules/src/index.ts'),
       '@gluonjs/organisms': resolve(import.meta.dirname, 'packages/organisms/src/index.ts'),
+      '@gluonjs/example-component-library': resolve(import.meta.dirname, 'examples/component-library/library/src/index.ts'),
       '@gluonjs/devtools-api': resolve(import.meta.dirname, 'packages/devtools-api/src/index.ts'),
       '@gluonjs/reactivity/preact-signals': resolve(import.meta.dirname, 'packages/reactivity/src/preact-signals.ts'),
       '@gluonjs/reactivity/signals': resolve(import.meta.dirname, 'packages/reactivity/src/signals/index.ts'),
