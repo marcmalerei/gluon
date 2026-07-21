@@ -9,7 +9,15 @@ export default defineConfig({
   } },
   build: {
     emptyOutDir: true,
-    lib: { entry: resolve(import.meta.dirname, 'src/index.ts'), formats: ['es'], fileName: 'index' },
+    lib: {
+      entry: {
+        index: resolve(import.meta.dirname, 'src/index.ts'),
+        manifest: resolve(import.meta.dirname, 'src/manifest.ts'),
+        'product-badge': resolve(import.meta.dirname, 'src/product-badge.ts'),
+        'product-picker': resolve(import.meta.dirname, 'src/product-picker.ts'),
+      },
+      formats: ['es'],
+    },
     rollupOptions: { external: ['@gluonjs/core', '@gluonjs/quarks'] },
   },
 });

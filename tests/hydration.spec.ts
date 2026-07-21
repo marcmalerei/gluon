@@ -21,7 +21,9 @@ import {
 } from '@gluonjs/core';
 import { Button, buttonStyles } from '@gluonjs/atoms';
 import { Card, cardStyles } from '@gluonjs/molecules';
-import { ProductBadge } from '@gluonjs/example-component-library';
+import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
+import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
+import { createComponentLibraryLoader } from '@gluonjs/quarks';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   hydrateApplication,
@@ -96,6 +98,34 @@ describe('SSR hydration', () => {
 
     expect(result).toMatchObject({ retained: true, recovered: false });
     expect(root.querySelector('.example-product-badge')).toBe(badge);
+  });
+
+  it('validates the loader style handoff before retaining the component-library DOM', async () => {
+    const resolver = { load: async () => ProductBadge };
+    const serverLoader = createComponentLibraryLoader(componentLibraryManifest, resolver);
+    await serverLoader.load('product-badge');
+    const serverStyles = JSON.parse(JSON.stringify(serverLoader.styleSnapshot()));
+
+    const value = html`<section>${ProductBadge('In stock')}</section>`;
+    const prepared = await prepareForHydration(value);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const badge = root.querySelector('.example-product-badge');
+    const documentSheetCount = document.adoptedStyleSheets.length;
+
+    const clientLoader = createComponentLibraryLoader(componentLibraryManifest, resolver, {
+      styleTarget: document,
+      styles: { resolve: () => [productBadgeStyles] },
+    });
+    await clientLoader.load('product-badge');
+    clientLoader.validateStyleSnapshot(serverStyles);
+    const result = await hydrateTemplate(value, root);
+
+    expect(result).toMatchObject({ retained: true, recovered: false });
+    expect(root.querySelector('.example-product-badge')).toBe(badge);
+    expect(document.adoptedStyleSheets).toHaveLength(documentSheetCount + 1);
+    clientLoader.release('product-badge');
+    expect(document.adoptedStyleSheets).toHaveLength(documentSheetCount);
   });
 
   it('retains matching nodes while activating refs, events, context, and reactive updates', async () => {

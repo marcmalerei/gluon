@@ -199,7 +199,7 @@ they are not alternative component bases.
 
 | Class | Use it for |
 | --- | --- |
-| [`ComponentLibraryLoader`](/gluon/1.1.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe its cache state, and release its target-owned constructable stylesheets. |
+| [`ComponentLibraryLoader`](/gluon/1.1.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe cache state, retain target-owned constructable stylesheets, and validate request-local SSR style snapshots before hydration. |
 
 ### Tooling classes
 

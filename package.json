@@ -80,6 +80,7 @@
     "build:component-library-package": "npm run build:core && npm run build:quarks && npm run build --prefix examples/component-library/library",
     "check:component-library-package": "npm run build:component-library-package && npm run pack:check --prefix examples/component-library/library",
     "check:component-library-clean-install": "npm run build:component-library-package && node scripts/validate-component-library-clean-install.mjs",
+    "check:component-library-loader-build": "npm run build:component-library && node scripts/validate-component-library-loader-build.mjs",
     "docs:api": "typedoc --options typedoc.json --treatWarningsAsErrors && node scripts/generate-api-examples.mjs",
     "build:docs": "npm run docs:api && node scripts/build-docs.mjs && npm run build:docs-examples",
     "build:docs-examples": "vite build --config docs-site/examples/vite.config.ts",
