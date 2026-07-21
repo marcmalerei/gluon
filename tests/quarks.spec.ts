@@ -213,8 +213,8 @@ describe('quarks', () => {
     await loader.load('first');
     await loader.load('second');
     loader.release('first');
-    expect(target.adoptedStyleSheets).toContain(sheet);
+    expect(target.adoptedStyleSheets).toHaveLength(1);
     loader.release('second');
-    expect(target.adoptedStyleSheets).not.toContain(sheet);
+    expect(target.adoptedStyleSheets).toHaveLength(0);
   });
 });
