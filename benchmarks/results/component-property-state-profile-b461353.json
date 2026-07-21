@@ -1,0 +1,627 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-21T09:16:41.754Z",
+  "source": {
+    "commit": "b461353291b62afc12d553f4f962db6c9c368264",
+    "branch": "codex/218-lit-property-state-parity",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "chromium": "149.0.7827.55",
+    "packages": {
+      "gluon": "1.1.0",
+      "lit": "3.3.3",
+      "playwright": "1.61.1",
+      "vite": "8.1.4"
+    }
+  },
+  "methodology": {
+    "productionBuild": true,
+    "headless": true,
+    "framework": "gluon",
+    "componentCount": 50,
+    "warmupIterations": 1000,
+    "measuredIterations": 20000,
+    "samplingIntervalMicroseconds": 100,
+    "scenarioIsolation": "fresh browser context and CPU profile per scenario"
+  },
+  "runs": [
+    {
+      "scenario": "property",
+      "measurement": {
+        "framework": "gluon",
+        "scenario": "property",
+        "warmupIterations": 1000,
+        "measuredIterations": 20000,
+        "elapsedMs": 350.1000000089407,
+        "snapshot": {
+          "componentCount": 50,
+          "rowCount": 0,
+          "firstLabel": "Component 0 A",
+          "firstCount": null,
+          "firstItemId": null,
+          "firstItemLabel": null,
+          "lastLabel": "Component 49 A",
+          "lastCount": null,
+          "lastItemId": null,
+          "lastItemLabel": null
+        }
+      },
+      "profile": "component-property-state-profile-b461353-property.cpuprofile",
+      "profileSummary": [
+        {
+          "functionName": "Sn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 37103,
+          "selfSamples": 546,
+          "selfTimeMs": 54.6,
+          "selfPercent": 20.983858570330515
+        },
+        {
+          "functionName": "setStableStringValue",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 5003,
+          "selfSamples": 428,
+          "selfTimeMs": 42.8,
+          "selfPercent": 16.448885472713297
+        },
+        {
+          "functionName": "wn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 37562,
+          "selfSamples": 215,
+          "selfTimeMs": 21.5,
+          "selfPercent": 8.262874711760185
+        },
+        {
+          "functionName": "cr",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 44324,
+          "selfSamples": 206,
+          "selfTimeMs": 20.6,
+          "selfPercent": 7.916986933128363
+        },
+        {
+          "functionName": "(program)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 162,
+          "selfTimeMs": 16.2,
+          "selfPercent": 6.22598001537279
+        },
+        {
+          "functionName": "(garbage collector)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 139,
+          "selfTimeMs": 13.9,
+          "selfPercent": 5.342044581091468
+        },
+        {
+          "functionName": "Dd",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 2904,
+          "selfSamples": 103,
+          "selfTimeMs": 10.3,
+          "selfPercent": 3.9584934665641813
+        },
+        {
+          "functionName": "Vt",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 33662,
+          "selfSamples": 90,
+          "selfTimeMs": 9,
+          "selfPercent": 3.4588777863182165
+        },
+        {
+          "functionName": "performCompiledPropertyUpdate",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 46043,
+          "selfSamples": 84,
+          "selfTimeMs": 8.4,
+          "selfPercent": 3.2282859338970025
+        },
+        {
+          "functionName": "lr",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 50971,
+          "selfSamples": 68,
+          "selfTimeMs": 6.8,
+          "selfPercent": 2.6133743274404306
+        },
+        {
+          "functionName": "Fd",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 4848,
+          "selfSamples": 67,
+          "selfTimeMs": 6.7,
+          "selfPercent": 2.574942352036895
+        },
+        {
+          "functionName": "bn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36829,
+          "selfSamples": 67,
+          "selfTimeMs": 6.7,
+          "selfPercent": 2.574942352036895
+        },
+        {
+          "functionName": "Re",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 18914,
+          "selfSamples": 64,
+          "selfTimeMs": 6.4,
+          "selfPercent": 2.4596464258262873
+        },
+        {
+          "functionName": "run",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 1846,
+          "selfSamples": 53,
+          "selfTimeMs": 5.3,
+          "selfPercent": 2.0368946963873946
+        },
+        {
+          "functionName": "queuePropertyUpdate",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 45449,
+          "selfSamples": 45,
+          "selfTimeMs": 4.5,
+          "selfPercent": 1.7294388931591083
+        },
+        {
+          "functionName": "Cn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 37455,
+          "selfSamples": 38,
+          "selfTimeMs": 3.8,
+          "selfPercent": 1.4604150653343582
+        },
+        {
+          "functionName": "yn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36798,
+          "selfSamples": 38,
+          "selfTimeMs": 3.8,
+          "selfPercent": 1.4604150653343582
+        },
+        {
+          "functionName": "(idle)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 23,
+          "selfTimeMs": 2.3,
+          "selfPercent": 0.8839354342813222
+        },
+        {
+          "functionName": "Ue",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 23023,
+          "selfSamples": 11,
+          "selfTimeMs": 1.1,
+          "selfPercent": 0.42275172943889316
+        },
+        {
+          "functionName": "pendingFullUpdate.connectionRendered.<computed>.property.e.beforeUpdateHooks.length.updatedHooks.length.wn.compiledPropertyUpdateJob",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 45896,
+          "selfSamples": 10,
+          "selfTimeMs": 1,
+          "selfPercent": 0.3843197540353574
+        },
+        {
+          "functionName": "xn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36995,
+          "selfSamples": 10,
+          "selfTimeMs": 1,
+          "selfPercent": 0.3843197540353574
+        },
+        {
+          "functionName": "e",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 41531,
+          "selfSamples": 8,
+          "selfTimeMs": 0.8,
+          "selfPercent": 0.3074558032282859
+        },
+        {
+          "functionName": "isURL",
+          "url": "",
+          "lineNumber": 48,
+          "columnNumber": 15,
+          "selfSamples": 8,
+          "selfTimeMs": 0.8,
+          "selfPercent": 0.3074558032282859
+        },
+        {
+          "functionName": "get isActiveAndEmpty",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 2072,
+          "selfSamples": 7,
+          "selfTimeMs": 0.7,
+          "selfPercent": 0.2690238278247502
+        },
+        {
+          "functionName": "_n",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36701,
+          "selfSamples": 7,
+          "selfTimeMs": 0.7,
+          "selfPercent": 0.2690238278247502
+        },
+        {
+          "functionName": "Fe",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 18833,
+          "selfSamples": 7,
+          "selfTimeMs": 0.7,
+          "selfPercent": 0.2690238278247502
+        },
+        {
+          "functionName": "UtilityScript",
+          "url": "",
+          "lineNumber": 272,
+          "columnNumber": 14,
+          "selfSamples": 6,
+          "selfTimeMs": 0.6,
+          "selfPercent": 0.23059185242121444
+        },
+        {
+          "functionName": "ensurePendingUpdate",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 47452,
+          "selfSamples": 6,
+          "selfTimeMs": 0.6,
+          "selfPercent": 0.23059185242121444
+        },
+        {
+          "functionName": "set",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 51946,
+          "selfSamples": 6,
+          "selfTimeMs": 0.6,
+          "selfPercent": 0.23059185242121444
+        },
+        {
+          "functionName": "promise",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 51009,
+          "selfSamples": 6,
+          "selfTimeMs": 0.6,
+          "selfPercent": 0.23059185242121444
+        }
+      ]
+    },
+    {
+      "scenario": "state",
+      "measurement": {
+        "framework": "gluon",
+        "scenario": "state",
+        "warmupIterations": 1000,
+        "measuredIterations": 20000,
+        "elapsedMs": 1335.6000000089407,
+        "snapshot": {
+          "componentCount": 50,
+          "rowCount": 0,
+          "firstLabel": null,
+          "firstCount": "Count: 21000",
+          "firstItemId": null,
+          "firstItemLabel": null,
+          "lastLabel": null,
+          "lastCount": "Count: 21000",
+          "lastItemId": null,
+          "lastItemLabel": null
+        }
+      },
+      "profile": "component-property-state-profile-b461353-state.cpuprofile",
+      "profileSummary": [
+        {
+          "functionName": "click",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 4182,
+          "selfTimeMs": 418.2,
+          "selfPercent": 52.93000885963802
+        },
+        {
+          "functionName": "Sn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 37103,
+          "selfSamples": 540,
+          "selfTimeMs": 54,
+          "selfPercent": 6.8345779015314525
+        },
+        {
+          "functionName": "querySelector",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 441,
+          "selfTimeMs": 44.1,
+          "selfPercent": 5.581571952917352
+        },
+        {
+          "functionName": "setValue",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 5177,
+          "selfSamples": 396,
+          "selfTimeMs": 39.6,
+          "selfPercent": 5.012023794456398
+        },
+        {
+          "functionName": "(garbage collector)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 381,
+          "selfTimeMs": 38.1,
+          "selfPercent": 4.822174408302747
+        },
+        {
+          "functionName": "wn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 37562,
+          "selfSamples": 337,
+          "selfTimeMs": 33.7,
+          "selfPercent": 4.265282875585369
+        },
+        {
+          "functionName": "run",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 1846,
+          "selfSamples": 325,
+          "selfTimeMs": 32.5,
+          "selfPercent": 4.113403366662448
+        },
+        {
+          "functionName": "(program)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 185,
+          "selfTimeMs": 18.5,
+          "selfPercent": 2.341475762561701
+        },
+        {
+          "functionName": "Dd",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 2904,
+          "selfSamples": 129,
+          "selfTimeMs": 12.9,
+          "selfPercent": 1.6327047209214023
+        },
+        {
+          "functionName": "lr",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 50971,
+          "selfSamples": 115,
+          "selfTimeMs": 11.5,
+          "selfPercent": 1.4555119605113278
+        },
+        {
+          "functionName": "Vt",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 33662,
+          "selfSamples": 111,
+          "selfTimeMs": 11.1,
+          "selfPercent": 1.4048854575370207
+        },
+        {
+          "functionName": "yn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36798,
+          "selfSamples": 84,
+          "selfTimeMs": 8.4,
+          "selfPercent": 1.063156562460448
+        },
+        {
+          "functionName": "Re",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 18914,
+          "selfSamples": 73,
+          "selfTimeMs": 7.3,
+          "selfPercent": 0.9239336792811036
+        },
+        {
+          "functionName": "Ee",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 3214,
+          "selfSamples": 65,
+          "selfTimeMs": 6.5,
+          "selfPercent": 0.8226806733324895
+        },
+        {
+          "functionName": "queuePropertyUpdate",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 45449,
+          "selfSamples": 56,
+          "selfTimeMs": 5.6,
+          "selfPercent": 0.7087710416402987
+        },
+        {
+          "functionName": "performCompiledPropertyUpdate",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 46043,
+          "selfSamples": 51,
+          "selfTimeMs": 5.1,
+          "selfPercent": 0.6454879129224149
+        },
+        {
+          "functionName": "Cn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 37455,
+          "selfSamples": 48,
+          "selfTimeMs": 4.8,
+          "selfPercent": 0.6075180356916846
+        },
+        {
+          "functionName": "u",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 1,
+          "columnNumber": 1545,
+          "selfSamples": 48,
+          "selfTimeMs": 4.8,
+          "selfPercent": 0.6075180356916846
+        },
+        {
+          "functionName": "cr",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 44324,
+          "selfSamples": 47,
+          "selfTimeMs": 4.7,
+          "selfPercent": 0.5948614099481079
+        },
+        {
+          "functionName": "(anonymous)",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 29750,
+          "selfSamples": 29,
+          "selfTimeMs": 2.9,
+          "selfPercent": 0.3670421465637261
+        },
+        {
+          "functionName": "bn",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36829,
+          "selfSamples": 24,
+          "selfTimeMs": 2.4,
+          "selfPercent": 0.3037590178458423
+        },
+        {
+          "functionName": "Fd",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 4848,
+          "selfSamples": 17,
+          "selfTimeMs": 1.7,
+          "selfPercent": 0.21516263764080495
+        },
+        {
+          "functionName": "get",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 51917,
+          "selfSamples": 16,
+          "selfTimeMs": 1.6,
+          "selfPercent": 0.20250601189722822
+        },
+        {
+          "functionName": "i",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 1,
+          "columnNumber": 868,
+          "selfSamples": 15,
+          "selfTimeMs": 1.5,
+          "selfPercent": 0.18984938615365143
+        },
+        {
+          "functionName": "ensurePendingUpdate",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 47452,
+          "selfSamples": 13,
+          "selfTimeMs": 1.3,
+          "selfPercent": 0.1645361346664979
+        },
+        {
+          "functionName": "(anonymous)",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 1,
+          "columnNumber": 1595,
+          "selfSamples": 12,
+          "selfTimeMs": 1.2,
+          "selfPercent": 0.15187950892292115
+        },
+        {
+          "functionName": "(idle)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 10,
+          "selfTimeMs": 1,
+          "selfPercent": 0.12656625743576763
+        },
+        {
+          "functionName": "_n",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 15,
+          "columnNumber": 36701,
+          "selfSamples": 9,
+          "selfTimeMs": 0.9,
+          "selfPercent": 0.11390963169219087
+        },
+        {
+          "functionName": "Dd",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 34,
+          "columnNumber": 2904,
+          "selfSamples": 9,
+          "selfTimeMs": 0.9,
+          "selfPercent": 0.11390963169219087
+        },
+        {
+          "functionName": "handleClick",
+          "url": "http://127.0.0.1:53880/assets/index-D_SaOMNB.js",
+          "lineNumber": 24,
+          "columnNumber": 434,
+          "selfSamples": 8,
+          "selfTimeMs": 0.8,
+          "selfPercent": 0.10125300594861411
+        }
+      ]
+    }
+  ]
+}

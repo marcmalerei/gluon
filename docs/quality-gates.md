@@ -116,6 +116,11 @@ boundary to its packed local Compiler and Language Server archives.
 The canonical shop flow waits for the observable settled inventory copy with a
 bounded diagnostic deadline; it does not treat a fixed scheduler delay as
 proof that the async availability request completed.
+The browser coverage command runs test files serially. This keeps the shop's
+real two-second `Suspense` timeout and dynamic inventory import from competing
+with the other 44 browser files during cold Vite transformation; it does not
+increase or bypass the application timeout. The same 45 files and global
+coverage thresholds remain in force.
 
 `npm run docs:api` generates TypeDoc Markdown for every public package entry
 point, appends one verified `Example` section to every public function, class,
