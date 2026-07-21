@@ -1,6 +1,6 @@
 # Security threat model
 
-This threat model applies to the prepared `1.2.0` release line. Its
+This threat model applies to the released `1.2.0` release line. Its
 machine-readable source is
 [`quality/security-threat-model.json`](../quality/security-threat-model.json),
 and `npm run check:security` rejects missing threat areas or evidence paths.

@@ -1,13 +1,12 @@
 # Release readiness
 
-The `1.2.0` documentation describes the prepared lockstep candidate. All 17
-official manifests are at `1.2.0`. Registry preflight on 2026-07-21 confirmed
-that every contracted package still exposes `1.1.0` as `latest` with SLSA
-provenance and that `1.2.0` is absent. Immutable GitHub release `v1.1.0` remains
-the current finalized release while the candidate is reviewed. The `v1.0.9`
-GitHub release remains a draft after its public-type verification failure. The
-`@gluonjs` scope, package records, and trusted-publisher bindings are verified
-in the package contract.
+The `1.2.0` documentation describes the completed lockstep release. All 17
+official manifests are at `1.2.0`. Release run `29822468758` published every
+contracted package under `latest` with SLSA provenance, passed clean-room
+installation and public-type verification, and published immutable GitHub
+release `v1.2.0` on 2026-07-21. The `v1.0.9` GitHub release remains a draft
+after its public-type verification failure. The `@gluonjs` scope, package
+records, and trusted-publisher bindings are verified in the package contract.
 
 Gluon's release group contains 17 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
