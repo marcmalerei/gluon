@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render } from '../src/index.js';
-import { fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
+import { css, render } from '../src/index.js';
+import { createComponentLibraryLoader, fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
 
 describe('quarks', () => {
   beforeEach(() => {
@@ -131,5 +131,90 @@ describe('quarks', () => {
       'Entry 1 only an element may declare tag.',
       'Entry 2 only an element may declare tag.',
     ]));
+  });
+
+  it('loads only the requested public entry and its declared dependencies with observable cache state', async () => {
+    const load = vi.fn(async (entry: { id: string }) => ({ id: entry.id }));
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'base', module: '@acme/components/base', exportName: 'Base', layer: 'atom', styles: [], dependencies: [], accessibility: 'Base.' },
+      { id: 'picker', module: '@acme/components/picker', exportName: 'Picker', layer: 'molecule', styles: [], dependencies: ['base'], accessibility: 'Picker.' },
+    ] }, { load });
+
+    expect(loader.status('picker')).toBe('idle');
+    const first = loader.load('picker');
+    expect(loader.status('picker')).toBe('loading');
+    expect(await first).toMatchObject({ entry: { id: 'picker' }, value: { id: 'picker' } });
+    expect(loader.status('picker')).toBe('loaded');
+    await loader.load('picker');
+    expect(load.mock.calls.map(([entry]) => entry.id)).toEqual(['base', 'picker']);
+    expect(() => loader.load('missing')).toThrow('Unknown component-library entry: missing.');
+  });
+
+  it('reports failed, cyclic, and conflicting element loads without retaining a bad cache entry', async () => {
+    const failed = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'broken', module: '@acme/components/broken', exportName: 'Broken', layer: 'atom', styles: [], dependencies: [], accessibility: 'Broken.' },
+    ] }, { load: async () => { throw new Error('network failure'); } });
+    await expect(failed.load('broken')).rejects.toThrow('network failure');
+    await Promise.resolve();
+    expect(failed.status('broken')).toBe('failed');
+
+    const cyclic = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'first', module: '@acme/components/first', exportName: 'First', layer: 'atom', styles: [], dependencies: ['second'], accessibility: 'First.' },
+      { id: 'second', module: '@acme/components/second', exportName: 'Second', layer: 'atom', styles: [], dependencies: ['first'], accessibility: 'Second.' },
+    ] }, { load: async () => null });
+    await expect(cyclic.load('first')).rejects.toThrow('Component dependency cycle includes first.');
+
+    const tag: `${string}-${string}` = `acme-loader-${Math.random().toString(36).slice(2)}`;
+    class RegisteredElement extends HTMLElement {}
+    class DifferentElement extends HTMLElement {}
+    customElements.define(tag, RegisteredElement);
+    const elements = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'element', module: '@acme/components/element', exportName: 'Element', layer: 'element', tag, styles: [], dependencies: [], accessibility: 'Element.' },
+    ] }, { load: async () => DifferentElement });
+    await expect(elements.load('element')).rejects.toThrow(`Duplicate custom-element registration for ${tag}.`);
+  });
+
+  it('retains and releases only the requested component-library sheets', async () => {
+    const sheet = css`:host { display: block; }`;
+    const target = document.createElement('div').attachShadow({ mode: 'open' });
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'styled', module: '@acme/components/styled', exportName: 'Styled', layer: 'atom', styles: ['styled'], dependencies: [], accessibility: 'Styled.' },
+    ] }, { load: async () => null }, { styleTarget: target, styles: { resolve: () => [sheet] } });
+
+    await loader.load('styled');
+    expect(target.adoptedStyleSheets).toContain(sheet);
+    loader.dispose();
+    expect(target.adoptedStyleSheets).not.toContain(sheet);
+    loader.dispose();
+    expect(() => loader.load('styled')).toThrow('A disposed component-library loader cannot load entries.');
+  });
+
+  it('does not remove a stylesheet that predated the component-library owner', async () => {
+    const sheet = css`:host { color: green; }`;
+    const target = document.createElement('div').attachShadow({ mode: 'open' });
+    target.adoptedStyleSheets = [sheet];
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'shared', module: '@acme/components/shared', exportName: 'Shared', layer: 'atom', styles: ['shared'], dependencies: [], accessibility: 'Shared.' },
+    ] }, { load: async () => null }, { styleTarget: target, styles: { resolve: () => [sheet] } });
+
+    await loader.load('shared');
+    loader.release('shared');
+    expect(target.adoptedStyleSheets).toHaveLength(1);
+  });
+
+  it('keeps a loader-owned shared stylesheet until every entry releases it', async () => {
+    const sheet = css`:host { color: blue; }`;
+    const target = document.createElement('div').attachShadow({ mode: 'open' });
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'first', module: '@acme/components/first', exportName: 'First', layer: 'atom', styles: ['shared'], dependencies: [], accessibility: 'First.' },
+      { id: 'second', module: '@acme/components/second', exportName: 'Second', layer: 'atom', styles: ['shared'], dependencies: [], accessibility: 'Second.' },
+    ] }, { load: async () => null }, { styleTarget: target, styles: { resolve: () => [sheet] } });
+
+    await loader.load('first');
+    await loader.load('second');
+    loader.release('first');
+    expect(target.adoptedStyleSheets).toHaveLength(1);
+    loader.release('second');
+    expect(target.adoptedStyleSheets).toHaveLength(0);
   });
 });
