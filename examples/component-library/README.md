@@ -17,7 +17,9 @@ is owned by the explicit document target; the picker's internal sheet remains
 owned by its ShadowRoot.
 
 `npm run check:component-library-loader-build` verifies the production Vite
-manifest and browser requests: the initial page requests only the badge chunk,
+manifest and browser requests from a clean checkout by building the required
+Core, Compiler, and Vite workspaces first: the initial page requests only the
+badge chunk,
 the explicit picker action requests its chunk once, a repeated load is served
 from the loader cache, and the loaded picker remains interactive. The retained
 CI evidence includes raw chunk sizes, resource paths, browser version, and a

@@ -81,6 +81,8 @@ does not replace server DOM as recovery.
 
 `npm run typecheck:ui` compiles the public manifest API. `npm run
 check:ui-contract` retains the existing official UI inventory. `npm run
-check:component-library-loader-build` retains the exact dynamic entry chunks,
+check:component-library-loader-build` first builds the Core, Compiler, and Vite
+workspace prerequisites so the check is reproducible from a clean checkout,
+then retains the exact dynamic entry chunks,
 the initial and post-request browser resource lists, one cache hit, the public
 interaction result, browser metadata, and a rendered screenshot.
