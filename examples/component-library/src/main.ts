@@ -1,5 +1,5 @@
 import { createApp, html } from '@gluonjs/core';
-import { ProductBadge } from './library.js';
+import { ProductBadge } from '@gluonjs/example-component-library';
 
 createApp(() => html`
   <section aria-labelledby="component-library-heading">

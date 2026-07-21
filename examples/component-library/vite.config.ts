@@ -10,6 +10,7 @@ export default defineConfig({
     '@gluonjs/core': resolve(import.meta.dirname, '../../src/index.ts'),
     '@gluonjs/quarks': resolve(import.meta.dirname, '../../packages/quarks/src/index.ts'),
     '@gluonjs/reactivity': resolve(import.meta.dirname, '../../packages/reactivity/src/index.ts'),
+    '@gluonjs/example-component-library': resolve(import.meta.dirname, 'library/src/index.ts'),
     '@gluonjs/vite': resolve(import.meta.dirname, '../../packages/vite/src/index.ts'),
   } },
   build: { outDir: 'dist', emptyOutDir: true },

@@ -20,6 +20,12 @@ Stories use the package entry point, expose controls, execute the real picker
 interaction, and enable the accessibility addon. The catalog is not a
 replacement for GLUON GOODS.
 
-`library/` is the separately buildable package boundary. Run
-`npm run check:component-library-package` to build it and inspect the exact
-tarball contents before a clean-consumer install.
+`library/` is the separately buildable `@gluonjs/example-component-library`
+package boundary. Its implementation imports only the public Core and Quarks
+entries; the example consumer imports the library package entry rather than
+the source implementation. Run `npm run check:component-library-package` to
+build it and inspect the exact tarball contents before a clean-consumer install.
+`npm run check:component-library-clean-install` packs the real library and
+Gluon dependencies, installs them in an empty temporary consumer, typechecks
+and production-builds that consumer, then verifies its browser interaction and
+teardown flow.

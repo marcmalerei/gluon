@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { createApp, html } from '../src/index.js';
-import { ProductBadge } from '../examples/component-library/src/library.js';
+import { ProductBadge } from '@gluonjs/example-component-library';
 
 afterEach(() => {
   document.body.replaceChildren();

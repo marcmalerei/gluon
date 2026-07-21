@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {
+      "@gluonjs/core": ["dist/types/index.d.ts"],
+      "@gluonjs/quarks": ["packages/quarks/dist/index.d.ts"],
+      "@gluonjs/reactivity": ["packages/reactivity/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}
