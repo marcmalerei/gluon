@@ -99,6 +99,7 @@ npx playwright install chromium firefox webkit
 npm run benchmark:rendering
 npm run benchmark:components
 npm run benchmark:runtime
+npm run profile:component-property-state
 ```
 
 The default run uses Chromium, Firefox, and WebKit with eight warm-up rounds and
@@ -119,6 +120,12 @@ npm run benchmark:components -- \
   --warmup=4 \
   --timeout=300000 \
   --output=.tmp/component-diagnostic.json
+
+npm run profile:component-property-state -- \
+  --warmup=1000 \
+  --iterations=20000 \
+  --interval=100 \
+  --output=.tmp/component-property-state-profile.json
 ```
 
 Each command builds its benchmark with Vite in production mode and explicitly
@@ -131,6 +138,13 @@ console errors or warnings, and writes JSON plus Markdown. Rendering uses a
 supplied with `--output` must end in `.json`; the Markdown summary uses the same
 basename. `npm run check:benchmark-builds` rejects a comparative config that
 does not compile Gluon's production branch.
+
+The property/state profiler uses the same production component build but runs
+only Gluon in a fresh Chromium context per scenario. Chrome DevTools records a
+raw `.cpuprofile` at the declared sampling interval while the correctness-gated
+harness updates 50 mounted components for the requested iterations. The JSON
+summary records top self-time frames and exact raw-profile filenames. This is
+diagnostic hot-path evidence, not a cross-browser performance result.
 
 For an interactive demonstration in a browser:
 

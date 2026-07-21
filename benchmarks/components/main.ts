@@ -53,6 +53,22 @@ export interface ComponentBenchmarkResult {
   readonly scenarios: readonly ComponentScenarioBenchmarkResult[];
 }
 
+export interface ComponentProfileConfig {
+  readonly framework: ComponentFramework;
+  readonly scenario: 'property' | 'state';
+  readonly warmupIterations?: number;
+  readonly measuredIterations?: number;
+}
+
+export interface ComponentProfileResult {
+  readonly framework: ComponentFramework;
+  readonly scenario: 'property' | 'state';
+  readonly warmupIterations: number;
+  readonly measuredIterations: number;
+  readonly elapsedMs: number;
+  readonly snapshot: ComponentHarnessSnapshot;
+}
+
 const initialBatchSizes: Record<ComponentScenario, number> = {
   lifecycle: 1,
   property: 2,
@@ -128,6 +144,43 @@ export async function runComponentComparison(
     userAgent: navigator.userAgent,
     scenarios,
   };
+}
+
+/** Runs one isolated component hot path while an external profiler records it. */
+export async function runComponentProfile(config: ComponentProfileConfig): Promise<ComponentProfileResult> {
+  if (!componentFrameworks.includes(config.framework)) throw new TypeError('framework must be gluon, lit, or vue.');
+  if (config.scenario !== 'property' && config.scenario !== 'state') {
+    throw new TypeError('profile scenario must be property or state.');
+  }
+  const warmupIterations = positiveInteger(config.warmupIterations ?? 1_000, 'warmupIterations');
+  const measuredIterations = positiveInteger(config.measuredIterations ?? 20_000, 'measuredIterations');
+  const harness = await createComponentHarness(config.framework, config.scenario);
+  try {
+    for (let iteration = 0; iteration < warmupIterations; iteration += 1) await harness.run();
+    const started = performance.now();
+    for (let iteration = 0; iteration < measuredIterations; iteration += 1) await harness.run();
+    const elapsedMs = performance.now() - started;
+    const snapshot = harness.snapshot();
+    if (snapshot.componentCount !== COMPONENT_COUNT) {
+      throw new Error(`Profile correctness gate produced ${snapshot.componentCount} components.`);
+    }
+    if (config.scenario === 'property' && snapshot.firstLabel === null) {
+      throw new Error('Property profile correctness gate did not retain its label.');
+    }
+    if (config.scenario === 'state' && snapshot.firstCount === null) {
+      throw new Error('State profile correctness gate did not retain its count.');
+    }
+    return {
+      framework: config.framework,
+      scenario: config.scenario,
+      warmupIterations,
+      measuredIterations,
+      elapsedMs,
+      snapshot,
+    };
+  } finally {
+    await harness.dispose();
+  }
 }
 
 function validateScenarioSelection(
@@ -222,10 +275,12 @@ function nextFrame(): Promise<void> {
 declare global {
   interface Window {
     runComponentComparison: typeof runComponentComparison;
+    runComponentProfile: typeof runComponentProfile;
   }
 }
 
 window.runComponentComparison = runComponentComparison;
+window.runComponentProfile = runComponentProfile;
 
 const runButton = document.querySelector<HTMLButtonElement>('#run-benchmark');
 const sampleInput = document.querySelector<HTMLInputElement>('#sample-count');
