@@ -183,7 +183,9 @@ describe('quarks', () => {
 
     await loader.load('styled');
     expect(target.adoptedStyleSheets).toContain(sheet);
-    loader.release('styled');
+    loader.dispose();
     expect(target.adoptedStyleSheets).not.toContain(sheet);
+    loader.dispose();
+    expect(() => loader.load('styled')).toThrow('A disposed component-library loader cannot load entries.');
   });
 });
