@@ -147,7 +147,7 @@
     "test:playground": "vitest run --config vitest.playground-node.config.ts && vitest run --config vitest.playground.config.ts",
     "test:browser-matrix": "npm run test:browser && npm run test:router-browser && npm run test:test-utils && npm run test:devtools && vitest run --config vitest.playground.config.ts",
     "test:coverage": "npm run test:browser:coverage && npm run test:reactivity:coverage && npm run test:signals:coverage && npm run test:router:coverage && npm run test:router-browser:coverage && npm run test:store:coverage && npm run test:ssr:coverage && npm run test:vite:coverage && npm run test:test-utils:coverage && npm run test:devtools-api:coverage && npm run test:devtools:coverage && npm run test:language-server:coverage && npm run test:vue-analyzer:coverage && npm run test:create-gluon:coverage",
-    "test:browser:coverage": "vitest run --coverage",
+    "test:browser:coverage": "vitest run --coverage --no-file-parallelism",
     "test:reactivity:coverage": "vitest run --config vitest.reactivity.config.ts --coverage",
     "test:signals:coverage": "vitest run --config vitest.signals.config.ts --coverage",
     "test:router:coverage": "vitest run --config vitest.router.config.ts --coverage",
