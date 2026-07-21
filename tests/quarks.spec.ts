@@ -188,4 +188,33 @@ describe('quarks', () => {
     loader.dispose();
     expect(() => loader.load('styled')).toThrow('A disposed component-library loader cannot load entries.');
   });
+
+  it('does not remove a stylesheet that predated the component-library owner', async () => {
+    const sheet = css`:host { color: green; }`;
+    const target = document.createElement('div').attachShadow({ mode: 'open' });
+    target.adoptedStyleSheets = [sheet];
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'shared', module: '@acme/components/shared', exportName: 'Shared', layer: 'atom', styles: ['shared'], dependencies: [], accessibility: 'Shared.' },
+    ] }, { load: async () => null }, { styleTarget: target, styles: { resolve: () => [sheet] } });
+
+    await loader.load('shared');
+    loader.release('shared');
+    expect(target.adoptedStyleSheets).toEqual([sheet]);
+  });
+
+  it('keeps a loader-owned shared stylesheet until every entry releases it', async () => {
+    const sheet = css`:host { color: blue; }`;
+    const target = document.createElement('div').attachShadow({ mode: 'open' });
+    const loader = createComponentLibraryLoader({ schemaVersion: 1, name: 'example', entries: [
+      { id: 'first', module: '@acme/components/first', exportName: 'First', layer: 'atom', styles: ['shared'], dependencies: [], accessibility: 'First.' },
+      { id: 'second', module: '@acme/components/second', exportName: 'Second', layer: 'atom', styles: ['shared'], dependencies: [], accessibility: 'Second.' },
+    ] }, { load: async () => null }, { styleTarget: target, styles: { resolve: () => [sheet] } });
+
+    await loader.load('first');
+    await loader.load('second');
+    loader.release('first');
+    expect(target.adoptedStyleSheets).toContain(sheet);
+    loader.release('second');
+    expect(target.adoptedStyleSheets).not.toContain(sheet);
+  });
 });

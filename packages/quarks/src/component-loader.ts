@@ -41,6 +41,7 @@ export class ComponentLibraryLoader {
   readonly #styleTarget?: Document | ShadowRoot;
   readonly #styles?: ComponentLibraryStyleResolver;
   readonly #styleReferences = new Map<CSSStyleSheet, number>();
+  readonly #installedStyles = new Set<CSSStyleSheet>();
   readonly #entryStyles = new Map<string, readonly CSSStyleSheet[]>();
   #disposed = false;
 
@@ -105,7 +106,10 @@ export class ComponentLibraryLoader {
     const target = this.#styleTarget;
     for (const sheet of sheets) {
       const count = this.#styleReferences.get(sheet) ?? 0;
-      if (count === 0 && !target.adoptedStyleSheets.includes(sheet)) target.adoptedStyleSheets = [...target.adoptedStyleSheets, sheet];
+      if (count === 0 && !target.adoptedStyleSheets.includes(sheet)) {
+        target.adoptedStyleSheets = [...target.adoptedStyleSheets, sheet];
+        this.#installedStyles.add(sheet);
+      }
       this.#styleReferences.set(sheet, count + 1);
     }
     this.#entryStyles.set(entry.id, sheets);
@@ -116,7 +120,9 @@ export class ComponentLibraryLoader {
     if (!count || !this.#styleTarget) return;
     if (count > 1) { this.#styleReferences.set(sheet, count - 1); return; }
     this.#styleReferences.delete(sheet);
-    this.#styleTarget.adoptedStyleSheets = this.#styleTarget.adoptedStyleSheets.filter((candidate) => candidate !== sheet);
+    if (this.#installedStyles.delete(sheet)) {
+      this.#styleTarget.adoptedStyleSheets = this.#styleTarget.adoptedStyleSheets.filter((candidate) => candidate !== sheet);
+    }
   }
 
   #requireEntry(id: string): ComponentLibraryEntry {

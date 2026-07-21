@@ -52,10 +52,12 @@ custom element.
 
 Styles are constructable sheets owned by an explicit target-scoped owner. A
 loader retains exactly the requested entry styles, returns a disposal handle,
-and releases exactly those references once the consumer tears down. It must not
-use a `<style>` fallback. SSR must retain the selected stylesheet ids in its
-request-local manifest; hydration must validate and hand off the same ordered
-ids without replacing retained DOM.
+and releases exactly those references once the consumer tears down. A sheet
+already adopted by the target before the loader retains it remains owned by the
+target and is never removed by that loader. It must not use a `<style>`
+fallback. SSR must retain the selected stylesheet ids in its request-local
+manifest; hydration must validate and hand off the same ordered ids without
+replacing retained DOM.
 
 `createComponentLibraryLoader(manifest, resolver, options?)` is the public loader core.
 The consumer-owned resolver receives only the requested validated record; this
