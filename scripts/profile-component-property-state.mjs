@@ -10,6 +10,11 @@ const configFile = resolve(root, 'benchmarks/components/vite.config.ts');
 const options = parseOptions(process.argv.slice(2));
 const outputPath = resolve(root, options.output);
 const packageLock = JSON.parse(await readFile(resolve(root, 'package-lock.json'), 'utf8'));
+const source = {
+  commit: git('rev-parse', 'HEAD'),
+  branch: sourceRef(),
+  workingTreeDirty: git('status', '--porcelain').length > 0,
+};
 
 await build({ configFile });
 const server = await preview({
@@ -74,11 +79,7 @@ const packageJson = JSON.parse(await readFile(resolve(root, 'package.json'), 'ut
 const evidence = {
   schemaVersion: 1,
   generatedAt: new Date().toISOString(),
-  source: {
-    commit: git('rev-parse', 'HEAD'),
-    branch: sourceRef(),
-    workingTreeDirty: git('status', '--porcelain').length > 0,
-  },
+  source,
   environment: {
     platform: platform(),
     release: release(),
