@@ -122,6 +122,7 @@ if (!nonPublishableBuild) {
 const aggregateSpdx = JSON.parse(await run('npm', [
   'sbom',
   '--package-lock-only',
+  '--legacy-peer-deps',
   '--sbom-format',
   'spdx',
 ]));
