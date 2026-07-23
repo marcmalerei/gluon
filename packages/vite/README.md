@@ -16,6 +16,13 @@ export default defineConfig({
 });
 ```
 
+The same plugin compiles `.gluon` presentational Single-File Components before
+ordinary module analysis; no second plugin is required. SFC script blocks are
+transpiled with the configured TypeScript decorator mode, while generated code
+uses ordinary public Gluon component, Quark, template, and stylesheet
+contracts. See
+[Presentational Single-File Components](../../docs/sfc-authoring.md).
+
 The plugin also transpiles standard TypeScript decorators imported from
 `@gluonjs/core/decorators`; no `experimentalDecorators` setting is required.
 `@customElement()` participates in the same compatible Custom Element HMR path

@@ -58,8 +58,10 @@ packages/ssr/
 └── src/static.ts       Route-aware static output and mixed deployment manifest
 
 packages/compiler/
-└── src/index.ts        Template/part locations, diagnostics, source maps, and
-                        development transform insertion
+├── src/index.ts        Template/part locations, diagnostics, source maps, and
+│                       development transform insertion
+└── src/sfc.ts          Presentational .gluon block validation and lowering to
+                        public component, Quark, template, and style contracts
 
 packages/vite/
 ├── src/index.ts        Vite project boundary, compiler integration, virtual client

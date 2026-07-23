@@ -2,6 +2,14 @@ import MagicString from 'magic-string';
 import ts from 'typescript';
 
 export {
+  GluonSfcCompileError,
+  compileGluonSfc,
+  type GluonSfcCompileOptions,
+  type GluonSfcCompileResult,
+  type GluonSfcLayer,
+} from './sfc.js';
+
+export {
   GLUON_DIAGNOSTIC_CATALOG_VERSION,
   formatGluonDiagnostic,
   getGluonDiagnostic,

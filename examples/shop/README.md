@@ -72,8 +72,11 @@ facts as light DOM before the element upgrades.
 
 The bag quantity/remove surface is the concise stateful-authoring acceptance
 boundary. The global Journal navigation is the concise presentational boundary:
-the app-local `ShopEditorialLink` Atom uses public `defineUiAtom()` with
-declarative anchor/span selection and one props object.
+the app-local `ShopEditorialLink` Atom has declarative anchor/span selection and
+one props object. Its canonical implementation is a `.gluon` Single-File
+Component: typed props, native markup, slot composition, and its owned
+stylesheet remain together while Vite emits ordinary public Atom and Quark
+contracts. `defineUiAtom()` remains the equivalent handwritten TypeScript path.
 `src/bag-quantity-control.ts` registers lazily from the real bag flow, imports
 only `@gluonjs/core`, owns one constructable ShadowRoot sheet, and communicates
 with the Store through cancelable native events. Its explicitly keyed optimistic

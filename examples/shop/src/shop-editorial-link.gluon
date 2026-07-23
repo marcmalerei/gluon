@@ -1,0 +1,19 @@
+<script lang="ts">
+import type { TemplateValue } from '@gluonjs/core';
+
+export interface ShopEditorialLinkProps {
+  readonly href?: string;
+  readonly children?: TemplateValue;
+  readonly onClick?: (event: MouseEvent) => void;
+}
+</script>
+
+<template component="ShopEditorialLink" layer="atom" props="ShopEditorialLinkProps">
+  <component :is="href ? 'a' : 'span'" :href="href" :onClick="onClick" class="shop-editorial-link"><slot /></component>
+</template>
+
+<style id="shop-editorial-link">
+  :where(.shop-editorial-link) {
+    color: inherit;
+  }
+</style>

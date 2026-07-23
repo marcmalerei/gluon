@@ -1,6 +1,9 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { transpileGluonDecorators } from './packages/compiler/src/index.js';
+import {
+  compileGluonSfc,
+  transpileGluonDecorators,
+} from './packages/compiler/src/index.js';
 
 export default defineConfig({
   plugins: [{
@@ -9,6 +12,14 @@ export default defineConfig({
     transform(code, id) {
       if (!/from\s+['"][^'"]*\/decorators(?:\.js)?['"]/.test(code)) return null;
       return transpileGluonDecorators(code, id);
+    },
+  }, {
+    name: 'gluon-sfc-tests',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!id.split('?', 1)[0]?.endsWith('.gluon')) return null;
+      const compiled = compileGluonSfc(code, { filename: id });
+      return transpileGluonDecorators(compiled.code, `${id}.ts`);
     },
   }],
   resolve: {

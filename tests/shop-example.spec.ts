@@ -41,6 +41,13 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).toContain(shopStyles);
     expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    const editorialSheet = document.adoptedStyleSheets.find((sheet) => (
+      getStyleSheetText(sheet).includes('.shop-editorial-link')
+    ));
+    expect(editorialSheet).toBeDefined();
+    const journalLinks = [...root.querySelectorAll<HTMLAnchorElement>('.shop-editorial-link')];
+    expect(journalLinks.some((link) => link.textContent === 'Journal' && link.hash === '#journal'))
+      .toBe(true);
     expect(getComputedStyle(document.documentElement).getPropertyValue('--gluon-color-action').trim())
       .toBe('#c8ff00');
     const skipLink = root.querySelector<HTMLAnchorElement>('.skip-link')!;
@@ -92,6 +99,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopStyles);
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).not.toContain(editorialSheet);
     expect(document.querySelector('gluon-teleport')).toBeNull();
   });
 

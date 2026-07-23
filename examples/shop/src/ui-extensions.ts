@@ -3,13 +3,13 @@ import {
   Icon,
   defineButtonPreset,
   defineIcon,
-  defineUiAtom,
   type ButtonProps,
 } from '@gluonjs/atoms';
-import { html, svg, type TemplateResult, type TemplateValue } from '@gluonjs/core';
+import { html, svg, type Component, type TemplateResult, type TemplateValue } from '@gluonjs/core';
 import { FormField, defineMolecule } from '@gluonjs/molecules';
 import { defineOrganism } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
+import ShopEditorialLinkSfc from './shop-editorial-link.gluon';
 
 const checkoutLock = defineIcon({
   name: 'checkout-lock',
@@ -37,15 +37,7 @@ export interface ShopEditorialLinkProps {
   readonly onClick?: (event: MouseEvent) => void;
 }
 
-export const ShopEditorialLink = defineUiAtom<ShopEditorialLinkProps, 'a' | 'span'>({
-  displayName: 'ShopEditorialLink',
-  tag: ({ href }) => href ? 'a' : 'span',
-  nativeProps: ({ href, children, onClick }, tag) => ({
-    children,
-    onClick,
-    ...(tag === 'a' ? { href } : {}),
-  }),
-});
+export const ShopEditorialLink = ShopEditorialLinkSfc as Component<ShopEditorialLinkProps>;
 
 export const ShopIconAction = defineButtonPreset({
   displayName: 'ShopIconAction',

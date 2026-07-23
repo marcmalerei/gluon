@@ -7,6 +7,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { build, createServer, preview, type Rollup } from 'vite';
 import {
   formatGluonDiagnostic,
+  compileGluonSfc,
+  GluonSfcCompileError,
   getGluonDiagnostic,
   gluonDiagnosticCatalog,
   gluonDiagnosticReferenceUrl,
@@ -28,6 +30,107 @@ afterEach(async () => {
 });
 
 describe('@gluonjs/compiler', () => {
+  it('lowers presentational SFCs to explicit Gluon runtime contracts', () => {
+    const compiled = compileGluonSfc(`
+<script lang="ts">
+import type { TemplateValue } from '@gluonjs/core';
+export interface TextLinkProps {
+  readonly href?: string;
+  readonly children?: TemplateValue;
+}
+</script>
+<template component="TextLink" layer="atom" props="TextLinkProps">
+  <component :is="href ? 'a' : 'span'" :href="href" class="text-link"><slot /></component>
+</template>
+<style id="docs-text-link" order="12">
+  .text-link { text-underline-offset: 0.2em; }
+</style>
+`, { filename: '/app/TextLink.gluon' });
+
+    expect(compiled).toMatchObject({
+      componentName: 'TextLink',
+      layer: 'atom',
+      styleId: 'docs-text-link',
+    });
+    expect(compiled.code).toContain("defineAtom(");
+    expect(compiled.code).toContain("quark(props.href ? 'a' : 'span')");
+    expect(compiled.code).toContain('children: props.children');
+    expect(compiled.code).toContain('createComponentStyleDependency({');
+    expect(compiled.code).toContain('sheet: TextLinkStyle');
+    expect(compiled.code).toContain('export default TextLink');
+    expect(transformGluonModule(compiled.code, '/app/TextLink.gluon.ts').templates)
+      .toHaveLength(1);
+  });
+
+  it('lowers interpolation and rejects stateful or ambiguous SFC forms', () => {
+    const compiled = compileGluonSfc(`
+<script lang="ts">
+export interface BadgeProps { readonly label: string; }
+</script>
+<template component="Badge" layer="molecule" props="BadgeProps">
+  <strong>{{ label }}</strong>
+</template>
+`, { filename: '/app/Badge.gluon' });
+    expect(compiled.code).toContain('defineMolecule(');
+    expect(compiled.code).toContain('<strong>${props.label}</strong>');
+
+    expect(() => compileGluonSfc(`
+<script setup>const state = 1;</script>
+<template component="Stateful" layer="organism"><p>{{ state }}</p></template>
+`, { filename: '/app/Stateful.gluon' })).toThrow(GluonSfcCompileError);
+    expect(() => compileGluonSfc(`
+<template component="Broken" layer="atom"><component :is="resolveTag()">Broken</component></template>
+`, { filename: '/app/Broken.gluon' })).toThrow(/:is supports/i);
+  });
+
+  it('rejects unsupported SFC blocks, metadata, styles, and template shapes', () => {
+    const invalidSources = [
+      ['missing template', '<script>export const value = 1;</script>'],
+      ['malformed blocks', '<template component="Broken" layer="atom"><p>'],
+      ['script setup', '<script setup>const value = 1;</script><template component="Broken" layer="atom"><p>Broken</p></template>'],
+      ['custom block', '<template component="Broken" layer="atom"><p>Broken</p></template><docs>Unsupported</docs>'],
+      ['multiple styles', '<template component="Broken" layer="atom"><p>Broken</p></template><style id="one">.one {}</style><style id="two">.two {}</style>'],
+      ['external script', '<script src="./logic.ts"></script><template component="Broken" layer="atom"><p>Broken</p></template>'],
+      ['script language', '<script lang="tsx">export const value = 1;</script><template component="Broken" layer="atom"><p>Broken</p></template>'],
+      ['template language', '<template lang="pug" component="Broken" layer="atom">p Broken</template>'],
+      ['style language', '<template component="Broken" layer="atom"><p>Broken</p></template><style lang="scss" id="broken">.x { color: red; }</style>'],
+      ['scoped style', '<template component="Broken" layer="atom"><p>Broken</p></template><style scoped id="broken">.x { color: red; }</style>'],
+      ['missing component', '<template layer="atom"><p>Broken</p></template>'],
+      ['invalid props', '<template component="Broken" layer="atom" props="not-valid"><p>Broken</p></template>'],
+      ['invalid layer', '<template component="Broken" layer="page"><p>Broken</p></template>'],
+      ['missing style id', '<template component="Broken" layer="atom"><p>Broken</p></template><style>.x {}</style>'],
+      ['invalid style order', '<template component="Broken" layer="atom"><p>Broken</p></template><style id="broken" order="-1">.x { color: red; }</style>'],
+      ['nested dynamic root', '<template component="Broken" layer="atom"><div><component :is="tag">Broken</component></div></template>'],
+      ['unsupported slot', '<template component="Broken" layer="atom"><slot name="title" /></template>'],
+      ['dynamic attributes', '<template component="Broken" layer="atom"><component :is="tag" v-bind="attrs">Broken</component></template>'],
+      ['dynamic children', '<template component="Broken" layer="atom"><component :is="tag"><strong>Broken</strong></component></template>'],
+    ] as const;
+
+    for (const [label, source] of invalidSources) {
+      expect(
+        () => compileGluonSfc(source, { filename: `/app/${label}.gluon` }),
+        label,
+      ).toThrow(GluonSfcCompileError);
+    }
+  });
+
+  it('supports default props, fixed interpolation, and identifier-selected native roots', () => {
+    const plain = compileGluonSfc(
+      '<template component="Message" layer="organism"><p>{{ label }}</p></template>',
+      { filename: '/app/Message.gluon' },
+    );
+    expect(plain.code).toContain('export interface GluonSfcProps');
+    expect(plain.code).toContain('defineOrganism(');
+
+    const dynamic = compileGluonSfc(
+      '<template component="Dynamic" layer="atom"><component :is="tag" title="Status">{{ label }}</component></template>',
+      { filename: '/app/Dynamic.gluon' },
+    );
+    expect(dynamic.code).toContain("quark(props.tag)");
+    expect(dynamic.code).toContain('title: "Status"');
+    expect(dynamic.code).toContain('children: props.label');
+  });
+
   it('resolves, formats, and links the public diagnostic catalog', () => {
     const definition = gluonDiagnosticCatalog[0]!;
     expect(getGluonDiagnostic(definition.code)).toBe(definition);

@@ -51,8 +51,9 @@ be added through a superseding RFC.
 
 RFC 0003 now permits one bounded exception outside the 1.0 completion contract:
 static, report-only inventory of enumerated Vue 3.5 source. It does not permit
-runtime/API compatibility, production SFC compilation, source generation, or
-source rewriting.
+runtime/API compatibility, production `.vue` SFC compilation, source generation,
+or source rewriting. The later optional `.gluon` presentational format compiles
+to existing public runtime contracts and does not change that Vue boundary.
 
 ## Verified starting point
 

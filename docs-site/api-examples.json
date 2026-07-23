@@ -1169,6 +1169,36 @@
         "console.log(result.code, transpiled.code, map.sources, tag, start, diagnostic?.message, result.hmr);"
       ]
     },
+    "compiler-sfc": {
+      "module": "@gluonjs/compiler",
+      "code": [
+        "import {",
+        "  GluonSfcCompileError,",
+        "  compileGluonSfc,",
+        "  type GluonSfcCompileOptions,",
+        "  type GluonSfcCompileResult,",
+        "  type GluonSfcLayer,",
+        "} from '@gluonjs/compiler';",
+        "",
+        "const source = `",
+        "<script lang=\"ts\">",
+        "export interface BadgeProps { readonly label: string; }",
+        "</script>",
+        "<template component=\"Badge\" layer=\"atom\" props=\"BadgeProps\">",
+        "  <strong>{{ label }}</strong>",
+        "</template>",
+        "<style id=\"docs-badge\">.docs-badge { font-weight: 600; }</style>",
+        "`;",
+        "const options = { filename: '/src/Badge.gluon' } satisfies GluonSfcCompileOptions;",
+        "try {",
+        "  const result: GluonSfcCompileResult = compileGluonSfc(source, options);",
+        "  const layer: GluonSfcLayer = result.layer;",
+        "  console.log(result.componentName, layer, result.styleId, result.code);",
+        "} catch (error) {",
+        "  if (error instanceof GluonSfcCompileError) console.error(error.code, error.filename);",
+        "}"
+      ]
+    },
     "compiler-diagnostics": {
       "module": "@gluonjs/compiler/diagnostics",
       "code": [
@@ -3550,6 +3580,26 @@
     "packages/compiler/src/functions/transformGluonModule.md": {
       "recipe": "compiler-transform",
       "description": "Analyze a TypeScript module for Gluon templates and optionally inject deterministic development HMR helpers while returning code, source map, diagnostics, and locations:"
+    },
+    "packages/compiler/src/classes/GluonSfcCompileError.md": {
+      "recipe": "compiler-sfc",
+      "description": "Handle a source-named SFC contract violation without treating malformed or unsupported authoring as valid runtime code:"
+    },
+    "packages/compiler/src/functions/compileGluonSfc.md": {
+      "recipe": "compiler-sfc",
+      "description": "Lower one presentational .gluon file to ordinary public component, Quark, template, and constructable stylesheet calls:"
+    },
+    "packages/compiler/src/interfaces/GluonSfcCompileOptions.md": {
+      "recipe": "compiler-sfc",
+      "description": "Provide the source filename used in deterministic SFC errors and downstream build diagnostics:"
+    },
+    "packages/compiler/src/interfaces/GluonSfcCompileResult.md": {
+      "recipe": "compiler-sfc",
+      "description": "Consume generated module code together with its component, layer, and optional owned stylesheet identity:"
+    },
+    "packages/compiler/src/type-aliases/GluonSfcLayer.md": {
+      "recipe": "compiler-sfc",
+      "description": "Select the Atom, Molecule, or Organism definition primitive emitted for a presentational SFC:"
     },
     "packages/compiler/src/interfaces/GluonCompilerDiagnostic.md": {
       "recipe": "compiler-transform",

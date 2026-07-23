@@ -39,6 +39,19 @@ Inline `<style>` elements in `html` templates produce
 `GLUON_TEMPLATE_STYLE_ELEMENT`; Gluon browser styling uses constructable
 stylesheets and `adoptedStyleSheets` only.
 
+## Presentational SFC compiler
+
+`compileGluonSfc(source, { filename })` lowers a `.gluon` presentational
+Single-File Component to ordinary public Core and Quark calls. The maintained
+application path is the official `@gluonjs/vite` plugin, which recognizes
+`.gluon` files automatically and transpiles their typed script blocks.
+
+The compiler supports typed script, one annotated template, identifier
+interpolation, a default slot, a prop-driven conditional native root, and one
+owned constructable stylesheet. It rejects stateful or ambiguous forms instead
+of adding a second runtime. See
+[the task-oriented SFC guide](../../docs/sfc-authoring.md).
+
 ## License
 
 MIT License, Copyright © 2026 Marc Malerei.

@@ -39,6 +39,7 @@
     "provenance": true
   },
   "dependencies": {
+    "@vue/compiler-sfc": "3.5.39",
     "magic-string": "^0.30.21",
     "typescript": "^5.7.0"
   },
