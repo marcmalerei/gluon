@@ -258,7 +258,7 @@ exact contracted predecessor. Any other value blocks the bootstrap.
 Prepare and inspect the deterministic allowlisted archives from clean `main`:
 
 ```sh
-npm ci --ignore-scripts
+npm ci --ignore-scripts --legacy-peer-deps
 npm run check:release-bootstrap
 npm run release:bootstrap:artifacts
 cat .tmp/npm-bootstrap/bootstrap-evidence.json
@@ -326,11 +326,17 @@ The reviewed release PR makes these changes together:
 Validate that commit before creating a tag:
 
 ```sh
-npm ci --ignore-scripts
+npm ci --ignore-scripts --legacy-peer-deps
 npm run check
 npm run release:validate -- --candidate 1.3.0
 npm run release:artifacts -- --version 1.3.0
 ```
+
+Release-candidate installs use `--legacy-peer-deps` because the official
+packages declare exact lockstep peers that do not exist in the public registry
+until the protected tag workflow publishes them. The repository gates validate
+those peers from the packed local release train instead of resolving an
+unpublished version from npm.
 
 `release:artifacts` packs every package twice and compares canonical unpacked
 file SHA-256 digests. It then clean-installs all 18 local archives and
