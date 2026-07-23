@@ -359,6 +359,13 @@ export const Available: StoryObj<{ label: string }> = {
 See the [Storybook guide](docs/storybook.md) and the runnable
 [`examples/component-library`](examples/component-library/README.md) catalog.
 
+For a first project, use the versioned
+[step-by-step learning path](docs-site/content/1.2.0/guides/learning-path/index.md).
+Before extracting shop UI, use the
+[component decision guide](docs-site/content/1.2.0/guides/component-decisions/index.md):
+official packages require a cross-application semantic and accessibility
+contract; branded GLUON GOODS compositions remain application-local.
+
 ## Vite and state-preserving HMR
 
 `@gluonjs/vite` records `html` and `css` template and interpolation locations,
