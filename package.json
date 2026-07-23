@@ -90,7 +90,7 @@
     "dev:virtualizer-example": "vite --config examples/virtualizer/vite.config.ts",
     "dev:signals-example": "vite --config examples/signals/vite.config.ts",
     "storybook:component-library": "storybook dev --config-dir examples/component-library/storybook --port 6006",
-    "build:storybook:component-library": "storybook build --config-dir examples/component-library/storybook --output-dir examples/component-library/storybook-static",
+    "build:storybook:component-library": "npm run build:core && npm run build:gluon-components-vite && storybook build --config-dir examples/component-library/storybook --output-dir examples/component-library/storybook-static",
     "check:storybook:component-library": "npm run build:storybook:component-library && node scripts/validate-component-library-storybook.mjs",
     "preview:shop": "node scripts/preview-examples.mjs shop",
     "preview:playground": "node scripts/preview-examples.mjs playground",
