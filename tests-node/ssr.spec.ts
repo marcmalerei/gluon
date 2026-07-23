@@ -490,6 +490,7 @@ describe('@gluonjs/ssr request ownership and state', () => {
       'gluon-ui-tokens',
       'gluon-ui-theme',
       'gluon-atom-button',
+      'shop-editorial-link',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
@@ -705,20 +706,22 @@ describe('@gluonjs/ssr static output and style transport', () => {
       assets: ['/assets/orbit.webp'],
     };
     const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
-    expect(response.styles.entries).toHaveLength(7);
+    expect(response.styles.entries).toHaveLength(8);
     expect(response.styles.entries.map((entry) => entry.id)).toEqual([
       'gluon-ui-layer-order',
       'gluon-ui-foundation',
       'gluon-ui-tokens',
       'gluon-ui-theme',
       'gluon-atom-button',
+      'shop-editorial-link',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
-    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
     expect(response.styles.entries[4]?.cssText).toContain('.gluon-button');
-    expect(response.styles.entries[5]?.cssText).toContain('--gluon-color-action: #c8ff00');
-    expect(response.styles.entries[6]?.cssText).toContain('.checkout-page');
+    expect(response.styles.entries[5]?.cssText).toContain('.shop-editorial-link');
+    expect(response.styles.entries[6]?.cssText).toContain('--gluon-color-action: #c8ff00');
+    expect(response.styles.entries[7]?.cssText).toContain('.checkout-page');
     expect(response.styles.entries.some((entry) => entry.id === 'gluon-atoms-components')).toBe(false);
     expect(response.head).toContain('data-gluon-style="gluon-ui-layer-order"');
     expect(response.head).toContain('nonce="request-nonce"');

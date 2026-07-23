@@ -38,6 +38,14 @@
         "language": "typescript"
       },
       "confidence": "exact",
+      "file": "gluon-sfc.d.ts",
+      "line": 1
+    },
+    {
+      "value": {
+        "language": "typescript"
+      },
+      "confidence": "exact",
       "file": "hydrate.ts",
       "line": 1
     },
@@ -709,7 +717,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 115
+      "line": 107
     }
   ],
   "bindings": [
@@ -1976,7 +1984,7 @@
       },
       "confidence": "structural",
       "file": "ui-extensions.ts",
-      "line": 120
+      "line": 112
     },
     {
       "value": {
@@ -1985,7 +1993,7 @@
       },
       "confidence": "structural",
       "file": "ui-extensions.ts",
-      "line": 121
+      "line": 113
     },
     {
       "value": {
@@ -1994,7 +2002,7 @@
       },
       "confidence": "structural",
       "file": "ui-extensions.ts",
-      "line": 123
+      "line": 115
     },
     {
       "value": {
@@ -2002,7 +2010,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 129
+      "line": 121
     },
     {
       "value": {
@@ -2010,7 +2018,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 136
+      "line": 128
     },
     {
       "value": {
@@ -2018,7 +2026,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 152
+      "line": 144
     },
     {
       "value": {
@@ -2026,7 +2034,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 155
+      "line": 147
     }
   ],
   "styles": [

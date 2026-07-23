@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Added first-class `.gluon` Single-File Component transforms through the
+  shared compiler.
+
 ## [1.2.0] - 2026-07-21
 
 ### Changed

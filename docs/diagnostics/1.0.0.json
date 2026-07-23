@@ -184,6 +184,16 @@
       "source": "language-server"
     },
     {
+      "id": 1112,
+      "code": "GLUON_SFC_INVALID",
+      "compactCode": "G1112",
+      "title": "Single-File Component is invalid",
+      "summary": "A .gluon source uses malformed, stateful, or unsupported presentational authoring.",
+      "why": "The initial SFC format lowers only explicit typed props, presentational templates, default slots, native tag selection, and one owned stylesheet.",
+      "remediation": "Use the supported presentational subset or move state, lifecycle, complex composition, and advanced native bindings to the corresponding handwritten Gluon API.",
+      "source": "compiler"
+    },
+    {
       "id": 1201,
       "code": "GLUON_HYDRATION_TEXT_MISMATCH",
       "compactCode": "G1201",

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
+  compileGluonSfc,
   transformGluonModule,
   transpileGluonDecorators,
   type GluonDecoratorMode,
@@ -46,6 +47,18 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
     },
     transform(code, id) {
       const cleanId = normalizePath(id.split('?', 1)[0]!);
+      if (cleanId.endsWith('.gluon')) {
+        const compiled = compileGluonSfc(code, { filename: cleanId });
+        const result = transformGluonModule(compiled.code, `${cleanId}.ts`, {
+          development: config.command === 'serve',
+        });
+        const transpiled = transpileGluonDecorators(
+          result.code,
+          `${cleanId}.ts`,
+          options.decorators,
+        );
+        return { code: transpiled.code, map: transpiled.map ?? result.map };
+      }
       if (!shouldTransform(cleanId, config.root, options.include)) return null;
       const result = transformGluonModule(code, cleanId, {
         development: config.command === 'serve',

@@ -741,12 +741,14 @@ Included now:
 - Custom Element authoring
 - adopted stylesheet management
 - Quark, Atom, Molecule, and Organism composition
+- optional presentational `.gluon` Single-File Component authoring compiled to
+  those same public component, Quark, template, and stylesheet contracts
 - browser tests, type checking, and ESM builds
 
 Not included now:
 
 - islands
-- Vue runtime/API compatibility, production SFC compilation, or source rewriting;
+- Vue runtime/API compatibility, production `.vue` SFC compilation, or source rewriting;
   the retained codemod evaluation proves no behaviorally equivalent writer class
 - a supported performance-superiority claim
 - branded browser, operating-system, device, or assistive-technology support claims

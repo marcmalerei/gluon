@@ -247,6 +247,7 @@ they are not alternative component bases.
 | [`HydrationMismatchError`](/gluon/1.2.0/api/generated/src/classes/HydrationMismatchError.html) | Core hydration found mismatches while recovery was configured as `throw`; inspect `mismatches`. |
 | [`LegacyComponentStyleConflictError`](/gluon/1.2.0/api/generated/src/styles/classes/LegacyComponentStyleConflictError.html) | A legacy component stylesheet conflicts with usage-driven style ownership; inspect `componentStyleId`. |
 | [`UiHydrationError`](/gluon/1.2.0/api/generated/packages/atoms/src/classes/UiHydrationError.html) | UI stylesheet hydration found missing, duplicate, reordered, or mismatched carriers; inspect `mismatch`. |
+| [`GluonSfcCompileError`](/gluon/1.2.0/api/generated/packages/compiler/src/classes/GluonSfcCompileError.html) | Presentational `.gluon` compilation rejected malformed, stateful, or ambiguous source; inspect `code` and `filename`. |
 | [`SsrRenderError`](/gluon/1.2.0/api/generated/packages/ssr/src/classes/SsrRenderError.html) | SSR received an invalid value or unsupported directive; inspect `code`. |
 | [`ComponentStyleHydrationError`](/gluon/1.2.0/api/generated/packages/ssr/src/hydration/classes/ComponentStyleHydrationError.html) | Component stylesheet hydration reported a typed mismatch; inspect `mismatch`. |
 | [`SsrTransportError`](/gluon/1.2.0/api/generated/packages/ssr/src/hydration/classes/SsrTransportError.html) | The hydration style transport is unsupported, malformed, or conflicts with recovery; inspect `code`. |
