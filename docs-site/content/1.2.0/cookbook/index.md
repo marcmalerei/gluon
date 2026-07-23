@@ -7,6 +7,14 @@ Every TypeScript recipe below is sourced from a file compiled by
 
 <<< ../../../examples/basic-app.ts
 
+## Build a searchable keyed list with owned styles
+
+<<< ../../../examples/beginner-feature.ts
+
+## Compose Atom, Molecule, and Organism boundaries
+
+<<< ../../../examples/component-decisions.ts
+
 ## Publish a Custom Element
 
 <<< ../../../examples/custom-element.ts

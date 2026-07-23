@@ -5,6 +5,10 @@ and deployment.
 
 [Get started](/gluon/1.2.0/guides/getting-started/) [Browse API →](/gluon/1.2.0/api/)
 
+First framework project? Use the
+[junior learning path](/gluon/1.2.0/guides/learning-path/) for a progressive
+feature and plain-language glossary.
+
 <<< ../../examples/basic-app.ts
 
 ## Guides
@@ -23,6 +27,8 @@ constructable stylesheets, SSR style snapshots, and disposal. The maintained
 package consumer and Storybook catalog exercise those same public boundaries.
 
 [Build component boundaries →](/gluon/1.2.0/guides/components/)
+
+[Choose Atom, Molecule, Organism, or Custom Element →](/gluon/1.2.0/guides/component-decisions/)
 
 ## API reference
 
