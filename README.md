@@ -334,6 +334,31 @@ await cleanupFixtures();
 
 See the [`@gluonjs/test-utils` guide](packages/test-utils/README.md).
 
+## Storybook
+
+`@gluonjs/gluon-components-vite` is the first-party Storybook framework for
+Gluon component libraries. Stories return native `html` or `svg` templates;
+the renderer uses Core's public render lifecycle and returns exact `unmount()`
+cleanup for story changes.
+
+```ts
+import type { Meta, StoryObj } from '@gluonjs/gluon-components-vite';
+import { html } from '@gluonjs/core';
+
+const meta = {
+  title: 'Catalog/Stock label',
+  render: ({ label }) => html`<strong>${label}</strong>`,
+} satisfies Meta<{ label: string }>;
+
+export default meta;
+export const Available: StoryObj<{ label: string }> = {
+  args: { label: 'In stock' },
+};
+```
+
+See the [Storybook guide](docs/storybook.md) and the runnable
+[`examples/component-library`](examples/component-library/README.md) catalog.
+
 ## Vite and state-preserving HMR
 
 `@gluonjs/vite` records `html` and `css` template and interpolation locations,

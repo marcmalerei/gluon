@@ -59,6 +59,7 @@ export default defineConfig({
       '@gluonjs/example-component-library/product-picker': resolve(import.meta.dirname, 'examples/component-library/library/src/product-picker.ts'),
       '@gluonjs/example-component-library': resolve(import.meta.dirname, 'examples/component-library/library/src/index.ts'),
       '@gluonjs/devtools-api': resolve(import.meta.dirname, 'packages/devtools-api/src/index.ts'),
+      '@gluonjs/gluon-components-vite': resolve(import.meta.dirname, 'packages/gluon-components-vite/src/index.ts'),
       '@gluonjs/reactivity/preact-signals': resolve(import.meta.dirname, 'packages/reactivity/src/preact-signals.ts'),
       '@gluonjs/reactivity/signals': resolve(import.meta.dirname, 'packages/reactivity/src/signals/index.ts'),
       '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
@@ -118,6 +119,7 @@ export default defineConfig({
       provider: 'v8',
       include: [
         'src/**/*.ts',
+        'packages/gluon-components-vite/src/entry-preview.ts',
         'packages/quarks/src/**/*.ts',
         'packages/atoms/src/**/*.ts',
         'packages/molecules/src/**/*.ts',

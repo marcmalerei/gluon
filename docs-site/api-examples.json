@@ -2562,6 +2562,44 @@
         "console.log(order); // ['pre', 'update', 'post']"
       ]
     },
+    "storybook-gluon": {
+      "module": "@gluonjs/gluon-components-vite",
+      "code": [
+        "import type {",
+        "  Decorator,",
+        "  FrameworkOptions,",
+        "  GluonRenderer,",
+        "  GluonStoryComponent,",
+        "  Loader,",
+        "  Meta,",
+        "  Preview,",
+        "  StorybookConfig,",
+        "  StoryContext,",
+        "  StoryFn,",
+        "  StoryObj,",
+        "} from '@gluonjs/gluon-components-vite';",
+        "import { html } from '@gluonjs/core';",
+        "",
+        "const config = {",
+        "  stories: ['../src/**/*.stories.ts'],",
+        "  framework: '@gluonjs/gluon-components-vite',",
+        "} satisfies StorybookConfig;",
+        "const meta = {",
+        "  title: 'Catalog/Stock label',",
+        "  args: { label: 'In stock' },",
+        "  render: ({ label }) => html`<strong>${label}</strong>`,",
+        "} satisfies Meta<{ label: string }>;",
+        "const story = { args: { label: 'Back order' } } satisfies StoryObj<{ label: string }>;",
+        "const options: FrameworkOptions = {};",
+        "const component: GluonStoryComponent = (args, context: StoryContext) => html`<p data-story=${context.id}>${String(args.label)}</p>`;",
+        "const rendererResult = (renderer: GluonRenderer) => renderer.storyResult;",
+        "const decorator: Decorator = (Story) => Story();",
+        "const loader: Loader = async () => ({ stock: 'available' });",
+        "const preview: Preview = { decorators: [decorator], loaders: [loader] };",
+        "const storyFn: StoryFn<{ label: string }> = ({ label }) => html`<strong>${label}</strong>`;",
+        "console.log(config.framework, story.args?.label, options, rendererResult, preview, storyFn);"
+      ]
+    },
     "reactivity-errors": {
       "module": "@gluonjs/reactivity",
       "code": [
@@ -2585,6 +2623,50 @@
     }
   },
   "overrides": {
+    "packages/gluon-components-vite/src/interfaces/FrameworkOptions.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type the optional Vite builder settings accepted by the first-party Gluon Storybook framework:"
+    },
+    "packages/gluon-components-vite/src/interfaces/GluonRenderer.md": {
+      "recipe": "storybook-gluon",
+      "description": "Describe Storybook canvas and story results as native Gluon templates:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/Decorator.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type a Storybook decorator against the Gluon renderer context:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/GluonStoryComponent.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type component metadata as a function that returns one Gluon template:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/Loader.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type asynchronous Storybook data loaders for Gluon stories:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/Meta.md": {
+      "recipe": "storybook-gluon",
+      "description": "Declare typed args and a Gluon template render function for one component story group:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/Preview.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type project-wide Gluon Storybook annotations:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/StorybookConfig.md": {
+      "recipe": "storybook-gluon",
+      "description": "Select the first-party Gluon Vite framework in Storybook main configuration:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/StoryContext.md": {
+      "recipe": "storybook-gluon",
+      "description": "Receive typed Gluon renderer context inside stories and play helpers:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/StoryFn.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type a CSF2 story function that returns a Gluon template:"
+    },
+    "packages/gluon-components-vite/src/type-aliases/StoryObj.md": {
+      "recipe": "storybook-gluon",
+      "description": "Define typed CSF3 story variants from shared Gluon metadata:"
+    },
     "packages/reactivity/src/preact-signals/functions/fromPreactSignal.md": {
       "recipe": "reactivity-preact-signals",
       "description": "Connect a real Preact computed signal to Gluon without making Preact part of the stable Reactivity entry:"

@@ -18,13 +18,18 @@ and leak diagnostics without renderer internals.
 <<< ../../../../examples/testing.ts
 
 The separate component-library reference includes a Storybook catalog built
-from public package exports. Its four retained story states execute real
-interactions, run WCAG A/AA analysis, and compare committed visual baselines:
+from public package exports through `@gluonjs/gluon-components-vite`. Its
+stories return native Gluon templates; the renderer owns Core rendering and
+exact teardown. Four retained story states execute real interactions, run WCAG
+A/AA analysis, and compare committed visual baselines:
 
 ```sh
 npm run storybook:component-library
 npm run check:storybook:component-library
 ```
+
+The [Storybook guide](../../../../../docs/storybook.md) explains installation,
+typed stories, component style dependencies, controls, and cleanup.
 
 The production consumer and clean-install package checks remain the authority
 for code splitting, loader cache, registration, stylesheet ownership, SSR,

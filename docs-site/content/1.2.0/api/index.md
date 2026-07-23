@@ -30,6 +30,7 @@ to construct, subclass, receive as an error, or reserve for tooling.
 - [`@gluonjs/compiler`](generated/packages/compiler/src/)
 - [`@gluonjs/compiler/diagnostics`](generated/packages/compiler/src/diagnostics/)
 - [`@gluonjs/vite`](generated/packages/vite/src/)
+- [`@gluonjs/gluon-components-vite`](generated/packages/gluon-components-vite/src/)
 - [`@gluonjs/test-utils`](generated/packages/test-utils/src/)
 - [`@gluonjs/devtools-api`](generated/packages/devtools-api/src/)
 - [`@gluonjs/devtools`](generated/packages/devtools/src/)

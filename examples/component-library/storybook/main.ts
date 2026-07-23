@@ -1,10 +1,10 @@
 import { resolve } from 'node:path';
-import type { StorybookConfig } from '@storybook/web-components-vite';
+import type { StorybookConfig } from '@gluonjs/gluon-components-vite';
 
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.ts'],
   addons: ['@storybook/addon-a11y'],
-  framework: '@storybook/web-components-vite',
+  framework: '@gluonjs/gluon-components-vite',
   viteFinal: async (current) => ({
     ...current,
     resolve: {
