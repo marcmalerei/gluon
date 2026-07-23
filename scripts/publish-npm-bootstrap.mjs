@@ -9,7 +9,9 @@ const execFile = promisify(execFileCallback);
 const root = resolve(import.meta.dirname, '..');
 const releaseContract = await readJson('release/release-contract.json');
 const packageContract = await readJson('package-contract.json');
+const rootManifest = await readJson('package.json');
 const bootstrap = releaseContract.bootstrap;
+const releasedVersion = rootManifest.version;
 const directory = resolve(root, option('--directory') ?? bootstrap.artifactDirectory);
 const dryRun = process.argv.includes('--dry-run');
 const confirmed = process.argv.includes('--confirm-owner-controlled-bootstrap');
@@ -35,27 +37,35 @@ validateEvidence(evidence);
 await verifyChecksums();
 await reproduceArtifacts(evidence);
 
+if (packageContract.registry.publicationState !== 'released'
+  || releaseContract.targetVersion !== releasedVersion) {
+  throw new Error('Incremental bootstrap requires the current clean main release to remain recorded as released.');
+}
 if (!dryRun) {
   await requireCleanMain(evidence.sourceCommit);
   await requireNpmOwner();
 }
 
 const registryState = new Map();
-if (!dryRun) {
-  for (const entry of evidence.packages) {
-    const packument = await registryPackument(entry.name);
-    if (packument?.versions?.[bootstrap.version]) {
-      verifyBootstrapMetadata(entry, packument);
-      registryState.set(entry.name, true);
-      continue;
-    }
-    if (packument) verifySupersededPackageRecord(entry.name, packument);
-    registryState.set(entry.name, false);
+for (const entry of evidence.packages) {
+  const packument = await registryPackument(entry.name);
+  if (packument?.versions?.[bootstrap.version]) {
+    const released = packument.versions?.[releasedVersion] !== undefined;
+    if (released) verifyReleasedPackageRecord(entry.name, packument);
+    else verifyBootstrapMetadata(entry, packument);
+    registryState.set(entry.name, released ? 'released' : 'bootstrap');
+    continue;
   }
+  if (packument) verifySupersededPackageRecord(entry.name, packument);
+  registryState.set(entry.name, 'missing');
 }
 
 for (const entry of evidence.packages) {
-  if (!dryRun && registryState.get(entry.name) === true) {
+  if (registryState.get(entry.name) === 'released') {
+    console.log(`verified existing released ${entry.name}@${releasedVersion} and bootstrap record; regenerated bootstrap archive skipped`);
+    continue;
+  }
+  if (registryState.get(entry.name) === 'bootstrap') {
     console.log(`verified existing ${entry.name}@${bootstrap.version}; immutable matching bootstrap skipped`);
     continue;
   }
@@ -160,6 +170,19 @@ function verifyBootstrapMetadata(entry, packument) {
   ]);
   if (latest && !allowedLatest.has(latest)) {
     throw new Error(`${entry.name} unexpectedly has latest=${latest}; only reviewed bootstrap placeholders are permitted before the first supported release.`);
+  }
+}
+
+function verifyReleasedPackageRecord(name, packument) {
+  const metadata = packument.versions?.[releasedVersion];
+  if (metadata?.name !== name || metadata.version !== releasedVersion) {
+    throw new Error(`${name}@${releasedVersion} does not match the current released package record.`);
+  }
+  if (packument['dist-tags']?.latest !== releasedVersion) {
+    throw new Error(`${name} latest is not the current released version ${releasedVersion}.`);
+  }
+  if (!metadata.dist?.integrity || !metadata.dist?.attestations) {
+    throw new Error(`${name}@${releasedVersion} is missing registry integrity or provenance attestations.`);
   }
 }
 
