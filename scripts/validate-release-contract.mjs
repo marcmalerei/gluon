@@ -625,6 +625,8 @@ function validateWorkflow() {
     'requireCleanMain',
     'requireNpmOwner',
     'reproduceArtifacts',
+    'verifyReleasedPackageRecord',
+    'regenerated bootstrap archive skipped',
   ]) if (!bootstrapPublishScript.includes(required)) throw new Error(`npm bootstrap publisher is missing ${required}.`);
   for (const match of workflow.matchAll(/uses:\s+[^\s@]+@([^\s#]+)/g)) {
     if (!/^[a-f0-9]{40}$/.test(match[1])) {

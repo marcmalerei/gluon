@@ -319,7 +319,11 @@ retained as a superseded record. Each bootstrap archive contains only its
 manifest, bootstrap notice, and MIT license; it exports no implementation. The
 executable release contract, artifact builder, and bootstrap publisher verify
 that boundary and make partial publication recoverable without replacing an
-immutable matching version.
+immutable matching version. They verify incremental additions without
+comparing a released package's immutable historical bootstrap archive with
+regenerated current documentation. Existing packages are skipped only when
+their contracted bootstrap record exists and their current supported `latest`
+release has registry integrity and provenance.
 
 ## Supply-chain evidence
 
