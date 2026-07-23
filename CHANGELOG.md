@@ -7,6 +7,31 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-23
+
+### Added
+
+- Added `defineUiAtom()` for concise, typed presentational Atom authoring with
+  conditional native tags, owned constructable stylesheets, and explicit slot
+  migration behavior.
+- Added typed presentational `.gluon` Single-File Components through the shared
+  compiler and Vite plugin, with normal Gluon component, Quark, template, and
+  constructable stylesheet output.
+- Added the first-party `@gluonjs/gluon-components-vite` Storybook Vite
+  framework and native Gluon renderer with typed CSF exports and exact teardown.
+- Added a junior learning path, compiled end-to-end examples, and a component
+  decision guide that distinguishes official primitives from honest app-local
+  GLUON GOODS components.
+
+### Changed
+
+- Migrated the component-library Storybook acceptance surface from the generic
+  Web Components adapter to native Gluon templates and lifecycle ownership.
+- Integrated the new Atom and `.gluon` authoring APIs into the canonical GLUON
+  GOODS shop while preserving official package boundaries.
+- Updated the audited `fast-uri` development dependency to a non-vulnerable
+  release.
+
 ## [1.2.0] - 2026-07-21
 
 ### Added

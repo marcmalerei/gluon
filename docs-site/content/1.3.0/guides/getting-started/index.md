@@ -1,6 +1,6 @@
 # Getting started
 
-Gluon `1.2.0` supports Node `^22.12.0 || ^24.0.0`. Create a maintained
+Gluon `1.3.0` supports Node `^22.12.0 || ^24.0.0`. Create a maintained
 application from the public generator:
 
 ```sh

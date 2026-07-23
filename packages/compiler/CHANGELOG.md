@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-23
+
+### Added
+
 - Added `compileGluonSfc()` for typed presentational `.gluon` components that
   lower to normal component, Quark, template, and constructable-style contracts.
 

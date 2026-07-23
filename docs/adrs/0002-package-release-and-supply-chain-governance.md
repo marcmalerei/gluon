@@ -275,7 +275,7 @@ automated release gates. The project accepts that the sole operator can create
 a release tag that permanently publishes package versions directly under
 `latest` without another person's approval. npm does not provide an atomic
 multi-package publish operation, so a failed train may temporarily leave only
-part of the 17-package train at the new `latest` version. The same protected job
+part of the 18-package train at the new `latest` version. The same protected job
 is safely repeatable for matching immutable versions and keeps the GitHub
 release in draft state until the complete train passes clean-room verification.
 
