@@ -29,7 +29,11 @@ screenshot.
 
 Run `npm run storybook:component-library` for the separate developer catalog
 or `npm run build:storybook:component-library` for its build smoke check.
-Stories use public package entry points, expose controls, execute the real
+The catalog selects the public `@gluonjs/gluon-components-vite` framework.
+Stories return native Gluon templates directly; the renderer owns canvas
+updates and exact `unmount()` cleanup, so no Web Components renderer wrapper or
+manual story-level `render()` call is required. Stories use public package
+entry points, expose controls, execute the real
 picker interaction, cover loading, cache-hit, and failed loader states, and
 enable the accessibility addon. `npm run check:storybook:component-library`
 builds the catalog, runs every retained interaction in Chromium, compares the
@@ -39,6 +43,8 @@ with axe-core, and writes screenshots plus a machine-readable report to
 directory before later repository analysis runs. Set
 `UPDATE_STORYBOOK_SCREENSHOTS=1` only when intentionally reviewing and updating
 those baselines. The catalog is not a replacement for GLUON GOODS.
+See the [Storybook with Gluon guide](../../docs/storybook.md) for a minimal
+configuration, typed story, style ownership, and lifecycle explanation.
 
 `library/` is the separately buildable `@gluonjs/example-component-library`
 package boundary. Its implementation imports only the public Core and Quarks

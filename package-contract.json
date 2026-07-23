@@ -73,6 +73,14 @@
       "dependencies": ["@gluonjs/compiler"]
     },
     {
+      "name": "@gluonjs/gluon-components-vite",
+      "directory": "packages/gluon-components-vite",
+      "state": "current",
+      "environment": "browser",
+      "exports": [".", "./entry-preview", "./preset", "./renderer-preset"],
+      "dependencies": ["@gluonjs/core"]
+    },
+    {
       "name": "@gluonjs/test-utils",
       "directory": "packages/test-utils",
       "state": "current",

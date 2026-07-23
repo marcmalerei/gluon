@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/web-components-vite';
-import { css } from '@gluonjs/core';
+import type { Meta, StoryObj } from '@gluonjs/gluon-components-vite';
+import { css, html } from '@gluonjs/core';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import {
   createComponentLibraryLoader,
@@ -22,7 +22,7 @@ const panelStyles = css`
 
 const meta = {
   title: 'Component library/Loader',
-  render: ({ mode }) => createLoaderPanel(mode),
+  render: ({ mode }) => html`${createLoaderPanel(mode)}`,
   args: { mode: 'loading' as LoaderMode },
   argTypes: {
     mode: {

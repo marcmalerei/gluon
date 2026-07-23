@@ -17,6 +17,7 @@
       "@gluonjs/organisms": ["packages/organisms/src/index.ts"],
       "@gluonjs/devtools": ["packages/devtools/src/index.ts"],
       "@gluonjs/devtools-api": ["packages/devtools-api/src/index.ts"],
+      "@gluonjs/gluon-components-vite": ["packages/gluon-components-vite/src/index.ts"],
       "@gluonjs/example-component-library": ["examples/component-library/library/src/index.ts"],
       "@gluonjs/example-component-library/manifest": ["examples/component-library/library/src/manifest.ts"],
       "@gluonjs/example-component-library/product-badge": ["examples/component-library/library/src/product-badge.ts"],

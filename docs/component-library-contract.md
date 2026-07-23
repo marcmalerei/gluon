@@ -88,10 +88,12 @@ the initial and post-request browser resource lists, one cache hit, the public
 interaction result, browser metadata, and a rendered screenshot.
 
 `npm run check:storybook:component-library` builds the separate developer
-catalog and opens the published Product Picker plus loading, cache-hit, and
-failed loader stories in Chromium. Every story executes its public interaction
-before WCAG A/AA analysis and a pixel comparison against the committed
-baseline; the resulting images, diffs, and JSON report remain quality evidence
-rather than production runtime dependencies. The verifier removes its generated
-static catalog after capture so later whole-repository analyzers see source and
-retained baselines only.
+catalog through `@gluonjs/gluon-components-vite` and opens the published Product
+Picker plus loading, cache-hit, and failed loader stories in Chromium. Stories
+return Gluon templates; the renderer uses the public Core render/unmount
+lifecycle and exact style ownership. Every story executes its public
+interaction before WCAG A/AA analysis and a pixel comparison against the
+committed baseline; the resulting images, diffs, and JSON report remain quality
+evidence rather than production runtime dependencies. The verifier removes its
+generated static catalog after capture so later whole-repository analyzers see
+source and retained baselines only.

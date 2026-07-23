@@ -1,0 +1,61 @@
+{
+  "name": "@gluonjs/gluon-components-vite",
+  "version": "1.2.0",
+  "description": "The official Storybook renderer and Vite framework for Gluon components.",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/gluon-components-vite"
+  },
+  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/gluon-components-vite#readme",
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./entry-preview": {
+      "types": "./dist/entry-preview.d.ts",
+      "import": "./dist/entry-preview.js"
+    },
+    "./preset": {
+      "types": "./dist/preset.d.ts",
+      "import": "./dist/preset.js"
+    },
+    "./renderer-preset": {
+      "types": "./dist/renderer-preset.d.ts",
+      "import": "./dist/renderer-preset.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@storybook/builder-vite": "10.5.3"
+  },
+  "peerDependencies": {
+    "@gluonjs/core": "1.2.0",
+    "storybook": "^10.5.3",
+    "vite": "^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

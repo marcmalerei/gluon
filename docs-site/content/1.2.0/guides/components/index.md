@@ -57,10 +57,13 @@ style ids through SSR and hydration without replacing retained DOM. The loader
 never introduces a `<style>` fallback.
 
 The repository's `examples/component-library` package, clean consumer, and
-Storybook catalog are the complete runnable reference. Storybook uses the
-published exports for controls, interactions, accessibility checks, and visual
-baselines; it is developer evidence, not a replacement for the GLUON GOODS
-application acceptance flow.
+Storybook catalog are the complete runnable reference. Storybook uses
+`@gluonjs/gluon-components-vite` so stories return native Gluon templates and
+receive exact canvas teardown without a Web Components adapter. The catalog
+uses the published exports for controls, interactions, accessibility checks,
+and visual baselines; it is developer evidence, not a replacement for the
+GLUON GOODS application acceptance flow. See the
+[complete Storybook guide](../../../../../docs/storybook.md).
 
 ## Declare properties
 
