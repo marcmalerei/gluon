@@ -8,6 +8,7 @@ import {
   createUiStyleSelection,
   defineButtonPreset,
   defineIcon,
+  defineUiAtom,
   getThemeStyles,
   installUi,
   type UiOwner,
@@ -91,8 +92,20 @@ const customIcon = defineIcon({
   viewBox: '0 0 24 24',
   body: svg`<path d="M6 8h12"></path>`,
 });
+const TextLink = defineUiAtom<{
+  readonly href?: string;
+  readonly children?: string;
+}, 'a' | 'span'>({
+  displayName: 'TextLink',
+  tag: ({ href }) => href ? 'a' : 'span',
+  nativeProps: ({ href, children }, tag) => ({
+    children,
+    ...(tag === 'a' ? { href } : {}),
+  }),
+});
 
 PurchaseButton({ label: 'Buy', type: 'submit', attributes: { ref: buttonRef } });
+TextLink({ href: '/shop', children: 'Shop', aria: { current: 'page' } });
 Icon({ icon: customIcon, label: 'Bag', attributes: { ref: svgRef, data: { owner: 'app' } } });
 Input({ attributes: { autocomplete: 'email', ref: { value: undefined } } });
 Label({ children: 'Email', attributes: { data: { owner: 'app' } } });

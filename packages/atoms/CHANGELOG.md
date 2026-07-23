@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added `defineUiAtom()` for single-object presentational authoring, ergonomic
+  conditional native tags, optional owned constructable stylesheets, and an
+  explicit loose `slot.content` migration mode.
+
 ## [Unreleased]
 
 ## [1.2.0] - 2026-07-21

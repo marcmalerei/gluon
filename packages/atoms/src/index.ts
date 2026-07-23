@@ -17,6 +17,14 @@ export {
 } from './icon.js';
 export { Input, type InputProps } from './input.js';
 export { Label, type LabelProps } from './label.js';
+export {
+  defineUiAtom,
+  type DefineUiAtomOptions,
+  type LooseUiAtomProps,
+  type UiAtomBaseProps,
+  type UiAtomProps,
+  type UiAtomStyleOptions,
+} from './define-ui-atom.js';
 export { atomManifest } from './manifest.js';
 export {
   atomStyles,

@@ -70,7 +70,10 @@ light-DOM slots; its official add/retry Button is a functional layer inside the
 same ShadowRoot. Server output retains the product title, inventory status, and
 facts as light DOM before the element upgrades.
 
-The bag quantity/remove surface is the concise-authoring acceptance boundary.
+The bag quantity/remove surface is the concise stateful-authoring acceptance
+boundary. The global Journal navigation is the concise presentational boundary:
+the app-local `ShopEditorialLink` Atom uses public `defineUiAtom()` with
+declarative anchor/span selection and one props object.
 `src/bag-quantity-control.ts` registers lazily from the real bag flow, imports
 only `@gluonjs/core`, owns one constructable ShadowRoot sheet, and communicates
 with the Store through cancelable native events. Its explicitly keyed optimistic

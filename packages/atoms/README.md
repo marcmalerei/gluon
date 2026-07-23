@@ -38,6 +38,48 @@ owner. `atomStyles` is deprecated; adopting it with exact rendering throws
 `GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` rather than applying duplicate rules.
 `installUiTheme()` is deprecated in favor of `installUi()`.
 
+## Concise app Atoms
+
+Use `defineUiAtom()` for small presentational wrappers that would otherwise
+repeat prop partitioning, native-tag branching, and stylesheet metadata:
+
+```ts
+import { defineUiAtom } from '@gluonjs/atoms';
+import { css } from '@gluonjs/core';
+
+interface TextLinkProps {
+  readonly href?: string;
+  readonly children?: string;
+}
+
+export const TextLink = defineUiAtom<TextLinkProps, 'a' | 'span'>({
+  displayName: 'TextLink',
+  tag: ({ href }) => href ? 'a' : 'span',
+  style: {
+    id: 'shop-text-link',
+    sheet: css`:where(.shop-text-link) { text-underline-offset: 0.2em; }`,
+  },
+  nativeProps: ({ href, children }, tag) => ({
+    class: 'shop-text-link',
+    children,
+    ...(tag === 'a' ? { href } : {}),
+  }),
+});
+```
+
+The component still returns an ordinary Gluon `TemplateResult`; the selected
+tag is rendered by `quark()`, and the optional sheet becomes ordinary immutable
+Atom style metadata. For a line-neutral native wrapper, omit `nativeProps` and
+all caller props are forwarded in one object.
+
+During an incremental migration, `{ loose: true }` additionally accepts legacy
+`slot.content`; normal `children` wins if both are supplied. Strict mode rejects
+`slot.content` instead of forwarding it as an accidental DOM attribute.
+`defineUiAtom()` is for stateless presentational Atoms only. Use `defineAtom()`
+and `q.*()` when a component needs several native nodes or precise prop
+partitioning, `defineMolecule()`/`defineOrganism()` for larger composition, and
+`defineGluonElement()` for state or lifecycle ownership.
+
 `create-gluon --ui` is the maintained application-owner example for this
 contract. It retains the `UiOwner` for the application lifetime, keeps its
 `--starter-*` tokens in a separate application sheet, maps only
