@@ -339,6 +339,11 @@ producing the package archives, aggregate and per-package SPDX 2.3 and
 CycloneDX 1.7 SBOMs, `release-evidence.json`, and a `SHA256SUMS` manifest under
 `.tmp/release`.
 
+The aggregate npm SPDX document is generated from `package-lock.json` with
+`--package-lock-only`. This keeps release-candidate generation independent of
+the not-yet-published exact lockstep package versions while preserving the
+reviewed dependency graph.
+
 SPDX output is validated against the vendored official SPDX 2.3 JSON schema.
 The release contract pins its upstream commit, source URL, and SHA-256; a schema
 change therefore requires an explicit reviewed contract update.

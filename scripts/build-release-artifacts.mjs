@@ -119,7 +119,12 @@ if (!nonPublishableBuild) {
   await writeFile(resolve(output, 'compatibility-manifest.json'), await readFile(resolve(root, compatibilityManifestPath)));
 }
 
-const aggregateSpdx = JSON.parse(await run('npm', ['sbom', '--sbom-format', 'spdx']));
+const aggregateSpdx = JSON.parse(await run('npm', [
+  'sbom',
+  '--package-lock-only',
+  '--sbom-format',
+  'spdx',
+]));
 normalizeSpdx(aggregateSpdx, '@gluonjs/core', version, created, sourceCommit);
 validateSpdx(aggregateSpdx, 'aggregate');
 await writeJson(resolve(sbomOutput, 'gluon-framework.spdx.json'), aggregateSpdx);
