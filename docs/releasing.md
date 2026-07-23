@@ -235,6 +235,13 @@ package record exists. The one-time bootstrap therefore publishes a minimal
 `README.md`, and `LICENSE`: they expose no runtime, executable, types, exports,
 dependencies, or supported API. They do not use provenance, because this is an
 interactive owner publication rather than the protected release workflow.
+When a new official package joins after a supported release, the same builder
+regenerates the complete reviewed archive set from clean `main`. Existing
+packages are skipped only after the publisher verifies their current `latest`
+release, registry integrity, provenance, and bootstrap-record presence. Their
+historical bootstrap archives are immutable and are not compared with newly
+generated notices or READMEs. A package that has not reached a supported
+release still requires an exact bootstrap-archive integrity match.
 
 The first live bootstrap attempt created
 `@gluonjs/reactivity@0.0.0-bootstrap.0` with the reviewed archive integrity, but
@@ -268,10 +275,13 @@ irreversible step. The publisher rejects `NPM_TOKEN` and `NODE_AUTH_TOKEN`, an
 artifact set that is not byte-identical to an independent rebuild, a dirty or
 non-`main` checkout, a source commit that is not the exact current
 `origin/main`, a user who is not an npm organization owner, a conflicting
-existing package record, any unexpected `latest`, and a rerun whose registry
-integrity differs from the reviewed archive. Registry visibility is allowed up
-to ten minutes after a successful publish before the operation stops; this wait
-does not weaken the exact integrity and dist-tag checks.
+existing package record, any unexpected `latest`, and a rerun whose unpublished
+bootstrap integrity differs from the reviewed archive. For already released
+packages it instead requires the current released version under `latest`, its
+registry integrity and provenance, and the contracted bootstrap record.
+Registry visibility is allowed up to ten minutes after a successful publish
+before the operation stops; this wait does not weaken the exact integrity and
+dist-tag checks.
 
 The npm owner then runs this command in an interactive terminal and completes
 the registry's 2FA challenges without copying credentials or one-time codes
