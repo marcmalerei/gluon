@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 22.22.2
           cache: npm
-      - run: npm ci --ignore-scripts
+      - run: npm ci --ignore-scripts --legacy-peer-deps
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run build
       - run: npm run benchmark:dx -- --output=.tmp/dx-scorecard/${{ github.sha }}.json

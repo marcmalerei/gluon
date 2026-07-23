@@ -26,8 +26,8 @@
   },
   "files": ["dist"],
   "peerDependencies": {
-    "@gluonjs/core": "^1.2.0",
-    "@gluonjs/quarks": "^1.2.0"
+    "@gluonjs/core": "^1.3.0",
+    "@gluonjs/quarks": "^1.3.0"
   },
   "scripts": {
     "build": "vite build --config vite.config.ts && tsc -p tsconfig.build.json",

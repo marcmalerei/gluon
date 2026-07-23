@@ -1,26 +1,26 @@
-Gluon Vue migration analysis 1.2.0
+Gluon Vue migration analysis 1.3.0
 Support: supported
 Files: 7; components: 2; findings: 11
 
 src/OptionsCard.vue:15:15 GVA1402 warning structural CSS module behavior requires constructed-sheet review.
-  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
+  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
 src/ProductCard.spec.ts:1:1 GVA1601 warning structural Test evidence requires a replacement or retention plan.
-  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
+  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
 src/ProductCard.spec.ts:1:1 GVA1601 warning structural Vue test file requires a replacement or retention plan.
-  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
+  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
 src/ProductCard.vue:3:1 GVA1301 warning structural Router evidence requires route-owner redesign.
-  Stage: route-state-async — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui
+  Stage: route-state-async — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui
 src/ProductCard.vue:4:1 GVA1302 warning structural Store evidence requires application/request ownership redesign.
-  Stage: route-state-async — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui
+  Stage: route-state-async — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui
 src/ProductCard.vue:12:17 GVA1303 warning structural Async evidence requires cancellation and teardown redesign.
-  Stage: route-state-async — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui
+  Stage: route-state-async — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-3-cut-over-routes-shared-state-and-async-ui
 src/ProductCard.vue:25:15 GVA1401 warning structural Scoped-style behavior requires constructed-sheet review.
-  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
+  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
 src/server.ts:3:13 GVA1501 warning structural SSR or hydration evidence requires single-renderer ownership review.
-  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
+  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
 src/server.ts:4:6 GVA1501 warning structural SSR or hydration evidence requires single-renderer ownership review.
-  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
+  Stage: styles-universal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-4-cut-over-styles-and-universal-rendering
 vite.config.ts:1:1 GVA1601 warning structural Vue build-plugin evidence requires a removal plan.
-  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
+  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
 vite.config.ts:1:1 GVA1601 warning structural Vite build configuration requires a removal plan.
-  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.2.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue
+  Stage: shell-removal — https://marcmalerei.github.io/gluon/1.3.0/migration/vue-to-gluon-cutover/#stage-5-transfer-the-shell-and-remove-vue

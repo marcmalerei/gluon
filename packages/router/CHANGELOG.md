@@ -4,6 +4,13 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-23
+
+### Changed
+
+- Advanced the lockstep release with the concise authoring and native Storybook
+  capability set while retaining the existing public contract.
+
 ## [1.2.0] - 2026-07-21
 
 ### Changed

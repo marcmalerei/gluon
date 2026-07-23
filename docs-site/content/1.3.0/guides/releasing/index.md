@@ -1,14 +1,12 @@
 # Release readiness
 
-The `1.2.0` documentation describes the completed lockstep release. All 17
-official manifests are at `1.2.0`. Release run `29822468758` published every
-contracted package under `latest` with SLSA provenance, passed clean-room
-installation and public-type verification, and published immutable GitHub
-release `v1.2.0` on 2026-07-21. The `v1.0.9` GitHub release remains a draft
-after its public-type verification failure. The `@gluonjs` scope, package
-records, and trusted-publisher bindings are verified in the package contract.
+The `1.3.0` documentation describes the prepared lockstep candidate. All 18
+official manifests are at `1.3.0`. The package contract records the exact
+registry preflight, while immutable GitHub release `v1.2.0` remains the current
+finalized release during candidate review. The `v1.0.9` GitHub release remains
+a draft after its public-type verification failure.
 
-Gluon's release group contains 17 lockstep packages. The repository validates
+Gluon's release group contains 18 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
 documentation version, license, changelogs, provenance settings, and protected
 workflow with:
@@ -19,7 +17,7 @@ npm run check:release-contract
 
 A release-candidate commit must additionally pass the complete repository check
 and strict candidate validation. The release artifact builder creates
-reproducible package-content digests, clean-installs all 17 local archives,
+reproducible package-content digests, clean-installs all 18 local archives,
 typechecks every contracted public export, and creates SPDX 2.3 and CycloneDX
 1.7 SBOMs for each package and the aggregate release, SHA-256 checksums, and
 machine-readable build evidence. The official SPDX schema is vendored with a
@@ -43,7 +41,7 @@ long-lived npm secrets. This accepts that the sole operator can create a release
 tag that permanently publishes package versions directly under `latest`
 without another person's approval. npm does not provide an atomic
 multi-package publish operation, so a failed train can temporarily leave only
-part of the 17-package train on the new `latest` version.
+part of the 18-package train on the new `latest` version.
 
 Two active tag rulesets cover exactly `refs/tags/v*`. Only `marcmalerei` may
 bypass the creation restriction, so the sole operator can cut a release. The
@@ -65,7 +63,7 @@ CSR/SSR/streaming/hydration/SSG evidence. Both evidence files must describe the
 same tested commit and explicitly reject branded-product support claims.
 
 Publication uses one recoverable protected job. Trusted publishing places all
-17 reviewed versions directly under `latest` with provenance and without a
+18 reviewed versions directly under `latest` with provenance and without a
 long-lived npm token or per-package 2FA approval. A rerun verifies and skips
 matching immutable versions before continuing unpublished packages. The GitHub
 release remains a draft until the complete train passes integrity, provenance,

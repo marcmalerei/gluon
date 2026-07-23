@@ -63,7 +63,7 @@ for (const framework of manifest.frameworks) {
     const fixture = resolve(root, framework.fixture);
     const copy = resolve(temporary, framework.id);
     await cp(fixture, copy, { recursive: true, filter: (source) => !['node_modules', 'dist', 'dist-server', 'build', 'playwright-report', 'test-results'].includes(basename(source)) });
-    commands.push(await run('npm ci --ignore-scripts', copy));
+    commands.push(await run('npm ci --ignore-scripts --legacy-peer-deps', copy));
     commands.push(await run(framework.id === 'vue' ? 'npm run type-check' : 'npm run typecheck', copy));
     commands.push(await run('npm run build', copy));
     commands.push(await run('npm run test:e2e', copy));

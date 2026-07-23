@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-23
+
+### Changed
+
+- Updated generated applications to pin the complete official Gluon package
+  selection to the lockstep 1.3.0 release.
+
 ## [1.2.0] - 2026-07-21
 
 ### Changed

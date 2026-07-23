@@ -1,6 +1,6 @@
 # Release operations
 
-Gluon uses one lockstep release for the 17 packages in
+Gluon uses one lockstep release for the 18 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
@@ -161,7 +161,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.2.0` release commit, the repository owner must verify
+Before preparing the `1.3.0` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -189,7 +189,7 @@ all of the following outside the source tree:
    who creates a release tag can publish immutable package versions directly
    to `latest` without another person's approval. Because npm has no atomic
    multi-package publish operation, a failed train may temporarily leave only
-   part of the 17-package train on the new `latest` version.
+   part of the 18-package train on the new `latest` version.
 7. Two active GitHub tag rulesets cover exactly `refs/tags/v*`. The creation
    rule gives only the `marcmalerei` user an `always` bypass so the sole
    operator can cut a release. The update and deletion rules have no bypass
@@ -258,7 +258,7 @@ exact contracted predecessor. Any other value blocks the bootstrap.
 Prepare and inspect the deterministic allowlisted archives from clean `main`:
 
 ```sh
-npm ci --ignore-scripts
+npm ci --ignore-scripts --legacy-peer-deps
 npm run check:release-bootstrap
 npm run release:bootstrap:artifacts
 cat .tmp/npm-bootstrap/bootstrap-evidence.json
@@ -311,13 +311,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.2.0` and `private: false`;
-- set every official implementation and peer dependency to exact `1.2.0`;
+- set every official manifest to version `1.3.0` and `private: false`;
+- set every official implementation and peer dependency to exact `1.3.0`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.2.0` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.2.0`, then make that version
+- add dated `1.3.0` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.3.0`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -326,18 +326,29 @@ The reviewed release PR makes these changes together:
 Validate that commit before creating a tag:
 
 ```sh
-npm ci --ignore-scripts
+npm ci --ignore-scripts --legacy-peer-deps
 npm run check
-npm run release:validate -- --candidate 1.2.0
-npm run release:artifacts -- --version 1.2.0
+npm run release:validate -- --candidate 1.3.0
+npm run release:artifacts -- --version 1.3.0
 ```
 
+Release-candidate installs use `--legacy-peer-deps` because the official
+packages declare exact lockstep peers that do not exist in the public registry
+until the protected tag workflow publishes them. The repository gates validate
+those peers from the packed local release train instead of resolving an
+unpublished version from npm.
+
 `release:artifacts` packs every package twice and compares canonical unpacked
-file SHA-256 digests. It then clean-installs all 17 local archives and
+file SHA-256 digests. It then clean-installs all 18 local archives and
 typechecks every contracted public export with `skipLibCheck: false` before
 producing the package archives, aggregate and per-package SPDX 2.3 and
 CycloneDX 1.7 SBOMs, `release-evidence.json`, and a `SHA256SUMS` manifest under
 `.tmp/release`.
+
+The aggregate npm SPDX document is generated from `package-lock.json` with
+`--package-lock-only --legacy-peer-deps`. This keeps release-candidate
+generation independent of the not-yet-published exact lockstep package
+versions while preserving the reviewed dependency graph.
 
 SPDX output is validated against the vendored official SPDX 2.3 JSON schema.
 The release contract pins its upstream commit, source URL, and SHA-256; a schema
@@ -421,13 +432,13 @@ verifier without the ephemeral token.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance directly under `latest`. Before the first publish it proves
-that all 17 npm package records already exist. After each publish it compares
+that all 18 npm package records already exist. After each publish it compares
 registry integrity and provenance with `release-evidence.json`. A rerun skips
 an already-existing version only when those facts match; a mismatch stops the
 train. No long-lived npm token, `npm dist-tag` mutation, or per-package 2FA
 approval is part of a supported release.
 
-After all 17 direct publications succeed, the same protected job requires every
+After all 18 direct publications succeed, the same protected job requires every
 `latest` tag to point to the reviewed version, compares registry integrity and
 provenance, performs a clean-directory install and public-type check, attaches
 the registry verification and final checksum manifest, and only then publishes
