@@ -239,6 +239,7 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "signal-polyfill": "0.2.2",
+    "storybook": "^10.5.3",
     "typedoc": "^0.28.20",
     "typedoc-plugin-markdown": "^4.12.0",
     "typescript": "^5.7.0",
