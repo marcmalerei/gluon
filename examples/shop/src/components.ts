@@ -24,6 +24,7 @@ import {
 import { BagQuantityControl } from './bag-quantity-control.js';
 import {
   ShopIconAction,
+  ShopEditorialLink,
   ShopMenuAction,
   ShopTextAction,
 } from './ui-extensions.js';
@@ -47,7 +48,7 @@ export function SiteHeader(store: ShopStore): TemplateValue {
       <nav class="desktop-nav" aria-label="Primary navigation">
         ${compose(RouterLink, { to: '/shop' })`Shop`}
         ${compose(RouterLink, { to: '/shop?sort=new' })`New`}
-        <a href="#journal">Journal</a>
+        ${ShopEditorialLink({ href: '#journal', children: 'Journal' })}
       </nav>
       <div class="header-actions">
         ${ShopTextAction({
@@ -291,7 +292,11 @@ function MobileMenu(store: ShopStore): TemplateValue {
           })}
           ${compose(RouterLink, { to: '/shop' })`<span>Shop</span>${ArrowIcon()}`}
           ${compose(RouterLink, { to: '/shop?sort=new' })`<span>New</span>${ArrowIcon()}`}
-          <a href="#journal" @click=${close}><span>Journal</span>${ArrowIcon()}</a>
+          ${ShopEditorialLink({
+            href: '#journal',
+            onClick: close,
+            children: html`<span>Journal</span>${ArrowIcon()}`,
+          })}
         </nav>
         <div class="menu-categories">${CategoryLinks()}</div>
       </aside>

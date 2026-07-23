@@ -585,6 +585,43 @@
         "removeLegacyTheme();"
       ]
     },
+    "concise-atom-authoring": {
+      "module": "@gluonjs/atoms",
+      "code": [
+        "import { css } from '@gluonjs/core';",
+        "import {",
+        "  defineUiAtom,",
+        "  type DefineUiAtomOptions,",
+        "  type LooseUiAtomProps,",
+        "  type UiAtomBaseProps,",
+        "  type UiAtomProps,",
+        "  type UiAtomStyleOptions,",
+        "} from '@gluonjs/atoms';",
+        "",
+        "interface TextLinkProps extends UiAtomBaseProps {",
+        "  readonly href?: string;",
+        "}",
+        "",
+        "const style = {",
+        "  id: 'goods-text-link',",
+        "  sheet: css`:where(.goods-text-link) { text-underline-offset: 0.2em; }`,",
+        "} satisfies UiAtomStyleOptions;",
+        "const options = {",
+        "  displayName: 'TextLink',",
+        "  tag: ({ href }) => href ? 'a' : 'span',",
+        "  style,",
+        "  nativeProps: ({ href, children }, tag) => ({",
+        "    class: 'goods-text-link',",
+        "    children,",
+        "    ...(tag === 'a' ? { href } : {}),",
+        "  }),",
+        "} satisfies DefineUiAtomOptions<TextLinkProps, 'a' | 'span'>;",
+        "const TextLink = defineUiAtom(options);",
+        "const props = { href: '/shop', children: 'Shop' } satisfies UiAtomProps<TextLinkProps, 'a' | 'span'>;",
+        "const legacy = { slot: { content: 'Legacy label' } } satisfies LooseUiAtomProps;",
+        "console.log(TextLink(props), legacy.slot?.content);"
+      ]
+    },
     "ui-owner": {
       "module": "@gluonjs/atoms",
       "code": [
@@ -3625,6 +3662,30 @@
     "packages/atoms/src/functions/defineButtonPreset.md": {
       "recipe": "atom-components",
       "description": "Create an app-owned branded or danger Button preset while retaining the official native implementation and protected semantics:"
+    },
+    "packages/atoms/src/functions/defineUiAtom.md": {
+      "recipe": "concise-atom-authoring",
+      "description": "Create a stateless presentational Atom with one public props object, a fixed or conditional native tag, and optional owned stylesheet metadata:"
+    },
+    "packages/atoms/src/interfaces/DefineUiAtomOptions.md": {
+      "recipe": "concise-atom-authoring",
+      "description": "Declare the native tag selection, defaults, optional prop mapping, migration mode, and style ownership for one concise Atom:"
+    },
+    "packages/atoms/src/interfaces/LooseUiAtomProps.md": {
+      "recipe": "concise-atom-authoring",
+      "description": "Represent the explicit legacy slot.content input accepted only when an Atom opts into loose migration mode:"
+    },
+    "packages/atoms/src/interfaces/UiAtomBaseProps.md": {
+      "recipe": "concise-atom-authoring",
+      "description": "Share the optional Gluon template children contract across concise app-owned Atom props:"
+    },
+    "packages/atoms/src/interfaces/UiAtomStyleOptions.md": {
+      "recipe": "concise-atom-authoring",
+      "description": "Name one constructable stylesheet so defineUiAtom can create immutable Atom ownership metadata:"
+    },
+    "packages/atoms/src/type-aliases/UiAtomProps.md": {
+      "recipe": "concise-atom-authoring",
+      "description": "Combine app-owned semantic props with compatible native element bindings and the explicit migration slot shape:"
     },
     "packages/atoms/src/functions/defineIcon.md": {
       "recipe": "atom-components",

@@ -6,6 +6,7 @@ import {
   atomStyles,
   defineButtonPreset,
   defineIcon,
+  defineUiAtom,
   installUi,
 } from '@gluonjs/atoms';
 import {
@@ -26,6 +27,58 @@ beforeEach(() => {
 });
 
 describe('typed UI extensions', () => {
+  it('authors conditional native Atoms with one props object and explicit loose slots', () => {
+    const style = new CSSStyleSheet();
+    style.replaceSync('.app-link { text-decoration: underline; }');
+    const AppLink = defineUiAtom<{
+      readonly href?: string;
+      readonly children?: string;
+      readonly emphasis?: boolean;
+    }, 'a' | 'span'>({
+      displayName: 'AppLink',
+      tag: ({ href }) => href ? 'a' : 'span',
+      style: { id: 'app-link', sheet: style },
+      nativeProps: ({ href, children, emphasis }, tag) => ({
+        children,
+        class: { 'app-link': true, 'is-emphasized': emphasis },
+        ...(tag === 'a' ? { href } : {}),
+      }),
+    });
+    const LegacyBadge = defineUiAtom<{
+      readonly children?: string;
+      readonly title?: string;
+    }, 'span'>({
+      displayName: 'LegacyBadge',
+      tag: 'span',
+      loose: true,
+    });
+
+    render(q.div({ children: [
+      AppLink({ href: '/shop', children: 'Shop', emphasis: true }),
+      AppLink({ children: 'Unavailable' }),
+      LegacyBadge({ slot: { content: 'Migrated' }, title: 'Legacy slot' }),
+    ] }), document.body);
+
+    const [link, status, badge] = document.querySelectorAll('.app-link, [title="Legacy slot"]');
+    expect(link).toBeInstanceOf(HTMLAnchorElement);
+    expect(link?.getAttribute('href')).toBe('/shop');
+    expect(link?.classList.contains('is-emphasized')).toBe(true);
+    expect(status).toBeInstanceOf(HTMLSpanElement);
+    expect(status?.textContent).toBe('Unavailable');
+    expect(badge?.textContent).toBe('Migrated');
+    expect(document.adoptedStyleSheets).toContain(style);
+    expect(AppLink.styles[0]?.id).toBe('app-link');
+
+    unmount(document.body);
+    expect(document.adoptedStyleSheets).not.toContain(style);
+
+    const StrictBadge = defineUiAtom<{ readonly children?: string }, 'span'>({
+      displayName: 'StrictBadge',
+      tag: 'span',
+    });
+    expect(() => StrictBadge({ slot: { content: 'Rejected' } })).toThrow(/loose: true/i);
+  });
+
   it('composes a branded preset with native bindings and releases refs/listeners', () => {
     const ref: { value?: HTMLButtonElement } = {};
     const attributeClick = vi.fn();
