@@ -1,10 +1,12 @@
 # Release readiness
 
-The `1.3.0` documentation describes the prepared lockstep candidate. All 18
-official manifests are at `1.3.0`. The package contract records the exact
-registry preflight, while immutable GitHub release `v1.2.0` remains the current
-finalized release during candidate review. The `v1.0.9` GitHub release remains
-a draft after its public-type verification failure.
+The `1.3.0` documentation describes the completed lockstep release. All 18
+official manifests are at `1.3.0`. Release run `30035135735` published every
+contracted package under `latest` with npm provenance, passed clean-room
+installation and public-type verification, and published immutable GitHub
+release `v1.3.0` on 2026-07-23. The `v1.0.9` GitHub release remains a draft
+after its public-type verification failure. The `@gluonjs` scope, package
+records, and trusted-publisher bindings are verified in the package contract.
 
 Gluon's release group contains 18 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
