@@ -133,25 +133,32 @@ describe('@gluonjs/reactivity', () => {
   });
 
   it('reports development tracking and triggering events', () => {
-    const state = reactive({ count: 0 });
-    const onTrack = vi.fn();
-    const onTrigger = vi.fn();
-    effect(() => state.count, { onTrack, onTrigger });
+    const previous = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    try {
+      const state = reactive({ count: 0 });
+      const onTrack = vi.fn();
+      const onTrigger = vi.fn();
+      effect(() => state.count, { onTrack, onTrigger });
 
-    state.count = 1;
+      state.count = 1;
 
-    expect(onTrack).toHaveBeenCalledWith(expect.objectContaining({
-      target: toRaw(state),
-      type: 'get',
-      key: 'count',
-    }));
-    expect(onTrigger).toHaveBeenCalledWith(expect.objectContaining({
-      target: toRaw(state),
-      type: 'set',
-      key: 'count',
-      newValue: 1,
-      oldValue: 0,
-    }));
+      expect(onTrack).toHaveBeenCalledWith(expect.objectContaining({
+        target: toRaw(state),
+        type: 'get',
+        key: 'count',
+      }));
+      expect(onTrigger).toHaveBeenCalledWith(expect.objectContaining({
+        target: toRaw(state),
+        type: 'set',
+        key: 'count',
+        newValue: 1,
+        oldValue: 0,
+      }));
+    } finally {
+      if (previous === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = previous;
+    }
   });
 
   it('does not read development mode when dependency debugger hooks are absent', () => {
