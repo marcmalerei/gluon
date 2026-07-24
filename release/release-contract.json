@@ -2,7 +2,7 @@
   "$schema": "./release-contract.schema.json",
   "schemaVersion": 1,
   "releaseGroup": "gluon-framework",
-  "targetVersion": "1.3.0",
+  "targetVersion": "1.4.0",
   "tagPrefix": "v",
   "environment": "npm",
   "artifactDirectory": ".tmp/release",

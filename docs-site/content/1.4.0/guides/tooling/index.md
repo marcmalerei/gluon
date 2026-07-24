@@ -36,4 +36,4 @@ for code splitting, loader cache, registration, stylesheet ownership, SSR,
 hydration, and teardown behavior.
 
 Open the [public Playground](/gluon/playground/) or browse the
-[versioned diagnostic reference](/gluon/1.3.0/reference/diagnostics/).
+[versioned diagnostic reference](/gluon/1.4.0/reference/diagnostics/).

@@ -14,7 +14,7 @@ export default defineConfig({
     },
   })],
   root: import.meta.dirname,
-  base: '/gluon/1.3.0/examples/',
+  base: '/gluon/1.4.0/examples/',
   resolve: {
     alias: {
       '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
@@ -28,7 +28,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist/1.3.0/examples',
+    outDir: '../dist/1.4.0/examples',
     emptyOutDir: false,
     rollupOptions: {
       input: {

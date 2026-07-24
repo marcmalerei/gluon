@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/reactivity",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "DOM-free reactive state primitives for Gluon.",
   "private": false,
   "license": "MIT",
