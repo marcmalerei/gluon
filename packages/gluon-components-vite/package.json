@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/gluon-components-vite",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "The official Storybook renderer and Vite framework for Gluon components.",
   "private": false,
   "type": "module",
@@ -50,7 +50,7 @@
     "@storybook/builder-vite": "10.5.3"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.3.0",
+    "@gluonjs/core": "1.4.0",
     "storybook": "^10.5.3",
     "vite": "^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
   },

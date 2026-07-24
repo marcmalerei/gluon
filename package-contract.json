@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-23",
+    "checkedAt": "2026-07-24",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "Release run 30035135735 published all 18 contracted packages at 1.3.0 under latest with npm provenance on 2026-07-23. Independent public-registry verification confirmed matching reviewed archive integrity, provenance attestations, clean-room installation, and public type declarations for every package. Immutable GitHub release v1.3.0 is published from commit e3e62e751a5ea170bd95c42e0915b671ef001087."
+    "publicationState": "ready",
+    "observation": "Registry preflight on 2026-07-24 confirmed that all 18 contracted package records expose 1.3.0 as latest and that version 1.4.0 is absent. Scope control remains verified by the completed 1.3.0 publication contract."
   },
   "packages": [
     {

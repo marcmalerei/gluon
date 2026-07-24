@@ -27,7 +27,7 @@ export { ANALYZER_LIMITS, VueMigrationAnalyzerError } from './types.js';
 export type * from './types.js';
 export { VUE_MIGRATION_REPORT_SCHEMA_VERSION } from './schema.js';
 
-const ANALYZER_VERSION = '1.3.0';
+const ANALYZER_VERSION = '1.4.0';
 const ignoredDirectories = new Set(['.git', 'node_modules', 'dist', 'coverage', '.nuxt', '.output']);
 const fileKinds: readonly FileKind[] = ['manifest', 'lockfile', 'sfc', 'source', 'test', 'server', 'build-config', 'symlink', 'other'];
 const categories: readonly InventoryCategory[] = ['component', 'prop-event-model', 'slot-directive-ref', 'reactivity-lifecycle', 'router', 'store', 'async', 'style', 'ssr-hydration', 'test', 'build', 'remaining-vue'];

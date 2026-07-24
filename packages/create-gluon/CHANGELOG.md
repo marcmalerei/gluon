@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-24
+
+### Changed
+
+- Updated generated applications and components to pin the complete selected
+  Gluon package set to the lockstep `1.4.0` release.
+
 ## [1.3.0] - 2026-07-23
 
 ### Changed

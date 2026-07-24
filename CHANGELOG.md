@@ -7,11 +7,23 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-24
+
 ### Added
 
 - Added an install-time Gluon agent skill with a safe explicit CLI, complete
   public-package guidance, packed-template verification, opt-out and protected
   regeneration behavior across npm, pnpm, Yarn, and ignored-script installs.
+
+### Changed
+
+- Required every official package README to provide task-oriented public API
+  guidance and examples, enforced by package-contract validation.
+
+### Fixed
+
+- Kept the component-library product picker trigger synchronized when its value
+  changes programmatically, with Storybook interaction coverage for rerenders.
 
 ## [1.3.0] - 2026-07-23
 
