@@ -7,6 +7,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added an install-time Gluon agent skill with a safe explicit CLI, complete
+  public-package guidance, packed-template verification, opt-out and protected
+  regeneration behavior across npm, pnpm, Yarn, and ignored-script installs.
+
 ## [1.3.0] - 2026-07-23
 
 ### Added
