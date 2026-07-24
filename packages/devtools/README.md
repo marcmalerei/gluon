@@ -9,10 +9,34 @@ Gluon Devtools is explicitly opt-in. `createDevtoolsBridge()` defaults to
 entry points enable it deliberately and register each application root with an
 independent ID plus optional Router, Store, state, and context inspectors.
 
+## Inspect an application
+
 ```ts
+import { createApp, html } from '@gluonjs/core';
+import {
+  createDevtoolsBridge,
+  mountGluonDevtools,
+} from '@gluonjs/devtools';
+
+const root = document.querySelector<HTMLElement>('#app');
+if (!root) throw new Error('Missing #app');
+
+const app = createApp(() => html`<main>GLUON GOODS</main>`);
+app.mount(root);
 const bridge = createDevtoolsBridge({ enabled: true, exposeGlobal: true });
-bridge.registerApplication({ id: 'shop', app, root, router, store });
-mountGluonDevtools(bridge);
+const unregister = bridge.registerApplication({
+  id: 'shop',
+  name: 'GLUON GOODS',
+  app,
+  root,
+  state: () => ({ bagCount: 1 }),
+});
+const panel = mountGluonDevtools(bridge);
+
+panel.unmount();
+unregister();
+bridge.dispose();
+app.unmount();
 ```
 
 Render records include scheduling causes, reactive dependency counts, timing,

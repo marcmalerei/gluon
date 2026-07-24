@@ -118,6 +118,18 @@ async function validateCurrentPackage(entry) {
       throw new Error(`${entry.name} README must contain exactly one ${token}.`);
     }
   }
+  if (!/```(?:bash|html|js|sh|ts|tsx)\n[\s\S]+?```/.test(readme)) {
+    throw new Error(`${entry.name} README must contain a fenced, runnable usage example.`);
+  }
+  if ((entry.bins ?? []).length === 0) {
+    const escapedPackageName = entry.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const publicImport = new RegExp(
+      `(?:from\\s+['"]${escapedPackageName}(?:\\/[^'"]+)?['"]|import\\s*\\(\\s*['"]${escapedPackageName}(?:\\/[^'"]+)?['"]\\s*\\))`,
+    );
+    if (!publicImport.test(readme)) {
+      throw new Error(`${entry.name} README usage example must import its public package entry point.`);
+    }
+  }
 
   const actualOfficialDependencies = new Set(
     ['dependencies', 'peerDependencies']
