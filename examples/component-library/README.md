@@ -7,7 +7,9 @@ The library uses only `@gluonjs/core` and `@gluonjs/quarks` public entry points:
 `ProductBadge` is a stateless Atom and `example-product-picker` is a stateful
 Custom Element. Its ShadowRoot owns a constructable stylesheet, native buttons
 remain keyboard-operable, and its typed `change` event reports the exact new
-quantity.
+quantity. The picker treats its public `value` property as the current quantity:
+button interactions update that property, and its `reflect: true` declaration
+keeps the `value` attribute synchronized for HTML and DOM consumers.
 
 Run `npm run build:component-library` to build the consumer. It imports only
 the serializable manifest initially, requests the badge and picker through

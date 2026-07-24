@@ -8,7 +8,10 @@ import {
   ProductBadge,
   productBadgeStyles,
 } from '@gluonjs/example-component-library/product-badge';
-import { ProductPicker } from '@gluonjs/example-component-library/product-picker';
+import {
+  ProductPicker,
+  type ProductPickerElement,
+} from '@gluonjs/example-component-library/product-picker';
 
 const storyStyles = css`
   #storybook-root { display: block; color: #101010; font: 16px/1.5 system-ui, sans-serif; }
@@ -54,12 +57,17 @@ type Story = StoryObj<{ label: string }>;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
-    const pickerRoot = canvasElement.querySelector('example-product-picker')?.shadowRoot;
+    const picker = canvasElement.querySelector<ProductPickerElement>('example-product-picker');
+    const pickerRoot = picker?.shadowRoot;
     const increment = pickerRoot?.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]');
     const output = pickerRoot?.querySelector('output');
-    if (!increment || !output) throw new Error('Product picker story did not render its public controls.');
+    if (!picker || !increment || !output) throw new Error('Product picker story did not render its public controls.');
     increment.click();
-    await waitFor(() => output.textContent === '2');
+    await waitFor(() => (
+      output.textContent === '2'
+      && picker.value === 2
+      && picker.getAttribute('value') === '2'
+    ));
   },
 };
 
