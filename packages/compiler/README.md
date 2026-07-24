@@ -39,6 +39,37 @@ Inline `<style>` elements in `html` templates produce
 `GLUON_TEMPLATE_STYLE_ELEMENT`; Gluon browser styling uses constructable
 stylesheets and `adoptedStyleSheets` only.
 
+## Transform a module
+
+Pass the original source and its filename to `transformGluonModule()`. The
+result preserves transformed code and its source map while reporting the
+templates and diagnostics that tooling can display:
+
+```ts
+import {
+  transformGluonModule,
+  type GluonTransformResult,
+} from '@gluonjs/compiler';
+
+const source = `
+  import { html } from '@gluonjs/core';
+  export const ProductName = (name: string) => html\`<h1>\${name}</h1>\`;
+`;
+
+const result: GluonTransformResult = transformGluonModule(
+  source,
+  '/src/product-name.ts',
+  { development: true },
+);
+
+console.log(result.templates[0]?.tag); // "html"
+console.log(result.diagnostics); // source-located compiler diagnostics
+```
+
+Use `result.code` and `result.map` together when passing the output to the next
+build transform. Production callers omit `development: true`; development mode
+adds the HMR bridges described above.
+
 ## Presentational SFC compiler
 
 `compileGluonSfc(source, { filename })` lowers a `.gluon` presentational
