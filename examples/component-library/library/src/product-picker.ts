@@ -24,8 +24,9 @@ export const ProductPicker: CustomElementConstructor & { new(): ProductPickerEle
     const quantity = context.state('quantity', () => context.props.value);
     context.watch(() => context.props.value, (value) => { quantity.value = value ?? 1; });
     const change = (next: number): void => {
-      quantity.value = Math.max(1, next);
-      context.emit('change', { quantity: quantity.value });
+      const value = Math.max(1, next);
+      context.host.value = value;
+      context.emit('change', { quantity: value });
     };
     return { render: () => html`
       <button type="button" aria-label="Decrease quantity" @click=${() => change(quantity.value - 1)}>−</button>

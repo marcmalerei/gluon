@@ -24,6 +24,8 @@ describe('component-library consumer example', () => {
     const event = new Promise<CustomEvent<{ quantity: number }>>((resolve) => picker.addEventListener('change', resolve as EventListener, { once: true }));
     (picker.shadowRoot?.querySelector('[aria-label="Increase quantity"]') as HTMLButtonElement).click();
     expect((await event).detail).toEqual({ quantity: 3 });
+    expect(picker.value).toBe(3);
+    expect(picker.getAttribute('value')).toBe('3');
     await picker.updateComplete;
     expect(picker.shadowRoot?.querySelector('output')?.textContent).toBe('3');
 
