@@ -30,6 +30,15 @@ package consumer and Storybook catalog exercise those same public boundaries.
 
 [Choose Atom, Molecule, Organism, or Custom Element →](/gluon/1.4.0/guides/component-decisions/)
 
+## Schema-driven forms
+
+The optional `@gluonjs/json-forms` package renders its documented JSON Schema
+and JSON Forms UI-schema subset through form-associated, accessible native
+controls. Its delivery-preferences reference flow keeps the policy state in the
+host application and the component responsible for rendering and validation.
+
+[Open the JSON Forms reference flow →](/gluon/1.4.0/examples/json-forms.html)
+
 ## API reference
 
 Generated, version-matched API documentation for every current public package

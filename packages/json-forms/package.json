@@ -1,0 +1,53 @@
+{
+  "name": "@gluonjs/json-forms",
+  "version": "1.4.0",
+  "description": "Schema-driven, form-associated Custom Elements for Gluon.",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/json-forms"
+  },
+  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/json-forms#readme",
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  },
+  "peerDependencies": {
+    "@gluonjs/core": "1.4.0"
+  },
+  "peerDependenciesMeta": {
+    "@gluonjs/core": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

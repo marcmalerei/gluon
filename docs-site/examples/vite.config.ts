@@ -19,6 +19,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
+      '@gluonjs/json-forms': resolve(repositoryRoot, 'packages/json-forms/src/index.ts'),
       '@gluonjs/quarks': resolve(repositoryRoot, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),
       '@gluonjs/molecules': resolve(repositoryRoot, 'packages/molecules/src/index.ts'),
@@ -32,6 +33,7 @@ export default defineConfig({
     emptyOutDir: false,
     rollupOptions: {
       input: {
+        'json-forms': resolve(import.meta.dirname, 'json-forms.html'),
         plain: resolve(import.meta.dirname, 'plain.html'),
         ui: resolve(import.meta.dirname, 'ui.html'),
         vue: resolve(import.meta.dirname, 'vue.html'),

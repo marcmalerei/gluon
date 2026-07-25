@@ -42,7 +42,7 @@ and emits reviewed Markdown into `.tmp/docs-api`.
 `generate-api-examples.mjs` then derives every public function, class,
 interface, type-alias, and variable page, maps it back to an official package
 entry point, appends an `Example` section, and typechecks the complete generated
-snippet corpus. `api-examples.json` maps all 584 current symbol pages to reviewed
+snippet corpus. `api-examples.json` maps all 686 current symbol pages to reviewed
 task-oriented examples. Related symbols may share a maintained application
 recipe, but every page has its own purpose statement and the compiled recipe
 must use that documented symbol. Unknown pages, missing catalog entries, private
@@ -69,8 +69,10 @@ generic runtime-owner copy.
 
 All TypeScript and Vue example sources live in `examples/` and are compiled
 through `examples/tsconfig.json` plus the maintained Vite configurations;
-Markdown includes those exact files rather than copied snippets. `plain.html`
-and `vue.html` are the runnable interoperability hosts. The Vue host consumes
+Markdown includes those exact files rather than copied snippets. `plain.html`,
+`vue.html`, and `json-forms.html` are the runnable reference hosts. The JSON
+Forms reference keeps delivery-policy state in its host application while the
+public form-associated element owns schema rendering and validation. The Vue host consumes
 the production GLUON GOODS product configurator with an explicit
 `isCustomElement` compiler boundary. Its verified renders are
 [`design/rendered-vue-migration-desktop.png`](design/rendered-vue-migration-desktop.png)

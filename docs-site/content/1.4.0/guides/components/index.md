@@ -232,6 +232,7 @@ they are not alternative component bases.
 | Class | Use it for |
 | --- | --- |
 | [`ComponentLibraryLoader`](/gluon/1.4.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe cache state, retain target-owned constructable stylesheets, and validate request-local SSR style snapshots before hydration. |
+| [`JsonFormsElement`](/gluon/1.4.0/api/generated/packages/json-forms/src/classes/JsonFormsElement.html) | Render the supported direct-property JSON Forms subset as a form-associated Custom Element; prefer the `JsonForm()` template helper when composing it inside a Gluon render tree. |
 
 ### Tooling classes
 

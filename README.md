@@ -713,6 +713,7 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 | **Atoms** | Focused controls, tokens, and themes from optional `@gluonjs/atoms`. |
 | **Molecules** | Reusable compositions such as `Card` and `FormField` from optional `@gluonjs/molecules`. |
 | **Organisms** | Larger interface structures such as `AppShell` from optional `@gluonjs/organisms`. |
+| **JSON Forms** | Schema-driven, form-associated Custom Elements from optional `@gluonjs/json-forms`. |
 
 ```text
                          increasing UI scope
@@ -724,7 +725,7 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 
 Every component created with `defineAtom`, `defineMolecule`, or `defineOrganism` carries explicit `layer` and `displayName` metadata.
 
-Quarks, Atoms, Molecules, and Organisms are optional `@gluonjs/*` packages.
+Quarks, Atoms, Molecules, Organisms, and JSON Forms are optional `@gluonjs/*` packages.
 Core exposes no UI subpath and a production tree-shaking fixture verifies that a
 Core-only consumer contains none of the stable UI markers.
 
