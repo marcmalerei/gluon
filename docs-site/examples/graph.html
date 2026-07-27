@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gluon Graph — Knowledge map</title>
+    <script type="module" src="/graph.ts"></script>
+  </head>
+  <body>
+    <main class="graph-reference" aria-labelledby="graph-title">
+      <header class="graph-topbar">
+        <a class="graph-brand" href="../" aria-label="Gluon documentation home">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="18" cy="5" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6.6 7.2 10.6 16M16.4 6.4 13.4 16M7 6.2l9 .1"/></svg>
+          <span>Gluon graph</span>
+        </a>
+        <p>Knowledge map</p>
+      </header>
+      <section class="graph-workspace" aria-label="Knowledge map workspace">
+        <aside class="graph-inspector" aria-labelledby="inspector-title">
+          <div class="inspector-heading">
+            <p class="section-kicker">Interactive reference</p>
+            <h1 id="graph-title">Knowledge map</h1>
+            <p>Explore the connected research, product, and operations notes in this seeded graph.</p>
+          </div>
+          <label class="search-control">
+            <span class="sr-only">Search nodes</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.6" cy="10.6" r="6.6"/><path d="m16 16 4.5 4.5"/></svg>
+            <input id="graph-search" type="search" placeholder="Search nodes" autocomplete="off" />
+          </label>
+          <fieldset class="group-controls">
+            <legend id="inspector-title">Groups</legend>
+            <div id="group-list"></div>
+          </fieldset>
+          <div class="range-controls" aria-label="Graph display controls">
+            <label for="node-size"><span>Node size</span><output id="node-size-value">100%</output></label>
+            <input id="node-size" type="range" min="0.65" max="1.7" step="0.05" value="1" />
+            <label for="link-density"><span>Link density</span><output id="link-density-value">100%</output></label>
+            <input id="link-density" type="range" min="0.18" max="1" step="0.02" value="1" />
+          </div>
+          <label class="switch-control" for="show-labels">
+            <span>Show labels</span>
+            <input id="show-labels" type="checkbox" role="switch" />
+          </label>
+          <div class="inspector-actions">
+            <button id="recenter" type="button">Recenter</button>
+            <button id="rebalance" class="subtle-button" type="button">Rebalance</button>
+          </div>
+          <p id="graph-selection" class="selection-status" aria-live="polite">Select a node to inspect its connections.</p>
+        </aside>
+        <section class="graph-canvas-region" aria-label="Network graph canvas">
+          <div class="graph-canvas-caption" aria-hidden="true"><span></span>Drag to pan · scroll to zoom · Escape to recenter</div>
+          <gluon-graph id="knowledge-graph"></gluon-graph>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

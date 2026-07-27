@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-24",
+    "checkedAt": "2026-07-27",
     "scope": "@gluonjs",
     "scopeControl": "verified",
     "publicationState": "ready",
-    "observation": "Registry preflight on 2026-07-24 confirmed that all 18 contracted package records expose 1.3.0 as latest and that version 1.4.0 is absent. Scope control remains verified by the completed 1.3.0 publication contract."
+    "observation": "Registry preflight on 2026-07-27 confirmed that all 19 contracted package records expose 1.4.0 as latest and that version 1.5.0 is absent. Scope control remains verified by the completed 1.4.0 publication contract."
   },
   "packages": [
     {
@@ -104,6 +104,14 @@
       "environment": "browser",
       "exports": ["."],
       "dependencies": ["@gluonjs/core", "@gluonjs/devtools-api"]
+    },
+    {
+      "name": "@gluonjs/graph",
+      "directory": "packages/graph",
+      "state": "current",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core"]
     },
     {
       "name": "@gluonjs/language-server",
