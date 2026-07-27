@@ -40,6 +40,7 @@ try {
     const result = await scaffoldProject({ directory: name, cwd: fixtureDirectory, ...features });
     await pointOfficialDependenciesAtArchives(result.directory, archives, features);
     run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], result.directory);
+    if (features.testing) installFixtureChromium(result.directory);
     run('npm', ['run', 'typecheck'], result.directory);
     run('npm', ['run', 'check:templates'], result.directory);
     run('npm', ['test'], result.directory);
@@ -71,6 +72,7 @@ try {
     });
     await pointOfficialDependenciesAtArchives(result.directory, archives, result.features);
     run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], result.directory);
+    installFixtureChromium(result.directory);
     run('npm', ['run', 'typecheck'], result.directory);
     run('npm', ['run', 'check:templates'], result.directory);
     run('npm', ['run', 'test:components'], result.directory);
@@ -85,6 +87,7 @@ try {
     router: true, store: true, testing: true, ui: true, ssr: true,
   });
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], retainedDirectory);
+  installFixtureChromium(retainedDirectory);
   run('npm', ['run', 'typecheck'], retainedDirectory);
   run('npm', ['run', 'check:templates'], retainedDirectory);
   run('npm', ['test'], retainedDirectory);
@@ -179,4 +182,8 @@ function run(command, arguments_, cwd) {
     const stderr = error?.stderr?.toString() ?? '';
     throw new Error(`${command} ${arguments_.join(' ')} failed in ${cwd}\n${stdout}${stderr}`);
   }
+}
+
+function installFixtureChromium(directory) {
+  run('npx', ['playwright', 'install', 'chromium'], directory);
 }
