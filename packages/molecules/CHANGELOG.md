@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-27
+
+### Changed
+
+- Advanced the lockstep release for the new `@gluonjs/graph` package while retaining the existing public package contract.
+
 ## [1.4.0] - 2026-07-24
 
 ### Changed

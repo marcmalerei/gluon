@@ -5,10 +5,11 @@ this archive resolve to immutable version paths rather than a floating page.
 
 ## Supported
 
-- [Gluon 1.4.0 documentation](/gluon/1.4.0/) — current supported release line.
+- [Gluon 1.5.0 documentation](/gluon/1.5.0/) — current supported release line.
 
 ## Archived
 
+- Gluon 1.4.0 — previous supported release line, retained in repository history.
 - Gluon 1.3.0 — previous supported release line, retained in repository history.
 - Gluon 1.2.0 — previous supported release line, retained in repository history.
 - Gluon 1.1.0 — previous supported release line, retained in repository history.

@@ -1,6 +1,6 @@
 # Release operations
 
-Gluon uses one lockstep release for the 18 packages in
+Gluon uses one lockstep release for the 19 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
@@ -8,10 +8,10 @@ and `.github/workflows/release.yml` is the only supported publication path.
 ## Current publication state
 
 The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.4.0` candidate. Every official
-manifest is public and lockstep at `1.4.0`. Registry preflight on 2026-07-24
-confirmed that all 18 contracted packages expose `1.3.0` as `latest` and that
-`1.4.0` is absent. Immutable GitHub release `v1.3.0` remains the current
+`scopeControl: verified` for the prepared `1.5.0` candidate. Every official
+manifest is public and lockstep at `1.5.0`. Registry preflight on 2026-07-27
+confirmed that all 19 contracted packages expose `1.4.0` as `latest` and that
+`1.5.0` is absent. Immutable GitHub release `v1.4.0` remains the current
 finalized release; the `v1.0.9` GitHub release remains a draft after its
 public-type verification failure. This is enforced locally by:
 
@@ -161,7 +161,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.4.0` release commit, the repository owner must verify
+Before preparing the `1.5.0` release commit, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -311,13 +311,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.4.0` and `private: false`;
-- set every official implementation and peer dependency to exact `1.4.0`;
+- set every official manifest to version `1.5.0` and `private: false`;
+- set every official implementation and peer dependency to exact `1.5.0`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.4.0` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.4.0`, then make that version
+- add dated `1.5.0` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.5.0`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -328,8 +328,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run check
-npm run release:validate -- --candidate 1.4.0
-npm run release:artifacts -- --version 1.4.0
+npm run release:validate -- --candidate 1.5.0
+npm run release:artifacts -- --version 1.5.0
 ```
 
 Release-candidate installs use `--legacy-peer-deps` because the official

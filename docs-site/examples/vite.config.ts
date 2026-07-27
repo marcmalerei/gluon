@@ -14,7 +14,7 @@ export default defineConfig({
     },
   })],
   root: import.meta.dirname,
-  base: '/gluon/1.4.0/examples/',
+  base: '/gluon/1.5.0/examples/',
   resolve: {
     alias: {
       '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
@@ -23,16 +23,18 @@ export default defineConfig({
       '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),
       '@gluonjs/molecules': resolve(repositoryRoot, 'packages/molecules/src/index.ts'),
       '@gluonjs/organisms': resolve(repositoryRoot, 'packages/organisms/src/index.ts'),
+      '@gluonjs/graph': resolve(repositoryRoot, 'packages/graph/src/index.ts'),
       '@gluonjs/reactivity/signals': resolve(repositoryRoot, 'packages/reactivity/src/signals/index.ts'),
       '@gluonjs/reactivity': resolve(repositoryRoot, 'packages/reactivity/src/index.ts'),
     },
   },
   build: {
-    outDir: '../dist/1.4.0/examples',
+    outDir: '../dist/1.5.0/examples',
     emptyOutDir: false,
     rollupOptions: {
       input: {
         plain: resolve(import.meta.dirname, 'plain.html'),
+        graph: resolve(import.meta.dirname, 'graph.html'),
         ui: resolve(import.meta.dirname, 'ui.html'),
         vue: resolve(import.meta.dirname, 'vue.html'),
       },
