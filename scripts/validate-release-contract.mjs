@@ -738,6 +738,7 @@ function expectedRecoveryPaths(version, failureCategory = 'squash-merge-tested-c
     paths.push(
       'release/release-contract.json',
       'release/release-contract.schema.json',
+      'scripts/build-release-artifacts.mjs',
       'scripts/publish-npm-bootstrap.mjs',
     );
   }

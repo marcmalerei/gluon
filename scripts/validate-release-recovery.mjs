@@ -51,6 +51,7 @@ if (manifest.failureCategory === 'missing-bootstrap-record') {
   expectedPaths.push(
     'release/release-contract.json',
     'release/release-contract.schema.json',
+    'scripts/build-release-artifacts.mjs',
     'scripts/publish-npm-bootstrap.mjs',
   );
 }

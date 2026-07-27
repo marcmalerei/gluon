@@ -410,11 +410,14 @@ new package lacks its reviewed bootstrap record, use the distinct
 `missing-bootstrap-record` recovery category. It still preserves the canonical
 package and application tree. Its allowlist additionally permits only the
 release contract's recorded supported baseline and the bootstrap publisher that
-verifies it. After that recovery is merged to `main`, rebuild and review the
-bootstrap artifacts, let the npm owner publish the missing immutable record,
-then create `v<version>-recovery.1`. That execution tag publishes the unchanged
-canonical version and finalizes the GitHub release against the canonical tag;
-neither tag nor package source is rewritten.
+verifies it. While the recovery changes await a new Quality Gates record,
+repository-state artifact checks are explicitly non-publishable; they cannot
+reuse stale evidence. After that recovery passes Quality Gates, refresh the two
+evidence files, rebuild and review the bootstrap artifacts, let the npm owner
+publish the missing immutable record, then create `v<version>-recovery.1`.
+That execution tag publishes the unchanged canonical version and finalizes the
+GitHub release against the canonical tag; neither tag nor package source is
+rewritten.
 
 The publication job verifies public repository visibility, the absence of
 environment reviewers and an uncontracted wait timer, the exact `v*` tag policy,
