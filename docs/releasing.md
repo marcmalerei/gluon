@@ -161,7 +161,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before preparing the `1.5.0` release commit, the repository owner must verify
+Before protected publication of the `1.5.0` release, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -235,13 +235,15 @@ package record exists. The one-time bootstrap therefore publishes a minimal
 `README.md`, and `LICENSE`: they expose no runtime, executable, types, exports,
 dependencies, or supported API. They do not use provenance, because this is an
 interactive owner publication rather than the protected release workflow.
-When a new official package joins after a supported release, the same builder
-regenerates the complete reviewed archive set from clean `main`. Existing
-packages are skipped only after the publisher verifies their current `latest`
-release, registry integrity, provenance, and bootstrap-record presence. Their
-historical bootstrap archives are immutable and are not compared with newly
-generated notices or READMEs. A package that has not reached a supported
-release still requires an exact bootstrap-archive integrity match.
+When a new official package joins a ready release candidate after a supported
+release, the release contract records that prior supported `baselineVersion`.
+The same builder regenerates the complete reviewed archive set from clean
+`main`. Existing packages are skipped only after the publisher verifies that
+baseline under `latest`, its registry integrity and provenance, and the
+bootstrap-record presence. Their historical bootstrap archives are immutable
+and are not compared with newly generated notices or READMEs. A package that
+has not reached a supported release still requires an exact bootstrap-archive
+integrity match.
 
 The first live bootstrap attempt created
 `@gluonjs/reactivity@0.0.0-bootstrap.0` with the reviewed archive integrity, but
@@ -270,15 +272,16 @@ npm run release:bootstrap:publish -- --dry-run
 ```
 
 The builder records the exact source commit, archive integrity, SHA-1, SHA-256,
-and file allowlist for all 18 packages. Review every name and archive before the
+and file allowlist for all 19 packages. Review every name and archive before the
 irreversible step. The publisher rejects `NPM_TOKEN` and `NODE_AUTH_TOKEN`, an
 artifact set that is not byte-identical to an independent rebuild, a dirty or
 non-`main` checkout, a source commit that is not the exact current
 `origin/main`, a user who is not an npm organization owner, a conflicting
 existing package record, any unexpected `latest`, and a rerun whose unpublished
 bootstrap integrity differs from the reviewed archive. For already released
-packages it instead requires the current released version under `latest`, its
-registry integrity and provenance, and the contracted bootstrap record.
+packages it instead requires the contract's recorded supported baseline under
+`latest`, its registry integrity and provenance, and the contracted bootstrap
+record.
 Registry visibility is allowed up to ten minutes after a successful publish
 before the operation stops; this wait does not weaken the exact integrity and
 dist-tag checks.
@@ -304,7 +307,7 @@ with GitHub Actions, repository owner `marcmalerei`, repository `gluon`,
 workflow filename `release.yml`, environment `npm`, and the `npm publish`
 allowed action required by this repository's workflow. npm does not validate
 these coordinates when they are saved, so review them exactly. Configure and
-verify all 18 bindings before restricting traditional token publishing; no
+verify all 19 bindings before restricting traditional token publishing; no
 long-lived publication token may be added to GitHub.
 
 ## Release-candidate commit
@@ -401,6 +404,20 @@ histories. A hard-coded allowlist excludes every package source, manifest,
 README, license, and changelog path. The recovery workflow therefore publishes
 the unchanged `1.0.7` archives and creates the GitHub release against canonical
 tag `v1.0.7`; the recovery tag is only the protected OIDC execution ref.
+
+If publication instead stops before any release archive is published because a
+new package lacks its reviewed bootstrap record, use the distinct
+`missing-bootstrap-record` recovery category. It still preserves the canonical
+package and application tree. Its allowlist additionally permits only the
+release contract's recorded supported baseline and the bootstrap publisher that
+verifies it. While the recovery changes await a new Quality Gates record,
+repository-state artifact checks are explicitly non-publishable; they cannot
+reuse stale evidence. After that recovery passes Quality Gates, refresh the two
+evidence files, rebuild and review the bootstrap artifacts, let the npm owner
+publish the missing immutable record, then create `v<version>-recovery.1`.
+That execution tag publishes the unchanged canonical version and finalizes the
+GitHub release against the canonical tag; neither tag nor package source is
+rewritten.
 
 The publication job verifies public repository visibility, the absence of
 environment reviewers and an uncontracted wait timer, the exact `v*` tag policy,

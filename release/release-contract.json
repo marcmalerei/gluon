@@ -10,6 +10,7 @@
   "compatibilityManifestPath": "release/compatibility/{version}.json",
   "bootstrap": {
     "version": "0.0.0-bootstrap.1",
+    "baselineVersion": "1.4.0",
     "artifactDirectory": ".tmp/npm-bootstrap",
     "distTag": "gluon-bootstrap",
     "access": "public",

@@ -2,11 +2,12 @@
 
 The `1.5.0` documentation describes the prepared lockstep candidate. All 19
 official manifests are at `1.5.0`. Registry preflight on 2026-07-27 confirmed
-that every contracted package exposes `1.4.0` as `latest` and that `1.5.0` is
-absent. Immutable GitHub release `v1.4.0` remains the current finalized release
-during candidate review. The historical `v1.0.9` GitHub release remains a draft after its
-public-type verification failure. The `@gluonjs` scope remains verified in the
-package contract.
+that the 18 established package records expose `1.4.0` as `latest`, `1.5.0` is
+absent, and the new `@gluonjs/graph` record needs the reviewed bootstrap before
+trusted publication can begin. Immutable GitHub release `v1.4.0` remains the
+current finalized release during candidate review. The historical `v1.0.9`
+GitHub release remains a draft after its public-type verification failure. The
+`@gluonjs` scope remains verified in the package contract.
 
 Gluon's release group contains 19 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,

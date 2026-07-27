@@ -1,0 +1,30 @@
+{
+  "$schema": "../recovery-manifest.schema.json",
+  "schemaVersion": 1,
+  "releaseVersion": "1.5.0",
+  "canonicalTag": "v1.5.0",
+  "canonicalTagCommit": "db24227a3897510ccb3475becd52d2eab6a94f54",
+  "canonicalTagTree": "86ce5278fe1c7991a0b133c1ee55a2bdce31c900",
+  "failedTestedCommit": "1f038c710d5f85780657db3615e353793a90e968",
+  "failedEvidenceCommit": "db24227a3897510ccb3475becd52d2eab6a94f54",
+  "failedRunUrl": "https://github.com/marcmalerei/gluon/actions/runs/30269940809",
+  "failureCategory": "missing-bootstrap-record",
+  "recoveryTag": "v1.5.0-recovery.1",
+  "allowedCanonicalDeltaPaths": [
+    ".github/workflows/release.yml",
+    "docs-site/content/1.5.0/guides/releasing/index.md",
+    "docs/releasing.md",
+    "release/compatibility/1.5.0.json",
+    "release/evidence/1.5.0.json",
+    "release/recovery-manifest.schema.json",
+    "release/recovery/1.5.0.json",
+    "scripts/publish-release.mjs",
+    "scripts/validate-release-contract.mjs",
+    "scripts/validate-release-recovery.mjs",
+    "scripts/verify-release-hosting.mjs",
+    "release/release-contract.json",
+    "release/release-contract.schema.json",
+    "scripts/build-release-artifacts.mjs",
+    "scripts/publish-npm-bootstrap.mjs"
+  ]
+}
