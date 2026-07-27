@@ -56,7 +56,7 @@
         "Static resource URLs are escaped before entering generated markup."
       ],
       "residualRisk": "The deploying application owns the policy header, nonce generation, hash allowlists, and report handling.",
-      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.4.0/guides/quality/index.md"]
+      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.5.0/guides/quality/index.md"]
     },
     {
       "id": "trusted-types",
