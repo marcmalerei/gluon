@@ -208,10 +208,12 @@ function validateReleaseContract() {
   }
   if (!prereleaseVersion(releaseContract.bootstrap?.version)
     || releaseContract.bootstrap.version === releaseContract.targetVersion
+    || !stableVersion(releaseContract.bootstrap.baselineVersion)
+    || compareStableVersions(releaseContract.bootstrap.baselineVersion, releaseContract.targetVersion) >= 0
     || releaseContract.bootstrap.distTag === releaseContract.publication.distTag
     || releaseContract.bootstrap.latestPolicy !== 'absent-or-reviewed-bootstrap-until-first-supported-release'
     || releaseContract.bootstrap.identity !== 'owner-interactive-2fa') {
-    throw new Error('npm bootstrap must use a distinct prerelease, a non-latest reviewed dist-tag, the temporary bootstrap latest policy, and owner-controlled interactive 2FA.');
+    throw new Error('npm bootstrap must use a distinct prerelease, an earlier stable baseline, a non-latest reviewed dist-tag, the temporary bootstrap latest policy, and owner-controlled interactive 2FA.');
   }
   if (!releaseContract.bootstrap.supersededRecords.every((entry) => packageContract.packages.some(({ name }) => name === entry.name)
     && entry.version !== releaseContract.bootstrap.version
@@ -383,11 +385,12 @@ function validateReleasedState() {
   let releaseRef = tag;
   let releaseCommit = tagCommit;
   if (recovery) {
+    const recoveryPaths = expectedRecoveryPaths(version, recovery.failureCategory);
     if (recovery.releaseVersion !== version
       || recovery.canonicalTag !== tag
       || recovery.canonicalTagCommit !== tagCommit
       || recovery.recoveryTag !== `${tag}-recovery.1`
-      || JSON.stringify(recovery.allowedCanonicalDeltaPaths) !== JSON.stringify(expectedRecoveryPaths(version))) {
+      || JSON.stringify(recovery.allowedCanonicalDeltaPaths) !== JSON.stringify(recoveryPaths)) {
       throw new Error(`${recoveryPath} does not match the exact ${version} recovery boundary.`);
     }
     releaseRef = recovery.recoveryTag;
@@ -401,7 +404,7 @@ function validateReleasedState() {
       cwd: root,
       encoding: 'utf8',
     }).trim().split('\n').filter(Boolean);
-    const allowedRecoveryPaths = new Set(expectedRecoveryPaths(version));
+    const allowedRecoveryPaths = new Set(recoveryPaths);
     if (recoveryDelta.some((changed) => !allowedRecoveryPaths.has(changed))) {
       throw new Error(`${releaseRef} changes package or application inputs outside the exact recovery allowlist.`);
     }
@@ -680,6 +683,15 @@ function stableVersion(value) {
   return /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(value);
 }
 
+function compareStableVersions(left, right) {
+  const leftParts = left.split('.').map(Number);
+  const rightParts = right.split('.').map(Number);
+  for (let index = 0; index < leftParts.length; index += 1) {
+    if (leftParts[index] !== rightParts[index]) return leftParts[index] - rightParts[index];
+  }
+  return 0;
+}
+
 function prereleaseVersion(value) {
   return /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*$/.test(value ?? '');
 }
@@ -708,8 +720,8 @@ function readOptionalJsonAtRef(ref, path) {
   }
 }
 
-function expectedRecoveryPaths(version) {
-  return [
+function expectedRecoveryPaths(version, failureCategory = 'squash-merge-tested-commit-not-ancestor') {
+  const paths = [
     '.github/workflows/release.yml',
     `docs-site/content/${version}/guides/releasing/index.md`,
     'docs/releasing.md',
@@ -722,4 +734,12 @@ function expectedRecoveryPaths(version) {
     'scripts/validate-release-recovery.mjs',
     'scripts/verify-release-hosting.mjs',
   ];
+  if (failureCategory === 'missing-bootstrap-record') {
+    paths.push(
+      'release/release-contract.json',
+      'release/release-contract.schema.json',
+      'scripts/publish-npm-bootstrap.mjs',
+    );
+  }
+  return paths;
 }
