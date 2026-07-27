@@ -227,6 +227,11 @@ Custom Element, or headless wrapper, then installs, typechecks, runs
 `gluon-template-check`, executes the generated Chromium browser test, builds
 client and SSR entries, and runs `npm pack --dry-run --json`.
 
+Each testing fixture installs Chromium through its own local Playwright CLI
+after its dependencies are installed. That makes the fixture browser revision
+match its resolved testing dependencies instead of relying on the repository
+runner's Playwright cache.
+
 `npm run test:create-gluon` separately covers deterministic planning, dry-run
 non-mutation, public imports, dependency direction, barrel sorting, malformed
 manifests, name/path/tag validation, traversal and absolute paths, symbolic-link
