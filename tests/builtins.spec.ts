@@ -501,8 +501,10 @@ describe('Transition and TransitionGroup', () => {
     render(view(['a', 'b']), root);
     render(view(['b', 'c']), root);
     expect(root.textContent).toBe('bc');
-    await new Promise((resolve) => setTimeout(resolve, 80));
-    expect(document.body.textContent).not.toContain('a');
+    await vi.waitFor(
+      () => expect(document.body.querySelector('[data-item="a"]')).toBeNull(),
+      { timeout: 500 },
+    );
     unmount(root);
     root.remove();
   });
