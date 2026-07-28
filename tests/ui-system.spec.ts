@@ -523,6 +523,105 @@ describe('overflow-aware navigation', () => {
       .every((control) => control.hidden && control.disabled)).toBe(true);
   });
 
+  it('keeps a focused control available until a compact strip can release focus', async () => {
+    const uiOwner = installUi(document, { theme: 'light' });
+    const rootRef = { value: undefined as HTMLElement | undefined };
+    render(NavigationStrip({
+      label: 'Responsive navigation',
+      attributes: { ref: rootRef, style: { 'inline-size': '16rem' } },
+      children: ['One', 'Two', 'Three', 'Four'].map((label) => q.a({
+        href: `#${label.toLowerCase()}`,
+        style: {
+          'align-items': 'center',
+          display: 'inline-flex',
+          flex: '0 0 8rem',
+          'min-block-size': '2.75rem',
+        },
+        children: label,
+      })),
+    }), document.body);
+
+    const root = rootRef.value!;
+    const viewport = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    const next = root.querySelector<HTMLButtonElement>('.is-next')!;
+    Object.defineProperties(viewport, {
+      clientWidth: { configurable: true, value: 160 },
+      scrollWidth: { configurable: true, value: 320 },
+    });
+    viewport.dispatchEvent(new Event('scroll'));
+    await vi.waitFor(() => expect(root.hasAttribute('data-overflow')).toBe(true));
+    next.focus();
+    expect(document.activeElement).toBe(next);
+
+    Object.defineProperties(viewport, {
+      clientWidth: { configurable: true, value: 320 },
+      scrollWidth: { configurable: true, value: 320 },
+    });
+    viewport.dispatchEvent(new Event('scroll'));
+    await vi.waitFor(() => {
+      expect(root.hasAttribute('data-overflow')).toBe(false);
+      expect(next.hidden).toBe(false);
+      expect(next.disabled).toBe(false);
+      expect(next.getAttribute('aria-disabled')).toBe('true');
+    });
+
+    next.blur();
+    await vi.waitFor(() => expect(next.hidden && next.disabled).toBe(true));
+    expect(next.hasAttribute('aria-disabled')).toBe(false);
+    uiOwner.dispose();
+  });
+
+  it('ignores destinations explicitly marked as not current', async () => {
+    const uiOwner = installUi(document, { theme: 'light' });
+    const rootRef = { value: undefined as HTMLElement | undefined };
+    render(NavigationStrip({
+      label: 'Unselected navigation',
+      attributes: { ref: rootRef, style: { 'inline-size': '16rem' } },
+      children: ['One', 'Two', 'Three', 'Four'].map((label) => q.a({
+        href: `#${label.toLowerCase()}`,
+        'aria-current': label === 'Four' ? 'false' : undefined,
+        style: {
+          'align-items': 'center',
+          display: 'inline-flex',
+          flex: '0 0 8rem',
+          'min-block-size': '2.75rem',
+        },
+        children: label,
+      })),
+    }), document.body);
+
+    const root = rootRef.value!;
+    const viewport = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    Object.defineProperties(viewport, {
+      clientWidth: { configurable: true, value: 160 },
+      scrollWidth: { configurable: true, value: 320 },
+    });
+    viewport.dispatchEvent(new Event('scroll'));
+    await vi.waitFor(() => expect(root.hasAttribute('data-overflow')).toBe(true));
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    expect(viewport.scrollLeft).toBeLessThanOrEqual(1);
+    uiOwner.dispose();
+  });
+
+  it('tolerates deferred content and controls while an update is scheduled', async () => {
+    const rootRef = { value: undefined as HTMLElement | undefined };
+    render(NavigationStrip({
+      label: 'Changing navigation',
+      attributes: { ref: rootRef },
+      children: q.a({ href: '#one', children: 'One' }),
+    }), document.body);
+
+    const root = rootRef.value!;
+    const viewport = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    root.querySelector('.gluon-navigation-strip-content')?.remove();
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    root.querySelector('.is-previous')?.remove();
+    viewport.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('resize'));
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    expect(root.isConnected).toBe(true);
+  });
+
   it('initializes without optional platform observers', async () => {
     const resizeObserver = Object.getOwnPropertyDescriptor(window, 'ResizeObserver');
     const mutationObserver = Object.getOwnPropertyDescriptor(window, 'MutationObserver');
