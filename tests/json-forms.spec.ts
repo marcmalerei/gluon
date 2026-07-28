@@ -152,6 +152,36 @@ describe('JSON Forms component', () => {
     expect(element.checkValidity()).toBe(false);
   });
 
+  it('validates direct text and numeric constraints and removes a cleared number', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        note: { type: 'string', minLength: 2, maxLength: 4 },
+        quantity: { type: 'number', minimum: 1, maximum: 3 },
+      },
+    });
+    await settled(element);
+
+    const note = element.shadowRoot!.querySelector('#field-note') as HTMLInputElement;
+    note.value = 'x';
+    note.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.errors.some(({ keyword }) => keyword === 'minLength')).toBe(true);
+
+    note.value = 'ready';
+    note.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    const quantity = element.shadowRoot!.querySelector('#field-quantity') as HTMLInputElement;
+    quantity.value = '4';
+    quantity.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.errors.some(({ keyword }) => keyword === 'maximum')).toBe(true);
+
+    quantity.value = '';
+    quantity.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ note: 'ready' });
+  });
+
   it('keeps JSON helpers, UI-schema metadata, and invalid schemas explicit', () => {
     expect(isJsonObject({ nested: ['safe', 2, false] })).toBe(true);
     expect(isJsonObject({ invalid: Number.NaN })).toBe(false);

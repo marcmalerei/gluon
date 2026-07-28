@@ -1,6 +1,6 @@
 # Release operations
 
-Gluon uses one lockstep release for the 19 packages in
+Gluon uses one lockstep release for the 20 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
@@ -8,11 +8,12 @@ and `.github/workflows/release.yml` is the only supported publication path.
 ## Current publication state
 
 The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.5.0` candidate. Every official
-manifest is public and lockstep at `1.5.0`. Registry preflight on 2026-07-27
-confirmed that all 19 contracted packages expose `1.4.0` as `latest` and that
-`1.5.0` is absent. Immutable GitHub release `v1.4.0` remains the current
-finalized release; the `v1.0.9` GitHub release remains a draft after its
+`scopeControl: verified` for the prepared `1.6.0` candidate. Every official
+manifest is public and lockstep at `1.6.0`. Registry preflight on 2026-07-28
+confirmed that the 19 previously contracted packages expose `1.5.0` as `latest`,
+that `1.6.0` is absent, and that the new `@gluonjs/json-forms` record needs the
+reviewed bootstrap before trusted publication can begin. Immutable GitHub release
+`v1.5.0` remains the current finalized release; the `v1.0.9` GitHub release remains a draft after its
 public-type verification failure. This is enforced locally by:
 
 ```sh
@@ -161,7 +162,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before protected publication of the `1.5.0` release, the repository owner must verify
+Before protected publication of the `1.6.0` release, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -189,7 +190,7 @@ all of the following outside the source tree:
    who creates a release tag can publish immutable package versions directly
    to `latest` without another person's approval. Because npm has no atomic
    multi-package publish operation, a failed train may temporarily leave only
-   part of the 18-package train on the new `latest` version.
+   part of the 20-package train on the new `latest` version.
 7. Two active GitHub tag rulesets cover exactly `refs/tags/v*`. The creation
    rule gives only the `marcmalerei` user an `always` bypass so the sole
    operator can cut a release. The update and deletion rules have no bypass
@@ -272,7 +273,7 @@ npm run release:bootstrap:publish -- --dry-run
 ```
 
 The builder records the exact source commit, archive integrity, SHA-1, SHA-256,
-and file allowlist for all 19 packages. Review every name and archive before the
+and file allowlist for all 20 packages. Review every name and archive before the
 irreversible step. The publisher rejects `NPM_TOKEN` and `NODE_AUTH_TOKEN`, an
 artifact set that is not byte-identical to an independent rebuild, a dirty or
 non-`main` checkout, a source commit that is not the exact current
@@ -307,20 +308,20 @@ with GitHub Actions, repository owner `marcmalerei`, repository `gluon`,
 workflow filename `release.yml`, environment `npm`, and the `npm publish`
 allowed action required by this repository's workflow. npm does not validate
 these coordinates when they are saved, so review them exactly. Configure and
-verify all 19 bindings before restricting traditional token publishing; no
+verify all 20 bindings before restricting traditional token publishing; no
 long-lived publication token may be added to GitHub.
 
 ## Release-candidate commit
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.5.0` and `private: false`;
-- set every official implementation and peer dependency to exact `1.5.0`;
+- set every official manifest to version `1.6.0` and `private: false`;
+- set every official implementation and peer dependency to exact `1.6.0`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.5.0` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.5.0`, then make that version
+- add dated `1.6.0` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.6.0`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -331,8 +332,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run check
-npm run release:validate -- --candidate 1.5.0
-npm run release:artifacts -- --version 1.5.0
+npm run release:validate -- --candidate 1.6.0
+npm run release:artifacts -- --version 1.6.0
 ```
 
 Release-candidate installs use `--legacy-peer-deps` because the official
@@ -342,7 +343,7 @@ those peers from the packed local release train instead of resolving an
 unpublished version from npm.
 
 `release:artifacts` packs every package twice and compares canonical unpacked
-file SHA-256 digests. It then clean-installs all 18 local archives and
+file SHA-256 digests. It then clean-installs all 20 local archives and
 typechecks every contracted public export with `skipLibCheck: false` before
 producing the package archives, aggregate and per-package SPDX 2.3 and
 CycloneDX 1.7 SBOMs, `release-evidence.json`, and a `SHA256SUMS` manifest under
@@ -449,13 +450,13 @@ verifier without the ephemeral token.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance directly under `latest`. Before the first publish it proves
-that all 18 npm package records already exist. After each publish it compares
+that all 20 npm package records already exist. After each publish it compares
 registry integrity and provenance with `release-evidence.json`. A rerun skips
 an already-existing version only when those facts match; a mismatch stops the
 train. No long-lived npm token, `npm dist-tag` mutation, or per-package 2FA
 approval is part of a supported release.
 
-After all 18 direct publications succeed, the same protected job requires every
+After all 20 direct publications succeed, the same protected job requires every
 `latest` tag to point to the reviewed version, compares registry integrity and
 provenance, performs a clean-directory install and public-type check, attaches
 the registry verification and final checksum manifest, and only then publishes

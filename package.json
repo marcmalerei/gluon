@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/core",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
   "private": false,
   "workspaces": [
@@ -51,7 +51,7 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/reactivity": "1.5.0"
+    "@gluonjs/reactivity": "1.6.0"
   },
   "scripts": {
     "postinstall": "node agent-skill/install.mjs",

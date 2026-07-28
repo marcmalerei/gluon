@@ -7,6 +7,14 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-07-28
+
+### Added
+
+- Added the optional `@gluonjs/json-forms` package and its form-associated,
+  accessible `gluon-json-form` Custom Element for the documented direct-property
+  JSON Schema and JSON Forms UI-schema subset.
+
 ## [1.5.0] - 2026-07-27
 
 ### Added

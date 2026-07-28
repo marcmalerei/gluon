@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/json-forms",
-  "version": "1.4.0",
+  "version": "1.6.0",
   "description": "Schema-driven, form-associated Custom Elements for Gluon.",
   "private": false,
   "type": "module",
@@ -39,7 +39,7 @@
     "ajv-formats": "3.0.1"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.4.0"
+    "@gluonjs/core": "1.6.0"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {

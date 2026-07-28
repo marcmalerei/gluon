@@ -27,6 +27,11 @@ The package-specific header artwork contract is verified on the rendered
 at 1440×1000 and
 [`design/rendered-package-readme-mobile.png`](design/rendered-package-readme-mobile.png)
 at 390×844.
+The JSON Forms delivery-preferences reference is verified by
+[`design/rendered-json-forms-desktop.png`](design/rendered-json-forms-desktop.png)
+at 1440×1000 and
+[`design/rendered-json-forms-mobile.png`](design/rendered-json-forms-mobile.png)
+at 390×844.
 
 ## Commands
 
@@ -42,7 +47,7 @@ and emits reviewed Markdown into `.tmp/docs-api`.
 `generate-api-examples.mjs` then derives every public function, class,
 interface, type-alias, and variable page, maps it back to an official package
 entry point, appends an `Example` section, and typechecks the complete generated
-snippet corpus. `api-examples.json` maps all 686 current symbol pages to reviewed
+snippet corpus. `api-examples.json` maps all 694 current symbol pages to reviewed
 task-oriented examples. Related symbols may share a maintained application
 recipe, but every page has its own purpose statement and the compiled recipe
 must use that documented symbol. Unknown pages, missing catalog entries, private
@@ -81,7 +86,7 @@ at 1440×1000 and
 at 390×844.
 
 The versioned Migration entry links to the tested
-[Vue-to-Gluon cutover playbook](content/1.5.0/migration/vue-to-gluon-cutover/index.md).
+[Vue-to-Gluon cutover playbook](content/1.6.0/migration/vue-to-gluon-cutover/index.md).
 The guide keeps Vue and Gluon
 application ownership explicit for every stage and embeds the compiled Vue host
 sources instead of maintaining copied snippets. `validate-docs.mjs` requires the
@@ -90,7 +95,7 @@ The Migration index and analyzer guide document RFC 0003's implemented
 report-only package, CLI, schema, diagnostics, limits, and no-write boundary.
 Documentation validation requires the guide and its public package references.
 The versioned
-[codemod decision](content/1.5.0/migration/vue-codemod-decision/index.md)
+[codemod decision](content/1.6.0/migration/vue-codemod-decision/index.md)
 records the issue #92 no-go, corpus-only measurements, explicit candidate
 classifications, counterexamples, and the continuing manual-review boundary.
 The verified analyzer-guide renders are

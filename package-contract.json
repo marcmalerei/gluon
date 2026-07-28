@@ -5,7 +5,7 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-27",
+    "checkedAt": "2026-07-28",
     "scope": "@gluonjs",
     "scopeControl": "verified",
     "publicationState": "ready",
