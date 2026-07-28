@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, inputStyles, labelStyles } from '@gluonjs/atoms';
-import { formFieldStyles } from '@gluonjs/molecules';
+import { formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -110,6 +110,7 @@ describe('GLUON GOODS reference shop', () => {
     });
     await router.isReady();
     const root = document.createElement('div');
+    root.style.inlineSize = '320px';
     document.body.append(root);
     app.mount(root);
 
@@ -124,13 +125,36 @@ describe('GLUON GOODS reference shop', () => {
     expect(router.currentRoute.value.fullPath).toBe('/shop?sort=new');
     expect(store.menuOpen).toBe(false);
     expect(root.querySelector('.mobile-menu[role="dialog"]')).toBeNull();
-    const lighting = [...root.querySelectorAll<HTMLAnchorElement>('.catalog-filters a')]
-      .find((link) => link.textContent === 'Lighting')!;
-    lighting.click();
+    const filters = root.querySelector<HTMLElement>('.catalog-filters')!;
+    const filterViewport = filters.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    const previousFilters = filters.querySelector<HTMLButtonElement>('.is-previous')!;
+    const nextFilters = filters.querySelector<HTMLButtonElement>('.is-next')!;
+    await expect.poll(() => filters.hasAttribute('data-overflow')).toBe(true);
+    expect(document.adoptedStyleSheets).toContain(navigationStripStyles);
+    expect(previousFilters.disabled).toBe(true);
+    expect(nextFilters.disabled).toBe(false);
+    nextFilters.focus();
+    nextFilters.click();
+    await expect.poll(() => filterViewport.scrollLeft).toBeGreaterThan(1);
+    expect(document.activeElement).toBe(nextFilters);
+
+    const seating = [...root.querySelectorAll<HTMLAnchorElement>('.catalog-filters a')]
+      .find((link) => link.textContent === 'Seating')!;
+    seating.click();
     await settleShop();
-    expect(router.currentRoute.value.fullPath).toBe('/shop?category=Lighting');
+    expect(router.currentRoute.value.fullPath).toBe('/shop?category=Seating');
+    const currentFilter = root.querySelector<HTMLAnchorElement>('.catalog-filters [aria-current="page"]')!;
+    expect(currentFilter.textContent).toBe('Seating');
+    await expect.poll(() => {
+      const currentRect = currentFilter.getBoundingClientRect();
+      const currentViewportRect = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!
+        .getBoundingClientRect();
+      return currentRect.left >= currentViewportRect.left - 1
+        && currentRect.right <= currentViewportRect.right + 1;
+    }).toBe(true);
     expect(root.querySelectorAll('.catalog-grid .product-card')).toHaveLength(1);
     app.unmount();
+    expect(document.adoptedStyleSheets).not.toContain(navigationStripStyles);
   });
 
   it('completes bag checkout and renders a durable order confirmation route', async () => {

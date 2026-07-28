@@ -1,4 +1,5 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
+import { NavigationStrip } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -65,18 +66,22 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
         <h1>Shop all objects</h1>
         <p>${visible.length} ${visible.length === 1 ? 'object' : 'objects'} made to move with you.</p>
       </header>
-      <nav class="catalog-filters" aria-label="Filter products">
-        ${RouterLink({
-          to: '/shop',
-          children: 'All',
-          attributes: { class: selected === 'All' ? 'is-selected' : '' },
-        })}
-        ${repeat(categories, (category) => category, (category) => RouterLink({
-          to: `/shop?category=${encodeURIComponent(category)}`,
-          children: category,
-          attributes: { class: selected === category ? 'is-selected' : '' },
-        }))}
-      </nav>
+      ${NavigationStrip({
+        label: 'Filter products',
+        attributes: { class: 'catalog-filters' },
+        children: [
+          RouterLink({
+            to: '/shop',
+            children: 'All',
+            attributes: { class: selected === 'All' ? 'is-selected' : '' },
+          }),
+          repeat(categories, (category) => category, (category) => RouterLink({
+            to: `/shop?category=${encodeURIComponent(category)}`,
+            children: category,
+            attributes: { class: selected === category ? 'is-selected' : '' },
+          })),
+        ],
+      })}
       ${LayoutTransition({
         layoutId: 'catalog-grid',
         transitionKey: selected,
