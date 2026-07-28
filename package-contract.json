@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-07-27",
+    "checkedAt": "2026-07-28",
     "scope": "@gluonjs",
     "scopeControl": "verified",
     "publicationState": "ready",
-    "observation": "Registry preflight on 2026-07-27 confirmed that all 19 contracted package records expose 1.4.0 as latest and that version 1.5.0 is absent. Scope control remains verified by the completed 1.4.0 publication contract."
+    "observation": "Registry preflight on 2026-07-28 confirmed that all 19 previously contracted package records expose 1.5.0 as latest and that version 1.6.0 is absent. @gluonjs/json-forms joins the 1.6.0 lockstep release as the twentieth package; scope control remains verified by the completed 1.5.0 publication contract."
   },
   "packages": [
     {
@@ -162,6 +162,14 @@
       "environment": "browser",
       "exports": ["."],
       "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms", "@gluonjs/molecules"]
+    },
+    {
+      "name": "@gluonjs/json-forms",
+      "directory": "packages/json-forms",
+      "state": "current",
+      "environment": "browser",
+      "exports": ["."],
+      "dependencies": ["@gluonjs/core"]
     },
     {
       "name": "create-gluon",

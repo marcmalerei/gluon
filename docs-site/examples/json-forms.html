@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Gluon JSON Forms reference</title>
+  </head>
+  <body>
+    <main class="reference-shell">
+      <header>
+        <a href="../" class="wordmark">GLUON / OPERATIONS</a>
+        <h1>Delivery preferences</h1>
+        <p>Set the contact and handover rules used for every dispatched order.</p>
+      </header>
+      <form id="delivery-preferences" class="preferences-form">
+        <gluon-json-form name="delivery-preferences"></gluon-json-form>
+        <footer>
+          <p id="form-status" role="status" aria-live="polite">All changes are saved locally until you submit.</p>
+          <button type="submit">Save preferences</button>
+        </footer>
+      </form>
+    </main>
+    <script type="module" src="./json-forms.ts"></script>
+  </body>
+</html>

@@ -9,7 +9,7 @@
 </p>
 
 > [!IMPORTANT]
-> This source tree and package describe Gluon `1.5.0` across all 19 official
+> This source tree and package describe Gluon `1.6.0` across all 20 official
 > packages. npm publication occurs only from an immutable release tag through
 > the protected release workflow; later repository commits cannot replace
 > published package contents.
@@ -32,7 +32,8 @@
 - a shareable Gluon Playground with live diagnostics, reference lookup, and starter download
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - an interactive, canvas-backed `@gluonjs/graph` Custom Element for knowledge-map and relationship views
-- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.5.0/migration/vue-to-gluon-cutover/index.md)
+- a form-associated `@gluonjs/json-forms` Custom Element for the documented JSON Schema subset
+- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.6.0/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -371,9 +372,9 @@ See the [Storybook guide](docs/storybook.md) and the runnable
 [`examples/component-library`](examples/component-library/README.md) catalog.
 
 For a first project, use the versioned
-[step-by-step learning path](docs-site/content/1.5.0/guides/learning-path/index.md).
+[step-by-step learning path](docs-site/content/1.6.0/guides/learning-path/index.md).
 Before extracting shop UI, use the
-[component decision guide](docs-site/content/1.5.0/guides/component-decisions/index.md):
+[component decision guide](docs-site/content/1.6.0/guides/component-decisions/index.md):
 official packages require a cross-application semantic and accessibility
 contract; branded GLUON GOODS compositions remain application-local.
 
@@ -541,7 +542,7 @@ change-detection, required, and validation options as `static properties`.
 `@state()` is reactive internal state with attribute transport disabled.
 Typed events continue to use `static events` and `emit()`; template
 `@event-name` bindings are listeners, not TypeScript decorators. The
-[component guide](docs-site/content/1.5.0/guides/components/index.md) shows the
+[component guide](docs-site/content/1.6.0/guides/components/index.md) shows the
 decorator and plain TypeScript forms side by side.
 
 `defineGluonElement()` is the concise path for the same autonomous boundary. It
@@ -714,6 +715,7 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 | **Atoms** | Focused controls, tokens, and themes from optional `@gluonjs/atoms`. |
 | **Molecules** | Reusable compositions such as `Card` and `FormField` from optional `@gluonjs/molecules`. |
 | **Organisms** | Larger interface structures such as `AppShell` from optional `@gluonjs/organisms`. |
+| **JSON Forms** | Schema-driven, form-associated Custom Elements from optional `@gluonjs/json-forms`. |
 
 ```text
                          increasing UI scope
@@ -725,7 +727,7 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 
 Every component created with `defineAtom`, `defineMolecule`, or `defineOrganism` carries explicit `layer` and `displayName` metadata.
 
-Quarks, Atoms, Molecules, and Organisms are optional `@gluonjs/*` packages.
+Quarks, Atoms, Molecules, Organisms, and JSON Forms are optional `@gluonjs/*` packages.
 Core exposes no UI subpath and a production tree-shaking fixture verifies that a
 Core-only consumer contains none of the stable UI markers.
 

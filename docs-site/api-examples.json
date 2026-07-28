@@ -1,6 +1,42 @@
 {
   "version": 1,
   "recipes": {
+    "json-forms-contract": {
+      "module": "@gluonjs/json-forms",
+      "code": [
+        "import {",
+        "  JsonForm,",
+        "  jsonFormsTag,",
+        "  registerJsonForms,",
+        "  type JsonFormChangeDetail,",
+        "  type JsonFormOptions,",
+        "  type JsonFormsElement,",
+        "  type JsonFormsUiSchema,",
+        "  type JsonFormValidationChangeDetail,",
+        "  type JsonFormValidationError,",
+        "  type JsonObject,",
+        "  type JsonSchema,",
+        "  type JsonValue,",
+        "} from '@gluonjs/json-forms';",
+        "",
+        "const schema = { type: 'object', properties: { email: { type: 'string', format: 'email' }, delivery: { type: 'string', enum: ['morning', 'afternoon'] } }, required: ['email'] } satisfies JsonSchema;",
+        "const uischema = { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/email', label: 'Email address' }, { type: 'Control', scope: '#/properties/delivery' }] } satisfies JsonFormsUiSchema;",
+        "const data = { email: 'hello@example.test', delivery: 'morning' } satisfies JsonObject;",
+        "const value: JsonValue = data.delivery;",
+        "const errors: readonly JsonFormValidationError[] = [];",
+        "const change: JsonFormChangeDetail = { data, errors };",
+        "const validation: JsonFormValidationChangeDetail = { valid: true, errors };",
+        "",
+        "registerJsonForms();",
+        "const element = document.createElement(jsonFormsTag) as JsonFormsElement;",
+        "element.schema = schema;",
+        "element.uischema = uischema;",
+        "element.data = data;",
+        "const options = { schema, uischema, data, onChange: (event) => console.log(event.detail.data), onValidationChange: (event) => console.log(event.detail.valid) } satisfies JsonFormOptions;",
+        "const view = JsonForm(options);",
+        "console.log(element.value, value, change, validation, view);"
+      ]
+    },
     "graph-element": {
       "module": "@gluonjs/graph",
       "code": [
@@ -2644,6 +2680,54 @@
     }
   },
   "overrides": {
+    "packages/json-forms/src/classes/JsonFormsElement.md": {
+      "recipe": "json-forms-contract",
+      "description": "Register and configure a schema-driven form-associated Custom Element through only the public package entry point:"
+    },
+    "packages/json-forms/src/functions/JsonForm.md": {
+      "recipe": "json-forms-contract",
+      "description": "Render the same registered JSON Forms element from a Gluon template while keeping schema, data, and events typed:"
+    },
+    "packages/json-forms/src/functions/registerJsonForms.md": {
+      "recipe": "json-forms-contract",
+      "description": "Register the explicit JSON Forms Custom Element before using it from plain HTML or a host application:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormChangeDetail.md": {
+      "recipe": "json-forms-contract",
+      "description": "Receive frozen changed JSON data and the validation diagnostics that describe that exact edit:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormOptions.md": {
+      "recipe": "json-forms-contract",
+      "description": "Keep schema, UI schema, controlled data, state callbacks, and host form options together for the Gluon render helper:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsUiSchema.md": {
+      "recipe": "json-forms-contract",
+      "description": "Order direct schema properties and provide a JSON Forms control label with the supported VerticalLayout subset:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormValidationChangeDetail.md": {
+      "recipe": "json-forms-contract",
+      "description": "Observe only changes to the form validity result, including its immutable diagnostics:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormValidationError.md": {
+      "recipe": "json-forms-contract",
+      "description": "Persist a serializable schema-validation diagnostic beside the controlled form state:"
+    },
+    "packages/json-forms/src/interfaces/JsonObject.md": {
+      "recipe": "json-forms-contract",
+      "description": "Type the controlled root object passed to and emitted from a schema-driven form:"
+    },
+    "packages/json-forms/src/interfaces/JsonSchema.md": {
+      "recipe": "json-forms-contract",
+      "description": "Define the initial direct-property JSON Schema subset as a checked public contract:"
+    },
+    "packages/json-forms/src/type-aliases/JsonValue.md": {
+      "recipe": "json-forms-contract",
+      "description": "Use the JSON value union when retaining a serializable schema value or form field value:"
+    },
+    "packages/json-forms/src/variables/jsonFormsTag.md": {
+      "recipe": "json-forms-contract",
+      "description": "Use the exported tag name instead of repeating a custom-element string literal in application code:"
+    },
     "packages/gluon-components-vite/src/interfaces/FrameworkOptions.md": {
       "recipe": "storybook-gluon",
       "description": "Type the optional Vite builder settings accepted by the first-party Gluon Storybook framework:"

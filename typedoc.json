@@ -4,6 +4,7 @@
     "src/index.ts",
     "src/decorators.ts",
     "src/styles/index.ts",
+    "packages/json-forms/src/index.ts",
     "packages/quarks/src/index.ts",
     "packages/atoms/src/index.ts",
     "packages/molecules/src/index.ts",

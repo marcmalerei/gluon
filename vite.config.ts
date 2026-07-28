@@ -50,6 +50,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
+      '@gluonjs/json-forms': resolve(import.meta.dirname, 'packages/json-forms/src/index.ts'),
       '@gluonjs/quarks': resolve(import.meta.dirname, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(import.meta.dirname, 'packages/atoms/src/index.ts'),
       '@gluonjs/molecules': resolve(import.meta.dirname, 'packages/molecules/src/index.ts'),

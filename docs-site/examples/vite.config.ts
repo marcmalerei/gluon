@@ -14,11 +14,12 @@ export default defineConfig({
     },
   })],
   root: import.meta.dirname,
-  base: '/gluon/1.5.0/examples/',
+  base: '/gluon/1.6.0/examples/',
   resolve: {
     alias: {
       '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
       '@gluonjs/core': resolve(repositoryRoot, 'src/index.ts'),
+      '@gluonjs/json-forms': resolve(repositoryRoot, 'packages/json-forms/src/index.ts'),
       '@gluonjs/quarks': resolve(repositoryRoot, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(repositoryRoot, 'packages/atoms/src/index.ts'),
       '@gluonjs/molecules': resolve(repositoryRoot, 'packages/molecules/src/index.ts'),
@@ -29,10 +30,11 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist/1.5.0/examples',
+    outDir: '../dist/1.6.0/examples',
     emptyOutDir: false,
     rollupOptions: {
       input: {
+        'json-forms': resolve(import.meta.dirname, 'json-forms.html'),
         plain: resolve(import.meta.dirname, 'plain.html'),
         graph: resolve(import.meta.dirname, 'graph.html'),
         ui: resolve(import.meta.dirname, 'ui.html'),
