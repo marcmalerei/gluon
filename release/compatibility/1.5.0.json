@@ -1,0 +1,115 @@
+{
+  "$schema": "../compatibility-manifest.schema.json",
+  "schemaVersion": 1,
+  "releaseVersion": "1.5.0",
+  "sourceCommit": "1e7ddbcbcb9fc3a6ed3837f9e38682048db70890",
+  "cutAt": "2026-07-27T17:29:31Z",
+  "automatedQualityRun": {
+    "url": "https://github.com/marcmalerei/gluon/actions/runs/30288568692",
+    "conclusion": "success"
+  },
+  "supportBoundary": {
+    "model": "playwright-engine-and-node-evidence",
+    "brandedProductSupportClaimed": false
+  },
+  "engineTargets": [
+    {
+      "id": "playwright-chromium",
+      "browserBinary": "Chrome for Testing",
+      "browserVersion": "149.0.7827.55",
+      "engine": "Playwright Chromium",
+      "engineVersion": "1228",
+      "runner": "GitHub Actions ubuntu-24.04 image release 20260720.247.2",
+      "mode": "headless-automated",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363593"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "playwright-firefox",
+      "browserBinary": "Firefox",
+      "browserVersion": "151.0",
+      "engine": "Playwright Firefox",
+      "engineVersion": "1532",
+      "runner": "GitHub Actions ubuntu-24.04 image release 20260720.247.2",
+      "mode": "headless-automated",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363543"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "playwright-webkit",
+      "browserBinary": "WebKit",
+      "browserVersion": "26.5",
+      "engine": "Playwright WebKit",
+      "engineVersion": "2311",
+      "runner": "GitHub Actions ubuntu-24.04 image release 20260720.247.2",
+      "mode": "headless-automated",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363614"
+      ],
+      "outcome": "pass"
+    }
+  ],
+  "nodeTargets": [
+    {
+      "id": "node-22-lts",
+      "version": "22.12.0",
+      "releaseStatus": "maintenance-lts",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363572"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "node-24-lts",
+      "version": "24.18.0",
+      "releaseStatus": "active-lts",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363568"
+      ],
+      "outcome": "pass"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "client-rendering",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363593",
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363543",
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363614"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "server-rendering",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363544"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "streaming",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363544"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "hydration",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363544"
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "static-generation",
+      "evidence": [
+        "https://github.com/marcmalerei/gluon/actions/runs/30288568692/job/90052363544"
+      ],
+      "outcome": "pass"
+    }
+  ]
+}

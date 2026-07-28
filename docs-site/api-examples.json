@@ -37,6 +37,27 @@
         "console.log(element.value, value, change, validation, view);"
       ]
     },
+    "graph-element": {
+      "module": "@gluonjs/graph",
+      "code": [
+        "import '@gluonjs/graph';",
+        "import { graphTagName, type GluonGraphElement, type GluonGraphEvents, type GraphGroup, type GraphLink, type GraphNode, type GraphNodeSelection, type GraphViewport } from '@gluonjs/graph';",
+        "",
+        "const groups = [{ id: 'research', label: 'Research', color: '#8ba9ff' }] satisfies readonly GraphGroup[];",
+        "const nodes = [{ id: 'brief', label: 'Research brief', group: 'research', weight: 3 }] satisfies readonly GraphNode[];",
+        "const links = [] satisfies readonly GraphLink[];",
+        "const graph = document.createElement(graphTagName) as GluonGraphElement;",
+        "Object.assign(graph, { groups, nodes, links, showLabels: true });",
+        "const selection = (event: CustomEvent<GluonGraphEvents['graph-node-select']>) => {",
+        "  const detail: GraphNodeSelection = event.detail;",
+        "  console.log(detail.node.label, detail.selected);",
+        "};",
+        "graph.addEventListener('graph-node-select', selection as EventListener);",
+        "const viewport: GraphViewport = graph.getViewport();",
+        "graph.recenter();",
+        "console.log(viewport.scale);"
+      ]
+    },
     "component-library-manifest": {
       "module": "@gluonjs/quarks",
       "code": [
@@ -3310,6 +3331,38 @@
     "packages/devtools-api/src/classes/DevtoolsProtocol.md": {
       "recipe": "devtools-protocol",
       "description": "Own application inspectors, selection, a sequenced timeline, immutable snapshots, and subscriber notification behind the versioned Devtools contract:"
+    },
+    "packages/graph/src/classes/GluonGraphElement.md": {
+      "recipe": "graph-element",
+      "description": "Render an optional, canvas-backed graph from typed input and retain its native pan, zoom, selection, and recenter controls:"
+    },
+    "packages/graph/src/interfaces/GluonGraphEvents.md": {
+      "recipe": "graph-element",
+      "description": "Subscribe to the typed node-selection and viewport-change events emitted by the public graph element:"
+    },
+    "packages/graph/src/interfaces/GraphGroup.md": {
+      "recipe": "graph-element",
+      "description": "Give each visible graph community a stable identifier, readable label, and host-owned color:"
+    },
+    "packages/graph/src/interfaces/GraphLink.md": {
+      "recipe": "graph-element",
+      "description": "Connect stable node identifiers without introducing a graph-library-specific data format:"
+    },
+    "packages/graph/src/interfaces/GraphNode.md": {
+      "recipe": "graph-element",
+      "description": "Describe a labelled, weighted node and optionally assign it to a color-coded group:"
+    },
+    "packages/graph/src/interfaces/GraphNodeSelection.md": {
+      "recipe": "graph-element",
+      "description": "Read the node and selected state from an interaction without querying the canvas:"
+    },
+    "packages/graph/src/interfaces/GraphViewport.md": {
+      "recipe": "graph-element",
+      "description": "Store or display the current camera translation and scale as a serializable graph viewport:"
+    },
+    "packages/graph/src/variables/graphTagName.md": {
+      "recipe": "graph-element",
+      "description": "Create the officially registered graph element without repeating its tag name as an unverified string:"
     },
     "packages/devtools-api/src/functions/toDevtoolsValue.md": {
       "recipe": "devtools-protocol",

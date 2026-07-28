@@ -31,6 +31,7 @@
     "packages/test-utils/src/ssr.ts",
     "packages/devtools-api/src/index.ts",
     "packages/devtools/src/index.ts",
+    "packages/graph/src/index.ts",
     "packages/language-server/src/index.ts",
     "packages/vue-migration-analyzer/src/index.ts",
     "packages/vue-migration-analyzer/src/schema.ts",

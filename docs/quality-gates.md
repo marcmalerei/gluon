@@ -154,7 +154,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.4.0/examples/ui.html` with the other versioned documentation examples.
+`/1.5.0/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 15 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
@@ -226,6 +226,11 @@ artifacts. The gate generates exactly one Atom, Molecule, Organism, stateful
 Custom Element, or headless wrapper, then installs, typechecks, runs
 `gluon-template-check`, executes the generated Chromium browser test, builds
 client and SSR entries, and runs `npm pack --dry-run --json`.
+
+Each testing fixture installs Chromium through its own local Playwright CLI
+after its dependencies are installed. That makes the fixture browser revision
+match its resolved testing dependencies instead of relying on the repository
+runner's Playwright cache.
 
 `npm run test:create-gluon` separately covers deterministic planning, dry-run
 non-mutation, public imports, dependency direction, barrel sorting, malformed

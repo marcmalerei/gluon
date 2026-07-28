@@ -36,11 +36,13 @@ if (releaseCutEvidenceExists !== compatibilityManifestExists) {
 const evidencePendingCandidate = checkState
   && packageContract.registry.publicationState === 'ready'
   && !releaseCutEvidenceExists;
+const recoveryEvidencePending = checkState && await isRecoveryEvidencePending();
 const postReleaseDevelopment = checkState
   && packageContract.registry.publicationState === 'released';
 const nonPublishableBuild = process.argv.includes('--allow-blocked')
   || (checkState && packageContract.registry.publicationState === 'blocked')
   || evidencePendingCandidate
+  || recoveryEvidencePending
   || postReleaseDevelopment;
 const allowedArguments = new Set(['--version', version, '--output', option('--output'), '--allow-blocked', '--check-state']);
 
@@ -51,7 +53,7 @@ if (process.argv.includes('--allow-blocked') && checkState) throw new Error('Cho
 if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version)) {
   throw new Error(`Invalid stable release version ${version}.`);
 }
-if (evidencePendingCandidate || postReleaseDevelopment) {
+if (evidencePendingCandidate || recoveryEvidencePending || postReleaseDevelopment) {
   if (version !== rootManifest.version) throw new Error('Repository-state artifact checks require the current package version.');
   await execFile(process.execPath, ['scripts/validate-release-contract.mjs'], { cwd: root });
 } else if (nonPublishableBuild) {
@@ -212,6 +214,21 @@ console.log(`release artifacts built: ${packageResults.length} packages with ver
 function option(name) {
   const index = process.argv.indexOf(name);
   return index < 0 ? undefined : process.argv[index + 1];
+}
+
+async function isRecoveryEvidencePending() {
+  if (packageContract.registry.publicationState !== 'ready') return false;
+  const recovery = await readOptionalJson(`release/recovery/${version}.json`);
+  if (recovery?.failureCategory !== 'missing-bootstrap-record' || !releaseCutEvidenceExists) return false;
+  const evidence = await readJson(releaseCutEvidencePath);
+  if (!/^[a-f0-9]{40}$/.test(evidence.testedCommit ?? '')) return false;
+  const permittedEvidenceChanges = new Set([releaseCutEvidencePath, compatibilityManifestPath]);
+  const { stdout } = await execFile('git', ['diff', '--name-only', evidence.testedCommit, 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  const changed = stdout.trim().split('\n').filter(Boolean);
+  return changed.some((path) => !permittedEvidenceChanges.has(path));
 }
 
 async function pack(directory, destination) {
@@ -495,6 +512,15 @@ function sortObject(value) {
 
 async function readJson(path) {
   return JSON.parse(await readFile(resolve(root, path), 'utf8'));
+}
+
+async function readOptionalJson(path) {
+  try {
+    return await readJson(path);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    throw error;
+  }
 }
 
 async function fileExists(path) {

@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/core",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
   "private": false,
   "workspaces": [
@@ -51,11 +51,11 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/reactivity": "1.4.0"
+    "@gluonjs/reactivity": "1.5.0"
   },
   "scripts": {
     "postinstall": "node agent-skill/install.mjs",
-    "build": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
+    "build": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:graph && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:json-forms": "npm run build --workspace @gluonjs/json-forms",
     "build:ui": "npm run build:quarks && npm run build:atoms && npm run build:molecules && npm run build:organisms",
@@ -73,6 +73,7 @@
     "build:test-utils": "npm run build --workspace @gluonjs/test-utils",
     "build:devtools-api": "npm run build --workspace @gluonjs/devtools-api",
     "build:devtools": "npm run build --workspace @gluonjs/devtools",
+    "build:graph": "npm run build --workspace @gluonjs/graph",
     "build:language-server": "npm run build --workspace @gluonjs/language-server",
     "build:vue-analyzer": "npm run build --workspace @gluonjs/vue-migration-analyzer",
     "build:create-gluon": "npm run build --workspace create-gluon",
@@ -107,7 +108,7 @@
     "dev:benchmark:components": "vite --config benchmarks/components/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
     "benchmark:bundle": "node scripts/run-bundle-matrix.mjs",
-    "typecheck": "npm run typecheck:core && npm run typecheck:decorators-legacy && npm run typecheck:json-forms && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:gluon-components-vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
+    "typecheck": "npm run typecheck:core && npm run typecheck:decorators-legacy && npm run typecheck:json-forms && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:gluon-components-vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:graph && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:decorators-legacy": "tsc -p tests-node/tsconfig.decorators-legacy.json",
     "typecheck:json-forms": "npm run typecheck --workspace @gluonjs/json-forms",
@@ -122,6 +123,7 @@
     "typecheck:test-utils": "npm run typecheck --workspace @gluonjs/test-utils",
     "typecheck:devtools-api": "npm run typecheck --workspace @gluonjs/devtools-api",
     "typecheck:devtools": "npm run typecheck --workspace @gluonjs/devtools",
+    "typecheck:graph": "npm run typecheck --workspace @gluonjs/graph",
     "typecheck:language-server": "npm run typecheck --workspace @gluonjs/language-server",
     "typecheck:vue-analyzer": "npm run typecheck --workspace @gluonjs/vue-migration-analyzer",
     "typecheck:create-gluon": "npm run typecheck --workspace create-gluon",

@@ -7,6 +7,15 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-27
+
+### Added
+
+- Added the optional `@gluonjs/graph` package with a dependency-free,
+  canvas-backed Custom Element for deterministic typed network maps, group
+  filtering, selection, pan/zoom, keyboard controls, and a runnable knowledge
+  map reference.
+
 ## [1.4.0] - 2026-07-24
 
 ### Added

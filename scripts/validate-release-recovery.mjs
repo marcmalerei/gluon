@@ -47,6 +47,14 @@ const expectedPaths = [
   'scripts/validate-release-recovery.mjs',
   'scripts/verify-release-hosting.mjs',
 ];
+if (manifest.failureCategory === 'missing-bootstrap-record') {
+  expectedPaths.push(
+    'release/release-contract.json',
+    'release/release-contract.schema.json',
+    'scripts/build-release-artifacts.mjs',
+    'scripts/publish-npm-bootstrap.mjs',
+  );
+}
 if (manifest.releaseVersion !== version
   || manifest.canonicalTag !== canonicalTag
   || manifest.recoveryTag !== `${canonicalTag}-recovery.1`

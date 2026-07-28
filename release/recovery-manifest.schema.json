@@ -31,7 +31,12 @@
       "format": "uri",
       "pattern": "^https://github.com/marcmalerei/gluon/actions/runs/[0-9]+$"
     },
-    "failureCategory": { "const": "squash-merge-tested-commit-not-ancestor" },
+    "failureCategory": {
+      "enum": [
+        "squash-merge-tested-commit-not-ancestor",
+        "missing-bootstrap-record"
+      ]
+    },
     "recoveryTag": {
       "type": "string",
       "pattern": "^v[1-9][0-9]*\\.[0-9]+\\.[0-9]+-recovery\\.[1-9][0-9]*$"

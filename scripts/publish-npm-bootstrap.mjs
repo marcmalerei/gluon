@@ -11,7 +11,8 @@ const releaseContract = await readJson('release/release-contract.json');
 const packageContract = await readJson('package-contract.json');
 const rootManifest = await readJson('package.json');
 const bootstrap = releaseContract.bootstrap;
-const releasedVersion = rootManifest.version;
+const candidateVersion = rootManifest.version;
+const baselineVersion = bootstrap.baselineVersion;
 const directory = resolve(root, option('--directory') ?? bootstrap.artifactDirectory);
 const dryRun = process.argv.includes('--dry-run');
 const confirmed = process.argv.includes('--confirm-owner-controlled-bootstrap');
@@ -37,10 +38,7 @@ validateEvidence(evidence);
 await verifyChecksums();
 await reproduceArtifacts(evidence);
 
-if (packageContract.registry.publicationState !== 'released'
-  || releaseContract.targetVersion !== releasedVersion) {
-  throw new Error('Incremental bootstrap requires the current clean main release to remain recorded as released.');
-}
+validateBootstrapBaseline();
 if (!dryRun) {
   await requireCleanMain(evidence.sourceCommit);
   await requireNpmOwner();
@@ -50,7 +48,7 @@ const registryState = new Map();
 for (const entry of evidence.packages) {
   const packument = await registryPackument(entry.name);
   if (packument?.versions?.[bootstrap.version]) {
-    const released = packument.versions?.[releasedVersion] !== undefined;
+    const released = packument.versions?.[baselineVersion] !== undefined;
     if (released) verifyReleasedPackageRecord(entry.name, packument);
     else verifyBootstrapMetadata(entry, packument);
     registryState.set(entry.name, released ? 'released' : 'bootstrap');
@@ -62,7 +60,7 @@ for (const entry of evidence.packages) {
 
 for (const entry of evidence.packages) {
   if (registryState.get(entry.name) === 'released') {
-    console.log(`verified existing released ${entry.name}@${releasedVersion} and bootstrap record; regenerated bootstrap archive skipped`);
+    console.log(`verified existing released ${entry.name}@${baselineVersion} and bootstrap record; regenerated bootstrap archive skipped`);
     continue;
   }
   if (registryState.get(entry.name) === 'bootstrap') {
@@ -95,6 +93,23 @@ function validateEvidence(evidenceValue) {
     || JSON.stringify(actualNames) !== JSON.stringify(expectedNames)) {
     throw new Error('Bootstrap evidence does not match the reviewed release and package contracts.');
   }
+}
+
+function validateBootstrapBaseline() {
+  if (!/^[1-9][0-9]*\.[0-9]+\.[0-9]+$/.test(baselineVersion ?? '')) {
+    throw new Error('Incremental bootstrap requires a stable recorded baselineVersion.');
+  }
+  if (releaseContract.targetVersion !== candidateVersion) {
+    throw new Error('Incremental bootstrap requires the release contract target to match the clean main candidate version.');
+  }
+  if (packageContract.registry.publicationState === 'released') {
+    if (baselineVersion !== candidateVersion) {
+      throw new Error('A released main train must use itself as the incremental bootstrap baseline.');
+    }
+    return;
+  }
+  if (packageContract.registry.publicationState === 'ready' && baselineVersion !== candidateVersion) return;
+  throw new Error('Incremental bootstrap requires either a released main train or a ready candidate with an earlier recorded supported baseline.');
 }
 
 async function requireCleanMain(sourceCommit) {
@@ -174,15 +189,15 @@ function verifyBootstrapMetadata(entry, packument) {
 }
 
 function verifyReleasedPackageRecord(name, packument) {
-  const metadata = packument.versions?.[releasedVersion];
-  if (metadata?.name !== name || metadata.version !== releasedVersion) {
-    throw new Error(`${name}@${releasedVersion} does not match the current released package record.`);
+  const metadata = packument.versions?.[baselineVersion];
+  if (metadata?.name !== name || metadata.version !== baselineVersion) {
+    throw new Error(`${name}@${baselineVersion} does not match the recorded supported baseline package record.`);
   }
-  if (packument['dist-tags']?.latest !== releasedVersion) {
-    throw new Error(`${name} latest is not the current released version ${releasedVersion}.`);
+  if (packument['dist-tags']?.latest !== baselineVersion) {
+    throw new Error(`${name} latest is not the recorded supported baseline version ${baselineVersion}.`);
   }
   if (!metadata.dist?.integrity || !metadata.dist?.attestations) {
-    throw new Error(`${name}@${releasedVersion} is missing registry integrity or provenance attestations.`);
+    throw new Error(`${name}@${baselineVersion} is missing registry integrity or provenance attestations.`);
   }
 }
 
