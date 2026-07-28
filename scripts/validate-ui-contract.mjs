@@ -11,7 +11,7 @@ const componentOutput = resolve(root, '.tmp/ui-component-usage');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['Button', 'Icon', 'Input', 'Label', 'installUi']],
-  ['@gluonjs/molecules', ['Card', 'FormField']],
+  ['@gluonjs/molecules', ['Card', 'FormField', 'NavigationStrip']],
   ['@gluonjs/organisms', ['AppShell']],
 ]);
 const manifestExports = new Map([
@@ -127,7 +127,7 @@ try {
   const source = (await Promise.all(files
     .filter((file) => file.endsWith('.js'))
     .map((file) => readFile(resolve(ownerOutput, file), 'utf8')))).join('\n');
-  for (const marker of ['gluon-card', 'gluon-form-field', 'gluon-app-shell']) {
+  for (const marker of ['gluon-card', 'gluon-form-field', 'gluon-navigation-strip', 'gluon-app-shell']) {
     if (source.includes(marker)) throw new Error(`UI-owner-only bundle contains unselected marker ${marker}.`);
   }
 } finally {
@@ -164,7 +164,7 @@ try {
     .filter((file) => file.endsWith('.js'))
     .map(async (file) => [file, await readFile(resolve(componentOutput, file), 'utf8')])));
   const initial = entries.get('button-only.js') ?? '';
-  for (const marker of ['gluon-input', 'gluon-label', 'gluon-icon', 'gluon-card', 'gluon-form-field', 'gluon-app-shell']) {
+  for (const marker of ['gluon-input', 'gluon-label', 'gluon-icon', 'gluon-card', 'gluon-form-field', 'gluon-navigation-strip', 'gluon-app-shell']) {
     if (initial.includes(marker)) throw new Error(`Button-only entry contains unselected marker ${marker}.`);
   }
   if (!initial.includes('gluon-button')) throw new Error('Button-only entry does not contain its exact component marker.');
@@ -197,6 +197,7 @@ for (const marker of [
   'gluon-input',
   'gluon-label',
   'gluon-form-field',
+  'gluon-navigation-strip',
   'PurchaseAction',
   'CheckoutExperience',
 ]) {
@@ -221,4 +222,4 @@ const shopComposition = {
   files: shopInitialFiles.map((path) => path.split('/').at(-1)),
 };
 
-console.log(`UI contract valid: 4 optional packages, 15 typed extension entries, canonical DX T2 extensions, exact production component chunks exclude unrelated UI markers, GLUON GOODS ${JSON.stringify(shopComposition)}`);
+console.log(`UI contract valid: 4 optional packages, 16 typed extension entries, canonical DX T2 extensions, exact production component chunks exclude unrelated UI markers, GLUON GOODS ${JSON.stringify(shopComposition)}`);

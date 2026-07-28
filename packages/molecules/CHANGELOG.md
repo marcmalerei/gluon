@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the accessible `NavigationStrip` composition with overflow controls,
+  resize/content observation, and automatic reveal of the `aria-current`
+  destination without dropping focus from an operated edge control.
+
 ## [1.6.0] - 2026-07-28
 
 ### Changed

@@ -13,7 +13,12 @@ import {
   css,
   svg,
 } from '@gluonjs/core';
-import { Card, FormField, defineMolecule } from '@gluonjs/molecules';
+import {
+  Card,
+  FormField,
+  NavigationStrip,
+  defineMolecule,
+} from '@gluonjs/molecules';
 import { AppShell, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
@@ -120,13 +125,22 @@ createApp(() => AppShell({
     ],
   }),
   navigation: q.a({ href: '#profile', children: 'Profile' }),
-  children: Card({
-    attributes: { id: 'profile' },
-    title: 'Profile',
-    subtitle: 'Stable atoms, molecules, and headless choices',
-    actions: Button({ label: 'Save profile' }),
-    children: [
-      FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
+  children: [
+    NavigationStrip({
+      label: 'Account sections',
+      children: [
+        q.a({ href: '#profile', 'aria-current': 'page', children: 'Profile' }),
+        q.a({ href: '#orders', children: 'Orders' }),
+        q.a({ href: '#security', children: 'Security' }),
+      ],
+    }),
+    Card({
+      attributes: { id: 'profile' },
+      title: 'Profile',
+      subtitle: 'Stable atoms, molecules, and headless choices',
+      actions: Button({ label: 'Save profile' }),
+      children: [
+        FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',
         helper: 'Optional order reference',
@@ -146,26 +160,27 @@ createApp(() => AppShell({
       q.p({ children: `Selected finish: ${finish.value}` }),
       CheckoutActions({ total: '$128.00' }),
       Popover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
-      dialogOpen.value
-        ? Overlay({
-            attributes: { class: 'example-overlay' },
-            onDismiss: closeDialog,
-            children: Dialog({
-              label: 'Profile preferences',
+        dialogOpen.value
+          ? Overlay({
+              attributes: { class: 'example-overlay' },
               onDismiss: closeDialog,
-              attributes: { class: 'example-dialog' },
-              children: [
-                q.h2({ children: 'Profile preferences' }),
-                Button({
-                  label: 'Close dialog',
-                  attributes: { data: { dialogInitialFocus: true } },
-                  onClick: closeDialog,
-                }),
-              ],
-            }),
-          })
-        : null,
-    ],
-  }),
+              children: Dialog({
+                label: 'Profile preferences',
+                onDismiss: closeDialog,
+                attributes: { class: 'example-dialog' },
+                children: [
+                  q.h2({ children: 'Profile preferences' }),
+                  Button({
+                    label: 'Close dialog',
+                    attributes: { data: { dialogInitialFocus: true } },
+                    onClick: closeDialog,
+                  }),
+                ],
+              }),
+            })
+          : null,
+      ],
+    }),
+  ],
   footer: 'Keyboard: Tab, Shift+Tab, Arrow keys, Home, End',
 })).mount(document.querySelector('#ui-system')!);

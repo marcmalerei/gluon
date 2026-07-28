@@ -17,6 +17,8 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 
 - home, catalog, and deep-linkable product routes
 - desktop and mobile navigation
+- overflow-aware catalog category navigation with native links, a revealed
+  current filter, and 44px previous/next controls at constrained widths
 - a realistic product catalog and product-detail surface
 - keyboard-operable product configuration through the same typed,
   form-associated `gluon-product-configurator` Custom Element consumed by the
@@ -70,8 +72,11 @@ light-DOM slots; its official add/retry Button is a functional layer inside the
 same ShadowRoot. Server output retains the product title, inventory status, and
 facts as light DOM before the element upgrades.
 
-The bag quantity/remove surface is the concise stateful-authoring acceptance
-boundary. The global Journal navigation is the concise presentational boundary:
+The catalog filter is the reusable constrained-navigation acceptance boundary:
+the official `NavigationStrip` Molecule retains native Router links and exposes
+overflow directions without moving focus from the current destination. The bag
+quantity/remove surface is the concise stateful-authoring acceptance boundary.
+The global Journal navigation is the concise presentational boundary:
 the app-local `ShopEditorialLink` Atom has declarative anchor/span selection and
 one props object. Its canonical implementation is a `.gluon` Single-File
 Component: typed props, native markup, slot composition, and its owned
@@ -222,6 +227,13 @@ discovery. The clean CI production graph measures 194,440 raw bytes and 56,251
 level-9 gzip bytes. The reviewed ceilings are 194,500 / 56,300 bytes, leaving
 60 raw bytes and 49 gzip bytes of explicit regression headroom. This records
 the customer-flow composition cost without making a runtime-speed claim.
+
+Issue #269 integrates the public overflow-aware `NavigationStrip` into the same
+catalog discovery flow. The clean production graph measures 195,647 raw bytes
+and 56,403 level-9 gzip bytes. The reviewed ceilings are 196,000 / 56,500 bytes,
+leaving 353 raw bytes and 97 gzip bytes of explicit regression headroom. HTML,
+image-byte, and image-count ceilings remain unchanged; this is a composition
+measurement, not a runtime-speed claim.
 
 That comparison is now available through `npm run benchmark:rendering` and
 documented in [`docs/performance.md`](../../docs/performance.md). It remains a

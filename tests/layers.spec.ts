@@ -11,7 +11,14 @@ import {
   installUi,
   labelStyles,
 } from '@gluonjs/atoms';
-import { Card, FormField, cardStyles, formFieldStyles } from '@gluonjs/molecules';
+import {
+  Card,
+  FormField,
+  NavigationStrip,
+  cardStyles,
+  formFieldStyles,
+  navigationStripStyles,
+} from '@gluonjs/molecules';
 import { AppShell, appShellStyles } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
 
@@ -28,6 +35,7 @@ describe('component layers', () => {
     expect(Label.layer).toBe('atom');
     expect(Card.layer).toBe('molecule');
     expect(FormField.layer).toBe('molecule');
+    expect(NavigationStrip.layer).toBe('molecule');
     expect(AppShell.layer).toBe('organism');
     for (const component of [Button, Card, AppShell]) {
       expect(Object.keys(component)).toEqual(['layer', 'displayName', 'styles']);
@@ -49,6 +57,8 @@ describe('component layers', () => {
     }
     expect(Button.styles.map(({ id }) => id)).toEqual(['gluon-atom-button']);
     expect(FormField.styles.map(({ id }) => id)).toEqual(['gluon-molecule-form-field']);
+    expect(NavigationStrip.styles.map(({ id }) => id))
+      .toEqual(['gluon-molecule-navigation-strip']);
     expect(AppShell.styles.map(({ id }) => id)).toEqual(['gluon-organism-app-shell']);
   });
 
@@ -58,15 +68,21 @@ describe('component layers', () => {
     render(AppShell({
       header: q.h1({ children: 'Gluon' }),
       navigation: q.a({ href: '#main', children: 'Main' }),
-      children: Card({
-        title: 'Profile',
-        actions: Button({ label: 'Save' }),
-        children: FormField({
-          label: 'Name',
-          value: 'Ada',
-          helper: 'Public display name',
+      children: [
+        NavigationStrip({
+          label: 'Sections',
+          children: q.a({ href: '#main', 'aria-current': 'page', children: 'Main' }),
         }),
-      }),
+        Card({
+          title: 'Profile',
+          actions: Button({ label: 'Save' }),
+          children: FormField({
+            label: 'Name',
+            value: 'Ada',
+            helper: 'Public display name',
+          }),
+        }),
+      ],
       footer: Icon({ name: 'spark', label: 'Gluon' }),
     }), document.body);
 
@@ -81,6 +97,7 @@ describe('component layers', () => {
       labelStyles,
       cardStyles,
       formFieldStyles,
+      navigationStripStyles,
       appShellStyles,
     ].includes(sheet))).toEqual([
       buttonStyles,
@@ -89,6 +106,7 @@ describe('component layers', () => {
       labelStyles,
       cardStyles,
       formFieldStyles,
+      navigationStripStyles,
       appShellStyles,
     ]);
     expect(document.querySelector('style[data-gluon]')).toBeNull();

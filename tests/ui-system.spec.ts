@@ -22,7 +22,13 @@ import {
   unadoptStyles,
 } from '../src/index.js';
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
-import { Card, FormField, moleculeManifest, moleculeStyles } from '@gluonjs/molecules';
+import {
+  Card,
+  FormField,
+  NavigationStrip,
+  moleculeManifest,
+  moleculeStyles,
+} from '@gluonjs/molecules';
 import { AppShell, organismManifest, organismStyles } from '@gluonjs/organisms';
 import {
   Dialog,
@@ -425,22 +431,237 @@ describe('headless interaction primitives', () => {
   });
 });
 
+describe('overflow-aware navigation', () => {
+  it('exposes native controls, updates overflow edges, and reveals the aria-current destination', async () => {
+    const uiOwner = installUi(document, { theme: 'light' });
+    const destination = (label: string, current = false) => q.a({
+      href: `#${label.toLowerCase()}`,
+      'aria-current': current ? 'page' : undefined,
+      style: {
+        'align-items': 'center',
+        display: 'inline-flex',
+        flex: '0 0 8rem',
+        'min-block-size': '2.75rem',
+      },
+      children: label,
+    });
+
+    render(NavigationStrip({
+      label: 'Mission sections',
+      attributes: { style: { 'inline-size': '16rem' } },
+      children: [
+        destination('Overview', true),
+        destination('Runs'),
+        destination('Operations'),
+        destination('Repositories'),
+      ],
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+    const viewport = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    const previous = root.querySelector<HTMLButtonElement>('.is-previous')!;
+    const next = root.querySelector<HTMLButtonElement>('.is-next')!;
+    await vi.waitFor(() => expect(root.hasAttribute('data-overflow')).toBe(true));
+
+    expect(root.tagName).toBe('NAV');
+    expect(root.getAttribute('aria-label')).toBe('Mission sections');
+    expect(previous.getAttribute('aria-label')).toBe('Show previous navigation items');
+    expect(next.getAttribute('aria-label')).toBe('Show more navigation items');
+    expect(previous.hidden).toBe(false);
+    expect(previous.disabled).toBe(true);
+    expect(next.hidden).toBe(false);
+    expect(next.disabled).toBe(false);
+
+    next.focus();
+    next.click();
+    await vi.waitFor(() => expect(viewport.scrollLeft).toBeGreaterThan(1));
+    expect(document.activeElement).toBe(next);
+    await vi.waitFor(() => expect(previous.disabled).toBe(false));
+    const afterNext = viewport.scrollLeft;
+    previous.click();
+    await vi.waitFor(() => expect(viewport.scrollLeft).toBeLessThan(afterNext));
+    await vi.waitFor(() => expect(previous.disabled).toBe(true));
+    viewport.dispatchEvent(new Event('scroll'));
+    viewport.dispatchEvent(new Event('scroll'));
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+    const overview = root.querySelector<HTMLAnchorElement>('[href="#overview"]')!;
+    overview.setAttribute('aria-current', 'step');
+    await new Promise<void>((resolve) => queueMicrotask(resolve));
+
+    root.querySelector('[aria-current]')?.removeAttribute('aria-current');
+    const repositories = root.querySelector<HTMLAnchorElement>('[href="#repositories"]')!;
+    repositories.setAttribute('aria-current', 'page');
+    await vi.waitFor(() => {
+      const viewportRect = viewport.getBoundingClientRect();
+      const currentRect = repositories.getBoundingClientRect();
+      expect(currentRect.left).toBeGreaterThanOrEqual(viewportRect.left - 1);
+      expect(currentRect.right).toBeLessThanOrEqual(viewportRect.right + 1);
+      expect(next.disabled).toBe(false);
+      expect(next.getAttribute('aria-disabled')).toBe('true');
+    });
+    expect(document.activeElement).toBe(next);
+    previous.focus();
+    await vi.waitFor(() => expect(next.disabled).toBe(true));
+    expect(next.hasAttribute('aria-disabled')).toBe(false);
+    repositories.removeAttribute('aria-current');
+    overview.setAttribute('aria-current', 'page');
+    await vi.waitFor(() => expect(overview.getBoundingClientRect().left)
+      .toBeGreaterThanOrEqual(viewport.getBoundingClientRect().left - 1));
+    uiOwner.dispose();
+  });
+
+  it('removes redundant controls when every destination fits', async () => {
+    render(NavigationStrip({
+      label: 'Short navigation',
+      attributes: { style: { 'inline-size': '30rem' } },
+      children: q.a({ href: '#only', 'aria-current': 'page', children: 'Only destination' }),
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+    await vi.waitFor(() => expect(root.hasAttribute('data-overflow')).toBe(false));
+    expect([...root.querySelectorAll<HTMLButtonElement>('.gluon-navigation-strip-control')]
+      .every((control) => control.hidden && control.disabled)).toBe(true);
+  });
+
+  it('initializes without optional platform observers', async () => {
+    const resizeObserver = Object.getOwnPropertyDescriptor(window, 'ResizeObserver');
+    const mutationObserver = Object.getOwnPropertyDescriptor(window, 'MutationObserver');
+    Object.defineProperty(window, 'ResizeObserver', { configurable: true, value: undefined });
+    Object.defineProperty(window, 'MutationObserver', { configurable: true, value: undefined });
+    try {
+      render(NavigationStrip({
+        label: 'Observer-free navigation',
+        attributes: { style: { 'inline-size': '30rem' } },
+        children: q.a({ href: '#only', children: 'Only destination' }),
+      }), document.body);
+
+      const root = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+      await vi.waitFor(() => expect(root.hasAttribute('data-overflow')).toBe(false));
+    } finally {
+      if (resizeObserver) Object.defineProperty(window, 'ResizeObserver', resizeObserver);
+      else delete (window as { ResizeObserver?: typeof ResizeObserver }).ResizeObserver;
+      if (mutationObserver) Object.defineProperty(window, 'MutationObserver', mutationObserver);
+      else delete (window as { MutationObserver?: typeof MutationObserver }).MutationObserver;
+    }
+  });
+
+  it('keeps the controller stable when the same strip is rendered again', async () => {
+    const navigation = () => NavigationStrip({
+      label: 'Stable navigation',
+      attributes: { style: { 'inline-size': '30rem' } },
+      children: q.a({ href: '#only', children: 'Only destination' }),
+    });
+
+    render(navigation(), document.body);
+    const original = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+    render(navigation(), document.body);
+
+    expect(document.querySelector<HTMLElement>('.gluon-navigation-strip')).toBe(original);
+    await vi.waitFor(() => expect(original.hasAttribute('data-overflow')).toBe(false));
+  });
+
+  it('accounts for the controls before revealing an initially current destination', async () => {
+    render(NavigationStrip({
+      label: 'Initial destination',
+      attributes: { style: { 'inline-size': '16rem' } },
+      children: ['One', 'Two', 'Three', 'Four'].map((label) => q.a({
+        href: `#${label.toLowerCase()}`,
+        'aria-current': label === 'Four' ? 'page' : undefined,
+        style: { display: 'inline-block', flex: '0 0 8rem' },
+        children: label,
+      })),
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+    const viewport = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    const current = root.querySelector<HTMLElement>('[aria-current="page"]')!;
+    await vi.waitFor(() => {
+      const viewportRect = viewport.getBoundingClientRect();
+      const currentRect = current.getBoundingClientRect();
+      expect(root.querySelector<HTMLButtonElement>('.is-next')?.disabled).toBe(true);
+      expect(currentRect.left).toBeGreaterThanOrEqual(viewportRect.left - 1);
+      expect(currentRect.right).toBeLessThanOrEqual(viewportRect.right + 1);
+    });
+  });
+
+  it('keeps caller-owned labels and object refs on a compact strip', async () => {
+    const rootRef = { value: undefined as HTMLElement | undefined };
+    render(NavigationStrip({
+      label: 'Compact navigation',
+      previousLabel: 'Earlier destinations',
+      nextLabel: 'Later destinations',
+      attributes: { ref: rootRef, style: { 'inline-size': '30rem' } },
+      children: q.a({ href: '#only', 'aria-current': 'page', children: 'Only destination' }),
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+    expect(rootRef.value).toBe(root);
+    expect(root.querySelector<HTMLButtonElement>('.is-previous')?.getAttribute('aria-label'))
+      .toBe('Earlier destinations');
+    expect(root.querySelector<HTMLButtonElement>('.is-next')?.getAttribute('aria-label'))
+      .toBe('Later destinations');
+  });
+
+  it('uses logical RTL scrolling when the platform has no scrollBy helper', async () => {
+    const assigned: Array<HTMLElement | undefined> = [];
+    render(NavigationStrip({
+      label: 'RTL navigation',
+      attributes: {
+        dir: 'rtl',
+        ref: (element) => { assigned.push(element); },
+        style: { 'inline-size': '16rem' },
+      },
+      children: ['One', 'Two', 'Three', 'Four'].map((label) => q.a({
+        href: `#${label.toLowerCase()}`,
+        style: { display: 'inline-block', flex: '0 0 8rem' },
+        children: label,
+      })),
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-navigation-strip')!;
+    const viewport = root.querySelector<HTMLElement>('.gluon-navigation-strip-viewport')!;
+    const next = root.querySelector<HTMLButtonElement>('.is-next')!;
+    Object.defineProperty(viewport, 'scrollBy', { configurable: true, value: undefined });
+    Object.defineProperties(viewport, {
+      clientWidth: { configurable: true, value: 160 },
+      scrollLeft: { configurable: true, writable: true, value: 0 },
+      scrollWidth: { configurable: true, value: 320 },
+    });
+
+    await vi.waitFor(() => expect(root.hasAttribute('data-overflow')).toBe(true));
+    expect(assigned).toContain(root);
+    expect(viewport.ownerDocument.defaultView?.getComputedStyle(viewport).direction).toBe('rtl');
+    next.click();
+    await vi.waitFor(() => expect(viewport.scrollLeft).toBeLessThan(-1));
+    expect(root.querySelector<HTMLButtonElement>('.is-previous')?.disabled).toBe(false);
+  });
+});
+
 it('keeps the stable composed UI surface free of automated WCAG A/AA violations', async () => {
   const uiOwner = installUi(document, { theme: 'light' });
   render(AppShell({
     header: q.h1({ children: 'Account settings' }),
     navigation: q.a({ href: '#profile', children: 'Profile' }),
-    children: Card({
-      title: 'Profile',
-      subtitle: 'Visible account details',
-      actions: Button({ label: 'Save profile' }),
-      children: [
-        FormField({ label: 'Name', value: 'Ada', helper: 'Shown on receipts' }),
-        FormField({ label: 'Email', value: 'invalid', error: 'Enter a valid email address' }),
-        q.p({ children: [Icon({ name: 'spark', label: 'Verified' }), ' Verified account'] }),
-        Input({ attributes: { 'aria-label': 'Search settings' } }),
-      ],
-    }),
+    children: [
+      NavigationStrip({
+        label: 'Account sections',
+        children: [
+          q.a({ href: '#profile', 'aria-current': 'page', children: 'Profile' }),
+          q.a({ href: '#security', children: 'Security' }),
+        ],
+      }),
+      Card({
+        title: 'Profile',
+        subtitle: 'Visible account details',
+        actions: Button({ label: 'Save profile' }),
+        children: [
+          FormField({ label: 'Name', value: 'Ada', helper: 'Shown on receipts' }),
+          FormField({ label: 'Email', value: 'invalid', error: 'Enter a valid email address' }),
+          q.p({ children: [Icon({ name: 'spark', label: 'Verified' }), ' Verified account'] }),
+          Input({ attributes: { 'aria-label': 'Search settings' } }),
+        ],
+      }),
+    ],
     footer: 'Privacy controls',
   }), document.body);
 

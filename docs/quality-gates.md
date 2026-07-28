@@ -156,7 +156,7 @@ GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
 `/1.6.0/examples/ui.html` with the other versioned documentation examples.
 
-The same UI gate requires extension metadata for all 15 stable entries, the
+The same UI gate requires extension metadata for all 16 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
 danger-action, and custom-icon outcomes in canonical DX task T2. The comparison
 rule in `benchmarks/dx/specification-v1.json` applies that unchanged outcome to
@@ -164,7 +164,7 @@ Gluon, Vue, and React. #107 still owns comparator implementations, completed-run
 evidence conforming to the canonical schema, and the final comparison.
 
 The production scan also proves that GLUON GOODS contains only the selected
-Button, Icon, Input, Label, FormField, `PurchaseAction`, and
+Button, Icon, Input, Label, FormField, NavigationStrip, `PurchaseAction`, and
 `CheckoutExperience` markers. It rejects unused Card/AppShell and deprecated
 aggregate-style markers, while `check:shop-boundaries` rejects private package
 paths, `<style>` fallbacks, and undocumented `.gluon-*` class coupling.
@@ -310,11 +310,13 @@ issue #179, the clean production graph measured 191,197 raw bytes and 55,385
 gzip bytes. The compiler-proven primitive text-update path in issue #179 raises
 that graph to 193,610 raw bytes and 55,897 gzip bytes. Issue #190's reactive
 platform-observer integration raises the clean CI graph to 194,440 raw bytes
-and 56,251 gzip bytes. The reviewed regression ceilings are therefore 194,500
-raw bytes and 56,300 gzip bytes, leaving 60 raw bytes and 49 gzip bytes of
-explicit headroom; HTML, image-byte, and image-count ceilings remain unchanged.
-These are composition measurements, not runtime-speed or framework-size claims.
-Vue is built only in the documentation host.
+and 56,251 gzip bytes. Issue #269's public overflow-aware NavigationStrip and
+catalog integration raise that graph to 195,647 raw bytes and 56,403 gzip bytes.
+The reviewed regression ceilings are therefore 196,000 raw bytes and 56,500
+gzip bytes, leaving 353 raw bytes and 97 gzip bytes of explicit headroom; HTML,
+image-byte, and image-count ceilings remain unchanged. These are composition
+measurements, not runtime-speed or framework-size claims. Vue is built only in
+the documentation host.
 
 Issue #115 replaces aggregate component retention with usage-driven exact
 component sheets. `check:ui-contract` additionally
@@ -342,9 +344,9 @@ Browser assertions that cross a reactive transition poll for the resulting DOM
 state with a bounded timeout. They do not assume that the render and a 140-ms
 transition always finish within one fixed wall-clock delay on every engine.
 
-After issues #172 and #177, the measured initial graph is 191,197 raw bytes and
-55,385 level-9 gzip bytes. The current 191,500 / 55,500 ceilings leave 303 raw
-bytes and 115 gzip bytes of explicit headroom while preventing unreviewed large
+After issue #269, the measured initial graph is 195,647 raw bytes and 56,403
+level-9 gzip bytes. The current 196,000 / 56,500 ceilings leave 353 raw bytes
+and 97 gzip bytes of explicit headroom while preventing unreviewed large
 regressions. Changing a ceiling requires an evidence-backed documentation
 update in the same pull request.
 

@@ -28,7 +28,12 @@ import {
   inputStyles,
   labelStyles,
 } from '@gluonjs/atoms';
-import { Card, cardStyles, formFieldStyles } from '@gluonjs/molecules';
+import {
+  Card,
+  cardStyles,
+  formFieldStyles,
+  navigationStripStyles,
+} from '@gluonjs/molecules';
 import { appShellStyles } from '@gluonjs/organisms';
 import { nextTick } from '@gluonjs/reactivity';
 
@@ -39,6 +44,7 @@ const allComponentSheets = [
   labelStyles,
   cardStyles,
   formFieldStyles,
+  navigationStripStyles,
   appShellStyles,
 ];
 

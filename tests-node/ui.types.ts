@@ -14,7 +14,14 @@ import {
   type UiOwner,
   type ButtonProps,
 } from '@gluonjs/atoms';
-import { Card, FormField, moleculeManifest, type CardProps } from '@gluonjs/molecules';
+import {
+  Card,
+  FormField,
+  NavigationStrip,
+  moleculeManifest,
+  type CardProps,
+  type NavigationStripProps,
+} from '@gluonjs/molecules';
 import { AppShell, organismManifest } from '@gluonjs/organisms';
 import {
   Dialog,
@@ -35,6 +42,11 @@ import {
 
 const buttonProps: ButtonProps = { label: 'Save', variant: 'primary' };
 const cardProps: CardProps = { title: 'Profile', actions: Button(buttonProps) };
+const navigationStripProps: NavigationStripProps = {
+  label: 'Account sections',
+  children: q.a({ href: '#profile', 'aria-current': 'page', children: 'Profile' }),
+  attributes: { data: { owner: 'account' } },
+};
 const tree: TemplateResult = AppShell({
   children: Card({
     ...cardProps,
@@ -117,6 +129,7 @@ Listbox({ id: 'finish', label: 'Finish', options: [], attributes: { data: { owne
 Field({ label: 'Email', children: q.input(), attributes: { class: 'app-field' } });
 FormField({ label: 'Email', attributes: { autocomplete: 'email' }, fieldAttributes: { data: { owner: 'app' } } });
 AppShell({ children: Card({ title: 'Card' }), attributes: { data: { owner: 'app' } } });
+NavigationStrip(navigationStripProps);
 unsafeQuarkProps<HTMLButtonElement>({ 'vendor-future-key': true });
 
 void tree;
@@ -125,6 +138,7 @@ void theme;
 void selection;
 void manifests;
 void buttonStyleId;
+void navigationStripProps;
 void componentLibraryValidation;
 
 // @ts-expect-error component style metadata is immutable
@@ -174,5 +188,9 @@ Card({ title: 'Card', attributes: { href: '/other' } });
 FormField({ label: 'Email', fieldAttributes: { href: '/other' } });
 // @ts-expect-error FormField Input attributes reject textarea-only props
 FormField({ label: 'Email', attributes: { rows: 4 } });
+// @ts-expect-error NavigationStrip requires an accessible landmark name
+NavigationStrip({ children: q.a({ href: '#profile', children: 'Profile' }) });
+// @ts-expect-error NavigationStrip nav attributes reject anchor-only props
+NavigationStrip({ label: 'Sections', attributes: { href: '/other' } });
 // @ts-expect-error AppShell div attributes reject anchor-only props
 AppShell({ children: 'Content', attributes: { href: '/other' } });

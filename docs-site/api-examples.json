@@ -772,10 +772,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, iconStyles, inputStyles, labelStyles } from '@gluonjs/atoms';",
-        "import { cardStyles, formFieldStyles } from '@gluonjs/molecules';",
+        "import { cardStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, iconStyles, inputStyles, labelStyles, cardStyles, formFieldStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, iconStyles, inputStyles, labelStyles, cardStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -813,11 +813,13 @@
         "import {",
         "  Card,",
         "  FormField,",
+        "  NavigationStrip,",
         "  moleculeManifest,",
         "  moleculeStyles,",
         "  type CardProps,",
         "  type CardTone,",
         "  type FormFieldProps,",
+        "  type NavigationStripProps,",
         "} from '@gluonjs/molecules';",
         "",
         "const email = { label: 'Email', name: 'email', type: 'email', helper: 'Order updates go here.' } satisfies FormFieldProps;",
@@ -829,7 +831,11 @@
         "  children: FormField(email),",
         "  actions: Button({ label: 'View order' }),",
         "} satisfies CardProps;",
-        "console.log(html`${Card(order)}`, moleculeStyles, moleculeManifest.entries);"
+        "const sections = {",
+        "  label: 'Order sections',",
+        "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
+        "} satisfies NavigationStripProps;",
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4048,6 +4054,10 @@
       "recipe": "molecule-components",
       "description": "Combine Input properties with a required visible label and mutually useful helper or error messaging:"
     },
+    "packages/molecules/src/interfaces/NavigationStripProps.md": {
+      "recipe": "molecule-components",
+      "description": "Name a native navigation landmark, supply destinations in source order, and optionally customize the two overflow-control names:"
+    },
     "packages/molecules/src/type-aliases/CardTone.md": {
       "recipe": "molecule-components",
       "description": "Select the neutral, success, warning, or danger emphasis applied by a Card without depending on CSS classes:"
@@ -4060,6 +4070,10 @@
       "recipe": "molecule-components",
       "description": "Render a labeled Input together with helper text or an announced validation error as one Molecule:"
     },
+    "packages/molecules/src/variables/NavigationStrip.md": {
+      "recipe": "molecule-components",
+      "description": "Keep overflowing navigation destinations discoverable through native controls and automatically reveal the exact current destination:"
+    },
     "packages/molecules/src/variables/moleculeManifest.md": {
       "recipe": "molecule-components",
       "description": "Inspect the stable Molecule inventory and its accessibility, example, and test evidence:"
@@ -4067,6 +4081,10 @@
     "packages/molecules/src/variables/moleculeStyles.md": {
       "recipe": "molecule-components",
       "description": "Adopt the constructable stylesheet that implements the public Card and FormField class contract:"
+    },
+    "packages/molecules/src/variables/navigationStripStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable NavigationStrip layout and overflow-control stylesheet:"
     },
     "packages/organisms/src/interfaces/AppShellProps.md": {
       "recipe": "organism-components",

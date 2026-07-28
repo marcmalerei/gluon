@@ -345,7 +345,13 @@ export const shopStyles = css`
     .catalog-heading { display: flex; align-items: end; justify-content: space-between; min-height: 280px; padding: 64px var(--shop-gutter) 42px; }
     .catalog-heading h1 { margin: 0; font-size: clamp(56px, 7vw, 112px); font-weight: 520; line-height: 0.92; letter-spacing: -0.07em; }
     .catalog-heading p { margin: 0; color: var(--shop-muted); }
-    .catalog-filters { display: flex; gap: 8px; overflow: auto; padding: 0 var(--shop-gutter) 28px; }
+    .catalog-filters {
+      margin-bottom: 28px;
+      padding: 0 var(--shop-gutter);
+      --gluon-navigation-strip-control-background: var(--shop-white);
+      --gluon-navigation-strip-control-border-color: var(--shop-rule);
+      --gluon-navigation-strip-gap: 8px;
+    }
     .catalog-filters a { display: grid; place-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--shop-rule); white-space: nowrap; }
     .catalog-filters a:hover, .catalog-filters .is-selected { border-color: var(--shop-black); background: var(--shop-black); color: white; }
     .catalog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--shop-rule); }
@@ -478,7 +484,6 @@ export const shopStyles = css`
 
       .catalog-heading { display: block; min-height: 230px; padding-top: 62px; }
       .catalog-heading h1 { margin-bottom: 18px; font-size: 59px; }
-      .catalog-filters { padding-right: 0; }
       .catalog-grid { grid-template-columns: 1fr 1fr; }
       .catalog-grid .product-copy { display: block; min-height: 84px; }
       .catalog-grid .product-copy strong { font-size: 16px; }
