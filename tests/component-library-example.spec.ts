@@ -21,6 +21,9 @@ describe('component-library consumer example', () => {
     expect(document.adoptedStyleSheets).toHaveLength(documentSheetCount);
     expect(customElements.get('example-product-picker')).toBe(ProductPicker);
     expect((await import('@gluonjs/example-component-library')).ProductPicker).toBe(ProductPicker);
+    expect(picker.value).toBe(2);
+    expect(picker.getAttribute('value')).toBe('2');
+    expect(picker.shadowRoot?.querySelector('output')?.textContent).toBe('2');
     const event = new Promise<CustomEvent<{ quantity: number }>>((resolve) => picker.addEventListener('change', resolve as EventListener, { once: true }));
     (picker.shadowRoot?.querySelector('[aria-label="Increase quantity"]') as HTMLButtonElement).click();
     expect((await event).detail).toEqual({ quantity: 3 });
@@ -28,6 +31,15 @@ describe('component-library consumer example', () => {
     expect(picker.getAttribute('value')).toBe('3');
     await picker.updateComplete;
     expect(picker.shadowRoot?.querySelector('output')?.textContent).toBe('3');
+
+    const reboundEvent = new Promise<CustomEvent<{ quantity: number }>>((resolve) => picker.addEventListener('change', resolve as EventListener, { once: true }));
+    picker.value = 7;
+    (picker.shadowRoot?.querySelector('[aria-label="Decrease quantity"]') as HTMLButtonElement).click();
+    expect((await reboundEvent).detail).toEqual({ quantity: 6 });
+    expect(picker.value).toBe(6);
+    expect(picker.getAttribute('value')).toBe('6');
+    await picker.updateComplete;
+    expect(picker.shadowRoot?.querySelector('output')?.textContent).toBe('6');
 
     app.unmount();
     expect(host.querySelector('example-product-picker')).toBeNull();

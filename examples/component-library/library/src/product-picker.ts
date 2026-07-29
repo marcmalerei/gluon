@@ -21,17 +21,15 @@ export const ProductPicker: CustomElementConstructor & { new(): ProductPickerEle
   events: { change: elementEvent<ProductPickerChange>() },
   styles: productPickerStyles,
   setup(context) {
-    const quantity = context.state('quantity', () => context.props.value);
-    context.watch(() => context.props.value, (value) => { quantity.value = value ?? 1; });
     const change = (next: number): void => {
       const value = Math.max(1, next);
       context.host.value = value;
       context.emit('change', { quantity: value });
     };
     return { render: () => html`
-      <button type="button" aria-label="Decrease quantity" @click=${() => change(quantity.value - 1)}>−</button>
-      <output aria-live="polite">${quantity.value}</output>
-      <button type="button" aria-label="Increase quantity" @click=${() => change(quantity.value + 1)}>+</button>
+      <button type="button" aria-label="Decrease quantity" @click=${() => change(context.props.value - 1)}>−</button>
+      <output aria-live="polite">${context.props.value}</output>
+      <button type="button" aria-label="Increase quantity" @click=${() => change(context.props.value + 1)}>+</button>
     ` };
   },
 }) as CustomElementConstructor & { new(): ProductPickerElement; };

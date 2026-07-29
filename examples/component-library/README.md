@@ -8,8 +8,9 @@ The library uses only `@gluonjs/core` and `@gluonjs/quarks` public entry points:
 Custom Element. Its ShadowRoot owns a constructable stylesheet, native buttons
 remain keyboard-operable, and its typed `change` event reports the exact new
 quantity. The picker treats its public `value` property as the current quantity:
-button interactions update that property, and its `reflect: true` declaration
-keeps the `value` attribute synchronized for HTML and DOM consumers.
+rendering reads that property directly, button interactions update it, and its
+`reflect: true` declaration keeps the `value` attribute synchronized for HTML
+and DOM consumers without a second local quantity state.
 
 Run `npm run build:component-library` to build the consumer. It imports only
 the serializable manifest initially, requests the badge and picker through
