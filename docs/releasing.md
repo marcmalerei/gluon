@@ -20,6 +20,22 @@ public-type verification failure. This is enforced locally by:
 npm run check:release-contract
 ```
 
+## v1.6.0 train handoff
+
+Issue [#270](https://github.com/marcmalerei/gluon/issues/270) established the
+20-package `1.6.0` train, and [#257](https://github.com/marcmalerei/gluon/issues/257)
+delivered its first new package, `@gluonjs/json-forms`. The train is ready for
+the two-commit release cut: a Quality-Gates-tested candidate followed only by
+its release-cut evidence and compatibility manifest. The immutable v1.5.0
+recovery baseline remains outside that cut.
+
+Publication remains deliberately outside an ordinary pull request. Before the
+owner creates the protected `v1.6.0` tag, every official npm package must have
+an owner-reviewed package record and the exact Trusted Publishing binding for
+`release.yml` in the `npm` environment. The tag-triggered Release workflow
+then creates a GitHub draft, publishes the reviewed archives with provenance,
+verifies the registry train, and only then publishes the immutable release.
+
 The validator checks the package-contract JSON against its declared schema,
 lockstep manifest and lockfile versions, exact
 official-package dependency versions, public/provenance publish settings,
