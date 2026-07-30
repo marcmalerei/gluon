@@ -16,6 +16,9 @@ concurrency:
 jobs:
   repository:
     runs-on: ubuntu-latest
+    # A successful full check normally completes in roughly 10–12 minutes.
+    # Keep enough headroom for a cold hosted runner while making a stuck runner visible.
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v7
         with:
@@ -25,11 +28,15 @@ jobs:
           node-version: 22.12.0
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
       - run: npx playwright install --with-deps chromium
+        timeout-minutes: 12
       - run: npm run check
+        timeout-minutes: 25
 
   browser-engines:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -41,8 +48,11 @@ jobs:
           node-version: 22.12.0
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
       - run: npx playwright install --with-deps ${{ matrix.browser }}
+        timeout-minutes: 12
       - run: npm run test:browser-matrix
+        timeout-minutes: 15
         env:
           GLUON_BROWSER: ${{ matrix.browser }}
       - name: Retain browser screenshot differences
@@ -57,6 +67,7 @@ jobs:
 
   node-runtime:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
@@ -68,11 +79,15 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
       - run: npm run build
+        timeout-minutes: 10
       - run: npm run test:ssr
+        timeout-minutes: 10
 
   budgets:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -80,13 +95,19 @@ jobs:
           node-version: 22.12.0
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
       - run: npm run build:core
+        timeout-minutes: 5
       - run: npm run build:compiler
+        timeout-minutes: 5
       - run: npm run build:vite
+        timeout-minutes: 5
       - run: npm run check:budgets
+        timeout-minutes: 5
 
   performance-evidence:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -94,14 +115,23 @@ jobs:
           node-version: 22.12.0
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
       - run: npx playwright install --with-deps chromium firefox webkit
+        timeout-minutes: 20
       - run: npm run benchmark:bundle
+        timeout-minutes: 10
       - run: npm run check:component-library-loader-build
+        timeout-minutes: 10
       - run: npm run check:storybook:component-library
+        timeout-minutes: 15
       - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
+        timeout-minutes: 15
       - run: npm run benchmark:components -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/components.json
+        timeout-minutes: 15
       - run: npm run benchmark:runtime -- --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard.json
+        timeout-minutes: 20
       - run: npm run check:shop-performance
+        timeout-minutes: 10
       - name: Retain quality evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
