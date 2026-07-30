@@ -199,6 +199,10 @@ It typechecks every contracted package export with `skipLibCheck: false` before
 publication can start. This catches declaration-bundle defects in the exact
 package archives rather than relying only on source-tree typechecks.
 
+`npm run check:release-sbom-closure` builds the aggregate SPDX document from
+the lockfile and requires every declared package dependency to have an exact
+package/version record before release-artifact generation starts.
+
 `npm run check:reactivity-singleton` additionally packs Core and Reactivity,
 installs them as a consumer's direct dependencies, rejects a nested Core copy,
 and requires both package-resolution paths to identify the same Reactivity
