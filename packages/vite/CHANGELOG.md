@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Ship the HMR client source referenced by the published JavaScript and
+  declaration source maps.
+
 ## [1.6.0] - 2026-07-28
 
 ### Changed

@@ -1,7 +1,7 @@
 import { execFile as execFileCallback } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
-import { basename, resolve } from 'node:path';
+import { basename, posix, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import process from 'node:process';
 import Ajv from 'ajv';
@@ -96,6 +96,7 @@ for (const entry of packageContract.packages) {
   if (firstDigest.digest !== secondDigest.digest || JSON.stringify(firstDigest.files) !== JSON.stringify(secondDigest.files)) {
     throw new Error(`${entry.name} canonical package contents are not reproducible.`);
   }
+  await verifyViteClientSourceMaps(resolve(packageOutput, first.filename), first.files, entry.name);
 
   packageResults.push({
     name: entry.name,
@@ -250,6 +251,29 @@ async function canonicalPackageDigest(archive, files) {
   }
   const digest = sha256(Buffer.from(entries.map((entry) => `${entry.path}\0${entry.sha256}\n`).join('')));
   return { digest, files: entries };
+}
+
+async function verifyViteClientSourceMaps(archive, files, packageName) {
+  if (packageName !== '@gluonjs/vite') return;
+  const included = new Set(files.map(({ path }) => path));
+  for (const mapPath of ['dist/client.js.map', 'dist/client.d.ts.map']) {
+    if (!included.has(mapPath)) throw new Error(`${packageName} package is missing ${mapPath}.`);
+    const { stdout } = await execFile('tar', ['-xOf', archive, `package/${mapPath}`], {
+      cwd: root,
+      encoding: null,
+    });
+    const map = JSON.parse(stdout.toString('utf8'));
+    if (!Array.isArray(map.sources) || map.sources.length === 0) {
+      throw new Error(`${packageName} ${mapPath} must declare at least one source.`);
+    }
+    for (const source of map.sources) {
+      if (typeof source !== 'string') throw new Error(`${packageName} ${mapPath} has an invalid source entry.`);
+      const sourcePath = posix.normalize(posix.join(posix.dirname(mapPath), map.sourceRoot ?? '', source));
+      if (sourcePath === '..' || sourcePath.startsWith('../') || !included.has(sourcePath)) {
+        throw new Error(`${packageName} ${mapPath} references unpublished source ${source}.`);
+      }
+    }
+  }
 }
 
 async function verifyPackedPackageTypes(packages) {

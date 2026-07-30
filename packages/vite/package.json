@@ -26,6 +26,7 @@
   },
   "files": [
     "dist",
+    "src/client.ts",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
