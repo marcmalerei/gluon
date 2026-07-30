@@ -7,6 +7,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Made `@gluonjs/reactivity` an exact peer of `@gluonjs/core` and verify that
+  packed consumers resolve the renderer and application state to one runtime.
+
 ## [1.6.0] - 2026-07-28
 
 ### Added

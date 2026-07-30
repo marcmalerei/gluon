@@ -2,9 +2,26 @@
 
 `GluonElement` integrates `@gluonjs/core` rendering with the shared
 `@gluonjs/reactivity` dependency graph, scheduler, and effect scopes. The Core
-package declares Reactivity as a runtime dependency and leaves that import
-external in its production ESM build so an application uses one reactivity
-identity.
+package declares Reactivity as an exact, required peer and leaves that import
+external in its production ESM build. An application that imports Reactivity
+therefore resolves the same package identity as the Core renderer.
+
+## One Reactivity runtime
+
+Install the lockstep packages together and import application state from the
+public Reactivity entry point:
+
+```sh
+npm install @gluonjs/core@1.6.0 @gluonjs/reactivity@1.6.0
+npm ls @gluonjs/reactivity
+```
+
+The second command should report one deduped `@gluonjs/reactivity@1.6.0` path.
+The repository's packed-consumer gate installs Core and direct application
+Reactivity from separate archives, rejects a nested Core copy, and verifies
+that Node resolves both imports to the same module file. This is a package
+topology contract; package-manager overrides that intentionally isolate peer
+dependencies are outside that verified boundary.
 
 ## Render dependencies and scheduling
 

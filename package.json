@@ -50,7 +50,7 @@
     "access": "public",
     "provenance": true
   },
-  "dependencies": {
+  "peerDependencies": {
     "@gluonjs/reactivity": "1.6.0"
   },
   "scripts": {
@@ -188,6 +188,7 @@
     "check:eleventy-clean-install": "npm run build:ssr && node scripts/validate-eleventy-clean-install.mjs",
     "check:example-previews": "npm run build:shop && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:component-library && node scripts/validate-example-previews.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
+    "check:reactivity-singleton": "node scripts/validate-reactivity-singleton.mjs",
     "check:create-gluon-fixtures": "node scripts/validate-create-gluon-fixtures.mjs",
     "check:vue-analyzer-fixtures": "npm run build:vue-analyzer && node scripts/generate-vue-analyzer-fixtures.mjs --check",
     "check:vue-analyzer-clean-install": "npm run build:vue-analyzer && node scripts/validate-vue-analyzer-clean-install.mjs",
@@ -219,7 +220,7 @@
     "check:release-bootstrap": "node scripts/build-npm-bootstrap-artifacts.mjs --check",
     "check:release-contract": "node scripts/validate-release-contract.mjs",
     "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state",
-    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:eleventy-clean-install && npm run check:example-previews && npm run check:component-library-clean-install && npm run check:storybook:component-library && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
+    "check": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:eleventy-clean-install && npm run check:example-previews && npm run check:component-library-clean-install && npm run check:storybook:component-library && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:reactivity-singleton && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:create-gluon-fixtures && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract && npm run check:release-artifacts"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.6",
