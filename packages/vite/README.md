@@ -65,6 +65,10 @@ inject the virtual HMR client, `import.meta.hot` handlers, stable proxies, or
 module identity strings. The plugin defines `__GLUON_DEV__` as `false`, which
 allows Rollup to remove Core render-debug branches from application bundles.
 
+The packaged HMR client maps reference `src/client.ts`. That exact source file
+ships with `@gluonjs/vite`, so Vite and browser-test diagnostics can resolve
+`dist/client.js` and its declarations without a missing-source warning.
+
 Set `universal: true` for a production client build. The plugin emits
 `gluon-assets.json` with the hashed entry chunk, modulepreload imports, CSS, and
 referenced assets consumed by `@gluonjs/ssr` and static generation. Pass
