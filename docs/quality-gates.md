@@ -199,6 +199,11 @@ It typechecks every contracted package export with `skipLibCheck: false` before
 publication can start. This catches declaration-bundle defects in the exact
 package archives rather than relying only on source-tree typechecks.
 
+`npm run check:reactivity-singleton` additionally packs Core and Reactivity,
+installs them as a consumer's direct dependencies, rejects a nested Core copy,
+and requires both package-resolution paths to identify the same Reactivity
+module. It preserves the renderer/application runtime singleton boundary.
+
 ## Report-only Vue analyzer gate
 
 The preceding `npm run check:project-analysis` gate builds the public language
