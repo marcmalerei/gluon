@@ -354,6 +354,11 @@ The aggregate npm SPDX document is generated from `package-lock.json` with
 generation independent of the not-yet-published exact lockstep package
 versions while preserving the reviewed dependency graph.
 
+`npm run check:release-sbom-closure` runs that exact command before artifact
+creation and requires every dependency declared by an official package,
+including installed peer and optional dependencies, to occur in the aggregate
+SPDX package inventory. It reports the exact missing package and version.
+
 SPDX output is validated against the vendored official SPDX 2.3 JSON schema.
 The release contract pins its upstream commit, source URL, and SHA-256; a schema
 change therefore requires an explicit reviewed contract update.
