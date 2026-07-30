@@ -69,3 +69,15 @@ JSON Forms rules, custom renderer registries, localization, async schemas, and
 file widgets are intentionally unsupported in this slice. An unsupported schema
 or UI schema renders an explicit configuration error rather than silently
 dropping fields.
+
+## 1.6 delivery decision
+
+The direct-property component above is the complete `1.6.0` delivery scope. It
+is the first usable package identified in issue #256 and was delivered in
+[#257](https://github.com/marcmalerei/gluon/issues/257). The listed nested,
+array, reference, composition, rule, registry, localization, and async
+capabilities are not compatibility promises for `1.6.0`; each needs a separate
+future slice that defines its public contract, accessibility behavior, and
+browser evidence before it can become supported. Until then, applications must
+treat the explicit configuration error as the package's only supported response
+to those inputs.
