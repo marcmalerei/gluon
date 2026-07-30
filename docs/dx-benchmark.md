@@ -7,12 +7,18 @@ contract is
 and completed evidence must conform to
 [`benchmarks/dx/schema/run-v1.schema.json`](../benchmarks/dx/schema/run-v1.schema.json).
 
-This repository does not currently contain a completed human-plus-automation
-DX benchmark run. A schema-valid automated-only run retains all 21 framework-
-task records while its `humanPasses` array is deliberately empty. One retained
-record selects the comparator lanes and captures the environment and package
-versions observed on 12 July 2026. A second, explicitly partial record
-captures issue #111's nested checkout/dialog syntax measurements for the
+This repository does not contain a completed human-plus-automation DX benchmark
+run. A schema-valid automated-only run retains all 21 framework-task records
+while its `humanPasses` array is deliberately empty. The 1.6 decision for
+issue #107 therefore uses only the bounded per-dimension conclusion in
+[`dx-scorecard-report.md`](dx-scorecard-report.md): named automated wins, ties,
+losses, and mixed results, but no general DX-superiority claim. A human pass is
+not a release gate for closing that historical issue; it remains required for
+any future human-plus-automation comparison or general claim.
+
+One retained record selects the comparator lanes and captures the environment
+and package versions observed on 12 July 2026. A second, explicitly partial
+record captures issue #111's nested checkout/dialog syntax measurements for the
 T3-local-layers implementation slice. A third partial record captures issue
 #112's retained stateful form-control comparison for T4. Those partial records
 support no win, tie, loss, usability, readability, or general DX-superiority

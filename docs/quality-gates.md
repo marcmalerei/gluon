@@ -305,8 +305,9 @@ fixture mappings, the automated-only schema and committed raw run, and still
 reports zero completed human-plus-automation runs. The DX Scorecard workflow
 executes the full clean-install/HMR/SSR/hydration/diagnostic scorecard every
 Monday and on manual dispatch, retaining raw artifacts for 90 days. Human
-evidence remains required before issue #107 can close. The full contract and
-current boundary are documented in
+evidence remains required for a future human-plus-automation comparison or a
+general DX claim; it is not a release gate for the bounded issue #107 decision.
+The full contract and current boundary are documented in
 [`dx-benchmark.md`](dx-benchmark.md).
 
 The comparator projects have independent pinned TypeScript graphs and are

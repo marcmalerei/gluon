@@ -257,8 +257,10 @@ The versioned issue #107 benchmark contract is documented in
 [`dx-benchmark.md`](dx-benchmark.md). Its retained automated run contains all 21
 framework-task results with exact versions, clean installs, diagnostics,
 three-engine flows, HMR, SSR, and hydration. It deliberately contains no human
-pass. Issue #107 remains open until at least one real participant executes the
-unchanged brief and a maintainer reviews the combined evidence.
+pass. The 1.6 decision closes #107 with its bounded automated win/tie/loss
+report, not a general superiority claim. A real participant using the unchanged
+brief and a fresh version-pinned rerun remain necessary before any future
+human-plus-automation or general-DX conclusion.
 
 ## M4 — Universal Rendering
 

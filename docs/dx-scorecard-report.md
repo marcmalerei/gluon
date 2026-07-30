@@ -1,11 +1,10 @@
-# Automated DX scorecard report
+# Automated DX scorecard and issue #107 decision
 
-This report interprets only
+This report is the final per-dimension decision record for issue #107. It interprets only
 [`automation-8a02472.json`](../benchmarks/dx/runs/automation-8a02472.json),
 captured on 12 July 2026 from commit
-`8a024721fd484dacb79397a0bf257e49c1f4664b`. It is not the final issue #107
-report: the required human usability pass has not occurred, so no general DX
-superiority claim is supported.
+`8a024721fd484dacb79397a0bf257e49c1f4664b`. No human usability pass occurred,
+so the record supports no general DX-superiority claim.
 
 ## Retained lanes
 
@@ -56,10 +55,27 @@ lists remain separate in every raw task record.
   and T6 explicitly measures request state, hydration, and style ownership.
   Removing those concepts solely to reduce a count is an accepted non-goal.
 
-## Remaining blocker
+## Final decision for issue #107
 
-Run the unchanged
-[`human-usability-brief-v1.md`](../benchmarks/dx/human-usability-brief-v1.md)
-with at least one real participant and retain reviewed observations under the
-completed-run schema. Until then issue #107 stays open and this report cannot be
-promoted to a final human-plus-automation comparison.
+Gluon is better only in the named automated dimensions above: retained
+author-created source and configuration for T1–T6, its generated stateful
+control, direct plain-HTML use for T7, and the retained missing-cleanup
+diagnostic. It ties the comparators on the six shared observable flows and on
+invalid prop/event diagnostics. It loses on direct production and development
+dependency counts, and the required-concepts dimension remains mixed. No total
+score or general ranking follows from those facts.
+
+The 1.6 release accepts the missing human pass as a non-goal for closing this
+historical issue; it does **not** treat its absence as favorable evidence or as
+a substitute for participant research. A fresh check on 30 July 2026 confirmed
+that the official [Vue Quick Start](https://vuejs.org/guide/quick-start.html)
+still selects `create-vue`, while the official [React application guide](https://react.dev/learn/creating-a-react-app)
+still recommends framework lanes including React Router. That check does not
+refresh this 12 July version-pinned comparison or turn it into a claim about
+current framework versions.
+
+A future claim that Gluon is generally better than Vue or React requires a new
+version-pinned run of all seven tasks, a real participant study using the
+unchanged [human-usability brief](../benchmarks/dx/human-usability-brief-v1.md),
+and a new per-dimension report. Until then, documentation must use the bounded
+automated conclusion above.
