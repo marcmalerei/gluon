@@ -20,6 +20,24 @@ security, accessibility, retention, performance-evidence, and shop-budget jobs.
 dispatch. It uses the current Node 24-based `actions/checkout@v7` and
 `actions/setup-node@v6` action majors:
 
+Every job has a bounded runtime so a stalled hosted runner is reported as a
+failed check instead of indefinitely blocking a pull request. The job limits
+include cold-runner headroom and are deliberately larger than their individually
+bounded expensive steps:
+
+| Job                    |                   Job limit | Individually bounded expensive work                                                   |
+| ---------------------- | --------------------------: | ------------------------------------------------------------------------------------- |
+| `repository`           |                  35 minutes | install 10, Chromium install 12, full check 25 minutes                                |
+| `browser-engines`      |       30 minutes per engine | install 10, browser install 12, browser matrix 15 minutes                             |
+| `node-runtime`         | 25 minutes per Node version | install 10, build 10, SSR suite 10 minutes                                            |
+| `budgets`              |                  20 minutes | install 10; each build/budget command 5 minutes                                       |
+| `performance-evidence` |                  45 minutes | install 10, all-browser install 20, individual benchmark/check commands 10–20 minutes |
+
+Browser screenshot differences remain uploadable after a failed or timed-out
+browser-test step, and performance evidence remains retained whenever its job
+has not been cancelled. GitHub Actions keeps the failed step logs with the run,
+including an explicit step-timeout message.
+
 - the full `npm run check` gate directly after a clean install on Node 22.12
   with Chromium, so source typechecks cannot depend on leftover or prebuilt
   workspace package exports; the check then builds those public exports before
