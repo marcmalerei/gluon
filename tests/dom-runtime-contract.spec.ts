@@ -426,6 +426,9 @@ describe('DOM runtime contract', () => {
     const strong = root.querySelector('#trusted');
     render(content(trusted), root);
     expect(root.querySelector('#trusted')).toBe(strong);
+    strong!.remove();
+    render(content(trusted), root);
+    expect(root.querySelector('#trusted')).toBe(strong);
 
     const propertyRoot = document.createElement('div');
     expect(() => render(html`<div .innerHTML=${'<em>blocked</em>'}></div>`, propertyRoot)).toThrow(

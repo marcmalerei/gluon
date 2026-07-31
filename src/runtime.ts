@@ -1004,7 +1004,7 @@ class NodePart implements Part {
     }
     this.textNode = undefined;
     this.lastPrimitive = unsetValue;
-    if (!nodesAreInPlace(this.marker, this.nodes)) this.replaceNodes([...this.nodes]);
+    if (!nodesAreInPlace(this.marker, this.nodes)) this.replaceNodes(this.nodes);
   }
 
   private updateKeyedChild(child: KeyedChild, value: TemplateValue, assumeInPlace: boolean): void {
@@ -1116,7 +1116,7 @@ class NodePart implements Part {
 
   private setUnsafeHTML(result: UnsafeHtmlResult): void {
     if (this.unsafeMarkup === result.markup) {
-      this.replaceNodes([...this.nodes]);
+      this.replaceNodes(this.nodes);
       return;
     }
 

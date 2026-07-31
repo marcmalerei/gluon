@@ -111,6 +111,18 @@ describe('keyed list renderer conformance', () => {
     expect(moved.textContent?.trim()).toBe('Bee');
   });
 
+  it('reinstalls externally detached lazy rows without replacing their DOM identities', () => {
+    const root = document.createElement('div');
+    const rows = [row('a'), row('b'), row('c')];
+    render(keyedView(rows), root);
+    const items = listItems(root);
+
+    items[1]!.remove();
+    render(keyedView(rows), root);
+
+    expect(listItems(root)).toEqual(items);
+  });
+
   it('updates lazy primitive rows in place and materializes structural bindings on demand', () => {
     const root = document.createElement('div');
     const view = (item: {
