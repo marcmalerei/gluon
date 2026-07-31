@@ -70,7 +70,9 @@ image pinned to registry digest
 That runtime already contains the matching Chromium, Firefox, and WebKit
 binaries plus their Linux system dependencies. CI therefore performs no
 per-run APT or root-level browser dependency installation. `npm ci` still
-installs the lockfile's matching Playwright JavaScript package.
+installs the lockfile's matching Playwright JavaScript package. Jobs run as the
+image's unprivileged `pwuser`, use `--ipc=host` for Chromium stability, and
+explicitly trust only the checked-out GitHub workspace for benchmark metadata.
 
 Each browser-engine runner reuses that runtime for the browser suite and its
 engine's rendering, component, and runtime measurements. The Chromium runner

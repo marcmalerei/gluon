@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
-      options: --ipc=host
+      options: --ipc=host --user pwuser
     # Independent fixture and release-artifact checks run in parallel jobs.
     # Keep enough headroom for a cold hosted runner while making a stuck runner visible.
     timeout-minutes: 25
@@ -26,6 +26,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@v6
         with:
           node-version: 22.12.0
@@ -39,10 +40,11 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
-      options: --ipc=host
+      options: --ipc=host --user pwuser
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@v6
         with:
           node-version: 22.12.0
@@ -76,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
-      options: --ipc=host
+      options: --ipc=host --user pwuser
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -84,6 +86,7 @@ jobs:
         browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@v6
         with:
           node-version: 22.12.0
