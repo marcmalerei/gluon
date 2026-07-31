@@ -24,6 +24,36 @@ The exact-reverse fast path reuses the direct element for each still-safe
 primitive row, avoiding per-row node-array materialization. Structural,
 mixed, or multi-node rows continue through generic keyed reconciliation.
 
+## Renderer-owned node-array reuse
+
+Issue #295 removed two redundant array copies before private DOM
+reconciliation. An unchanged `unsafeHTML()` value and an externally detached
+stable keyed row now pass the renderer's existing node array back to
+`replaceNodes()`. That method reads the array and retains the same reference; it
+does not mutate the input. DOM identity and external-mutation recovery remain
+covered by focused browser tests.
+
+The production Core build from clean `main` at `801611d` and the candidate
+build were loaded together in each browser with the same reactivity build.
+Separate DOM roots repeatedly rendered one stable three-node `unsafeHTML()`
+value through the same outer template. Build order alternated for 12 warm-up
+rounds and 100 measured samples. Batches were calibrated to at least 12 ms for
+the faster build: 65,536 renders in Chromium and Firefox, and 131,072 in
+WebKit.
+
+| Browser | Main median / p95 ms/op | Candidate median / p95 ms/op |
+| --- | ---: | ---: |
+| Chromium 149 | 0.0002274 / 0.0002319 | 0.0002182 / 0.0002228 |
+| Firefox 151 | 0.0002441 / 0.0002747 | 0.0002289 / 0.0002747 |
+| WebKit 26.5 | 0.0001450 / 0.0001450 | 0.0001373 / 0.0001373 |
+
+Candidate medians were 4.0%, 6.3%, and 5.3% lower respectively. An independent
+run measured 3.3%, 6.3%, and 5.6% lower medians. The reported minified Core
+runtime chunk changed from 79.20 kB to 79.19 kB while its rounded gzip size
+remained 20.86 kB. These figures describe stable raw-markup rerenders on the
+recorded Apple M4 environment. The rarer keyed external-recovery path is
+behaviorally covered but is not included in the throughput claim.
+
 Official production Vite builds also recognize a conservative component-level
 case: one fixed `GluonElement` template with one declared primitive property in
 a text Part and, optionally, one private readonly event handler. Property-only
