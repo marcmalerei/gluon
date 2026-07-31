@@ -65,6 +65,37 @@ describe('usage-driven component styles', () => {
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
   });
 
+  it('keeps equivalent dependency lists stable and swaps unequal lists', () => {
+    const first = createComponentStyleDependency({
+      id: 'comparison-first',
+      sheet: css`.comparison-first { color: red; }`,
+      layer: 'atom',
+      order: 0,
+    });
+    const second = createComponentStyleDependency({
+      id: 'comparison-second',
+      sheet: css`.comparison-second { color: blue; }`,
+      layer: 'atom',
+      order: 1,
+    });
+    const view = (
+      label: string,
+      dependencies: readonly typeof first[],
+    ) => html`<p>${label}</p>`.withStyleDependencies(dependencies);
+
+    render(view('First', [first]), document.body);
+    const paragraph = document.body.querySelector('p');
+    render(view('Updated', [first]), document.body);
+
+    expect(document.body.querySelector('p')).toBe(paragraph);
+    expect(document.adoptedStyleSheets).toContain(first.sheet);
+    expect(document.adoptedStyleSheets).not.toContain(second.sheet);
+
+    render(view('Swapped', [second]), document.body);
+    expect(document.adoptedStyleSheets).not.toContain(first.sheet);
+    expect(document.adoptedStyleSheets).toContain(second.sheet);
+  });
+
   it('rejects deprecated aggregate coexistence instead of double-styling silently', () => {
     adoptStyles(document, atomStyles);
     expect(() => render(Button({ label: 'Conflicting path' }), document.body)).toThrowError(

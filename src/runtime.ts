@@ -545,10 +545,14 @@ function sameComponentStyles(
   left: readonly ComponentStyleDependency[],
   right: readonly ComponentStyleDependency[],
 ): boolean {
+  if (left === right) return true;
   if (left.length !== right.length) return false;
-  return left.every((dependency, index) => (
-    dependency.id === right[index]?.id && dependency.sheet === right[index]?.sheet
-  ));
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index]!.id !== right[index]!.id || left[index]!.sheet !== right[index]!.sheet) {
+      return false;
+    }
+  }
+  return true;
 }
 
 class NodePart implements Part {

@@ -433,6 +433,33 @@ Run the focused benchmark with:
 npm run benchmark:allocations
 ```
 
+## Shared component-style comparison fast path
+
+Issue #292 removed redundant work from repeated component-style claims without
+changing the style metadata or ownership APIs. Unstyled `TemplateResult`
+instances already share one frozen empty dependency list, so identical list
+references now return immediately. Distinct lists use an indexed comparison
+instead of allocating an `Array.prototype.every()` callback.
+
+The production Core build from clean `main` at `28133ca` and the candidate build
+were loaded together in each browser with the same reactivity build. Separate
+DOM roots repeatedly updated one nested unstyled template. The build order
+alternated for eight warm-up rounds and 40 measured samples; every sample
+contained 50,000 updates. Both builds therefore experienced the same browser
+process, timer, and run-level load.
+
+| Browser | Main median / p95 ms/op | Candidate median / p95 ms/op |
+| --- | ---: | ---: |
+| Chromium 149 | 0.000138 / 0.000140 | 0.000124 / 0.000124 |
+| Firefox 151 | 0.000180 / 0.000220 | 0.000180 / 0.000200 |
+| WebKit 26.5 | 0.000120 / 0.000200 | 0.000120 / 0.000160 |
+
+The Chromium median and p95 were 10.1% and 11.4% lower. Firefox and WebKit
+medians stayed at the same timer resolution while their p95 values were one
+timer step lower. These figures describe this controlled nested-template path
+on the recorded Apple M4 environment; they are not a general rendering-speed
+claim.
+
 ## Reactivity debugger fast path
 
 Reactive effects may opt into `onTrack` and `onTrigger` debugger hooks. Normal
