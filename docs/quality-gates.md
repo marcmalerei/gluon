@@ -95,13 +95,22 @@ GLUON_FIXTURE_CONCURRENCY=2 npm run check:create-gluon-fixtures
 Issue #297 recorded the pre-change baselines: 11:54 wall-clock for a successful
 Quality Gates run, 10:57 for its serial repository command, 4:14 for the
 create-gluon fixture section on the hosted runner, and 143.76 seconds for the
-same serial fixture validator on the recorded local machine. Post-change timing
-must identify the run and keep hosted-runner and local measurements separate.
+same serial fixture validator on the recorded local machine.
+
+The first post-change hosted
+[run 30619723521](https://github.com/marcmalerei/gluon/actions/runs/30619723521)
+on implementation commit `03b5f3d` completed all ten jobs in 4:33, a 61.8%
+wall-clock reduction from 11:54. The repository and create-gluon jobs completed
+in 4:20 and 4:24; the fixture command itself took 2:39 instead of 4:14. The
+browserless evidence aggregator completed in 21 seconds. Summed job occupancy
+fell from 23:18 to 20:54 despite adding separately visible fixture and
+release-artifact jobs.
+
 On the same local machine, the bounded validator completed in 100.08 seconds
 with two workers and 87.22 seconds with four workers; the separated repository
 and release-artifact lanes completed in 211.84 and 43.45 seconds respectively.
-These local results validate scheduling behavior but do not predict hosted
-runner timing.
+Hosted-runner and local measurements remain separate because they describe
+different hardware and scheduling environments.
 
 The component comparison builds the compiler first and runs the harness through
 the official production Vite plugin. Compiler tests prove both the accepted
