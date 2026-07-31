@@ -1,13 +1,13 @@
 # Release readiness
 
-The `1.6.0` documentation describes the prepared lockstep candidate. All 20
-official manifests are at `1.6.0`. Registry preflight on 2026-07-28 confirmed
-that the 19 established package records expose `1.5.0` as `latest`, `1.6.0` is
-absent, and the new `@gluonjs/json-forms` record needs the reviewed bootstrap
-before trusted publication can begin. Immutable GitHub release `v1.5.0` remains
-the current finalized release during candidate review. The historical `v1.0.9`
-GitHub release remains a draft after its public-type verification failure. The
-`@gluonjs` scope remains verified in the package contract.
+The `1.6.0` documentation describes the completed lockstep release. All 20
+official manifests are at `1.6.0`. Release run `30605909445` published every
+contracted package under `latest` with npm provenance, passed clean-room
+installation and public-type verification, and published immutable GitHub
+release `v1.6.0` on 2026-07-31. The historical `v1.0.9` GitHub release remains
+a draft after its public-type verification failure. The `@gluonjs` scope,
+package records, and trusted-publisher bindings are verified in the package
+contract.
 
 Gluon's release group contains 20 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
