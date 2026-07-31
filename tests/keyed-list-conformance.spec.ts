@@ -170,6 +170,57 @@ describe('keyed list renderer conformance', () => {
     expect(item.textContent).toBe('');
   });
 
+  it('reverses anchor-free lazy primitive rows without materializing them', () => {
+    const root = document.createElement('div');
+    const rows = [row('a', 'Alpha'), row('b', 'Beta'), row('c', 'Gamma')];
+    const view = (items: readonly Row[]) => html`<ul>${repeat(
+      items,
+      (item) => item.id,
+      (item) => html`<li data-id=${item.id}>${item.label}</li>`,
+    )}</ul>`;
+
+    render(view(rows), root);
+    const list = root.querySelector('ul')!;
+    const identities = [...list.childNodes];
+
+    render(view([
+      rows[2]!,
+      { ...rows[1]!, label: 'Updated Beta' },
+      rows[0]!,
+    ]), root);
+
+    expect([...list.childNodes]).toEqual([identities[0]!, ...identities.slice(1).reverse()]);
+    expect([...list.childNodes].slice(1).every((node) => node instanceof HTMLLIElement)).toBe(true);
+    expect(list.querySelector('[data-id="b"]')?.textContent).toBe('Updated Beta');
+  });
+
+  it('falls back to generic reconciliation when a reversed lazy row becomes structural', () => {
+    const root = document.createElement('div');
+    type Item = { readonly id: string; readonly content: TemplateValue };
+    const view = (items: readonly Item[]) => html`<ul>${repeat(
+      items,
+      (item) => item.id,
+      (item) => html`<li data-id=${item.id}>${item.content}</li>`,
+    )}</ul>`;
+    const initial: readonly Item[] = [
+      { id: 'a', content: 'Alpha' },
+      { id: 'b', content: 'Beta' },
+    ];
+
+    render(view(initial), root);
+    const list = root.querySelector('ul')!;
+    const first = list.querySelector('[data-id="a"]')!;
+    const second = list.querySelector('[data-id="b"]')!;
+
+    render(view([
+      { id: 'b', content: html`<strong>Beta</strong>` },
+      { id: 'a', content: 'Alpha' },
+    ]), root);
+
+    expect([...list.querySelectorAll('li')]).toEqual([second, first]);
+    expect(second.querySelector('strong')?.textContent).toBe('Beta');
+  });
+
   it('clones pristine primitive prototypes without sharing mounted DOM mutations', () => {
     const firstRoot = document.createElement('div');
     const secondRoot = document.createElement('div');

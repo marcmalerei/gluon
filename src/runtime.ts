@@ -847,8 +847,8 @@ class NodePart implements Part {
     for (let index = 0; reverseOrder && index < keys.length; index += 1) {
       reverseOrder = this.keyedChildren[index]!.key === keys[keys.length - index - 1];
     }
-    if (reverseOrder && this.marker.parentNode) {
-      const parent = this.marker.parentNode;
+    const parent = this.marker.parentNode;
+    if (reverseOrder && parent) {
       const reference = this.marker.nextSibling;
       const nextChildren: KeyedChild[] = [];
       const nextNodes: Node[] = [];
@@ -857,10 +857,15 @@ class NodePart implements Part {
         const child = this.keyedChildren[keys.length - index - 1]!;
         const value = values[index]!;
         this.updateKeyedChild(child, value, true);
-        const childNodes = keyedChildNodes(child);
-        if (childNodes[0] !== reference) moveNodesBefore(parent, childNodes, reference);
+        if (isLazyPrimitiveKeyedChild(child) && !child.part) {
+          if (child.element !== reference) parent.insertBefore(child.element, reference);
+          nextNodes.push(child.element);
+        } else {
+          const childNodes = keyedChildNodes(child);
+          if (childNodes[0] !== reference) moveNodesBefore(parent, childNodes, reference);
+          nextNodes.push(...childNodes);
+        }
         nextChildren.push(child);
-        nextNodes.push(...childNodes);
       }
 
       this.keyedChildren = nextChildren;
@@ -892,7 +897,6 @@ class NodePart implements Part {
 
     const previousChildren = this.keyedChildren;
     const previousNodes = this.nodes;
-    const parent = this.marker.parentNode;
     const nodesInPlace = Boolean(parent && nodesAreInPlace(this.marker, previousNodes));
     const boundary = nodesInPlace && previousNodes.length > 0
       ? previousNodes[previousNodes.length - 1]!.nextSibling
