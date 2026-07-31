@@ -27,10 +27,10 @@ bounded expensive steps:
 
 | Job                       |                   Job limit | Individually bounded expensive work                                                       |
 | ------------------------- | --------------------------: | ----------------------------------------------------------------------------------------- |
-| `repository`              |                  25 minutes | install 10, Chromium install 12, repository check 18 minutes                              |
-| `create-gluon-fixtures`   |                  25 minutes | install 10, Chromium install 12, build 10, fixture matrix 15 minutes                       |
+| `repository`              |                  25 minutes | install 10, repository check 18 minutes                                                    |
+| `create-gluon-fixtures`   |                  25 minutes | install/build 10 each, fixture matrix 15 minutes                                           |
 | `release-artifacts`       |                  25 minutes | install/build 10 each, release-artifact check 12 minutes                                   |
-| `browser-engines`         |       30 minutes per engine | install 10, browser install 12, browser matrix 15, individual evidence commands 10–15 min |
+| `browser-engines`         |       30 minutes per engine | install 10, browser matrix 15, individual evidence commands 10–15 minutes                 |
 | `node-runtime`            | 25 minutes per Node version | install 10, build 10, SSR suite 10 minutes                                                |
 | `budgets`                 |                  20 minutes | install 10; each build/budget command 5 minutes                                           |
 | `performance-evidence`    |                  10 minutes | artifact aggregation and completeness validation 5 minutes                                |
@@ -64,19 +64,27 @@ step logs with the run, including an explicit step-timeout message.
 boundaries in parallel jobs; `check:repository` alone is not complete release
 evidence.
 
-Each browser-engine runner provisions exactly its own Playwright engine and
-Linux dependencies with `playwright install --with-deps <engine>`, then reuses
-that installation for the browser suite and that engine's rendering,
-component, and runtime measurements. The Chromium runner additionally owns the
-bundle-parity, component-loader, Storybook, and GLUON GOODS performance gates.
-The `performance-evidence` job downloads those three engine artifacts and runs
-`npm run check:performance-evidence`; it installs no packages or browsers. The
-validator rejects missing engines, mismatched commits, failed runtime/shop
-budgets, missing Chromium reports, and missing Markdown or screenshot evidence.
+Every browser-executing CI job runs in the official Playwright 1.61.1 Noble
+image pinned to registry digest
+`sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48`.
+That runtime already contains the matching Chromium, Firefox, and WebKit
+binaries plus their Linux system dependencies. CI therefore performs no
+per-run APT or root-level browser dependency installation. `npm ci` still
+installs the lockfile's matching Playwright JavaScript package.
 
-The release workflow uses the same engine-artifact and aggregation boundary.
-Its candidate runs `check:repository`, while the complete create-gluon fixture
-matrix remains a separate blocking release job.
+Each browser-engine runner reuses that runtime for the browser suite and its
+engine's rendering, component, and runtime measurements. The Chromium runner
+additionally owns the bundle-parity, component-loader, Storybook, and GLUON
+GOODS performance gates. The `performance-evidence` job downloads those three
+engine artifacts and runs `npm run check:performance-evidence`; it installs no
+packages or browsers. The validator rejects missing engines, mismatched
+commits, failed runtime/shop budgets, missing Chromium reports, and missing
+Markdown or screenshot evidence.
+
+The release workflow uses the same image, engine-artifact, and aggregation
+boundaries. Its candidate runs `check:repository`, while the complete
+create-gluon fixture matrix remains a separate blocking release job. The
+scheduled DX scorecard uses the same browser runtime.
 
 The create-gluon validator still performs an isolated `npm install`, typecheck,
 template check, test, and production build for every supported generated
@@ -105,6 +113,15 @@ in 4:20 and 4:24; the fixture command itself took 2:39 instead of 4:14. The
 browserless evidence aggregator completed in 21 seconds. Summed job occupancy
 fell from 23:18 to 20:54 despite adding separately visible fixture and
 release-artifact jobs.
+
+The next documentation-only
+[run 30620103854](https://github.com/marcmalerei/gluon/actions/runs/30620103854)
+reproduced the remaining provisioning risk: every substantive non-Firefox job
+finished, but `playwright install --with-deps firefox` alone reached its
+12-minute step timeout and failed after 12:39 of job time. The pinned runtime
+image removes that APT-backed step from quality, release, and scheduled DX
+workflows; subsequent hosted evidence must measure the image boundary rather
+than infer an improvement from its design.
 
 On the same local machine, the bounded validator completed in 100.08 seconds
 with two workers and 87.22 seconds with four workers; the separated repository
@@ -315,7 +332,9 @@ After every isolated dependency install, the gate groups testing fixtures by
 their resolved local Playwright version. One representative local CLI
 provisions Chromium for each exact version in the shared Playwright cache.
 Every fixture therefore retains the browser revision required by its own
-dependencies without repeating the same installer process 16 times.
+dependencies without repeating the same installer process 16 times. In CI this
+can add a browser revision absent from the pinned runtime image, but it does not
+download or install operating-system packages.
 
 `npm run test:create-gluon` separately covers deterministic planning, dry-run
 non-mutation, public imports, dependency direction, barrel sorting, malformed

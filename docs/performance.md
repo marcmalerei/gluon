@@ -141,6 +141,11 @@ npm run benchmark:runtime
 npm run profile:component-property-state
 ```
 
+Hosted quality, release, and DX runs use the digest-pinned official Playwright
+1.61.1 Noble image, which already supplies these engines and their Linux system
+dependencies. The install command remains the local-development path; hosted
+workflows do not repeat it or invoke `--with-deps`.
+
 The default run uses Chromium, Firefox, and WebKit with eight warm-up rounds and
 40 measured samples. A shorter local diagnostic run can select browsers and
 sample counts explicitly:

@@ -234,6 +234,12 @@ explicitly rejects branded-product support claims. Both evidence files must name
 the same tested commit and successful Quality Gates run. After that commit,
 strict validation permits only those two evidence files to change.
 
+Release jobs that execute browsers use the same digest-pinned official
+Playwright 1.61.1 Noble image as Quality Gates. Its matching browser binaries
+and Linux system dependencies replace per-run `playwright install --with-deps`
+downloads; fixture projects still provision one Chromium revision per distinct
+resolved Playwright version when the image does not already contain it.
+
 Do not change `package-contract.json` from `blocked`/`unverified` to
 `ready`/`verified` until those facts have been checked by an owner.
 

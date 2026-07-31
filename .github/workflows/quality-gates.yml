@@ -16,6 +16,9 @@ concurrency:
 jobs:
   repository:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host
     # Independent fixture and release-artifact checks run in parallel jobs.
     # Keep enough headroom for a cold hosted runner while making a stuck runner visible.
     timeout-minutes: 25
@@ -29,13 +32,14 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
-      - run: npx playwright install --with-deps chromium
-        timeout-minutes: 12
       - run: npm run check:repository
         timeout-minutes: 18
 
   create-gluon-fixtures:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
@@ -45,8 +49,6 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
-      - run: npx playwright install --with-deps chromium
-        timeout-minutes: 12
       - run: npm run build
         timeout-minutes: 10
       - run: npm run check:create-gluon-fixtures
@@ -72,6 +74,9 @@ jobs:
 
   browser-engines:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -85,8 +90,6 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
-      - run: npx playwright install --with-deps ${{ matrix.browser }}
-        timeout-minutes: 12
       - run: npm run test:browser-matrix
         timeout-minutes: 15
         env:
