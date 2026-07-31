@@ -7,34 +7,28 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.6.0` candidate. Every official
-manifest is public and lockstep at `1.6.0`. Registry preflight on 2026-07-28
-confirmed that the 19 previously contracted packages expose `1.5.0` as `latest`,
-that `1.6.0` is absent, and that the new `@gluonjs/json-forms` record needs the
-reviewed bootstrap before trusted publication can begin. Immutable GitHub release
-`v1.5.0` remains the current finalized release; the `v1.0.9` GitHub release remains a draft after its
-public-type verification failure. This is enforced locally by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for the completed `1.6.0` release. Every official
+manifest is public and lockstep at `1.6.0`. Release run `30605909445` published
+all 20 contracted npm packages under `latest` with npm provenance, passed
+clean-room installation and public-type verification, and published immutable
+GitHub release `v1.6.0` on 2026-07-31. The `v1.0.9` GitHub release remains a
+draft after its public-type verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.6.0 train handoff
+## v1.6.0 train completion
 
 Issue [#270](https://github.com/marcmalerei/gluon/issues/270) established the
 20-package `1.6.0` train, and [#257](https://github.com/marcmalerei/gluon/issues/257)
-delivered its first new package, `@gluonjs/json-forms`. The train is ready for
-the two-commit release cut: a Quality-Gates-tested candidate followed only by
-its release-cut evidence and compatibility manifest. The immutable v1.5.0
-recovery baseline remains outside that cut.
-
-Publication remains deliberately outside an ordinary pull request. Before the
-owner creates the protected `v1.6.0` tag, every official npm package must have
-an owner-reviewed package record and the exact Trusted Publishing binding for
-`release.yml` in the `npm` environment. The tag-triggered Release workflow
-then creates a GitHub draft, publishes the reviewed archives with provenance,
-verifies the registry train, and only then publishes the immutable release.
+delivered its first new package, `@gluonjs/json-forms`. Protected tag `v1.6.0`
+resolved to release source commit
+`fc3632f4b05e0f144dc63ec7510d83c9425361ff`. The tag-triggered Release workflow
+created the GitHub draft, published the reviewed archives with provenance,
+verified the complete registry train, and then published the immutable release.
+The immutable v1.5.0 recovery baseline remained outside that release cut.
 
 The validator checks the package-contract JSON against its declared schema,
 lockstep manifest and lockfile versions, exact
