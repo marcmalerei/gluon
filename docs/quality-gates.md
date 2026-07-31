@@ -25,23 +25,26 @@ failed check instead of indefinitely blocking a pull request. The job limits
 include cold-runner headroom and are deliberately larger than their individually
 bounded expensive steps:
 
-| Job                    |                   Job limit | Individually bounded expensive work                                                   |
-| ---------------------- | --------------------------: | ------------------------------------------------------------------------------------- |
-| `repository`           |                  35 minutes | install 10, Chromium install 12, full check 25 minutes                                |
-| `browser-engines`      |       30 minutes per engine | install 10, browser install 12, browser matrix 15 minutes                             |
-| `node-runtime`         | 25 minutes per Node version | install 10, build 10, SSR suite 10 minutes                                            |
-| `budgets`              |                  20 minutes | install 10; each build/budget command 5 minutes                                       |
-| `performance-evidence` |                  45 minutes | install 10, all-browser install 20, individual benchmark/check commands 10–20 minutes |
+| Job                       |                   Job limit | Individually bounded expensive work                                                       |
+| ------------------------- | --------------------------: | ----------------------------------------------------------------------------------------- |
+| `repository`              |                  25 minutes | install 10, Chromium install 12, repository check 18 minutes                              |
+| `create-gluon-fixtures`   |                  25 minutes | install 10, Chromium install 12, build 10, fixture matrix 15 minutes                       |
+| `release-artifacts`       |                  25 minutes | install/build 10 each, release-artifact check 12 minutes                                   |
+| `browser-engines`         |       30 minutes per engine | install 10, browser install 12, browser matrix 15, individual evidence commands 10–15 min |
+| `node-runtime`            | 25 minutes per Node version | install 10, build 10, SSR suite 10 minutes                                                |
+| `budgets`                 |                  20 minutes | install 10; each build/budget command 5 minutes                                           |
+| `performance-evidence`    |                  10 minutes | artifact aggregation and completeness validation 5 minutes                                |
 
-Browser screenshot differences remain uploadable after a failed or timed-out
-browser-test step, and performance evidence remains retained whenever its job
-has not been cancelled. GitHub Actions keeps the failed step logs with the run,
-including an explicit step-timeout message.
+Browser screenshot differences and partial engine evidence remain uploadable
+after a failed or timed-out browser-test step. GitHub Actions keeps the failed
+step logs with the run, including an explicit step-timeout message.
 
-- the full `npm run check` gate directly after a clean install on Node 22.12
-  with Chromium, so source typechecks cannot depend on leftover or prebuilt
-  workspace package exports; the check then builds those public exports before
-  coverage and integration suites consume them;
+- the `npm run check:repository` gate directly after a clean install on Node
+  22.12 with Chromium, so source typechecks cannot depend on leftover or
+  prebuilt workspace package exports; the check then builds those public
+  exports before coverage and integration suites consume them;
+- the complete create-gluon fixture matrix and release-artifact check in
+  independent jobs, so neither serializes the repository critical path;
 - the browser, Router, test-utils, Devtools, Playground, and GLUON GOODS suites
   with Playwright Chromium, Firefox, and WebKit;
 - production builds plus SSR tests on Node 22.12 and Node 24;
@@ -54,6 +57,51 @@ including an explicit step-timeout message.
 - a production Chromium GLUON GOODS flow budget and a ten-sample comparative
   Chromium/Firefox/WebKit rendering run retained for 30 days as JSON and
   Markdown workflow artifacts.
+
+`npm run check` remains the complete local gate. It composes
+`check:repository`, `check:create-gluon-fixtures`, and
+`check:release-artifacts` in that order. The CI workflow runs those same
+boundaries in parallel jobs; `check:repository` alone is not complete release
+evidence.
+
+Each browser-engine runner provisions exactly its own Playwright engine and
+Linux dependencies with `playwright install --with-deps <engine>`, then reuses
+that installation for the browser suite and that engine's rendering,
+component, and runtime measurements. The Chromium runner additionally owns the
+bundle-parity, component-loader, Storybook, and GLUON GOODS performance gates.
+The `performance-evidence` job downloads those three engine artifacts and runs
+`npm run check:performance-evidence`; it installs no packages or browsers. The
+validator rejects missing engines, mismatched commits, failed runtime/shop
+budgets, missing Chromium reports, and missing Markdown or screenshot evidence.
+
+The release workflow uses the same engine-artifact and aggregation boundary.
+Its candidate runs `check:repository`, while the complete create-gluon fixture
+matrix remains a separate blocking release job.
+
+The create-gluon validator still performs an isolated `npm install`, typecheck,
+template check, test, and production build for every supported generated
+project. It prepares all 20 starter combinations, five component kinds, and the
+retained DX fixture, then executes independent installs and validations with
+bounded concurrency. The default is half the available logical concurrency,
+capped at four workers. Testing fixtures are grouped by their actually
+installed Playwright version and Chromium is provisioned once per version, not
+once per fixture. Use either form to reproduce a specific scheduling boundary:
+
+```bash
+npm run check:create-gluon-fixtures -- --concurrency=1
+GLUON_FIXTURE_CONCURRENCY=2 npm run check:create-gluon-fixtures
+```
+
+Issue #297 recorded the pre-change baselines: 11:54 wall-clock for a successful
+Quality Gates run, 10:57 for its serial repository command, 4:14 for the
+create-gluon fixture section on the hosted runner, and 143.76 seconds for the
+same serial fixture validator on the recorded local machine. Post-change timing
+must identify the run and keep hosted-runner and local measurements separate.
+On the same local machine, the bounded validator completed in 100.08 seconds
+with two workers and 87.22 seconds with four workers; the separated repository
+and release-artifact lanes completed in 211.84 and 43.45 seconds respectively.
+These local results validate scheduling behavior but do not predict hosted
+runner timing.
 
 The component comparison builds the compiler first and runs the harness through
 the official production Vite plugin. Compiler tests prove both the accepted
@@ -254,10 +302,11 @@ Custom Element, or headless wrapper, then installs, typechecks, runs
 `gluon-template-check`, executes the generated Chromium browser test, builds
 client and SSR entries, and runs `npm pack --dry-run --json`.
 
-Each testing fixture installs Chromium through its own local Playwright CLI
-after its dependencies are installed. That makes the fixture browser revision
-match its resolved testing dependencies instead of relying on the repository
-runner's Playwright cache.
+After every isolated dependency install, the gate groups testing fixtures by
+their resolved local Playwright version. One representative local CLI
+provisions Chromium for each exact version in the shared Playwright cache.
+Every fixture therefore retains the browser revision required by its own
+dependencies without repeating the same installer process 16 times.
 
 `npm run test:create-gluon` separately covers deterministic planning, dry-run
 non-mutation, public imports, dependency direction, barrel sorting, malformed
@@ -387,11 +436,14 @@ measured desktop Chromium flows, preserves every raw duration, and fails with
 the exact metric, actual p95, limit, and overage. The command builds Core,
 Compiler, and the Gluon Vite plugin first, so it works from a clean checkout.
 
-The `performance-evidence` job also runs the Gluon/Lit/Vue/Vanilla comparison
-with four warm-ups and ten samples in Chromium, Firefox, and WebKit. It uploads
-both benchmarks' JSON and Markdown output as a commit-named artifact retained
-for 30 days. These CI samples are regression and review evidence; the larger
-committed baseline remains the evidence used for comparative prose.
+The browser-engine jobs run the Gluon/Lit/Vue/Vanilla comparison with four
+warm-ups and ten samples in Chromium, Firefox, and WebKit. Each engine writes a
+separate `rendering-<engine>`, `components-<engine>`, and
+`runtime-scorecard-<engine>` JSON/Markdown pair because hosted runners are
+separate measurement environments. The browserless `performance-evidence`
+aggregator validates and uploads the complete commit-named artifact for 30
+days. These CI samples are regression and review evidence; the larger committed
+baseline remains the evidence used for comparative prose.
 
 ## Release-cut evidence boundary
 

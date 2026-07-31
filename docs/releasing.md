@@ -405,10 +405,14 @@ the normal reviewed `ready` candidate transition.
 
 After a normal candidate PR is merged with its tested commit preserved in
 history and all gates are green, create the exact reviewed `v<version>` tag.
-The tag starts the `Release` workflow. Its candidate job repeats the full
-repository check and artifact build. The single-operator `npm` environment then
-admits the publication job without independent approval. It permits only `v*`
-tags and disallows administrator bypass and long-lived npm secrets.
+The tag starts the `Release` workflow. Its candidate job repeats the repository
+lane and artifact build, while a parallel blocking job repeats the complete
+create-gluon fixture matrix. The browser-engine jobs reuse their provisioned
+engine for release performance evidence, and the browserless aggregator rejects
+an incomplete evidence set before publication. The single-operator `npm`
+environment then admits the publication job without independent approval. It
+permits only `v*` tags and disallows administrator bypass and long-lived npm
+secrets.
 
 The canonical `v1.0.7` tag cannot be moved or deleted after the squash-merge
 failure. Its only permitted recovery uses protected tag

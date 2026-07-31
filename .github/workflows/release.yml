@@ -50,7 +50,7 @@ jobs:
             echo "RELEASE_TAG=v$DISPATCH_VERSION" >> "$GITHUB_ENV"
           fi
       - run: node scripts/validate-release-recovery.mjs --version "$RELEASE_VERSION" --allow-pending-evidence
-      - run: npm run check
+      - run: npm run check:repository
       - run: npm run release:validate -- --candidate "$RELEASE_VERSION"
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION"
       - name: Retain release candidate
@@ -64,7 +64,7 @@ jobs:
 
   publish:
     if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
-    needs: [candidate, reproducibility, browser-engines, node-runtime, performance-evidence]
+    needs: [candidate, reproducibility, create-gluon-fixtures, browser-engines, node-runtime, performance-evidence]
     runs-on: ubuntu-latest
     environment: npm
     permissions:
@@ -200,6 +200,19 @@ jobs:
           if-no-files-found: error
           include-hidden-files: true
 
+  create-gluon-fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run check:create-gluon-fixtures
+
   browser-engines:
     runs-on: ubuntu-latest
     strategy:
@@ -217,6 +230,28 @@ jobs:
       - run: npm run test:browser-matrix
         env:
           GLUON_BROWSER: ${{ matrix.browser }}
+      - run: npm run benchmark:rendering -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering-${{ matrix.browser }}.json
+      - run: npm run benchmark:components -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/components-${{ matrix.browser }}.json
+      - run: npm run benchmark:runtime -- --browsers=${{ matrix.browser }} --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard-${{ matrix.browser }}.json
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run benchmark:bundle
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: cp .tmp/bundle-matrix/report.json .tmp/quality-evidence/bundle-matrix.json
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:component-library-loader-build
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:storybook:component-library
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:shop-performance
+      - name: Retain engine performance evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: gluon-${{ github.sha }}-performance-${{ matrix.browser }}
+          path: .tmp/quality-evidence
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true
 
   node-runtime:
     runs-on: ubuntu-latest
@@ -235,18 +270,19 @@ jobs:
       - run: npm run test:ssr
 
   performance-evidence:
+    needs: browser-engines
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.12.0
-          cache: npm
-      - run: npm ci --ignore-scripts --legacy-peer-deps
-      - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
-      - run: npm run benchmark:components -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/components.json
-      - run: npm run check:shop-performance
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: gluon-${{ github.sha }}-performance-*
+          path: .tmp/quality-evidence
+          merge-multiple: true
+      - run: npm run check:performance-evidence
       - name: Retain release performance evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

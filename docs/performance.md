@@ -72,8 +72,12 @@ browser versions, Node and npm versions, operating system, CPU, and memory.
 
 Every pull request and `main` run additionally retains ten-sample template and
 component Chromium/Firefox/WebKit comparisons plus the production GLUON GOODS
-customer-flow budget output and the expanded runtime scorecard for 30 days in the
-`quality-evidence-<commit>` workflow artifact. Those shorter CI runs detect
+customer-flow budget output and the expanded runtime scorecard for 30 days in
+the `quality-evidence-<commit>` workflow artifact. Each engine is measured on
+the runner that already provisioned it for the browser matrix and therefore
+writes separate `*-chromium`, `*-firefox`, and `*-webkit` JSON/Markdown pairs.
+A browserless aggregation gate verifies that all three commits and engine
+records agree before retaining the artifact. Those shorter CI runs detect
 regressions but do not replace the larger committed matrices used by the
 comparative text below.
 
