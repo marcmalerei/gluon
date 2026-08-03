@@ -16,9 +16,49 @@ concurrency:
 jobs:
   repository:
     runs-on: ubuntu-latest
-    # A successful full check normally completes in roughly 10–12 minutes.
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host --user pwuser
+    # Independent fixture and release-artifact checks run in parallel jobs.
     # Keep enough headroom for a cold hosted runner while making a stuck runner visible.
-    timeout-minutes: 35
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
+      - run: npm run check:repository
+        timeout-minutes: 18
+
+  create-gluon-fixtures:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host --user pwuser
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+        timeout-minutes: 10
+      - run: npm run build
+        timeout-minutes: 10
+      - run: npm run check:create-gluon-fixtures
+        timeout-minutes: 15
+
+  release-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,13 +69,16 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
-      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+        timeout-minutes: 10
+      - run: npm run check:release-artifacts
         timeout-minutes: 12
-      - run: npm run check
-        timeout-minutes: 25
 
   browser-engines:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host --user pwuser
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -43,18 +86,46 @@ jobs:
         browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@v6
         with:
           node-version: 22.12.0
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
-      - run: npx playwright install --with-deps ${{ matrix.browser }}
-        timeout-minutes: 12
       - run: npm run test:browser-matrix
         timeout-minutes: 15
         env:
           GLUON_BROWSER: ${{ matrix.browser }}
+      - run: npm run benchmark:rendering -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering-${{ matrix.browser }}.json
+        timeout-minutes: 10
+      - run: npm run benchmark:components -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/components-${{ matrix.browser }}.json
+        timeout-minutes: 10
+      - run: npm run benchmark:runtime -- --browsers=${{ matrix.browser }} --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard-${{ matrix.browser }}.json
+        timeout-minutes: 12
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run benchmark:bundle
+        timeout-minutes: 10
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: cp .tmp/bundle-matrix/report.json .tmp/quality-evidence/bundle-matrix.json
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:component-library-loader-build
+        timeout-minutes: 10
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:storybook:component-library
+        timeout-minutes: 15
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:shop-performance
+        timeout-minutes: 10
+      - name: Retain engine performance evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-engine-evidence-${{ matrix.browser }}-${{ github.sha }}
+          path: .tmp/quality-evidence
+          retention-days: 7
+          if-no-files-found: ignore
+          include-hidden-files: true
       - name: Retain browser screenshot differences
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
@@ -106,39 +177,26 @@ jobs:
         timeout-minutes: 5
 
   performance-evidence:
+    needs: browser-engines
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 22.12.0
-          cache: npm
-      - run: npm ci --ignore-scripts --legacy-peer-deps
-        timeout-minutes: 10
-      - run: npx playwright install --with-deps chromium firefox webkit
-        timeout-minutes: 20
-      - run: npm run benchmark:bundle
-        timeout-minutes: 10
-      - run: npm run check:component-library-loader-build
-        timeout-minutes: 10
-      - run: npm run check:storybook:component-library
-        timeout-minutes: 15
-      - run: npm run benchmark:rendering -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering.json
-        timeout-minutes: 15
-      - run: npm run benchmark:components -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/components.json
-        timeout-minutes: 15
-      - run: npm run benchmark:runtime -- --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard.json
-        timeout-minutes: 20
-      - run: npm run check:shop-performance
-        timeout-minutes: 10
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: quality-engine-evidence-*-${{ github.sha }}
+          path: .tmp/quality-evidence
+          merge-multiple: true
+      - run: npm run check:performance-evidence
+        timeout-minutes: 5
       - name: Retain quality evidence
-        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: quality-evidence-${{ github.sha }}
-          path: |
-            .tmp/quality-evidence
-            .tmp/bundle-matrix/report.json
+          path: .tmp/quality-evidence
           retention-days: 30
           if-no-files-found: error
+          include-hidden-files: true

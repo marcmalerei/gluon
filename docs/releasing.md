@@ -234,6 +234,13 @@ explicitly rejects branded-product support claims. Both evidence files must name
 the same tested commit and successful Quality Gates run. After that commit,
 strict validation permits only those two evidence files to change.
 
+Release jobs that execute browsers use the same digest-pinned official
+Playwright 1.61.1 Noble image as Quality Gates. Its matching browser binaries
+and Linux system dependencies replace per-run `playwright install --with-deps`
+downloads. Browser jobs run as the image's unprivileged `pwuser`; fixture
+projects still provision one Chromium revision per distinct resolved Playwright
+version when the image does not already contain it.
+
 Do not change `package-contract.json` from `blocked`/`unverified` to
 `ready`/`verified` until those facts have been checked by an owner.
 
@@ -405,10 +412,14 @@ the normal reviewed `ready` candidate transition.
 
 After a normal candidate PR is merged with its tested commit preserved in
 history and all gates are green, create the exact reviewed `v<version>` tag.
-The tag starts the `Release` workflow. Its candidate job repeats the full
-repository check and artifact build. The single-operator `npm` environment then
-admits the publication job without independent approval. It permits only `v*`
-tags and disallows administrator bypass and long-lived npm secrets.
+The tag starts the `Release` workflow. Its candidate job repeats the repository
+lane and artifact build, while a parallel blocking job repeats the complete
+create-gluon fixture matrix. The browser-engine jobs reuse their provisioned
+engine for release performance evidence, and the browserless aggregator rejects
+an incomplete evidence set before publication. The single-operator `npm`
+environment then admits the publication job without independent approval. It
+permits only `v*` tags and disallows administrator bypass and long-lived npm
+secrets.
 
 The canonical `v1.0.7` tag cannot be moved or deleted after the squash-merge
 failure. Its only permitted recovery uses protected tag

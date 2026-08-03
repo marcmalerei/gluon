@@ -15,15 +15,18 @@ concurrency:
 jobs:
   automated-evidence:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+      options: --ipc=host --user pwuser
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@v6
         with:
           node-version: 22.22.2
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
-      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run build
       - run: npm run benchmark:dx -- --output=.tmp/dx-scorecard/${{ github.sha }}.json
       - name: Retain raw automated evidence
