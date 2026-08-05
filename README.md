@@ -131,13 +131,11 @@ file collisions require both `--overwrite` and the separate
 
 ## Agent guidance on installation
 
-Installing `@gluonjs/core` normally creates a protected, idempotent `SKILL.md`
-in the application root. It documents the current public package boundaries
-and verified Gluon, Vite, Storybook, and UI-layer patterns for coding agents.
-Existing files are never silently replaced. See the
+Installing `@gluonjs/core` leaves the application source tree unchanged. Run
+`npx gluon-skill` explicitly to create protected, version-matched `SKILL.md`
+guidance for coding agents. Existing files are never silently replaced. See the
 [agent skill installation and regeneration guide](docs/agent-skill.md) for
-package-manager lifecycle security, `GLUON_SKIP_AGENT_SKILL`, ignored-script
-installs, monorepo targeting, and `npx gluon-skill --regenerate`.
+monorepo targeting and `npx gluon-skill --regenerate`.
 
 ## Quick start
 

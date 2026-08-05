@@ -72,8 +72,8 @@ test('supports opt-out and rejects an explicit directory without package.json', 
   );
 });
 
-test('packed core contains the installer and works in a consumer after scripts were ignored', {
-  timeout: 120_000,
+test('normal packed installs leave single-package and workspace consumers unchanged', {
+  timeout: 180_000,
 }, async () => {
   const packDirectory = await mkdtemp(resolve(tmpdir(), 'gluon-core-pack-'));
   const npmCache = resolve(packDirectory, 'npm-cache');
@@ -92,16 +92,42 @@ test('packed core contains the installer and works in a consumer after scripts w
   const paths = new Set(pack.files.map((file) => file.path));
   assert(paths.has('agent-skill/install.mjs'));
   assert(paths.has('agent-skill/SKILL.template.md'));
+  const archive = resolve(packDirectory, pack.filename);
+  const packedManifest = JSON.parse(execFileSync(
+    'tar', ['-xOf', archive, 'package/package.json'], { encoding: 'utf8', timeout: 10_000 },
+  ));
+  assert.equal(packedManifest.scripts?.postinstall, undefined);
 
   const root = await project('packed-consumer');
-  const unpacked = resolve(root, 'node_modules', '@gluonjs', 'core');
-  await mkdir(dirname(unpacked), { recursive: true });
-  execFileSync('tar', ['-xzf', resolve(packDirectory, pack.filename), '-C', dirname(unpacked)], {
-    timeout: 10_000,
+  execFileSync('npm', ['install', archive, '--legacy-peer-deps', '--ignore-scripts=false'], {
+    cwd: root,
+    encoding: 'utf8',
+    env: { ...process.env, npm_config_cache: npmCache },
+    timeout: 60_000,
   });
-  execFileSync('mv', [resolve(dirname(unpacked), 'package'), unpacked], { timeout: 10_000 });
-
   await assert.rejects(stat(resolve(root, 'SKILL.md')), { code: 'ENOENT' });
+
+  const workspaceRoot = await mkdtemp(resolve(tmpdir(), 'gluon-agent-skill-workspace-'));
+  const workspacePackage = resolve(workspaceRoot, 'packages', 'storefront');
+  await mkdir(workspacePackage, { recursive: true });
+  await writeFile(resolve(workspaceRoot, 'package.json'), JSON.stringify({
+    name: 'workspace-consumer', private: true, workspaces: ['packages/*'],
+  }));
+  await writeFile(resolve(workspacePackage, 'package.json'), JSON.stringify({
+    name: 'storefront', private: true,
+  }));
+  execFileSync('npm', [
+    'install', archive, '--workspace', 'storefront', '--legacy-peer-deps', '--ignore-scripts=false',
+  ], {
+    cwd: workspaceRoot,
+    encoding: 'utf8',
+    env: { ...process.env, npm_config_cache: npmCache },
+    timeout: 60_000,
+  });
+  await assert.rejects(stat(resolve(workspaceRoot, 'SKILL.md')), { code: 'ENOENT' });
+  await assert.rejects(stat(resolve(workspacePackage, 'SKILL.md')), { code: 'ENOENT' });
+
+  const unpacked = resolve(root, 'node_modules', '@gluonjs', 'core');
   const installStdout = execFileSync('node', [
     resolve(unpacked, 'agent-skill', 'install.mjs'),
   ], {

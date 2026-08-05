@@ -54,7 +54,6 @@
     "@gluonjs/reactivity": "1.7.0"
   },
   "scripts": {
-    "postinstall": "node agent-skill/install.mjs",
     "build": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:i18n && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:graph && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:json-forms": "npm run build --workspace @gluonjs/json-forms",

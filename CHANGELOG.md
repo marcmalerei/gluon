@@ -15,6 +15,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Stopped normal `@gluonjs/core` installation from writing `SKILL.md` into
+  consumer repositories; agent guidance remains available through the explicit
+  `npx gluon-skill` command.
 - Made `@gluonjs/reactivity` an exact peer of `@gluonjs/core` and verify that
   packed consumers resolve the renderer and application state to one runtime.
 - Added a focused aggregate SPDX closure gate for every declared package
