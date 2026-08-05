@@ -15,6 +15,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Restored conditional nested templates, including keyed `repeat()` children,
+  after the same child Part temporarily renders primitive text.
 - Stopped normal `@gluonjs/core` installation from writing `SKILL.md` into
   consumer repositories; agent guidance remains available through the explicit
   `npx gluon-skill` command.

@@ -87,6 +87,12 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.querySelector('#bag-title')?.textContent).toBe('Bag 2');
 
     document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
+    await settleShop();
+    root.querySelector<HTMLButtonElement>('.bag-action')!.click();
+    await settleShop();
+    expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 2');
+    expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
+    document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
     router.back();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/');

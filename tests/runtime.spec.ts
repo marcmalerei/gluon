@@ -6,6 +6,7 @@ import {
   html,
   markCompiledPrimitiveTextBinding,
   render,
+  repeat,
   updateCompiledPrimitiveTextBinding,
   type PartController,
 } from '../src/index.js';
@@ -90,6 +91,31 @@ describe('template runtime', () => {
       'three',
     ]);
     expect(root.querySelector('li')).toBe(first);
+  });
+
+  it('restores conditional nested templates after an empty render', () => {
+    const root = document.createElement('div');
+    const view = (visible: boolean) => html`
+      <section>
+        <span>${visible ? 'visible' : 'hidden'}</span>
+        ${visible ? html`
+          <small>restored detail</small>
+          ${repeat(
+            [{ id: 'one', label: 'Restored keyed detail' }],
+            (item) => item.id,
+            (item) => html`<em>${item.label}</em>`,
+          )}
+        ` : ''}
+      </section>
+    `;
+
+    render(view(true), root);
+    render(view(false), root);
+    render(view(true), root);
+
+    expect(root.querySelector('span')?.textContent).toBe('visible');
+    expect(root.querySelector('small')?.textContent).toBe('restored detail');
+    expect(root.querySelector('em')?.textContent).toBe('Restored keyed detail');
   });
 
   it('supports attribute, property, boolean, and event bindings with cleanup', () => {

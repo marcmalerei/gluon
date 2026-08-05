@@ -690,6 +690,7 @@ class NodePart implements Part {
           this.replaceNodes([this.textNode]);
         }
       } else {
+        this.resetChildren();
         const text = document.createTextNode(String(value));
         this.textNode = text;
         this.lastPrimitive = value;

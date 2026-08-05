@@ -163,6 +163,13 @@ restored around their marker. Static descendants inside a retained compiled
 node are not diffed individually; external code must not mutate renderer-owned
 static internals and expect that mutation to be preserved.
 
+When one child Part changes from a nested template, array, keyed `repeat()`, or
+unsafe-markup result to primitive text, the renderer disconnects the former
+child ownership before installing the text node. A later primitive-to-template
+render therefore mounts the current nested nodes at the retained marker instead
+of updating a detached prior instance. The browser contract covers a
+`TemplateResult -> string -> TemplateResult` sequence with a nested keyed list.
+
 The browser retention test performs 100 render/unmount cycles, verifies every
 ref is cleared, and verifies detached nodes no longer invoke their former
 listeners.
