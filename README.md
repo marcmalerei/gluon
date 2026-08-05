@@ -9,7 +9,7 @@
 </p>
 
 > [!IMPORTANT]
-> This source tree and package describe Gluon `1.6.0` across all 20 official
+> This source tree and package describe Gluon `1.7.0` across all 21 official
 > packages. npm publication occurs only from an immutable release tag through
 > the protected release workflow; later repository commits cannot replace
 > published package contents.
@@ -32,6 +32,7 @@
 - a shareable Gluon Playground with live diagnostics, reference lookup, and starter download
 - a living mobile-first GLUON GOODS reference shop built from public APIs
 - an interactive, canvas-backed `@gluonjs/graph` Custom Element for knowledge-map and relationship views
+- optional `@gluonjs/i18n` locale-aware messages with lazy namespace loading
 - a form-associated `@gluonjs/json-forms` Custom Element for the documented JSON Schema subset
 - a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.6.0/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
@@ -608,6 +609,37 @@ mount.unmount();
 Application mount roots are persistent `Element` or `ShadowRoot` instances;
 plain `DocumentFragment` objects are drainable and therefore rejected.
 
+### Native i18n
+
+`@gluonjs/i18n` provides `createI18n()` as an optional application plugin for locale-aware strings.
+It intentionally lives outside `@gluonjs/core` because it depends on both the core application injection API and `@gluonjs/reactivity`; applications without translated strings should not receive i18n in the core entry. `useI18n()` can be called from any render path running inside an application context, including quarks, atoms, molecules, organisms, and registered components.
+
+```ts
+import { createApp, html } from '@gluonjs/core';
+import { createI18n, useI18n } from '@gluonjs/i18n';
+
+const i18n = createI18n({
+  locale: 'de',
+  fallbackLocale: 'en',
+  messages: { en: { 'bag.title': 'Bag' } },
+  namespaces: {
+    product: (locale) => import(`./locales/${locale}/product.js`).then((module) => module.messages),
+  },
+});
+
+const ProductTitle = () => html`<h1>${useI18n().t('title', { namespace: 'product' })}</h1>`;
+
+createApp(() => html`${ProductTitle()}`).use(i18n).mount(document.querySelector('#app')!);
+```
+
+The lazy-loading mechanism is namespace based: colocate page or component
+strings in dynamic-importable namespace modules and call `t(key, { namespace })`
+from the template that owns that surface. Gluon requests only the active locale
+for that namespace, deduplicates concurrent requests, returns the configured
+fallback or key while loading, and invalidates the application render when the
+namespace resolves. Call `loadNamespace(name)` ahead of navigation or hover when
+a route can predict the next string bundle.
+
 Application and component lifecycle, plugin cleanup, dynamic component
 registries, error/warning ownership, event/async protection, and explicit
 public exposure are defined in the
@@ -727,7 +759,7 @@ Gluon is the base system. Its UI vocabulary increases in scope without changing 
 
 Every component created with `defineAtom`, `defineMolecule`, or `defineOrganism` carries explicit `layer` and `displayName` metadata.
 
-Quarks, Atoms, Molecules, Organisms, and JSON Forms are optional `@gluonjs/*` packages.
+Quarks, Atoms, Molecules, Organisms, i18n, and JSON Forms are optional `@gluonjs/*` packages.
 Core exposes no UI subpath and a production tree-shaking fixture verifies that a
 Core-only consumer contains none of the stable UI markers.
 

@@ -9,7 +9,7 @@
     "scope": "@gluonjs",
     "scopeControl": "verified",
     "publicationState": "released",
-    "observation": "Release run 30605909445 published all 20 contracted packages at 1.6.0 under latest with npm provenance on 2026-07-31. Independent public-registry verification confirmed matching reviewed archive integrity, provenance attestations, clean-room installation, and public type declarations for every package. Immutable GitHub release v1.6.0 is published from commit fc3632f4b05e0f144dc63ec7510d83c9425361ff."
+    "observation": "Release run 30605909445 published all 20 contracted packages at 1.6.0 under latest with npm provenance on 2026-07-31. @gluonjs/i18n joins the 1.7.0 release train as a new optional package; publication evidence for 1.7.0 is not recorded in this development state. Independent public-registry verification confirmed matching reviewed archive integrity, provenance attestations, clean-room installation, and public type declarations for every 1.6.0 package. Immutable GitHub release v1.6.0 is published from commit fc3632f4b05e0f144dc63ec7510d83c9425361ff."
   },
   "packages": [
     {
@@ -17,7 +17,11 @@
       "directory": "packages/reactivity",
       "state": "current",
       "environment": "universal",
-      "exports": [".", "./signals", "./preact-signals"],
+      "exports": [
+        ".",
+        "./signals",
+        "./preact-signals"
+      ],
       "dependencies": []
     },
     {
@@ -25,7 +29,10 @@
       "directory": "packages/compiler",
       "state": "current",
       "environment": "universal",
-      "exports": [".", "./diagnostics"],
+      "exports": [
+        ".",
+        "./diagnostics"
+      ],
       "dependencies": []
     },
     {
@@ -33,68 +40,135 @@
       "directory": ".",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./decorators", "./styles"],
-      "bins": ["gluon-skill"],
+      "exports": [
+        ".",
+        "./decorators",
+        "./styles"
+      ],
+      "bins": [
+        "gluon-skill"
+      ],
       "currentDependencies": [
         "@gluonjs/reactivity"
       ],
-      "dependencies": ["@gluonjs/reactivity"]
+      "dependencies": [
+        "@gluonjs/reactivity"
+      ]
     },
     {
       "name": "@gluonjs/router",
       "directory": "packages/router",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./memory"],
-      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity"]
+      "exports": [
+        ".",
+        "./memory"
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/reactivity"
+      ]
     },
     {
       "name": "@gluonjs/store",
       "directory": "packages/store",
       "state": "current",
       "environment": "universal",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/reactivity"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/reactivity"
+      ]
+    },
+    {
+      "name": "@gluonjs/i18n",
+      "directory": "packages/i18n",
+      "state": "current",
+      "environment": "browser",
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/reactivity"
+      ]
     },
     {
       "name": "@gluonjs/ssr",
       "directory": "packages/ssr",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./eleventy", "./hydration", "./static", "./streaming"],
-      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/store"]
+      "exports": [
+        ".",
+        "./eleventy",
+        "./hydration",
+        "./static",
+        "./streaming"
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/reactivity",
+        "@gluonjs/router",
+        "@gluonjs/store"
+      ]
     },
     {
       "name": "@gluonjs/vite",
       "directory": "packages/vite",
       "state": "current",
       "environment": "node",
-      "exports": ["."],
-      "currentDependencies": ["@gluonjs/compiler", "@gluonjs/core"],
-      "dependencies": ["@gluonjs/compiler"]
+      "exports": [
+        "."
+      ],
+      "currentDependencies": [
+        "@gluonjs/compiler",
+        "@gluonjs/core"
+      ],
+      "dependencies": [
+        "@gluonjs/compiler"
+      ]
     },
     {
       "name": "@gluonjs/gluon-components-vite",
       "directory": "packages/gluon-components-vite",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./entry-preview", "./preset", "./renderer-preset"],
-      "dependencies": ["@gluonjs/core"]
+      "exports": [
+        ".",
+        "./entry-preview",
+        "./preset",
+        "./renderer-preset"
+      ],
+      "dependencies": [
+        "@gluonjs/core"
+      ]
     },
     {
       "name": "@gluonjs/test-utils",
       "directory": "packages/test-utils",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./ssr"],
-      "dependencies": ["@gluonjs/core", "@gluonjs/reactivity", "@gluonjs/router", "@gluonjs/ssr", "@gluonjs/store"]
+      "exports": [
+        ".",
+        "./ssr"
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/reactivity",
+        "@gluonjs/router",
+        "@gluonjs/ssr",
+        "@gluonjs/store"
+      ]
     },
     {
       "name": "@gluonjs/devtools-api",
       "directory": "packages/devtools-api",
       "state": "current",
       "environment": "universal",
-      "exports": ["."],
+      "exports": [
+        "."
+      ],
       "dependencies": []
     },
     {
@@ -102,33 +176,55 @@
       "directory": "packages/devtools",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core", "@gluonjs/devtools-api"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/devtools-api"
+      ]
     },
     {
       "name": "@gluonjs/graph",
       "directory": "packages/graph",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core"
+      ]
     },
     {
       "name": "@gluonjs/language-server",
       "directory": "packages/language-server",
       "state": "current",
       "environment": "node",
-      "exports": ["."],
-      "bins": ["gluon-language-server", "gluon-project-analyze", "gluon-template-check"],
-      "dependencies": ["@gluonjs/compiler"]
+      "exports": [
+        "."
+      ],
+      "bins": [
+        "gluon-language-server",
+        "gluon-project-analyze",
+        "gluon-template-check"
+      ],
+      "dependencies": [
+        "@gluonjs/compiler"
+      ]
     },
     {
       "name": "@gluonjs/vue-migration-analyzer",
       "directory": "packages/vue-migration-analyzer",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./schema"],
-      "bins": ["gluon-vue-analyze"],
+      "exports": [
+        ".",
+        "./schema"
+      ],
+      "bins": [
+        "gluon-vue-analyze"
+      ],
       "dependencies": []
     },
     {
@@ -136,48 +232,78 @@
       "directory": "packages/quarks",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core"
+      ]
     },
     {
       "name": "@gluonjs/atoms",
       "directory": "packages/atoms",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core", "@gluonjs/quarks"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/quarks"
+      ]
     },
     {
       "name": "@gluonjs/molecules",
       "directory": "packages/molecules",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/quarks",
+        "@gluonjs/atoms"
+      ]
     },
     {
       "name": "@gluonjs/organisms",
       "directory": "packages/organisms",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core", "@gluonjs/quarks", "@gluonjs/atoms", "@gluonjs/molecules"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core",
+        "@gluonjs/quarks",
+        "@gluonjs/atoms",
+        "@gluonjs/molecules"
+      ]
     },
     {
       "name": "@gluonjs/json-forms",
       "directory": "packages/json-forms",
       "state": "current",
       "environment": "browser",
-      "exports": ["."],
-      "dependencies": ["@gluonjs/core"]
+      "exports": [
+        "."
+      ],
+      "dependencies": [
+        "@gluonjs/core"
+      ]
     },
     {
       "name": "create-gluon",
       "directory": "packages/create-gluon",
       "state": "current",
       "environment": "node",
-      "exports": ["."],
-      "bins": ["create-gluon"],
+      "exports": [
+        "."
+      ],
+      "bins": [
+        "create-gluon"
+      ],
       "dependencies": []
     }
   ]

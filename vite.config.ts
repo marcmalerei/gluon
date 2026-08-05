@@ -50,6 +50,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
+      '@gluonjs/i18n': resolve(import.meta.dirname, 'packages/i18n/src/index.ts'),
       '@gluonjs/json-forms': resolve(import.meta.dirname, 'packages/json-forms/src/index.ts'),
       '@gluonjs/quarks': resolve(import.meta.dirname, 'packages/quarks/src/index.ts'),
       '@gluonjs/atoms': resolve(import.meta.dirname, 'packages/atoms/src/index.ts'),
@@ -122,6 +123,7 @@ export default defineConfig({
       include: [
         'src/**/*.ts',
         'packages/gluon-components-vite/src/entry-preview.ts',
+        'packages/i18n/src/**/*.ts',
         'packages/quarks/src/**/*.ts',
         'packages/atoms/src/**/*.ts',
         'packages/molecules/src/**/*.ts',

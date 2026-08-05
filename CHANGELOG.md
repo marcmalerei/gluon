@@ -7,6 +7,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-08-05
+
+### Added
+
+- Added optional `@gluonjs/i18n` with an application plugin, `useI18n()` injection, reactive locale state, deterministic fallback strings, interpolation, and locale-scoped lazy namespace loading so core remains free of the i18n surface.
+
 ### Fixed
 
 - Made `@gluonjs/reactivity` an exact peer of `@gluonjs/core` and verify that
