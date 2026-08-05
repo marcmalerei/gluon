@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-08-05
+
+### Changed
+
+- Advanced the lockstep release for the new optional `@gluonjs/i18n` package while retaining this package's existing public contract.
+
 ### Added
 
 - Added the accessible `NavigationStrip` composition with overflow controls,

@@ -7,8 +7,17 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-08-05
+
+### Added
+
+- Added optional `@gluonjs/i18n` with an application plugin, `useI18n()` injection, reactive locale state, deterministic fallback strings, interpolation, and locale-scoped lazy namespace loading so core remains free of the i18n surface.
+
 ### Fixed
 
+- Stopped normal `@gluonjs/core` installation from writing `SKILL.md` into
+  consumer repositories; agent guidance remains available through the explicit
+  `npx gluon-skill` command.
 - Made `@gluonjs/reactivity` an exact peer of `@gluonjs/core` and verify that
   packed consumers resolve the renderer and application state to one runtime.
 - Added a focused aggregate SPDX closure gate for every declared package

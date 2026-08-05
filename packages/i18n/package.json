@@ -1,0 +1,45 @@
+{
+  "name": "@gluonjs/i18n",
+  "version": "1.7.0",
+  "description": "Locale-aware messages and lazy namespace loading for Gluon applications.",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/i18n"
+  },
+  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/i18n#readme",
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "peerDependencies": {
+    "@gluonjs/core": "1.7.0",
+    "@gluonjs/reactivity": "1.7.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

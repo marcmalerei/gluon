@@ -37,6 +37,44 @@
         "console.log(element.value, value, change, validation, view);"
       ]
     },
+    "i18n-application": {
+      "module": "@gluonjs/i18n",
+      "code": [
+        "import { createApp, html } from '@gluonjs/core';",
+        "import {",
+        "  createI18n,",
+        "  i18nKey,",
+        "  useI18n,",
+        "  type I18n,",
+        "  type I18nFallbackContext,",
+        "  type I18nMessages,",
+        "  type I18nNamespaceLoader,",
+        "  type I18nOptions,",
+        "  type LocaleCode,",
+        "  type TranslateOptions,",
+        "} from '@gluonjs/i18n';",
+        "",
+        "const fallbackLocale: LocaleCode = 'en';",
+        "const english = { title: 'Orbit lamp', greeting: 'Hello {name}' } satisfies I18nMessages;",
+        "const loadProduct: I18nNamespaceLoader = async (locale) =>",
+        "  locale === 'de' ? { title: 'Orbit-Leuchte' } : english;",
+        "const missing = (context: I18nFallbackContext) => `[${context.locale}] ${context.key}`;",
+        "const options = {",
+        "  locale: 'de',",
+        "  fallbackLocale,",
+        "  messages: { en: english },",
+        "  namespaces: { product: loadProduct },",
+        "  missing,",
+        "} satisfies I18nOptions;",
+        "const plugin = createI18n(options);",
+        "const i18n: I18n = plugin;",
+        "const translation = { namespace: 'product', values: { name: 'Mara' } } satisfies TranslateOptions;",
+        "",
+        "const ProductTitle = () => html`<h1>${useI18n().t('title', translation)}</h1>`;",
+        "createApp(ProductTitle).use(plugin).mount(document.querySelector('#app')!);",
+        "console.log(i18n.t('greeting', { values: { name: 'Mara' } }), i18nKey);"
+      ]
+    },
     "graph-element": {
       "module": "@gluonjs/graph",
       "code": [
@@ -5573,6 +5611,46 @@
     "src/interfaces/GluonElementServerRenderOptions.md": {
       "recipe": "core-scoped-element-registry",
       "description": "Select the server definition table used to resolve an explicitly scoped element constructor:"
+    },
+    "packages/i18n/src/functions/createI18n.md": {
+      "recipe": "i18n-application",
+      "description": "Create one application-owned translation plugin with reactive locale state, deterministic fallback behavior, interpolation, and lazy namespaces:"
+    },
+    "packages/i18n/src/functions/useI18n.md": {
+      "recipe": "i18n-application",
+      "description": "Inject the translation service provided by the current Gluon application inside a component render:"
+    },
+    "packages/i18n/src/interfaces/I18n.md": {
+      "recipe": "i18n-application",
+      "description": "Retain the typed locale, readiness, namespace-loading, and translation operations exposed by the application service:"
+    },
+    "packages/i18n/src/interfaces/I18nFallbackContext.md": {
+      "recipe": "i18n-application",
+      "description": "Format a deterministic missing-message result from its key, active locale, and optional namespace:"
+    },
+    "packages/i18n/src/interfaces/I18nOptions.md": {
+      "recipe": "i18n-application",
+      "description": "Configure the initial locale, fallback locale, eager messages, lazy namespaces, and missing-message policy together:"
+    },
+    "packages/i18n/src/interfaces/TranslateOptions.md": {
+      "recipe": "i18n-application",
+      "description": "Select a lazy namespace and typed interpolation values for one translation lookup:"
+    },
+    "packages/i18n/src/type-aliases/I18nMessages.md": {
+      "recipe": "i18n-application",
+      "description": "Declare an immutable locale message catalog whose string keys remain application-owned:"
+    },
+    "packages/i18n/src/type-aliases/I18nNamespaceLoader.md": {
+      "recipe": "i18n-application",
+      "description": "Load one locale-specific namespace synchronously or asynchronously through the public package contract:"
+    },
+    "packages/i18n/src/type-aliases/LocaleCode.md": {
+      "recipe": "i18n-application",
+      "description": "Keep application locale identifiers explicit while allowing project-specific BCP 47 choices:"
+    },
+    "packages/i18n/src/variables/i18nKey.md": {
+      "recipe": "i18n-application",
+      "description": "Reference the typed injection key installed by the i18n plugin when composing application integrations:"
     }
   }
 }

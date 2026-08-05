@@ -11,6 +11,7 @@
       "@gluonjs/compiler/diagnostics": ["packages/compiler/src/diagnostics.ts"],
       "@gluonjs/core": ["src/index.ts"],
       "@gluonjs/core/decorators": ["src/decorators.ts"],
+      "@gluonjs/i18n": ["packages/i18n/src/index.ts"],
       "@gluonjs/json-forms": ["packages/json-forms/src/index.ts"],
       "@gluonjs/quarks": ["packages/quarks/src/index.ts"],
       "@gluonjs/atoms": ["packages/atoms/src/index.ts"],
