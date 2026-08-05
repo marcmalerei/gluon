@@ -13,6 +13,8 @@ manifest is public and lockstep at `1.7.0`. Registry preflight on 2026-08-05
 confirmed that the 20 previously contracted packages expose `1.6.0` as
 `latest`, that `1.7.0` is absent, and that the new `@gluonjs/i18n` record needs
 the reviewed owner-controlled bootstrap before trusted publication can begin.
+The incremental bootstrap contract therefore uses `1.6.0` as its exact
+supported registry baseline and publishes only the missing i18n package record.
 Immutable GitHub release `v1.6.0` remains the current finalized release; the
 `v1.0.9` GitHub release remains a draft after its public-type verification
 failure. This is enforced locally by:
