@@ -1,23 +1,43 @@
 # Release operations
 
-Gluon uses one lockstep release for the 20 packages in
+Gluon uses one lockstep release for the 21 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for the completed `1.6.0` release. Every official
-manifest is public and lockstep at `1.6.0`. Release run `30605909445` published
-all 20 contracted npm packages under `latest` with npm provenance, passed
-clean-room installation and public-type verification, and published immutable
-GitHub release `v1.6.0` on 2026-07-31. The `v1.0.9` GitHub release remains a
-draft after its public-type verification failure. This is enforced locally by:
+The machine-readable package contract records `publicationState: ready` and
+`scopeControl: verified` for the prepared `1.7.0` candidate. Every official
+manifest is public and lockstep at `1.7.0`. Registry preflight on 2026-08-05
+confirmed that the 20 previously contracted packages expose `1.6.0` as
+`latest`, that `1.7.0` is absent, and that the new `@gluonjs/i18n` record needs
+the reviewed owner-controlled bootstrap before trusted publication can begin.
+Immutable GitHub release `v1.6.0` remains the current finalized release; the
+`v1.0.9` GitHub release remains a draft after its public-type verification
+failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
+
+## v1.7.0 train handoff
+
+Issue [#301](https://github.com/marcmalerei/gluon/issues/301) tracks the
+21-package `1.7.0` train, and PR
+[#300](https://github.com/marcmalerei/gluon/pull/300) adds its first new
+package, `@gluonjs/i18n`. The train uses the two-commit release cut: a
+Quality-Gates-tested candidate followed only by its release-cut evidence and
+compatibility manifest. The immutable `v1.6.0` release remains the supported
+baseline until the protected `v1.7.0` workflow completes.
+
+Publication remains deliberately outside an ordinary pull request. Before the
+owner creates the protected `v1.7.0` tag, `@gluonjs/i18n` must have its
+owner-reviewed bootstrap package record and the exact Trusted Publishing
+binding for `release.yml` in the `npm` environment. The tag-triggered Release
+workflow then creates a GitHub draft, publishes the reviewed archives with
+provenance, verifies the complete registry train, and only then publishes the
+immutable release.
 
 ## v1.6.0 train completion
 
@@ -172,7 +192,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before protected publication of the `1.6.0` release, the repository owner must verify
+Before protected publication of the `1.7.0` release, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -200,7 +220,7 @@ all of the following outside the source tree:
    who creates a release tag can publish immutable package versions directly
    to `latest` without another person's approval. Because npm has no atomic
    multi-package publish operation, a failed train may temporarily leave only
-   part of the 20-package train on the new `latest` version.
+   part of the 21-package train on the new `latest` version.
 7. Two active GitHub tag rulesets cover exactly `refs/tags/v*`. The creation
    rule gives only the `marcmalerei` user an `always` bypass so the sole
    operator can cut a release. The update and deletion rules have no bypass
@@ -290,7 +310,7 @@ npm run release:bootstrap:publish -- --dry-run
 ```
 
 The builder records the exact source commit, archive integrity, SHA-1, SHA-256,
-and file allowlist for all 20 packages. Review every name and archive before the
+and file allowlist for all 21 packages. Review every name and archive before the
 irreversible step. The publisher rejects `NPM_TOKEN` and `NODE_AUTH_TOKEN`, an
 artifact set that is not byte-identical to an independent rebuild, a dirty or
 non-`main` checkout, a source commit that is not the exact current
@@ -325,20 +345,20 @@ with GitHub Actions, repository owner `marcmalerei`, repository `gluon`,
 workflow filename `release.yml`, environment `npm`, and the `npm publish`
 allowed action required by this repository's workflow. npm does not validate
 these coordinates when they are saved, so review them exactly. Configure and
-verify all 20 bindings before restricting traditional token publishing; no
+verify all 21 bindings before restricting traditional token publishing; no
 long-lived publication token may be added to GitHub.
 
 ## Release-candidate commit
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.6.0` and `private: false`;
-- set every official implementation and peer dependency to exact `1.6.0`;
+- set every official manifest to version `1.7.0` and `private: false`;
+- set every official implementation and peer dependency to exact `1.7.0`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.6.0` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.6.0`, then make that version
+- add dated `1.7.0` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.7.0`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -349,8 +369,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run check
-npm run release:validate -- --candidate 1.6.0
-npm run release:artifacts -- --version 1.6.0
+npm run release:validate -- --candidate 1.7.0
+npm run release:artifacts -- --version 1.7.0
 ```
 
 Release-candidate installs use `--legacy-peer-deps` because the official
@@ -360,7 +380,7 @@ those peers from the packed local release train instead of resolving an
 unpublished version from npm.
 
 `release:artifacts` packs every package twice and compares canonical unpacked
-file SHA-256 digests. It then clean-installs all 20 local archives and
+file SHA-256 digests. It then clean-installs all 21 local archives and
 typechecks every contracted public export with `skipLibCheck: false` before
 producing the package archives, aggregate and per-package SPDX 2.3 and
 CycloneDX 1.7 SBOMs, `release-evidence.json`, and a `SHA256SUMS` manifest under
@@ -476,13 +496,13 @@ verifier without the ephemeral token.
 
 The workflow publishes every reviewed archive through npm trusted publishing
 with provenance directly under `latest`. Before the first publish it proves
-that all 20 npm package records already exist. After each publish it compares
+that all 21 npm package records already exist. After each publish it compares
 registry integrity and provenance with `release-evidence.json`. A rerun skips
 an already-existing version only when those facts match; a mismatch stops the
 train. No long-lived npm token, `npm dist-tag` mutation, or per-package 2FA
 approval is part of a supported release.
 
-After all 20 direct publications succeed, the same protected job requires every
+After all 21 direct publications succeed, the same protected job requires every
 `latest` tag to point to the reviewed version, compares registry integrity and
 provenance, performs a clean-directory install and public-type check, attaches
 the registry verification and final checksum manifest, and only then publishes
@@ -500,5 +520,4 @@ A failed publication is never retried by rebuilding the same version. Preserve
 the run and draft-release evidence and rerun the failed job with the same
 artifacts. Matching immutable registry versions are verified and skipped;
 unpublished packages continue. If any existing registry version has different
-integrity or lacks provenance, stop and follow the new-version policy in ADR
-0002.
+integrity or lacks provenance, stop and follow the new-version policy in ADR 0002.

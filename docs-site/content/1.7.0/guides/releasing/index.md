@@ -6,9 +6,11 @@ package. The previous completed `1.6.0` release run `30605909445` published 20
 contracted packages under `latest` with npm provenance, passed clean-room
 installation and public-type verification, and published immutable GitHub
 release `v1.6.0` on 2026-07-31. The historical `v1.0.9` GitHub release remains
-a draft after its public-type verification failure. The `@gluonjs` scope,
-package records, and trusted-publisher bindings are verified in the package
-contract.
+a draft after its public-type verification failure. The `@gluonjs` scope and
+the 20 existing package records remain verified by that completed publication.
+The new `@gluonjs/i18n` record requires its reviewed owner-controlled bootstrap
+and exact trusted-publisher binding before the protected `v1.7.0` tag is
+created.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
