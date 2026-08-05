@@ -2,7 +2,7 @@
 
 This guide starts with the component boundary instead of the TypeScript type
 list. It explains what data crosses that boundary, who owns it, and which Gluon
-API to use. All examples import public `1.6.0` package entry points and are
+API to use. All examples import public `1.7.0` package entry points and are
 compiled by the documentation quality gate.
 
 ## The four terms to know

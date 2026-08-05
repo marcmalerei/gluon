@@ -2,7 +2,7 @@
 
 Gluon is an alternative application platform, not a Vue compatibility layer.
 There is no automatic Vue-to-Gluon source converter, production SFC compiler,
-compatibility runtime, or migration codemod in version `1.6.0`.
+compatibility runtime, or migration codemod in version `1.7.0`.
 
 ## Automation boundary
 
