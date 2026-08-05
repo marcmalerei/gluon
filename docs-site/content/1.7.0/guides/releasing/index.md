@@ -10,7 +10,8 @@ a draft after its public-type verification failure. The `@gluonjs` scope and
 the 20 existing package records remain verified by that completed publication.
 The new `@gluonjs/i18n` record requires its reviewed owner-controlled bootstrap
 and exact trusted-publisher binding before the protected `v1.7.0` tag is
-created.
+created. The incremental bootstrap contract uses the published `1.6.0` train as
+its exact registry baseline and therefore prepares only the missing i18n record.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
