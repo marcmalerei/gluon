@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-08-05",
+    "checkedAt": "2026-08-07",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Registry preflight on 2026-08-05 confirmed that all 20 previously contracted package records expose 1.6.0 as latest and that version 1.7.0 is absent. @gluonjs/i18n joins the 1.7.0 lockstep release as the twenty-first package and requires the reviewed owner-controlled bootstrap before trusted publication; scope control remains verified by the completed 1.6.0 publication contract."
+    "publicationState": "released",
+    "observation": "Recovery run 31166405472 published all 21 contracted packages at 1.7.0 under latest with npm provenance on 2026-08-07. Final recovery run 31169785993 independently confirmed matching reviewed archive integrity, provenance attestations, clean-room installation, and public type declarations for every package, then published immutable GitHub release v1.7.0. Protected execution tag v1.7.0-recovery.2 resolves to commit 8db054ead616b6b6c0b5bd7765f5421b3d99f224 and preserves the immutable canonical release history."
   },
   "packages": [
     {

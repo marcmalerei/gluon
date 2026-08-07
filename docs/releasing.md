@@ -7,42 +7,35 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.7.0` candidate. Every official
-manifest is public and lockstep at `1.7.0`. Release run `31163818091` stopped
-before publication because Bash conditionals ran under the container's default
-`sh` shell. Recovery run `31166405472` then published all 21 reviewed packages
-with provenance under `latest`, but its registry clean-room typecheck omitted
-the contracted Storybook declaration dependency and left the canonical GitHub
-release safely in draft. Recovery manifest `release/recovery/1.7.0.json`
-preserves both immutable execution histories and permits only
-`v1.7.0-recovery.2` to verify the existing packages and finalize canonical
-release `v1.7.0`. Immutable GitHub release `v1.6.0` remains the current
-finalized release until that recovery completes; the `v1.0.9` GitHub release
-remains a draft after its public-type verification failure. This is enforced
-locally by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for the completed `1.7.0` release. Every official
+manifest is public and lockstep at `1.7.0`. Recovery run `31166405472`
+published all 21 reviewed packages with npm provenance under `latest`. Final
+recovery run `31169785993` then confirmed matching reviewed archive integrity,
+provenance attestations, clean-room installation, and public type declarations
+for every package before publishing immutable GitHub release `v1.7.0` on
+2026-08-07. The `v1.0.9` GitHub release remains a draft after its public-type
+verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.7.0 train handoff
+## v1.7.0 train completion
 
-Issue [#301](https://github.com/marcmalerei/gluon/issues/301) tracks the
+Issue [#301](https://github.com/marcmalerei/gluon/issues/301) established the
 21-package `1.7.0` train, and PR
 [#300](https://github.com/marcmalerei/gluon/pull/300) adds its first new
-package, `@gluonjs/i18n`. The train uses the two-commit release cut: a
-Quality-Gates-tested candidate followed only by its release-cut evidence and
-compatibility manifest. The immutable `v1.6.0` release remains the supported
-baseline until the protected `v1.7.0` workflow completes.
-
-Publication remains deliberately outside an ordinary pull request. Before the
-owner creates the protected `v1.7.0` tag, `@gluonjs/i18n` must have its
-owner-reviewed bootstrap package record and the exact Trusted Publishing
-binding for `release.yml` in the `npm` environment. The tag-triggered Release
-workflow then creates a GitHub draft, publishes the reviewed archives with
-provenance, verifies the complete registry train, and only then publishes the
-immutable release.
+package, `@gluonjs/i18n`. Protected canonical tag `v1.7.0` resolves to release
+source commit `971b370dd24114c9c57089c02412545e5eec5235`. The first protected
+recovery execution published the complete npm train but exposed a clean-room
+Storybook declaration mismatch. Final protected execution tag
+`v1.7.0-recovery.2` resolves to
+`8db054ead616b6b6c0b5bd7765f5421b3d99f224`; its successful workflow verified
+the existing immutable packages and then published the canonical immutable
+GitHub release. Recovery manifest `release/recovery/1.7.0.json` preserves the
+canonical and both recovery histories without changing package or application
+inputs outside the reviewed release allowlist.
 
 All three version-resolution steps declare `shell: bash` explicitly. This is
 required because both normal tag and recovery-tag paths use Bash conditionals;
