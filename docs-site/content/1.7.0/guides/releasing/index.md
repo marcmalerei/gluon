@@ -1,17 +1,17 @@
 # Release readiness
 
-The `1.7.0` documentation describes the next lockstep release candidate. All 21
-official manifests are at `1.7.0`, including the new optional `@gluonjs/i18n`
-package. The previous completed `1.6.0` release run `30605909445` published 20
-contracted packages under `latest` with npm provenance, passed clean-room
-installation and public-type verification, and published immutable GitHub
-release `v1.6.0` on 2026-07-31. The historical `v1.0.9` GitHub release remains
-a draft after its public-type verification failure. The `@gluonjs` scope and
-the 20 existing package records remain verified by that completed publication.
-The new `@gluonjs/i18n` record requires its reviewed owner-controlled bootstrap
-and exact trusted-publisher binding before the protected `v1.7.0` tag is
-created. The incremental bootstrap contract uses the published `1.6.0` train as
-its exact registry baseline and therefore prepares only the missing i18n record.
+The `1.7.0` documentation describes the current lockstep release recovery. All
+21 official manifests are at `1.7.0`, including the new optional
+`@gluonjs/i18n` package. The previous completed `1.6.0` release run
+`30605909445` published 20 contracted packages under `latest` with npm
+provenance, passed clean-room installation and public-type verification, and
+published immutable GitHub release `v1.6.0` on 2026-07-31. The new i18n package
+has its reviewed bootstrap record and Trusted Publisher binding. Immutable tag
+`v1.7.0` points to the reviewed release tree, but Release run `31163818091`
+stopped before candidate artifacts or npm publication because Bash
+conditionals ran under the container's default `sh` shell and resolved an empty
+version. The reviewed recovery preserves the canonical package tree and uses
+only the protected `v1.7.0-recovery.1` execution tag.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,

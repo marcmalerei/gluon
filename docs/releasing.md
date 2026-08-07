@@ -9,15 +9,16 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 The machine-readable package contract records `publicationState: ready` and
 `scopeControl: verified` for the prepared `1.7.0` candidate. Every official
-manifest is public and lockstep at `1.7.0`. Registry preflight on 2026-08-05
-confirmed that the 20 previously contracted packages expose `1.6.0` as
-`latest`, that `1.7.0` is absent, and that the new `@gluonjs/i18n` record needs
-the reviewed owner-controlled bootstrap before trusted publication can begin.
-The incremental bootstrap contract therefore uses `1.6.0` as its exact
-supported registry baseline and publishes only the missing i18n package record.
-Immutable GitHub release `v1.6.0` remains the current finalized release; the
-`v1.0.9` GitHub release remains a draft after its public-type verification
-failure. This is enforced locally by:
+manifest is public and lockstep at `1.7.0`. The new `@gluonjs/i18n` package has
+its reviewed bootstrap record and Trusted Publisher binding. Immutable tag
+`v1.7.0` points to the reviewed release tree, but Release run `31163818091`
+stopped before candidate artifacts or npm publication because its Bash
+conditionals ran under the container's default `sh` shell and resolved an empty
+version. Recovery manifest `release/recovery/1.7.0.json` preserves the canonical
+tag and package tree and permits the one-time `v1.7.0-recovery.1` execution tag.
+Immutable GitHub release `v1.6.0` remains the current finalized release until
+that recovery completes; the `v1.0.9` GitHub release remains a draft after its
+public-type verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -40,6 +41,10 @@ binding for `release.yml` in the `npm` environment. The tag-triggered Release
 workflow then creates a GitHub draft, publishes the reviewed archives with
 provenance, verifies the complete registry train, and only then publishes the
 immutable release.
+
+All three version-resolution steps declare `shell: bash` explicitly. This is
+required because both normal tag and recovery-tag paths use Bash conditionals;
+container defaults must not silently select the empty workflow-dispatch input.
 
 ## v1.6.0 train completion
 

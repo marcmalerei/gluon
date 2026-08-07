@@ -34,7 +34,8 @@
     "failureCategory": {
       "enum": [
         "squash-merge-tested-commit-not-ancestor",
-        "missing-bootstrap-record"
+        "missing-bootstrap-record",
+        "release-tag-version-resolution-shell"
       ]
     },
     "recoveryTag": {
