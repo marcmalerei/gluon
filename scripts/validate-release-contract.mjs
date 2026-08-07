@@ -400,7 +400,7 @@ function validateReleasedState() {
     if (recovery.releaseVersion !== version
       || recovery.canonicalTag !== tag
       || recovery.canonicalTagCommit !== tagCommit
-      || recovery.recoveryTag !== `${tag}-recovery.1`
+      || recovery.recoveryTag !== (recovery.previousRecoveryTag ? `${tag}-recovery.2` : `${tag}-recovery.1`)
       || JSON.stringify(recovery.allowedCanonicalDeltaPaths) !== JSON.stringify(recoveryPaths)) {
       throw new Error(`${recoveryPath} does not match the exact ${version} recovery boundary.`);
     }
@@ -620,6 +620,9 @@ function validateWorkflow() {
   for (const required of ["'--registry', registry", 'releaseContract.publication.registry']) {
     if (!registryVerificationScript.includes(required)) throw new Error(`Registry verifier is missing ${required}.`);
   }
+  for (const required of ['typeVerificationDependencies', 'Registry type verification dependency']) {
+    if (!registryVerificationScript.includes(required)) throw new Error(`Registry verifier must retain ${required}.`);
+  }
   if (!publishScript.includes('releaseContract.bootstrap.version')) {
     throw new Error('Release publisher must verify the exact contracted bootstrap package record.');
   }
@@ -753,6 +756,7 @@ function expectedRecoveryPaths(version, failureCategory = 'squash-merge-tested-c
     'scripts/publish-release.mjs',
     'scripts/validate-release-contract.mjs',
     'scripts/validate-release-recovery.mjs',
+    'scripts/verify-registry-release.mjs',
     'scripts/verify-release-hosting.mjs',
   ];
   if (failureCategory === 'missing-bootstrap-record') {

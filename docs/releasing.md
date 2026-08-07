@@ -9,16 +9,18 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 The machine-readable package contract records `publicationState: ready` and
 `scopeControl: verified` for the prepared `1.7.0` candidate. Every official
-manifest is public and lockstep at `1.7.0`. The new `@gluonjs/i18n` package has
-its reviewed bootstrap record and Trusted Publisher binding. Immutable tag
-`v1.7.0` points to the reviewed release tree, but Release run `31163818091`
-stopped before candidate artifacts or npm publication because its Bash
-conditionals ran under the container's default `sh` shell and resolved an empty
-version. Recovery manifest `release/recovery/1.7.0.json` preserves the canonical
-tag and package tree and permits the one-time `v1.7.0-recovery.1` execution tag.
-Immutable GitHub release `v1.6.0` remains the current finalized release until
-that recovery completes; the `v1.0.9` GitHub release remains a draft after its
-public-type verification failure. This is enforced locally by:
+manifest is public and lockstep at `1.7.0`. Release run `31163818091` stopped
+before publication because Bash conditionals ran under the container's default
+`sh` shell. Recovery run `31166405472` then published all 21 reviewed packages
+with provenance under `latest`, but its registry clean-room typecheck omitted
+the contracted Storybook declaration dependency and left the canonical GitHub
+release safely in draft. Recovery manifest `release/recovery/1.7.0.json`
+preserves both immutable execution histories and permits only
+`v1.7.0-recovery.2` to verify the existing packages and finalize canonical
+release `v1.7.0`. Immutable GitHub release `v1.6.0` remains the current
+finalized release until that recovery completes; the `v1.0.9` GitHub release
+remains a draft after its public-type verification failure. This is enforced
+locally by:
 
 ```sh
 npm run check:release-contract
@@ -45,6 +47,9 @@ immutable release.
 All three version-resolution steps declare `shell: bash` explicitly. This is
 required because both normal tag and recovery-tag paths use Bash conditionals;
 container defaults must not silently select the empty workflow-dispatch input.
+Both packed-candidate and public-registry type verification install the exact
+`typeVerificationDependencies` recorded in the release contract, so their
+Storybook declaration graphs cannot drift independently.
 
 ## v1.6.0 train completion
 
@@ -480,6 +485,15 @@ publish the missing immutable record, then create `v<version>-recovery.1`.
 That execution tag publishes the unchanged canonical version and finalizes the
 GitHub release against the canonical tag; neither tag nor package source is
 rewritten.
+
+If every reviewed package is already published with matching integrity and
+provenance but the registry clean-room typecheck fails, retain the canonical
+release as a draft and record the failed recovery tag and run. A second and
+final `v<version>-recovery.2` execution may change only allowlisted release
+verification and documentation files. The publisher must verify and skip every
+matching immutable package version, then run the corrected clean-room typecheck,
+attest its registry evidence, and publish the canonical GitHub release. It must
+not republish, rebuild, or retag package contents.
 
 The publication job verifies public repository visibility, the absence of
 environment reviewers and an uncontracted wait timer, the exact `v*` tag policy,

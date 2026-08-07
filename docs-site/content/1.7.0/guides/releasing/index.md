@@ -6,12 +6,15 @@ The `1.7.0` documentation describes the current lockstep release recovery. All
 `30605909445` published 20 contracted packages under `latest` with npm
 provenance, passed clean-room installation and public-type verification, and
 published immutable GitHub release `v1.6.0` on 2026-07-31. The new i18n package
-has its reviewed bootstrap record and Trusted Publisher binding. Immutable tag
-`v1.7.0` points to the reviewed release tree, but Release run `31163818091`
-stopped before candidate artifacts or npm publication because Bash
-conditionals ran under the container's default `sh` shell and resolved an empty
-version. The reviewed recovery preserves the canonical package tree and uses
-only the protected `v1.7.0-recovery.1` execution tag.
+has its reviewed bootstrap record and Trusted Publisher binding. Release run
+`31163818091` stopped before publication because Bash conditionals ran under
+the container's default `sh` shell. Recovery run `31166405472` published all 21
+reviewed packages with provenance under `latest`, but its registry clean-room
+typecheck omitted the contracted Storybook declaration dependency and left the
+canonical GitHub release safely in draft. The reviewed second recovery
+preserves both immutable execution histories and uses only the protected
+`v1.7.0-recovery.2` execution tag to verify the existing packages and finalize
+canonical release `v1.7.0`.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
