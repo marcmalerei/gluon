@@ -24,6 +24,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   packed consumers resolve the renderer and application state to one runtime.
 - Added a focused aggregate SPDX closure gate for every declared package
   dependency in the lockstep release train.
+- Kept packed release type verification deterministic across Storybook 10.5's
+  transitive React declaration reference without making React an adapter
+  runtime or peer dependency.
 
 ## [1.6.0] - 2026-07-28
 

@@ -24,6 +24,7 @@ const spdxSchemaDigest = createHash('sha256')
 const packageContract = await readJson('package-contract.json');
 const packageContractSchema = await readJson('schemas/package-contract.schema.json');
 const rootManifest = await readJson('package.json');
+const storybookAdapterManifest = await readJson('packages/gluon-components-vite/package.json');
 const versions = await readJson('docs-site/versions.json');
 const lockfile = await readJson('package-lock.json');
 const rootChangelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
@@ -223,6 +224,16 @@ function validateReleaseContract() {
   }
   if (JSON.stringify(releaseContract.bootstrap.packageFiles) !== JSON.stringify(['package.json', 'README.md', 'LICENSE'])) {
     throw new Error('npm bootstrap archives must contain only package.json, README.md, and LICENSE.');
+  }
+  const expectedTypeVerificationDependencies = { '@storybook/react': '10.5.3' };
+  if (JSON.stringify(releaseContract.typeVerificationDependencies) !== JSON.stringify(expectedTypeVerificationDependencies)
+    || rootManifest.devDependencies?.['@storybook/react'] !== '10.5.3'
+    || lockfile.packages['node_modules/@storybook/react']?.version !== '10.5.3') {
+    throw new Error('Packed release type verification must pin the contracted Storybook declaration dependency.');
+  }
+  if (storybookAdapterManifest.dependencies?.['@storybook/react']
+    || storybookAdapterManifest.peerDependencies?.['@storybook/react']) {
+    throw new Error('The Gluon Storybook adapter must not expose React as a runtime or peer dependency.');
   }
   if (!releaseContract.spdxSchema.source.includes(`/${releaseContract.spdxSchema.sourceCommit}/`)) {
     throw new Error('SPDX schema source URL must pin the declared source commit.');
@@ -659,7 +670,13 @@ function validateWorkflow() {
   ]) if (!hostingScript.includes(required)) {
     throw new Error(`Release hosting verification is missing single-operator environment control ${required}.`);
   }
-  for (const required of ['releaseCutEvidencePath', "'release-cut-evidence.json'", "'compatibility-manifest.json'"]) {
+  for (const required of [
+    'releaseCutEvidencePath',
+    "'release-cut-evidence.json'",
+    "'compatibility-manifest.json'",
+    'typeVerificationDependencies',
+    'Release type verification dependency',
+  ]) {
     if (!artifactBuildScript.includes(required)) throw new Error(`Release artifact builder must retain ${required}.`);
   }
   if (artifactBuildScript.includes('manualEvidencePath') || artifactBuildScript.includes('manual-release-evidence.json')) {
