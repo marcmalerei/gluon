@@ -585,6 +585,10 @@ function validateWorkflow() {
   if (workflow.includes('inputs.phase') || /^  finalize:/m.test(workflow)) {
     throw new Error('Release workflow must publish, verify, and finalize the release in one trusted-publishing job.');
   }
+  const bashVersionResolutionSteps = workflow.match(/- name: Resolve release version\n\s+shell: bash\n/g) ?? [];
+  if (bashVersionResolutionSteps.length !== 3) {
+    throw new Error('Every release version-resolution step must run explicitly under Bash.');
+  }
   const reproducibilityJob = workflow.match(/\n  reproducibility:\n([\s\S]*?)\n  browser-engines:\n/)?.[1];
   if (!/^\s*-\s+run:\s+npm run build\s*$/m.test(reproducibilityJob ?? '')) {
     throw new Error('Release reproducibility must use the complete root build before rebuilding artifacts.');
