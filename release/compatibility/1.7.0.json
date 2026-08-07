@@ -2,10 +2,10 @@
   "$schema": "../compatibility-manifest.schema.json",
   "schemaVersion": 1,
   "releaseVersion": "1.7.0",
-  "sourceCommit": "9c0c8fd9dad863d9520d38497fc05fee25ace791",
-  "cutAt": "2026-08-07T09:14:04Z",
+  "sourceCommit": "cc07cb11a1384d6bbd316cbdb112fdf168dfe5dd",
+  "cutAt": "2026-08-07T10:01:52Z",
   "automatedQualityRun": {
-    "url": "https://github.com/marcmalerei/gluon/actions/runs/31164513182",
+    "url": "https://github.com/marcmalerei/gluon/actions/runs/31167868506",
     "conclusion": "success"
   },
   "supportBoundary": {
@@ -22,7 +22,7 @@
       "runner": "GitHub Actions ubuntu-latest",
       "mode": "headless-automated",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172685"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750688"
       ],
       "outcome": "pass"
     },
@@ -35,7 +35,7 @@
       "runner": "GitHub Actions ubuntu-latest",
       "mode": "headless-automated",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172717"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750673"
       ],
       "outcome": "pass"
     },
@@ -48,7 +48,7 @@
       "runner": "GitHub Actions ubuntu-latest",
       "mode": "headless-automated",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172688"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750623"
       ],
       "outcome": "pass"
     }
@@ -59,7 +59,7 @@
       "version": "22.12.0",
       "releaseStatus": "maintenance-lts",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172802"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750630"
       ],
       "outcome": "pass"
     },
@@ -68,7 +68,7 @@
       "version": "24.19.0",
       "releaseStatus": "active-lts",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172710"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750680"
       ],
       "outcome": "pass"
     }
@@ -77,37 +77,37 @@
     {
       "id": "client-rendering",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172685",
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172717",
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172688"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750688",
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750673",
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750623"
       ],
       "outcome": "pass"
     },
     {
       "id": "server-rendering",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172693"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750671"
       ],
       "outcome": "pass"
     },
     {
       "id": "streaming",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172693"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750671"
       ],
       "outcome": "pass"
     },
     {
       "id": "hydration",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172693"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750671"
       ],
       "outcome": "pass"
     },
     {
       "id": "static-generation",
       "evidence": [
-        "https://github.com/marcmalerei/gluon/actions/runs/31164513182/job/92822172693"
+        "https://github.com/marcmalerei/gluon/actions/runs/31167868506/job/92832750671"
       ],
       "outcome": "pass"
     }

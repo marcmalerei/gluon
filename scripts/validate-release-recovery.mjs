@@ -45,6 +45,7 @@ const expectedPaths = [
   'scripts/publish-release.mjs',
   'scripts/validate-release-contract.mjs',
   'scripts/validate-release-recovery.mjs',
+  'scripts/verify-registry-release.mjs',
   'scripts/verify-release-hosting.mjs',
 ];
 if (manifest.failureCategory === 'missing-bootstrap-record') {
@@ -55,9 +56,12 @@ if (manifest.failureCategory === 'missing-bootstrap-record') {
     'scripts/publish-npm-bootstrap.mjs',
   );
 }
+const expectedRecoveryTag = manifest.previousRecoveryTag
+  ? `${canonicalTag}-recovery.2`
+  : `${canonicalTag}-recovery.1`;
 if (manifest.releaseVersion !== version
   || manifest.canonicalTag !== canonicalTag
-  || manifest.recoveryTag !== `${canonicalTag}-recovery.1`
+  || manifest.recoveryTag !== expectedRecoveryTag
   || JSON.stringify(manifest.allowedCanonicalDeltaPaths) !== JSON.stringify(expectedPaths)) {
   throw new Error(`${manifestPath} does not match the exact one-time ${version} recovery boundary.`);
 }
@@ -66,9 +70,22 @@ const canonicalTagCommit = git('rev-list', '-n', '1', canonicalTag);
 const canonicalTagTree = git('rev-parse', `${canonicalTag}^{tree}`);
 const failedEvidenceTree = git('rev-parse', `${manifest.failedEvidenceCommit}^{tree}`);
 if (canonicalTagCommit !== manifest.canonicalTagCommit
-  || canonicalTagTree !== manifest.canonicalTagTree
-  || failedEvidenceTree !== manifest.canonicalTagTree) {
+  || canonicalTagTree !== manifest.canonicalTagTree) {
   throw new Error(`${manifestPath} does not match the immutable canonical tag and reviewed evidence tree.`);
+}
+if (manifest.previousRecoveryTag) {
+  if (manifest.failureCategory !== 'published-registry-type-verification-storybook'
+    || manifest.previousRecoveryTag !== `${canonicalTag}-recovery.1`
+    || git('rev-list', '-n', '1', manifest.previousRecoveryTag) !== manifest.failedEvidenceCommit) {
+    throw new Error(`${manifestPath} does not match the exact failed first recovery attempt.`);
+  }
+  const previousChanged = git('diff', '--name-only', canonicalTag, manifest.previousRecoveryTag).split('\n').filter(Boolean);
+  const previousForbidden = previousChanged.filter((path) => !expectedPaths.includes(path));
+  if (previousForbidden.length > 0) {
+    throw new Error(`Previous recovery changes paths outside the exact allowlist: ${previousForbidden.join(', ')}.`);
+  }
+} else if (failedEvidenceTree !== manifest.canonicalTagTree) {
+  throw new Error(`${manifestPath} failed evidence does not preserve the immutable canonical package tree.`);
 }
 requireAncestor(manifest.failedTestedCommit, manifest.failedEvidenceCommit,
   'The failed evidence commit does not descend from its recorded tested commit.');

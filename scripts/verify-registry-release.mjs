@@ -11,6 +11,8 @@ const output = resolve(root, option('--output') ?? '.tmp/release/registry-verifi
 const directory = resolve(root, option('--directory') ?? '.tmp/release');
 const packageContract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
 const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
+const rootManifest = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+const lockfile = JSON.parse(await readFile(resolve(root, 'package-lock.json'), 'utf8'));
 const registry = releaseContract.publication.registry;
 const fixture = resolve(root, '.tmp/registry-verification');
 
@@ -24,6 +26,15 @@ await rm(fixture, { recursive: true, force: true });
 await mkdir(fixture, { recursive: true });
 
 const dependencies = Object.fromEntries(packageContract.packages.map((entry) => [entry.name, version]));
+for (const [name, expectedVersion] of Object.entries(releaseContract.typeVerificationDependencies)) {
+  const declaredVersion = rootManifest.devDependencies?.[name];
+  const lockedVersion = lockfile.packages[`node_modules/${name}`]?.version;
+  if (declaredVersion !== expectedVersion || lockedVersion !== expectedVersion) {
+    throw new Error(`Registry type verification dependency ${name} must be declared and locked at ${expectedVersion}.`);
+  }
+  if (dependencies[name]) throw new Error(`Registry type verification dependency ${name} collides with an official package.`);
+  dependencies[name] = expectedVersion;
+}
 await writeFile(resolve(fixture, 'package.json'), `${JSON.stringify({
   name: 'gluon-registry-verification',
   version: '0.0.0',
