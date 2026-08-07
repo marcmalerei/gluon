@@ -1,20 +1,15 @@
 # Release readiness
 
-The `1.7.0` documentation describes the current lockstep release recovery. All
-21 official manifests are at `1.7.0`, including the new optional
-`@gluonjs/i18n` package. The previous completed `1.6.0` release run
-`30605909445` published 20 contracted packages under `latest` with npm
-provenance, passed clean-room installation and public-type verification, and
-published immutable GitHub release `v1.6.0` on 2026-07-31. The new i18n package
-has its reviewed bootstrap record and Trusted Publisher binding. Release run
-`31163818091` stopped before publication because Bash conditionals ran under
-the container's default `sh` shell. Recovery run `31166405472` published all 21
-reviewed packages with provenance under `latest`, but its registry clean-room
-typecheck omitted the contracted Storybook declaration dependency and left the
-canonical GitHub release safely in draft. The reviewed second recovery
-preserves both immutable execution histories and uses only the protected
-`v1.7.0-recovery.2` execution tag to verify the existing packages and finalize
-canonical release `v1.7.0`.
+The `1.7.0` documentation describes the completed lockstep release. All 21
+official manifests are at `1.7.0`, including the new optional `@gluonjs/i18n`
+package. Recovery run `31166405472` published every contracted package under
+`latest` with npm provenance. Final recovery run `31169785993` confirmed
+matching reviewed archive integrity, provenance attestations, clean-room
+installation, and public-type declarations for all 21 packages before
+publishing immutable GitHub release `v1.7.0` on 2026-08-07. Protected execution
+tag `v1.7.0-recovery.2` preserves the reviewed recovery history at commit
+`8db054ead616b6b6c0b5bd7765f5421b3d99f224`. The `@gluonjs` scope, package
+records, and Trusted Publisher bindings are verified in the package contract.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
