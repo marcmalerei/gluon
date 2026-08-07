@@ -282,6 +282,15 @@ async function verifyPackedPackageTypes(packages) {
     entry.name,
     `file:${resolve(packageOutput, entry.filename)}`,
   ]));
+  for (const [name, expectedVersion] of Object.entries(releaseContract.typeVerificationDependencies)) {
+    const declaredVersion = rootManifest.devDependencies?.[name];
+    const lockedVersion = lockfile.packages[`node_modules/${name}`]?.version;
+    if (declaredVersion !== expectedVersion || lockedVersion !== expectedVersion) {
+      throw new Error(`Release type verification dependency ${name} must be declared and locked at ${expectedVersion}.`);
+    }
+    if (dependencies[name]) throw new Error(`Release type verification dependency ${name} collides with an official package.`);
+    dependencies[name] = expectedVersion;
+  }
   await writeJson(resolve(packageTypeFixture, 'package.json'), {
     name: 'gluon-packed-type-verification',
     version: '0.0.0',

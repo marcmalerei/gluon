@@ -235,6 +235,7 @@
     "@preact/signals-core": "1.14.4",
     "@storybook/addon-a11y": "^10.5.3",
     "@storybook/addon-vitest": "^10.5.3",
+    "@storybook/react": "10.5.3",
     "@storybook/web-components-vite": "^10.5.3",
     "@types/node": "^22.10.0",
     "@types/react": "19.2.17",

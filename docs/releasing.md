@@ -388,6 +388,14 @@ producing the package archives, aggregate and per-package SPDX 2.3 and
 CycloneDX 1.7 SBOMs, `release-evidence.json`, and a `SHA256SUMS` manifest under
 `.tmp/release`.
 
+The packed type fixture also installs the exact verification-only dependencies
+recorded in `release/release-contract.json`. Storybook 10.5's generic
+declarations reference `@storybook/react` even for a Web Components renderer,
+so the fixture pins `@storybook/react@10.5.3` to make that external declaration
+graph deterministic. This does not add React to
+`@gluonjs/gluon-components-vite`'s runtime or peer dependencies; the adapter
+remains Web Components-native.
+
 The aggregate npm SPDX document is generated from `package-lock.json` with
 `--package-lock-only --legacy-peer-deps`. This keeps release-candidate
 generation independent of the not-yet-published exact lockstep package

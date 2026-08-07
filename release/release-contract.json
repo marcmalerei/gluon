@@ -6,6 +6,9 @@
   "tagPrefix": "v",
   "environment": "npm",
   "artifactDirectory": ".tmp/release",
+  "typeVerificationDependencies": {
+    "@storybook/react": "10.5.3"
+  },
   "releaseCutEvidencePath": "release/evidence/{version}.json",
   "compatibilityManifestPath": "release/compatibility/{version}.json",
   "bootstrap": {

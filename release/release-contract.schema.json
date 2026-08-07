@@ -11,6 +11,7 @@
     "tagPrefix",
     "environment",
     "artifactDirectory",
+    "typeVerificationDependencies",
     "releaseCutEvidencePath",
     "compatibilityManifestPath",
     "bootstrap",
@@ -31,6 +32,14 @@
     "tagPrefix": { "const": "v" },
     "environment": { "const": "npm" },
     "artifactDirectory": { "const": ".tmp/release" },
+    "typeVerificationDependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["@storybook/react"],
+      "properties": {
+        "@storybook/react": { "const": "10.5.3" }
+      }
+    },
     "releaseCutEvidencePath": { "const": "release/evidence/{version}.json" },
     "compatibilityManifestPath": { "const": "release/compatibility/{version}.json" },
     "bootstrap": {
