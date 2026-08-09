@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
-import { buttonStyles, inputStyles, labelStyles } from '@gluonjs/atoms';
+import { buttonStyles, inputStyles, labelStyles, textareaStyles } from '@gluonjs/atoms';
 import { formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -200,6 +200,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).toContain(formFieldStyles);
     expect(document.adoptedStyleSheets).toContain(inputStyles);
     expect(document.adoptedStyleSheets).toContain(labelStyles);
+    expect(document.adoptedStyleSheets).toContain(textareaStyles);
     purchase.click();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/checkout');

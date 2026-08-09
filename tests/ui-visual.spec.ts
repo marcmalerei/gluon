@@ -3,6 +3,7 @@ import { page } from 'vitest/browser';
 import {
   Button,
   Select,
+  Textarea,
   installUi,
 } from '@gluonjs/atoms';
 import {
@@ -109,6 +110,45 @@ test('matches Select default, disabled, invalid, and public size states', async 
   }), document.body);
 
   await expect.element(page.getByTestId('select-visual')).toMatchScreenshot('select-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.03, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches Textarea default, disabled, readonly, invalid, and width states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="textarea-visual"] { box-sizing: border-box; inline-size: 520px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="textarea-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .textarea-state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .textarea-state-grid label { display: grid; gap: 6px; font-size: 13px; font-weight: 650; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'textarea-visual' },
+    children: [
+      q.h1({ children: 'Native Textarea states' }),
+      q.div({
+        class: 'textarea-state-grid',
+        children: [
+          q.label({ children: ['Default', Textarea({ value: 'Workshop entrance', rows: 3 })] }),
+          q.label({ children: ['Disabled', Textarea({ value: 'Unavailable note', disabled: true, rows: 3 })] }),
+          q.label({ children: ['Readonly', Textarea({ value: 'Recorded instruction', readOnly: true, rows: 3 })] }),
+          q.label({ children: ['Invalid', Textarea({ value: 'Check this note', invalid: true, rows: 3 })] }),
+          q.label({ children: ['Full width', Textarea({ value: 'Across the complete field', fullWidth: true, rows: 3 })] }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('textarea-visual')).toMatchScreenshot('textarea-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.03, threshold: 0.15 },
   });

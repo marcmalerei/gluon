@@ -1,6 +1,7 @@
 import {
   Button,
   Icon,
+  Textarea,
   defineButtonPreset,
   defineIcon,
   type ButtonProps,
@@ -129,11 +130,12 @@ export const CheckoutExperience = defineOrganism((props: CheckoutExperienceProps
           class: 'checkout-field',
           children: [
             'Delivery instructions (optional)',
-            q.textarea({
-              class: ['checkout-input', 'checkout-textarea'],
+            Textarea({
+              attributes: { class: ['checkout-input', 'checkout-textarea'] },
               name: 'deliveryInstructions',
               rows: 3,
-              '.value': props.values.deliveryInstructions,
+              value: props.values.deliveryInstructions,
+              fullWidth: true,
               onInput: (event) => props.onFieldInput(
                 'deliveryInstructions',
                 (event.currentTarget as HTMLTextAreaElement).value,

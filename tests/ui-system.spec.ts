@@ -5,6 +5,7 @@ import {
   Icon,
   Input,
   Select,
+  Textarea,
   atomManifest,
   atomStyles,
   createUiStyleSelection,
@@ -50,6 +51,39 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
+  it('renders Textarea as a native controlled multiline control with explicit states', () => {
+    const onInput = vi.fn();
+    const onChange = vi.fn();
+    render(Textarea({
+      value: 'Workshop entrance',
+      name: 'instructions',
+      placeholder: 'Delivery notes',
+      readOnly: true,
+      required: true,
+      invalid: true,
+      rows: 4,
+      fullWidth: true,
+      onInput,
+      onChange,
+      attributes: { id: 'delivery-notes', data: { owner: 'checkout' } },
+    }), document.body);
+
+    const textarea = document.querySelector<HTMLTextAreaElement>('#delivery-notes')!;
+    expect(textarea.tagName).toBe('TEXTAREA');
+    expect(textarea.value).toBe('Workshop entrance');
+    expect(textarea.name).toBe('instructions');
+    expect(textarea.placeholder).toBe('Delivery notes');
+    expect(textarea.readOnly).toBe(true);
+    expect(textarea.required).toBe(true);
+    expect(textarea.rows).toBe(4);
+    expect(textarea.getAttribute('aria-invalid')).toBe('true');
+    expect(textarea.classList).toContain('is-full-width');
+    textarea.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(onInput).toHaveBeenCalledOnce();
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
   it('renders Select as a native controlled control with explicit public states', () => {
     const onChange = vi.fn();
     render(Select({
@@ -800,6 +834,7 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
               q.option({ value: 'weekly', children: 'Weekly' }),
             ],
           }),
+          Textarea({ value: 'Only account-related notes', attributes: { 'aria-label': 'Account notes' } }),
         ],
       }),
     ],

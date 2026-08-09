@@ -4,6 +4,7 @@ import {
   Input,
   Label,
   Select,
+  Textarea,
   defineButtonPreset,
   defineIcon,
   installUi,
@@ -151,6 +152,13 @@ createApp(() => AppShell({
             q.option({ value: 'black', children: 'Black' }),
             q.option({ value: 'cobalt', children: 'Cobalt' }),
           ],
+        }),
+        Textarea({
+          value: 'Leave parcels with reception.',
+          name: 'delivery-notes',
+          rows: 3,
+          fullWidth: true,
+          attributes: { 'aria-label': 'Delivery notes' },
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

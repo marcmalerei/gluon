@@ -28,6 +28,7 @@ import {
   inputStyles,
   labelStyles,
   selectStyles,
+  textareaStyles,
 } from '@gluonjs/atoms';
 import {
   Card,
@@ -44,6 +45,7 @@ const allComponentSheets = [
   inputStyles,
   labelStyles,
   selectStyles,
+  textareaStyles,
   cardStyles,
   formFieldStyles,
   navigationStripStyles,

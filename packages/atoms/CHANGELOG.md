@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the native `Textarea` Atom with controlled value, disabled, readonly,
+  required, invalid, rows, full-width, input/change, exact-style, and GLUON
+  GOODS checkout integration contracts.
 - Added the native `Select` Atom with typed sizes, controlled value, disabled,
   required, invalid, and full-width states, exact stylesheet ownership, and
   production catalog-sort usage in GLUON GOODS. Its explicit logical block size

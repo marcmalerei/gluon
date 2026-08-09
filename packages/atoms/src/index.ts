@@ -41,6 +41,12 @@ export { inputStyles } from './input-styles.js';
 export { labelStyles } from './label-styles.js';
 export { selectStyles } from './select-styles.js';
 export {
+  Textarea,
+  type TextareaAttributes,
+  type TextareaProps,
+} from './textarea.js';
+export { textareaStyles } from './textarea-styles.js';
+export {
   darkThemeStyles,
   createUiStyleSelection,
   getThemeStyles,

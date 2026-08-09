@@ -8,7 +8,7 @@ Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
 ```ts
-import { Button, Input, Select, installUi } from '@gluonjs/atoms';
+import { Button, Input, Select, Textarea, installUi } from '@gluonjs/atoms';
 
 const ui = installUi(document, { theme: 'light' });
 
@@ -31,7 +31,7 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-`Button`, `Icon`, `Input`, `Label`, and `Select` expose immutable `Component.styles`
+`Button`, `Icon`, `Input`, `Label`, `Select`, and `Textarea` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. `atomStyles` is deprecated; adopting it with exact rendering throws
@@ -100,6 +100,9 @@ native `button` rule or adopt `atomStyles`.
 - `Select` preserves native option, keyboard, disabled, and required semantics;
   compose it with `Label` or another native labeling relationship. Its public
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
+- `Textarea` preserves native multiline editing, selection, resize, form,
+  disabled, readonly, and required semantics. Associate it with visible label
+  text and use `invalid` only with useful validation copy.
 
 Every compatible Atom uses the named `attributes` extension contract. Use
 `defineButtonPreset()` for app-owned brand/danger classes and analytics/ref/data
@@ -111,8 +114,11 @@ metadata and bodies not created by Core's `svg` template tag. Official
 implementation details. The public Button override properties are
 `--gluon-button-background`, `--gluon-button-color`, and
 `--gluon-button-border-color`. Select exposes `--gluon-select-background`,
-`--gluon-select-color`, and `--gluon-select-border-color`; shared public tokens retain their documented
-`--gluon-*` names. See the
+`--gluon-select-color`, and `--gluon-select-border-color`. Textarea exposes
+`--gluon-textarea-background`,
+`--gluon-textarea-color`, `--gluon-textarea-border-color`,
+`--gluon-textarea-readonly-background`, and `--gluon-textarea-resize`.
+Shared public tokens retain their documented `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 
 Logical CSS properties support both text directions, and the maintained themes
@@ -125,5 +131,7 @@ application inputs so localization stays with the consuming product.
 
 GLUON GOODS is the production dogfood surface: its public Button presets cover
 global navigation, dialogs, product add/retry, and bag quantity/remove actions;
-catalog search uses `Input`, and catalog sorting uses the native `Select`. The application supplies only documented public
-tokens/classes and owns the shared/exact sheets through one `UiOwner` lifecycle.
+catalog search uses `Input`, catalog sorting uses the native `Select`, and
+checkout delivery instructions use `Textarea`. The application supplies only
+documented public tokens/classes and owns the shared/exact sheets through one
+`UiOwner` lifecycle.
