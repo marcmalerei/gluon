@@ -190,7 +190,11 @@ test('matches Checkbox unchecked, checked, indeterminate, disabled, and invalid 
 
   await expect.element(page.getByTestId('checkbox-visual')).toMatchScreenshot('checkbox-states-light', {
     comparatorName: 'pixelmatch',
-    comparatorOptions: { allowedMismatchedPixelRatio: 0.03, threshold: 0.15 },
+    comparatorOptions: {
+      // Native checkbox and font rasterization differ slightly between macOS and Linux WebKit.
+      allowedMismatchedPixelRatio: 0.04,
+      threshold: 0.15,
+    },
   });
   uiOwner.dispose();
 });
