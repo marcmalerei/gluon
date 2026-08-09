@@ -18,6 +18,12 @@ export {
 export { Input, type InputProps } from './input.js';
 export { Label, type LabelProps } from './label.js';
 export {
+  Select,
+  type SelectAttributes,
+  type SelectProps,
+  type SelectSize,
+} from './select.js';
+export {
   defineUiAtom,
   type DefineUiAtomOptions,
   type LooseUiAtomProps,
@@ -33,6 +39,7 @@ export { buttonStyles } from './button-styles.js';
 export { iconStyles } from './icon-styles.js';
 export { inputStyles } from './input-styles.js';
 export { labelStyles } from './label-styles.js';
+export { selectStyles } from './select-styles.js';
 export {
   darkThemeStyles,
   createUiStyleSelection,

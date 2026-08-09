@@ -20,7 +20,7 @@ import {
   unsafeHTML,
   unmount,
 } from '@gluonjs/core';
-import { Button, buttonStyles } from '@gluonjs/atoms';
+import { Button, Select, buttonStyles, selectStyles } from '@gluonjs/atoms';
 import { Card, cardStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
@@ -466,7 +466,11 @@ describe('SSR hydration', () => {
   });
 
   it('hands component carriers to their exact renderer-owned sheets and diagnoses mismatches', async () => {
-    const value = html`<main>${Button({ label: 'Hydrated action' })}${Card({ title: 'Hydrated card' })}</main>`;
+    const value = html`<main>${Button({ label: 'Hydrated action' })}${Select({
+      value: 'cobalt',
+      attributes: { 'aria-label': 'Hydrated finish' },
+      children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
+    })}${Card({ title: 'Hydrated card' })}</main>`;
     const prepared = await prepareForHydration(value);
     const selection = createComponentStyleSelection(prepared.value);
     const manifest = createStyleManifest(selection);
@@ -480,10 +484,12 @@ describe('SSR hydration', () => {
     const result = await hydrateTemplate(value, root, { styles: manifest, styleRoot });
     expect(result.retained).toBe(true);
     expect(styleRoot.adoptedStyleSheets).toContain(buttonStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(cardStyles);
     expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
     unmount(root);
     expect(styleRoot.adoptedStyleSheets).not.toContain(buttonStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(cardStyles);
 
     const carrierTemplate = document.createElement('template');

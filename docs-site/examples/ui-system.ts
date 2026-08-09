@@ -3,6 +3,7 @@ import {
   Icon,
   Input,
   Label,
+  Select,
   defineButtonPreset,
   defineIcon,
   installUi,
@@ -140,6 +141,17 @@ createApp(() => AppShell({
       subtitle: 'Stable atoms, molecules, and headless choices',
       actions: Button({ label: 'Save profile' }),
       children: [
+        Select({
+          value: finish.value,
+          attributes: { 'aria-label': 'Native finish selector' },
+          onChange: (event) => {
+            finish.value = (event.currentTarget as HTMLSelectElement).value;
+          },
+          children: [
+            q.option({ value: 'black', children: 'Black' }),
+            q.option({ value: 'cobalt', children: 'Cobalt' }),
+          ],
+        }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',

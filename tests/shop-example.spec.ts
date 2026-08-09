@@ -159,6 +159,13 @@ describe('GLUON GOODS reference shop', () => {
         && currentRect.right <= currentViewportRect.right + 1;
     }).toBe(true);
     expect(root.querySelectorAll('.catalog-grid .product-card')).toHaveLength(1);
+    const sort = root.querySelector<HTMLSelectElement>('#catalog-sort')!;
+    expect(sort.value).toBe('featured');
+    sort.value = 'price-high';
+    sort.dispatchEvent(new Event('change', { bubbles: true }));
+    await settleShop();
+    expect(router.currentRoute.value.fullPath).toBe('/shop?category=Seating&sort=price-high');
+    expect(root.querySelector<HTMLSelectElement>('#catalog-sort')?.value).toBe('price-high');
     app.unmount();
     expect(document.adoptedStyleSheets).not.toContain(navigationStripStyles);
   });

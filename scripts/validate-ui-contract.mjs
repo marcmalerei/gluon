@@ -10,7 +10,7 @@ const ownerOutput = resolve(root, '.tmp/ui-owner-only');
 const componentOutput = resolve(root, '.tmp/ui-component-usage');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
-  ['@gluonjs/atoms', ['Button', 'Icon', 'Input', 'Label', 'installUi']],
+  ['@gluonjs/atoms', ['Button', 'Icon', 'Input', 'Label', 'Select', 'installUi']],
   ['@gluonjs/molecules', ['Card', 'FormField', 'NavigationStrip']],
   ['@gluonjs/organisms', ['AppShell']],
 ]);
@@ -164,7 +164,7 @@ try {
     .filter((file) => file.endsWith('.js'))
     .map(async (file) => [file, await readFile(resolve(componentOutput, file), 'utf8')])));
   const initial = entries.get('button-only.js') ?? '';
-  for (const marker of ['gluon-input', 'gluon-label', 'gluon-icon', 'gluon-card', 'gluon-form-field', 'gluon-navigation-strip', 'gluon-app-shell']) {
+  for (const marker of ['gluon-input', 'gluon-label', 'gluon-icon', 'gluon-select', 'gluon-card', 'gluon-form-field', 'gluon-navigation-strip', 'gluon-app-shell']) {
     if (initial.includes(marker)) throw new Error(`Button-only entry contains unselected marker ${marker}.`);
   }
   if (!initial.includes('gluon-button')) throw new Error('Button-only entry does not contain its exact component marker.');
@@ -196,6 +196,7 @@ for (const marker of [
   'gluon-icon',
   'gluon-input',
   'gluon-label',
+  'gluon-select',
   'gluon-form-field',
   'gluon-navigation-strip',
   'PurchaseAction',

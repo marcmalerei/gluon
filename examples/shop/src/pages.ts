@@ -1,4 +1,5 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
+import { Select } from '@gluonjs/atoms';
 import { NavigationStrip } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
@@ -56,10 +57,13 @@ export function HomePage(_store: ShopStore): TemplateValue {
 
 export function CatalogPage(_store: ShopStore): TemplateValue {
   const route = useRoute();
+  const router = useRouter();
   const selected = typeof route.query.category === 'string' ? route.query.category : 'All';
-  const visible = selected === 'All'
+  const sort = typeof route.query.sort === 'string' ? route.query.sort : 'featured';
+  const filtered = selected === 'All'
     ? products
     : products.filter((product) => product.category === selected);
+  const visible = sortProducts(filtered, sort);
   return html`
     <section class="catalog-page">
       <header class="catalog-heading">
@@ -82,9 +86,28 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
           })),
         ],
       })}
+      <div class="catalog-sort">
+        <label for="catalog-sort">Sort by</label>
+        ${Select({
+          value: sort,
+          attributes: { id: 'catalog-sort', 'aria-label': 'Sort products' },
+          onChange: (event) => {
+            const value = (event.currentTarget as HTMLSelectElement).value;
+            const categoryQuery = selected === 'All' ? '' : `category=${encodeURIComponent(selected)}&`;
+            void router.push(`/shop?${categoryQuery}sort=${encodeURIComponent(value)}`);
+          },
+          children: html`
+            <option value="featured">Featured</option>
+            <option value="new">Newest</option>
+            <option value="name">Name</option>
+            <option value="price-low">Price: low to high</option>
+            <option value="price-high">Price: high to low</option>
+          `,
+        })}
+      </div>
       ${LayoutTransition({
         layoutId: 'catalog-grid',
-        transitionKey: selected,
+        transitionKey: `${selected}:${sort}`,
         duration: 180,
         children: html`<div class="catalog-grid">
           ${repeat(visible, (product) => product.slug, ProductCard)}
@@ -92,6 +115,15 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
       })}
     </section>
   `;
+}
+
+function sortProducts(items: readonly Product[], sort: string): readonly Product[] {
+  const sorted = [...items];
+  if (sort === 'new') return sorted.reverse();
+  if (sort === 'name') return sorted.sort((left, right) => left.name.localeCompare(right.name));
+  if (sort === 'price-low') return sorted.sort((left, right) => left.price - right.price);
+  if (sort === 'price-high') return sorted.sort((left, right) => right.price - left.price);
+  return items;
 }
 
 export function ProductPage(
