@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the native checkbox-backed `Switch` Atom with stable switch semantics,
+  Space activation, forms, reduced-motion/forced-colors/RTL support, and public
+  track/thumb customization properties.
 - Added the native `Radio` Atom with controlled checked state, same-name group,
   Arrow/Space keyboard, form/required, forced-colors, and GLUON GOODS product
   configuration contracts.

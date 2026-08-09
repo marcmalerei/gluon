@@ -53,6 +53,12 @@ export {
 } from './radio.js';
 export { radioStyles } from './radio-styles.js';
 export {
+  Switch,
+  type SwitchAttributes,
+  type SwitchProps,
+} from './switch.js';
+export { switchStyles } from './switch-styles.js';
+export {
   Textarea,
   type TextareaAttributes,
   type TextareaProps,

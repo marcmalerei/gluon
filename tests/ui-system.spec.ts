@@ -8,6 +8,7 @@ import {
   Input,
   Radio,
   Select,
+  Switch,
   Textarea,
   atomManifest,
   atomStyles,
@@ -107,6 +108,28 @@ describe('separate UI package contracts', () => {
     expect(cobalt.checked).toBe(true);
     expect(graphite.checked).toBe(false);
     expect(new FormData(form).get('finish')).toBe('cobalt');
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
+  it('keeps Switch native Space-key, form, label, and change behavior', async () => {
+    const onChange = vi.fn();
+    const form = document.createElement('form');
+    document.body.append(form);
+    render(q.label({ children: [
+      Switch({ name: 'network', value: 'enabled', required: true, onChange, attributes: { id: 'network-switch' } }),
+      'Allow network access',
+    ] }), form);
+
+    const control = form.querySelector<HTMLInputElement>('#network-switch')!;
+    expect(control.type).toBe('checkbox');
+    expect(control.getAttribute('role')).toBe('switch');
+    expect(control.required).toBe(true);
+    expect(new FormData(form).has('network')).toBe(false);
+
+    control.focus();
+    await userEvent.keyboard(' ');
+    expect(control.checked).toBe(true);
+    expect(new FormData(form).get('network')).toBe('enabled');
     expect(onChange).toHaveBeenCalledOnce();
   });
 
