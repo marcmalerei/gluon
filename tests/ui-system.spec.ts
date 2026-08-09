@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import axe, { type Result } from 'axe-core';
 import {
   Button,
   Checkbox,
   Icon,
   Input,
+  Radio,
   Select,
   Textarea,
   atomManifest,
@@ -80,6 +82,31 @@ describe('separate UI package contracts', () => {
     form.reset();
     expect(checkbox.checked).toBe(true);
     checkbox.click();
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
+  it('keeps Radio native grouping, Arrow-key, form, validation, and change behavior', async () => {
+    const onChange = vi.fn();
+    const form = document.createElement('form');
+    document.body.append(form);
+    render(q.div({ children: [
+      q.label({ children: ['Graphite', Radio({ checked: true, name: 'finish', value: 'graphite', required: true, attributes: { id: 'finish-graphite' } })] }),
+      q.label({ children: ['Cobalt', Radio({ name: 'finish', value: 'cobalt', invalid: true, onChange, attributes: { id: 'finish-cobalt' } })] }),
+    ] }), form);
+
+    const graphite = form.querySelector<HTMLInputElement>('#finish-graphite')!;
+    const cobalt = form.querySelector<HTMLInputElement>('#finish-cobalt')!;
+    expect(graphite.type).toBe('radio');
+    expect(graphite.checked).toBe(true);
+    expect(graphite.required).toBe(true);
+    expect(cobalt.getAttribute('aria-invalid')).toBe('true');
+    expect(new FormData(form).get('finish')).toBe('graphite');
+
+    graphite.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(cobalt.checked).toBe(true);
+    expect(graphite.checked).toBe(false);
+    expect(new FormData(form).get('finish')).toBe('cobalt');
     expect(onChange).toHaveBeenCalledOnce();
   });
 

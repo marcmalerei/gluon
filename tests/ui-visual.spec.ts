@@ -3,6 +3,7 @@ import { page } from 'vitest/browser';
 import {
   Button,
   Checkbox,
+  Radio,
   Select,
   Textarea,
   installUi,
@@ -195,6 +196,44 @@ test('matches Checkbox unchecked, checked, indeterminate, disabled, and invalid 
       allowedMismatchedPixelRatio: 0.04,
       threshold: 0.15,
     },
+  });
+  uiOwner.dispose();
+});
+
+test('matches Radio unchecked, checked, disabled, and invalid states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="radio-visual"] { box-sizing: border-box; inline-size: 420px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="radio-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .radio-state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+      .radio-state-grid label { display: flex; min-block-size: 44px; align-items: center; gap: 10px; font-size: 13px; font-weight: 650; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'radio-visual' },
+    children: [
+      q.h1({ children: 'Native Radio states' }),
+      q.div({
+        class: 'radio-state-grid',
+        children: [
+          q.label({ children: [Radio({ name: 'state' }), 'Unchecked'] }),
+          q.label({ children: [Radio({ name: 'state', checked: true }), 'Checked'] }),
+          q.label({ children: [Radio({ disabled: true }), 'Disabled'] }),
+          q.label({ children: [Radio({ invalid: true }), 'Invalid'] }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('radio-visual')).toMatchScreenshot('radio-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.03, threshold: 0.15 },
   });
   uiOwner.dispose();
 });

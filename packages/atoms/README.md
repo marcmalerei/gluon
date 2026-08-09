@@ -100,6 +100,9 @@ native `button` rule or adopt `atomStyles`.
   `Field`, or `FormField` to provide its accessible name.
 - `Label` is visible label text. `FormField` places it inside a native label;
   standalone callers must compose it with a native labeling relationship.
+- `Radio` preserves native same-name grouping, Arrow/Space keyboard, label,
+  form, required, checked, and disabled behavior. Place related controls in a
+  labeled `fieldset` or compose them with `ChoiceGroup`.
 - `Select` preserves native option, keyboard, disabled, and required semantics;
   compose it with `Label` or another native labeling relationship. Its public
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
@@ -121,8 +124,9 @@ implementation details. The public Button override properties are
 `--gluon-textarea-background`,
 `--gluon-textarea-color`, `--gluon-textarea-border-color`,
 `--gluon-textarea-readonly-background`, and `--gluon-textarea-resize`.
-Checkbox exposes `--gluon-checkbox-accent`; shared public tokens retain their
-documented `--gluon-*` names. See the
+Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
+`--gluon-radio-accent`. Shared public tokens retain their documented
+`--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 
 Logical CSS properties support both text directions, and the maintained themes
@@ -137,6 +141,6 @@ GLUON GOODS is the production dogfood surface: its public Button presets cover
 global navigation, dialogs, product add/retry, and bag quantity/remove actions;
 catalog search uses `Input`, catalog sorting uses the native `Select`, and
 checkout delivery instructions use `Textarea`; checkout consent uses
-`Checkbox`. The application supplies only
+`Checkbox`; product configuration uses native `Radio` groups. The application supplies only
 documented public tokens/classes and owns the shared/exact sheets through one
 `UiOwner` lifecycle.

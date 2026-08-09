@@ -56,6 +56,18 @@ export const atomStyles = css`
     :where(.gluon-checkbox:disabled) { cursor: not-allowed; opacity: 0.55; }
     :where(.gluon-checkbox):focus-visible { outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, #173f91); outline-offset: 3px; }
 
+    :where(.gluon-radio) {
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+      flex: none;
+      margin: 0;
+      accent-color: var(--gluon-radio-accent, var(--gluon-color-action, #087f7b));
+      cursor: pointer;
+    }
+    :where(.gluon-radio[aria-invalid="true"]) { outline: 1px solid var(--gluon-color-danger, #a52222); outline-offset: 2px; }
+    :where(.gluon-radio:disabled) { cursor: not-allowed; opacity: 0.55; }
+    :where(.gluon-radio):focus-visible { outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, #173f91); outline-offset: 3px; }
+
     :where(.gluon-button, .gluon-input, .gluon-select, .gluon-textarea):focus-visible {
       outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, #173f91);
       outline-offset: 3px;
@@ -121,7 +133,7 @@ export const atomStyles = css`
     @media (prefers-reduced-motion: reduce) {
       :where(.gluon-button, .gluon-input, .gluon-select, .gluon-textarea) { scroll-behavior: auto; }
     }
-    @media (forced-colors: active) { :where(.gluon-checkbox) { accent-color: AccentColor; } }
+    @media (forced-colors: active) { :where(.gluon-checkbox, .gluon-radio) { accent-color: AccentColor; } }
   }
 `;
 
@@ -131,6 +143,7 @@ markLegacyComponentStyleSheet(atomStyles, [
   'gluon-atom-icon',
   'gluon-atom-input',
   'gluon-atom-label',
+  'gluon-atom-radio',
   'gluon-atom-select',
   'gluon-atom-textarea',
 ]);

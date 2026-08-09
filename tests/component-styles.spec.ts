@@ -28,6 +28,7 @@ import {
   iconStyles,
   inputStyles,
   labelStyles,
+  radioStyles,
   selectStyles,
   textareaStyles,
 } from '@gluonjs/atoms';
@@ -46,6 +47,7 @@ const allComponentSheets = [
   iconStyles,
   inputStyles,
   labelStyles,
+  radioStyles,
   selectStyles,
   textareaStyles,
   cardStyles,

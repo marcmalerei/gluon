@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  Radio,
   Icon,
   Input,
   Label,
@@ -163,6 +164,14 @@ createApp(() => AppShell({
         }),
         q.label({
           children: [Checkbox({ name: 'updates', checked: true }), ' Product updates'],
+        }),
+        q.div({
+          role: 'group',
+          aria: { label: 'Preferred material' },
+          children: [
+            q.label({ children: [Radio({ name: 'material', value: 'steel', checked: true }), ' Steel'] }),
+            q.label({ children: [Radio({ name: 'material', value: 'aluminium' }), ' Aluminium'] }),
+          ],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

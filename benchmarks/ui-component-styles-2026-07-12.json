@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 7133,
-      "gzipBytes": 1539,
+      "rawBytes": 7721,
+      "gzipBytes": 1576,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -32,27 +32,29 @@
         ".gluon-icon",
         ".gluon-input",
         ".gluon-label",
+        ".gluon-radio",
         ".gluon-select",
         ".gluon-textarea"
       ]
     },
     "after": {
-      "rawBytes": 7472,
-      "gzipBytes": 1546,
-      "moduleCount": 10,
+      "rawBytes": 8159,
+      "gzipBytes": 1582,
+      "moduleCount": 11,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
         "packages/atoms/src/icon-styles.ts",
         "packages/atoms/src/input-styles.ts",
         "packages/atoms/src/label-styles.ts",
+        "packages/atoms/src/radio-styles.ts",
         "packages/atoms/src/select-styles.ts",
         "packages/atoms/src/textarea-styles.ts",
         "packages/molecules/src/card-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 10,
+      "stylesheetCount": 11,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -73,6 +75,7 @@
         ".gluon-icon",
         ".gluon-input",
         ".gluon-label",
+        ".gluon-radio",
         ".gluon-select",
         ".gluon-textarea"
       ]
@@ -80,8 +83,8 @@
   },
   "buttonOnly": {
     "before": {
-      "rawBytes": 5168,
-      "gzipBytes": 1082,
+      "rawBytes": 5756,
+      "gzipBytes": 1117,
       "moduleCount": 1,
       "modules": ["packages/atoms/src/styles.ts"],
       "stylesheetCount": 1,
@@ -91,6 +94,7 @@
         ".gluon-icon",
         ".gluon-input",
         ".gluon-label",
+        ".gluon-radio",
         ".gluon-select",
         ".gluon-textarea"
       ]
