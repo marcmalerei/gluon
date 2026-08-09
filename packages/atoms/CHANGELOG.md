@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the native `Radio` Atom with controlled checked state, same-name group,
+  Arrow/Space keyboard, form/required, forced-colors, and GLUON GOODS product
+  configuration contracts.
 - Added the native `Checkbox` Atom with controlled checked and indeterminate
   properties, form/reset/required behavior, forced-colors support, and required
   GLUON GOODS checkout consent.

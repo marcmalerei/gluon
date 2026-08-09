@@ -13,6 +13,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { customElement, property } from '@gluonjs/core/decorators';
+import { Radio } from '@gluonjs/atoms';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
 import {
@@ -134,10 +135,7 @@ export const productConfiguratorStyles = css`
     outline-offset: 3px;
   }
   .choice-group input {
-    width: 17px;
-    height: 17px;
-    margin: 0;
-    accent-color: var(--shop-cobalt, #173f91);
+    --gluon-radio-accent: var(--shop-cobalt, #173f91);
   }
   .choice-temperature > div,
   .choice-cable > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -424,14 +422,13 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
         <legend>${label}</legend>
         <div>${repeat(choices, String, (choice) => html`
           <label class=${this.configuration[key] === choice ? 'is-selected' : ''}>
-            <input
-              type="radio"
-              name=${key}
-              value=${String(choice)}
-              .checked=${this.configuration[key] === choice}
-              ?disabled=${disabled}
-              @change=${() => this.select(key, choice)}
-            >
+            ${Radio({
+              name: key,
+              value: String(choice),
+              checked: this.configuration[key] === choice,
+              disabled,
+              onChange: () => this.select(key, choice),
+            })}
             ${key === 'finish'
               ? html`<span class=${`finish-swatch swatch-${String(choice).toLowerCase()}`}></span>`
               : ''}
