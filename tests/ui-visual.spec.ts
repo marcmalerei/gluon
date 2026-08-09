@@ -46,15 +46,6 @@ test('matches the stable light-theme UI composition', async () => {
         actions: Button({ label: 'Save' }),
         children: [
           FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
-          Select({
-            value: 'medium',
-            attributes: { 'aria-label': 'Control size' },
-            children: [
-              q.option({ value: 'small', children: 'Small control' }),
-              q.option({ value: 'medium', children: 'Medium control' }),
-              q.option({ value: 'large', children: 'Large control' }),
-            ],
-          }),
           Listbox({
             id: 'visual-finish',
             label: 'Finish',

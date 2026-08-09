@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 5411,
-      "gzipBytes": 1303,
+      "rawBytes": 5453,
+      "gzipBytes": 1307,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -35,8 +35,8 @@
       ]
     },
     "after": {
-      "rawBytes": 5494,
-      "gzipBytes": 1308,
+      "rawBytes": 5536,
+      "gzipBytes": 1314,
       "moduleCount": 8,
       "modules": [
         "packages/atoms/src/button-styles.ts",
@@ -74,8 +74,8 @@
   },
   "buttonOnly": {
     "before": {
-      "rawBytes": 3446,
-      "gzipBytes": 846,
+      "rawBytes": 3488,
+      "gzipBytes": 851,
       "moduleCount": 1,
       "modules": ["packages/atoms/src/styles.ts"],
       "stylesheetCount": 1,
