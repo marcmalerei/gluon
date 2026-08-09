@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the native `Select` Atom with typed sizes, controlled value, disabled,
+  required, invalid, and full-width states, exact stylesheet ownership, and
+  production catalog-sort usage in GLUON GOODS.
+
 ## [1.7.0] - 2026-08-05
 
 ### Changed

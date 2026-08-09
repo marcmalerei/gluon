@@ -43,7 +43,7 @@ export const atomStyles = css`
     :where(.gluon-button.is-large) { padding-block: 0.875rem; padding-inline: 1.25rem; }
     :where(.gluon-button:disabled) { cursor: not-allowed; opacity: 0.55; }
 
-    :where(.gluon-button, .gluon-input):focus-visible {
+    :where(.gluon-button, .gluon-input, .gluon-select):focus-visible {
       outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, #173f91);
       outline-offset: 3px;
     }
@@ -68,8 +68,27 @@ export const atomStyles = css`
       font-weight: 650;
     }
 
+    :where(.gluon-select) {
+      min-block-size: 44px;
+      max-inline-size: 100%;
+      background: var(--gluon-select-background, var(--gluon-color-surface, white));
+      border: 1px solid var(--gluon-select-border-color, var(--gluon-color-rule, #b8c9c6));
+      border-radius: calc(var(--gluon-radius-control, 0.625rem) * 0.8);
+      color: var(--gluon-select-color, var(--gluon-color-text, inherit));
+      cursor: pointer;
+      font: inherit;
+      line-height: 1.25;
+      padding-block: 0.625rem;
+      padding-inline: 0.75rem 2rem;
+    }
+    :where(.gluon-select.is-small) { padding-block: 0.5rem; padding-inline-start: 0.625rem; }
+    :where(.gluon-select.is-large) { min-block-size: 52px; padding-block: 0.875rem; padding-inline-start: 1rem; }
+    :where(.gluon-select.is-full-width) { inline-size: 100%; }
+    :where(.gluon-select[aria-invalid="true"]) { border-color: var(--gluon-color-danger, #a52222); }
+    :where(.gluon-select:disabled) { cursor: not-allowed; opacity: 0.55; }
+
     @media (prefers-reduced-motion: reduce) {
-      :where(.gluon-button, .gluon-input) { scroll-behavior: auto; }
+      :where(.gluon-button, .gluon-input, .gluon-select) { scroll-behavior: auto; }
     }
   }
 `;
@@ -79,4 +98,5 @@ markLegacyComponentStyleSheet(atomStyles, [
   'gluon-atom-icon',
   'gluon-atom-input',
   'gluon-atom-label',
+  'gluon-atom-select',
 ]);

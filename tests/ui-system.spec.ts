@@ -4,6 +4,7 @@ import {
   Button,
   Icon,
   Input,
+  Select,
   atomManifest,
   atomStyles,
   createUiStyleSelection,
@@ -49,6 +50,38 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
+  it('renders Select as a native controlled control with explicit public states', () => {
+    const onChange = vi.fn();
+    render(Select({
+      value: 'weekly',
+      name: 'digest',
+      size: 'large',
+      disabled: true,
+      required: true,
+      invalid: true,
+      fullWidth: true,
+      onChange,
+      attributes: { id: 'digest-frequency', data: { owner: 'account' } },
+      children: [
+        q.option({ value: 'daily', children: 'Daily' }),
+        q.option({ value: 'weekly', children: 'Weekly' }),
+      ],
+    }), document.body);
+
+    const select = document.querySelector<HTMLSelectElement>('#digest-frequency')!;
+    expect(select.tagName).toBe('SELECT');
+    expect(select.value).toBe('weekly');
+    expect(select.name).toBe('digest');
+    expect(select.disabled).toBe(true);
+    expect(select.required).toBe(true);
+    expect(select.getAttribute('aria-invalid')).toBe('true');
+    expect(select.dataset.owner).toBe('account');
+    expect(select.classList).toContain('is-large');
+    expect(select.classList).toContain('is-full-width');
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
   it('does not adopt styles at import time and reuses explicit theme sheets', () => {
     expect(document.adoptedStyleSheets).toEqual([]);
     expect(getThemeStyles('light')).toBe(getThemeStyles('light'));
@@ -758,6 +791,15 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
           FormField({ label: 'Email', value: 'invalid', error: 'Enter a valid email address' }),
           q.p({ children: [Icon({ name: 'spark', label: 'Verified' }), ' Verified account'] }),
           Input({ attributes: { 'aria-label': 'Search settings' } }),
+          Select({
+            value: 'daily',
+            required: true,
+            attributes: { 'aria-label': 'Digest frequency' },
+            children: [
+              q.option({ value: 'daily', children: 'Daily' }),
+              q.option({ value: 'weekly', children: 'Weekly' }),
+            ],
+          }),
         ],
       }),
     ],

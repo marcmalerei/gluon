@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 import { page } from 'vitest/browser';
 import {
   Button,
+  Select,
   installUi,
 } from '@gluonjs/atoms';
 import {
@@ -45,6 +46,15 @@ test('matches the stable light-theme UI composition', async () => {
         actions: Button({ label: 'Save' }),
         children: [
           FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
+          Select({
+            value: 'medium',
+            attributes: { 'aria-label': 'Control size' },
+            children: [
+              q.option({ value: 'small', children: 'Small control' }),
+              q.option({ value: 'medium', children: 'Medium control' }),
+              q.option({ value: 'large', children: 'Large control' }),
+            ],
+          }),
           Listbox({
             id: 'visual-finish',
             label: 'Finish',
@@ -67,6 +77,49 @@ test('matches the stable light-theme UI composition', async () => {
       // Preserve geometric/color sensitivity while ignoring minor cross-OS font rasterization.
       threshold: 0.15,
     },
+  });
+  uiOwner.dispose();
+});
+
+test('matches Select default, disabled, invalid, and public size states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="select-visual"] { box-sizing: border-box; inline-size: 420px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="select-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .select-state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .select-state-grid label { display: grid; gap: 6px; font-size: 13px; font-weight: 650; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  const options = [
+    q.option({ value: 'black', children: 'Black' }),
+    q.option({ value: 'cobalt', children: 'Cobalt' }),
+  ];
+
+  render(q.main({
+    data: { testid: 'select-visual' },
+    children: [
+      q.h1({ children: 'Native Select states' }),
+      q.div({
+        class: 'select-state-grid',
+        children: [
+          q.label({ children: ['Default', Select({ value: 'black', children: options })] }),
+          q.label({ children: ['Disabled', Select({ value: 'cobalt', disabled: true, children: options })] }),
+          q.label({ children: ['Invalid', Select({ value: 'black', invalid: true, children: options })] }),
+          q.label({ children: ['Small', Select({ value: 'cobalt', size: 'small', children: options })] }),
+          q.label({ children: ['Large', Select({ value: 'black', size: 'large', fullWidth: true, children: options })] }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('select-visual')).toMatchScreenshot('select-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.03, threshold: 0.15 },
   });
   uiOwner.dispose();
 });
