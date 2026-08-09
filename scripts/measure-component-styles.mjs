@@ -28,6 +28,7 @@ const iconStyles = await sheet('packages/atoms/src/icon-styles.ts', 'iconStyles'
 const inputStyles = await sheet('packages/atoms/src/input-styles.ts', 'inputStyles');
 const labelStyles = await sheet('packages/atoms/src/label-styles.ts', 'labelStyles');
 const selectStyles = await sheet('packages/atoms/src/select-styles.ts', 'selectStyles');
+const textareaStyles = await sheet('packages/atoms/src/textarea-styles.ts', 'textareaStyles');
 const cardStyles = await sheet('packages/molecules/src/card-styles.ts', 'cardStyles');
 const formFieldStyles = await sheet('packages/molecules/src/form-field-styles.ts', 'formFieldStyles');
 const appShellStyles = await sheet('packages/organisms/src/app-shell-styles.ts', 'appShellStyles');
@@ -41,13 +42,14 @@ const actual = {
       ['packages/atoms/src/styles.ts', 'packages/molecules/src/styles.ts', 'packages/organisms/src/styles.ts'],
     ),
     after: measure(
-      [buttonStyles, iconStyles, inputStyles, labelStyles, selectStyles, cardStyles, formFieldStyles, appShellStyles],
+      [buttonStyles, iconStyles, inputStyles, labelStyles, selectStyles, textareaStyles, cardStyles, formFieldStyles, appShellStyles],
       [
         'packages/atoms/src/button-styles.ts',
         'packages/atoms/src/icon-styles.ts',
         'packages/atoms/src/input-styles.ts',
         'packages/atoms/src/label-styles.ts',
         'packages/atoms/src/select-styles.ts',
+        'packages/atoms/src/textarea-styles.ts',
         'packages/molecules/src/card-styles.ts',
         'packages/molecules/src/form-field-styles.ts',
         'packages/organisms/src/app-shell-styles.ts',
