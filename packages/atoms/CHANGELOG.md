@@ -6,7 +6,8 @@
 
 - Added the native `Select` Atom with typed sizes, controlled value, disabled,
   required, invalid, and full-width states, exact stylesheet ownership, and
-  production catalog-sort usage in GLUON GOODS.
+  production catalog-sort usage in GLUON GOODS. Its explicit logical block size
+  keeps the 44px control contract intact across Chromium, Firefox, and WebKit.
 
 ## [1.7.0] - 2026-08-05
 

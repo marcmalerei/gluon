@@ -4,6 +4,7 @@ export const selectStyles = css`
   @layer atoms {
     :where(.gluon-select) {
       min-block-size: 44px;
+      block-size: 44px;
       max-inline-size: 100%;
       background: var(--gluon-select-background, var(--gluon-color-surface, white));
       border: 1px solid var(--gluon-select-border-color, var(--gluon-color-rule, #b8c9c6));
@@ -16,7 +17,7 @@ export const selectStyles = css`
       padding-inline: 0.75rem 2rem;
     }
     :where(.gluon-select.is-small) { padding-block: 0.5rem; padding-inline-start: 0.625rem; }
-    :where(.gluon-select.is-large) { min-block-size: 52px; padding-block: 0.875rem; padding-inline-start: 1rem; }
+    :where(.gluon-select.is-large) { min-block-size: 52px; block-size: 52px; padding-block: 0.875rem; padding-inline-start: 1rem; }
     :where(.gluon-select.is-full-width) { inline-size: 100%; }
     :where(.gluon-select[aria-invalid="true"]) { border-color: var(--gluon-color-danger, #a52222); }
     :where(.gluon-select:disabled) { cursor: not-allowed; opacity: 0.55; }

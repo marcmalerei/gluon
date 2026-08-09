@@ -12,6 +12,7 @@ export const atomStyles = css`
     :where(.gluon-button) {
       appearance: none;
       min-block-size: 44px;
+      block-size: 44px;
       border: 1px solid transparent;
       border-radius: var(--gluon-radius-control, 0.625rem);
       cursor: pointer;
@@ -82,7 +83,7 @@ export const atomStyles = css`
       padding-inline: 0.75rem 2rem;
     }
     :where(.gluon-select.is-small) { padding-block: 0.5rem; padding-inline-start: 0.625rem; }
-    :where(.gluon-select.is-large) { min-block-size: 52px; padding-block: 0.875rem; padding-inline-start: 1rem; }
+    :where(.gluon-select.is-large) { min-block-size: 52px; block-size: 52px; padding-block: 0.875rem; padding-inline-start: 1rem; }
     :where(.gluon-select.is-full-width) { inline-size: 100%; }
     :where(.gluon-select[aria-invalid="true"]) { border-color: var(--gluon-color-danger, #a52222); }
     :where(.gluon-select:disabled) { cursor: not-allowed; opacity: 0.55; }
