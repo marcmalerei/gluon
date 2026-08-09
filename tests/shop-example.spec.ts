@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
-import { buttonStyles, inputStyles, labelStyles, textareaStyles } from '@gluonjs/atoms';
+import { buttonStyles, checkboxStyles, inputStyles, labelStyles, textareaStyles } from '@gluonjs/atoms';
 import { formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -201,6 +201,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).toContain(inputStyles);
     expect(document.adoptedStyleSheets).toContain(labelStyles);
     expect(document.adoptedStyleSheets).toContain(textareaStyles);
+    expect(document.adoptedStyleSheets).toContain(checkboxStyles);
     purchase.click();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/checkout');
@@ -216,6 +217,11 @@ describe('GLUON GOODS reference shop', () => {
     const deliveryInstructions = root.querySelector<HTMLTextAreaElement>('textarea[name="deliveryInstructions"]')!;
     deliveryInstructions.value = 'Leave with the workshop concierge.';
     deliveryInstructions.dispatchEvent(new Event('input', { bubbles: true }));
+    const terms = root.querySelector<HTMLInputElement>('input[name="terms"]')!;
+    expect(terms.required).toBe(true);
+    expect(terms.checked).toBe(false);
+    terms.click();
+    expect(terms.checked).toBe(true);
     purchase.click();
     await settleShop();
     expect(router.currentRoute.value.path).toMatch(/^\/orders\/GG-/);

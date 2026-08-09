@@ -8,7 +8,7 @@ Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
 ```ts
-import { Button, Input, Select, Textarea, installUi } from '@gluonjs/atoms';
+import { Button, Checkbox, Input, Select, Textarea, installUi } from '@gluonjs/atoms';
 
 const ui = installUi(document, { theme: 'light' });
 
@@ -31,7 +31,7 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-`Button`, `Icon`, `Input`, `Label`, `Select`, and `Textarea` expose immutable `Component.styles`
+`Button`, `Checkbox`, `Icon`, `Input`, `Label`, `Select`, and `Textarea` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. `atomStyles` is deprecated; adopting it with exact rendering throws
@@ -91,6 +91,9 @@ native `button` rule or adopt `atomStyles`.
 
 - `Button` renders a native `type="button"`, preserves disabled semantics, has
   a 44px minimum target, and receives a visible `:focus-visible` outline.
+- `Checkbox` preserves native Space-key, label, form, reset, required,
+  disabled, checked, and indeterminate behavior. Indeterminate remains a DOM
+  presentation state and does not create a third submitted form value.
 - `Icon` is `aria-hidden` without a label. With a label it exposes `role="img"`
   and the supplied accessible name.
 - `Input` renders a native input and supports `aria-invalid`; use `Label`,
@@ -118,7 +121,8 @@ implementation details. The public Button override properties are
 `--gluon-textarea-background`,
 `--gluon-textarea-color`, `--gluon-textarea-border-color`,
 `--gluon-textarea-readonly-background`, and `--gluon-textarea-resize`.
-Shared public tokens retain their documented `--gluon-*` names. See the
+Checkbox exposes `--gluon-checkbox-accent`; shared public tokens retain their
+documented `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 
 Logical CSS properties support both text directions, and the maintained themes
@@ -132,6 +136,7 @@ application inputs so localization stays with the consuming product.
 GLUON GOODS is the production dogfood surface: its public Button presets cover
 global navigation, dialogs, product add/retry, and bag quantity/remove actions;
 catalog search uses `Input`, catalog sorting uses the native `Select`, and
-checkout delivery instructions use `Textarea`. The application supplies only
+checkout delivery instructions use `Textarea`; checkout consent uses
+`Checkbox`. The application supplies only
 documented public tokens/classes and owns the shared/exact sheets through one
 `UiOwner` lifecycle.

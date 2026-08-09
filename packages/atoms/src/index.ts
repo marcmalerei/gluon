@@ -8,6 +8,11 @@ export {
   type ButtonVariant,
 } from './button.js';
 export {
+  Checkbox,
+  type CheckboxAttributes,
+  type CheckboxProps,
+} from './checkbox.js';
+export {
   Icon,
   defineIcon,
   type IconAttributes,
@@ -36,6 +41,7 @@ export {
   atomStyles,
 } from './styles.js';
 export { buttonStyles } from './button-styles.js';
+export { checkboxStyles } from './checkbox-styles.js';
 export { iconStyles } from './icon-styles.js';
 export { inputStyles } from './input-styles.js';
 export { labelStyles } from './label-styles.js';

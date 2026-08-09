@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   Icon,
   Input,
   Label,
@@ -159,6 +160,9 @@ createApp(() => AppShell({
           rows: 3,
           fullWidth: true,
           attributes: { 'aria-label': 'Delivery notes' },
+        }),
+        q.label({
+          children: [Checkbox({ name: 'updates', checked: true }), ' Product updates'],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

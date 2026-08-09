@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the native `Checkbox` Atom with controlled checked and indeterminate
+  properties, form/reset/required behavior, forced-colors support, and required
+  GLUON GOODS checkout consent.
 - Added the native `Textarea` Atom with controlled value, disabled, readonly,
   required, invalid, rows, full-width, input/change, exact-style, and GLUON
   GOODS checkout integration contracts.

@@ -24,6 +24,7 @@ const atomStyles = await sheet('packages/atoms/src/styles.ts', 'atomStyles');
 const moleculeStyles = await sheet('packages/molecules/src/styles.ts', 'moleculeStyles');
 const organismStyles = await sheet('packages/organisms/src/styles.ts', 'organismStyles');
 const buttonStyles = await sheet('packages/atoms/src/button-styles.ts', 'buttonStyles');
+const checkboxStyles = await sheet('packages/atoms/src/checkbox-styles.ts', 'checkboxStyles');
 const iconStyles = await sheet('packages/atoms/src/icon-styles.ts', 'iconStyles');
 const inputStyles = await sheet('packages/atoms/src/input-styles.ts', 'inputStyles');
 const labelStyles = await sheet('packages/atoms/src/label-styles.ts', 'labelStyles');
@@ -42,9 +43,10 @@ const actual = {
       ['packages/atoms/src/styles.ts', 'packages/molecules/src/styles.ts', 'packages/organisms/src/styles.ts'],
     ),
     after: measure(
-      [buttonStyles, iconStyles, inputStyles, labelStyles, selectStyles, textareaStyles, cardStyles, formFieldStyles, appShellStyles],
+      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, selectStyles, textareaStyles, cardStyles, formFieldStyles, appShellStyles],
       [
         'packages/atoms/src/button-styles.ts',
+        'packages/atoms/src/checkbox-styles.ts',
         'packages/atoms/src/icon-styles.ts',
         'packages/atoms/src/input-styles.ts',
         'packages/atoms/src/label-styles.ts',

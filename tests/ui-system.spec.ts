@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import axe, { type Result } from 'axe-core';
 import {
   Button,
+  Checkbox,
   Icon,
   Input,
   Select,
@@ -51,6 +52,37 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
+  it('keeps Checkbox native checked, indeterminate, form-reset, and submission behavior', () => {
+    const onChange = vi.fn();
+    const form = document.createElement('form');
+    document.body.append(form);
+    render(Checkbox({
+      checked: true,
+      indeterminate: true,
+      name: 'policy',
+      value: 'accepted',
+      required: true,
+      invalid: true,
+      onChange,
+      attributes: { id: 'policy-consent' },
+    }), form);
+
+    const checkbox = form.querySelector<HTMLInputElement>('#policy-consent')!;
+    expect(checkbox.type).toBe('checkbox');
+    expect(checkbox.checked).toBe(true);
+    expect(checkbox.defaultChecked).toBe(true);
+    expect(checkbox.indeterminate).toBe(true);
+    expect(checkbox.required).toBe(true);
+    expect(checkbox.getAttribute('aria-invalid')).toBe('true');
+    expect(new FormData(form).get('policy')).toBe('accepted');
+    checkbox.checked = false;
+    checkbox.indeterminate = false;
+    form.reset();
+    expect(checkbox.checked).toBe(true);
+    checkbox.click();
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
   it('renders Textarea as a native controlled multiline control with explicit states', () => {
     const onInput = vi.fn();
     const onChange = vi.fn();
@@ -835,6 +867,7 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
             ],
           }),
           Textarea({ value: 'Only account-related notes', attributes: { 'aria-label': 'Account notes' } }),
+          q.label({ children: [Checkbox({ name: 'updates' }), ' Product updates'] }),
         ],
       }),
     ],

@@ -717,7 +717,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 18
+      "line": 19
     },
     {
       "value": {
@@ -725,7 +725,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 108
+      "line": 109
     }
   ],
   "bindings": [
@@ -1991,7 +1991,7 @@
       },
       "confidence": "structural",
       "file": "ui-extensions.ts",
-      "line": 113
+      "line": 114
     },
     {
       "value": {
@@ -2000,7 +2000,7 @@
       },
       "confidence": "structural",
       "file": "ui-extensions.ts",
-      "line": 114
+      "line": 115
     },
     {
       "value": {
@@ -2009,7 +2009,7 @@
       },
       "confidence": "structural",
       "file": "ui-extensions.ts",
-      "line": 116
+      "line": 117
     },
     {
       "value": {
@@ -2017,7 +2017,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 122
+      "line": 123
     },
     {
       "value": {
@@ -2025,7 +2025,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 129
+      "line": 130
     },
     {
       "value": {
@@ -2033,7 +2033,7 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 146
+      "line": 147
     },
     {
       "value": {
@@ -2041,7 +2041,15 @@
       },
       "confidence": "exact",
       "file": "ui-extensions.ts",
-      "line": 149
+      "line": 154
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "ui-extensions.ts",
+      "line": 157
     }
   ],
   "styles": [
