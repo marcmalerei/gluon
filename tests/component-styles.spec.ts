@@ -30,6 +30,7 @@ import {
   labelStyles,
   radioStyles,
   selectStyles,
+  switchStyles,
   textareaStyles,
 } from '@gluonjs/atoms';
 import {
@@ -49,6 +50,7 @@ const allComponentSheets = [
   labelStyles,
   radioStyles,
   selectStyles,
+  switchStyles,
   textareaStyles,
   cardStyles,
   formFieldStyles,

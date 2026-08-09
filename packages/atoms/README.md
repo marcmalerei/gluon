@@ -106,6 +106,8 @@ native `button` rule or adopt `atomStyles`.
 - `Select` preserves native option, keyboard, disabled, and required semantics;
   compose it with `Label` or another native labeling relationship. Its public
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
+- `Switch` is a native checkbox with `role="switch"` for binary on/off settings.
+  Keep its caller-owned accessible label stable when the checked state changes.
 - `Textarea` preserves native multiline editing, selection, resize, form,
   disabled, readonly, and required semantics. Associate it with visible label
   text and use `invalid` only with useful validation copy.
@@ -125,7 +127,9 @@ implementation details. The public Button override properties are
 `--gluon-textarea-color`, `--gluon-textarea-border-color`,
 `--gluon-textarea-readonly-background`, and `--gluon-textarea-resize`.
 Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
-`--gluon-radio-accent`. Shared public tokens retain their documented
+`--gluon-radio-accent`. Switch exposes `--gluon-switch-track`,
+`--gluon-switch-on`, `--gluon-switch-thumb`, and
+`--gluon-switch-border-color`. Shared public tokens retain their documented
 `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 

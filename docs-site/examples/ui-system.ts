@@ -6,6 +6,7 @@ import {
   Input,
   Label,
   Select,
+  Switch,
   Textarea,
   defineButtonPreset,
   defineIcon,
@@ -173,6 +174,7 @@ createApp(() => AppShell({
             q.label({ children: [Radio({ name: 'material', value: 'aluminium' }), ' Aluminium'] }),
           ],
         }),
+        q.label({ children: [Switch({ name: 'network' }), ' Allow network access'] }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',

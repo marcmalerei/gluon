@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 7721,
-      "gzipBytes": 1576,
+      "rawBytes": 9420,
+      "gzipBytes": 1876,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -34,13 +34,14 @@
         ".gluon-label",
         ".gluon-radio",
         ".gluon-select",
+        ".gluon-switch",
         ".gluon-textarea"
       ]
     },
     "after": {
-      "rawBytes": 8159,
-      "gzipBytes": 1582,
-      "moduleCount": 11,
+      "rawBytes": 9954,
+      "gzipBytes": 1887,
+      "moduleCount": 12,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -49,12 +50,13 @@
         "packages/atoms/src/label-styles.ts",
         "packages/atoms/src/radio-styles.ts",
         "packages/atoms/src/select-styles.ts",
+        "packages/atoms/src/switch-styles.ts",
         "packages/atoms/src/textarea-styles.ts",
         "packages/molecules/src/card-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 11,
+      "stylesheetCount": 12,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -77,14 +79,15 @@
         ".gluon-label",
         ".gluon-radio",
         ".gluon-select",
+        ".gluon-switch",
         ".gluon-textarea"
       ]
     }
   },
   "buttonOnly": {
     "before": {
-      "rawBytes": 5756,
-      "gzipBytes": 1117,
+      "rawBytes": 7455,
+      "gzipBytes": 1418,
       "moduleCount": 1,
       "modules": ["packages/atoms/src/styles.ts"],
       "stylesheetCount": 1,
@@ -96,6 +99,7 @@
         ".gluon-label",
         ".gluon-radio",
         ".gluon-select",
+        ".gluon-switch",
         ".gluon-textarea"
       ]
     },
