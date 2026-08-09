@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   Icon,
   Textarea,
   defineButtonPreset,
@@ -141,6 +142,13 @@ export const CheckoutExperience = defineOrganism((props: CheckoutExperienceProps
                 (event.currentTarget as HTMLTextAreaElement).value,
               ),
             }),
+          ],
+        })}
+        ${q.label({
+          class: 'checkout-consent',
+          children: [
+            Checkbox({ name: 'terms', value: 'accepted', required: true }),
+            'I agree to the shipping and returns terms.',
           ],
         })}
         ${PurchaseAction({ totalLabel: props.totalLabel })}

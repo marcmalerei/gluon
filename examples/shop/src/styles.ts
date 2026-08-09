@@ -415,6 +415,7 @@ export const shopStyles = css`
     .checkout-field { display: grid; gap: 7px; font-size: 12px; }
     .checkout-input { min-height: 52px; padding: 0 14px; border: 1px solid var(--shop-rule); border-radius: 0; background: white; }
     .checkout-textarea { min-height: 96px; border-radius: 0; --gluon-textarea-resize: vertical; }
+    .checkout-consent { display: flex; min-height: 44px; align-items: center; gap: 12px; font-size: 13px; }
     .checkout-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 14px; }
     .place-order { width: 100%; margin-top: 12px; }
     .order-summary { align-self: start; padding: 28px; border: 1px solid var(--shop-rule); }

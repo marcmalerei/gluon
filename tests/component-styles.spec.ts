@@ -24,6 +24,7 @@ import {
   Button,
   atomStyles,
   buttonStyles,
+  checkboxStyles,
   iconStyles,
   inputStyles,
   labelStyles,
@@ -41,6 +42,7 @@ import { nextTick } from '@gluonjs/reactivity';
 
 const allComponentSheets = [
   buttonStyles,
+  checkboxStyles,
   iconStyles,
   inputStyles,
   labelStyles,

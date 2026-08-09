@@ -20,7 +20,7 @@ import {
   unsafeHTML,
   unmount,
 } from '@gluonjs/core';
-import { Button, Select, Textarea, buttonStyles, selectStyles, textareaStyles } from '@gluonjs/atoms';
+import { Button, Checkbox, Select, Textarea, buttonStyles, checkboxStyles, selectStyles, textareaStyles } from '@gluonjs/atoms';
 import { Card, cardStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
@@ -470,7 +470,7 @@ describe('SSR hydration', () => {
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
-    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Card({ title: 'Hydrated card' })}</main>`;
+    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Card({ title: 'Hydrated card' })}</main>`;
     const prepared = await prepareForHydration(value);
     const selection = createComponentStyleSelection(prepared.value);
     const manifest = createStyleManifest(selection);
@@ -486,12 +486,14 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(buttonStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(textareaStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(checkboxStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(cardStyles);
     expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
     unmount(root);
     expect(styleRoot.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(textareaStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(checkboxStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(cardStyles);
 
     const carrierTemplate = document.createElement('template');
