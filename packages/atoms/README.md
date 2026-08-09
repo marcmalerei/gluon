@@ -111,6 +111,9 @@ native `button` rule or adopt `atomStyles`.
 - `Textarea` preserves native multiline editing, selection, resize, form,
   disabled, readonly, and required semantics. Associate it with visible label
   text and use `invalid` only with useful validation copy.
+- `ToggleButton` is a native Button with a required caller-controlled boolean
+  `pressed` value reflected as `aria-pressed`. Use it for an independent pressed
+  choice, not for an on/off setting (`Switch`) or an ordinary action (`Button`).
 
 Every compatible Atom uses the named `attributes` extension contract. Use
 `defineButtonPreset()` for app-owned brand/danger classes and analytics/ref/data
@@ -129,7 +132,10 @@ implementation details. The public Button override properties are
 Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
 `--gluon-radio-accent`. Switch exposes `--gluon-switch-track`,
 `--gluon-switch-on`, `--gluon-switch-thumb`, and
-`--gluon-switch-border-color`. Shared public tokens retain their documented
+`--gluon-switch-border-color`. ToggleButton exposes
+`--gluon-toggle-button-pressed-background`,
+`--gluon-toggle-button-pressed-color`, and
+`--gluon-toggle-button-pressed-border-color`. Shared public tokens retain their documented
 `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 

@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 9420,
-      "gzipBytes": 1876,
+      "rawBytes": 10089,
+      "gzipBytes": 1954,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -35,13 +35,14 @@
         ".gluon-radio",
         ".gluon-select",
         ".gluon-switch",
-        ".gluon-textarea"
+        ".gluon-textarea",
+        ".gluon-toggle-button"
       ]
     },
     "after": {
-      "rawBytes": 9954,
-      "gzipBytes": 1887,
-      "moduleCount": 12,
+      "rawBytes": 10655,
+      "gzipBytes": 1972,
+      "moduleCount": 13,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -52,11 +53,12 @@
         "packages/atoms/src/select-styles.ts",
         "packages/atoms/src/switch-styles.ts",
         "packages/atoms/src/textarea-styles.ts",
+        "packages/atoms/src/toggle-button-styles.ts",
         "packages/molecules/src/card-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 12,
+      "stylesheetCount": 13,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -80,14 +82,15 @@
         ".gluon-radio",
         ".gluon-select",
         ".gluon-switch",
-        ".gluon-textarea"
+        ".gluon-textarea",
+        ".gluon-toggle-button"
       ]
     }
   },
   "buttonOnly": {
     "before": {
-      "rawBytes": 7455,
-      "gzipBytes": 1418,
+      "rawBytes": 8124,
+      "gzipBytes": 1490,
       "moduleCount": 1,
       "modules": ["packages/atoms/src/styles.ts"],
       "stylesheetCount": 1,
@@ -100,7 +103,8 @@
         ".gluon-radio",
         ".gluon-select",
         ".gluon-switch",
-        ".gluon-textarea"
+        ".gluon-textarea",
+        ".gluon-toggle-button"
       ]
     },
     "after": {
