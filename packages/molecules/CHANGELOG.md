@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-10
+
 ### Added
 
 - Added the stable `TableRegion` molecule for named, caller-owned native tables

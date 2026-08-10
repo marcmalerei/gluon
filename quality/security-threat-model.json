@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "releaseLine": "1.7.0",
+  "releaseLine": "1.8.0",
   "reviewedAt": "2026-07-12",
   "areas": [
     {
@@ -56,7 +56,7 @@
         "Static resource URLs are escaped before entering generated markup."
       ],
       "residualRisk": "The deploying application owns the policy header, nonce generation, hash allowlists, and report handling.",
-      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.7.0/guides/quality/index.md"]
+      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.8.0/guides/quality/index.md"]
     },
     {
       "id": "trusted-types",

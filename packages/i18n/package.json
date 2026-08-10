@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/i18n",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Locale-aware messages and lazy namespace loading for Gluon applications.",
   "private": false,
   "type": "module",
@@ -35,8 +35,8 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.7.0",
-    "@gluonjs/reactivity": "1.7.0"
+    "@gluonjs/core": "1.8.0",
+    "@gluonjs/reactivity": "1.8.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

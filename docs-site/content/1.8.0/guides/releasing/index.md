@@ -1,15 +1,12 @@
 # Release readiness
 
-The `1.7.0` documentation describes the completed lockstep release. All 21
-official manifests are at `1.7.0`, including the new optional `@gluonjs/i18n`
-package. Recovery run `31166405472` published every contracted package under
-`latest` with npm provenance. Final recovery run `31169785993` confirmed
-matching reviewed archive integrity, provenance attestations, clean-room
-installation, and public-type declarations for all 21 packages before
-publishing immutable GitHub release `v1.7.0` on 2026-08-07. Protected execution
-tag `v1.7.0-recovery.2` preserves the reviewed recovery history at commit
-`8db054ead616b6b6c0b5bd7765f5421b3d99f224`. The `@gluonjs` scope, package
-records, and Trusted Publisher bindings are verified in the package contract.
+The `1.8.0` documentation describes the next lockstep release candidate. All
+21 official manifests are at `1.8.0`. Registry preflight on 2026-08-10
+confirmed that every contracted package exposes `1.7.0` as `latest` and that
+`1.8.0` is absent. The completed `1.7.0` release remains the supported baseline
+until the protected workflow publishes and independently verifies all 21
+reviewed archives. The `@gluonjs` scope, package records, and Trusted Publisher
+bindings remain verified by the completed publication contract.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,

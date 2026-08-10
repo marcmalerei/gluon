@@ -7,6 +7,25 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-10
+
+### Added
+
+- Added accessible native-backed Select, Textarea, Checkbox, Radio, Switch,
+  ToggleButton, Progress, and StatusBadge Atoms with controlled state,
+  form semantics, exact constructable stylesheet ownership, and real GLUON
+  GOODS integrations.
+- Added reusable ControlField, ChoiceGroup, ButtonGroup, SegmentedControl,
+  Tabs, DialogSurface, Disclosure, Accordion, InlineNotice, EmptyState, and
+  TableRegion Molecules with keyboard, focus, overflow, feedback, and
+  composition contracts exercised in the canonical shop.
+
+### Fixed
+
+- Made React hydration lifecycle evidence wait for the committed passive-effect
+  mount before custom-element removal, preventing intermittent WebKit cleanup
+  assertions from racing React's early-update fallback.
+
 ## [1.7.0] - 2026-08-05
 
 ### Added
