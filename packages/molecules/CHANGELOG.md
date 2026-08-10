@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added `DialogSurface` over the headless ARIA Dialog, Overlay, and focus-scope
+  contracts, with structured title, description, content, close-action, and
+  footer regions plus controlled dismissal and a real GLUON GOODS bag drawer.
+
 - Added controlled accessible `Tabs` with stable tab/panel relationships,
   automatic or manual activation, roving keyboard focus, disabled skipping,
   horizontal/vertical RTL overflow layouts, and URL-backed GLUON GOODS product

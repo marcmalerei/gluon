@@ -11,7 +11,11 @@ import {
 } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
 import { Input } from '@gluonjs/atoms';
-import { ButtonGroup } from '@gluonjs/molecules';
+import {
+  ButtonGroup,
+  DialogSurface,
+  createDialogSurfaceController,
+} from '@gluonjs/molecules';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -38,6 +42,9 @@ const dialogSelectors: Record<ShopDialog, string> = {
   search: '.search-panel',
 };
 const dialogFocusScopes = new Map<ShopDialog, FocusScope>();
+const bagDialogController = createDialogSurfaceController({
+  initialFocus: '[data-dialog-initial-focus]',
+});
 
 export function SiteHeader(store: ShopStore): TemplateValue {
   return html`
@@ -152,31 +159,30 @@ export function BagOverlay(store: ShopStore): TemplateValue {
 
 function BagDrawer(store: ShopStore): TemplateValue {
   const close = (): void => dismissDialog('bag', () => { store.bagOpen = false; });
-  return html`
-    <div class="drawer-layer" @click=${(event: Event) => {
-      if (event.target === event.currentTarget) close();
-    }}>
-      <aside class="bag-drawer" role="dialog" aria-modal="true" aria-labelledby="bag-title" @keydown=${(event: Event) => {
-        handleDialogKeydown(event as KeyboardEvent, 'bag', close);
-      }}>
-        <header class="drawer-header">
-          <h2 id="bag-title">Bag ${store.bagCount}</h2>
-          ${ShopIconAction({
-            children: CloseIcon(),
-            attributes: { aria: { label: 'Close bag' }, data: { dialogInitialFocus: true } },
-            onClick: close,
-          })}
-        </header>
-        ${store.bag.length === 0 ? html`
-          <div class="empty-bag">
+  const empty = store.bag.length === 0;
+  return DialogSurface({
+    id: 'bag-dialog',
+    labelledBy: 'bag-title',
+    title: `Bag ${store.bagCount}`,
+    placement: 'end',
+    controller: bagDialogController,
+    onDismiss: close,
+    overlayAttributes: { class: 'drawer-layer' },
+    attributes: { class: 'bag-drawer' },
+    headerAttributes: { class: 'drawer-header' },
+    contentAttributes: { class: empty ? 'empty-bag' : 'bag-lines' },
+    closeAction: ShopIconAction({
+      children: CloseIcon(),
+      attributes: { aria: { label: 'Close bag' }, data: { dialogInitialFocus: true } },
+      onClick: close,
+    }),
+    children: empty ? html`
             <p>Your bag is ready for something useful.</p>
             ${compose(RouterLink, {
               to: '/shop',
               attributes: { class: 'inline-link' },
             })`Shop all objects`}
-          </div>
         ` : html`
-          <div class="bag-lines">
             ${TransitionGroup({
               items: store.bag,
               key: (line) => line.key,
@@ -201,16 +207,14 @@ function BagDrawer(store: ShopStore): TemplateValue {
               </article>
               `,
             })}
-          </div>
-          <footer class="bag-summary">
+        `,
+    footer: empty ? undefined : html`
             <div><span>Subtotal</span><strong>${formatPrice(store.bagTotal)}</strong></div>
             <p>Shipping calculated at checkout.</p>
             ${compose(RouterLink, { to: '/checkout', attributes: { class: 'primary-button' } })`Checkout`}
-          </footer>
-        `}
-      </aside>
-    </div>
-  `;
+        `,
+    footerAttributes: { class: 'bag-summary' },
+  });
 }
 
 export function SiteFooter(): TemplateValue {
@@ -310,6 +314,10 @@ function MobileMenu(store: ShopStore): TemplateValue {
 }
 
 export function focusOpenedDialog(dialog: ShopDialog, trigger: HTMLElement): void {
+  if (dialog === 'bag') {
+    bagDialogController.activate(trigger);
+    return;
+  }
   void nextTick(() => {
     const container = document.querySelector<HTMLElement>(dialogSelectors[dialog]);
     if (!container) return;
@@ -325,11 +333,16 @@ export function focusOpenedDialog(dialog: ShopDialog, trigger: HTMLElement): voi
 
 function dismissDialog(dialog: ShopDialog, close: () => void): void {
   close();
+  if (dialog === 'bag') {
+    bagDialogController.deactivate();
+    return;
+  }
   dialogFocusScopes.get(dialog)?.deactivate();
   dialogFocusScopes.delete(dialog);
 }
 
 export function disposeShopDialogs(): void {
+  bagDialogController.deactivate();
   for (const scope of dialogFocusScopes.values()) scope.deactivate();
   dialogFocusScopes.clear();
 }

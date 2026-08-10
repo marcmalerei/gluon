@@ -53,10 +53,28 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
-import { Card } from '@gluonjs/molecules';
+import { Card, DialogSurface, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
+  it('serializes the DialogSurface ARIA structure without invoking browser focus APIs', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(DialogSurface({
+      id: 'server-dialog',
+      labelledBy: 'server-dialog-title',
+      title: 'Server dialog',
+      description: 'Rendered without a DOM.',
+      controller: createDialogSurfaceController(),
+      closeAction: Button({ label: 'Close' }),
+      children: 'Server content',
+      footer: 'Server actions',
+    })));
+    expect(rendered).toContain('gluon-dialog-surface-overlay');
+    expect(rendered).toContain('role="dialog"');
+    expect(rendered).toContain('aria-labelledby="server-dialog-title"');
+    expect(rendered).toContain('aria-describedby="server-dialog-description"');
+    expect(rendered).toContain('Server actions');
+  });
+
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {
     const disposed: string[] = [];
     const assets = { entry: '/assets/app.js', imports: ['/assets/vendor.js'] };

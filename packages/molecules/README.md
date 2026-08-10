@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, FormField, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -39,6 +39,18 @@ Arrow/Home/End navigation, and manual or automatic activation. Horizontal,
 vertical, RTL, overflow, forced-colors, and reduced-motion presentation are
 included; panel content, loading, routing, persistence, and effects remain
 caller-owned.
+`DialogSurface` composes the Quarks ARIA `Dialog`, `Overlay`, and
+`createFocusScope` contracts into a styled, controlled surface. Create one
+stable controller per openable surface, call `controller.activate(trigger)`
+when opening, pass it to the component, and call `controller.deactivate()` as
+part of closing or teardown. The controller defers initial focus until mount,
+contains Tab and Shift+Tab, and restores a connected trigger. Escape and direct
+overlay pointer dismissal call `onDismiss`; open state, close controls, copy,
+async state, and destructive decisions remain caller-owned. This component
+uses an ARIA dialog on a `div`; it deliberately does not call native
+`HTMLDialogElement.showModal()`, enter the top layer, or make background content
+inert. Applications that require the native-dialog boundary should own a
+native `<dialog>` lifecycle instead.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -87,6 +99,12 @@ SegmentedControl exposes `--gluon-segmented-control-border-color`,
 Tabs exposes `--gluon-tabs-border-color`, `--gluon-tabs-background`,
 `--gluon-tabs-color`, `--gluon-tabs-selected-border-color`,
 `--gluon-tabs-selected-color`, and `--gluon-tabs-panel-padding`.
+DialogSurface exposes `--gluon-dialog-z-index`,
+`--gluon-dialog-overlay-background`, `--gluon-dialog-inline-size`,
+`--gluon-dialog-max-block-size`, `--gluon-dialog-background`,
+`--gluon-dialog-color`, `--gluon-dialog-border`, `--gluon-dialog-radius`,
+`--gluon-dialog-shadow`, and section padding variables for header,
+description, content, and footer.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -111,3 +129,6 @@ The catalog uses `SegmentedControl` for a URL-backed Grid/List view choice; the
 shop owns the route update and the corresponding product layout.
 Product details use `Tabs` for URL-backed Story and Details panels while the
 shop owns routing and restores focus to the activated tab after navigation.
+The bag uses `DialogSurface` for its labelled end drawer, overlay and Escape
+dismissal, initial close-button focus, focus containment, and trigger-focus
+restoration while the shop continues to own bag state and checkout decisions.

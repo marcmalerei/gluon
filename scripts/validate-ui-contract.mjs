@@ -11,7 +11,7 @@ const componentOutput = resolve(root, '.tmp/ui-component-usage');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['Button', 'Checkbox', 'Icon', 'Input', 'Label', 'Progress', 'Radio', 'Select', 'StatusBadge', 'Switch', 'Textarea', 'ToggleButton', 'installUi']],
-  ['@gluonjs/molecules', ['ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'FormField', 'NavigationStrip', 'SegmentedControl', 'Tabs']],
+  ['@gluonjs/molecules', ['ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'FormField', 'NavigationStrip', 'SegmentedControl', 'Tabs']],
   ['@gluonjs/organisms', ['AppShell']],
 ]);
 const manifestExports = new Map([
@@ -164,7 +164,7 @@ try {
     .filter((file) => file.endsWith('.js'))
     .map(async (file) => [file, await readFile(resolve(componentOutput, file), 'utf8')])));
   const initial = entries.get('button-only.js') ?? '';
-  for (const marker of ['gluon-checkbox', 'gluon-progress', 'gluon-radio', 'gluon-status-badge', 'gluon-switch', 'gluon-toggle-button', 'gluon-input', 'gluon-label', 'gluon-icon', 'gluon-select', 'gluon-textarea', 'gluon-button-group', 'gluon-card', 'gluon-choice-group', 'gluon-control-field', 'gluon-form-field', 'gluon-navigation-strip', 'gluon-segmented-control', 'gluon-tabs', 'gluon-app-shell']) {
+  for (const marker of ['gluon-checkbox', 'gluon-progress', 'gluon-radio', 'gluon-status-badge', 'gluon-switch', 'gluon-toggle-button', 'gluon-input', 'gluon-label', 'gluon-icon', 'gluon-select', 'gluon-textarea', 'gluon-button-group', 'gluon-card', 'gluon-choice-group', 'gluon-control-field', 'gluon-dialog-surface', 'gluon-form-field', 'gluon-navigation-strip', 'gluon-segmented-control', 'gluon-tabs', 'gluon-app-shell']) {
     if (initial.includes(marker)) throw new Error(`Button-only entry contains unselected marker ${marker}.`);
   }
   if (!initial.includes('gluon-button')) throw new Error('Button-only entry does not contain its exact component marker.');

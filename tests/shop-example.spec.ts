@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
+import { choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -320,9 +320,30 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).not.toContain(inputStyles);
     expect(document.activeElement).toBe(searchReturnTarget);
 
-    root.querySelector<HTMLButtonElement>('.bag-action')!.click();
+    const bagReturnTarget = root.querySelector<HTMLButtonElement>('.bag-action')!;
+    bagReturnTarget.click();
     await settleShop();
     expect(document.querySelector('.empty-bag')?.textContent).toContain('ready for something useful');
+    expect(document.adoptedStyleSheets).toContain(dialogSurfaceStyles);
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Close bag');
+    document.querySelector<HTMLElement>('.bag-drawer')!.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      cancelable: true,
+    }));
+    await expect.poll(() => document.querySelector('.bag-drawer'), { timeout: 5_000 }).toBeNull();
+    expect(document.activeElement).toBe(bagReturnTarget);
+    expect(document.adoptedStyleSheets).not.toContain(dialogSurfaceStyles);
+
+    bagReturnTarget.click();
+    await settleShop();
+    document.querySelector<HTMLElement>('.drawer-layer')!
+      .dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    await expect.poll(() => document.querySelector('.bag-drawer'), { timeout: 5_000 }).toBeNull();
+    expect(document.activeElement).toBe(bagReturnTarget);
+
+    bagReturnTarget.click();
+    await settleShop();
     document.querySelector<HTMLAnchorElement>('.empty-bag a')!.click();
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/shop');

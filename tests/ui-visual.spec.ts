@@ -18,8 +18,9 @@ import {
   adoptStyles,
   css,
   render,
+  unadoptStyles,
 } from '../src/index.js';
-import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, SegmentedControl, Tabs } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, FormField, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -566,5 +567,36 @@ test('matches Tabs selected, disabled, overflow, panel, vertical, and RTL states
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });
+  uiOwner.dispose();
+});
+
+test('matches DialogSurface labelled header, description, content, close action, and footer', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer app { body { margin: 0; inline-size: 640px; block-size: 520px; } .dialog-copy { display: grid; gap: .75rem; } .dialog-actions { display: flex; justify-content: end; gap: .75rem; } button { min-block-size: 44px; padding-inline: 1rem; } }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(DialogSurface({
+    id: 'visual-dialog',
+    labelledBy: 'visual-dialog-title',
+    title: 'Archive project?',
+    description: 'The project remains available in archived work.',
+    controller: createDialogSurfaceController(),
+    closeAction: q.button({ type: 'button', 'aria-label': 'Close dialog', children: '×' }),
+    children: q.div({ class: 'dialog-copy', children: [
+      q.p({ children: 'Open tasks and files are preserved.' }),
+      q.label({ children: [q.input({ type: 'checkbox' }), ' Notify collaborators'] }),
+    ] }),
+    footer: q.div({ class: 'dialog-actions', children: [
+      q.button({ type: 'button', children: 'Cancel' }),
+      q.button({ type: 'button', children: 'Archive' }),
+    ] }),
+  }), document.body);
+  await expect.element(page.getByRole('dialog')).toMatchScreenshot('dialog-surface-states-light', {
+    comparatorName: 'pixelmatch', threshold: 0.1,
+  });
+  unadoptStyles(document, visualStyles);
   uiOwner.dispose();
 });

@@ -272,6 +272,7 @@ export const shopStyles = css`
       z-index: 70;
       display: flex;
       justify-content: flex-end;
+      padding: 0;
       background: rgb(17 17 17 / 32%);
       animation: layer-in 180ms ease both;
     }
@@ -540,6 +541,11 @@ export const shopStyles = css`
       .mobile-menu-button { padding-inline: 5px; }
       .mobile-menu-button span { font-size: 12px; }
       .catalog-grid .product-copy strong { font-size: 14px; }
+    }
+
+    @media (max-width: 340px) {
+      .bag-line { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
+      .bag-line > img { width: 72px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
