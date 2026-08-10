@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -909,6 +909,7 @@
         "  InlineNotice,",
         "  NavigationStrip,",
         "  SegmentedControl,",
+        "  TableRegion,",
         "  Tabs,",
         "  createDialogSurfaceController,",
         "  moleculeManifest,",
@@ -963,6 +964,10 @@
         "  type SegmentedControlOption,",
         "  type SegmentedControlOrientation,",
         "  type SegmentedControlProps,",
+        "  type TableRegionAccessibleName,",
+        "  type TableRegionAttributes,",
+        "  type TableRegionContent,",
+        "  type TableRegionProps,",
         "  type TabsAccessibleName,",
         "  type TabsActivation,",
         "  type TabsAttributes,",
@@ -1010,6 +1015,10 @@
         "const emptyHeadingLevel: EmptyStateHeadingLevel = 3;",
         "const emptyAttributes = { class: 'empty-bag' } satisfies EmptyStateAttributes;",
         "const emptyBag = { presentation: emptyPresentation, heading: 'Your bag is empty', headingLevel: emptyHeadingLevel, children: 'Choose something useful.', action: Button({ label: 'Shop objects' }), attributes: emptyAttributes } satisfies EmptyStateProps;",
+        "const tableName = { label: 'Recent orders' } satisfies TableRegionAccessibleName;",
+        "const tableAttributes = { class: 'recent-orders' } satisfies TableRegionAttributes;",
+        "const tableContent = { children: html`<table><caption>Recent orders</caption><tbody><tr><th scope=\"row\">A-101</th><td>Ready</td></tr></tbody></table>` } satisfies TableRegionContent;",
+        "const recentOrders = { ...tableName, ...tableContent, id: 'recent-orders', summary: 'One recent order.', scrollHint: 'Scroll horizontally to review every column.', attributes: tableAttributes } satisfies TableRegionProps;",
         "const choiceAttributes = { data: { owner: 'settings' } } satisfies ChoiceGroupAttributes;",
         "const choiceOrientation: ChoiceGroupOrientation = 'horizontal';",
         "const visibility = { id: 'visibility', legend: 'Visibility', orientation: choiceOrientation, attributes: choiceAttributes, children: html`<label>${Radio({ name: 'visibility', checked: true })} Team</label><label>${Radio({ name: 'visibility' })} Private</label>` } satisfies ChoiceGroupProps;",
@@ -1038,7 +1047,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4637,6 +4646,22 @@
       "recipe": "molecule-components",
       "description": "Compose a controlled value, finite options, naming, orientation, and change handler:"
     },
+    "packages/molecules/src/type-aliases/TableRegionAccessibleName.md": {
+      "recipe": "molecule-components",
+      "description": "Require a direct accessible label or labelled-by relationship for the table region:"
+    },
+    "packages/molecules/src/type-aliases/TableRegionAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible outer HTMLDivElement attributes while TableRegion owns region semantics and relationships:"
+    },
+    "packages/molecules/src/type-aliases/TableRegionContent.md": {
+      "recipe": "molecule-components",
+      "description": "Choose mutually exclusive caller-owned table content or explicit empty content:"
+    },
+    "packages/molecules/src/type-aliases/TableRegionProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a named native-table region with optional summary, overflow hint, empty content, and native attributes:"
+    },
     "packages/molecules/src/type-aliases/TabsAccessibleName.md": {
       "recipe": "molecule-components",
       "description": "Require a direct accessible label or labelled-by relationship for the tablist:"
@@ -4709,6 +4734,10 @@
       "recipe": "molecule-components",
       "description": "Render a controlled one-of-many toolbar of pressed buttons without tab or radio semantics:"
     },
+    "packages/molecules/src/variables/TableRegion.md": {
+      "recipe": "molecule-components",
+      "description": "Render a named region around a caller-owned native table with a conditional overflow affordance and no DataGrid behavior:"
+    },
     "packages/molecules/src/variables/Tabs.md": {
       "recipe": "molecule-components",
       "description": "Render controlled WAI-ARIA tabs and panels while callers retain routing, loading, and persistence:"
@@ -4728,6 +4757,10 @@
     "packages/molecules/src/variables/navigationStripStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable NavigationStrip layout and overflow-control stylesheet:"
+    },
+    "packages/molecules/src/variables/tableRegionStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable TableRegion layout and overflow stylesheet:"
     },
     "packages/organisms/src/interfaces/AppShellProps.md": {
       "recipe": "organism-components",

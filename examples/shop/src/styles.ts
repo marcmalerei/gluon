@@ -424,8 +424,14 @@ export const shopStyles = css`
     .place-order { width: 100%; margin-top: 12px; }
     .order-summary { align-self: start; padding: 28px; border: 1px solid var(--shop-rule); }
     .order-summary h2 { margin-bottom: 24px; font-size: 22px; }
-    .order-summary > div, .order-summary footer { display: flex; justify-content: space-between; gap: 20px; padding: 15px 0; border-top: 1px solid var(--shop-rule); }
-    .order-summary footer { margin-top: 12px; border-color: var(--shop-black); font-size: 20px; }
+    .checkout-order-table-region { --gluon-table-region-content-min-inline-size: 360px; }
+    .checkout-order-table { font-size: 14px; }
+    .checkout-order-table th, .checkout-order-table td { padding: 15px 8px; border-block-start: 1px solid var(--shop-rule); text-align: start; }
+    .checkout-order-table th:first-child, .checkout-order-table td:first-child { padding-inline-start: 0; }
+    .checkout-order-table th:last-child, .checkout-order-table td:last-child { padding-inline-end: 0; text-align: end; }
+    .checkout-order-table thead th { color: var(--shop-muted); font-size: 11px; font-weight: 520; letter-spacing: .06em; text-transform: uppercase; }
+    .checkout-order-table tbody th { font-weight: 520; }
+    .checkout-order-table tfoot th, .checkout-order-table tfoot td { border-color: var(--shop-black); font-size: 20px; }
     .order-confirmation, .checkout-empty { min-height: 65vh; padding: clamp(54px, 9vw, 130px) var(--shop-gutter); }
     .order-confirmation > p { max-width: 620px; margin-top: 22px; font-size: 18px; }
     .order-confirmation-notice { max-width: 680px; margin-top: 32px; }

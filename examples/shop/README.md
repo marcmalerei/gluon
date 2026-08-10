@@ -31,6 +31,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
   `defineGluonElement()`, with inferred properties/native events, cancelable
   optimistic quantity state, exposed focus, and 44px actions
 - a labeled checkout form, exact order summary, and URL-addressable confirmation
+- a native captioned checkout order table in an overflow-aware `TableRegion`
 - one isolated Store manager per shop application and persisted configured bag lines
 - abortable product availability with explicit loading, error, timeout, and retry UI
 - TC39 Signal-driven workshop availability through the optional Reactivity adapter
@@ -183,6 +184,9 @@ The latest verified renders are:
 - [EmptyState empty bag on desktop](../../docs/evidence/empty-state/empty-bag-desktop.png)
 - [EmptyState empty bag at 390px](../../docs/evidence/empty-state/empty-bag-390.png)
 - [EmptyState empty bag at 320px](../../docs/evidence/empty-state/empty-bag-320.png)
+- [TableRegion checkout summary on desktop](../../docs/evidence/table-region/checkout-summary-desktop.png)
+- [TableRegion checkout summary at 390px](../../docs/evidence/table-region/checkout-summary-390.png)
+- [TableRegion checkout summary at 320px](../../docs/evidence/table-region/checkout-summary-320.png)
 - [Vue-migration product boundary on desktop](design/rendered-product-migration-desktop.png)
 - [Vue-migration product boundary at 390px](design/rendered-product-migration-mobile.png)
 - [desktop keyboard focus on the product gallery](design/rendered-product-focus-desktop.png)

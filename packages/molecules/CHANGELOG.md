@@ -4,6 +4,11 @@
 
 ### Added
 
+- Added the stable `TableRegion` molecule for named, caller-owned native tables
+  with optional summary and empty content, plus an overflow hint and viewport
+  Tab stop only when horizontal scrolling is present. It intentionally does
+  not own DataGrid, sorting, selection, pagination, or virtualization behavior.
+
 - Added static `EmptyState` composition with optional media, semantic heading,
   body, caller-owned recovery action, compact/full layout, and real GLUON GOODS
   empty-bag integration.

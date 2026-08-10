@@ -20,7 +20,7 @@ import {
   render,
   unadoptStyles,
 } from '../src/index.js';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -689,6 +689,35 @@ test('matches EmptyState full, compact, action, wrapping, and RTL states', async
     q.div({ dir: 'rtl', children: EmptyState({ presentation: 'compact', heading: 'Your bag is empty', headingLevel: 3, children: 'Choose something useful.' }) }),
   ] }), document.body);
   await expect.element(page.getByTestId('empty-state-visual')).toMatchScreenshot('empty-state-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
+  });
+  unadoptStyles(document, visualStyles);
+  uiOwner.dispose();
+});
+
+test('matches TableRegion native table, overflow, empty, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer app { body { margin: 0; padding: 16px; inline-size: 340px; font-size: 18px; } .table-stack { display: grid; gap: 16px; block-size: 580px; overflow: hidden; } .visual-table-region { --gluon-table-region-content-min-inline-size: 520px; } .visual-table th, .visual-table td { padding: 10px; border-block-end: 1px solid #a9b4b2; text-align: start; } .visual-table th:last-child, .visual-table td:last-child { text-align: end; } .visual-empty { padding: 20px; border: 1px dashed currentColor; } }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  const table = (caption: string) => q.table({ class: 'visual-table', children: [
+    q.caption({ children: caption }),
+    q.thead({ children: q.tr({ children: [q.th({ scope: 'col', children: 'Object' }), q.th({ scope: 'col', children: 'Quantity' }), q.th({ scope: 'col', children: 'Price' })] }) }),
+    q.tbody({ children: [
+      q.tr({ children: [q.th({ scope: 'row', children: 'Orbit Lamp' }), q.td({ children: '1' }), q.td({ children: '€249.00' })] }),
+      q.tr({ children: [q.th({ scope: 'row', children: 'Fold Tray' }), q.td({ children: '2' }), q.td({ children: '€118.00' })] }),
+    ] }),
+  ] });
+  render(q.main({ data: { testid: 'table-region-visual' }, class: 'table-stack', children: [
+    TableRegion({ id: 'visual-orders', label: 'Order summary', summary: 'Three objects ready to order.', scrollHint: 'Scroll horizontally to review every order column.', attributes: { class: 'visual-table-region' }, children: table('Current order') }),
+    q.div({ dir: 'rtl', children: TableRegion({ id: 'visual-orders-rtl', label: 'ملخص الطلب', attributes: { class: 'visual-table-region' }, children: table('الطلب الحالي') }) }),
+    TableRegion({ id: 'visual-empty-table', label: 'Archived orders', empty: true, emptyContent: q.p({ class: 'visual-empty', children: 'No archived orders.' }) }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('table-region-visual')).toMatchScreenshot('table-region-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
   });
