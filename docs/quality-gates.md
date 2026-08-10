@@ -191,6 +191,10 @@ before and after observer registration and uses the deadline only to fail a
 missing commit. The retained synchronous event assertion remains separate, and
 a focused 25-update React case exercises the event/render boundary in every
 configured Playwright engine.
+The retained-hydration case separately waits for React's recorded passive-effect
+mount before teardown and for its paired cleanup afterward. Matching server
+text alone is not treated as a hydration-commit signal, so WebKit cannot remove
+the bridge while React still considers the root unhydrated.
 
 ## Generated API example gate
 
