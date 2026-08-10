@@ -19,7 +19,7 @@ import {
   css,
   render,
 } from '../src/index.js';
-import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, SegmentedControl } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, SegmentedControl, Tabs } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -527,6 +527,42 @@ test('matches SegmentedControl selected, disabled, vertical, and RTL states', as
     ] }),
   ] }), document.body);
   await expect.element(page.getByTestId('segmented-control-visual')).toMatchScreenshot('segmented-control-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches Tabs selected, disabled, overflow, panel, vertical, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="tabs-visual"] { box-sizing: border-box; inline-size: 420px; block-size: 430px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="tabs-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .tabs-grid { display: grid; gap: 26px; }
+      .overflow-tabs { inline-size: 280px; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({ data: { testid: 'tabs-visual' }, children: [
+    q.h1({ children: 'Tabs states' }),
+    q.div({ class: 'tabs-grid', children: [
+      Tabs({ label: 'Product information', value: 'details', attributes: { class: 'overflow-tabs' }, items: [
+        { id: 'visual-story', value: 'story', label: 'Story', panel: 'Story panel' },
+        { id: 'visual-details', value: 'details', label: 'Details', panel: q.p({ children: 'Powder-coated steel and replaceable hardware.' }) },
+        { id: 'visual-care', value: 'care', label: 'Care', panel: 'Care panel', disabled: true },
+        { id: 'visual-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery panel' },
+      ] }),
+      q.div({ dir: 'rtl', children: Tabs({ label: 'Vertical RTL tabs', value: 'second', orientation: 'vertical', items: [
+        { id: 'visual-first', value: 'first', label: 'First', panel: 'First panel' },
+        { id: 'visual-second', value: 'second', label: 'Second', panel: 'Second panel' },
+      ] }) }),
+    ] }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('tabs-visual')).toMatchScreenshot('tabs-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });

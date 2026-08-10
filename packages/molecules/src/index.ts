@@ -5,6 +5,7 @@ export { ControlField, type ControlFieldAttributes, type ControlFieldProps, type
 export { FormField, type FormFieldProps } from './form-field.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
 export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedControlAttributes, type SegmentedControlChangeEvent, type SegmentedControlOption, type SegmentedControlOrientation, type SegmentedControlProps } from './segmented-control.js';
+export { Tabs, type TabsAccessibleName, type TabsActivation, type TabsAttributes, type TabsChangeEvent, type TabsItem, type TabsOrientation, type TabsProps } from './tabs.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { cardStyles } from './card-styles.js';
@@ -14,4 +15,5 @@ export { controlFieldStyles } from './control-field-styles.js';
 export { formFieldStyles } from './form-field-styles.js';
 export { navigationStripStyles } from './navigation-strip-styles.js';
 export { segmentedControlStyles } from './segmented-control-styles.js';
+export { tabsStyles } from './tabs-styles.js';
 export { defineMolecule, type Component } from '@gluonjs/core';

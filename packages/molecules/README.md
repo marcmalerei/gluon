@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, NavigationStrip, SegmentedControl } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -33,6 +33,12 @@ buttons for a small finite option set. It exposes one Tab stop and Arrow/Home/En
 navigation, skips disabled options, and supports horizontal, vertical, and RTL
 layout. It is deliberately not a tablist or radio group: callers own the value,
 routing, panels, persistence, and async effects.
+`Tabs` implements the WAI-ARIA tablist/tab/tabpanel pattern with stable caller
+IDs, controlled selection, one Tab stop, disabled-option skipping,
+Arrow/Home/End navigation, and manual or automatic activation. Horizontal,
+vertical, RTL, overflow, forced-colors, and reduced-motion presentation are
+included; panel content, loading, routing, persistence, and effects remain
+caller-owned.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -78,6 +84,9 @@ SegmentedControl exposes `--gluon-segmented-control-border-color`,
 `--gluon-segmented-control-selected-background`,
 `--gluon-segmented-control-selected-color`, and
 `--gluon-segmented-control-radius`.
+Tabs exposes `--gluon-tabs-border-color`, `--gluon-tabs-background`,
+`--gluon-tabs-color`, `--gluon-tabs-selected-border-color`,
+`--gluon-tabs-selected-color`, and `--gluon-tabs-panel-padding`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -100,3 +109,5 @@ The site header uses `ButtonGroup` for the search, bag, and mobile-menu action
 cluster without changing the individual actions' semantics.
 The catalog uses `SegmentedControl` for a URL-backed Grid/List view choice; the
 shop owns the route update and the corresponding product layout.
+Product details use `Tabs` for URL-backed Story and Details panels while the
+shop owns routing and restores focus to the activated tab after navigation.

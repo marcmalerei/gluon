@@ -61,6 +61,20 @@ export const moleculeStyles = css`
     :where(.gluon-segmented-control.is-vertical > .gluon-segmented-control-option:last-child) { border-end-start-radius: var(--gluon-segmented-control-radius, var(--gluon-radius-control, 0.625rem)); border-end-end-radius: var(--gluon-segmented-control-radius, var(--gluon-radius-control, 0.625rem)); }
     :where(.gluon-segmented-control-option[aria-pressed="true"]) { z-index: 1; background: var(--gluon-segmented-control-selected-background, var(--gluon-color-action-soft, #e6f4f1)); color: var(--gluon-segmented-control-selected-color, var(--gluon-color-action-soft-text, #075e5b)); }
 
+    :where(.gluon-tabs) { min-inline-size: 0; }
+    :where(.gluon-tabs-list) { display: flex; min-inline-size: 0; overflow: auto hidden; scrollbar-width: thin; border-block-end: 1px solid var(--gluon-tabs-border-color, var(--gluon-color-rule, #d9e4e2)); }
+    :where(.gluon-tabs.is-horizontal > .gluon-tabs-list) { flex-direction: row; }
+    :where(.gluon-tabs.is-vertical) { display: grid; grid-template-columns: minmax(10rem, auto) minmax(0, 1fr); align-items: start; }
+    :where(.gluon-tabs.is-vertical > .gluon-tabs-list) { flex-direction: column; overflow: visible; border-block-end: 0; border-inline-end: 1px solid var(--gluon-tabs-border-color, var(--gluon-color-rule, #d9e4e2)); }
+    :where(.gluon-tabs-tab) { appearance: none; min-block-size: 44px; flex: 0 0 auto; padding: 0.75rem 1rem; border: 0; border-block-end: 3px solid transparent; background: var(--gluon-tabs-background, transparent); color: var(--gluon-tabs-color, inherit); font: inherit; font-weight: 650; cursor: pointer; white-space: nowrap; }
+    :where(.gluon-tabs-tab[aria-selected="true"]) { border-color: var(--gluon-tabs-selected-border-color, var(--gluon-color-action, #087f7b)); color: var(--gluon-tabs-selected-color, var(--gluon-color-action-soft-text, #075e5b)); }
+    :where(.gluon-tabs.is-vertical .gluon-tabs-tab) { border-block-end: 0; border-inline-end: 3px solid transparent; text-align: start; }
+    :where(.gluon-tabs.is-vertical .gluon-tabs-tab[aria-selected="true"]) { border-inline-end-color: var(--gluon-tabs-selected-border-color, var(--gluon-color-action, #087f7b)); }
+    :where(.gluon-tabs-tab:disabled) { cursor: not-allowed; opacity: 0.55; }
+    :where(.gluon-tabs-tab:focus-visible) { outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, #173f91); outline-offset: -3px; }
+    :where(.gluon-tabs-panel) { min-inline-size: 0; padding: var(--gluon-tabs-panel-padding, 1rem 0); }
+    :where(.gluon-tabs-panel:focus-visible) { outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, #173f91); outline-offset: 3px; }
+
     :where(.gluon-control-field) { display: grid; gap: 0.375rem; min-inline-size: 0; }
     :where(.gluon-control-field-label) { font-size: 0.875rem; font-weight: 650; }
     :where(.gluon-control-field-required) { color: var(--gluon-control-field-required-color, var(--gluon-color-danger, #a52222)); }
@@ -84,6 +98,7 @@ export const moleculeStyles = css`
       :where(.gluon-choice-group-error) { color: Mark; }
       :where(.gluon-choice-group-helper) { color: CanvasText; }
       :where(.gluon-segmented-control-option[aria-pressed="true"]) { border-color: Highlight; color: Highlight; }
+      :where(.gluon-tabs-tab[aria-selected="true"]) { border-color: Highlight; color: Highlight; }
     }
   }
 `;
@@ -95,4 +110,5 @@ markLegacyComponentStyleSheet(moleculeStyles, [
   'gluon-molecule-control-field',
   'gluon-molecule-form-field',
   'gluon-molecule-segmented-control',
+  'gluon-molecule-tabs',
 ]);
