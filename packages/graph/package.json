@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/graph",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Interactive, dependency-free network graph Custom Element for Gluon.",
   "private": false,
   "type": "module",
@@ -35,7 +35,7 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.7.0"
+    "@gluonjs/core": "1.8.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

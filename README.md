@@ -9,7 +9,7 @@
 </p>
 
 > [!IMPORTANT]
-> This source tree and package describe Gluon `1.7.0` across all 21 official
+> This source tree and package describe Gluon `1.8.0` across all 21 official
 > packages. npm publication occurs only from an immutable release tag through
 > the protected release workflow; later repository commits cannot replace
 > published package contents.
@@ -34,7 +34,7 @@
 - an interactive, canvas-backed `@gluonjs/graph` Custom Element for knowledge-map and relationship views
 - optional `@gluonjs/i18n` locale-aware messages with lazy namespace loading
 - a form-associated `@gluonjs/json-forms` Custom Element for the documented JSON Schema subset
-- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.7.0/migration/vue-to-gluon-cutover/index.md)
+- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.8.0/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -371,9 +371,9 @@ See the [Storybook guide](docs/storybook.md) and the runnable
 [`examples/component-library`](examples/component-library/README.md) catalog.
 
 For a first project, use the versioned
-[step-by-step learning path](docs-site/content/1.7.0/guides/learning-path/index.md).
+[step-by-step learning path](docs-site/content/1.8.0/guides/learning-path/index.md).
 Before extracting shop UI, use the
-[component decision guide](docs-site/content/1.7.0/guides/component-decisions/index.md):
+[component decision guide](docs-site/content/1.8.0/guides/component-decisions/index.md):
 official packages require a cross-application semantic and accessibility
 contract; branded GLUON GOODS compositions remain application-local.
 
@@ -541,7 +541,7 @@ change-detection, required, and validation options as `static properties`.
 `@state()` is reactive internal state with attribute transport disabled.
 Typed events continue to use `static events` and `emit()`; template
 `@event-name` bindings are listeners, not TypeScript decorators. The
-[component guide](docs-site/content/1.7.0/guides/components/index.md) shows the
+[component guide](docs-site/content/1.8.0/guides/components/index.md) shows the
 decorator and plain TypeScript forms side by side.
 
 `defineGluonElement()` is the concise path for the same autonomous boundary. It

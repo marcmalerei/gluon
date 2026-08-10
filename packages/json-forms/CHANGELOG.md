@@ -4,6 +4,12 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-10
+
+### Changed
+
+- Advanced the lockstep release for the accessible Atom and Molecule component train while retaining this package's existing public contract.
+
 ## [1.7.0] - 2026-08-05
 
 ### Changed

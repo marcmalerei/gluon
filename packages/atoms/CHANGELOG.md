@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-10
+
 ### Added
 
 - Added the presentational `StatusBadge` Atom with five brand-neutral tones,
