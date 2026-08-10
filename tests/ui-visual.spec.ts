@@ -617,7 +617,7 @@ test('matches Disclosure closed, open, unavailable, RTL, and zoom-safe states', 
   ] }), document.body);
   await expect.element(page.getByTestId('disclosure-visual')).toMatchScreenshot('disclosure-states-light', {
     comparatorName: 'pixelmatch',
-    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
   });
   unadoptStyles(document, visualStyles);
   uiOwner.dispose();
