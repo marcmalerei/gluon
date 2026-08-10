@@ -438,10 +438,7 @@ export const shopStyles = css`
     .policy-page h1 { margin-bottom: 28px; font-size: clamp(72px, 11vw, 170px); font-weight: 520; line-height: 0.88; letter-spacing: -0.075em; }
     .policy-page p { max-width: 680px; margin-bottom: 34px; font-size: clamp(18px, 2vw, 27px); }
     .policy-details { inline-size: min(680px, 100%); margin-block-end: 34px; --gluon-disclosure-content-padding: 8px 0 18px; }
-    .policy-details dl { display: grid; gap: 16px; margin: 0; }
-    .policy-details dl > div { display: grid; grid-template-columns: minmax(90px, 0.35fr) 1fr; gap: 18px; }
-    .policy-details dt { font-weight: 650; }
-    .policy-details dd { margin: 0; color: var(--shop-muted); line-height: 1.5; }
+    .policy-details p { margin: 0; color: var(--shop-muted); font-size: 16px; line-height: 1.5; }
   }
 
   @layer shop.responsive {

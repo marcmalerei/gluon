@@ -15,6 +15,7 @@ import {
   type ButtonProps,
 } from '@gluonjs/atoms';
 import {
+  Accordion,
   Card,
   FormField,
   NavigationStrip,
@@ -130,6 +131,19 @@ Field({ label: 'Email', children: q.input(), attributes: { class: 'app-field' } 
 FormField({ label: 'Email', attributes: { autocomplete: 'email' }, fieldAttributes: { data: { owner: 'app' } } });
 AppShell({ children: Card({ title: 'Card' }), attributes: { data: { owner: 'app' } } });
 NavigationStrip(navigationStripProps);
+Accordion({
+  label: 'Delivery details',
+  value: 'tracking',
+  items: [{ id: 'tracking', value: 'tracking', summary: 'Tracking', children: 'Sent after dispatch.' }],
+  onChange: (value) => { const selected: string | undefined = value; void selected; },
+});
+Accordion({
+  labelledBy: 'delivery-title',
+  mode: 'multiple',
+  value: ['tracking'],
+  items: [{ id: 'tracking-multiple', value: 'tracking', summary: 'Tracking', children: 'Sent after dispatch.' }],
+  onChange: (value) => { const selected: readonly string[] = value; void selected; },
+});
 unsafeQuarkProps<HTMLButtonElement>({ 'vendor-future-key': true });
 
 void tree;
@@ -192,5 +206,13 @@ FormField({ label: 'Email', attributes: { rows: 4 } });
 NavigationStrip({ children: q.a({ href: '#profile', children: 'Profile' }) });
 // @ts-expect-error NavigationStrip nav attributes reject anchor-only props
 NavigationStrip({ label: 'Sections', attributes: { href: '/other' } });
+// @ts-expect-error Accordion requires an accessible group name
+Accordion({ value: 'one', items: [] });
+// @ts-expect-error multiple Accordion values are arrays
+Accordion({ label: 'Sections', mode: 'multiple', value: 'one', items: [] });
+// @ts-expect-error multiple Accordion does not accept the single-mode collapse policy
+Accordion({ label: 'Sections', mode: 'multiple', value: [], collapsible: false, items: [] });
+// @ts-expect-error unavailable Accordion items require a visible reason
+Accordion({ label: 'Sections', items: [{ id: 'later', value: 'later', summary: 'Later', children: 'Later', unavailable: true }] });
 // @ts-expect-error AppShell div attributes reject anchor-only props
 AppShell({ children: 'Content', attributes: { href: '/other' } });

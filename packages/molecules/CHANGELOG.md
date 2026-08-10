@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added controlled `Accordion` composition over native Disclosure items with
+  single or multiple open values, stable headings, optional focus traversal,
+  and URL-backed GLUON GOODS shipping topics.
+
 - Added native `Disclosure` details/summary composition with controlled or
   initial open state, toggle handling, visible unavailable reasons, logical
   marker styling, and GLUON GOODS shipping-detail integration.

@@ -37,6 +37,7 @@ import {
   toggleButtonStyles,
 } from '@gluonjs/atoms';
 import {
+  accordionStyles,
   Card,
   buttonGroupStyles,
   cardStyles,
@@ -53,6 +54,7 @@ import { appShellStyles } from '@gluonjs/organisms';
 import { nextTick } from '@gluonjs/reactivity';
 
 const allComponentSheets = [
+  accordionStyles,
   buttonStyles,
   checkboxStyles,
   iconStyles,

@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -897,6 +897,7 @@
         "import { Button, Input, Radio } from '@gluonjs/atoms';",
         "import { html } from '@gluonjs/core';",
         "import {",
+        "  Accordion,",
         "  ButtonGroup,",
         "  Card,",
         "  ChoiceGroup,",
@@ -910,6 +911,14 @@
         "  createDialogSurfaceController,",
         "  moleculeManifest,",
         "  moleculeStyles,",
+        "  type AccordionAccessibleName,",
+        "  type AccordionAttributes,",
+        "  type AccordionChangeEvent,",
+        "  type AccordionHeadingLevel,",
+        "  type AccordionItem,",
+        "  type AccordionMultipleProps,",
+        "  type AccordionProps,",
+        "  type AccordionSingleProps,",
         "  type ButtonGroupAccessibleName,",
         "  type ButtonGroupAttributes,",
         "  type ButtonGroupOrientation,",
@@ -974,6 +983,15 @@
         "const disclosureState = { defaultOpen: false } satisfies DisclosureState;",
         "const disclosureAvailability = { unavailable: false } satisfies DisclosureAvailability;",
         "const deliveryDisclosure = { ...disclosureState, ...disclosureAvailability, id: 'delivery-details', summary: 'Delivery details', children: 'Tracked delivery in 2–3 working days.', attributes: disclosureAttributes, summaryAttributes: disclosureSummaryAttributes } satisfies DisclosureProps;",
+        "const accordionName = { label: 'Shipping topics' } satisfies AccordionAccessibleName;",
+        "const accordionAttributes = { class: 'shipping-topics' } satisfies AccordionAttributes;",
+        "const accordionHeadingLevel: AccordionHeadingLevel = 3;",
+        "const accordionItems = [{ id: 'shipping-tracking', value: 'tracking', summary: 'Tracking', children: 'Sent after dispatch.' }] satisfies readonly AccordionItem[];",
+        "const handleAccordion = (value: string | undefined, event: AccordionChangeEvent) => console.log(value, event.type);",
+        "const accordionSingle = { ...accordionName, value: 'tracking', onChange: handleAccordion } satisfies AccordionSingleProps;",
+        "const accordionMultiple = { ...accordionName, mode: 'multiple', value: ['tracking'] } satisfies AccordionMultipleProps;",
+        "const accordionProps = { ...accordionSingle, items: accordionItems, headingLevel: accordionHeadingLevel, attributes: accordionAttributes } satisfies AccordionProps;",
+        "const multipleAccordionProps = { ...accordionMultiple, items: accordionItems } satisfies AccordionProps;",
         "const choiceAttributes = { data: { owner: 'settings' } } satisfies ChoiceGroupAttributes;",
         "const choiceOrientation: ChoiceGroupOrientation = 'horizontal';",
         "const visibility = { id: 'visibility', legend: 'Visibility', orientation: choiceOrientation, attributes: choiceAttributes, children: html`<label>${Radio({ name: 'visibility', checked: true })} Team</label><label>${Radio({ name: 'visibility' })} Private</label>` } satisfies ChoiceGroupProps;",
@@ -1002,7 +1020,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4077,6 +4095,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact pressed-state stylesheet retained alongside ToggleButton's Button dependency:"
     },
+    "packages/molecules/src/variables/accordionStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Accordion group and heading stylesheet:"
+    },
     "packages/molecules/src/variables/cardStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Card stylesheet retained by rendered Card values:"
@@ -4385,9 +4407,41 @@
       "recipe": "atom-components",
       "description": "Adopt the theme-independent typography, radius, spacing, and focus tokens required by layered UI components:"
     },
+    "packages/molecules/src/type-aliases/AccordionItem.md": {
+      "recipe": "molecule-components",
+      "description": "Describe one stable native Disclosure item, its controlled value, heading summary, content, availability, and extension attributes:"
+    },
     "packages/molecules/src/interfaces/CardProps.md": {
       "recipe": "molecule-components",
       "description": "Compose a Card's heading, tone, media, actions, body, and native article attributes as one typed surface:"
+    },
+    "packages/molecules/src/type-aliases/AccordionAccessibleName.md": {
+      "recipe": "molecule-components",
+      "description": "Require either a direct accessible label or a labelled-by relationship for the Accordion group:"
+    },
+    "packages/molecules/src/type-aliases/AccordionAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLDivElement attributes while Accordion owns its group role and accessible name:"
+    },
+    "packages/molecules/src/type-aliases/AccordionChangeEvent.md": {
+      "recipe": "molecule-components",
+      "description": "Handle the native toggle event that proposes a controlled Accordion value change:"
+    },
+    "packages/molecules/src/type-aliases/AccordionHeadingLevel.md": {
+      "recipe": "molecule-components",
+      "description": "Choose the semantic heading level exposed inside every native summary:"
+    },
+    "packages/molecules/src/type-aliases/AccordionMultipleProps.md": {
+      "recipe": "molecule-components",
+      "description": "Control zero or more open Accordion values while retaining caller ownership of the array:"
+    },
+    "packages/molecules/src/type-aliases/AccordionProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a labelled native Disclosure group with caller-owned items and controlled open values:"
+    },
+    "packages/molecules/src/type-aliases/AccordionSingleProps.md": {
+      "recipe": "molecule-components",
+      "description": "Control one optional open Accordion value and choose whether that item may collapse:"
     },
     "packages/molecules/src/type-aliases/ButtonGroupAccessibleName.md": {
       "recipe": "molecule-components",
@@ -4548,6 +4602,10 @@
     "packages/molecules/src/type-aliases/TabsProps.md": {
       "recipe": "molecule-components",
       "description": "Compose controlled tab selection, stable items, activation, orientation, and change handling:"
+    },
+    "packages/molecules/src/variables/Accordion.md": {
+      "recipe": "molecule-components",
+      "description": "Render a labelled controlled Accordion over native Disclosure items while preserving summary activation and Tab order:"
     },
     "packages/molecules/src/variables/Card.md": {
       "recipe": "molecule-components",

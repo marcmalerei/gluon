@@ -53,7 +53,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
-import { Card, DialogSurface, Disclosure, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -89,6 +89,24 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('<summary');
     expect(rendered).toContain('aria-disabled="true"');
     expect(rendered).toContain('aria-describedby="server-disclosure-unavailable"');
+  });
+
+  it('serializes Accordion group, heading, and controlled native disclosures', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(Accordion({
+      label: 'Delivery service details',
+      value: 'tracking',
+      items: [
+        { id: 'server-tracking', value: 'tracking', summary: 'Tracking', children: 'Sent after dispatch.' },
+        { id: 'server-remote', value: 'remote', summary: 'Remote areas', unavailable: true, unavailableReason: 'Not available.', children: 'Unavailable.' },
+      ],
+    })));
+    expect(rendered).toContain('role="group"');
+    expect(rendered).toContain('aria-label="Delivery service details"');
+    expect(rendered).toContain('role="heading"');
+    expect(rendered).toContain('aria-level="3"');
+    expect(rendered).toContain('id="server-tracking"');
+    expect(rendered).toContain('open');
+    expect(rendered).toContain('server-remote-unavailable');
   });
 
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {

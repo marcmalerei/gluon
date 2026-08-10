@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -379,11 +379,13 @@ describe('GLUON GOODS reference shop', () => {
     await router.push('/shipping');
     await settleShop();
     expect(root.querySelector('.policy-page h1')?.textContent).toBe('Shipping');
-    const shippingDetails = root.querySelector<HTMLDetailsElement>('#shipping-service-details')!;
+    const shippingDetails = root.querySelector<HTMLDetailsElement>('#shipping-packaging')!;
+    expect(document.adoptedStyleSheets).toContain(accordionStyles);
     expect(document.adoptedStyleSheets).toContain(disclosureStyles);
     expect(shippingDetails.open).toBe(false);
     shippingDetails.querySelector<HTMLElement>('summary')!.click();
     await vi.waitFor(() => expect(shippingDetails.open).toBe(true));
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/shipping?topic=packaging'));
     expect(shippingDetails.textContent).toContain('Recyclable board');
     await router.push('/returns');
     await settleShop();
@@ -395,6 +397,7 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(root.querySelector('.not-found h1')?.textContent).toBe('That object moved.');
     app.unmount();
+    expect(document.adoptedStyleSheets).not.toContain(accordionStyles);
     expect(document.adoptedStyleSheets).not.toContain(disclosureStyles);
   });
 
