@@ -100,6 +100,9 @@ native `button` rule or adopt `atomStyles`.
   `Field`, or `FormField` to provide its accessible name.
 - `Label` is visible label text. `FormField` places it inside a native label;
   standalone callers must compose it with a native labeling relationship.
+- `Progress` preserves native determinate `value`/`max` semantics and omits the
+  `value` attribute for indeterminate work. Give every instance an accessible
+  name through `attributes` or a native labeling relationship.
 - `Radio` preserves native same-name grouping, Arrow/Space keyboard, label,
   form, required, checked, and disabled behavior. Place related controls in a
   labeled `fieldset` or compose them with `ChoiceGroup`.
@@ -135,7 +138,10 @@ Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
 `--gluon-switch-border-color`. ToggleButton exposes
 `--gluon-toggle-button-pressed-background`,
 `--gluon-toggle-button-pressed-color`, and
-`--gluon-toggle-button-pressed-border-color`. Shared public tokens retain their documented
+`--gluon-toggle-button-pressed-border-color`. Progress exposes
+`--gluon-progress-track`, `--gluon-progress-value`,
+`--gluon-progress-track-border`, `--gluon-progress-width`, and
+`--gluon-progress-height`. Shared public tokens retain their documented
 `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 
@@ -151,6 +157,7 @@ GLUON GOODS is the production dogfood surface: its public Button presets cover
 global navigation, dialogs, product add/retry, and bag quantity/remove actions;
 catalog search uses `Input`, catalog sorting uses the native `Select`, and
 checkout delivery instructions use `Textarea`; checkout consent uses
-`Checkbox`; product configuration uses native `Radio` groups. The application supplies only
+`Checkbox`; product configuration uses native `Radio` groups; async inventory
+feedback uses indeterminate `Progress`. The application supplies only
 documented public tokens/classes and owns the shared/exact sheets through one
 `UiOwner` lifecycle.

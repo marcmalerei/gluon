@@ -13,7 +13,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { customElement, property } from '@gluonjs/core/decorators';
-import { Radio } from '@gluonjs/atoms';
+import { Progress, Radio } from '@gluonjs/atoms';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
 import {
@@ -200,7 +200,8 @@ export const productConfiguratorStyles = css`
     box-shadow: 0 0 0 1px rgb(17 17 17 / 28%);
   }
   .inventory-low-stock { background: #ffb347; }
-  .inventory-pending { color: var(--shop-muted, #656565); }
+  .inventory-pending { display: inline-flex; align-items: center; gap: 8px; color: var(--shop-muted, #656565); }
+  .inventory-pending progress { --gluon-progress-width: 3rem; }
   .inventory-retry {
     min-height: 44px;
     border: 0;
@@ -517,7 +518,9 @@ function renderInventoryStatus(product: Product): TemplateValue {
   return html`<div slot="inventory" class="inventory-status" role="status" aria-live="polite">${Suspense({
     source: (context) => loadInventory(product, context),
     sourceKey: product.slug,
-    fallback: html`<span class="inventory-pending">Checking workshop availability…</span>`,
+    fallback: html`<span class="inventory-pending">${Progress({
+      attributes: { 'aria-label': 'Checking workshop availability' },
+    })}<span>Checking workshop availability…</span></span>`,
     delay: 50,
     timeout: 2_000,
     children: (inventory) => html`

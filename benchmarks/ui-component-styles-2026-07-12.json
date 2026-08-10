@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 10089,
-      "gzipBytes": 1954,
+      "rawBytes": 11907,
+      "gzipBytes": 2237,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -32,6 +32,7 @@
         ".gluon-icon",
         ".gluon-input",
         ".gluon-label",
+        ".gluon-progress",
         ".gluon-radio",
         ".gluon-select",
         ".gluon-switch",
@@ -40,15 +41,16 @@
       ]
     },
     "after": {
-      "rawBytes": 10655,
-      "gzipBytes": 1972,
-      "moduleCount": 13,
+      "rawBytes": 12537,
+      "gzipBytes": 2264,
+      "moduleCount": 14,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
         "packages/atoms/src/icon-styles.ts",
         "packages/atoms/src/input-styles.ts",
         "packages/atoms/src/label-styles.ts",
+        "packages/atoms/src/progress-styles.ts",
         "packages/atoms/src/radio-styles.ts",
         "packages/atoms/src/select-styles.ts",
         "packages/atoms/src/switch-styles.ts",
@@ -58,7 +60,7 @@
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 13,
+      "stylesheetCount": 14,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -79,6 +81,7 @@
         ".gluon-icon",
         ".gluon-input",
         ".gluon-label",
+        ".gluon-progress",
         ".gluon-radio",
         ".gluon-select",
         ".gluon-switch",
@@ -89,8 +92,8 @@
   },
   "buttonOnly": {
     "before": {
-      "rawBytes": 8124,
-      "gzipBytes": 1490,
+      "rawBytes": 9942,
+      "gzipBytes": 1779,
       "moduleCount": 1,
       "modules": ["packages/atoms/src/styles.ts"],
       "stylesheetCount": 1,
@@ -100,6 +103,7 @@
         ".gluon-icon",
         ".gluon-input",
         ".gluon-label",
+        ".gluon-progress",
         ".gluon-radio",
         ".gluon-select",
         ".gluon-switch",

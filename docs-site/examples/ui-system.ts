@@ -5,6 +5,7 @@ import {
   Icon,
   Input,
   Label,
+  Progress,
   Select,
   Switch,
   ToggleButton,
@@ -177,6 +178,7 @@ createApp(() => AppShell({
         }),
         q.label({ children: [Switch({ name: 'network' }), ' Allow network access'] }),
         ToggleButton({ pressed: true, label: 'Grid view', variant: 'ghost' }),
+        Progress({ value: 72, attributes: { 'aria-label': 'Profile completion' } }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',
