@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
+        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -901,10 +901,12 @@
         "  Card,",
         "  ChoiceGroup,",
         "  ControlField,",
+        "  DialogSurface,",
         "  FormField,",
         "  NavigationStrip,",
         "  SegmentedControl,",
         "  Tabs,",
+        "  createDialogSurfaceController,",
         "  moleculeManifest,",
         "  moleculeStyles,",
         "  type ButtonGroupAccessibleName,",
@@ -921,6 +923,13 @@
         "  type ControlFieldProps,",
         "  type ControlFieldRelationships,",
         "  type ControlFieldRenderer,",
+        "  type DialogSurfaceAccessibleName,",
+        "  type DialogSurfaceAttributes,",
+        "  type DialogSurfaceController,",
+        "  type DialogSurfaceControllerOptions,",
+        "  type DialogSurfacePlacement,",
+        "  type DialogSurfaceProps,",
+        "  type DialogSurfaceSectionAttributes,",
         "  type FormFieldProps,",
         "  type NavigationStripProps,",
         "  type SegmentedControlAccessibleName,",
@@ -947,6 +956,13 @@
         "const fieldAttributes = { class: 'order-reference-field' } satisfies ControlFieldAttributes;",
         "const renderOrderReference: ControlFieldRenderer = (relationships: ControlFieldRelationships) => Input({ attributes: { id: relationships.controlId, aria: relationships.aria } });",
         "const orderReference = { id: 'order-reference', label: 'Order reference', helper: 'Optional internal reference.', attributes: fieldAttributes, control: renderOrderReference } satisfies ControlFieldProps;",
+        "const dialogName = { labelledBy: 'archive-title' } satisfies DialogSurfaceAccessibleName;",
+        "const dialogAttributes = { class: 'archive-dialog' } satisfies DialogSurfaceAttributes;",
+        "const dialogSectionAttributes = { class: 'archive-actions' } satisfies DialogSurfaceSectionAttributes;",
+        "const dialogPlacement: DialogSurfacePlacement = 'center';",
+        "const dialogControllerOptions = { initialFocus: '[data-dialog-initial-focus]' } satisfies DialogSurfaceControllerOptions;",
+        "const dialogController: DialogSurfaceController = createDialogSurfaceController(dialogControllerOptions);",
+        "const archiveDialog = { ...dialogName, id: 'archive-dialog', title: 'Archive order?', description: 'The order remains available.', placement: dialogPlacement, controller: dialogController, attributes: dialogAttributes, footerAttributes: dialogSectionAttributes, closeAction: Button({ label: 'Close', attributes: { data: { dialogInitialFocus: true } } }), children: 'Archive this order?', footer: Button({ label: 'Archive' }), onDismiss: () => dialogController.deactivate() } satisfies DialogSurfaceProps;",
         "const choiceAttributes = { data: { owner: 'settings' } } satisfies ChoiceGroupAttributes;",
         "const choiceOrientation: ChoiceGroupOrientation = 'horizontal';",
         "const visibility = { id: 'visibility', legend: 'Visibility', orientation: choiceOrientation, attributes: choiceAttributes, children: html`<label>${Radio({ name: 'visibility', checked: true })} Team</label><label>${Radio({ name: 'visibility' })} Private</label>` } satisfies ChoiceGroupProps;",
@@ -975,7 +991,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4074,6 +4090,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Tabs layout and state stylesheet:"
     },
+    "packages/molecules/src/variables/dialogSurfaceStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable DialogSurface overlay, placement, and region stylesheet:"
+    },
     "packages/molecules/src/variables/formFieldStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable FormField stylesheet retained alongside its nested Atom dependencies:"
@@ -4386,6 +4406,14 @@
       "recipe": "molecule-components",
       "description": "Apply deterministic control, label, helper, error, required, invalid, and ARIA relationship metadata inside a control render callback:"
     },
+    "packages/molecules/src/interfaces/DialogSurfaceController.md": {
+      "recipe": "molecule-components",
+      "description": "Coordinate deferred initial focus, Tab containment, trigger restoration, and teardown for one stable DialogSurface instance:"
+    },
+    "packages/molecules/src/interfaces/DialogSurfaceControllerOptions.md": {
+      "recipe": "molecule-components",
+      "description": "Choose a selector, element, or resolver for DialogSurface initial focus with a safe first-focusable fallback:"
+    },
     "packages/molecules/src/interfaces/FormFieldProps.md": {
       "recipe": "molecule-components",
       "description": "Combine Input properties with a required visible label and mutually useful helper or error messaging:"
@@ -4421,6 +4449,26 @@
     "packages/molecules/src/type-aliases/ControlFieldRenderer.md": {
       "recipe": "molecule-components",
       "description": "Render caller-owned control content from public relationship metadata without cloning private state:"
+    },
+    "packages/molecules/src/type-aliases/DialogSurfaceAccessibleName.md": {
+      "recipe": "molecule-components",
+      "description": "Require either a direct label or a labelled-by relationship for the ARIA dialog surface:"
+    },
+    "packages/molecules/src/type-aliases/DialogSurfaceAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLDivElement attributes while DialogSurface retains dialog role and structural ownership:"
+    },
+    "packages/molecules/src/type-aliases/DialogSurfacePlacement.md": {
+      "recipe": "molecule-components",
+      "description": "Choose a centered modal, logical-end drawer, or full-viewport ARIA dialog presentation:"
+    },
+    "packages/molecules/src/type-aliases/DialogSurfaceProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose accessible naming, structured regions, controlled dismissal, placement, native attributes, and a stable focus controller:"
+    },
+    "packages/molecules/src/type-aliases/DialogSurfaceSectionAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward native attributes to caller-selected DialogSurface header and footer regions without replacing their children:"
     },
     "packages/molecules/src/type-aliases/SegmentedControlAccessibleName.md": {
       "recipe": "molecule-components",
@@ -4482,6 +4530,10 @@
       "recipe": "molecule-components",
       "description": "Render a generic labeled field while the caller retains control value, event, and validation ownership:"
     },
+    "packages/molecules/src/variables/DialogSurface.md": {
+      "recipe": "molecule-components",
+      "description": "Render a controlled ARIA dialog and overlay with structured content while application state and decisions stay caller-owned:"
+    },
     "packages/molecules/src/variables/FormField.md": {
       "recipe": "molecule-components",
       "description": "Render a labeled Input together with helper text or an announced validation error as one Molecule:"
@@ -4497,6 +4549,10 @@
     "packages/molecules/src/variables/Tabs.md": {
       "recipe": "molecule-components",
       "description": "Render controlled WAI-ARIA tabs and panels while callers retain routing, loading, and persistence:"
+    },
+    "packages/molecules/src/functions/createDialogSurfaceController.md": {
+      "recipe": "molecule-components",
+      "description": "Create the stable focus lifecycle controller passed to one DialogSurface across open, render, close, and teardown:"
     },
     "packages/molecules/src/variables/moleculeManifest.md": {
       "recipe": "molecule-components",

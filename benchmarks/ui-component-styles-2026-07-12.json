@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 22055,
-      "gzipBytes": 3434,
+      "rawBytes": 24917,
+      "gzipBytes": 3895,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -37,6 +37,13 @@
         ".gluon-control-field-helper",
         ".gluon-control-field-label",
         ".gluon-control-field-required",
+        ".gluon-dialog-surface",
+        ".gluon-dialog-surface-content",
+        ".gluon-dialog-surface-description",
+        ".gluon-dialog-surface-footer",
+        ".gluon-dialog-surface-header",
+        ".gluon-dialog-surface-overlay",
+        ".gluon-dialog-surface-title",
         ".gluon-form-error",
         ".gluon-form-field",
         ".gluon-form-helper",
@@ -59,9 +66,9 @@
       ]
     },
     "after": {
-      "rawBytes": 23215,
-      "gzipBytes": 3454,
-      "moduleCount": 20,
+      "rawBytes": 26130,
+      "gzipBytes": 3905,
+      "moduleCount": 21,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -79,12 +86,13 @@
         "packages/molecules/src/card-styles.ts",
         "packages/molecules/src/choice-group-styles.ts",
         "packages/molecules/src/control-field-styles.ts",
+        "packages/molecules/src/dialog-surface-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/molecules/src/segmented-control-styles.ts",
         "packages/molecules/src/tabs-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 20,
+      "stylesheetCount": 21,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -110,6 +118,13 @@
         ".gluon-control-field-helper",
         ".gluon-control-field-label",
         ".gluon-control-field-required",
+        ".gluon-dialog-surface",
+        ".gluon-dialog-surface-content",
+        ".gluon-dialog-surface-description",
+        ".gluon-dialog-surface-footer",
+        ".gluon-dialog-surface-header",
+        ".gluon-dialog-surface-overlay",
+        ".gluon-dialog-surface-title",
         ".gluon-form-error",
         ".gluon-form-field",
         ".gluon-form-helper",

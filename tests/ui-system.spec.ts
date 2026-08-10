@@ -37,10 +37,12 @@ import {
   ButtonGroup,
   ChoiceGroup,
   ControlField,
+  DialogSurface,
   FormField,
   NavigationStrip,
   SegmentedControl,
   Tabs,
+  createDialogSurfaceController,
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
@@ -484,6 +486,84 @@ describe('separate UI package contracts', () => {
     }), document.body);
     expect([...document.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
       .every((tab) => tab.disabled && tab.tabIndex === -1)).toBe(true);
+  });
+
+  it('structures DialogSurface content and contains, dismisses, and restores focus', async () => {
+    const trigger = document.createElement('button');
+    trigger.textContent = 'Open preferences';
+    const root = document.createElement('div');
+    document.body.append(trigger, root);
+    trigger.focus();
+    const controller = createDialogSurfaceController({ initialFocus: '[data-dialog-initial-focus]' });
+    const dismiss = vi.fn(() => controller.deactivate());
+    controller.activate(trigger);
+    render(DialogSurface({
+      id: 'preferences-dialog',
+      labelledBy: 'preferences-title',
+      title: 'Preferences',
+      description: 'Choose how the application behaves.',
+      placement: 'end',
+      controller,
+      onDismiss: dismiss,
+      closeAction: q.button({ type: 'button', data: { dialogInitialFocus: true }, children: 'Close' }),
+      children: q.input({ 'aria-label': 'Display name' }),
+      footer: q.button({ type: 'button', children: 'Save' }),
+      attributes: { data: { owner: 'settings' } },
+    }), root);
+    await Promise.resolve();
+
+    const overlay = document.querySelector<HTMLElement>('.gluon-dialog-surface-overlay')!;
+    const dialog = document.querySelector<HTMLElement>('#preferences-dialog')!;
+    const buttons = dialog.querySelectorAll<HTMLButtonElement>('button');
+    expect(dialog.getAttribute('role')).toBe('dialog');
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(dialog.getAttribute('aria-labelledby')).toBe('preferences-title');
+    expect(dialog.getAttribute('aria-describedby')).toBe('preferences-dialog-description');
+    expect(dialog.dataset.owner).toBe('settings');
+    expect(dialog.classList).toContain('is-end');
+    expect(controller.active).toBe(true);
+    expect(document.activeElement).toBe(buttons[0]);
+
+    buttons[1]!.focus();
+    await userEvent.keyboard('{Tab}');
+    expect(document.activeElement).toBe(buttons[0]);
+    overlay.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(dismiss).toHaveBeenCalledOnce();
+    expect(controller.active).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('keeps non-modal DialogSurface overlays inert when overlay dismissal is disabled', async () => {
+    const controller = createDialogSurfaceController();
+    const dismiss = vi.fn();
+    const externalRef: { value?: HTMLDivElement } = {};
+    const keydown = { handleEvent: vi.fn((event: KeyboardEvent) => {
+      if (event.key === 'Tab') event.preventDefault();
+    }) };
+    const view = () => DialogSurface({
+      id: 'passive-dialog',
+      label: 'Passive dialog',
+      modal: false,
+      dismissOnOverlay: false,
+      controller,
+      onDismiss: dismiss,
+      attributes: { ref: externalRef, onKeydown: keydown },
+      children: 'Passive content',
+    });
+    render(view(), document.body);
+    expect(externalRef.value?.id).toBe('passive-dialog');
+    render(view(), document.body);
+    externalRef.value!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+    expect(keydown.handleEvent).toHaveBeenCalledOnce();
+    document.querySelector<HTMLElement>('.gluon-dialog-surface-overlay')!
+      .dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(dismiss).not.toHaveBeenCalled();
+    document.querySelector<HTMLElement>('[role="dialog"]')!
+      .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(dismiss).toHaveBeenCalledOnce();
+    expect(keydown.handleEvent).toHaveBeenCalledTimes(2);
+    render(q.div({ children: 'Unmounted' }), document.body);
+    expect(externalRef.value).toBeUndefined();
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

@@ -26,10 +26,12 @@ import {
   ButtonGroup,
   ChoiceGroup,
   ControlField,
+  DialogSurface,
   FormField,
   NavigationStrip,
   SegmentedControl,
   Tabs,
+  createDialogSurfaceController,
   defineMolecule,
 } from '@gluonjs/molecules';
 import { AppShell, defineOrganism } from '@gluonjs/organisms';
@@ -41,16 +43,19 @@ import {
   Popover,
   createFocusScope,
   q,
-  type FocusScope,
 } from '@gluonjs/quarks';
-import { nextTick, ref } from '@gluonjs/reactivity';
+import { ref } from '@gluonjs/reactivity';
 
 const theme = ref<'light' | 'dark'>('light');
 const finish = ref('black');
 const dialogOpen = ref(false);
 const purchaseRef: { value?: HTMLButtonElement } = {};
 const analyticsEvents: string[] = [];
-let dialogScope: FocusScope | undefined;
+const dialogFocusOptions = { initialFocus: '[data-dialog-initial-focus]' } satisfies Parameters<typeof createFocusScope>[1];
+const dialogController = createDialogSurfaceController(dialogFocusOptions);
+// DialogSurface composes these same public headless primitives; applications can still use them directly.
+const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
+void headlessDialogPrimitives;
 const customBagIcon = defineIcon({
   name: 'example-bag',
   viewBox: '0 0 24 24',
@@ -90,27 +95,19 @@ const exampleStyles = css`
     .gluon-field { display: grid; gap: 0.375rem; margin-block: 16px; }
     .gluon-field .gluon-input { inline-size: 100%; }
     .example-overlay { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: rgb(0 0 0 / 45%); }
-    .example-dialog, [popover] { max-inline-size: 360px; padding: 24px; border: 1px solid var(--gluon-color-rule); background: var(--gluon-color-surface); color: var(--gluon-color-text); }
+    .example-dialog { max-inline-size: 360px; border: 1px solid var(--gluon-color-rule); background: var(--gluon-color-surface); color: var(--gluon-color-text); }
+    [popover] { max-inline-size: 360px; padding: 24px; border: 1px solid var(--gluon-color-rule); background: var(--gluon-color-surface); color: var(--gluon-color-text); }
   }
 `;
 
 function closeDialog(): void {
   dialogOpen.value = false;
-  dialogScope?.deactivate();
-  dialogScope = undefined;
+  dialogController.deactivate();
 }
 
 function openDialog(trigger: HTMLElement): void {
   dialogOpen.value = true;
-  void nextTick(() => {
-    const dialog = document.querySelector<HTMLElement>('.example-dialog');
-    if (!dialog) return;
-    dialogScope = createFocusScope(dialog, {
-      initialFocus: '[data-dialog-initial-focus]',
-      returnFocus: trigger,
-    });
-    dialogScope.activate();
-  });
+  dialogController.activate(trigger);
 }
 
 const uiOwner = installUi(document, { theme: 'light' });
@@ -244,22 +241,21 @@ createApp(() => AppShell({
       CheckoutActions({ total: '$128.00' }),
       Popover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
         dialogOpen.value
-          ? Overlay({
-              attributes: { class: 'example-overlay' },
+          ? DialogSurface({
+              id: 'profile-preferences',
+              labelledBy: 'profile-preferences-title',
+              title: 'Profile preferences',
+              description: 'Update the preferences owned by this profile.',
+              controller: dialogController,
               onDismiss: closeDialog,
-              children: Dialog({
-                label: 'Profile preferences',
-                onDismiss: closeDialog,
-                attributes: { class: 'example-dialog' },
-                children: [
-                  q.h2({ children: 'Profile preferences' }),
-                  Button({
-                    label: 'Close dialog',
-                    attributes: { data: { dialogInitialFocus: true } },
-                    onClick: closeDialog,
-                  }),
-                ],
+              overlayAttributes: { class: 'example-overlay' },
+              attributes: { class: 'example-dialog' },
+              closeAction: Button({
+                label: 'Close dialog',
+                attributes: { data: { dialogInitialFocus: true } },
+                onClick: closeDialog,
               }),
+              children: 'Profile preferences remain application-owned.',
             })
           : null,
       ],
