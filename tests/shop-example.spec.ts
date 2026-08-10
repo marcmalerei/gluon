@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
-import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, textareaStyles } from '@gluonjs/atoms';
+import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
 import { formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -79,7 +79,11 @@ describe('GLUON GOODS reference shop', () => {
     await expect.poll(
       () => configurator.shadowRoot?.querySelector('.inventory-status')?.textContent,
       { timeout: 2_000 },
-    ).toContain('In stock · dispatches in 2–3 days');
+    ).toContain('Dispatches in 2–3 days');
+    const inventoryBadge = configurator.shadowRoot?.querySelector('.gluon-status-badge');
+    expect(inventoryBadge?.textContent).toBe('In stock');
+    expect(inventoryBadge?.classList).toContain('is-success');
+    expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(statusBadgeStyles);
 
     configurator.shadowRoot?.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
     addButton.click();

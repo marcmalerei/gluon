@@ -7,6 +7,7 @@ import {
   Label,
   Progress,
   Select,
+  StatusBadge,
   Switch,
   ToggleButton,
   Textarea,
@@ -179,6 +180,7 @@ createApp(() => AppShell({
         q.label({ children: [Switch({ name: 'network' }), ' Allow network access'] }),
         ToggleButton({ pressed: true, label: 'Grid view', variant: 'ghost' }),
         Progress({ value: 72, attributes: { 'aria-label': 'Profile completion' } }),
+        StatusBadge({ tone: 'success', children: 'Profile active' }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',

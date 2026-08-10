@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 11907,
-      "gzipBytes": 2237,
+      "rawBytes": 13362,
+      "gzipBytes": 2471,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -35,15 +35,16 @@
         ".gluon-progress",
         ".gluon-radio",
         ".gluon-select",
+        ".gluon-status-badge",
         ".gluon-switch",
         ".gluon-textarea",
         ".gluon-toggle-button"
       ]
     },
     "after": {
-      "rawBytes": 12537,
-      "gzipBytes": 2264,
-      "moduleCount": 14,
+      "rawBytes": 14150,
+      "gzipBytes": 2509,
+      "moduleCount": 15,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -53,6 +54,7 @@
         "packages/atoms/src/progress-styles.ts",
         "packages/atoms/src/radio-styles.ts",
         "packages/atoms/src/select-styles.ts",
+        "packages/atoms/src/status-badge-styles.ts",
         "packages/atoms/src/switch-styles.ts",
         "packages/atoms/src/textarea-styles.ts",
         "packages/atoms/src/toggle-button-styles.ts",
@@ -60,7 +62,7 @@
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 14,
+      "stylesheetCount": 15,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -84,6 +86,7 @@
         ".gluon-progress",
         ".gluon-radio",
         ".gluon-select",
+        ".gluon-status-badge",
         ".gluon-switch",
         ".gluon-textarea",
         ".gluon-toggle-button"
@@ -92,8 +95,8 @@
   },
   "buttonOnly": {
     "before": {
-      "rawBytes": 9942,
-      "gzipBytes": 1779,
+      "rawBytes": 11397,
+      "gzipBytes": 2028,
       "moduleCount": 1,
       "modules": ["packages/atoms/src/styles.ts"],
       "stylesheetCount": 1,
@@ -106,6 +109,7 @@
         ".gluon-progress",
         ".gluon-radio",
         ".gluon-select",
+        ".gluon-status-badge",
         ".gluon-switch",
         ".gluon-textarea",
         ".gluon-toggle-button"

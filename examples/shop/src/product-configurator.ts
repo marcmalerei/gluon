@@ -13,7 +13,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { customElement, property } from '@gluonjs/core/decorators';
-import { Progress, Radio } from '@gluonjs/atoms';
+import { Progress, Radio, StatusBadge } from '@gluonjs/atoms';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
 import {
@@ -191,15 +191,6 @@ export const productConfiguratorStyles = css`
     border-bottom: 1px solid var(--shop-rule, #d5d5d1);
     font-size: 12px;
   }
-  .inventory-dot {
-    width: 8px;
-    height: 8px;
-    flex: 0 0 auto;
-    border-radius: 50%;
-    background: var(--shop-action, #c8ff00);
-    box-shadow: 0 0 0 1px rgb(17 17 17 / 28%);
-  }
-  .inventory-low-stock { background: #ffb347; }
   .inventory-pending { display: inline-flex; align-items: center; gap: 8px; color: var(--shop-muted, #656565); }
   .inventory-pending progress { --gluon-progress-width: 3rem; }
   .inventory-retry {
@@ -524,8 +515,11 @@ function renderInventoryStatus(product: Product): TemplateValue {
     delay: 50,
     timeout: 2_000,
     children: (inventory) => html`
-      <span class=${`inventory-dot inventory-${product.availability}`} aria-hidden="true"></span>
-      <span>${inventory.availability.value.label} · dispatches in ${inventory.availability.value.dispatch}</span>
+      ${StatusBadge({
+        tone: product.availability === 'in-stock' ? 'success' : 'warning',
+        children: inventory.availability.value.label,
+      })}
+      <span>Dispatches in ${inventory.availability.value.dispatch}</span>
     `,
     error: (_error, retry) => html`
       <span>Availability could not be checked.</span>

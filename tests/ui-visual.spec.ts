@@ -9,6 +9,7 @@ import {
   Switch,
   ToggleButton,
   Select,
+  StatusBadge,
   Textarea,
   installUi,
 } from '@gluonjs/atoms';
@@ -350,6 +351,47 @@ test('matches Progress determinate, indeterminate, full-width, and RTL states', 
   }), document.body);
 
   await expect.element(page.getByTestId('progress-visual')).toMatchScreenshot('progress-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches StatusBadge tones, wrapping, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="status-badge-visual"] { box-sizing: border-box; inline-size: 380px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="status-badge-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .status-badge-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+      .status-badge-wrap { inline-size: 9rem; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'status-badge-visual' },
+    children: [
+      q.h1({ children: 'StatusBadge tones' }),
+      q.div({
+        class: 'status-badge-grid',
+        children: [
+          StatusBadge({ children: 'Neutral' }),
+          StatusBadge({ tone: 'info', children: 'Information' }),
+          StatusBadge({ tone: 'success', children: 'In stock' }),
+          StatusBadge({ tone: 'warning', children: 'Low stock' }),
+          StatusBadge({ tone: 'danger', children: 'Unavailable' }),
+          q.div({ class: 'status-badge-wrap', children: StatusBadge({ tone: 'warning', children: 'Waiting for workshop confirmation' }) }),
+          q.div({ dir: 'rtl', children: StatusBadge({ tone: 'info', children: 'RTL status' }) }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('status-badge-visual')).toMatchScreenshot('status-badge-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
   });

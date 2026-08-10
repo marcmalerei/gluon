@@ -9,6 +9,7 @@ import {
   Progress,
   Radio,
   Select,
+  StatusBadge,
   Switch,
   ToggleButton,
   defineToggleButtonPreset,
@@ -178,6 +179,23 @@ describe('separate UI package contracts', () => {
     expect(indeterminate.hasAttribute('value')).toBe(false);
     expect(indeterminate.classList).toContain('is-full-width');
     expect(indeterminate.getAttribute('aria-label')).toBe('Inventory check');
+  });
+
+  it('keeps StatusBadge presentational while forwarding span attributes and tones', () => {
+    render(q.div({ children: [
+      StatusBadge({ children: 'Queued', attributes: { id: 'neutral-status', title: 'Order state' } }),
+      StatusBadge({ tone: 'success', children: 'In stock', attributes: { id: 'success-status', dir: 'rtl' } }),
+    ] }), document.body);
+
+    const neutral = document.querySelector<HTMLSpanElement>('#neutral-status')!;
+    const success = document.querySelector<HTMLSpanElement>('#success-status')!;
+    expect(neutral.tagName).toBe('SPAN');
+    expect(neutral.getAttribute('role')).toBeNull();
+    expect(neutral.title).toBe('Order state');
+    expect(neutral.classList).toContain('is-neutral');
+    expect(success.classList).toContain('is-success');
+    expect(success.dir).toBe('rtl');
+    expect(success.textContent).toBe('In stock');
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

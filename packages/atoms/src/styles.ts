@@ -152,6 +152,28 @@ export const atomStyles = css`
     :where(.gluon-progress:indeterminate) { background: linear-gradient(90deg, var(--gluon-progress-track, #e5e9e8) 0 30%, var(--gluon-progress-value, #087f7b) 30% 60%, var(--gluon-progress-track, #e5e9e8) 60% 100%); background-size: 200% 100%; animation: gluon-progress-indeterminate 1.2s linear infinite; }
     @keyframes gluon-progress-indeterminate { to { background-position: -200% 0; } }
 
+    :where(.gluon-status-badge) {
+      box-sizing: border-box;
+      display: inline-flex;
+      max-inline-size: 100%;
+      align-items: center;
+      border: 1px solid var(--gluon-status-badge-border, var(--gluon-color-rule, #b8c9c6));
+      border-radius: 999px;
+      background: var(--gluon-status-badge-background, var(--gluon-color-canvas, #e5e9e8));
+      color: var(--gluon-status-badge-color, var(--gluon-color-text, #263432));
+      font-size: 0.75rem;
+      font-weight: 650;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      padding-block: 0.25rem;
+      padding-inline: 0.625rem;
+      text-align: start;
+    }
+    :where(.gluon-status-badge.is-info) { --gluon-status-badge-background: #e7eefc; --gluon-status-badge-border: #9fb4e2; --gluon-status-badge-color: #173f91; }
+    :where(.gluon-status-badge.is-success) { --gluon-status-badge-background: #e2f2e8; --gluon-status-badge-border: #8bc7a3; --gluon-status-badge-color: #17633a; }
+    :where(.gluon-status-badge.is-warning) { --gluon-status-badge-background: #fff0c7; --gluon-status-badge-border: #d7ad45; --gluon-status-badge-color: #6b4900; }
+    :where(.gluon-status-badge.is-danger) { --gluon-status-badge-background: #f8e5e5; --gluon-status-badge-border: #daa0a0; --gluon-status-badge-color: #8c1d1d; }
+
     :where(.gluon-select) {
       min-block-size: 44px;
       max-inline-size: 100%;
@@ -198,6 +220,7 @@ export const atomStyles = css`
     @media (forced-colors: active) { :where(.gluon-switch) { appearance: auto; accent-color: AccentColor; } :where(.gluon-switch)::before { content: none; } }
     @media (forced-colors: active) { :where(.gluon-toggle-button[aria-pressed="true"]) { border-color: Highlight; color: Highlight; box-shadow: inset 0 0 0 1px Highlight; } }
     @media (forced-colors: active) { :where(.gluon-progress) { appearance: auto; forced-color-adjust: auto; } }
+    @media (forced-colors: active) { :where(.gluon-status-badge) { border-color: CanvasText; background: Canvas; color: CanvasText; forced-color-adjust: none; } }
   }
 `;
 
@@ -210,6 +233,7 @@ markLegacyComponentStyleSheet(atomStyles, [
   'gluon-atom-progress',
   'gluon-atom-radio',
   'gluon-atom-select',
+  'gluon-atom-status-badge',
   'gluon-atom-switch',
   'gluon-atom-textarea',
   'gluon-atom-toggle-button',

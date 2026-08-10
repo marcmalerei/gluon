@@ -51,6 +51,13 @@ export {
   type ProgressProps,
 } from './progress.js';
 export { progressStyles } from './progress-styles.js';
+export {
+  StatusBadge,
+  type StatusBadgeAttributes,
+  type StatusBadgeProps,
+  type StatusBadgeTone,
+} from './status-badge.js';
+export { statusBadgeStyles } from './status-badge-styles.js';
 export { selectStyles } from './select-styles.js';
 export {
   Radio,

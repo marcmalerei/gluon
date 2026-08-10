@@ -631,6 +631,7 @@
         "  Progress,",
         "  Radio,",
         "  Select,",
+        "  StatusBadge,",
         "  Switch,",
         "  Textarea,",
         "  ToggleButton,",
@@ -665,6 +666,9 @@
         "  type SelectAttributes,",
         "  type SelectProps,",
         "  type SelectSize,",
+        "  type StatusBadgeAttributes,",
+        "  type StatusBadgeProps,",
+        "  type StatusBadgeTone,",
         "  type SwitchAttributes,",
         "  type SwitchProps,",
         "  type TextareaAttributes,",
@@ -708,13 +712,16 @@
         "const radio = { checked: true, name: 'finish', value: 'cobalt', attributes: radioAttributes } satisfies RadioProps;",
         "const progressAttributes = { 'aria-label': 'Order progress' } satisfies ProgressAttributes;",
         "const progress = { value: 2, max: 4, fullWidth: true, attributes: progressAttributes } satisfies ProgressProps;",
+        "const statusTone: StatusBadgeTone = 'success';",
+        "const statusAttributes = { title: 'Current order state' } satisfies StatusBadgeAttributes;",
+        "const status = { tone: statusTone, children: 'Ready', attributes: statusAttributes } satisfies StatusBadgeProps;",
         "const switchAttributes = { id: 'network' } satisfies SwitchAttributes;",
         "const switchControl = { checked: true, name: 'network', value: 'enabled', attributes: switchAttributes } satisfies SwitchProps;",
         "const toggleAttributes = { id: 'grid-view' } satisfies ToggleButtonAttributes;",
         "const togglePreset = { displayName: 'ViewToggle', variant: 'ghost' } satisfies ToggleButtonPresetOptions;",
         "const toggle = { pressed: true, label: 'Grid view', attributes: toggleAttributes } satisfies ToggleButtonProps;",
         "const ViewToggle = defineToggleButtonPreset(togglePreset);",
-        "const checkout = html`${Label(label)}${Input(input)}${Select(select)}${Textarea(textarea)}${Checkbox(checkbox)}${Progress(progress)}${Radio(radio)}${Switch(switchControl)}${ToggleButton(toggle)}${ViewToggle(toggle)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
+        "const checkout = html`${Label(label)}${Input(input)}${Select(select)}${Textarea(textarea)}${Checkbox(checkbox)}${Progress(progress)}${Radio(radio)}${StatusBadge(status)}${Switch(switchControl)}${ToggleButton(toggle)}${ViewToggle(toggle)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
         "console.log(checkout, getThemeStyles(theme), atomStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
         "ui.setTheme('dark');",
         "ui.dispose();",
@@ -850,11 +857,11 @@
     "ui-exact-component-styles": {
       "module": "@gluonjs/atoms",
       "code": [
-        "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
+        "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
         "import { cardStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -3973,6 +3980,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Select stylesheet retained by rendered Select values:"
     },
+    "packages/atoms/src/variables/statusBadgeStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable StatusBadge stylesheet retained by rendered StatusBadge values:"
+    },
     "packages/atoms/src/variables/switchStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Switch stylesheet retained by rendered Switch values:"
@@ -4049,6 +4060,10 @@
       "recipe": "atom-components",
       "description": "Configure native determinate value/max or indeterminate Progress, responsive width, and native attributes:"
     },
+    "packages/atoms/src/interfaces/StatusBadgeProps.md": {
+      "recipe": "atom-components",
+      "description": "Configure caller-owned status content, brand-neutral tone, and compatible native span attributes:"
+    },
     "packages/atoms/src/interfaces/SwitchProps.md": {
       "recipe": "atom-components",
       "description": "Configure native checkbox-backed Switch checked, form, required, disabled, change handling, and native attribute behavior:"
@@ -4120,6 +4135,14 @@
     "packages/atoms/src/type-aliases/ProgressAttributes.md": {
       "recipe": "atom-components",
       "description": "Forward typed HTMLProgressElement attributes while Progress retains value, max, and width ownership:"
+    },
+    "packages/atoms/src/type-aliases/StatusBadgeAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed HTMLSpanElement attributes while StatusBadge retains visible content and tone ownership:"
+    },
+    "packages/atoms/src/type-aliases/StatusBadgeTone.md": {
+      "recipe": "atom-components",
+      "description": "Choose the neutral, info, success, warning, or danger presentational tone without encoding domain meaning:"
     },
     "packages/atoms/src/type-aliases/SwitchAttributes.md": {
       "recipe": "atom-components",
@@ -4204,6 +4227,10 @@
     "packages/atoms/src/variables/Progress.md": {
       "recipe": "atom-components",
       "description": "Render native determinate progress with value/max or indeterminate progress without a value attribute:"
+    },
+    "packages/atoms/src/variables/StatusBadge.md": {
+      "recipe": "atom-components",
+      "description": "Render caller-owned status text in a presentational native span with one brand-neutral tone:"
     },
     "packages/atoms/src/variables/Switch.md": {
       "recipe": "atom-components",
