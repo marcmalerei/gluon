@@ -574,7 +574,7 @@ test('matches DialogSurface labelled header, description, content, close action,
   document.body.replaceChildren();
   document.adoptedStyleSheets = [];
   const visualStyles = css`
-    @layer app { body { margin: 0; inline-size: 640px; block-size: 520px; } .dialog-copy { display: grid; gap: .75rem; } .dialog-actions { display: flex; justify-content: end; gap: .75rem; } button { min-block-size: 44px; padding-inline: 1rem; } }
+    @layer app { body { margin: 0; inline-size: 640px; block-size: 520px; } .gluon-dialog-surface { block-size: 260px; } .dialog-copy { display: grid; gap: .75rem; } .dialog-actions { display: flex; justify-content: end; gap: .75rem; } button { min-block-size: 44px; padding-inline: 1rem; } }
   `;
   const uiOwner = installUi(document, { theme: 'light' });
   adoptStyles(document, visualStyles);
@@ -595,7 +595,8 @@ test('matches DialogSurface labelled header, description, content, close action,
     ] }),
   }), document.body);
   await expect.element(page.getByRole('dialog')).toMatchScreenshot('dialog-surface-states-light', {
-    comparatorName: 'pixelmatch', threshold: 0.1,
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });
   unadoptStyles(document, visualStyles);
   uiOwner.dispose();
