@@ -20,7 +20,7 @@ import {
   render,
   unadoptStyles,
 } from '../src/index.js';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, InlineNotice, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -664,6 +664,31 @@ test('matches InlineNotice tones, wrapping, actions, dismissal, and RTL states',
     q.div({ dir: 'rtl', children: InlineNotice({ tone: 'danger', title: 'Payment failed', children: 'Try another method.', dismissAction: q.button({ type: 'button', children: 'Dismiss' }) }) }),
   ] }), document.body);
   await expect.element(page.getByTestId('inline-notice-visual')).toMatchScreenshot('inline-notice-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
+  });
+  unadoptStyles(document, visualStyles);
+  uiOwner.dispose();
+});
+
+test('matches EmptyState full, compact, action, wrapping, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer app { body { margin: 0; padding: 16px; inline-size: 340px; font-size: 18px; } .empty-stack { display: grid; gap: 12px; block-size: 600px; overflow: hidden; } .empty-illustration { display: grid; place-items: center; inline-size: 72px; block-size: 72px; border: 1px solid currentColor; border-radius: 50%; font-size: 32px; } .empty-link { color: inherit; font-weight: 700; } }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({ data: { testid: 'empty-state-visual' }, class: 'empty-stack', children: [
+    EmptyState({
+      heading: 'No matching objects',
+      children: 'Clear the current material and category filters to see the complete collection.',
+      illustration: q.span({ class: 'empty-illustration', aria: { hidden: true }, children: '○' }),
+      action: q.a({ href: '#clear', class: 'empty-link', children: 'Clear filters' }),
+    }),
+    q.div({ dir: 'rtl', children: EmptyState({ presentation: 'compact', heading: 'Your bag is empty', headingLevel: 3, children: 'Choose something useful.' }) }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('empty-state-visual')).toMatchScreenshot('empty-state-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
   });

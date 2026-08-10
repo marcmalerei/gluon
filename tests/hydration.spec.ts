@@ -21,7 +21,7 @@ import {
   unmount,
 } from '@gluonjs/core';
 import { Button, Checkbox, Input, Progress, Radio, Select, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, InlineNotice, SegmentedControl, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, inlineNoticeStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, InlineNotice, SegmentedControl, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import { createComponentLibraryLoader } from '@gluonjs/quarks';
@@ -466,7 +466,7 @@ describe('SSR hydration', () => {
   });
 
   it('hands component carriers to their exact renderer-owned sheets and diagnoses mismatches', async () => {
-    const value = html`<main>${Button({ label: 'Hydrated action' })}${ButtonGroup({ label: 'Hydrated actions', children: Button({ label: 'Nested action' }) })}${SegmentedControl({ label: 'Hydrated view', value: 'grid', options: [{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }] })}${Tabs({ label: 'Hydrated tabs', value: 'one', items: [{ id: 'hydrated-one', value: 'one', label: 'One', panel: 'First panel' }, { id: 'hydrated-two', value: 'two', label: 'Two', panel: 'Second panel' }] })}${DialogSurface({ id: 'hydrated-dialog', label: 'Hydrated dialog', controller: createDialogSurfaceController(), children: 'Dialog content' })}${Disclosure({ id: 'hydrated-disclosure', summary: 'Hydrated disclosure', defaultOpen: true, children: 'Disclosure content' })}${Accordion({ label: 'Hydrated accordion', value: 'one', items: [{ id: 'hydrated-accordion-one', value: 'one', summary: 'One', children: 'First disclosure' }] })}${InlineNotice({ tone: 'success', title: 'Hydrated notice', children: 'Hydrated feedback' })}${Select({
+    const value = html`<main>${Button({ label: 'Hydrated action' })}${ButtonGroup({ label: 'Hydrated actions', children: Button({ label: 'Nested action' }) })}${SegmentedControl({ label: 'Hydrated view', value: 'grid', options: [{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }] })}${Tabs({ label: 'Hydrated tabs', value: 'one', items: [{ id: 'hydrated-one', value: 'one', label: 'One', panel: 'First panel' }, { id: 'hydrated-two', value: 'two', label: 'Two', panel: 'Second panel' }] })}${DialogSurface({ id: 'hydrated-dialog', label: 'Hydrated dialog', controller: createDialogSurfaceController(), children: 'Dialog content' })}${Disclosure({ id: 'hydrated-disclosure', summary: 'Hydrated disclosure', defaultOpen: true, children: 'Disclosure content' })}${Accordion({ label: 'Hydrated accordion', value: 'one', items: [{ id: 'hydrated-accordion-one', value: 'one', summary: 'One', children: 'First disclosure' }] })}${InlineNotice({ tone: 'success', title: 'Hydrated notice', children: 'Hydrated feedback' })}${EmptyState({ heading: 'Hydrated empty state', children: 'No items.' })}${Select({
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
@@ -501,6 +501,7 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(disclosureStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(accordionStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(inlineNoticeStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(emptyStateStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(choiceGroupStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(controlFieldStyles);
     expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();

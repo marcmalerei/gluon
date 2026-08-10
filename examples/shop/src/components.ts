@@ -14,6 +14,7 @@ import { Input } from '@gluonjs/atoms';
 import {
   ButtonGroup,
   DialogSurface,
+  EmptyState,
   createDialogSurfaceController,
 } from '@gluonjs/molecules';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
@@ -176,13 +177,16 @@ function BagDrawer(store: ShopStore): TemplateValue {
       attributes: { aria: { label: 'Close bag' }, data: { dialogInitialFocus: true } },
       onClick: close,
     }),
-    children: empty ? html`
-            <p>Your bag is ready for something useful.</p>
-            ${compose(RouterLink, {
+    children: empty ? EmptyState({
+      presentation: 'compact',
+      heading: 'Your bag is ready for something useful.',
+      headingLevel: 3,
+      attributes: { class: 'bag-empty-state' },
+      action: compose(RouterLink, {
               to: '/shop',
               attributes: { class: 'inline-link' },
-            })`Shop all objects`}
-        ` : html`
+            })`Shop all objects`,
+    }) : html`
             ${TransitionGroup({
               items: store.bag,
               key: (line) => line.key,

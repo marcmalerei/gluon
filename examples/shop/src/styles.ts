@@ -293,8 +293,8 @@ export const shopStyles = css`
       border-bottom: 1px solid var(--shop-black);
     }
     .drawer-header h2 { margin: 0; font-size: 26px; font-weight: 540; }
-    .empty-bag { display: grid; place-items: start; gap: 18px; padding: 48px 28px; }
-    .empty-bag p { max-width: 260px; font-size: 28px; line-height: 1.12; letter-spacing: -0.035em; }
+    .empty-bag { flex: 1; }
+    .bag-empty-state { justify-items: start; --gluon-empty-state-padding: 48px 28px; --gluon-empty-state-heading-size: 260px; --gluon-empty-state-heading-font-size: 28px; text-align: start; letter-spacing: -0.035em; }
     .inline-link { border-bottom: 1px solid; padding-bottom: 3px; }
     .bag-lines { flex: 1; overflow: auto; }
     .bag-line { display: grid; grid-template-columns: 130px 1fr; gap: 18px; padding: 22px 28px; border-bottom: 1px solid var(--shop-rule); }

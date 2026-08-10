@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 29636,
-      "gzipBytes": 4640,
+      "rawBytes": 31251,
+      "gzipBytes": 4876,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -50,6 +50,11 @@
         ".gluon-disclosure-content",
         ".gluon-disclosure-summary",
         ".gluon-disclosure-unavailable",
+        ".gluon-empty-state",
+        ".gluon-empty-state-action",
+        ".gluon-empty-state-body",
+        ".gluon-empty-state-heading",
+        ".gluon-empty-state-media",
         ".gluon-form-error",
         ".gluon-form-field",
         ".gluon-form-helper",
@@ -78,9 +83,9 @@
       ]
     },
     "after": {
-      "rawBytes": 31020,
-      "gzipBytes": 4659,
-      "moduleCount": 24,
+      "rawBytes": 32724,
+      "gzipBytes": 4898,
+      "moduleCount": 25,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -101,13 +106,14 @@
         "packages/molecules/src/control-field-styles.ts",
         "packages/molecules/src/dialog-surface-styles.ts",
         "packages/molecules/src/disclosure-styles.ts",
+        "packages/molecules/src/empty-state-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/molecules/src/inline-notice-styles.ts",
         "packages/molecules/src/segmented-control-styles.ts",
         "packages/molecules/src/tabs-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 24,
+      "stylesheetCount": 25,
       "selectors": [
         ".gluon-accordion",
         ".gluon-accordion-heading",
@@ -146,6 +152,11 @@
         ".gluon-disclosure-content",
         ".gluon-disclosure-summary",
         ".gluon-disclosure-unavailable",
+        ".gluon-empty-state",
+        ".gluon-empty-state-action",
+        ".gluon-empty-state-body",
+        ".gluon-empty-state-heading",
+        ".gluon-empty-state-media",
         ".gluon-form-error",
         ".gluon-form-field",
         ".gluon-form-helper",

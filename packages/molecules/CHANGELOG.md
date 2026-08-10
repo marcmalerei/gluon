@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added static `EmptyState` composition with optional media, semantic heading,
+  body, caller-owned recovery action, compact/full layout, and real GLUON GOODS
+  empty-bag integration.
+
 - Added `InlineNotice` bounded feedback with neutral, info, success, warning,
   and danger tones, explicit live-region modes, caller-owned actions, and real
   GLUON GOODS order-confirmation feedback.

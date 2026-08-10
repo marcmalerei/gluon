@@ -29,6 +29,7 @@ import {
   ControlField,
   DialogSurface,
   Disclosure,
+  EmptyState,
   FormField,
   InlineNotice,
   NavigationStrip,
@@ -240,6 +241,12 @@ createApp(() => AppShell({
           tone: 'success',
           title: 'Profile saved',
           children: 'Your public details are up to date.',
+        }),
+        EmptyState({
+          presentation: 'compact',
+          heading: 'No archived projects',
+          children: 'Completed projects will appear here.',
+          action: Button({ label: 'Create project' }),
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

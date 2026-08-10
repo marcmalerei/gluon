@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, InlineNotice, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -72,6 +72,12 @@ static region; use `polite`, `assertive`, or `off` when message timing requires
 an explicit choice. Optional caller-owned action and dismiss controls render
 outside the live region. The application continues to own copy, lifecycle,
 events, retries, and dismissal state.
+`EmptyState` composes optional caller-owned media, a semantic heading level,
+body copy, and recovery action in compact or full layouts. It is intentionally
+static and adds no status, alert, or live-region semantics, avoiding repeated
+announcements on ordinary rerenders. When an empty result is newly produced by
+an asynchronous action, announce that transition separately with the bounded
+`InlineNotice` contract while keeping the persistent empty state static.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -135,6 +141,8 @@ properties for every native item.
 InlineNotice exposes gap, padding, border, accent width, radius, background,
 color, and action-gap custom properties. Tone defaults remain contrast-aware,
 and application overrides must preserve readable text and state distinction.
+EmptyState exposes gap, minimum block size, padding, media size, heading/body
+width and typography, body color, and action-gap custom properties.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -167,3 +175,6 @@ URL-backed tracking, packaging, and remote-area details without replacing
 native summary behavior.
 The order-confirmation route uses a polite success `InlineNotice` for the real
 order ID, delivery email, total, and caller-owned continue-shopping action.
+The empty bag uses compact `EmptyState` composition with a semantic heading and
+caller-owned shop route while the enclosing DialogSurface retains focus and
+dismissal ownership.

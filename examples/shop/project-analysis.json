@@ -213,7 +213,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 50
+      "line": 51
     },
     {
       "value": {
@@ -221,15 +221,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 52
-    },
-    {
-      "value": {
-        "kind": "compose"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 57
+      "line": 53
     },
     {
       "value": {
@@ -241,11 +233,11 @@
     },
     {
       "value": {
-        "kind": "html"
+        "kind": "compose"
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 66
+      "line": 59
     },
     {
       "value": {
@@ -253,7 +245,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 74
+      "line": 67
     },
     {
       "value": {
@@ -261,7 +253,15 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 101
+      "line": 75
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 102
     },
     {
       "value": {
@@ -269,7 +269,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 122
+      "line": 123
     },
     {
       "value": {
@@ -277,7 +277,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 139
+      "line": 140
     },
     {
       "value": {
@@ -285,27 +285,11 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 141
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 179
+      "line": 142
     },
     {
       "value": {
         "kind": "compose"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 181
-    },
-    {
-      "value": {
-        "kind": "html"
       },
       "confidence": "exact",
       "file": "components.ts",
@@ -317,7 +301,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 190
+      "line": 189
     },
     {
       "value": {
@@ -325,15 +309,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 211
-    },
-    {
-      "value": {
-        "kind": "compose"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 214
+      "line": 194
     },
     {
       "value": {
@@ -341,11 +317,19 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 221
+      "line": 215
     },
     {
       "value": {
         "kind": "compose"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 218
+    },
+    {
+      "value": {
+        "kind": "html"
       },
       "confidence": "exact",
       "file": "components.ts",
@@ -357,7 +341,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 226
+      "line": 229
     },
     {
       "value": {
@@ -365,31 +349,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 227
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 241
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 277
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 294
+      "line": 230
     },
     {
       "value": {
@@ -397,7 +357,31 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 302
+      "line": 231
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 245
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 281
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 298
     },
     {
       "value": {
@@ -405,15 +389,23 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 303
+      "line": 306
     },
     {
       "value": {
-        "kind": "html"
+        "kind": "compose"
       },
       "confidence": "exact",
       "file": "components.ts",
       "line": 307
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 311
     },
     {
       "value": {
@@ -896,7 +888,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 52
+      "line": 53
     },
     {
       "value": {
@@ -905,7 +897,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 57
+      "line": 58
     },
     {
       "value": {
@@ -913,7 +905,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 58
+      "line": 59
     },
     {
       "value": {
@@ -922,7 +914,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 59
+      "line": 60
     },
     {
       "value": {
@@ -930,15 +922,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 61
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 95
+      "line": 62
     },
     {
       "value": {
@@ -950,12 +934,20 @@
     },
     {
       "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 97
+    },
+    {
+      "value": {
         "kind": "attribute",
         "name": "aria-label"
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 103
+      "line": 104
     },
     {
       "value": {
@@ -964,7 +956,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 130
+      "line": 131
     },
     {
       "value": {
@@ -973,7 +965,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 130
+      "line": 131
     },
     {
       "value": {
@@ -981,7 +973,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 132
+      "line": 133
     },
     {
       "value": {
@@ -989,7 +981,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 132
+      "line": 133
     },
     {
       "value": {
@@ -998,7 +990,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 133
+      "line": 134
     },
     {
       "value": {
@@ -1007,7 +999,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 141
+      "line": 142
     },
     {
       "value": {
@@ -1015,7 +1007,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 144
+      "line": 145
     },
     {
       "value": {
@@ -1023,7 +1015,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 144
+      "line": 145
     },
     {
       "value": {
@@ -1031,15 +1023,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 181
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 186
+      "line": 190
     },
     {
       "value": {
@@ -1048,47 +1032,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 192
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 195
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
       "line": 196
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 198
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 198
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 198
     },
     {
       "value": {
@@ -1104,7 +1048,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 212
+      "line": 200
     },
     {
       "value": {
@@ -1112,7 +1056,47 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 214
+      "line": 202
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 202
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 202
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 203
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 216
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 218
     },
     {
       "value": {
@@ -1121,7 +1105,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 225
+      "line": 229
     },
     {
       "value": {
@@ -1129,7 +1113,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 226
+      "line": 230
     },
     {
       "value": {
@@ -1137,7 +1121,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 227
+      "line": 231
     },
     {
       "value": {
@@ -1146,7 +1130,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 242
+      "line": 246
     },
     {
       "value": {
@@ -1155,7 +1139,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 247
+      "line": 251
     },
     {
       "value": {
@@ -1164,7 +1148,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 247
+      "line": 251
     },
     {
       "value": {
@@ -1172,7 +1156,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 260
+      "line": 264
     },
     {
       "value": {
@@ -1181,7 +1165,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 267
+      "line": 271
     },
     {
       "value": {
@@ -1189,7 +1173,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 267
+      "line": 271
     },
     {
       "value": {
@@ -1197,7 +1181,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 268
+      "line": 272
     },
     {
       "value": {
@@ -1206,7 +1190,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 278
+      "line": 282
     },
     {
       "value": {
@@ -1215,7 +1199,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 281
+      "line": 285
     },
     {
       "value": {
@@ -1223,7 +1207,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 286
+      "line": 290
     },
     {
       "value": {
@@ -1232,7 +1216,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 293
+      "line": 297
     },
     {
       "value": {
@@ -1240,7 +1224,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 302
+      "line": 306
     },
     {
       "value": {
@@ -1248,7 +1232,7 @@
       },
       "confidence": "exact",
       "file": "components.ts",
-      "line": 302
+      "line": 306
     },
     {
       "value": {
@@ -1257,23 +1241,7 @@
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 303
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 303
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "components.ts",
-      "line": 304
+      "line": 307
     },
     {
       "value": {
@@ -1285,12 +1253,28 @@
     },
     {
       "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 308
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "components.ts",
+      "line": 311
+    },
+    {
+      "value": {
         "kind": "attribute",
         "name": "class"
       },
       "confidence": "structural",
       "file": "components.ts",
-      "line": 310
+      "line": 314
     },
     {
       "value": {

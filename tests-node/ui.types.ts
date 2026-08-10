@@ -17,6 +17,7 @@ import {
 import {
   Accordion,
   Card,
+  EmptyState,
   FormField,
   InlineNotice,
   NavigationStrip,
@@ -140,6 +141,14 @@ InlineNotice({
   action: Button({ label: 'Review' }),
   attributes: { data: { owner: 'checkout' } },
 });
+EmptyState({
+  presentation: 'compact',
+  heading: 'No objects',
+  headingLevel: 3,
+  children: 'Clear filters to continue.',
+  action: Button({ label: 'Clear filters' }),
+  attributes: { data: { owner: 'catalog' } },
+});
 Accordion({
   label: 'Delivery details',
   value: 'tracking',
@@ -221,6 +230,10 @@ InlineNotice({ tone: 'critical', children: 'Invalid tone' });
 InlineNotice({ children: 'Feedback', attributes: { role: 'alert' } });
 // @ts-expect-error InlineNotice live and atomic semantics stay on its bounded announcement region
 InlineNotice({ children: 'Feedback', attributes: { aria: { live: 'assertive' } } });
+// @ts-expect-error EmptyState presentation remains closed
+EmptyState({ presentation: 'drawer', heading: 'Empty' });
+// @ts-expect-error EmptyState intentionally cannot become a repeated live region
+EmptyState({ heading: 'Empty', attributes: { aria: { live: 'polite' } } });
 // @ts-expect-error Accordion requires an accessible group name
 Accordion({ value: 'one', items: [] });
 // @ts-expect-error multiple Accordion values are arrays

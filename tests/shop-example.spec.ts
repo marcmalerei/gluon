@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -327,6 +327,9 @@ describe('GLUON GOODS reference shop', () => {
     bagReturnTarget.click();
     await settleShop();
     expect(document.querySelector('.empty-bag')?.textContent).toContain('ready for something useful');
+    expect(document.querySelector('.empty-bag [role="heading"]')?.getAttribute('aria-level')).toBe('3');
+    expect(document.querySelector('.empty-bag [aria-live]')).toBeNull();
+    expect(document.adoptedStyleSheets).toContain(emptyStateStyles);
     expect(document.adoptedStyleSheets).toContain(dialogSurfaceStyles);
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Close bag');
     document.querySelector<HTMLElement>('.bag-drawer')!.dispatchEvent(new KeyboardEvent('keydown', {
