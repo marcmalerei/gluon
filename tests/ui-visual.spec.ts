@@ -3,8 +3,10 @@ import { page } from 'vitest/browser';
 import {
   Button,
   Checkbox,
+  Icon,
   Radio,
   Switch,
+  ToggleButton,
   Select,
   Textarea,
   installUi,
@@ -271,6 +273,44 @@ test('matches Switch off, on, disabled, and RTL states', async () => {
   }), document.body);
 
   await expect.element(page.getByTestId('switch-visual')).toMatchScreenshot('switch-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches ToggleButton pressed, unpressed, icon, disabled, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="toggle-button-visual"] { box-sizing: border-box; inline-size: 380px; block-size: 220px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="toggle-button-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .toggle-button-state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'toggle-button-visual' },
+    children: [
+      q.h1({ children: 'ToggleButton states' }),
+      q.div({
+        class: 'toggle-button-state-grid',
+        children: [
+          ToggleButton({ pressed: false, label: 'List view', variant: 'ghost' }),
+          ToggleButton({ pressed: true, label: 'Grid view', variant: 'ghost' }),
+          ToggleButton({ pressed: true, children: [Icon({ name: 'spark' }), ' Featured'], variant: 'secondary' }),
+          ToggleButton({ pressed: false, label: 'Disabled', disabled: true }),
+          q.div({ dir: 'rtl', children: ToggleButton({ pressed: true, label: 'RTL', variant: 'ghost' }) }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('toggle-button-visual')).toMatchScreenshot('toggle-button-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
   });

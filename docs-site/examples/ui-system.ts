@@ -7,6 +7,7 @@ import {
   Label,
   Select,
   Switch,
+  ToggleButton,
   Textarea,
   defineButtonPreset,
   defineIcon,
@@ -175,6 +176,7 @@ createApp(() => AppShell({
           ],
         }),
         q.label({ children: [Switch({ name: 'network' }), ' Allow network access'] }),
+        ToggleButton({ pressed: true, label: 'Grid view', variant: 'ghost' }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',

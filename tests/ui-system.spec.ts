@@ -9,6 +9,8 @@ import {
   Radio,
   Select,
   Switch,
+  ToggleButton,
+  defineToggleButtonPreset,
   Textarea,
   atomManifest,
   atomStyles,
@@ -131,6 +133,34 @@ describe('separate UI package contracts', () => {
     expect(control.checked).toBe(true);
     expect(new FormData(form).get('network')).toBe('enabled');
     expect(onChange).toHaveBeenCalledOnce();
+  });
+
+  it('keeps ToggleButton controlled aria-pressed, preset, activation, and disabled behavior', () => {
+    const onClick = vi.fn();
+    const FilterToggle = defineToggleButtonPreset({
+      displayName: 'FilterToggle',
+      variant: 'ghost',
+      size: 'small',
+      class: 'filter-toggle',
+    });
+    render(q.div({ children: [
+      ToggleButton({ pressed: true, label: 'Grid view', onClick, attributes: { id: 'grid-toggle' } }),
+      FilterToggle({ pressed: false, label: 'Available only', attributes: { id: 'filter-toggle' } }),
+      ToggleButton({ pressed: false, label: 'Disabled view', disabled: true, attributes: { id: 'disabled-toggle' } }),
+    ] }), document.body);
+
+    const grid = document.querySelector<HTMLButtonElement>('#grid-toggle')!;
+    const filter = document.querySelector<HTMLButtonElement>('#filter-toggle')!;
+    const disabled = document.querySelector<HTMLButtonElement>('#disabled-toggle')!;
+    expect(grid.type).toBe('button');
+    expect(grid.getAttribute('aria-pressed')).toBe('true');
+    grid.click();
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(grid.getAttribute('aria-pressed')).toBe('true');
+    expect(filter.classList).toContain('filter-toggle');
+    expect(filter.classList).toContain('is-ghost');
+    expect(filter.classList).toContain('is-small');
+    expect(disabled.disabled).toBe(true);
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the controlled `ToggleButton` Atom and preset extension with required
+  boolean `aria-pressed`, Button sizing/variants, exact pressed styling, icon
+  content, forced-colors, RTL, and native activation contracts.
 - Added the native checkbox-backed `Switch` Atom with stable switch semantics,
   Space activation, forms, reduced-motion/forced-colors/RTL support, and public
   track/thumb customization properties.

@@ -32,6 +32,7 @@ import {
   selectStyles,
   switchStyles,
   textareaStyles,
+  toggleButtonStyles,
 } from '@gluonjs/atoms';
 import {
   Card,
@@ -52,6 +53,7 @@ const allComponentSheets = [
   selectStyles,
   switchStyles,
   textareaStyles,
+  toggleButtonStyles,
   cardStyles,
   formFieldStyles,
   navigationStripStyles,
