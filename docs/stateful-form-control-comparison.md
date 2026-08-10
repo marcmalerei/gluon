@@ -37,6 +37,13 @@ only a failure boundary; it is not a settlement delay. A focused React case
 repeats 25 accepted changes while preserving separate event, quantity, and
 computed-total assertions.
 
+SSR-identical text is not sufficient evidence that React hydration committed:
+WebKit can retain that text before React installs the component's passive
+lifecycle effect. The retained-hydration case therefore waits for the React
+mount counter before removing the autonomous element, then waits for the exact
+matching cleanup counter. This observable lifecycle boundary prevents teardown
+from becoming an early update while retaining the original server section.
+
 The raw record is
 `benchmarks/dx/stateful-form-control/evidence.json`; its parent-contract record
 is `benchmarks/dx/evidence/stateful-form-control-2026-07-12.json`. These records

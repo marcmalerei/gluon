@@ -1,5 +1,5 @@
 import { createApp, defineComponent, h, nextTick } from 'vue';
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { GluonElement, renderGluonElementForServer } from '@gluonjs/core';
 import { prepareForHydration } from '@gluonjs/ssr';
 import { hydrateElement } from '@gluonjs/ssr/hydration';
@@ -138,6 +138,7 @@ test('Vue and React hydrate retained server markup and every lane disposes its c
   const functionalBefore = gluonFunctionalLifecycleEvidence.cleanups;
   const vueBefore = vueLifecycleEvidence.cleanups;
   const reactBefore = reactLifecycleEvidence.cleanups;
+  const reactMountsBefore = reactLifecycleEvidence.mounts;
   const cases = [
     [vueQuantityTag, await renderVueQuantityShadow(product, 2)],
     [reactQuantityTag, renderReactQuantityShadow(product, 2)],
@@ -152,10 +153,16 @@ test('Vue and React hydrate retained server markup and every lane disposes its c
     control.value = 2;
     document.body.append(control);
     await settled(control);
+    if (tagName === reactQuantityTag) {
+      await vi.waitFor(() => expect(reactLifecycleEvidence.mounts).toBe(reactMountsBefore + 1));
+    }
     expect(control.shadowRoot?.querySelector('section')).toBe(retainedSection);
     expect(control.shadowRoot?.querySelector('strong')?.textContent).toBe('Total €498.00');
     control.remove();
     await settled(control);
+    if (tagName === reactQuantityTag) {
+      await vi.waitFor(() => expect(reactLifecycleEvidence.cleanups).toBe(reactBefore + 1));
+    }
   }
 
   for (const tagName of [gluonClassTag, gluonFunctionalTag]) {

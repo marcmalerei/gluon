@@ -5,7 +5,7 @@ import type { ProductInput, QuantityChange, QuantityControlPublic } from './shar
 import { adoptQuantityStyles } from './shared.js';
 
 export const reactQuantityTag = 'dx-react-quantity';
-export const reactLifecycleEvidence = { cleanups: 0 };
+export const reactLifecycleEvidence = { cleanups: 0, mounts: 0 };
 
 export interface ReactQuantityViewProps {
   readonly product: ProductInput;
@@ -18,7 +18,7 @@ export function ReactQuantityView(props: ReactQuantityViewProps): ReactElement {
   const [draft, setDraft] = useState(props.value);
   const total = useMemo(() => draft * props.product.price, [draft, props.product.price]);
   useEffect(() => { setDraft(props.value); }, [props.value]);
-  useEffect(() => () => { reactLifecycleEvidence.cleanups += 1; }, []);
+  useEffect(() => { reactLifecycleEvidence.mounts += 1; return () => { reactLifecycleEvidence.cleanups += 1; }; }, []);
   const change = (quantity: number): void => {
     const next = Math.max(0, quantity);
     if (props.requestChange(next)) setDraft(next);
