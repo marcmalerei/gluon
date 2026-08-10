@@ -45,6 +45,7 @@ import {
   InlineNotice,
   NavigationStrip,
   SegmentedControl,
+  TableRegion,
   Tabs,
   createDialogSurfaceController,
   moleculeManifest,
@@ -705,6 +706,45 @@ describe('separate UI package contracts', () => {
     states[0]!.querySelector<HTMLButtonElement>('button')!.click();
     expect(recover).toHaveBeenCalledOnce();
     expect(states[1]?.classList.contains('is-compact')).toBe(true);
+  });
+
+  it('adds a TableRegion viewport Tab stop only while the native table overflows', async () => {
+    render(q.main({ children: [
+      q.h2({ id: 'orders-title', children: 'Recent orders' }),
+      TableRegion({
+        id: 'orders-table',
+        labelledBy: 'orders-title',
+        summary: 'Two recent orders.',
+        scrollHint: 'Scroll horizontally to review every column.',
+        attributes: { data: { owner: 'orders' } },
+        children: q.table({ children: q.tbody({ children: q.tr({ children: [q.th({ scope: 'row', children: 'A-101' }), q.td({ children: 'Ready' })] }) }) }),
+      }),
+      TableRegion({ label: 'Archived orders', id: 'archived-orders', empty: true, emptyContent: q.p({ children: 'No archived orders.' }) }),
+    ] }), document.body);
+
+    const region = document.querySelector<HTMLElement>('#orders-table')!;
+    const viewport = region.querySelector<HTMLElement>('.gluon-table-region-viewport')!;
+    expect(region.getAttribute('role')).toBe('region');
+    expect(region.getAttribute('aria-labelledby')).toBe('orders-title');
+    expect(region.getAttribute('aria-describedby')).toBe('orders-table-summary');
+    expect(region.dataset.owner).toBe('orders');
+    expect(region.querySelector('table')).not.toBeNull();
+    expect(viewport.tabIndex).toBe(-1);
+    expect(region.querySelector<HTMLElement>('.gluon-table-region-scroll-hint')?.hidden).toBe(true);
+
+    Object.defineProperty(viewport, 'clientWidth', { configurable: true, value: 200 });
+    Object.defineProperty(viewport, 'scrollWidth', { configurable: true, value: 420 });
+    window.dispatchEvent(new Event('resize'));
+    await vi.waitFor(() => expect(region.hasAttribute('data-overflow')).toBe(true));
+    expect(viewport.tabIndex).toBe(0);
+    expect(region.querySelector<HTMLElement>('.gluon-table-region-scroll-hint')?.hidden).toBe(false);
+
+    Object.defineProperty(viewport, 'scrollWidth', { configurable: true, value: 200 });
+    window.dispatchEvent(new Event('resize'));
+    await vi.waitFor(() => expect(region.hasAttribute('data-overflow')).toBe(false));
+    expect(viewport.tabIndex).toBe(-1);
+    expect(document.querySelector('#archived-orders .gluon-table-region-viewport')).toBeNull();
+    expect(document.querySelector('#archived-orders')?.textContent).toContain('No archived orders.');
   });
 
   it('keeps unavailable Disclosure summaries focusable with a visible reason', () => {

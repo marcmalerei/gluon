@@ -50,6 +50,7 @@ import {
   inlineNoticeStyles,
   navigationStripStyles,
   segmentedControlStyles,
+  tableRegionStyles,
   tabsStyles,
 } from '@gluonjs/molecules';
 import { appShellStyles } from '@gluonjs/organisms';
@@ -80,6 +81,7 @@ const allComponentSheets = [
   inlineNoticeStyles,
   navigationStripStyles,
   segmentedControlStyles,
+  tableRegionStyles,
   tabsStyles,
   appShellStyles,
 ];

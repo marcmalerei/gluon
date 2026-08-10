@@ -53,7 +53,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, EmptyState, InlineNotice, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -138,6 +138,23 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-level="3"');
     expect(rendered).not.toContain('aria-live');
     expect(rendered).toContain('Clear filters');
+  });
+
+  it('serializes TableRegion relationships and caller-owned native table semantics', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(TableRegion({
+      id: 'server-orders',
+      label: 'Recent orders',
+      summary: 'One recent order.',
+      scrollHint: 'Scroll horizontally to review every column.',
+      children: html`<table><caption>Recent orders</caption><thead><tr><th scope="col">Order</th></tr></thead><tbody><tr><th scope="row">A-101</th></tr></tbody></table>`,
+    })));
+    expect(rendered).toContain('role="region"');
+    expect(rendered).toContain('aria-label="Recent orders"');
+    expect(rendered).toContain('aria-describedby="server-orders-summary"');
+    expect(rendered).toContain('id="server-orders-scroll-hint"');
+    expect(rendered).toContain('<table>');
+    expect(rendered).toContain('<caption>Recent orders</caption>');
+    expect(rendered).not.toContain('role="grid"');
   });
 
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {

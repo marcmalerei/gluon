@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -242,6 +242,16 @@ describe('GLUON GOODS reference shop', () => {
     expect(purchase.querySelector('svg')?.getAttribute('role')).toBe('img');
     expect(purchase.querySelector('svg')?.getAttribute('aria-label')).toBe('Secure checkout');
     expect(root.querySelectorAll('form')).toHaveLength(1);
+    const orderRegion = root.querySelector<HTMLElement>('#checkout-order-summary-table')!;
+    const orderTable = orderRegion.querySelector<HTMLTableElement>('table')!;
+    expect(orderRegion.getAttribute('role')).toBe('region');
+    expect(orderRegion.getAttribute('aria-labelledby')).toBe('checkout-order-summary-title');
+    expect(orderRegion.textContent).toContain('1 object ready to order.');
+    expect(orderTable.caption?.textContent).toBe('Objects and prices in this order');
+    expect([...orderTable.querySelectorAll('thead th')].map((header) => header.textContent)).toEqual(['Object', 'Quantity', 'Price']);
+    expect(orderTable.querySelector('tbody th')?.getAttribute('scope')).toBe('row');
+    expect(orderTable.closest('[role="grid"]')).toBeNull();
+    expect(document.adoptedStyleSheets).toContain(tableRegionStyles);
     expect(root.querySelectorAll('.checkout-field')).toHaveLength(6);
     expect([...root.querySelectorAll<HTMLInputElement>('input.checkout-input')].every((input) => (
       input.required && input.closest('label')?.classList.contains('checkout-field')

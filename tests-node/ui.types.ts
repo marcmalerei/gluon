@@ -21,6 +21,7 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  TableRegion,
   moleculeManifest,
   type CardProps,
   type NavigationStripProps,
@@ -149,6 +150,15 @@ EmptyState({
   action: Button({ label: 'Clear filters' }),
   attributes: { data: { owner: 'catalog' } },
 });
+TableRegion({
+  id: 'orders-table',
+  labelledBy: 'orders-title',
+  summary: 'Two orders.',
+  scrollHint: 'Scroll horizontally to review every column.',
+  children: q.table({ children: q.tbody({ children: q.tr({ children: q.td({ children: 'A-101' }) }) }) }),
+  attributes: { data: { owner: 'orders' }, ref: { value: undefined } },
+});
+TableRegion({ id: 'archived-orders', label: 'Archived orders', empty: true, emptyContent: 'No archived orders.' });
 Accordion({
   label: 'Delivery details',
   value: 'tracking',
@@ -234,6 +244,12 @@ InlineNotice({ children: 'Feedback', attributes: { aria: { live: 'assertive' } }
 EmptyState({ presentation: 'drawer', heading: 'Empty' });
 // @ts-expect-error EmptyState intentionally cannot become a repeated live region
 EmptyState({ heading: 'Empty', attributes: { aria: { live: 'polite' } } });
+// @ts-expect-error TableRegion requires an accessible region name
+TableRegion({ id: 'orders', children: q.table() });
+// @ts-expect-error TableRegion empty and populated content are mutually exclusive
+TableRegion({ id: 'orders', label: 'Orders', empty: true, emptyContent: 'None', children: q.table() });
+// @ts-expect-error TableRegion owns the outer region role
+TableRegion({ id: 'orders', label: 'Orders', children: q.table(), attributes: { role: 'grid' } });
 // @ts-expect-error Accordion requires an accessible group name
 Accordion({ value: 'one', items: [] });
 // @ts-expect-error multiple Accordion values are arrays

@@ -34,6 +34,7 @@ import {
   InlineNotice,
   NavigationStrip,
   SegmentedControl,
+  TableRegion,
   Tabs,
   createDialogSurfaceController,
   defineMolecule,
@@ -247,6 +248,13 @@ createApp(() => AppShell({
           heading: 'No archived projects',
           children: 'Completed projects will appear here.',
           action: Button({ label: 'Create project' }),
+        }),
+        TableRegion({
+          id: 'recent-orders',
+          label: 'Recent orders',
+          summary: 'One recent order.',
+          scrollHint: 'Scroll horizontally to review every column.',
+          children: q.table({ children: q.tbody({ children: q.tr({ children: [q.th({ scope: 'row', children: 'A-101' }), q.td({ children: 'Ready' })] }) }) }),
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

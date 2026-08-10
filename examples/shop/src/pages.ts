@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
+import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, TableRegion, Tabs } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -278,9 +278,22 @@ export function CheckoutPage(store: ShopStore): TemplateValue {
     <section class="checkout-empty"><h1>Your bag is empty.</h1>
       ${RouterLink({ to: '/shop', children: 'Return to the collection', attributes: { class: 'primary-button' } })}
     </section>`;
-  const summary = html`<aside class="order-summary" aria-label="Order summary"><h2>Order summary</h2>
-        ${repeat(store.bag, (line) => line.key, (line) => html`<div><span>${line.quantity} × ${line.product.name}</span><strong>${formatPrice(line.product.price * line.quantity)}</strong></div>`)}
-        <footer><span>Total</span><strong>${formatPrice(store.bagTotal)}</strong></footer></aside>`;
+  const itemCount = store.bag.reduce((count, line) => count + line.quantity, 0);
+  const summary = html`<aside class="order-summary"><h2 id="checkout-order-summary-title">Order summary</h2>
+    ${TableRegion({
+      id: 'checkout-order-summary-table',
+      labelledBy: 'checkout-order-summary-title',
+      summary: `${itemCount} ${itemCount === 1 ? 'object' : 'objects'} ready to order.`,
+      scrollHint: 'Scroll horizontally to review every order column.',
+      attributes: { class: 'checkout-order-table-region' },
+      children: html`<table class="checkout-order-table">
+        <caption class="visually-hidden">Objects and prices in this order</caption>
+        <thead><tr><th scope="col">Object</th><th scope="col">Quantity</th><th scope="col">Price</th></tr></thead>
+        <tbody>${repeat(store.bag, (line) => line.key, (line) => html`<tr><th scope="row">${line.product.name}</th><td>${line.quantity}</td><td>${formatPrice(line.product.price * line.quantity)}</td></tr>`)}</tbody>
+        <tfoot><tr><th scope="row" colspan="2">Total</th><td><strong>${formatPrice(store.bagTotal)}</strong></td></tr></tfoot>
+      </table>`,
+    })}
+  </aside>`;
   return CheckoutExperience({
     values: store.checkout,
     totalLabel: formatPrice(store.bagTotal),

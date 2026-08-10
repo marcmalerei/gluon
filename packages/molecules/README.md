@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, NavigationStrip, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -78,6 +78,12 @@ static and adds no status, alert, or live-region semantics, avoiding repeated
 announcements on ordinary rerenders. When an empty result is newly produced by
 an asynchronous action, announce that transition separately with the bounded
 `InlineNotice` contract while keeping the persistent empty state static.
+`TableRegion` wraps a caller-owned native table in a named region. Optional
+summary copy labels the data set, while an optional scroll hint becomes visible
+and the horizontal viewport joins Tab order only when content actually
+overflows. Empty content is an explicit mutually exclusive variant. Captions,
+headers, rows, sorting, pagination, selection, editing, and virtualization stay
+caller-owned; the component deliberately does not implement DataGrid behavior.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -143,6 +149,9 @@ color, and action-gap custom properties. Tone defaults remain contrast-aware,
 and application overrides must preserve readable text and state distinction.
 EmptyState exposes gap, minimum block size, padding, media size, heading/body
 width and typography, body color, and action-gap custom properties.
+TableRegion exposes gap, summary and hint colors, and
+`--gluon-table-region-content-min-inline-size` for application-owned column
+layouts that need horizontal overflow at constrained widths.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -178,3 +187,6 @@ order ID, delivery email, total, and caller-owned continue-shopping action.
 The empty bag uses compact `EmptyState` composition with a semantic heading and
 caller-owned shop route while the enclosing DialogSurface retains focus and
 dismissal ownership.
+Checkout uses `TableRegion` around its native captioned order table. The shop
+owns every header, row, price, and total; the molecule adds the region summary
+and narrow-layout overflow affordance without introducing grid interaction.
