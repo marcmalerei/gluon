@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -58,6 +58,13 @@ native state. It deliberately has no silent disabled prop. When content is not
 yet available, pass `unavailable: true` with a concrete `unavailableReason`;
 the summary remains focusable, exposes `aria-disabled`, shows and references
 the reason, and prevents Enter, Space, and pointer activation.
+`Accordion` composes caller-owned Disclosure items inside a labelled group. It
+supports controlled single or multiple open values, stable item IDs, an
+explicit heading level, optional non-collapsible single selection, and
+Arrow/Home/End focus movement that skips unavailable summaries without
+changing native activation or Tab order. Callers retain item copy, open state,
+routing, loading, unavailable reasons, and effects; it deliberately does not
+implement a custom tree widget.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -116,6 +123,8 @@ Disclosure exposes `--gluon-disclosure-border`, summary gap/padding/color and
 weight variables, `--gluon-disclosure-marker`, marker color/size/motion,
 `--gluon-disclosure-content-padding`, and
 `--gluon-disclosure-unavailable-color`.
+Accordion exposes a minimal layout wrapper and inherits the Disclosure custom
+properties for every native item.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -143,5 +152,6 @@ shop owns routing and restores focus to the activated tab after navigation.
 The bag uses `DialogSurface` for its labelled end drawer, overlay and Escape
 dismissal, initial close-button focus, focus containment, and trigger-focus
 restoration while the shop continues to own bag state and checkout decisions.
-The Shipping policy uses `Disclosure` for real tracking, packaging, and remote
-area details without replacing native summary behavior.
+The Shipping policy uses `Accordion` over native `Disclosure` items for
+URL-backed tracking, packaging, and remote-area details without replacing
+native summary behavior.

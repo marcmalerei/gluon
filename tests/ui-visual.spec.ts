@@ -20,7 +20,7 @@ import {
   render,
   unadoptStyles,
 } from '../src/index.js';
-import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -618,6 +618,31 @@ test('matches Disclosure closed, open, unavailable, RTL, and zoom-safe states', 
   await expect.element(page.getByTestId('disclosure-visual')).toMatchScreenshot('disclosure-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
+  });
+  unadoptStyles(document, visualStyles);
+  uiOwner.dispose();
+});
+
+test('matches Accordion single-open, unavailable, RTL, and zoom-safe states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer app { body { margin: 0; padding: 16px; inline-size: 300px; font-size: 18px; } .accordion-stack { block-size: 280px; overflow: hidden; } .gluon-disclosure-content p { margin: 0; line-height: 1.5; } }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.div({ dir: 'rtl', data: { testid: 'accordion-visual' }, class: 'accordion-stack', children: Accordion({
+    label: 'Delivery service details',
+    value: 'packaging',
+    items: [
+      { id: 'visual-tracking', value: 'tracking', summary: 'Tracking', children: q.p({ children: 'Sent after dispatch.' }) },
+      { id: 'visual-packaging', value: 'packaging', summary: 'Packaging', children: q.p({ children: 'Recyclable protective board.' }) },
+      { id: 'visual-remote', value: 'remote', summary: 'Remote areas', unavailable: true, unavailableReason: 'Not available for this destination.', children: 'Unavailable.' },
+    ],
+  }) }), document.body);
+  await expect.element(page.getByTestId('accordion-visual')).toMatchScreenshot('accordion-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });
   unadoptStyles(document, visualStyles);
   uiOwner.dispose();

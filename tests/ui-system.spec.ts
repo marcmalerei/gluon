@@ -33,6 +33,7 @@ import {
 } from '../src/index.js';
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
 import {
+  Accordion,
   Card,
   ButtonGroup,
   ChoiceGroup,
@@ -588,6 +589,63 @@ describe('separate UI package contracts', () => {
     summary.click();
     await vi.waitFor(() => expect(details.open).toBe(false));
     await vi.waitFor(() => expect(onToggle).toHaveBeenCalled());
+  });
+
+  it('controls Accordion single and multiple values while preserving native summaries', async () => {
+    const onSingleChange = vi.fn();
+    const items = [
+      { id: 'shipping-tracking', value: 'tracking', summary: 'Tracking', children: 'Sent after dispatch.' },
+      { id: 'shipping-packaging', value: 'packaging', summary: 'Packaging', children: 'Recyclable board.' },
+      { id: 'shipping-remote', value: 'remote', summary: 'Remote areas', children: 'Allow one extra day.', unavailable: true, unavailableReason: 'Not available for this destination.' },
+    ] as const;
+    render(Accordion({
+      label: 'Delivery service details',
+      value: 'tracking',
+      collapsible: false,
+      items,
+      onChange: onSingleChange,
+    }), document.body);
+    const details = [...document.querySelectorAll<HTMLDetailsElement>('.gluon-accordion > details')];
+    const summaries = details.map((entry) => entry.querySelector<HTMLElement>('summary')!);
+    expect(details.map((entry) => entry.open)).toEqual([true, false, false]);
+    expect(summaries[0]?.querySelector('[role="heading"]')?.getAttribute('aria-level')).toBe('3');
+    expect(onSingleChange).not.toHaveBeenCalled();
+
+    summaries[1]!.click();
+    await vi.waitFor(() => expect(onSingleChange).toHaveBeenCalledWith('packaging', expect.any(Event)));
+    onSingleChange.mockClear();
+    summaries[0]!.click();
+    await vi.waitFor(() => expect(details[0]?.open).toBe(true));
+    expect(onSingleChange).not.toHaveBeenCalled();
+
+    summaries[0]!.focus();
+    summaries[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(summaries[1]);
+    summaries[1]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(summaries[1]);
+    summaries[1]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(summaries[1]);
+
+    const onMultipleChange = vi.fn();
+    render(Accordion({
+      labelledBy: 'delivery-title',
+      mode: 'multiple',
+      value: ['tracking'],
+      items: items.slice(0, 2),
+      onChange: onMultipleChange,
+    }), document.body);
+    document.querySelectorAll<HTMLElement>('.gluon-accordion summary')[0]!.click();
+    await vi.waitFor(() => expect(onMultipleChange).toHaveBeenCalledWith([], expect.any(Event)));
+    onMultipleChange.mockClear();
+    render(Accordion({
+      labelledBy: 'delivery-title',
+      mode: 'multiple',
+      value: ['tracking'],
+      items: items.slice(0, 2),
+      onChange: onMultipleChange,
+    }), document.body);
+    document.querySelectorAll<HTMLElement>('.gluon-accordion summary')[1]!.click();
+    await vi.waitFor(() => expect(onMultipleChange).toHaveBeenCalledWith(['tracking', 'packaging'], expect.any(Event)));
   });
 
   it('keeps unavailable Disclosure summaries focusable with a visible reason', () => {

@@ -22,6 +22,7 @@ import {
   svg,
 } from '@gluonjs/core';
 import {
+  Accordion,
   Card,
   ButtonGroup,
   ChoiceGroup,
@@ -225,6 +226,14 @@ createApp(() => AppShell({
           id: 'profile-delivery-details',
           summary: 'Delivery details',
           children: 'Tracked delivery in 2–3 working days.',
+        }),
+        Accordion({
+          label: 'Account help',
+          value: 'delivery',
+          items: [
+            { id: 'profile-delivery', value: 'delivery', summary: 'Delivery', children: 'Tracked delivery in 2–3 working days.' },
+            { id: 'profile-returns', value: 'returns', summary: 'Returns', children: 'Unused objects can be returned within 30 days.' },
+          ],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { Disclosure, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
+import { Accordion, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -240,18 +240,27 @@ export function NotFoundPage(_store: ShopStore): TemplateValue {
 }
 
 export function ShippingPage(_store: ShopStore): TemplateValue {
+  const route = useRoute();
+  const router = useRouter();
+  const topic = typeof route.query.topic === 'string' && ['tracking', 'packaging', 'remote'].includes(route.query.topic)
+    ? route.query.topic
+    : undefined;
   return PolicyPage(
     'Shipping',
     'In-stock objects leave our workshop in 2–3 working days. Every order includes tracked delivery and repair guidance for the objects inside.',
-    Disclosure({
-      id: 'shipping-service-details',
-      summary: 'Delivery service details',
+    Accordion({
+      label: 'Delivery service details',
+      value: topic,
+      collapsible: true,
       attributes: { class: 'policy-details' },
-      children: html`<dl>
-        <div><dt>Tracking</dt><dd>Sent by email as soon as the workshop dispatches your order.</dd></div>
-        <div><dt>Packaging</dt><dd>Recyclable board, sized to protect replaceable parts.</dd></div>
-        <div><dt>Remote areas</dt><dd>Allow one additional working day after dispatch.</dd></div>
-      </dl>`,
+      items: [
+        { id: 'shipping-tracking', value: 'tracking', summary: 'Tracking', children: html`<p>Sent by email as soon as the workshop dispatches your order.</p>` },
+        { id: 'shipping-packaging', value: 'packaging', summary: 'Packaging', children: html`<p>Recyclable board, sized to protect replaceable parts.</p>` },
+        { id: 'shipping-remote', value: 'remote', summary: 'Remote areas', children: html`<p>Allow one additional working day after dispatch.</p>` },
+      ],
+      onChange: (value) => {
+        void router.push(value ? `/shipping?topic=${encodeURIComponent(value)}` : '/shipping');
+      },
     }),
   );
 }

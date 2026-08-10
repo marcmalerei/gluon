@@ -1,3 +1,4 @@
+export { Accordion, type AccordionAccessibleName, type AccordionAttributes, type AccordionChangeEvent, type AccordionHeadingLevel, type AccordionItem, type AccordionMultipleProps, type AccordionProps, type AccordionSingleProps } from './accordion.js';
 export { Card, type CardProps, type CardTone } from './card.js';
 export { ButtonGroup, type ButtonGroupAccessibleName, type ButtonGroupAttributes, type ButtonGroupOrientation, type ButtonGroupPresentation, type ButtonGroupProps } from './button-group.js';
 export { ChoiceGroup, type ChoiceGroupAttributes, type ChoiceGroupOrientation, type ChoiceGroupProps } from './choice-group.js';
@@ -10,6 +11,7 @@ export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedCo
 export { Tabs, type TabsAccessibleName, type TabsActivation, type TabsAttributes, type TabsChangeEvent, type TabsItem, type TabsOrientation, type TabsProps } from './tabs.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
+export { accordionStyles } from './accordion-styles.js';
 export { cardStyles } from './card-styles.js';
 export { buttonGroupStyles } from './button-group-styles.js';
 export { choiceGroupStyles } from './choice-group-styles.js';

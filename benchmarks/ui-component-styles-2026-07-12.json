@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 26892,
-      "gzipBytes": 4222,
+      "rawBytes": 27296,
+      "gzipBytes": 4272,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -13,6 +13,8 @@
       ],
       "stylesheetCount": 3,
       "selectors": [
+        ".gluon-accordion",
+        ".gluon-accordion-heading",
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
         ".gluon-app-shell-header",
@@ -70,9 +72,9 @@
       ]
     },
     "after": {
-      "rawBytes": 28158,
-      "gzipBytes": 4239,
-      "moduleCount": 22,
+      "rawBytes": 28621,
+      "gzipBytes": 4300,
+      "moduleCount": 23,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -86,6 +88,7 @@
         "packages/atoms/src/switch-styles.ts",
         "packages/atoms/src/textarea-styles.ts",
         "packages/atoms/src/toggle-button-styles.ts",
+        "packages/molecules/src/accordion-styles.ts",
         "packages/molecules/src/button-group-styles.ts",
         "packages/molecules/src/card-styles.ts",
         "packages/molecules/src/choice-group-styles.ts",
@@ -97,8 +100,10 @@
         "packages/molecules/src/tabs-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 22,
+      "stylesheetCount": 23,
       "selectors": [
+        ".gluon-accordion",
+        ".gluon-accordion-heading",
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
         ".gluon-app-shell-header",
