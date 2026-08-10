@@ -6,6 +6,7 @@ import {
   Checkbox,
   Icon,
   Input,
+  Progress,
   Radio,
   Select,
   Switch,
@@ -161,6 +162,22 @@ describe('separate UI package contracts', () => {
     expect(filter.classList).toContain('is-ghost');
     expect(filter.classList).toContain('is-small');
     expect(disabled.disabled).toBe(true);
+  });
+
+  it('keeps Progress native determinate and indeterminate semantics', () => {
+    render(q.div({ children: [
+      Progress({ value: 35, max: 80, attributes: { id: 'upload-progress', 'aria-label': 'Upload progress' } }),
+      Progress({ fullWidth: true, attributes: { id: 'inventory-progress', 'aria-label': 'Inventory check' } }),
+    ] }), document.body);
+
+    const determinate = document.querySelector<HTMLProgressElement>('#upload-progress')!;
+    const indeterminate = document.querySelector<HTMLProgressElement>('#inventory-progress')!;
+    expect(determinate.value).toBe(35);
+    expect(determinate.max).toBe(80);
+    expect(determinate.getAttribute('value')).toBe('35');
+    expect(indeterminate.hasAttribute('value')).toBe(false);
+    expect(indeterminate.classList).toContain('is-full-width');
+    expect(indeterminate.getAttribute('aria-label')).toBe('Inventory check');
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

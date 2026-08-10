@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  Progress,
   Radio,
   Switch,
   ToggleButton,
@@ -311,6 +312,44 @@ test('matches ToggleButton pressed, unpressed, icon, disabled, and RTL states', 
   }), document.body);
 
   await expect.element(page.getByTestId('toggle-button-visual')).toMatchScreenshot('toggle-button-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches Progress determinate, indeterminate, full-width, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="progress-visual"] { box-sizing: border-box; inline-size: 380px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="progress-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .progress-state-grid { display: grid; gap: 18px; }
+      .progress-state-grid label { display: grid; gap: 8px; font-size: 13px; font-weight: 650; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'progress-visual' },
+    children: [
+      q.h1({ children: 'Native Progress states' }),
+      q.div({
+        class: 'progress-state-grid',
+        children: [
+          q.label({ children: ['Determinate 35%', Progress({ value: 35, attributes: { 'aria-label': 'Determinate progress' } })] }),
+          q.label({ children: ['Indeterminate', Progress({ attributes: { 'aria-label': 'Indeterminate progress' } })] }),
+          q.label({ children: ['Full width', Progress({ value: 68, fullWidth: true, attributes: { 'aria-label': 'Full-width progress' } })] }),
+          q.label({ dir: 'rtl', children: ['RTL 50%', Progress({ value: 50, attributes: { 'aria-label': 'RTL progress' } })] }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('progress-visual')).toMatchScreenshot('progress-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
   });

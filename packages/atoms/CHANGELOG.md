@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the native `Progress` Atom with determinate value/max and attribute-free
+  indeterminate state, responsive width, exact styles, forced-colors support,
+  and GLUON GOODS async inventory integration.
 - Added the controlled `ToggleButton` Atom and preset extension with required
   boolean `aria-pressed`, Button sizing/variants, exact pressed styling, icon
   content, forced-colors, RTL, and native activation contracts.

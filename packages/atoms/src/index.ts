@@ -45,6 +45,12 @@ export { checkboxStyles } from './checkbox-styles.js';
 export { iconStyles } from './icon-styles.js';
 export { inputStyles } from './input-styles.js';
 export { labelStyles } from './label-styles.js';
+export {
+  Progress,
+  type ProgressAttributes,
+  type ProgressProps,
+} from './progress.js';
+export { progressStyles } from './progress-styles.js';
 export { selectStyles } from './select-styles.js';
 export {
   Radio,

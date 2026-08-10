@@ -20,7 +20,7 @@ import {
   unsafeHTML,
   unmount,
 } from '@gluonjs/core';
-import { Button, Checkbox, Radio, Select, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, radioStyles, selectStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
+import { Button, Checkbox, Progress, Radio, Select, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, progressStyles, radioStyles, selectStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
 import { Card, cardStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
@@ -470,7 +470,7 @@ describe('SSR hydration', () => {
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
-    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Radio({ checked: true, name: 'finish', attributes: { 'aria-label': 'Hydrated radio' } })}${Switch({ checked: true, name: 'network', attributes: { 'aria-label': 'Hydrated switch' } })}${ToggleButton({ pressed: true, label: 'Hydrated toggle' })}${Card({ title: 'Hydrated card' })}</main>`;
+    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Progress({ value: 2, max: 4, attributes: { 'aria-label': 'Hydrated progress' } })}${Radio({ checked: true, name: 'finish', attributes: { 'aria-label': 'Hydrated radio' } })}${Switch({ checked: true, name: 'network', attributes: { 'aria-label': 'Hydrated switch' } })}${ToggleButton({ pressed: true, label: 'Hydrated toggle' })}${Card({ title: 'Hydrated card' })}</main>`;
     const prepared = await prepareForHydration(value);
     const selection = createComponentStyleSelection(prepared.value);
     const manifest = createStyleManifest(selection);
@@ -487,6 +487,7 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(textareaStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(checkboxStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(progressStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(radioStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(switchStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(toggleButtonStyles);
@@ -497,6 +498,7 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).not.toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(textareaStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(checkboxStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(progressStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(radioStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(switchStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(toggleButtonStyles);

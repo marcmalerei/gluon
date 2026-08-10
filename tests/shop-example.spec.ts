@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
-import { buttonStyles, checkboxStyles, inputStyles, labelStyles, radioStyles, textareaStyles } from '@gluonjs/atoms';
+import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, textareaStyles } from '@gluonjs/atoms';
 import { formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -74,6 +74,8 @@ describe('GLUON GOODS reference shop', () => {
     await new Promise((resolve) => setTimeout(resolve, 70));
     expect(configurator.shadowRoot?.querySelector('.inventory-status')?.textContent)
       .toContain('Checking workshop availability');
+    expect(configurator.shadowRoot?.querySelector('progress:not([value])')).not.toBeNull();
+    expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(progressStyles);
     await expect.poll(
       () => configurator.shadowRoot?.querySelector('.inventory-status')?.textContent,
       { timeout: 2_000 },
