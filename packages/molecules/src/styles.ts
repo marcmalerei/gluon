@@ -27,6 +27,12 @@ export const moleculeStyles = css`
     :where(.gluon-card.is-warning) { border-color: #a66c00; }
     :where(.gluon-card.is-danger) { border-color: var(--gluon-color-danger, #a52222); }
 
+    :where(.gluon-control-field) { display: grid; gap: 0.375rem; min-inline-size: 0; }
+    :where(.gluon-control-field-label) { font-size: 0.875rem; font-weight: 650; }
+    :where(.gluon-control-field-required) { color: var(--gluon-control-field-required-color, var(--gluon-color-danger, #a52222)); }
+    :where(.gluon-control-field-helper) { color: var(--gluon-control-field-helper-color, var(--gluon-color-muted, #51625f)); font-size: 0.8125rem; line-height: 1.4; overflow-wrap: anywhere; }
+    :where(.gluon-control-field-error) { color: var(--gluon-control-field-error-color, var(--gluon-color-danger, #a52222)); font-size: 0.8125rem; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
+
     :where(.gluon-form-field) {
       display: grid;
       gap: 0.375rem;
@@ -37,10 +43,15 @@ export const moleculeStyles = css`
       font-size: 0.8125rem;
     }
     :where(.gluon-form-error) { color: var(--gluon-color-danger, #a52222); }
+    @media (forced-colors: active) {
+      :where(.gluon-control-field-required, .gluon-control-field-error) { color: Mark; }
+      :where(.gluon-control-field-helper) { color: CanvasText; }
+    }
   }
 `;
 
 markLegacyComponentStyleSheet(moleculeStyles, [
   'gluon-molecule-card',
+  'gluon-molecule-control-field',
   'gluon-molecule-form-field',
 ]);
