@@ -23,6 +23,7 @@ import {
 } from '@gluonjs/core';
 import {
   Card,
+  ButtonGroup,
   ChoiceGroup,
   ControlField,
   FormField,
@@ -115,8 +116,10 @@ adoptStyles(document, exampleStyles);
 
 createApp(() => AppShell({
   header: q.div({
-    class: { 'example-actions': true },
-    children: [
+    children: ButtonGroup({
+      label: 'Example actions',
+      attributes: { class: 'example-actions' },
+      children: [
       q.strong({ children: [Icon({ name: 'spark' }), Label({ children: ' GLUON UI' })] }),
       Button({
         label: `Use ${theme.value === 'light' ? 'dark' : 'light'} theme`,
@@ -132,7 +135,8 @@ createApp(() => AppShell({
         onClick: (event) => openDialog(event.currentTarget as HTMLElement),
       }),
       q.button({ type: 'button', popovertarget: 'ui-help', children: 'Open help popover' }),
-    ],
+      ],
+    }),
   }),
   navigation: q.a({ href: '#profile', children: 'Profile' }),
   children: [

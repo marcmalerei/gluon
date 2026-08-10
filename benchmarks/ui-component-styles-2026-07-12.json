@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 15428,
-      "gzipBytes": 2774,
+      "rawBytes": 17455,
+      "gzipBytes": 2978,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -20,6 +20,7 @@
         ".gluon-app-shell-main",
         ".gluon-app-shell-navigation",
         ".gluon-button",
+        ".gluon-button-group",
         ".gluon-card",
         ".gluon-card-body",
         ".gluon-card-header",
@@ -52,9 +53,9 @@
       ]
     },
     "after": {
-      "rawBytes": 16311,
-      "gzipBytes": 2795,
-      "moduleCount": 17,
+      "rawBytes": 18397,
+      "gzipBytes": 2998,
+      "moduleCount": 18,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -68,13 +69,14 @@
         "packages/atoms/src/switch-styles.ts",
         "packages/atoms/src/textarea-styles.ts",
         "packages/atoms/src/toggle-button-styles.ts",
+        "packages/molecules/src/button-group-styles.ts",
         "packages/molecules/src/card-styles.ts",
         "packages/molecules/src/choice-group-styles.ts",
         "packages/molecules/src/control-field-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 17,
+      "stylesheetCount": 18,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -83,6 +85,7 @@
         ".gluon-app-shell-main",
         ".gluon-app-shell-navigation",
         ".gluon-button",
+        ".gluon-button-group",
         ".gluon-card",
         ".gluon-card-body",
         ".gluon-card-header",
@@ -120,7 +123,9 @@
       "rawBytes": 11397,
       "gzipBytes": 2028,
       "moduleCount": 1,
-      "modules": ["packages/atoms/src/styles.ts"],
+      "modules": [
+        "packages/atoms/src/styles.ts"
+      ],
       "stylesheetCount": 1,
       "selectors": [
         ".gluon-button",
@@ -141,9 +146,13 @@
       "rawBytes": 1553,
       "gzipBytes": 535,
       "moduleCount": 1,
-      "modules": ["packages/atoms/src/button-styles.ts"],
+      "modules": [
+        "packages/atoms/src/button-styles.ts"
+      ],
       "stylesheetCount": 1,
-      "selectors": [".gluon-button"]
+      "selectors": [
+        ".gluon-button"
+      ]
     }
   },
   "limitations": [

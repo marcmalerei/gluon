@@ -27,6 +27,19 @@ export const moleculeStyles = css`
     :where(.gluon-card.is-warning) { border-color: #a66c00; }
     :where(.gluon-card.is-danger) { border-color: var(--gluon-color-danger, #a52222); }
 
+    :where(.gluon-button-group) { display: flex; min-inline-size: 0; align-items: stretch; gap: var(--gluon-button-group-gap, 0.75rem); }
+    :where(.gluon-button-group.is-horizontal) { flex-direction: row; }
+    :where(.gluon-button-group.is-horizontal.can-wrap) { flex-wrap: wrap; }
+    :where(.gluon-button-group.is-vertical) { flex-direction: column; }
+    :where(.gluon-button-group.is-attached) { gap: 0; }
+    :where(.gluon-button-group.is-attached) > :where(button) { border-color: var(--gluon-button-group-border-color, currentcolor); border-radius: 0; }
+    :where(.gluon-button-group.is-horizontal.is-attached) > :where(button + button) { margin-inline-start: -1px; }
+    :where(.gluon-button-group.is-horizontal.is-attached) > :where(button:first-child) { border-start-start-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); border-end-start-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); }
+    :where(.gluon-button-group.is-horizontal.is-attached) > :where(button:last-child) { border-start-end-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); border-end-end-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); }
+    :where(.gluon-button-group.is-vertical.is-attached) > :where(button + button) { margin-block-start: -1px; }
+    :where(.gluon-button-group.is-vertical.is-attached) > :where(button:first-child) { border-start-start-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); border-start-end-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); }
+    :where(.gluon-button-group.is-vertical.is-attached) > :where(button:last-child) { border-end-start-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); border-end-end-radius: var(--gluon-button-group-radius, var(--gluon-radius-control, 0.625rem)); }
+
     :where(.gluon-choice-group) { min-inline-size: 0; margin: 0; border: 0; padding: 0; }
     :where(.gluon-choice-group-legend) { padding: 0; font-size: 0.875rem; font-weight: 650; }
     :where(.gluon-choice-group-options) { display: flex; min-inline-size: 0; gap: var(--gluon-choice-group-gap, 0.75rem); margin-block-start: 0.5rem; }
@@ -53,6 +66,7 @@ export const moleculeStyles = css`
     }
     :where(.gluon-form-error) { color: var(--gluon-color-danger, #a52222); }
     @media (forced-colors: active) {
+      :where(.gluon-button-group.is-attached) > :where(button) { border-color: ButtonText; }
       :where(.gluon-control-field-required, .gluon-control-field-error) { color: Mark; }
       :where(.gluon-control-field-helper) { color: CanvasText; }
       :where(.gluon-choice-group-error) { color: Mark; }
@@ -62,6 +76,7 @@ export const moleculeStyles = css`
 `;
 
 markLegacyComponentStyleSheet(moleculeStyles, [
+  'gluon-molecule-button-group',
   'gluon-molecule-card',
   'gluon-molecule-choice-group',
   'gluon-molecule-control-field',

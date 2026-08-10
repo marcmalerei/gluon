@@ -19,7 +19,7 @@ import {
   css,
   render,
 } from '../src/index.js';
-import { Card, ChoiceGroup, ControlField, FormField } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -468,6 +468,36 @@ test('matches ChoiceGroup Radio, Checkbox, layout, error, disabled, and RTL stat
   }), document.body);
 
   await expect.element(page.getByTestId('choice-group-visual')).toMatchScreenshot('choice-group-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches ButtonGroup spaced, attached, vertical, wrapped, and RTL layouts', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="button-group-visual"] { box-sizing: border-box; inline-size: 420px; block-size: 390px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="button-group-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .button-group-grid { display: grid; gap: 22px; }
+      .narrow-actions { inline-size: 220px; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({ data: { testid: 'button-group-visual' }, children: [
+    q.h1({ children: 'ButtonGroup states' }),
+    q.div({ class: 'button-group-grid', children: [
+      ButtonGroup({ label: 'Spaced actions', children: [Button({ label: 'Save' }), Button({ label: 'Preview', variant: 'secondary' })] }),
+      ButtonGroup({ label: 'Attached actions', presentation: 'attached', children: [Button({ label: 'Day', variant: 'secondary' }), Button({ label: 'Week', variant: 'secondary' }), Button({ label: 'Month', variant: 'secondary' })] }),
+      ButtonGroup({ label: 'Wrapped actions', attributes: { class: 'narrow-actions' }, children: [Button({ label: 'Export' }), Button({ label: 'Duplicate', variant: 'secondary' }), Button({ label: 'Archive', variant: 'secondary' })] }),
+      q.div({ dir: 'rtl', children: ButtonGroup({ label: 'RTL vertical actions', orientation: 'vertical', presentation: 'attached', children: [Button({ label: 'Top', variant: 'secondary' }), Button({ label: 'Bottom', variant: 'secondary' })] }) }),
+    ] }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('button-group-visual')).toMatchScreenshot('button-group-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });

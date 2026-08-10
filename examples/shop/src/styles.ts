@@ -448,7 +448,7 @@ export const shopStyles = css`
       .site-header { grid-template-columns: 1fr auto; padding-right: 8px; }
       .desktop-nav, .search-action { display: none; }
       .header-actions { gap: 0; }
-      .mobile-menu-button { display: inline-flex; width: auto; gap: 7px; order: -1; padding-inline: 7px; }
+      .mobile-menu-button { display: inline-flex; width: auto; gap: 7px; padding-inline: 7px; }
       .mobile-menu-button span { font-size: 13px; }
       .bag-action { padding: 0 10px 0 14px; border-left: 0; font-size: 14px; }
       .wordmark { font-size: 19px; }

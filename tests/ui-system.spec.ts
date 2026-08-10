@@ -34,6 +34,7 @@ import {
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
 import {
   Card,
+  ButtonGroup,
   ChoiceGroup,
   ControlField,
   FormField,
@@ -265,6 +266,34 @@ describe('separate UI package contracts', () => {
     expect(features.getAttribute('aria-errormessage')).toBe('feature-group-error');
     expect(features.getAttribute('aria-invalid')).toBe('true');
     expect(features.querySelector<HTMLInputElement>('input')?.matches(':disabled')).toBe(true);
+  });
+
+  it('groups caller-owned buttons without changing their semantics or source order', async () => {
+    render(q.div({ children: [
+      q.h2({ id: 'actions-label', children: 'Document actions' }),
+      ButtonGroup({
+        labelledBy: 'actions-label',
+        presentation: 'attached',
+        wrap: false,
+        children: [Button({ label: 'Save' }), ToggleButton({ label: 'Pin', pressed: false }), Button({ label: 'Share' })],
+      }),
+      ButtonGroup({ label: 'Vertical actions', orientation: 'vertical', children: [Button({ label: 'Up' }), Button({ label: 'Down' })] }),
+    ] }), document.body);
+
+    const groups = document.querySelectorAll<HTMLElement>('[role="group"]');
+    expect(groups[0]?.getAttribute('aria-labelledby')).toBe('actions-label');
+    expect(groups[0]?.dataset.orientation).toBe('horizontal');
+    expect(groups[0]?.dataset.presentation).toBe('attached');
+    expect(groups[0]?.classList).not.toContain('can-wrap');
+    expect([...groups[0]!.querySelectorAll('button')].map((button) => button.textContent)).toEqual(['Save', 'Pin', 'Share']);
+    expect(groups[0]?.querySelector('[role="tab"], [role="menuitem"]')).toBeNull();
+    expect(groups[0]?.querySelector('[aria-pressed]')?.textContent).toBe('Pin');
+    expect(groups[1]?.getAttribute('aria-label')).toBe('Vertical actions');
+    expect(groups[1]?.classList).toContain('is-vertical');
+    await userEvent.tab();
+    expect(document.activeElement?.textContent).toBe('Save');
+    await userEvent.tab();
+    expect(document.activeElement?.textContent).toBe('Pin');
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

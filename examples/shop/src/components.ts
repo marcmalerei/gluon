@@ -11,6 +11,7 @@ import {
 } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
 import { Input } from '@gluonjs/atoms';
+import { ButtonGroup } from '@gluonjs/molecules';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -50,16 +51,27 @@ export function SiteHeader(store: ShopStore): TemplateValue {
         ${compose(RouterLink, { to: '/shop?sort=new' })`New`}
         ${ShopEditorialLink({ href: '#journal', children: 'Journal' })}
       </nav>
-      <div class="header-actions">
-        ${ShopTextAction({
+      ${ButtonGroup({
+        label: 'Store actions',
+        attributes: { class: 'header-actions' },
+        children: [
+        ShopTextAction({
           children: [SearchIcon(), html`<span>Search</span>`],
           attributes: { class: 'search-action' },
           onClick: (event) => {
             store.searchOpen = true;
             focusOpenedDialog('search', event.currentTarget as HTMLElement);
           },
-        })}
-        ${ShopTextAction({
+        }),
+        ShopIconAction({
+          children: [html`<span>Menu</span>`, MenuIcon()],
+          attributes: { class: 'mobile-menu-button', aria: { label: 'Open menu' } },
+          onClick: (event) => {
+            store.menuOpen = true;
+            focusOpenedDialog('menu', event.currentTarget as HTMLElement);
+          },
+        }),
+        ShopTextAction({
           label: `Bag ${store.bagCount}`,
           attributes: {
             class: 'bag-action',
@@ -69,16 +81,9 @@ export function SiteHeader(store: ShopStore): TemplateValue {
             store.bagOpen = true;
             focusOpenedDialog('bag', event.currentTarget as HTMLElement);
           },
-        })}
-        ${ShopIconAction({
-          children: [html`<span>Menu</span>`, MenuIcon()],
-          attributes: { class: 'mobile-menu-button', aria: { label: 'Open menu' } },
-          onClick: (event) => {
-            store.menuOpen = true;
-            focusOpenedDialog('menu', event.currentTarget as HTMLElement);
-          },
-        })}
-      </div>
+        }),
+        ],
+      })}
     </header>
     ${SearchPanel(store)}
     ${MobileMenu(store)}

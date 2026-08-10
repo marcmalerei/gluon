@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
+        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -897,6 +897,7 @@
         "import { Button, Input, Radio } from '@gluonjs/atoms';",
         "import { html } from '@gluonjs/core';",
         "import {",
+        "  ButtonGroup,",
         "  Card,",
         "  ChoiceGroup,",
         "  ControlField,",
@@ -904,6 +905,11 @@
         "  NavigationStrip,",
         "  moleculeManifest,",
         "  moleculeStyles,",
+        "  type ButtonGroupAccessibleName,",
+        "  type ButtonGroupAttributes,",
+        "  type ButtonGroupOrientation,",
+        "  type ButtonGroupPresentation,",
+        "  type ButtonGroupProps,",
         "  type CardProps,",
         "  type CardTone,",
         "  type ChoiceGroupAttributes,",
@@ -918,6 +924,11 @@
         "} from '@gluonjs/molecules';",
         "",
         "const email = { label: 'Email', name: 'email', type: 'email', helper: 'Order updates go here.' } satisfies FormFieldProps;",
+        "const buttonGroupName = { label: 'Order actions' } satisfies ButtonGroupAccessibleName;",
+        "const buttonGroupAttributes = { class: 'order-actions' } satisfies ButtonGroupAttributes;",
+        "const buttonGroupOrientation: ButtonGroupOrientation = 'horizontal';",
+        "const buttonGroupPresentation: ButtonGroupPresentation = 'attached';",
+        "const orderActions = { ...buttonGroupName, orientation: buttonGroupOrientation, presentation: buttonGroupPresentation, attributes: buttonGroupAttributes, children: [Button({ label: 'Save' }), Button({ label: 'Share' })] } satisfies ButtonGroupProps;",
         "const fieldAttributes = { class: 'order-reference-field' } satisfies ControlFieldAttributes;",
         "const renderOrderReference: ControlFieldRenderer = (relationships: ControlFieldRelationships) => Input({ attributes: { id: relationships.controlId, aria: relationships.aria } });",
         "const orderReference = { id: 'order-reference', label: 'Order reference', helper: 'Optional internal reference.', attributes: fieldAttributes, control: renderOrderReference } satisfies ControlFieldProps;",
@@ -936,7 +947,7 @@
         "  label: 'Order sections',",
         "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
         "} satisfies NavigationStripProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4015,6 +4026,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Card stylesheet retained by rendered Card values:"
     },
+    "packages/molecules/src/variables/buttonGroupStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable ButtonGroup layout stylesheet:"
+    },
     "packages/molecules/src/variables/choiceGroupStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable ChoiceGroup fieldset and layout stylesheet:"
@@ -4303,6 +4318,26 @@
       "recipe": "molecule-components",
       "description": "Compose a Card's heading, tone, media, actions, body, and native article attributes as one typed surface:"
     },
+    "packages/molecules/src/type-aliases/ButtonGroupAccessibleName.md": {
+      "recipe": "molecule-components",
+      "description": "Require either a direct accessible label or a labelled-by relationship for the group:"
+    },
+    "packages/molecules/src/type-aliases/ButtonGroupAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLDivElement attributes while ButtonGroup owns its group role and name:"
+    },
+    "packages/molecules/src/type-aliases/ButtonGroupOrientation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose horizontal or vertical layout without changing child button semantics:"
+    },
+    "packages/molecules/src/type-aliases/ButtonGroupPresentation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose spaced or visually attached button presentation:"
+    },
+    "packages/molecules/src/type-aliases/ButtonGroupProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a named layout-only group around caller-owned buttons:"
+    },
     "packages/molecules/src/interfaces/ChoiceGroupProps.md": {
       "recipe": "molecule-components",
       "description": "Compose visible legend, caller-owned Checkbox or Radio options, helper, error, disabled state, layout, and fieldset attributes:"
@@ -4346,6 +4381,10 @@
     "packages/molecules/src/variables/Card.md": {
       "recipe": "molecule-components",
       "description": "Render structured status or content inside a Card with optional media, actions, and semantic article attributes:"
+    },
+    "packages/molecules/src/variables/ButtonGroup.md": {
+      "recipe": "molecule-components",
+      "description": "Render a named group around caller-owned buttons while preserving their source order and semantics:"
     },
     "packages/molecules/src/variables/ChoiceGroup.md": {
       "recipe": "molecule-components",

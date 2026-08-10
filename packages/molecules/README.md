@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { Card, ChoiceGroup, ControlField, FormField, NavigationStrip } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, NavigationStrip } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -24,6 +24,10 @@ Checkbox or Radio options. It provides helper/error relationships, disabled
 fieldset propagation, and horizontal or vertical layout without taking option
 values, checked state, validation decisions, copy, or keyboard behavior away
 from the native controls.
+`ButtonGroup` renders an accessible named `role="group"` around caller-owned
+buttons. It preserves source and Tab order, supports horizontal or vertical
+layout, optional wrapping, and spaced or attached presentation, but never adds
+selection, menu, routing, tab, or pressed-state behavior to its children.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -42,7 +46,7 @@ NavigationStrip({
 });
 ```
 
-Styles use logical properties and shared Atom token names. `Card`, `ChoiceGroup`,
+Styles use logical properties and shared Atom token names. `ButtonGroup`, `Card`, `ChoiceGroup`,
 `ControlField`, and `FormField` carry separate immutable stylesheet dependencies;
 `NavigationStrip` carries its own layout/control sheet, and `FormField` collects
 its nested `Label` and `Input` sheets through ordinary renderer traversal.
@@ -62,6 +66,8 @@ ControlField exposes `--gluon-control-field-required-color`,
 `--gluon-control-field-helper-color`, and `--gluon-control-field-error-color`.
 ChoiceGroup exposes `--gluon-choice-group-gap`,
 `--gluon-choice-group-helper-color`, and `--gluon-choice-group-error-color`.
+ButtonGroup exposes `--gluon-button-group-gap`,
+`--gluon-button-group-border-color`, and `--gluon-button-group-radius`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -80,3 +86,5 @@ native Radio options. Its catalog filter uses `NavigationStrip` to keep every ca
 discoverable at constrained widths. Browser tests verify implicit labels,
 native constraint validation, overflow interaction, SSR/hydration styles, and
 teardown.
+The site header uses `ButtonGroup` for the search, bag, and mobile-menu action
+cluster without changing the individual actions' semantics.

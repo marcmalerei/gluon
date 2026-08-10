@@ -1,4 +1,5 @@
 export { Card, type CardProps, type CardTone } from './card.js';
+export { ButtonGroup, type ButtonGroupAccessibleName, type ButtonGroupAttributes, type ButtonGroupOrientation, type ButtonGroupPresentation, type ButtonGroupProps } from './button-group.js';
 export { ChoiceGroup, type ChoiceGroupAttributes, type ChoiceGroupOrientation, type ChoiceGroupProps } from './choice-group.js';
 export { ControlField, type ControlFieldAttributes, type ControlFieldProps, type ControlFieldRelationships, type ControlFieldRenderer } from './control-field.js';
 export { FormField, type FormFieldProps } from './form-field.js';
@@ -6,6 +7,7 @@ export { NavigationStrip, type NavigationStripProps } from './navigation-strip.j
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { cardStyles } from './card-styles.js';
+export { buttonGroupStyles } from './button-group-styles.js';
 export { choiceGroupStyles } from './choice-group-styles.js';
 export { controlFieldStyles } from './control-field-styles.js';
 export { formFieldStyles } from './form-field-styles.js';

@@ -54,6 +54,8 @@ describe('GLUON GOODS reference shop', () => {
     skipLink.focus();
     expect(document.activeElement).toBe(skipLink);
     expect(skipLink.getAttribute('href')).toBe('#main-content');
+    expect(root.querySelector('.site-header .header-actions')?.getAttribute('role')).toBe('group');
+    expect(root.querySelector('.site-header .header-actions')?.getAttribute('aria-label')).toBe('Store actions');
 
     expect(root.querySelector('h1')?.textContent).toBe('Objects that work the way you do.');
     expect(root.querySelectorAll('.product-card')).toHaveLength(4);
