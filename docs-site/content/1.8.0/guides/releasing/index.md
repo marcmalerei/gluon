@@ -1,12 +1,13 @@
 # Release readiness
 
-The `1.8.0` documentation describes the next lockstep release candidate. All
-21 official manifests are at `1.8.0`. Registry preflight on 2026-08-10
-confirmed that every contracted package exposes `1.7.0` as `latest` and that
-`1.8.0` is absent. The completed `1.7.0` release remains the supported baseline
-until the protected workflow publishes and independently verifies all 21
-reviewed archives. The `@gluonjs` scope, package records, and Trusted Publisher
-bindings remain verified by the completed publication contract.
+The `1.8.0` documentation describes the completed lockstep release. All 21
+official manifests are at `1.8.0`. Release run `31404878372` published every
+contracted package under `latest` with npm provenance, confirmed matching
+reviewed archive integrity, clean-room installation, and public type
+declarations, and published immutable GitHub release `v1.8.0` with 101 retained
+assets on 2026-08-10. Canonical tag `v1.8.0` resolves to merge commit
+`1c57fa0c8497b0c6ddd7911f0feb91afc6deda49`, which preserves the tested
+candidate and evidence histories.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
