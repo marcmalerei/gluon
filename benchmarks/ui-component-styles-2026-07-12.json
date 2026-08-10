@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 19907,
-      "gzipBytes": 3154,
+      "rawBytes": 22055,
+      "gzipBytes": 3434,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -50,14 +50,18 @@
         ".gluon-select",
         ".gluon-status-badge",
         ".gluon-switch",
+        ".gluon-tabs",
+        ".gluon-tabs-list",
+        ".gluon-tabs-panel",
+        ".gluon-tabs-tab",
         ".gluon-textarea",
         ".gluon-toggle-button"
       ]
     },
     "after": {
-      "rawBytes": 20908,
-      "gzipBytes": 3180,
-      "moduleCount": 19,
+      "rawBytes": 23215,
+      "gzipBytes": 3454,
+      "moduleCount": 20,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -77,9 +81,10 @@
         "packages/molecules/src/control-field-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/molecules/src/segmented-control-styles.ts",
+        "packages/molecules/src/tabs-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 19,
+      "stylesheetCount": 20,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -118,6 +123,10 @@
         ".gluon-select",
         ".gluon-status-badge",
         ".gluon-switch",
+        ".gluon-tabs",
+        ".gluon-tabs-list",
+        ".gluon-tabs-panel",
+        ".gluon-tabs-tab",
         ".gluon-textarea",
         ".gluon-toggle-button"
       ]

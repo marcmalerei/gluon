@@ -4,6 +4,11 @@
 
 ### Added
 
+- Added controlled accessible `Tabs` with stable tab/panel relationships,
+  automatic or manual activation, roving keyboard focus, disabled skipping,
+  horizontal/vertical RTL overflow layouts, and URL-backed GLUON GOODS product
+  information panels.
+
 - Added the controlled `SegmentedControl` Molecule with named toolbar and
   pressed-button semantics, roving Arrow/Home/End navigation, disabled-option
   skipping, horizontal/vertical RTL layout, and a URL-backed GLUON GOODS

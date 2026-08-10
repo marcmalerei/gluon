@@ -40,6 +40,7 @@ import {
   FormField,
   NavigationStrip,
   SegmentedControl,
+  Tabs,
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
@@ -376,6 +377,113 @@ describe('separate UI package contracts', () => {
     }), document.body);
     expect([...document.querySelectorAll<HTMLButtonElement>('.gluon-segmented-control-option')]
       .every((button) => button.disabled && button.tabIndex === -1)).toBe(true);
+  });
+
+  it('links controlled Tabs and panels with automatic roving focus', async () => {
+    const onChange = vi.fn();
+    const items = [
+      { id: 'product-story', value: 'story', label: 'Story', panel: 'Adaptable product story' },
+      { id: 'product-care', value: 'care', label: 'Care', panel: 'Care guidance', disabled: true },
+      { id: 'product-details', value: 'details', label: 'Details', panel: 'Material details' },
+    ];
+    const view = (value: string) => Tabs({ label: 'Product information', value, items, onChange });
+    render(view('story'), document.body);
+    const list = document.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    expect(list.getAttribute('aria-label')).toBe('Product information');
+    expect(list.getAttribute('aria-orientation')).toBe('horizontal');
+    expect(tabs.map((tab) => tab.tabIndex)).toEqual([0, -1, -1]);
+    expect(tabs[0]?.getAttribute('aria-controls')).toBe('product-story-panel');
+    expect(document.querySelector('#product-story-panel')?.getAttribute('aria-labelledby')).toBe('product-story-tab');
+    expect(document.querySelector<HTMLElement>('#product-story-panel')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>('#product-details-panel')?.hidden).toBe(true);
+    tabs[0]!.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(document.activeElement).toBe(tabs[2]);
+    expect(onChange).toHaveBeenLastCalledWith('details', expect.any(KeyboardEvent));
+    render(view('details'), document.body);
+    const selected = document.querySelector<HTMLButtonElement>('#product-details-tab')!;
+    expect(document.activeElement).toBe(selected);
+    expect(selected.getAttribute('aria-selected')).toBe('true');
+    expect(document.querySelector<HTMLElement>('#product-details-panel')?.hidden).toBe(false);
+  });
+
+  it('keeps manual vertical Tabs focused until Enter and reverses horizontal RTL arrows', async () => {
+    const onChange = vi.fn();
+    render(q.div({ dir: 'rtl', children: Tabs({
+      label: 'Account sections',
+      value: 'profile',
+      activation: 'manual',
+      items: [
+        { id: 'account-profile', value: 'profile', label: 'Profile', panel: 'Profile panel' },
+        { id: 'account-security', value: 'security', label: 'Security', panel: 'Security panel' },
+      ],
+      onChange,
+    }) }), document.body);
+    const tabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    tabs[0]!.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toBe(tabs[1]);
+    expect(onChange).not.toHaveBeenCalled();
+    await userEvent.keyboard('{Enter}');
+    expect(onChange).toHaveBeenLastCalledWith('security', expect.any(KeyboardEvent));
+  });
+
+  it('supports vertical Tabs navigation, manual Space activation, and safe selection fallbacks', async () => {
+    const onChange = vi.fn();
+    render(Tabs({
+      labelledBy: 'settings-heading',
+      value: 'missing',
+      orientation: 'vertical',
+      items: [
+        { id: 'settings-profile', value: 'profile', label: 'Profile', panel: 'Profile panel' },
+        { id: 'settings-security', value: 'security', label: 'Security', panel: 'Security panel' },
+        { id: 'settings-billing', value: 'billing', label: 'Billing', panel: 'Billing panel' },
+      ],
+      onChange,
+    }), document.body);
+    const list = document.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    expect(list.getAttribute('aria-labelledby')).toBe('settings-heading');
+    expect(list.getAttribute('aria-orientation')).toBe('vertical');
+    expect(tabs.map((tab) => tab.tabIndex)).toEqual([0, -1, -1]);
+
+    tabs[0]!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(tabs[1]);
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement).toBe(tabs[2]);
+    await userEvent.keyboard('{Home}');
+    expect(document.activeElement).toBe(tabs[0]);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(document.activeElement).toBe(tabs[2]);
+    expect(onChange).toHaveBeenLastCalledWith('billing', expect.any(KeyboardEvent));
+
+    render(Tabs({
+      label: 'Manual sections',
+      value: 'first',
+      activation: 'manual',
+      items: [
+        { id: 'manual-first', value: 'first', label: 'First', panel: 'First panel' },
+        { id: 'manual-second', value: 'second', label: 'Second', panel: 'Second panel' },
+      ],
+      onChange,
+    }), document.body);
+    const manualTabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    manualTabs[1]!.focus();
+    await userEvent.keyboard(' ');
+    expect(onChange).toHaveBeenLastCalledWith('second', expect.any(KeyboardEvent));
+
+    render(Tabs({
+      label: 'Unavailable sections',
+      value: 'first',
+      items: [
+        { id: 'disabled-first', value: 'first', label: 'First', panel: 'First panel', disabled: true },
+        { id: 'disabled-second', value: 'second', label: 'Second', panel: 'Second panel', disabled: true },
+      ],
+    }), document.body);
+    expect([...document.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
+      .every((tab) => tab.disabled && tab.tabIndex === -1)).toBe(true);
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

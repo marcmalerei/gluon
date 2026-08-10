@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { NavigationStrip, SegmentedControl } from '@gluonjs/molecules';
+import { NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -152,8 +152,10 @@ export function ProductPage(
   renderProductConfigurator: ProductConfiguratorRenderer = ProductConfigurator,
 ): TemplateValue {
   const route = useRoute();
+  const router = useRouter();
   const product = findProduct(route.params.slug);
   if (!product) return NotFoundPage(store);
+  const productInfo = route.query.info === 'details' ? 'details' : 'story';
   return html`
     <article class="product-page">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -189,15 +191,35 @@ export function ProductPage(
         })}
       </div>
       <section class="product-story">
-        <div>
-          <h2>Designed around change</h2>
-          <p>${product.name} is built from modular components that are easy to adjust, maintain, and repair. Precise materials make it useful now and adaptable later.</p>
-        </div>
-        <dl>
-          <div><dt>Materials</dt><dd>Powder-coated steel, replaceable hardware</dd></div>
-          <div><dt>Delivery & returns</dt><dd>Ships in 2–3 days, 30-day returns</dd></div>
-          <div><dt>Care</dt><dd>Wipe clean, parts available individually</dd></div>
-        </dl>
+        ${Tabs({
+          label: 'Product information',
+          value: productInfo,
+          attributes: { class: 'product-info-tabs' },
+          items: [
+            {
+              id: `${product.slug}-story`,
+              value: 'story',
+              label: 'Story',
+              panel: html`<div><h2>Designed around change</h2><p>${product.name} is built from modular components that are easy to adjust, maintain, and repair. Precise materials make it useful now and adaptable later.</p></div>`,
+            },
+            {
+              id: `${product.slug}-details`,
+              value: 'details',
+              label: 'Details',
+              panel: html`<dl>
+                <div><dt>Materials</dt><dd>Powder-coated steel, replaceable hardware</dd></div>
+                <div><dt>Delivery & returns</dt><dd>Ships in 2–3 days, 30-day returns</dd></div>
+                <div><dt>Care</dt><dd>Wipe clean, parts available individually</dd></div>
+              </dl>`,
+            },
+          ],
+          onChange: (nextInfo) => {
+            const suffix = nextInfo === 'details' ? '?info=details' : '';
+            void router.push(`/products/${product.slug}${suffix}`).then(() => {
+              document.getElementById(`${product.slug}-${nextInfo}-tab`)?.focus();
+            });
+          },
+        })}
         <div class="paired-product">
           <h2>Pairs well with</h2>
           ${ProductCard(products.find((entry) => entry.slug === 'stack-tray')!)}

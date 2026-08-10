@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles } from '@gluonjs/molecules';",
+        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -904,6 +904,7 @@
         "  FormField,",
         "  NavigationStrip,",
         "  SegmentedControl,",
+        "  Tabs,",
         "  moleculeManifest,",
         "  moleculeStyles,",
         "  type ButtonGroupAccessibleName,",
@@ -928,6 +929,13 @@
         "  type SegmentedControlOption,",
         "  type SegmentedControlOrientation,",
         "  type SegmentedControlProps,",
+        "  type TabsAccessibleName,",
+        "  type TabsActivation,",
+        "  type TabsAttributes,",
+        "  type TabsChangeEvent,",
+        "  type TabsItem,",
+        "  type TabsOrientation,",
+        "  type TabsProps,",
         "} from '@gluonjs/molecules';",
         "",
         "const email = { label: 'Email', name: 'email', type: 'email', helper: 'Order updates go here.' } satisfies FormFieldProps;",
@@ -960,7 +968,14 @@
         "const segmentOrientation: SegmentedControlOrientation = 'horizontal';",
         "const handleSegment = (value: string, event: SegmentedControlChangeEvent) => console.log(value, event.type);",
         "const orderView = { ...segmentName, value: 'summary', options: segmentOptions, orientation: segmentOrientation, attributes: segmentAttributes, onChange: handleSegment } satisfies SegmentedControlProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}`, moleculeStyles, moleculeManifest.entries);"
+        "const tabsName = { label: 'Order information' } satisfies TabsAccessibleName;",
+        "const tabsActivation: TabsActivation = 'automatic';",
+        "const tabsOrientation: TabsOrientation = 'horizontal';",
+        "const tabsAttributes = { class: 'order-information' } satisfies TabsAttributes;",
+        "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
+        "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
+        "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4055,6 +4070,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable SegmentedControl layout stylesheet:"
     },
+    "packages/molecules/src/variables/tabsStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Tabs layout and state stylesheet:"
+    },
     "packages/molecules/src/variables/formFieldStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable FormField stylesheet retained alongside its nested Atom dependencies:"
@@ -4379,6 +4398,10 @@
       "recipe": "molecule-components",
       "description": "Describe one caller-owned segmented value, visible label, accessible label, and disabled state:"
     },
+    "packages/molecules/src/interfaces/TabsItem.md": {
+      "recipe": "molecule-components",
+      "description": "Provide one stable tab ID base, value, label, caller-owned panel, and disabled state:"
+    },
     "packages/molecules/src/type-aliases/CardTone.md": {
       "recipe": "molecule-components",
       "description": "Select the neutral, success, warning, or danger emphasis applied by a Card without depending on CSS classes:"
@@ -4419,6 +4442,30 @@
       "recipe": "molecule-components",
       "description": "Compose a controlled value, finite options, naming, orientation, and change handler:"
     },
+    "packages/molecules/src/type-aliases/TabsAccessibleName.md": {
+      "recipe": "molecule-components",
+      "description": "Require a direct accessible label or labelled-by relationship for the tablist:"
+    },
+    "packages/molecules/src/type-aliases/TabsActivation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose automatic selection on roving focus or manual Enter and Space activation:"
+    },
+    "packages/molecules/src/type-aliases/TabsAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible attributes to the outer Tabs HTMLDivElement:"
+    },
+    "packages/molecules/src/type-aliases/TabsChangeEvent.md": {
+      "recipe": "molecule-components",
+      "description": "Handle native mouse or keyboard events when controlled tab selection changes:"
+    },
+    "packages/molecules/src/type-aliases/TabsOrientation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose horizontal or vertical layout and matching Arrow-key navigation:"
+    },
+    "packages/molecules/src/type-aliases/TabsProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose controlled tab selection, stable items, activation, orientation, and change handling:"
+    },
     "packages/molecules/src/variables/Card.md": {
       "recipe": "molecule-components",
       "description": "Render structured status or content inside a Card with optional media, actions, and semantic article attributes:"
@@ -4446,6 +4493,10 @@
     "packages/molecules/src/variables/SegmentedControl.md": {
       "recipe": "molecule-components",
       "description": "Render a controlled one-of-many toolbar of pressed buttons without tab or radio semantics:"
+    },
+    "packages/molecules/src/variables/Tabs.md": {
+      "recipe": "molecule-components",
+      "description": "Render controlled WAI-ARIA tabs and panels while callers retain routing, loading, and persistence:"
     },
     "packages/molecules/src/variables/moleculeManifest.md": {
       "recipe": "molecule-components",

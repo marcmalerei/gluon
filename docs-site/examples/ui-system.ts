@@ -29,6 +29,7 @@ import {
   FormField,
   NavigationStrip,
   SegmentedControl,
+  Tabs,
   defineMolecule,
 } from '@gluonjs/molecules';
 import { AppShell, defineOrganism } from '@gluonjs/organisms';
@@ -212,6 +213,14 @@ createApp(() => AppShell({
           options: [
             { value: 'details', label: 'Details' },
             { value: 'summary', label: 'Summary' },
+          ],
+        }),
+        Tabs({
+          label: 'Profile information',
+          value: 'overview',
+          items: [
+            { id: 'profile-overview', value: 'overview', label: 'Overview', panel: 'Profile overview' },
+            { id: 'profile-history', value: 'history', label: 'History', panel: 'Profile history' },
           ],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),

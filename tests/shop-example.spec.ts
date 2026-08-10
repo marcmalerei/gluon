@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles } from '@gluonjs/molecules';
+import { choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -119,6 +119,31 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.adoptedStyleSheets).not.toContain(editorialSheet);
     expect(document.querySelector('gluon-teleport')).toBeNull();
+  });
+
+  it('keeps product information Tabs URL-backed with stable panels and focus', async () => {
+    const { app, router } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']), {
+      storage: null,
+      styleTarget: document,
+    });
+    await router.isReady();
+    const root = document.createElement('div');
+    document.body.append(root);
+    app.mount(root);
+    const story = root.querySelector<HTMLButtonElement>('#orbit-lamp-story-tab')!;
+    const details = root.querySelector<HTMLButtonElement>('#orbit-lamp-details-tab')!;
+    expect(document.adoptedStyleSheets).toContain(tabsStyles);
+    expect(story.getAttribute('aria-selected')).toBe('true');
+    expect(root.querySelector<HTMLElement>('#orbit-lamp-story-panel')?.hidden).toBe(false);
+    details.focus();
+    details.click();
+    await settleShop();
+    expect(router.currentRoute.value.fullPath).toBe('/products/orbit-lamp?info=details');
+    expect(document.activeElement).toBe(root.querySelector('#orbit-lamp-details-tab'));
+    expect(root.querySelector('#orbit-lamp-details-panel')?.textContent).toContain('Powder-coated steel');
+    expect(root.querySelector<HTMLElement>('#orbit-lamp-story-panel')?.hidden).toBe(true);
+    app.unmount();
+    expect(document.adoptedStyleSheets).not.toContain(tabsStyles);
   });
 
   it('exposes functional mobile navigation and catalog filters', async () => {
