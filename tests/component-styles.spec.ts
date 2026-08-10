@@ -44,6 +44,7 @@ import {
   controlFieldStyles,
   formFieldStyles,
   navigationStripStyles,
+  segmentedControlStyles,
 } from '@gluonjs/molecules';
 import { appShellStyles } from '@gluonjs/organisms';
 import { nextTick } from '@gluonjs/reactivity';
@@ -67,6 +68,7 @@ const allComponentSheets = [
   controlFieldStyles,
   formFieldStyles,
   navigationStripStyles,
+  segmentedControlStyles,
   appShellStyles,
 ];
 

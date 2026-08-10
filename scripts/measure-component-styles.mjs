@@ -40,6 +40,7 @@ const buttonGroupStyles = await sheet('packages/molecules/src/button-group-style
 const choiceGroupStyles = await sheet('packages/molecules/src/choice-group-styles.ts', 'choiceGroupStyles');
 const controlFieldStyles = await sheet('packages/molecules/src/control-field-styles.ts', 'controlFieldStyles');
 const formFieldStyles = await sheet('packages/molecules/src/form-field-styles.ts', 'formFieldStyles');
+const segmentedControlStyles = await sheet('packages/molecules/src/segmented-control-styles.ts', 'segmentedControlStyles');
 const appShellStyles = await sheet('packages/organisms/src/app-shell-styles.ts', 'appShellStyles');
 
 const actual = {
@@ -51,7 +52,7 @@ const actual = {
       ['packages/atoms/src/styles.ts', 'packages/molecules/src/styles.ts', 'packages/organisms/src/styles.ts'],
     ),
     after: measure(
-      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, appShellStyles],
+      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, segmentedControlStyles, appShellStyles],
       [
         'packages/atoms/src/button-styles.ts',
         'packages/atoms/src/checkbox-styles.ts',
@@ -70,6 +71,7 @@ const actual = {
         'packages/molecules/src/choice-group-styles.ts',
         'packages/molecules/src/control-field-styles.ts',
         'packages/molecules/src/form-field-styles.ts',
+        'packages/molecules/src/segmented-control-styles.ts',
         'packages/organisms/src/app-shell-styles.ts',
       ],
     ),

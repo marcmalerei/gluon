@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 17455,
-      "gzipBytes": 2978,
+      "rawBytes": 19907,
+      "gzipBytes": 3154,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -45,6 +45,8 @@
         ".gluon-label",
         ".gluon-progress",
         ".gluon-radio",
+        ".gluon-segmented-control",
+        ".gluon-segmented-control-option",
         ".gluon-select",
         ".gluon-status-badge",
         ".gluon-switch",
@@ -53,9 +55,9 @@
       ]
     },
     "after": {
-      "rawBytes": 18397,
-      "gzipBytes": 2998,
-      "moduleCount": 18,
+      "rawBytes": 20908,
+      "gzipBytes": 3180,
+      "moduleCount": 19,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -74,9 +76,10 @@
         "packages/molecules/src/choice-group-styles.ts",
         "packages/molecules/src/control-field-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
+        "packages/molecules/src/segmented-control-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 18,
+      "stylesheetCount": 19,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -110,6 +113,8 @@
         ".gluon-label",
         ".gluon-progress",
         ".gluon-radio",
+        ".gluon-segmented-control",
+        ".gluon-segmented-control-option",
         ".gluon-select",
         ".gluon-status-badge",
         ".gluon-switch",

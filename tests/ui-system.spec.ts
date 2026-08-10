@@ -39,6 +39,7 @@ import {
   ControlField,
   FormField,
   NavigationStrip,
+  SegmentedControl,
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
@@ -294,6 +295,53 @@ describe('separate UI package contracts', () => {
     expect(document.activeElement?.textContent).toBe('Save');
     await userEvent.tab();
     expect(document.activeElement?.textContent).toBe('Pin');
+  });
+
+  it('keeps SegmentedControl controlled and navigates one pressed-button Tab stop', async () => {
+    const onChange = vi.fn();
+    render(q.div({ children: [
+      q.h2({ id: 'view-label', children: 'Result view' }),
+      SegmentedControl({
+        labelledBy: 'view-label',
+        value: 'grid',
+        options: [
+          { value: 'grid', label: 'Grid' },
+          { value: 'map', label: 'Map', disabled: true },
+          { value: 'list', label: 'List' },
+        ],
+        onChange,
+      }),
+    ] }), document.body);
+    const toolbar = document.querySelector<HTMLElement>('[role="toolbar"]')!;
+    const buttons = [...toolbar.querySelectorAll<HTMLButtonElement>('button')];
+    expect(toolbar.getAttribute('aria-labelledby')).toBe('view-label');
+    expect(toolbar.getAttribute('aria-orientation')).toBe('horizontal');
+    expect(toolbar.querySelector('[role="tab"], [role="radio"]')).toBeNull();
+    expect(buttons.map((button) => button.getAttribute('aria-pressed'))).toEqual(['true', 'false', 'false']);
+    expect(buttons.map((button) => button.tabIndex)).toEqual([0, -1, -1]);
+    buttons[0]!.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(document.activeElement).toBe(buttons[2]);
+    expect(onChange).toHaveBeenLastCalledWith('list', expect.any(KeyboardEvent));
+    expect(buttons[0]!.getAttribute('aria-pressed')).toBe('true');
+    buttons[2]!.click();
+    expect(onChange).toHaveBeenLastCalledWith('list', expect.any(MouseEvent));
+  });
+
+  it('supports vertical and RTL SegmentedControl arrow direction', async () => {
+    const onChange = vi.fn();
+    render(q.div({ dir: 'rtl', children: SegmentedControl({
+      label: 'Density',
+      value: 'comfortable',
+      orientation: 'horizontal',
+      options: [{ value: 'comfortable', label: 'Comfortable' }, { value: 'compact', label: 'Compact' }],
+      onChange,
+    }) }), document.body);
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.gluon-segmented-control-option');
+    buttons[0]!.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toBe(buttons[1]);
+    expect(onChange).toHaveBeenLastCalledWith('compact', expect.any(KeyboardEvent));
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

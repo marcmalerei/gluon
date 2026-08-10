@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
+import { choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -178,8 +178,20 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(router.currentRoute.value.fullPath).toBe('/shop?category=Seating&sort=price-high');
     expect(root.querySelector<HTMLSelectElement>('#catalog-sort')?.value).toBe('price-high');
+    expect(document.adoptedStyleSheets).toContain(segmentedControlStyles);
+    const viewButtons = root.querySelectorAll<HTMLButtonElement>('.catalog-view button');
+    expect(viewButtons).toHaveLength(2);
+    expect(viewButtons[0]?.getAttribute('aria-pressed')).toBe('true');
+    viewButtons[1]!.click();
+    await settleShop();
+    expect(router.currentRoute.value.fullPath).toBe('/shop?category=Seating&sort=price-high&view=list');
+    expect(root.querySelector('.catalog-grid')?.classList).toContain('is-list-view');
+    const selectedListView = root.querySelectorAll<HTMLButtonElement>('.catalog-view button')[1]!;
+    expect(selectedListView.getAttribute('aria-pressed')).toBe('true');
+    expect(getComputedStyle(selectedListView).color).toBe('rgb(255, 255, 255)');
     app.unmount();
     expect(document.adoptedStyleSheets).not.toContain(navigationStripStyles);
+    expect(document.adoptedStyleSheets).not.toContain(segmentedControlStyles);
   });
 
   it('completes bag checkout and renders a durable order confirmation route', async () => {

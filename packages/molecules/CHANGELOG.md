@@ -4,6 +4,11 @@
 
 ### Added
 
+- Added the controlled `SegmentedControl` Molecule with named toolbar and
+  pressed-button semantics, roving Arrow/Home/End navigation, disabled-option
+  skipping, horizontal/vertical RTL layout, and a URL-backed GLUON GOODS
+  Grid/List catalog view.
+
 - Added the accessible layout-only `ButtonGroup` Molecule with named group
   semantics, horizontal/vertical and spaced/attached presentation, wrapping,
   logical-property styling, and GLUON GOODS header-action integration.
