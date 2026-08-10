@@ -8,7 +8,7 @@ import {
   type ButtonProps,
 } from '@gluonjs/atoms';
 import { html, svg, type Component, type TemplateResult, type TemplateValue } from '@gluonjs/core';
-import { FormField, defineMolecule } from '@gluonjs/molecules';
+import { ControlField, FormField, defineMolecule } from '@gluonjs/molecules';
 import { defineOrganism } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
 import ShopEditorialLinkSfc from './shop-editorial-link.gluon';
@@ -127,22 +127,26 @@ export const CheckoutExperience = defineOrganism((props: CheckoutExperienceProps
             autocomplete: 'address-level2',
           })}
         </div>
-        ${q.label({
-          class: 'checkout-field',
-          children: [
-            'Delivery instructions (optional)',
-            Textarea({
-              attributes: { class: ['checkout-input', 'checkout-textarea'] },
-              name: 'deliveryInstructions',
-              rows: 3,
-              value: props.values.deliveryInstructions,
-              fullWidth: true,
-              onInput: (event) => props.onFieldInput(
-                'deliveryInstructions',
-                (event.currentTarget as HTMLTextAreaElement).value,
-              ),
-            }),
-          ],
+        ${ControlField({
+          id: 'checkout-delivery-instructions',
+          label: 'Delivery instructions (optional)',
+          helper: 'Add access notes for the workshop courier.',
+          attributes: { class: 'checkout-field' },
+          control: (relationships) => Textarea({
+            attributes: {
+              id: relationships.controlId,
+              class: ['checkout-input', 'checkout-textarea'],
+              aria: relationships.aria,
+            },
+            name: 'deliveryInstructions',
+            rows: 3,
+            value: props.values.deliveryInstructions,
+            fullWidth: true,
+            onInput: (event) => props.onFieldInput(
+              'deliveryInstructions',
+              (event.currentTarget as HTMLTextAreaElement).value,
+            ),
+          }),
         })}
         ${q.label({
           class: 'checkout-consent',

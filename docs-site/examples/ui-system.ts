@@ -23,6 +23,7 @@ import {
 } from '@gluonjs/core';
 import {
   Card,
+  ControlField,
   FormField,
   NavigationStrip,
   defineMolecule,
@@ -181,6 +182,15 @@ createApp(() => AppShell({
         ToggleButton({ pressed: true, label: 'Grid view', variant: 'ghost' }),
         Progress({ value: 72, attributes: { 'aria-label': 'Profile completion' } }),
         StatusBadge({ tone: 'success', children: 'Profile active' }),
+        ControlField({
+          id: 'profile-note',
+          label: 'Profile note',
+          helper: 'Visible to the account owner.',
+          control: (relationships) => Textarea({
+            value: 'Prefers email updates.',
+            attributes: { id: relationships.controlId, aria: relationships.aria },
+          }),
+        }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({
         label: 'Reference',

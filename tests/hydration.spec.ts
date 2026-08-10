@@ -20,8 +20,8 @@ import {
   unsafeHTML,
   unmount,
 } from '@gluonjs/core';
-import { Button, Checkbox, Progress, Radio, Select, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Card, cardStyles } from '@gluonjs/molecules';
+import { Button, Checkbox, Input, Progress, Radio, Select, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
+import { Card, ControlField, cardStyles, controlFieldStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import { createComponentLibraryLoader } from '@gluonjs/quarks';
@@ -470,7 +470,7 @@ describe('SSR hydration', () => {
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
-    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Progress({ value: 2, max: 4, attributes: { 'aria-label': 'Hydrated progress' } })}${Radio({ checked: true, name: 'finish', attributes: { 'aria-label': 'Hydrated radio' } })}${StatusBadge({ tone: 'success', children: 'Hydrated status' })}${Switch({ checked: true, name: 'network', attributes: { 'aria-label': 'Hydrated switch' } })}${ToggleButton({ pressed: true, label: 'Hydrated toggle' })}${Card({ title: 'Hydrated card' })}</main>`;
+    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Progress({ value: 2, max: 4, attributes: { 'aria-label': 'Hydrated progress' } })}${Radio({ checked: true, name: 'finish', attributes: { 'aria-label': 'Hydrated radio' } })}${StatusBadge({ tone: 'success', children: 'Hydrated status' })}${Switch({ checked: true, name: 'network', attributes: { 'aria-label': 'Hydrated switch' } })}${ToggleButton({ pressed: true, label: 'Hydrated toggle' })}${ControlField({ id: 'hydrated-field', label: 'Hydrated field', helper: 'Hydrated help', control: (relationships) => Input({ value: 'Hydrated', attributes: { id: relationships.controlId, aria: relationships.aria } }) })}${Card({ title: 'Hydrated card' })}</main>`;
     const prepared = await prepareForHydration(value);
     const selection = createComponentStyleSelection(prepared.value);
     const manifest = createStyleManifest(selection);
@@ -487,24 +487,28 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(textareaStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(checkboxStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(inputStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(progressStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(radioStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(statusBadgeStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(switchStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(toggleButtonStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(cardStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(controlFieldStyles);
     expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
     unmount(root);
     expect(styleRoot.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(textareaStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(checkboxStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(inputStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(progressStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(radioStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(statusBadgeStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(switchStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(toggleButtonStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(cardStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(controlFieldStyles);
 
     const carrierTemplate = document.createElement('template');
     carrierTemplate.innerHTML = renderStyleCarriers(manifest);

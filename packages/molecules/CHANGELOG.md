@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the generic `ControlField` Molecule with caller-rendered controls,
+  deterministic label/helper/error relationships, required indication, exact
+  styles, and GLUON GOODS delivery-instructions integration.
+
 ## [1.7.0] - 2026-08-05
 
 ### Changed

@@ -39,6 +39,7 @@ import {
 import {
   Card,
   cardStyles,
+  controlFieldStyles,
   formFieldStyles,
   navigationStripStyles,
 } from '@gluonjs/molecules';
@@ -59,6 +60,7 @@ const allComponentSheets = [
   textareaStyles,
   toggleButtonStyles,
   cardStyles,
+  controlFieldStyles,
   formFieldStyles,
   navigationStripStyles,
   appShellStyles,

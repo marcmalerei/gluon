@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { cardStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
+        "import { cardStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -894,27 +894,35 @@
     "molecule-components": {
       "module": "@gluonjs/molecules",
       "code": [
-        "import { Button } from '@gluonjs/atoms';",
+        "import { Button, Input } from '@gluonjs/atoms';",
         "import { html } from '@gluonjs/core';",
         "import {",
         "  Card,",
+        "  ControlField,",
         "  FormField,",
         "  NavigationStrip,",
         "  moleculeManifest,",
         "  moleculeStyles,",
         "  type CardProps,",
         "  type CardTone,",
+        "  type ControlFieldAttributes,",
+        "  type ControlFieldProps,",
+        "  type ControlFieldRelationships,",
+        "  type ControlFieldRenderer,",
         "  type FormFieldProps,",
         "  type NavigationStripProps,",
         "} from '@gluonjs/molecules';",
         "",
         "const email = { label: 'Email', name: 'email', type: 'email', helper: 'Order updates go here.' } satisfies FormFieldProps;",
+        "const fieldAttributes = { class: 'order-reference-field' } satisfies ControlFieldAttributes;",
+        "const renderOrderReference: ControlFieldRenderer = (relationships: ControlFieldRelationships) => Input({ attributes: { id: relationships.controlId, aria: relationships.aria } });",
+        "const orderReference = { id: 'order-reference', label: 'Order reference', helper: 'Optional internal reference.', attributes: fieldAttributes, control: renderOrderReference } satisfies ControlFieldProps;",
         "const tone: CardTone = 'success';",
         "const order = {",
         "  title: 'Order confirmed',",
         "  subtitle: '#GL-1042',",
         "  tone,",
-        "  children: FormField(email),",
+        "  children: html`${FormField(email)}${ControlField(orderReference)}` ,",
         "  actions: Button({ label: 'View order' }),",
         "} satisfies CardProps;",
         "const sections = {",
@@ -4000,6 +4008,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Card stylesheet retained by rendered Card values:"
     },
+    "packages/molecules/src/variables/controlFieldStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable ControlField relationship and message stylesheet:"
+    },
     "packages/molecules/src/variables/formFieldStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable FormField stylesheet retained alongside its nested Atom dependencies:"
@@ -4280,6 +4292,14 @@
       "recipe": "molecule-components",
       "description": "Compose a Card's heading, tone, media, actions, body, and native article attributes as one typed surface:"
     },
+    "packages/molecules/src/interfaces/ControlFieldProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a visible label, caller-rendered control, helper, error, required indication, and outer native div attributes:"
+    },
+    "packages/molecules/src/interfaces/ControlFieldRelationships.md": {
+      "recipe": "molecule-components",
+      "description": "Apply deterministic control, label, helper, error, required, invalid, and ARIA relationship metadata inside a control render callback:"
+    },
     "packages/molecules/src/interfaces/FormFieldProps.md": {
       "recipe": "molecule-components",
       "description": "Combine Input properties with a required visible label and mutually useful helper or error messaging:"
@@ -4292,9 +4312,21 @@
       "recipe": "molecule-components",
       "description": "Select the neutral, success, warning, or danger emphasis applied by a Card without depending on CSS classes:"
     },
+    "packages/molecules/src/type-aliases/ControlFieldAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLDivElement attributes without replacing ControlField structural content:"
+    },
+    "packages/molecules/src/type-aliases/ControlFieldRenderer.md": {
+      "recipe": "molecule-components",
+      "description": "Render caller-owned control content from public relationship metadata without cloning private state:"
+    },
     "packages/molecules/src/variables/Card.md": {
       "recipe": "molecule-components",
       "description": "Render structured status or content inside a Card with optional media, actions, and semantic article attributes:"
+    },
+    "packages/molecules/src/variables/ControlField.md": {
+      "recipe": "molecule-components",
+      "description": "Render a generic labeled field while the caller retains control value, event, and validation ownership:"
     },
     "packages/molecules/src/variables/FormField.md": {
       "recipe": "molecule-components",

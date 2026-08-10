@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 13362,
-      "gzipBytes": 2471,
+      "rawBytes": 14262,
+      "gzipBytes": 2609,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -26,6 +26,11 @@
         ".gluon-card-subtitle",
         ".gluon-card-title",
         ".gluon-checkbox",
+        ".gluon-control-field",
+        ".gluon-control-field-error",
+        ".gluon-control-field-helper",
+        ".gluon-control-field-label",
+        ".gluon-control-field-required",
         ".gluon-form-error",
         ".gluon-form-field",
         ".gluon-form-helper",
@@ -42,9 +47,9 @@
       ]
     },
     "after": {
-      "rawBytes": 14150,
-      "gzipBytes": 2509,
-      "moduleCount": 15,
+      "rawBytes": 15076,
+      "gzipBytes": 2624,
+      "moduleCount": 16,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -59,10 +64,11 @@
         "packages/atoms/src/textarea-styles.ts",
         "packages/atoms/src/toggle-button-styles.ts",
         "packages/molecules/src/card-styles.ts",
+        "packages/molecules/src/control-field-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 15,
+      "stylesheetCount": 16,
       "selectors": [
         ".gluon-app-shell",
         ".gluon-app-shell-footer",
@@ -77,6 +83,11 @@
         ".gluon-card-subtitle",
         ".gluon-card-title",
         ".gluon-checkbox",
+        ".gluon-control-field",
+        ".gluon-control-field-error",
+        ".gluon-control-field-helper",
+        ".gluon-control-field-label",
+        ".gluon-control-field-required",
         ".gluon-form-error",
         ".gluon-form-field",
         ".gluon-form-helper",

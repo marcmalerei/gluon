@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  Input,
   Progress,
   Radio,
   Switch,
@@ -18,7 +19,7 @@ import {
   css,
   render,
 } from '../src/index.js';
-import { Card, FormField } from '@gluonjs/molecules';
+import { Card, ControlField, FormField } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -394,6 +395,44 @@ test('matches StatusBadge tones, wrapping, and RTL states', async () => {
   await expect.element(page.getByTestId('status-badge-visual')).toMatchScreenshot('status-badge-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.06, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches ControlField helper, required, error, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="control-field-visual"] { box-sizing: border-box; inline-size: 420px; block-size: 560px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="control-field-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .control-field-grid { display: grid; gap: 18px; }
+      .control-field-grid :is(input, select, textarea) { box-sizing: border-box; inline-size: 100%; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'control-field-visual' },
+    children: [
+      q.h1({ children: 'ControlField states' }),
+      q.div({
+        class: 'control-field-grid',
+        children: [
+          ControlField({ id: 'visual-name', label: 'Full name', helper: 'Shown on receipts', required: true, control: (relationships) => Input({ value: 'Ada Lovelace', attributes: { id: relationships.controlId, required: relationships.required, aria: relationships.aria } }) }),
+          ControlField({ id: 'visual-window', label: 'Delivery window', control: (relationships) => Select({ value: 'morning', attributes: { id: relationships.controlId, aria: relationships.aria }, children: [q.option({ value: 'morning', children: 'Morning' }), q.option({ value: 'afternoon', children: 'Afternoon' })] }) }),
+          ControlField({ id: 'visual-note', label: 'Courier note', error: 'Add a delivery note', control: (relationships) => Textarea({ value: '', rows: 2, invalid: relationships.invalid, attributes: { id: relationships.controlId, aria: relationships.aria } }) }),
+          q.div({ dir: 'rtl', children: ControlField({ id: 'visual-rtl', label: 'RTL field', helper: 'Logical alignment', control: (relationships) => Input({ value: 'RTL', attributes: { id: relationships.controlId, aria: relationships.aria } }) }) }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('control-field-visual')).toMatchScreenshot('control-field-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
   });
   uiOwner.dispose();
 });

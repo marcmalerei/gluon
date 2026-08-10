@@ -34,6 +34,7 @@ import {
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
 import {
   Card,
+  ControlField,
   FormField,
   NavigationStrip,
   moleculeManifest,
@@ -196,6 +197,35 @@ describe('separate UI package contracts', () => {
     expect(success.classList).toContain('is-success');
     expect(success.dir).toBe('rtl');
     expect(success.textContent).toBe('In stock');
+  });
+
+  it('wires ControlField labels, help, errors, and caller-owned controls without cloning state', () => {
+    const field = (
+      id: string,
+      control: Parameters<typeof ControlField>[0]['control'],
+      options: { helper?: string; error?: string; required?: boolean } = {},
+    ) => ControlField({ id, label: id, control, ...options });
+    render(q.div({ children: [
+      field('input-control', (relationships) => Input({ value: 'Ada', invalid: relationships.invalid, attributes: { id: relationships.controlId, required: relationships.required, aria: relationships.aria } }), { helper: 'Receipt name', required: true }),
+      field('select-control', (relationships) => Select({ value: 'one', attributes: { id: relationships.controlId, aria: relationships.aria }, children: q.option({ value: 'one', children: 'One' }) })),
+      field('textarea-control', (relationships) => Textarea({ value: '', invalid: relationships.invalid, attributes: { id: relationships.controlId, aria: relationships.aria } }), { helper: 'Courier note', error: 'Enter a note' }),
+      field('checkbox-control', (relationships) => Checkbox({ attributes: { id: relationships.controlId, aria: relationships.aria } })),
+      field('radio-control', (relationships) => Radio({ name: 'control-choice', attributes: { id: relationships.controlId, aria: relationships.aria } })),
+      field('switch-control', (relationships) => Switch({ attributes: { id: relationships.controlId, aria: relationships.aria } })),
+    ] }), document.body);
+
+    const input = document.querySelector<HTMLInputElement>('#input-control')!;
+    const textarea = document.querySelector<HTMLTextAreaElement>('#textarea-control')!;
+    expect(input.value).toBe('Ada');
+    expect(input.required).toBe(true);
+    expect(input.getAttribute('aria-labelledby')).toBe('input-control-label');
+    expect(input.getAttribute('aria-describedby')).toBe('input-control-helper');
+    expect(document.querySelector('label[for="input-control"]')?.textContent).toContain('input-control');
+    expect(textarea.getAttribute('aria-describedby')).toBe('textarea-control-helper');
+    expect(textarea.getAttribute('aria-errormessage')).toBe('textarea-control-error');
+    expect(textarea.getAttribute('aria-invalid')).toBe('true');
+    expect(document.querySelector('#textarea-control-error')?.getAttribute('role')).toBe('alert');
+    expect(document.querySelectorAll('.gluon-control-field')).toHaveLength(6);
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {
@@ -970,6 +1000,7 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
         children: [
           FormField({ label: 'Name', value: 'Ada', helper: 'Shown on receipts' }),
           FormField({ label: 'Email', value: 'invalid', error: 'Enter a valid email address' }),
+          ControlField({ id: 'account-reference', label: 'Account reference', helper: 'Optional internal reference', control: (relationships) => Input({ attributes: { id: relationships.controlId, aria: relationships.aria } }) }),
           q.p({ children: [Icon({ name: 'spark', label: 'Verified' }), ' Verified account'] }),
           Input({ attributes: { 'aria-label': 'Search settings' } }),
           Select({

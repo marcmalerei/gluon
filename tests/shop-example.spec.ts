@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
+import { controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -206,6 +206,7 @@ describe('GLUON GOODS reference shop', () => {
       input.required && input.closest('label')?.classList.contains('checkout-field')
     ))).toBe(true);
     expect(document.adoptedStyleSheets).toContain(formFieldStyles);
+    expect(document.adoptedStyleSheets).toContain(controlFieldStyles);
     expect(document.adoptedStyleSheets).toContain(inputStyles);
     expect(document.adoptedStyleSheets).toContain(labelStyles);
     expect(document.adoptedStyleSheets).toContain(textareaStyles);
@@ -223,6 +224,10 @@ describe('GLUON GOODS reference shop', () => {
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }
     const deliveryInstructions = root.querySelector<HTMLTextAreaElement>('textarea[name="deliveryInstructions"]')!;
+    expect(deliveryInstructions.id).toBe('checkout-delivery-instructions');
+    expect(deliveryInstructions.getAttribute('aria-labelledby')).toBe('checkout-delivery-instructions-label');
+    expect(deliveryInstructions.getAttribute('aria-describedby')).toBe('checkout-delivery-instructions-helper');
+    expect(root.querySelector('#checkout-delivery-instructions-helper')?.textContent).toContain('workshop courier');
     deliveryInstructions.value = 'Leave with the workshop concierge.';
     deliveryInstructions.dispatchEvent(new Event('input', { bubbles: true }));
     const terms = root.querySelector<HTMLInputElement>('input[name="terms"]')!;
