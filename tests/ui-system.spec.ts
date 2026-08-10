@@ -344,6 +344,40 @@ describe('separate UI package contracts', () => {
     expect(onChange).toHaveBeenLastCalledWith('compact', expect.any(KeyboardEvent));
   });
 
+  it('supports vertical SegmentedControl Home, End, and disabled fallback behavior', async () => {
+    const onChange = vi.fn();
+    render(SegmentedControl({
+      label: 'Priority',
+      value: 'missing',
+      orientation: 'vertical',
+      options: [
+        { value: 'low', label: 'Low' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'high', label: 'High' },
+      ],
+      onChange,
+    }), document.body);
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.gluon-segmented-control-option');
+    expect([...buttons].map((button) => button.tabIndex)).toEqual([0, -1, -1]);
+    buttons[1]!.focus();
+    await userEvent.keyboard('{ArrowUp}');
+    expect(document.activeElement).toBe(buttons[0]);
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement).toBe(buttons[2]);
+    await userEvent.keyboard('{Home}');
+    expect(document.activeElement).toBe(buttons[0]);
+    expect(onChange).toHaveBeenLastCalledWith('low', expect.any(KeyboardEvent));
+
+    render(SegmentedControl({
+      label: 'Disabled priority',
+      value: 'low',
+      disabled: true,
+      options: [{ value: 'low', label: 'Low' }, { value: 'high', label: 'High' }],
+    }), document.body);
+    expect([...document.querySelectorAll<HTMLButtonElement>('.gluon-segmented-control-option')]
+      .every((button) => button.disabled && button.tabIndex === -1)).toBe(true);
+  });
+
   it('renders Textarea as a native controlled multiline control with explicit states', () => {
     const onInput = vi.fn();
     const onChange = vi.fn();
