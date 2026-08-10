@@ -30,6 +30,7 @@ import {
   DialogSurface,
   Disclosure,
   FormField,
+  InlineNotice,
   NavigationStrip,
   SegmentedControl,
   Tabs,
@@ -234,6 +235,11 @@ createApp(() => AppShell({
             { id: 'profile-delivery', value: 'delivery', summary: 'Delivery', children: 'Tracked delivery in 2–3 working days.' },
             { id: 'profile-returns', value: 'returns', summary: 'Returns', children: 'Unused objects can be returned within 30 days.' },
           ],
+        }),
+        InlineNotice({
+          tone: 'success',
+          title: 'Profile saved',
+          children: 'Your public details are up to date.',
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

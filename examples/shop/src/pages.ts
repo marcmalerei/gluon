@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { Accordion, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
+import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -299,9 +299,16 @@ export function OrderConfirmationPage(store: ShopStore): TemplateValue {
   const order = store.order;
   if (!order || route.params.id !== order.id) return NotFoundPage(store);
   return html`<section class="order-confirmation"><p class="eyebrow">Order confirmed</p>
-    <h1>Thank you, your objects are reserved.</h1><p>Order <strong>${order.id}</strong> is confirmed.</p>
-    <p>We sent the delivery details to ${order.email}.</p><strong class="order-total">${formatPrice(order.total)}</strong>
-    ${RouterLink({ to: '/shop', children: 'Continue shopping', attributes: { class: 'primary-button' } })}</section>`;
+    <h1>Thank you, your objects are reserved.</h1>
+    ${InlineNotice({
+      tone: 'success',
+      announcement: 'polite',
+      title: `Order ${order.id} is confirmed.`,
+      attributes: { class: 'order-confirmation-notice' },
+      children: html`<p>We sent the delivery details to ${order.email}.</p><strong class="order-total">${formatPrice(order.total)}</strong>`,
+      action: RouterLink({ to: '/shop', children: 'Continue shopping', attributes: { class: 'primary-button' } }),
+    })}
+  </section>`;
 }
 
 function ProductGallery(product: Product): TemplateValue {

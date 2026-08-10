@@ -53,7 +53,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, InlineNotice, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -107,6 +107,21 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('id="server-tracking"');
     expect(rendered).toContain('open');
     expect(rendered).toContain('server-remote-unavailable');
+  });
+
+  it('serializes InlineNotice live content separately from caller-owned actions', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(InlineNotice({
+      tone: 'danger',
+      title: 'Payment failed',
+      children: 'Try another payment method.',
+      action: Button({ label: 'Try again' }),
+    })));
+    expect(rendered).toContain('gluon-inline-notice');
+    expect(rendered).toContain('data-tone="danger"');
+    expect(rendered).toContain('role="alert"');
+    expect(rendered).toContain('aria-live="assertive"');
+    expect(rendered).toContain('Payment failed');
+    expect(rendered).toContain('gluon-inline-notice-actions');
   });
 
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {

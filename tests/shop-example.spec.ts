@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -281,6 +281,9 @@ describe('GLUON GOODS reference shop', () => {
     expect(router.currentRoute.value.path).toMatch(/^\/orders\/GG-/);
     expect(root.querySelector('.order-confirmation')?.textContent).toContain('ada@example.com');
     expect(root.querySelector('.order-confirmation')?.textContent).toContain('€189');
+    expect(root.querySelector('.order-confirmation [role="status"]')?.textContent).toContain('confirmed');
+    expect(root.querySelector('.order-confirmation-notice a')?.textContent).toBe('Continue shopping');
+    expect(document.adoptedStyleSheets).toContain(inlineNoticeStyles);
     expect(store.bagCount).toBe(0);
     expect(store.order?.lines[0]?.configuration.finish).toBe('Cobalt');
     expect(store.order?.deliveryInstructions).toBe('Leave with the workshop concierge.');

@@ -43,6 +43,7 @@ const controlFieldStyles = await sheet('packages/molecules/src/control-field-sty
 const dialogSurfaceStyles = await sheet('packages/molecules/src/dialog-surface-styles.ts', 'dialogSurfaceStyles');
 const disclosureStyles = await sheet('packages/molecules/src/disclosure-styles.ts', 'disclosureStyles');
 const formFieldStyles = await sheet('packages/molecules/src/form-field-styles.ts', 'formFieldStyles');
+const inlineNoticeStyles = await sheet('packages/molecules/src/inline-notice-styles.ts', 'inlineNoticeStyles');
 const segmentedControlStyles = await sheet('packages/molecules/src/segmented-control-styles.ts', 'segmentedControlStyles');
 const tabsStyles = await sheet('packages/molecules/src/tabs-styles.ts', 'tabsStyles');
 const appShellStyles = await sheet('packages/organisms/src/app-shell-styles.ts', 'appShellStyles');
@@ -56,7 +57,7 @@ const actual = {
       ['packages/atoms/src/styles.ts', 'packages/molecules/src/styles.ts', 'packages/organisms/src/styles.ts'],
     ),
     after: measure(
-      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, segmentedControlStyles, tabsStyles, appShellStyles],
+      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, inlineNoticeStyles, segmentedControlStyles, tabsStyles, appShellStyles],
       [
         'packages/atoms/src/button-styles.ts',
         'packages/atoms/src/checkbox-styles.ts',
@@ -78,6 +79,7 @@ const actual = {
         'packages/molecules/src/dialog-surface-styles.ts',
         'packages/molecules/src/disclosure-styles.ts',
         'packages/molecules/src/form-field-styles.ts',
+        'packages/molecules/src/inline-notice-styles.ts',
         'packages/molecules/src/segmented-control-styles.ts',
         'packages/molecules/src/tabs-styles.ts',
         'packages/organisms/src/app-shell-styles.ts',

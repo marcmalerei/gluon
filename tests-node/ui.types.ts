@@ -18,6 +18,7 @@ import {
   Accordion,
   Card,
   FormField,
+  InlineNotice,
   NavigationStrip,
   moleculeManifest,
   type CardProps,
@@ -131,6 +132,14 @@ Field({ label: 'Email', children: q.input(), attributes: { class: 'app-field' } 
 FormField({ label: 'Email', attributes: { autocomplete: 'email' }, fieldAttributes: { data: { owner: 'app' } } });
 AppShell({ children: Card({ title: 'Card' }), attributes: { data: { owner: 'app' } } });
 NavigationStrip(navigationStripProps);
+InlineNotice({
+  tone: 'warning',
+  announcement: 'assertive',
+  title: 'Inventory changed',
+  children: 'Review the updated quantity.',
+  action: Button({ label: 'Review' }),
+  attributes: { data: { owner: 'checkout' } },
+});
 Accordion({
   label: 'Delivery details',
   value: 'tracking',
@@ -206,6 +215,12 @@ FormField({ label: 'Email', attributes: { rows: 4 } });
 NavigationStrip({ children: q.a({ href: '#profile', children: 'Profile' }) });
 // @ts-expect-error NavigationStrip nav attributes reject anchor-only props
 NavigationStrip({ label: 'Sections', attributes: { href: '/other' } });
+// @ts-expect-error InlineNotice tones remain closed
+InlineNotice({ tone: 'critical', children: 'Invalid tone' });
+// @ts-expect-error InlineNotice owns the outer role and live-region mapping
+InlineNotice({ children: 'Feedback', attributes: { role: 'alert' } });
+// @ts-expect-error InlineNotice live and atomic semantics stay on its bounded announcement region
+InlineNotice({ children: 'Feedback', attributes: { aria: { live: 'assertive' } } });
 // @ts-expect-error Accordion requires an accessible group name
 Accordion({ value: 'one', items: [] });
 // @ts-expect-error multiple Accordion values are arrays

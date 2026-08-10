@@ -6,6 +6,7 @@ export { ControlField, type ControlFieldAttributes, type ControlFieldProps, type
 export { DialogSurface, createDialogSurfaceController, type DialogSurfaceAccessibleName, type DialogSurfaceAttributes, type DialogSurfaceController, type DialogSurfaceControllerOptions, type DialogSurfacePlacement, type DialogSurfaceProps, type DialogSurfaceSectionAttributes } from './dialog-surface.js';
 export { Disclosure, type DisclosureAttributes, type DisclosureAvailability, type DisclosureProps, type DisclosureState, type DisclosureSummaryAttributes } from './disclosure.js';
 export { FormField, type FormFieldProps } from './form-field.js';
+export { InlineNotice, type InlineNoticeAnnouncement, type InlineNoticeAttributes, type InlineNoticeProps, type InlineNoticeTone } from './inline-notice.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
 export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedControlAttributes, type SegmentedControlChangeEvent, type SegmentedControlOption, type SegmentedControlOrientation, type SegmentedControlProps } from './segmented-control.js';
 export { Tabs, type TabsAccessibleName, type TabsActivation, type TabsAttributes, type TabsChangeEvent, type TabsItem, type TabsOrientation, type TabsProps } from './tabs.js';
@@ -19,6 +20,7 @@ export { controlFieldStyles } from './control-field-styles.js';
 export { dialogSurfaceStyles } from './dialog-surface-styles.js';
 export { disclosureStyles } from './disclosure-styles.js';
 export { formFieldStyles } from './form-field-styles.js';
+export { inlineNoticeStyles } from './inline-notice-styles.js';
 export { navigationStripStyles } from './navigation-strip-styles.js';
 export { segmentedControlStyles } from './segmented-control-styles.js';
 export { tabsStyles } from './tabs-styles.js';

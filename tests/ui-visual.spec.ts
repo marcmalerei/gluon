@@ -20,7 +20,7 @@ import {
   render,
   unadoptStyles,
 } from '../src/index.js';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, InlineNotice, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -643,6 +643,29 @@ test('matches Accordion single-open, unavailable, RTL, and zoom-safe states', as
   await expect.element(page.getByTestId('accordion-visual')).toMatchScreenshot('accordion-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.08, threshold: 0.15 },
+  });
+  unadoptStyles(document, visualStyles);
+  uiOwner.dispose();
+});
+
+test('matches InlineNotice tones, wrapping, actions, dismissal, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer app { body { margin: 0; padding: 16px; inline-size: 340px; font-size: 18px; } .notice-stack { display: grid; gap: 10px; block-size: 650px; overflow: hidden; } .gluon-inline-notice-body p { margin: 0; } .notice-link { color: inherit; font-weight: 700; } }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({ data: { testid: 'inline-notice-visual' }, class: 'notice-stack', children: [
+    InlineNotice({ children: 'Neutral workshop context.' }),
+    InlineNotice({ tone: 'info', title: 'Delivery update', children: 'Tracking is available after dispatch.' }),
+    InlineNotice({ tone: 'success', title: 'Order confirmed', children: 'Your objects are reserved.', action: q.a({ href: '#order', class: 'notice-link', children: 'View order' }) }),
+    InlineNotice({ tone: 'warning', title: 'Inventory changed', children: 'One long product name wraps without widening this bounded notice.' }),
+    q.div({ dir: 'rtl', children: InlineNotice({ tone: 'danger', title: 'Payment failed', children: 'Try another method.', dismissAction: q.button({ type: 'button', children: 'Dismiss' }) }) }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('inline-notice-visual')).toMatchScreenshot('inline-notice-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
   });
   unadoptStyles(document, visualStyles);
   uiOwner.dispose();
