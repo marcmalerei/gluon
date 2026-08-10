@@ -27,6 +27,15 @@ export const moleculeStyles = css`
     :where(.gluon-card.is-warning) { border-color: #a66c00; }
     :where(.gluon-card.is-danger) { border-color: var(--gluon-color-danger, #a52222); }
 
+    :where(.gluon-choice-group) { min-inline-size: 0; margin: 0; border: 0; padding: 0; }
+    :where(.gluon-choice-group-legend) { padding: 0; font-size: 0.875rem; font-weight: 650; }
+    :where(.gluon-choice-group-options) { display: flex; min-inline-size: 0; gap: var(--gluon-choice-group-gap, 0.75rem); margin-block-start: 0.5rem; }
+    :where(.gluon-choice-group.is-vertical > .gluon-choice-group-options) { flex-direction: column; align-items: stretch; }
+    :where(.gluon-choice-group.is-horizontal > .gluon-choice-group-options) { flex-flow: row wrap; align-items: center; }
+    :where(.gluon-choice-group-helper, .gluon-choice-group-error) { display: block; margin-block-start: 0.5rem; color: var(--gluon-choice-group-helper-color, var(--gluon-color-muted, #51625f)); font-size: 0.8125rem; line-height: 1.4; overflow-wrap: anywhere; }
+    :where(.gluon-choice-group-error) { color: var(--gluon-choice-group-error-color, var(--gluon-color-danger, #a52222)); font-weight: 650; }
+    :where(.gluon-choice-group:disabled) { opacity: 0.6; }
+
     :where(.gluon-control-field) { display: grid; gap: 0.375rem; min-inline-size: 0; }
     :where(.gluon-control-field-label) { font-size: 0.875rem; font-weight: 650; }
     :where(.gluon-control-field-required) { color: var(--gluon-control-field-required-color, var(--gluon-color-danger, #a52222)); }
@@ -46,12 +55,15 @@ export const moleculeStyles = css`
     @media (forced-colors: active) {
       :where(.gluon-control-field-required, .gluon-control-field-error) { color: Mark; }
       :where(.gluon-control-field-helper) { color: CanvasText; }
+      :where(.gluon-choice-group-error) { color: Mark; }
+      :where(.gluon-choice-group-helper) { color: CanvasText; }
     }
   }
 `;
 
 markLegacyComponentStyleSheet(moleculeStyles, [
   'gluon-molecule-card',
+  'gluon-molecule-choice-group',
   'gluon-molecule-control-field',
   'gluon-molecule-form-field',
 ]);

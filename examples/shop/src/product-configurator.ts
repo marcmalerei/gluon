@@ -14,6 +14,7 @@ import {
 } from '@gluonjs/core';
 import { customElement, property } from '@gluonjs/core/decorators';
 import { Progress, Radio, StatusBadge } from '@gluonjs/atoms';
+import { ChoiceGroup } from '@gluonjs/molecules';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
 import {
@@ -409,10 +410,13 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
     choices: readonly ProductConfiguration[Key][],
     disabled: boolean,
   ): TemplateValue {
-    return html`
-      <fieldset class=${`choice-group choice-${key}`} ?disabled=${disabled}>
-        <legend>${label}</legend>
-        <div>${repeat(choices, String, (choice) => html`
+    return ChoiceGroup({
+      id: `product-${key}`,
+      legend: label,
+      disabled,
+      orientation: 'horizontal',
+      attributes: { class: `choice-group choice-${key}` },
+      children: repeat(choices, String, (choice) => html`
           <label class=${this.configuration[key] === choice ? 'is-selected' : ''}>
             ${Radio({
               name: key,
@@ -426,9 +430,8 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
               : ''}
             <span>${choice}</span>
           </label>
-        `)}</div>
-      </fieldset>
-    `;
+        `),
+    });
   }
 
   private select<Key extends keyof ProductConfiguration>(

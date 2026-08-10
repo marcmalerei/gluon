@@ -23,6 +23,7 @@ import {
 } from '@gluonjs/core';
 import {
   Card,
+  ChoiceGroup,
   ControlField,
   FormField,
   NavigationStrip,
@@ -190,6 +191,15 @@ createApp(() => AppShell({
             value: 'Prefers email updates.',
             attributes: { id: relationships.controlId, aria: relationships.aria },
           }),
+        }),
+        ChoiceGroup({
+          id: 'profile-visibility',
+          legend: 'Profile visibility',
+          orientation: 'horizontal',
+          children: [
+            q.label({ children: [Radio({ name: 'visibility', checked: true }), ' Team'] }),
+            q.label({ children: [Radio({ name: 'visibility' }), ' Private'] }),
+          ],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

@@ -39,6 +39,7 @@ import {
 import {
   Card,
   cardStyles,
+  choiceGroupStyles,
   controlFieldStyles,
   formFieldStyles,
   navigationStripStyles,
@@ -60,6 +61,7 @@ const allComponentSheets = [
   textareaStyles,
   toggleButtonStyles,
   cardStyles,
+  choiceGroupStyles,
   controlFieldStyles,
   formFieldStyles,
   navigationStripStyles,

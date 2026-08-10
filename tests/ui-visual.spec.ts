@@ -19,7 +19,7 @@ import {
   css,
   render,
 } from '../src/index.js';
-import { Card, ControlField, FormField } from '@gluonjs/molecules';
+import { Card, ChoiceGroup, ControlField, FormField } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -433,6 +433,43 @@ test('matches ControlField helper, required, error, and RTL states', async () =>
   await expect.element(page.getByTestId('control-field-visual')).toMatchScreenshot('control-field-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches ChoiceGroup Radio, Checkbox, layout, error, disabled, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="choice-group-visual"] { box-sizing: border-box; inline-size: 420px; block-size: 440px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="choice-group-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .choice-group-grid { display: grid; gap: 22px; }
+      .gluon-choice-group-options label { display: inline-flex; min-block-size: 44px; align-items: center; gap: 8px; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'choice-group-visual' },
+    children: [
+      q.h1({ children: 'ChoiceGroup states' }),
+      q.div({
+        class: 'choice-group-grid',
+        children: [
+          ChoiceGroup({ id: 'visual-finish', legend: 'Finish', helper: 'Choose one', orientation: 'horizontal', children: [q.label({ children: [Radio({ name: 'visual-finish', checked: true }), ' Graphite'] }), q.label({ children: [Radio({ name: 'visual-finish' }), ' Cobalt'] })] }),
+          ChoiceGroup({ id: 'visual-features', legend: 'Features', error: 'Choose at least one feature', children: [q.label({ children: [Checkbox({ checked: true }), ' Repairable'] }), q.label({ children: [Checkbox({}), ' Recycled'] })] }),
+          q.div({ dir: 'rtl', children: ChoiceGroup({ id: 'visual-disabled', legend: 'Disabled RTL', disabled: true, orientation: 'horizontal', children: [q.label({ children: [Radio({ checked: true }), ' One'] }), q.label({ children: [Radio({}), ' Two'] })] }) }),
+        ],
+      }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('choice-group-visual')).toMatchScreenshot('choice-group-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });
   uiOwner.dispose();
 });

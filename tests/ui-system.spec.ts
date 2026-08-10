@@ -34,6 +34,7 @@ import {
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
 import {
   Card,
+  ChoiceGroup,
   ControlField,
   FormField,
   NavigationStrip,
@@ -226,6 +227,44 @@ describe('separate UI package contracts', () => {
     expect(textarea.getAttribute('aria-invalid')).toBe('true');
     expect(document.querySelector('#textarea-control-error')?.getAttribute('role')).toBe('alert');
     expect(document.querySelectorAll('.gluon-control-field')).toHaveLength(6);
+  });
+
+  it('keeps ChoiceGroup native fieldset, legend, disabled, form, and option behavior', async () => {
+    const form = document.createElement('form');
+    document.body.append(form);
+    render(q.div({ children: [
+      ChoiceGroup({
+        id: 'finish-group',
+        legend: 'Finish',
+        helper: 'Choose one finish',
+        orientation: 'horizontal',
+        children: [
+          q.label({ children: [Radio({ name: 'finish-group-value', value: 'graphite', checked: true }), ' Graphite'] }),
+          q.label({ children: [Radio({ name: 'finish-group-value', value: 'cobalt' }), ' Cobalt'] }),
+        ],
+      }),
+      ChoiceGroup({
+        id: 'feature-group',
+        legend: 'Features',
+        error: 'Choose a feature',
+        disabled: true,
+        children: q.label({ children: [Checkbox({ name: 'feature', value: 'repairable' }), ' Repairable'] }),
+      }),
+    ] }), form);
+
+    const finish = form.querySelector<HTMLFieldSetElement>('#finish-group')!;
+    const features = form.querySelector<HTMLFieldSetElement>('#feature-group')!;
+    const radios = finish.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+    expect(finish.querySelector('legend')?.textContent).toBe('Finish');
+    expect(finish.getAttribute('aria-describedby')).toBe('finish-group-helper');
+    expect(finish.classList).toContain('is-horizontal');
+    radios[1]!.click();
+    expect(radios[1]!.checked).toBe(true);
+    expect(new FormData(form).get('finish-group-value')).toBe('cobalt');
+    expect(features.disabled).toBe(true);
+    expect(features.getAttribute('aria-errormessage')).toBe('feature-group-error');
+    expect(features.getAttribute('aria-invalid')).toBe('true');
+    expect(features.querySelector<HTMLInputElement>('input')?.matches(':disabled')).toBe(true);
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

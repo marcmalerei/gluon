@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { cardStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
+        "import { cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -894,10 +894,11 @@
     "molecule-components": {
       "module": "@gluonjs/molecules",
       "code": [
-        "import { Button, Input } from '@gluonjs/atoms';",
+        "import { Button, Input, Radio } from '@gluonjs/atoms';",
         "import { html } from '@gluonjs/core';",
         "import {",
         "  Card,",
+        "  ChoiceGroup,",
         "  ControlField,",
         "  FormField,",
         "  NavigationStrip,",
@@ -905,6 +906,9 @@
         "  moleculeStyles,",
         "  type CardProps,",
         "  type CardTone,",
+        "  type ChoiceGroupAttributes,",
+        "  type ChoiceGroupOrientation,",
+        "  type ChoiceGroupProps,",
         "  type ControlFieldAttributes,",
         "  type ControlFieldProps,",
         "  type ControlFieldRelationships,",
@@ -917,12 +921,15 @@
         "const fieldAttributes = { class: 'order-reference-field' } satisfies ControlFieldAttributes;",
         "const renderOrderReference: ControlFieldRenderer = (relationships: ControlFieldRelationships) => Input({ attributes: { id: relationships.controlId, aria: relationships.aria } });",
         "const orderReference = { id: 'order-reference', label: 'Order reference', helper: 'Optional internal reference.', attributes: fieldAttributes, control: renderOrderReference } satisfies ControlFieldProps;",
+        "const choiceAttributes = { data: { owner: 'settings' } } satisfies ChoiceGroupAttributes;",
+        "const choiceOrientation: ChoiceGroupOrientation = 'horizontal';",
+        "const visibility = { id: 'visibility', legend: 'Visibility', orientation: choiceOrientation, attributes: choiceAttributes, children: html`<label>${Radio({ name: 'visibility', checked: true })} Team</label><label>${Radio({ name: 'visibility' })} Private</label>` } satisfies ChoiceGroupProps;",
         "const tone: CardTone = 'success';",
         "const order = {",
         "  title: 'Order confirmed',",
         "  subtitle: '#GL-1042',",
         "  tone,",
-        "  children: html`${FormField(email)}${ControlField(orderReference)}` ,",
+        "  children: html`${FormField(email)}${ControlField(orderReference)}${ChoiceGroup(visibility)}` ,",
         "  actions: Button({ label: 'View order' }),",
         "} satisfies CardProps;",
         "const sections = {",
@@ -4008,6 +4015,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Card stylesheet retained by rendered Card values:"
     },
+    "packages/molecules/src/variables/choiceGroupStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable ChoiceGroup fieldset and layout stylesheet:"
+    },
     "packages/molecules/src/variables/controlFieldStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable ControlField relationship and message stylesheet:"
@@ -4292,6 +4303,10 @@
       "recipe": "molecule-components",
       "description": "Compose a Card's heading, tone, media, actions, body, and native article attributes as one typed surface:"
     },
+    "packages/molecules/src/interfaces/ChoiceGroupProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose visible legend, caller-owned Checkbox or Radio options, helper, error, disabled state, layout, and fieldset attributes:"
+    },
     "packages/molecules/src/interfaces/ControlFieldProps.md": {
       "recipe": "molecule-components",
       "description": "Compose a visible label, caller-rendered control, helper, error, required indication, and outer native div attributes:"
@@ -4312,6 +4327,14 @@
       "recipe": "molecule-components",
       "description": "Select the neutral, success, warning, or danger emphasis applied by a Card without depending on CSS classes:"
     },
+    "packages/molecules/src/type-aliases/ChoiceGroupAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLFieldSetElement attributes while ChoiceGroup retains structural and relationship ownership:"
+    },
+    "packages/molecules/src/type-aliases/ChoiceGroupOrientation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose vertical stacking or horizontal wrapping without changing native control semantics:"
+    },
     "packages/molecules/src/type-aliases/ControlFieldAttributes.md": {
       "recipe": "molecule-components",
       "description": "Forward compatible HTMLDivElement attributes without replacing ControlField structural content:"
@@ -4323,6 +4346,10 @@
     "packages/molecules/src/variables/Card.md": {
       "recipe": "molecule-components",
       "description": "Render structured status or content inside a Card with optional media, actions, and semantic article attributes:"
+    },
+    "packages/molecules/src/variables/ChoiceGroup.md": {
+      "recipe": "molecule-components",
+      "description": "Render a native fieldset and legend around caller-owned Checkbox or Radio options:"
     },
     "packages/molecules/src/variables/ControlField.md": {
       "recipe": "molecule-components",

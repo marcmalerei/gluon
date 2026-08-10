@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { Card, ControlField, FormField, NavigationStrip } from '@gluonjs/molecules';
+import { Card, ChoiceGroup, ControlField, FormField, NavigationStrip } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -19,6 +19,11 @@ render callback receives stable control/label/helper/error IDs and matching ARIA
 relationships without cloning the control or owning its value, events, or
 validation. Pass the returned IDs/ARIA metadata to the official Atom or native
 control and forward `required`/`invalid` when that control supports them.
+`ChoiceGroup` renders a native fieldset and visible legend around caller-owned
+Checkbox or Radio options. It provides helper/error relationships, disabled
+fieldset propagation, and horizontal or vertical layout without taking option
+values, checked state, validation decisions, copy, or keyboard behavior away
+from the native controls.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -37,7 +42,7 @@ NavigationStrip({
 });
 ```
 
-Styles use logical properties and shared Atom token names. `Card`,
+Styles use logical properties and shared Atom token names. `Card`, `ChoiceGroup`,
 `ControlField`, and `FormField` carry separate immutable stylesheet dependencies;
 `NavigationStrip` carries its own layout/control sheet, and `FormField` collects
 its nested `Label` and `Input` sheets through ordinary renderer traversal.
@@ -55,6 +60,8 @@ Applications can set `--gluon-navigation-strip-gap`,
 classes.
 ControlField exposes `--gluon-control-field-required-color`,
 `--gluon-control-field-helper-color`, and `--gluon-control-field-error-color`.
+ChoiceGroup exposes `--gluon-choice-group-gap`,
+`--gluon-choice-group-helper-color`, and `--gluon-choice-group-error-color`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -68,7 +75,8 @@ Molecules use the public `defineMolecule()` metadata helper described in the
 GLUON GOODS repeats `FormField` for its five required delivery inputs, uses
 `ControlField` for optional delivery instructions with deterministic help, and uses
 an app-local `PurchaseAction` defined with `defineMolecule()` in the same real
-checkout form. Its catalog filter uses `NavigationStrip` to keep every category
+checkout form. Product configuration uses three `ChoiceGroup` fieldsets with
+native Radio options. Its catalog filter uses `NavigationStrip` to keep every category
 discoverable at constrained widths. Browser tests verify implicit labels,
 native constraint validation, overflow interaction, SSR/hydration styles, and
 teardown.
