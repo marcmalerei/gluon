@@ -428,7 +428,9 @@ export const shopStyles = css`
     .order-summary footer { margin-top: 12px; border-color: var(--shop-black); font-size: 20px; }
     .order-confirmation, .checkout-empty { min-height: 65vh; padding: clamp(54px, 9vw, 130px) var(--shop-gutter); }
     .order-confirmation > p { max-width: 620px; margin-top: 22px; font-size: 18px; }
-    .order-total { display: block; margin: 30px 0; font-size: 28px; }
+    .order-confirmation-notice { max-width: 680px; margin-top: 32px; }
+    .order-confirmation-notice p { margin: 0; }
+    .order-total { display: block; margin-top: 18px; font-size: 28px; }
     .paired-product .product-copy strong { font-size: 19px; }
 
     .not-found { display: grid; place-items: start; align-content: center; min-height: 70vh; padding: 70px var(--shop-gutter); }

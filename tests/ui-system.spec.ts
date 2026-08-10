@@ -41,6 +41,7 @@ import {
   DialogSurface,
   Disclosure,
   FormField,
+  InlineNotice,
   NavigationStrip,
   SegmentedControl,
   Tabs,
@@ -646,6 +647,39 @@ describe('separate UI package contracts', () => {
     }), document.body);
     document.querySelectorAll<HTMLElement>('.gluon-accordion summary')[1]!.click();
     await vi.waitFor(() => expect(onMultipleChange).toHaveBeenCalledWith(['tracking', 'packaging'], expect.any(Event)));
+  });
+
+  it('maps InlineNotice feedback to deliberate live semantics and caller-owned actions', () => {
+    const retry = vi.fn();
+    const dismiss = vi.fn();
+    render(q.main({ children: [
+      InlineNotice({ children: 'Static account context.' }),
+      InlineNotice({
+        tone: 'success',
+        title: 'Order confirmed',
+        children: 'Delivery details were sent.',
+        action: q.button({ type: 'button', onClick: retry, children: 'View order' }),
+        dismissAction: q.button({ type: 'button', onClick: dismiss, children: 'Dismiss' }),
+        attributes: { id: 'order-notice', data: { owner: 'checkout' } },
+      }),
+      InlineNotice({ tone: 'danger', children: 'Payment failed.' }),
+      InlineNotice({ tone: 'warning', announcement: 'off', children: 'Static delivery note.' }),
+    ] }), document.body);
+    const notices = [...document.querySelectorAll<HTMLElement>('.gluon-inline-notice')];
+    expect(notices[0]?.querySelector('[role]')).toBeNull();
+    expect(notices[0]?.dataset.announcement).toBe('off');
+    const successRegion = notices[1]!.querySelector<HTMLElement>('[role="status"]')!;
+    expect(successRegion.getAttribute('aria-live')).toBe('polite');
+    expect(successRegion.getAttribute('aria-atomic')).toBe('true');
+    expect(successRegion.textContent).toContain('Order confirmed');
+    expect(successRegion.querySelector('button')).toBeNull();
+    expect(notices[1]?.dataset.owner).toBe('checkout');
+    notices[1]!.querySelectorAll<HTMLButtonElement>('button')[0]!.click();
+    notices[1]!.querySelectorAll<HTMLButtonElement>('button')[1]!.click();
+    expect(retry).toHaveBeenCalledOnce();
+    expect(dismiss).toHaveBeenCalledOnce();
+    expect(notices[2]?.querySelector('[role="alert"]')?.getAttribute('aria-live')).toBe('assertive');
+    expect(notices[3]?.querySelector('[role]')).toBeNull();
   });
 
   it('keeps unavailable Disclosure summaries focusable with a visible reason', () => {

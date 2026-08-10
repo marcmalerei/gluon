@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 27296,
-      "gzipBytes": 4272,
+      "rawBytes": 29636,
+      "gzipBytes": 4640,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -54,6 +54,12 @@
         ".gluon-form-field",
         ".gluon-form-helper",
         ".gluon-icon",
+        ".gluon-inline-notice",
+        ".gluon-inline-notice-actions",
+        ".gluon-inline-notice-announcement",
+        ".gluon-inline-notice-body",
+        ".gluon-inline-notice-marker",
+        ".gluon-inline-notice-title",
         ".gluon-input",
         ".gluon-label",
         ".gluon-progress",
@@ -72,9 +78,9 @@
       ]
     },
     "after": {
-      "rawBytes": 28621,
-      "gzipBytes": 4300,
-      "moduleCount": 23,
+      "rawBytes": 31020,
+      "gzipBytes": 4659,
+      "moduleCount": 24,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -96,11 +102,12 @@
         "packages/molecules/src/dialog-surface-styles.ts",
         "packages/molecules/src/disclosure-styles.ts",
         "packages/molecules/src/form-field-styles.ts",
+        "packages/molecules/src/inline-notice-styles.ts",
         "packages/molecules/src/segmented-control-styles.ts",
         "packages/molecules/src/tabs-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 23,
+      "stylesheetCount": 24,
       "selectors": [
         ".gluon-accordion",
         ".gluon-accordion-heading",
@@ -143,6 +150,12 @@
         ".gluon-form-field",
         ".gluon-form-helper",
         ".gluon-icon",
+        ".gluon-inline-notice",
+        ".gluon-inline-notice-actions",
+        ".gluon-inline-notice-announcement",
+        ".gluon-inline-notice-body",
+        ".gluon-inline-notice-marker",
+        ".gluon-inline-notice-title",
         ".gluon-input",
         ".gluon-label",
         ".gluon-progress",

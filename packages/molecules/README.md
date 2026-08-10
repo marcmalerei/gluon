@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, InlineNotice, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -65,6 +65,13 @@ Arrow/Home/End focus movement that skips unavailable summaries without
 changing native activation or Tab order. Callers retain item copy, open state,
 routing, loading, unavailable reasons, and effects; it deliberately does not
 implement a custom tree widget.
+`InlineNotice` renders bounded neutral, info, success, warning, or danger
+feedback with a non-color marker. Its `auto` announcement maps info/success to
+a polite status, warning/danger to an assertive alert, and neutral content to a
+static region; use `polite`, `assertive`, or `off` when message timing requires
+an explicit choice. Optional caller-owned action and dismiss controls render
+outside the live region. The application continues to own copy, lifecycle,
+events, retries, and dismissal state.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -125,6 +132,9 @@ weight variables, `--gluon-disclosure-marker`, marker color/size/motion,
 `--gluon-disclosure-unavailable-color`.
 Accordion exposes a minimal layout wrapper and inherits the Disclosure custom
 properties for every native item.
+InlineNotice exposes gap, padding, border, accent width, radius, background,
+color, and action-gap custom properties. Tone defaults remain contrast-aware,
+and application overrides must preserve readable text and state distinction.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -155,3 +165,5 @@ restoration while the shop continues to own bag state and checkout decisions.
 The Shipping policy uses `Accordion` over native `Disclosure` items for
 URL-backed tracking, packaging, and remote-area details without replacing
 native summary behavior.
+The order-confirmation route uses a polite success `InlineNotice` for the real
+order ID, delivery email, total, and caller-owned continue-shopping action.

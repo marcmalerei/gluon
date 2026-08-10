@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added `InlineNotice` bounded feedback with neutral, info, success, warning,
+  and danger tones, explicit live-region modes, caller-owned actions, and real
+  GLUON GOODS order-confirmation feedback.
+
 - Added controlled `Accordion` composition over native Disclosure items with
   single or multiple open values, stable headings, optional focus traversal,
   and URL-backed GLUON GOODS shipping topics.
