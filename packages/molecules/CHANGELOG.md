@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the native-fieldset `ChoiceGroup` Molecule with visible legend, helper,
+  error, disabled propagation, horizontal/vertical layout, and caller-owned
+  Checkbox/Radio options in GLUON GOODS product configuration.
 - Added the generic `ControlField` Molecule with caller-rendered controls,
   deterministic label/helper/error relationships, required indication, exact
   styles, and GLUON GOODS delivery-instructions integration.

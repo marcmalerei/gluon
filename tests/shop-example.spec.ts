@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
+import { choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -66,6 +66,8 @@ describe('GLUON GOODS reference shop', () => {
     const configurator = getProductConfigurator(root);
     await configurator.updateComplete;
     expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(radioStyles);
+    expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(choiceGroupStyles);
+    expect(configurator.shadowRoot?.querySelectorAll('.gluon-choice-group')).toHaveLength(3);
     expect(configurator.shadowRoot?.querySelectorAll('.gluon-radio')).toHaveLength(7);
     const addAction = configurator.shadowRoot?.querySelector<HTMLElement>('gluon-product-add-action')!;
     const addButton = getProductAddButton(configurator);
