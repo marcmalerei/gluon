@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added the accessible layout-only `ButtonGroup` Molecule with named group
+  semantics, horizontal/vertical and spaced/attached presentation, wrapping,
+  logical-property styling, and GLUON GOODS header-action integration.
+
 - Added the native-fieldset `ChoiceGroup` Molecule with visible legend, helper,
   error, disabled propagation, horizontal/vertical layout, and caller-owned
   Checkbox/Radio options in GLUON GOODS product configuration.
