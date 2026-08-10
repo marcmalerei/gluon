@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, NavigationStrip } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, NavigationStrip, SegmentedControl } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -28,6 +28,11 @@ from the native controls.
 buttons. It preserves source and Tab order, supports horizontal or vertical
 layout, optional wrapping, and spaced or attached presentation, but never adds
 selection, menu, routing, tab, or pressed-state behavior to its children.
+`SegmentedControl` is a controlled, single-choice toolbar of native toggle
+buttons for a small finite option set. It exposes one Tab stop and Arrow/Home/End
+navigation, skips disabled options, and supports horizontal, vertical, and RTL
+layout. It is deliberately not a tablist or radio group: callers own the value,
+routing, panels, persistence, and async effects.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -68,6 +73,11 @@ ChoiceGroup exposes `--gluon-choice-group-gap`,
 `--gluon-choice-group-helper-color`, and `--gluon-choice-group-error-color`.
 ButtonGroup exposes `--gluon-button-group-gap`,
 `--gluon-button-group-border-color`, and `--gluon-button-group-radius`.
+SegmentedControl exposes `--gluon-segmented-control-border-color`,
+`--gluon-segmented-control-background`,
+`--gluon-segmented-control-selected-background`,
+`--gluon-segmented-control-selected-color`, and
+`--gluon-segmented-control-radius`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -88,3 +98,5 @@ native constraint validation, overflow interaction, SSR/hydration styles, and
 teardown.
 The site header uses `ButtonGroup` for the search, bag, and mobile-menu action
 cluster without changing the individual actions' semantics.
+The catalog uses `SegmentedControl` for a URL-backed Grid/List view choice; the
+shop owns the route update and the corresponding product layout.

@@ -4,6 +4,7 @@ export { ChoiceGroup, type ChoiceGroupAttributes, type ChoiceGroupOrientation, t
 export { ControlField, type ControlFieldAttributes, type ControlFieldProps, type ControlFieldRelationships, type ControlFieldRenderer } from './control-field.js';
 export { FormField, type FormFieldProps } from './form-field.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
+export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedControlAttributes, type SegmentedControlChangeEvent, type SegmentedControlOption, type SegmentedControlOrientation, type SegmentedControlProps } from './segmented-control.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { cardStyles } from './card-styles.js';
@@ -12,4 +13,5 @@ export { choiceGroupStyles } from './choice-group-styles.js';
 export { controlFieldStyles } from './control-field-styles.js';
 export { formFieldStyles } from './form-field-styles.js';
 export { navigationStripStyles } from './navigation-strip-styles.js';
+export { segmentedControlStyles } from './segmented-control-styles.js';
 export { defineMolecule, type Component } from '@gluonjs/core';

@@ -28,6 +28,7 @@ import {
   ControlField,
   FormField,
   NavigationStrip,
+  SegmentedControl,
   defineMolecule,
 } from '@gluonjs/molecules';
 import { AppShell, defineOrganism } from '@gluonjs/organisms';
@@ -203,6 +204,14 @@ createApp(() => AppShell({
           children: [
             q.label({ children: [Radio({ name: 'visibility', checked: true }), ' Team'] }),
             q.label({ children: [Radio({ name: 'visibility' }), ' Private'] }),
+          ],
+        }),
+        SegmentedControl({
+          label: 'Profile layout',
+          value: 'details',
+          options: [
+            { value: 'details', label: 'Details' },
+            { value: 'summary', label: 'Summary' },
           ],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),

@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles } from '@gluonjs/molecules';",
+        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -903,6 +903,7 @@
         "  ControlField,",
         "  FormField,",
         "  NavigationStrip,",
+        "  SegmentedControl,",
         "  moleculeManifest,",
         "  moleculeStyles,",
         "  type ButtonGroupAccessibleName,",
@@ -921,6 +922,12 @@
         "  type ControlFieldRenderer,",
         "  type FormFieldProps,",
         "  type NavigationStripProps,",
+        "  type SegmentedControlAccessibleName,",
+        "  type SegmentedControlAttributes,",
+        "  type SegmentedControlChangeEvent,",
+        "  type SegmentedControlOption,",
+        "  type SegmentedControlOrientation,",
+        "  type SegmentedControlProps,",
         "} from '@gluonjs/molecules';",
         "",
         "const email = { label: 'Email', name: 'email', type: 'email', helper: 'Order updates go here.' } satisfies FormFieldProps;",
@@ -947,7 +954,13 @@
         "  label: 'Order sections',",
         "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
         "} satisfies NavigationStripProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}`, moleculeStyles, moleculeManifest.entries);"
+        "const segmentName = { label: 'Order view' } satisfies SegmentedControlAccessibleName;",
+        "const segmentAttributes = { class: 'order-view' } satisfies SegmentedControlAttributes;",
+        "const segmentOptions = [{ value: 'summary', label: 'Summary' }, { value: 'details', label: 'Details' }] satisfies readonly SegmentedControlOption[];",
+        "const segmentOrientation: SegmentedControlOrientation = 'horizontal';",
+        "const handleSegment = (value: string, event: SegmentedControlChangeEvent) => console.log(value, event.type);",
+        "const orderView = { ...segmentName, value: 'summary', options: segmentOptions, orientation: segmentOrientation, attributes: segmentAttributes, onChange: handleSegment } satisfies SegmentedControlProps;",
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4038,6 +4051,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable ControlField relationship and message stylesheet:"
     },
+    "packages/molecules/src/variables/segmentedControlStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable SegmentedControl layout stylesheet:"
+    },
     "packages/molecules/src/variables/formFieldStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable FormField stylesheet retained alongside its nested Atom dependencies:"
@@ -4358,6 +4375,10 @@
       "recipe": "molecule-components",
       "description": "Name a native navigation landmark, supply destinations in source order, and optionally customize the two overflow-control names:"
     },
+    "packages/molecules/src/interfaces/SegmentedControlOption.md": {
+      "recipe": "molecule-components",
+      "description": "Describe one caller-owned segmented value, visible label, accessible label, and disabled state:"
+    },
     "packages/molecules/src/type-aliases/CardTone.md": {
       "recipe": "molecule-components",
       "description": "Select the neutral, success, warning, or danger emphasis applied by a Card without depending on CSS classes:"
@@ -4377,6 +4398,26 @@
     "packages/molecules/src/type-aliases/ControlFieldRenderer.md": {
       "recipe": "molecule-components",
       "description": "Render caller-owned control content from public relationship metadata without cloning private state:"
+    },
+    "packages/molecules/src/type-aliases/SegmentedControlAccessibleName.md": {
+      "recipe": "molecule-components",
+      "description": "Require a direct accessible label or labelled-by relationship for the segmented toolbar:"
+    },
+    "packages/molecules/src/type-aliases/SegmentedControlAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLDivElement attributes while SegmentedControl owns toolbar semantics:"
+    },
+    "packages/molecules/src/type-aliases/SegmentedControlChangeEvent.md": {
+      "recipe": "molecule-components",
+      "description": "Handle native mouse or keyboard activation when a controlled segment changes:"
+    },
+    "packages/molecules/src/type-aliases/SegmentedControlOrientation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose horizontal or vertical layout and matching Arrow-key navigation:"
+    },
+    "packages/molecules/src/type-aliases/SegmentedControlProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a controlled value, finite options, naming, orientation, and change handler:"
     },
     "packages/molecules/src/variables/Card.md": {
       "recipe": "molecule-components",
@@ -4401,6 +4442,10 @@
     "packages/molecules/src/variables/NavigationStrip.md": {
       "recipe": "molecule-components",
       "description": "Keep overflowing navigation destinations discoverable through native controls and automatically reveal the exact current destination:"
+    },
+    "packages/molecules/src/variables/SegmentedControl.md": {
+      "recipe": "molecule-components",
+      "description": "Render a controlled one-of-many toolbar of pressed buttons without tab or radio semantics:"
     },
     "packages/molecules/src/variables/moleculeManifest.md": {
       "recipe": "molecule-components",

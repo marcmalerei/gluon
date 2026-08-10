@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { NavigationStrip } from '@gluonjs/molecules';
+import { NavigationStrip, SegmentedControl } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -60,6 +60,7 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
   const router = useRouter();
   const selected = typeof route.query.category === 'string' ? route.query.category : 'All';
   const sort = typeof route.query.sort === 'string' ? route.query.sort : 'featured';
+  const view = route.query.view === 'list' ? 'list' : 'grid';
   const filtered = selected === 'All'
     ? products
     : products.filter((product) => product.category === selected);
@@ -87,14 +88,25 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
         ],
       })}
       <div class="catalog-sort">
+        ${SegmentedControl({
+          label: 'Product view',
+          value: view,
+          options: [
+            { value: 'grid', label: 'Grid' },
+            { value: 'list', label: 'List' },
+          ],
+          onChange: (nextView) => {
+            void router.push(catalogUrl(selected, sort, nextView));
+          },
+          attributes: { class: 'catalog-view' },
+        })}
         <label for="catalog-sort">Sort by</label>
         ${Select({
           value: sort,
           attributes: { id: 'catalog-sort', 'aria-label': 'Sort products' },
           onChange: (event) => {
             const value = (event.currentTarget as HTMLSelectElement).value;
-            const categoryQuery = selected === 'All' ? '' : `category=${encodeURIComponent(selected)}&`;
-            void router.push(`/shop?${categoryQuery}sort=${encodeURIComponent(value)}`);
+            void router.push(catalogUrl(selected, value, view));
           },
           children: html`
             <option value="featured">Featured</option>
@@ -107,14 +119,23 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
       </div>
       ${LayoutTransition({
         layoutId: 'catalog-grid',
-        transitionKey: `${selected}:${sort}`,
+        transitionKey: `${selected}:${sort}:${view}`,
         duration: 180,
-        children: html`<div class="catalog-grid">
+        children: html`<div class=${view === 'list' ? 'catalog-grid is-list-view' : 'catalog-grid'}>
           ${repeat(visible, (product) => product.slug, ProductCard)}
         </div>`,
       })}
     </section>
   `;
+}
+
+function catalogUrl(category: string, sort: string, view: string): string {
+  const query = new URLSearchParams();
+  if (category !== 'All') query.set('category', category);
+  if (sort !== 'featured') query.set('sort', sort);
+  if (view !== 'grid') query.set('view', view);
+  const suffix = query.toString();
+  return suffix ? `/shop?${suffix}` : '/shop';
 }
 
 function sortProducts(items: readonly Product[], sort: string): readonly Product[] {

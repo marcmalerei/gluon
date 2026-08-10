@@ -19,7 +19,7 @@ import {
   css,
   render,
 } from '../src/index.js';
-import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, FormField, SegmentedControl } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -498,6 +498,35 @@ test('matches ButtonGroup spaced, attached, vertical, wrapped, and RTL layouts',
     ] }),
   ] }), document.body);
   await expect.element(page.getByTestId('button-group-visual')).toMatchScreenshot('button-group-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches SegmentedControl selected, disabled, vertical, and RTL states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="segmented-control-visual"] { box-sizing: border-box; inline-size: 420px; block-size: 340px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="segmented-control-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
+      .segmented-grid { display: grid; gap: 24px; }
+      .wide-segments { inline-size: 100%; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({ data: { testid: 'segmented-control-visual' }, children: [
+    q.h1({ children: 'SegmentedControl states' }),
+    q.div({ class: 'segmented-grid', children: [
+      SegmentedControl({ label: 'View', value: 'grid', attributes: { class: 'wide-segments' }, options: [{ value: 'grid', label: 'Grid' }, { value: 'map', label: 'Map', disabled: true }, { value: 'list', label: 'List' }] }),
+      SegmentedControl({ label: 'Density', value: 'compact', orientation: 'vertical', options: [{ value: 'comfortable', label: 'Comfortable' }, { value: 'compact', label: 'Compact' }] }),
+      q.div({ dir: 'rtl', children: SegmentedControl({ label: 'RTL range', value: 'month', options: [{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }] }) }),
+    ] }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('segmented-control-visual')).toMatchScreenshot('segmented-control-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });
