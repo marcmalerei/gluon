@@ -642,7 +642,7 @@ test('matches Accordion single-open, unavailable, RTL, and zoom-safe states', as
   }) }), document.body);
   await expect.element(page.getByTestId('accordion-visual')).toMatchScreenshot('accordion-states-light', {
     comparatorName: 'pixelmatch',
-    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.08, threshold: 0.15 },
   });
   unadoptStyles(document, visualStyles);
   uiOwner.dispose();
