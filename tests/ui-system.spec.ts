@@ -40,6 +40,7 @@ import {
   ControlField,
   DialogSurface,
   Disclosure,
+  EmptyState,
   FormField,
   InlineNotice,
   NavigationStrip,
@@ -680,6 +681,30 @@ describe('separate UI package contracts', () => {
     expect(dismiss).toHaveBeenCalledOnce();
     expect(notices[2]?.querySelector('[role="alert"]')?.getAttribute('aria-live')).toBe('assertive');
     expect(notices[3]?.querySelector('[role]')).toBeNull();
+  });
+
+  it('renders EmptyState as static compact or full content with caller-owned recovery', () => {
+    const recover = vi.fn();
+    render(q.main({ children: [
+      EmptyState({
+        heading: 'No matching objects',
+        headingLevel: 3,
+        children: 'Clear the filters to see the complete collection.',
+        illustration: Icon({ name: 'spark', label: 'Empty tray' }),
+        action: q.button({ type: 'button', onClick: recover, children: 'Clear filters' }),
+        attributes: { id: 'catalog-empty', data: { owner: 'catalog' } },
+      }),
+      EmptyState({ presentation: 'compact', heading: 'Bag is empty', children: 'Choose something useful.' }),
+    ] }), document.body);
+    const states = [...document.querySelectorAll<HTMLElement>('.gluon-empty-state')];
+    expect(states[0]?.dataset.presentation).toBe('full');
+    expect(states[0]?.dataset.owner).toBe('catalog');
+    expect(states[0]?.querySelector('[role="heading"]')?.getAttribute('aria-level')).toBe('3');
+    expect(states[0]?.querySelector('svg')?.getAttribute('aria-label')).toBe('Empty tray');
+    expect(states[0]?.querySelector('[role="status"], [role="alert"], [aria-live]')).toBeNull();
+    states[0]!.querySelector<HTMLButtonElement>('button')!.click();
+    expect(recover).toHaveBeenCalledOnce();
+    expect(states[1]?.classList.contains('is-compact')).toBe(true);
   });
 
   it('keeps unavailable Disclosure summaries focusable with a visible reason', () => {

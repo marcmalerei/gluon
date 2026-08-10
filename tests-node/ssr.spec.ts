@@ -53,7 +53,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, InlineNotice, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, EmptyState, InlineNotice, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -122,6 +122,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-live="assertive"');
     expect(rendered).toContain('Payment failed');
     expect(rendered).toContain('gluon-inline-notice-actions');
+  });
+
+  it('serializes EmptyState as static content with semantic heading and recovery', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(EmptyState({
+      heading: 'No matching objects',
+      headingLevel: 3,
+      children: 'Clear the filters.',
+      presentation: 'compact',
+      action: Button({ label: 'Clear filters' }),
+    })));
+    expect(rendered).toContain('gluon-empty-state');
+    expect(rendered).toContain('data-presentation="compact"');
+    expect(rendered).toContain('role="heading"');
+    expect(rendered).toContain('aria-level="3"');
+    expect(rendered).not.toContain('aria-live');
+    expect(rendered).toContain('Clear filters');
   });
 
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {

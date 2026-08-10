@@ -114,6 +114,14 @@ export const moleculeStyles = css`
     :where(.gluon-inline-notice-actions > *) { min-inline-size: 0; }
     :where(.gluon-inline-notice-actions :is(a, button)) { display: inline-flex; align-items: center; min-block-size: 44px; }
 
+    :where(.gluon-empty-state) { display: grid; justify-items: center; align-content: center; gap: var(--gluon-empty-state-gap, 1rem); inline-size: 100%; min-inline-size: 0; min-block-size: var(--gluon-empty-state-min-block-size, 18rem); padding: var(--gluon-empty-state-padding, clamp(2rem, 8vw, 5rem) clamp(1rem, 5vw, 3rem)); text-align: center; overflow-wrap: anywhere; }
+    :where(.gluon-empty-state.is-compact) { --gluon-empty-state-min-block-size: auto; --gluon-empty-state-padding: 1.25rem; --gluon-empty-state-gap: 0.75rem; }
+    :where(.gluon-empty-state-media) { display: grid; place-items: center; max-inline-size: var(--gluon-empty-state-media-size, 12rem); }
+    :where(.gluon-empty-state-heading) { max-inline-size: var(--gluon-empty-state-heading-size, 32rem); font-size: var(--gluon-empty-state-heading-font-size, clamp(1.35rem, 4vw, 2rem)); font-weight: 750; line-height: 1.15; }
+    :where(.gluon-empty-state-body) { max-inline-size: var(--gluon-empty-state-body-size, 42rem); color: var(--gluon-empty-state-body-color, var(--gluon-color-muted, #53605e)); line-height: 1.55; }
+    :where(.gluon-empty-state-action) { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gluon-empty-state-action-gap, 0.5rem 0.75rem); }
+    :where(.gluon-empty-state-action :is(a, button)) { display: inline-flex; align-items: center; min-block-size: 44px; }
+
     :where(.gluon-control-field) { display: grid; gap: 0.375rem; min-inline-size: 0; }
     :where(.gluon-control-field-label) { font-size: 0.875rem; font-weight: 650; }
     :where(.gluon-control-field-required) { color: var(--gluon-control-field-required-color, var(--gluon-color-danger, #a52222)); }
@@ -144,12 +152,14 @@ export const moleculeStyles = css`
       :where(.gluon-disclosure-summary[aria-disabled="true"]) { color: GrayText; opacity: 1; }
       :where(.gluon-accordion) { color: CanvasText; }
       :where(.gluon-inline-notice) { border: 2px solid CanvasText; background: Canvas; color: CanvasText; }
+      :where(.gluon-empty-state, .gluon-empty-state-body) { color: CanvasText; }
     }
     @media (max-width: 30rem) { :where(.gluon-dialog-surface-overlay) { padding: var(--gluon-dialog-mobile-overlay-padding, 0); } :where(.gluon-dialog-surface) { inline-size: 100%; max-block-size: 100dvh; border-radius: var(--gluon-dialog-mobile-radius, 0); } }
     @media (prefers-reduced-motion: reduce) { :where(.gluon-dialog-surface-overlay, .gluon-dialog-surface) { animation: none !important; transition: none !important; } }
     @media (prefers-reduced-motion: reduce) { :where(.gluon-disclosure-summary)::after { transition: none; } }
     @media (prefers-reduced-motion: reduce) { :where(.gluon-accordion) { scroll-behavior: auto; } }
     @media (prefers-reduced-motion: reduce) { :where(.gluon-inline-notice, .gluon-inline-notice *) { animation: none !important; transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) { :where(.gluon-empty-state, .gluon-empty-state *) { animation: none !important; transition: none !important; } }
   }
 `;
 
@@ -165,4 +175,5 @@ markLegacyComponentStyleSheet(moleculeStyles, [
   'gluon-molecule-tabs',
   'gluon-molecule-dialog-surface',
   'gluon-molecule-disclosure',
+  'gluon-molecule-empty-state',
 ]);

@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -904,6 +904,7 @@
         "  ControlField,",
         "  DialogSurface,",
         "  Disclosure,",
+        "  EmptyState,",
         "  FormField,",
         "  InlineNotice,",
         "  NavigationStrip,",
@@ -946,6 +947,10 @@
         "  type DisclosureProps,",
         "  type DisclosureState,",
         "  type DisclosureSummaryAttributes,",
+        "  type EmptyStateAttributes,",
+        "  type EmptyStateHeadingLevel,",
+        "  type EmptyStatePresentation,",
+        "  type EmptyStateProps,",
         "  type FormFieldProps,",
         "  type InlineNoticeAnnouncement,",
         "  type InlineNoticeAttributes,",
@@ -1001,6 +1006,10 @@
         "const noticeAnnouncement: InlineNoticeAnnouncement = 'polite';",
         "const noticeAttributes = { class: 'order-notice' } satisfies InlineNoticeAttributes;",
         "const orderNotice = { tone: noticeTone, announcement: noticeAnnouncement, title: 'Order confirmed', children: 'Delivery details were sent.', action: Button({ label: 'View order' }), attributes: noticeAttributes } satisfies InlineNoticeProps;",
+        "const emptyPresentation: EmptyStatePresentation = 'compact';",
+        "const emptyHeadingLevel: EmptyStateHeadingLevel = 3;",
+        "const emptyAttributes = { class: 'empty-bag' } satisfies EmptyStateAttributes;",
+        "const emptyBag = { presentation: emptyPresentation, heading: 'Your bag is empty', headingLevel: emptyHeadingLevel, children: 'Choose something useful.', action: Button({ label: 'Shop objects' }), attributes: emptyAttributes } satisfies EmptyStateProps;",
         "const choiceAttributes = { data: { owner: 'settings' } } satisfies ChoiceGroupAttributes;",
         "const choiceOrientation: ChoiceGroupOrientation = 'horizontal';",
         "const visibility = { id: 'visibility', legend: 'Visibility', orientation: choiceOrientation, attributes: choiceAttributes, children: html`<label>${Radio({ name: 'visibility', checked: true })} Team</label><label>${Radio({ name: 'visibility' })} Private</label>` } satisfies ChoiceGroupProps;",
@@ -1029,7 +1038,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4112,6 +4121,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable InlineNotice tone, layout, marker, and action stylesheet:"
     },
+    "packages/molecules/src/variables/emptyStateStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable EmptyState layout, media, copy, and action stylesheet:"
+    },
     "packages/molecules/src/variables/cardStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Card stylesheet retained by rendered Card values:"
@@ -4504,6 +4517,10 @@
       "recipe": "molecule-components",
       "description": "Compose bounded feedback copy, tone, announcement behavior, and caller-owned action or dismiss controls:"
     },
+    "packages/molecules/src/interfaces/EmptyStateProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose optional media, semantic heading, body, and caller-owned recovery action as a static empty state:"
+    },
     "packages/molecules/src/interfaces/NavigationStripProps.md": {
       "recipe": "molecule-components",
       "description": "Name a native navigation landmark, supply destinations in source order, and optionally customize the two overflow-control names:"
@@ -4547,6 +4564,18 @@
     "packages/molecules/src/type-aliases/InlineNoticeTone.md": {
       "recipe": "molecule-components",
       "description": "Select neutral, info, success, warning, or danger emphasis for bounded feedback:"
+    },
+    "packages/molecules/src/type-aliases/EmptyStateAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible outer HTMLDivElement attributes while EmptyState excludes accidental live-region semantics:"
+    },
+    "packages/molecules/src/type-aliases/EmptyStateHeadingLevel.md": {
+      "recipe": "molecule-components",
+      "description": "Choose the semantic heading level appropriate to the surrounding empty-state page or panel:"
+    },
+    "packages/molecules/src/type-aliases/EmptyStatePresentation.md": {
+      "recipe": "molecule-components",
+      "description": "Choose a compact embedded empty state or a full spacious presentation:"
     },
     "packages/molecules/src/type-aliases/DialogSurfaceAccessibleName.md": {
       "recipe": "molecule-components",
@@ -4667,6 +4696,10 @@
     "packages/molecules/src/variables/InlineNotice.md": {
       "recipe": "molecule-components",
       "description": "Render bounded feedback with deliberate live semantics and caller-owned lifecycle and controls:"
+    },
+    "packages/molecules/src/variables/EmptyState.md": {
+      "recipe": "molecule-components",
+      "description": "Render a static compact or full empty state while application routes, loading, analytics, and wording remain caller-owned:"
     },
     "packages/molecules/src/variables/NavigationStrip.md": {
       "recipe": "molecule-components",
