@@ -285,7 +285,7 @@ test('matches ToggleButton pressed, unpressed, icon, disabled, and RTL states', 
   const visualStyles = css`
     @layer gluon {
       body { margin: 0; background: #fff; }
-      [data-testid="toggle-button-visual"] { box-sizing: border-box; inline-size: 380px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="toggle-button-visual"] { box-sizing: border-box; inline-size: 380px; block-size: 220px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
       [data-testid="toggle-button-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
       .toggle-button-state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
     }
