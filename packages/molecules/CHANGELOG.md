@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added native `Disclosure` details/summary composition with controlled or
+  initial open state, toggle handling, visible unavailable reasons, logical
+  marker styling, and GLUON GOODS shipping-detail integration.
+
 - Added `DialogSurface` over the headless ARIA Dialog, Overlay, and focus-scope
   contracts, with structured title, description, content, close-action, and
   footer regions plus controlled dismissal and a real GLUON GOODS bag drawer.

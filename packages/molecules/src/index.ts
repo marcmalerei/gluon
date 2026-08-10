@@ -3,6 +3,7 @@ export { ButtonGroup, type ButtonGroupAccessibleName, type ButtonGroupAttributes
 export { ChoiceGroup, type ChoiceGroupAttributes, type ChoiceGroupOrientation, type ChoiceGroupProps } from './choice-group.js';
 export { ControlField, type ControlFieldAttributes, type ControlFieldProps, type ControlFieldRelationships, type ControlFieldRenderer } from './control-field.js';
 export { DialogSurface, createDialogSurfaceController, type DialogSurfaceAccessibleName, type DialogSurfaceAttributes, type DialogSurfaceController, type DialogSurfaceControllerOptions, type DialogSurfacePlacement, type DialogSurfaceProps, type DialogSurfaceSectionAttributes } from './dialog-surface.js';
+export { Disclosure, type DisclosureAttributes, type DisclosureAvailability, type DisclosureProps, type DisclosureState, type DisclosureSummaryAttributes } from './disclosure.js';
 export { FormField, type FormFieldProps } from './form-field.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
 export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedControlAttributes, type SegmentedControlChangeEvent, type SegmentedControlOption, type SegmentedControlOrientation, type SegmentedControlProps } from './segmented-control.js';
@@ -14,6 +15,7 @@ export { buttonGroupStyles } from './button-group-styles.js';
 export { choiceGroupStyles } from './choice-group-styles.js';
 export { controlFieldStyles } from './control-field-styles.js';
 export { dialogSurfaceStyles } from './dialog-surface-styles.js';
+export { disclosureStyles } from './disclosure-styles.js';
 export { formFieldStyles } from './form-field-styles.js';
 export { navigationStripStyles } from './navigation-strip-styles.js';
 export { segmentedControlStyles } from './segmented-control-styles.js';

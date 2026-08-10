@@ -53,7 +53,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { Button } from '@gluonjs/atoms';
-import { Card, DialogSurface, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Card, DialogSurface, Disclosure, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -73,6 +73,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-labelledby="server-dialog-title"');
     expect(rendered).toContain('aria-describedby="server-dialog-description"');
     expect(rendered).toContain('Server actions');
+  });
+
+  it('serializes native Disclosure open and unavailable relationships', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(Disclosure({
+      id: 'server-disclosure',
+      summary: 'Repair history',
+      defaultOpen: true,
+      unavailable: true,
+      unavailableReason: 'Available after the first repair.',
+      children: 'No repairs yet.',
+    })));
+    expect(rendered).toContain('<details');
+    expect(rendered).toContain('open');
+    expect(rendered).toContain('<summary');
+    expect(rendered).toContain('aria-disabled="true"');
+    expect(rendered).toContain('aria-describedby="server-disclosure-unavailable"');
   });
 
   it('renders request-isolated Eleventy pages and disposes success and failure ownership', async () => {

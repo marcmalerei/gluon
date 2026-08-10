@@ -20,7 +20,7 @@ import {
   render,
   unadoptStyles,
 } from '../src/index.js';
-import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, FormField, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 
@@ -595,6 +595,27 @@ test('matches DialogSurface labelled header, description, content, close action,
     ] }),
   }), document.body);
   await expect.element(page.getByRole('dialog')).toMatchScreenshot('dialog-surface-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+  });
+  unadoptStyles(document, visualStyles);
+  uiOwner.dispose();
+});
+
+test('matches Disclosure closed, open, unavailable, RTL, and zoom-safe states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer app { body { margin: 0; padding: 16px; inline-size: 300px; font-size: 18px; } .disclosure-stack { display: grid; block-size: 230px; overflow: hidden; } .gluon-disclosure-content p { margin: 0; line-height: 1.5; } }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({ data: { testid: 'disclosure-visual' }, class: 'disclosure-stack', children: [
+    Disclosure({ id: 'visual-closed', summary: 'Delivery details', children: q.p({ children: 'Tracked delivery.' }) }),
+    Disclosure({ id: 'visual-open', summary: 'Care instructions', open: true, children: q.p({ children: 'Wipe clean and replace parts individually.' }) }),
+    q.div({ dir: 'rtl', children: Disclosure({ id: 'visual-unavailable', summary: 'Repair history', unavailable: true, unavailableReason: 'Available after the first repair.', children: 'No repairs yet.' }) }),
+  ] }), document.body);
+  await expect.element(page.getByTestId('disclosure-visual')).toMatchScreenshot('disclosure-states-light', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
   });

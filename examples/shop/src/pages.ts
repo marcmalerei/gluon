@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
+import { Disclosure, NavigationStrip, SegmentedControl, Tabs } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -243,6 +243,16 @@ export function ShippingPage(_store: ShopStore): TemplateValue {
   return PolicyPage(
     'Shipping',
     'In-stock objects leave our workshop in 2–3 working days. Every order includes tracked delivery and repair guidance for the objects inside.',
+    Disclosure({
+      id: 'shipping-service-details',
+      summary: 'Delivery service details',
+      attributes: { class: 'policy-details' },
+      children: html`<dl>
+        <div><dt>Tracking</dt><dd>Sent by email as soon as the workshop dispatches your order.</dd></div>
+        <div><dt>Packaging</dt><dd>Recyclable board, sized to protect replaceable parts.</dd></div>
+        <div><dt>Remote areas</dt><dd>Allow one additional working day after dispatch.</dd></div>
+      </dl>`,
+    }),
   );
 }
 
@@ -296,11 +306,12 @@ function ProductGallery(product: Product): TemplateValue {
   `;
 }
 
-function PolicyPage(title: string, copy: string): TemplateValue {
+function PolicyPage(title: string, copy: string, details?: TemplateValue): TemplateValue {
   return html`
     <article class="policy-page">
       <h1>${title}</h1>
       <p>${copy}</p>
+      ${details}
       ${RouterLink({ to: '/shop', children: html`<span>Return to the collection</span>${ArrowIcon()}`, attributes: { class: 'primary-button' } })}
     </article>
   `;

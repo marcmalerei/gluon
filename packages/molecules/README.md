@@ -7,7 +7,7 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, FormField, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, FormField, NavigationStrip, SegmentedControl, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -51,6 +51,13 @@ uses an ARIA dialog on a `div`; it deliberately does not call native
 `HTMLDialogElement.showModal()`, enter the top layer, or make background content
 inert. Applications that require the native-dialog boundary should own a
 native `<dialog>` lifecycle instead.
+`Disclosure` renders native `details` and `summary`, preserving browser
+keyboard toggling, find-in-page expansion, semantics, and form behavior. Use
+`open` with `onToggle` for controlled state or `defaultOpen` for the initial
+native state. It deliberately has no silent disabled prop. When content is not
+yet available, pass `unavailable: true` with a concrete `unavailableReason`;
+the summary remains focusable, exposes `aria-disabled`, shows and references
+the reason, and prevents Enter, Space, and pointer activation.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -105,6 +112,10 @@ DialogSurface exposes `--gluon-dialog-z-index`,
 `--gluon-dialog-color`, `--gluon-dialog-border`, `--gluon-dialog-radius`,
 `--gluon-dialog-shadow`, and section padding variables for header,
 description, content, and footer.
+Disclosure exposes `--gluon-disclosure-border`, summary gap/padding/color and
+weight variables, `--gluon-disclosure-marker`, marker color/size/motion,
+`--gluon-disclosure-content-padding`, and
+`--gluon-disclosure-unavailable-color`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends
@@ -132,3 +143,5 @@ shop owns routing and restores focus to the activated tab after navigation.
 The bag uses `DialogSurface` for its labelled end drawer, overlay and Escape
 dismissal, initial close-button focus, focus containment, and trigger-focus
 restoration while the shop continues to own bag state and checkout decisions.
+The Shipping policy uses `Disclosure` for real tracking, packaging, and remote
+area details without replacing native summary behavior.

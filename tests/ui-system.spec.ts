@@ -38,6 +38,7 @@ import {
   ChoiceGroup,
   ControlField,
   DialogSurface,
+  Disclosure,
   FormField,
   NavigationStrip,
   SegmentedControl,
@@ -564,6 +565,63 @@ describe('separate UI package contracts', () => {
     expect(keydown.handleEvent).toHaveBeenCalledTimes(2);
     render(q.div({ children: 'Unmounted' }), document.body);
     expect(externalRef.value).toBeUndefined();
+  });
+
+  it('preserves native Disclosure open state, summary activation, and toggle events', async () => {
+    const onToggle = vi.fn();
+    render(Disclosure({
+      id: 'shipping-details',
+      summary: 'Shipping details',
+      defaultOpen: true,
+      onToggle,
+      attributes: { data: { owner: 'policy' } },
+      summaryAttributes: { data: { section: 'delivery' } },
+      contentAttributes: { class: 'policy-copy' },
+      children: 'Tracked delivery in 2–3 days.',
+    }), document.body);
+    const details = document.querySelector<HTMLDetailsElement>('#shipping-details')!;
+    const summary = details.querySelector<HTMLElement>('summary')!;
+    expect(details.open).toBe(true);
+    expect(details.dataset.owner).toBe('policy');
+    expect(summary.dataset.section).toBe('delivery');
+    expect(details.querySelector('.policy-copy')?.textContent).toContain('Tracked delivery');
+    summary.click();
+    await vi.waitFor(() => expect(details.open).toBe(false));
+    await vi.waitFor(() => expect(onToggle).toHaveBeenCalled());
+  });
+
+  it('keeps unavailable Disclosure summaries focusable with a visible reason', () => {
+    const summaryClick = vi.fn();
+    const summaryKeydown = vi.fn();
+    const attributeToggle = vi.fn((event: Event) => event.preventDefault());
+    const onToggle = vi.fn();
+    render(Disclosure({
+      id: 'repair-history',
+      summary: 'Repair history',
+      open: false,
+      unavailable: true,
+      unavailableReason: 'Available after the first repair.',
+      onToggle,
+      attributes: { '@toggle': attributeToggle },
+      summaryAttributes: { onClick: summaryClick, onKeydown: summaryKeydown },
+      children: 'No repairs yet.',
+    }), document.body);
+    const details = document.querySelector<HTMLDetailsElement>('#repair-history')!;
+    const summary = details.querySelector<HTMLElement>('summary')!;
+    expect(summary.tabIndex).toBe(0);
+    expect(summary.getAttribute('aria-disabled')).toBe('true');
+    expect(summary.getAttribute('aria-describedby')).toBe('repair-history-unavailable');
+    expect(details.querySelector('#repair-history-unavailable')?.textContent).toContain('first repair');
+    summary.click();
+    expect(summaryClick).toHaveBeenCalledOnce();
+    expect(details.open).toBe(false);
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    summary.dispatchEvent(enter);
+    expect(summaryKeydown).toHaveBeenCalledOnce();
+    expect(enter.defaultPrevented).toBe(true);
+    details.dispatchEvent(new Event('toggle', { cancelable: true }));
+    expect(attributeToggle).toHaveBeenCalledOnce();
+    expect(onToggle).not.toHaveBeenCalled();
   });
 
   it('renders Textarea as a native controlled multiline control with explicit states', () => {

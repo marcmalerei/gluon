@@ -40,6 +40,7 @@ const buttonGroupStyles = await sheet('packages/molecules/src/button-group-style
 const choiceGroupStyles = await sheet('packages/molecules/src/choice-group-styles.ts', 'choiceGroupStyles');
 const controlFieldStyles = await sheet('packages/molecules/src/control-field-styles.ts', 'controlFieldStyles');
 const dialogSurfaceStyles = await sheet('packages/molecules/src/dialog-surface-styles.ts', 'dialogSurfaceStyles');
+const disclosureStyles = await sheet('packages/molecules/src/disclosure-styles.ts', 'disclosureStyles');
 const formFieldStyles = await sheet('packages/molecules/src/form-field-styles.ts', 'formFieldStyles');
 const segmentedControlStyles = await sheet('packages/molecules/src/segmented-control-styles.ts', 'segmentedControlStyles');
 const tabsStyles = await sheet('packages/molecules/src/tabs-styles.ts', 'tabsStyles');
@@ -54,7 +55,7 @@ const actual = {
       ['packages/atoms/src/styles.ts', 'packages/molecules/src/styles.ts', 'packages/organisms/src/styles.ts'],
     ),
     after: measure(
-      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, formFieldStyles, segmentedControlStyles, tabsStyles, appShellStyles],
+      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, segmentedControlStyles, tabsStyles, appShellStyles],
       [
         'packages/atoms/src/button-styles.ts',
         'packages/atoms/src/checkbox-styles.ts',
@@ -73,6 +74,7 @@ const actual = {
         'packages/molecules/src/choice-group-styles.ts',
         'packages/molecules/src/control-field-styles.ts',
         'packages/molecules/src/dialog-surface-styles.ts',
+        'packages/molecules/src/disclosure-styles.ts',
         'packages/molecules/src/form-field-styles.ts',
         'packages/molecules/src/segmented-control-styles.ts',
         'packages/molecules/src/tabs-styles.ts',
