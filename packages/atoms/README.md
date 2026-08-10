@@ -31,7 +31,8 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-`Button`, `Checkbox`, `Icon`, `Input`, `Label`, `Select`, and `Textarea` expose immutable `Component.styles`
+`Button`, `Checkbox`, `Icon`, `Input`, `Label`, `Progress`, `Radio`, `Select`,
+`StatusBadge`, `Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. `atomStyles` is deprecated; adopting it with exact rendering throws
@@ -109,6 +110,9 @@ native `button` rule or adopt `atomStyles`.
 - `Select` preserves native option, keyboard, disabled, and required semantics;
   compose it with `Label` or another native labeling relationship. Its public
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
+- `StatusBadge` is a presentational span. It owns only neutral, info, success,
+  warning, or danger tone styling; applications own domain mapping, translated
+  status copy, and whether a surrounding surface is a live region.
 - `Switch` is a native checkbox with `role="switch"` for binary on/off settings.
   Keep its caller-owned accessible label stable when the checked state changes.
 - `Textarea` preserves native multiline editing, selection, resize, form,
@@ -141,7 +145,9 @@ Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
 `--gluon-toggle-button-pressed-border-color`. Progress exposes
 `--gluon-progress-track`, `--gluon-progress-value`,
 `--gluon-progress-track-border`, `--gluon-progress-width`, and
-`--gluon-progress-height`. Shared public tokens retain their documented
+`--gluon-progress-height`. StatusBadge exposes
+`--gluon-status-badge-background`, `--gluon-status-badge-color`, and
+`--gluon-status-badge-border`. Shared public tokens retain their documented
 `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 
@@ -159,5 +165,6 @@ catalog search uses `Input`, catalog sorting uses the native `Select`, and
 checkout delivery instructions use `Textarea`; checkout consent uses
 `Checkbox`; product configuration uses native `Radio` groups; async inventory
 feedback uses indeterminate `Progress`. The application supplies only
-documented public tokens/classes and owns the shared/exact sheets through one
-`UiOwner` lifecycle.
+documented public tokens/classes; completed inventory feedback uses
+`StatusBadge` with application-owned availability-to-tone mapping. The app owns
+the shared and exact sheets through one `UiOwner` lifecycle.

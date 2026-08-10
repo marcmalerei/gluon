@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the presentational `StatusBadge` Atom with five brand-neutral tones,
+  caller-owned status copy and live-region semantics, exact styles, wrapping,
+  RTL, forced-colors, and GLUON GOODS inventory integration.
 - Added the native `Progress` Atom with determinate value/max and attribute-free
   indeterminate state, responsive width, exact styles, forced-colors support,
   and GLUON GOODS async inventory integration.
