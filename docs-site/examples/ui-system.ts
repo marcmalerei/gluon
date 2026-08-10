@@ -27,6 +27,7 @@ import {
   ChoiceGroup,
   ControlField,
   DialogSurface,
+  Disclosure,
   FormField,
   NavigationStrip,
   SegmentedControl,
@@ -219,6 +220,11 @@ createApp(() => AppShell({
             { id: 'profile-overview', value: 'overview', label: 'Overview', panel: 'Profile overview' },
             { id: 'profile-history', value: 'history', label: 'History', panel: 'Profile history' },
           ],
+        }),
+        Disclosure({
+          id: 'profile-delivery-details',
+          summary: 'Delivery details',
+          children: 'Tracked delivery in 2–3 working days.',
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       Field({

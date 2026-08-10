@@ -541,7 +541,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 258
+      "line": 250
     },
     {
       "value": {
@@ -549,7 +549,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 262
+      "line": 268
     },
     {
       "value": {
@@ -557,7 +557,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 263
+      "line": 272
     },
     {
       "value": {
@@ -565,7 +565,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 282
+      "line": 273
     },
     {
       "value": {
@@ -573,7 +573,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 289
+      "line": 292
     },
     {
       "value": {
@@ -581,7 +581,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 300
+      "line": 299
     },
     {
       "value": {
@@ -589,7 +589,15 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 304
+      "line": 310
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 315
     },
     {
       "value": {
@@ -1468,7 +1476,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 260
+      "line": 270
     },
     {
       "value": {
@@ -1476,7 +1484,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 263
+      "line": 273
     },
     {
       "value": {
@@ -1484,7 +1492,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 263
+      "line": 273
     },
     {
       "value": {
@@ -1492,7 +1500,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 263
+      "line": 273
     },
     {
       "value": {
@@ -1500,7 +1508,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 263
+      "line": 273
     },
     {
       "value": {
@@ -1508,83 +1516,13 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 264
+      "line": 274
     },
     {
       "value": {
         "kind": "child"
       },
       "confidence": "exact",
-      "file": "pages.ts",
-      "line": 283
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "class"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 284
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "pages.ts",
-      "line": 284
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "pages.ts",
-      "line": 285
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "aria-label"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 290
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "alt"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 291
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "src"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 291
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "src"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 292
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "src"
-      },
-      "confidence": "structural",
       "file": "pages.ts",
       "line": 293
     },
@@ -1595,23 +1533,77 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 302
+      "line": 294
     },
     {
       "value": {
         "kind": "child"
       },
       "confidence": "exact",
+      "file": "pages.ts",
+      "line": 294
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 295
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-label"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 300
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "alt"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 301
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 301
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
+      "file": "pages.ts",
+      "line": 302
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "src"
+      },
+      "confidence": "structural",
       "file": "pages.ts",
       "line": 303
     },
     {
       "value": {
-        "kind": "child"
+        "kind": "attribute",
+        "name": "class"
       },
-      "confidence": "exact",
+      "confidence": "structural",
       "file": "pages.ts",
-      "line": 304
+      "line": 312
     },
     {
       "value": {
@@ -1619,7 +1611,31 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 304
+      "line": 313
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 314
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 315
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 315
     },
     {
       "value": {

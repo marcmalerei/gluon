@@ -858,10 +858,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
+        "import { buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, formFieldStyles, navigationStripStyles, segmentedControlStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -902,6 +902,7 @@
         "  ChoiceGroup,",
         "  ControlField,",
         "  DialogSurface,",
+        "  Disclosure,",
         "  FormField,",
         "  NavigationStrip,",
         "  SegmentedControl,",
@@ -930,6 +931,11 @@
         "  type DialogSurfacePlacement,",
         "  type DialogSurfaceProps,",
         "  type DialogSurfaceSectionAttributes,",
+        "  type DisclosureAttributes,",
+        "  type DisclosureAvailability,",
+        "  type DisclosureProps,",
+        "  type DisclosureState,",
+        "  type DisclosureSummaryAttributes,",
         "  type FormFieldProps,",
         "  type NavigationStripProps,",
         "  type SegmentedControlAccessibleName,",
@@ -963,6 +969,11 @@
         "const dialogControllerOptions = { initialFocus: '[data-dialog-initial-focus]' } satisfies DialogSurfaceControllerOptions;",
         "const dialogController: DialogSurfaceController = createDialogSurfaceController(dialogControllerOptions);",
         "const archiveDialog = { ...dialogName, id: 'archive-dialog', title: 'Archive order?', description: 'The order remains available.', placement: dialogPlacement, controller: dialogController, attributes: dialogAttributes, footerAttributes: dialogSectionAttributes, closeAction: Button({ label: 'Close', attributes: { data: { dialogInitialFocus: true } } }), children: 'Archive this order?', footer: Button({ label: 'Archive' }), onDismiss: () => dialogController.deactivate() } satisfies DialogSurfaceProps;",
+        "const disclosureAttributes = { class: 'delivery-details' } satisfies DisclosureAttributes;",
+        "const disclosureSummaryAttributes = { class: 'delivery-summary' } satisfies DisclosureSummaryAttributes;",
+        "const disclosureState = { defaultOpen: false } satisfies DisclosureState;",
+        "const disclosureAvailability = { unavailable: false } satisfies DisclosureAvailability;",
+        "const deliveryDisclosure = { ...disclosureState, ...disclosureAvailability, id: 'delivery-details', summary: 'Delivery details', children: 'Tracked delivery in 2–3 working days.', attributes: disclosureAttributes, summaryAttributes: disclosureSummaryAttributes } satisfies DisclosureProps;",
         "const choiceAttributes = { data: { owner: 'settings' } } satisfies ChoiceGroupAttributes;",
         "const choiceOrientation: ChoiceGroupOrientation = 'horizontal';",
         "const visibility = { id: 'visibility', legend: 'Visibility', orientation: choiceOrientation, attributes: choiceAttributes, children: html`<label>${Radio({ name: 'visibility', checked: true })} Team</label><label>${Radio({ name: 'visibility' })} Private</label>` } satisfies ChoiceGroupProps;",
@@ -991,7 +1002,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}`, moleculeStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -4094,6 +4105,10 @@
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable DialogSurface overlay, placement, and region stylesheet:"
     },
+    "packages/molecules/src/variables/disclosureStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Disclosure marker, state, and content stylesheet:"
+    },
     "packages/molecules/src/variables/formFieldStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable FormField stylesheet retained alongside its nested Atom dependencies:"
@@ -4470,6 +4485,26 @@
       "recipe": "molecule-components",
       "description": "Forward native attributes to caller-selected DialogSurface header and footer regions without replacing their children:"
     },
+    "packages/molecules/src/type-aliases/DisclosureAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible HTMLDetailsElement attributes while Disclosure owns children and open-state input:"
+    },
+    "packages/molecules/src/type-aliases/DisclosureAvailability.md": {
+      "recipe": "molecule-components",
+      "description": "Require a visible reason whenever a Disclosure summary is focusable but unavailable:"
+    },
+    "packages/molecules/src/type-aliases/DisclosureProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose native summary, content, controlled or initial open state, toggle handling, availability, and native attributes:"
+    },
+    "packages/molecules/src/type-aliases/DisclosureState.md": {
+      "recipe": "molecule-components",
+      "description": "Choose mutually exclusive controlled open state or an initial default-open state:"
+    },
+    "packages/molecules/src/type-aliases/DisclosureSummaryAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward native summary attributes while Disclosure owns children and unavailable ARIA relationships:"
+    },
     "packages/molecules/src/type-aliases/SegmentedControlAccessibleName.md": {
       "recipe": "molecule-components",
       "description": "Require a direct accessible label or labelled-by relationship for the segmented toolbar:"
@@ -4533,6 +4568,10 @@
     "packages/molecules/src/variables/DialogSurface.md": {
       "recipe": "molecule-components",
       "description": "Render a controlled ARIA dialog and overlay with structured content while application state and decisions stay caller-owned:"
+    },
+    "packages/molecules/src/variables/Disclosure.md": {
+      "recipe": "molecule-components",
+      "description": "Render native details and summary behavior with caller-owned content, state, and toggle effects:"
     },
     "packages/molecules/src/variables/FormField.md": {
       "recipe": "molecule-components",
