@@ -363,9 +363,9 @@ test('matches StatusBadge tones, wrapping, and RTL states', async () => {
   const visualStyles = css`
     @layer gluon {
       body { margin: 0; background: #fff; }
-      [data-testid="status-badge-visual"] { box-sizing: border-box; inline-size: 380px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
+      [data-testid="status-badge-visual"] { box-sizing: border-box; inline-size: 380px; block-size: 280px; padding: 24px; color: #17312f; font: 16px/1.4 system-ui, sans-serif; }
       [data-testid="status-badge-visual"] h1 { margin: 0 0 20px; font-size: 22px; }
-      .status-badge-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+      .status-badge-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; }
       .status-badge-wrap { inline-size: 9rem; }
     }
   `;
