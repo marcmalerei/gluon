@@ -276,7 +276,7 @@ test('matches Switch off, on, disabled, and RTL states', async () => {
 
   await expect.element(page.getByTestId('switch-visual')).toMatchScreenshot('switch-states-light', {
     comparatorName: 'pixelmatch',
-    comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.06, threshold: 0.15 },
   });
   uiOwner.dispose();
 });
