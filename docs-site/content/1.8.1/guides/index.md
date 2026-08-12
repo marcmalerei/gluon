@@ -1,6 +1,6 @@
 # Guides
 
-These guides use the public `1.8.0` package entry points and the same application
+These guides use the public `1.8.1` package entry points and the same application
 contracts exercised by GLUON GOODS.
 
 ## Start

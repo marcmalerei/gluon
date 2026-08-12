@@ -7,31 +7,26 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for the completed `1.8.0` release. Every official
-manifest is public and lockstep at `1.8.0`. Release run `31404878372` published
-all 21 reviewed packages with npm provenance under `latest`, verified matching
-archive integrity, clean-room installation, and public type declarations, and
-then published immutable GitHub release `v1.8.0` with 101 retained assets on
-2026-08-10. The `v1.0.9` GitHub release remains a draft after its public-type
-verification failure. This is enforced locally by:
+The machine-readable package contract records `publicationState: ready` and
+`scopeControl: verified` for the prepared `1.8.1` candidate. Every official
+manifest is public and lockstep at `1.8.1`. Registry preflight on 2026-08-12
+confirmed that all 21 package records expose `1.8.0` as `latest` and that
+`1.8.1` is absent. Immutable GitHub release `v1.8.0` remains the current
+finalized release; the `v1.0.9` GitHub release remains a draft after its
+public-type verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.8.0 train completion
+## v1.8.1 train handoff
 
-Issue [#361](https://github.com/marcmalerei/gluon/issues/361) established the
-21-package `1.8.0` train. It promotes the accessible Atom and Molecule APIs
-delivered after `1.7.0`, including form controls, feedback, disclosure,
-selection, dialog, tab, empty-state, and table-region compositions. Protected
-canonical tag `v1.8.0` resolves to merge commit
-`1c57fa0c8497b0c6ddd7911f0feb91afc6deda49`, which retains tested candidate
-`c6f83c92921b461bcb69a8f2db0f4973becabbfb` and the evidence-only follow-up.
-Release run `31404878372` passed candidate, fixtures, browser, Node,
-performance, reproducibility, hosting, attestation, publication, and public
-registry verification before finalizing the immutable release.
+Issue [#367](https://github.com/marcmalerei/gluon/issues/367) establishes the
+21-package `1.8.1` patch train for retained nested SSR hydration and
+request-local abort propagation. The train uses the two-commit release cut: a
+Quality-Gates-tested candidate followed only by its release-cut evidence and
+compatibility manifest. The immutable `v1.8.0` release remains the supported
+baseline until the protected `v1.8.1` workflow completes.
 
 ## v1.7.0 train completion
 
@@ -209,7 +204,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before protected publication of the `1.8.0` release, the repository owner must verify
+Before protected publication of the `1.8.1` release, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -369,13 +364,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.8.0` and `private: false`;
-- set every official implementation and peer dependency to exact `1.8.0`;
+- set every official manifest to version `1.8.1` and `private: false`;
+- set every official implementation and peer dependency to exact `1.8.1`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.8.0` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.8.0`, then make that version
+- add dated `1.8.1` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.8.1`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -386,8 +381,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run check
-npm run release:validate -- --candidate 1.8.0
-npm run release:artifacts -- --version 1.8.0
+npm run release:validate -- --candidate 1.8.1
+npm run release:artifacts -- --version 1.8.1
 ```
 
 Release-candidate installs use `--legacy-peer-deps` because the official

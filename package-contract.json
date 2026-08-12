@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-08-10",
+    "checkedAt": "2026-08-12",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "Release run 31404878372 published all 21 contracted packages at 1.8.0 under latest with npm provenance on 2026-08-10, verified matching reviewed archive integrity, clean-room installation, and public type declarations, then published immutable GitHub release v1.8.0 with 101 retained assets. Canonical tag v1.8.0 resolves to merge commit 1c57fa0c8497b0c6ddd7911f0feb91afc6deda49 and preserves the tested candidate and evidence histories."
+    "publicationState": "ready",
+    "observation": "Registry preflight on 2026-08-12 confirmed that all 21 contracted package records expose 1.8.0 as latest and that version 1.8.1 is absent. Scope control and trusted publication remain verified by the completed 1.8.0 release contract."
   },
   "packages": [
     {

@@ -4,6 +4,12 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-08-12
+
+### Changed
+
+- Advanced the lockstep release for retained nested SSR hydration and request-local abort propagation while retaining this package's existing public contract.
+
 ## [1.8.0] - 2026-08-10
 
 ### Changed
