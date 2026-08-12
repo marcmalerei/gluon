@@ -154,12 +154,16 @@ descriptors when `CSSStyleSheet` is absent; `GluonElement` uses a DOM-free base
 and server render entry without running connection lifecycle. A request creates
 one detached scope, memory Router, Store manager, and application, then releases
 them in `finally`. The public serializer owns escaping, URL validation, async
-built-in resolution, deterministic binding markers, DSD output, and JSON-safe
-state embedding. The browser hydration entry independently validates parsed DOM,
-adopts matching Core Parts, restores public Router/Store snapshots, and reports
-categorized recovery evidence. Vite emits the immutable client asset manifest;
-static generation consumes it with the same request renderer. Style carriers
-are request-local and become document-local adopted sheets only after validation.
+built-in resolution, deterministic binding markers, local DSD marker-range
+transport, and JSON-safe state embedding. Each serialized Gluon element root
+owns an inert `data-gluon-hydration` range; nested ranges are excluded from the
+parent's local end and are adopted independently. The browser hydration entry
+validates that transport before adopting matching Core Parts, restores public
+Router/Store snapshots, and reports categorized recovery evidence. Request
+signals are passed through the same ownership boundary and cleanup remains
+request-local. Vite emits the immutable client asset manifest; static
+generation consumes it with the same request renderer. Style carriers are
+request-local and become document-local adopted sheets only after validation.
 
 `@gluonjs/test-utils` composes only public Core, Reactivity, Router, and Store
 exports. Each fixture owns a real application root and records its cleanup

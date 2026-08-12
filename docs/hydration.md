@@ -52,6 +52,31 @@ is deferred until the matching shadow tree has been adopted.
 its detached container, matching document parsing even though `innerHTML` does
 not enable declarative Shadow DOM.
 
+### Nested Declarative Shadow DOM
+
+Every `renderElement()` root carries the inert host attribute
+`data-gluon-hydration="v1:<start>:<end>"`. `start` is the inclusive first
+marker allocated by that root's ShadowRoot template and `end` is the exclusive
+boundary. The serializer reserves the host's property and light-DOM child
+markers outside this range, so the application root can retain the host while
+the child hydrator starts at the transported ShadowRoot offset. Nested roots
+receive their own ranges; an outer range does not absorb markers that belong
+to an adopted child ShadowRoot.
+
+`hydrateApplication()` first binds the application light DOM, then adopts each
+server-marked nested root in place. `hydrateElement()` validates the host
+transport and marker range before installing any binding. The attribute is
+removed only after successful retained hydration. It is inert metadata and
+does not require an inline executable bootstrap or a CSP exception. Existing
+direct `hydrateElement()` callers without the attribute remain supported; an
+application's discovered server roots require the transport metadata.
+
+Transport failures are categorized by `HydrationMarkerTransportError.mismatch`:
+`missing`, `invalid`, or `tampered`. They fail closed with the existing DSD and
+without root replacement. A nested template is omitted only from the local
+client comparison after its DSD has been adopted into the child root; the
+official serializer performs that handoff, not consumer HTML rewriting.
+
 The successful result has `retained: true`. Temporary attribute and end markers
 are removed; child anchors remain as renderer ownership boundaries.
 
@@ -96,6 +121,25 @@ Pass the HTTP response or request `AbortSignal` through `signal`. Cancellation
 rejects the iterator with the abort reason and aborts pending Gluon async source
 controllers. Consumers decide how inert patch templates are applied before
 hydration; Gluon does not inject executable inline scripts.
+
+## Request-local aborts
+
+`renderRequest({ signal })` exposes the exact same signal object as
+`SsrRequestContext.signal`. A pre-aborted signal is checked before routes,
+`load()`, `createApp()`, and rendering. Abort during loading, async boundaries,
+serialization, or progressive work rejects with `signal.reason` when present,
+otherwise a platform `AbortError`. The request always disposes its own
+application, Router, Store manager, and detached effect scope exactly once in
+`finally`; no controller or cleanup owner is shared with another request.
+
+```ts
+const response = await renderRequest({
+  url,
+  signal: request.signal,
+  load: ({ signal }) => loadData({ signal }),
+  createApp: ({ signal, data }) => createApp(() => renderPage(data, signal)),
+});
+```
 
 ## Verification
 

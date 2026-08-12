@@ -349,6 +349,13 @@ export abstract class GluonElement<
   /** Starts connection-owned reactivity and queues the first render. Prefer {@link onConnected} in subclasses. */
   connectedCallback(): void {
     if (this.connected) return;
+    // Declarative Shadow DOM can be installed before a registered element is
+    // connected. Hold the first render until the SSR hydrator adopts that root;
+    // otherwise the synchronous connection job would replace server nodes
+    // before hydrateElement() can retain them.
+    if (this.hasAttribute('data-gluon-hydration')) {
+      this.hydrationPending = true;
+    }
     this.connected = true;
     this.applicationContext = resolveApplicationContext(this);
     this.componentErrorReporter = this.createComponentErrorReporter();

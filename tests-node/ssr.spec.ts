@@ -461,6 +461,35 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(cleanup).toHaveBeenCalledOnce();
   });
 
+  it('transports deterministic local marker ranges for nested and adjacent DSD roots', async () => {
+    class MarkerInner extends GluonElement {
+      protected override render() { return html`<p>${'inner'}</p>`; }
+    }
+    class MarkerOuter extends GluonElement {
+      protected override render() {
+        return html`<section>${renderElement(MarkerInner)}</section>`;
+      }
+    }
+    defineElement('ssr-marker-inner', MarkerInner);
+    defineElement('ssr-marker-outer', MarkerOuter);
+
+    const value = html`${renderElement(MarkerOuter)}${renderElement(MarkerInner)}`;
+    const [first, second] = await Promise.all([renderToString(value), renderToString(value)]);
+    expect(first).toBe(second);
+    expect(first).toContain('data-gluon-hydration="v1:3:6"');
+    expect(first).toContain('data-gluon-hydration="v1:6:7"');
+    expect(first).toContain('data-gluon-hydration="v1:10:11"');
+    expect(first.indexOf('data-gluon-hydration="v1:3:6"'))
+      .toBeLessThan(first.indexOf('data-gluon-hydration="v1:6:7"'));
+    const chunks: string[] = [];
+    for await (const chunk of renderToChunks(value)) chunks.push(chunk);
+    expect(chunks.join('')).toBe(first);
+    const progressive = [];
+    for await (const chunk of renderProgressively(value)) progressive.push(chunk);
+    expect(progressive).toHaveLength(1);
+    expect(progressive[0]!.html).toBe(first);
+  });
+
   it('server-renders the packed component-library public exports', async () => {
     const atom = withoutHydrationMarkers(await renderToString(ProductBadge('In stock')));
     expect(atom).toBe('<span class="gluon quark example-product-badge">In stock</span>');
@@ -566,6 +595,78 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
 });
 
 describe('@gluonjs/ssr request ownership and state', () => {
+  it('passes the exact request signal and rejects before load or app creation when pre-aborted', async () => {
+    const controller = new AbortController();
+    const reason = new Error('pre-aborted');
+    controller.abort(reason);
+    const load = vi.fn();
+    const createAppSpy = vi.fn();
+    await expect(renderRequest({
+      url: '/',
+      signal: controller.signal,
+      load,
+      createApp: createAppSpy,
+    })).rejects.toBe(reason);
+    expect(load).not.toHaveBeenCalled();
+    expect(createAppSpy).not.toHaveBeenCalled();
+  });
+
+  it('aborts a request during load without starting the application', async () => {
+    const controller = new AbortController();
+    const reason = new Error('load-aborted');
+    let started!: () => void;
+    const loadStarted = new Promise<void>((resolve) => { started = resolve; });
+    const load = vi.fn(({ signal }: { readonly signal: AbortSignal }) => {
+      expect(signal).toBe(controller.signal);
+      started();
+      return new Promise<never>(() => {});
+    });
+    const createAppSpy = vi.fn();
+    const pending = renderRequest({
+      url: '/',
+      signal: controller.signal,
+      load,
+      createApp: createAppSpy,
+    });
+    await loadStarted;
+    controller.abort(reason);
+    await expect(pending).rejects.toBe(reason);
+    expect(createAppSpy).not.toHaveBeenCalled();
+  });
+
+  it('aborts async request rendering and runs application cleanup exactly once', async () => {
+    const controller = new AbortController();
+    const reason = new Error('boundary-aborted');
+    let started!: () => void;
+    const boundaryStarted = new Promise<void>((resolve) => { started = resolve; });
+    const cleanup = vi.fn();
+    let contextSignal!: AbortSignal;
+    const pending = renderRequest({
+      url: '/',
+      signal: controller.signal,
+      createApp: (context) => {
+        contextSignal = context.signal;
+        const app = createApp(() => html`${Suspense({
+          source: ({ signal }) => {
+            started();
+            return new Promise<string>(() => {
+              signal.addEventListener('abort', () => undefined, { once: true });
+            });
+          },
+          fallback: html`<p>loading</p>`,
+          children: (value) => html`<p>${value}</p>`,
+        })}`);
+        app.use(() => cleanup);
+        return app;
+      },
+    });
+    await boundaryStarted;
+    expect(contextSignal).toBe(controller.signal);
+    controller.abort(reason);
+    await expect(pending).rejects.toBe(reason);
+    expect(cleanup).toHaveBeenCalledOnce();
+  });
+
   it('renders a deep GLUON GOODS product URL through public server APIs', async () => {
     const fixture = await renderSsrFixture(
       () => renderShopRequest('/products/orbit-lamp'),
@@ -672,6 +773,8 @@ describe('@gluonjs/ssr request ownership and state', () => {
     expect(serialized).toContain('\\u2028\\u2029');
     expect(() => serializeSsrState({ value: Number.NaN })).toThrow('non-finite');
     expect(() => serializeSsrState({ value: 1n })).toThrow('bigint');
+    expect(() => serializeSsrState({ value: () => undefined })).toThrow('function');
+    expect(() => serializeSsrState({ value: Symbol('blocked') })).toThrow('symbol');
     expect(() => serializeSsrState(undefined)).toThrow('JSON representation');
     expect(() => serializeSsrState(new Date())).toThrow('plain objects');
     const circular: { self?: unknown } = {};
@@ -869,5 +972,6 @@ describe('@gluonjs/ssr static output and style transport', () => {
 function withoutHydrationMarkers(value: string): string {
   return value
     .replace(/<!--gluon:\/?(?:h|i|k):\d+-->/g, '')
-    .replace(/ data-gluon-h-\d+=""/g, '');
+    .replace(/ data-gluon-h-\d+=""/g, '')
+    .replace(/ data-gluon-hydration="v\d+:\d+:\d+"/g, '');
 }

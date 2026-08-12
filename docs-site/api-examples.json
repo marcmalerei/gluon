@@ -1805,6 +1805,35 @@
         "console.log(SsrTransportError);"
       ]
     },
+    "ssr-hydration-transport": {
+      "module": "@gluonjs/ssr",
+      "code": [
+        "import { GluonElement, defineElement, html } from '@gluonjs/core';",
+        "import {",
+        "  SSR_HYDRATION_MARKER_ATTRIBUTE,",
+        "  renderElement,",
+        "  renderToString,",
+        "  type RenderSerializationOptions,",
+        "  type SsrHydrationMarkerTransport,",
+        "} from '@gluonjs/ssr';",
+        "import {",
+        "  HydrationMarkerTransportError,",
+        "  type HydrationMarkerTransportMismatch,",
+        "} from '@gluonjs/ssr/hydration';",
+        "",
+        "class NestedBadge extends GluonElement {",
+        "  protected render() { return html`<strong>Ready</strong>`; }",
+        "}",
+        "defineElement('transport-badge', NestedBadge);",
+        "const transport: SsrHydrationMarkerTransport = { version: 1, start: 0, end: 1 };",
+        "const options = { signal: new AbortController().signal } satisfies RenderSerializationOptions;",
+        "const htmlOutput = await renderToString(renderElement(NestedBadge), options);",
+        "const attribute = SSR_HYDRATION_MARKER_ATTRIBUTE;",
+        "const mismatch: HydrationMarkerTransportMismatch = 'tampered';",
+        "const error = new HydrationMarkerTransportError(mismatch, `${attribute}: ${transport.start}-${transport.end}`);",
+        "console.log(htmlOutput, error.message);"
+      ]
+    },
     "ssr-static-site": {
       "module": "@gluonjs/ssr/static",
       "code": [
@@ -4178,6 +4207,14 @@
       "recipe": "component-style-hydration",
       "description": "Handle deterministic request-derived component carrier mismatches before client ownership changes:"
     },
+    "packages/ssr/src/hydration/classes/HydrationMarkerTransportError.md": {
+      "recipe": "ssr-hydration-transport",
+      "description": "Handle missing, invalid, or tampered nested DSD marker transport before mutating a retained root:"
+    },
+    "packages/ssr/src/hydration/type-aliases/HydrationMarkerTransportMismatch.md": {
+      "recipe": "ssr-hydration-transport",
+      "description": "Classify the fail-closed marker transport result returned by the browser handoff:"
+    },
     "packages/ssr/src/hydration/type-aliases/ComponentStyleHydrationMismatch.md": {
       "recipe": "component-style-hydration",
       "description": "Distinguish missing, extra, duplicate, reordered, mismatched, and wrong-target component carrier evidence:"
@@ -5488,6 +5525,14 @@
       "recipe": "ssr-request",
       "description": "Describe the URL, route table, request loader, and application factory needed for one isolated SSR request:"
     },
+    "packages/ssr/src/interfaces/RenderSerializationOptions.md": {
+      "recipe": "ssr-hydration-transport",
+      "description": "Pass an optional request signal through deterministic SSR serialization while retaining the public option boundary:"
+    },
+    "packages/ssr/src/interfaces/SsrHydrationMarkerTransport.md": {
+      "recipe": "ssr-hydration-transport",
+      "description": "Represent the versioned local marker range carried by one serialized Gluon element root:"
+    },
     "packages/ssr/src/static/functions/generateStaticSite.md": {
       "recipe": "ssr-static-site",
       "description": "Prerender an explicit route list into deployment files while recording dynamic routes for runtime fallback:"
@@ -5579,6 +5624,10 @@
     "packages/ssr/src/interfaces/StyleManifestEntry.md": {
       "recipe": "ssr-assets",
       "description": "Identify one stylesheet by stable ID, exact CSS text, digest, and adoption order:"
+    },
+    "packages/ssr/src/variables/SSR_HYDRATION_MARKER_ATTRIBUTE.md": {
+      "recipe": "ssr-hydration-transport",
+      "description": "Use the public inert host attribute name when inspecting or documenting a DSD marker handoff:"
     },
     "packages/ssr/src/static/interfaces/StaticGenerationResult.md": {
       "recipe": "ssr-static-site",

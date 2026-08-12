@@ -15,6 +15,7 @@ import {
   inject,
   markCompiledPrimitiveTextBinding,
   repeat,
+  render,
   renderGluonApplicationForServer,
   Suspense,
   unsafeHTML,
@@ -30,8 +31,9 @@ import {
   hydrateApplication,
   hydrateElement,
   hydrateTemplate,
+  HydrationMarkerTransportError,
 } from '@gluonjs/ssr/hydration';
-import { createStyleManifest, prepareForHydration, renderProgressively, renderStyleCarriers } from '@gluonjs/ssr';
+import { createStyleManifest, prepareForHydration, renderElement, renderProgressively, renderStyleCarriers, renderToString } from '@gluonjs/ssr';
 import { renderEleventyPage } from '@gluonjs/ssr/eleventy';
 import type { SsrRequestResult } from '@gluonjs/ssr';
 import {
@@ -156,6 +158,47 @@ describe('SSR hydration', () => {
     expect(clicks).toHaveBeenCalledOnce();
     expect(button?.textContent).toBe('Client');
     result.mount.unmount();
+  });
+
+  it('retains nested server elements while hydrating an application root', async () => {
+    class ApplicationNestedElement extends GluonElement {
+      protected override render() { return html`<p>${'application child'}</p>`; }
+    }
+    defineElement('hydration-application-nested', ApplicationNestedElement);
+    const app = createApp(() => html`
+      <main>${renderElement(ApplicationNestedElement)}</main>
+    `);
+    const serverMarkup = await renderToString(renderGluonApplicationForServer(app));
+    const root = document.createElement('div');
+    materializeDeclarativeShadowRoots(root, serverMarkup);
+    document.body.append(root);
+    const host = root.querySelector('hydration-application-nested') as ApplicationNestedElement;
+    const paragraph = host.shadowRoot?.querySelector('p');
+
+    const hydrated = await hydrateApplication(app, root);
+
+    expect(hydrated.hydration).toEqual(expect.objectContaining({ retained: true, recovered: false }));
+    expect(root.querySelector('hydration-application-nested')).toBe(host);
+    expect(host.shadowRoot?.querySelector('p')).toBe(paragraph);
+    expect(host.hasAttribute('data-gluon-hydration')).toBe(false);
+    hydrated.mount.unmount();
+    root.remove();
+
+    const failedApp = createApp(() => html`<main>${renderElement(ApplicationNestedElement)}</main>`);
+    const failedMarkup = await renderToString(renderGluonApplicationForServer(failedApp));
+    const failedRoot = document.createElement('div');
+    materializeDeclarativeShadowRoots(failedRoot, failedMarkup);
+    failedRoot.querySelector('hydration-application-nested')?.removeAttribute('data-gluon-hydration');
+    document.body.append(failedRoot);
+    await expect(hydrateApplication(failedApp, failedRoot)).rejects.toMatchObject({ mismatch: 'missing' });
+    expect(failedApp.mounted).toBe(false);
+    failedRoot.remove();
+
+    const clientRoot = document.createElement('div');
+    render(html`${renderElement(ApplicationNestedElement, { properties: { id: 'client-host' } })}`, clientRoot);
+    const clientHost = clientRoot.querySelector('hydration-application-nested');
+    expect((clientHost as HTMLElement)?.id).toBe('client-host');
+    unmount(clientRoot);
   });
 
   it('reports every mismatch category and performs deterministic root recovery', async () => {
@@ -289,6 +332,147 @@ describe('SSR hydration', () => {
     expect(upgraded.shadowRoot).toBe(shadow);
     expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
     upgraded.remove();
+  });
+
+  it('retains standalone and adjacent server DSD roots using transported marker ranges', async () => {
+    class TransportGreeting extends GluonElement {
+      protected override render() {
+        return html`<section><p>${'Hello Ada'}</p></section>`;
+      }
+    }
+    class TransportStatus extends GluonElement {
+      protected override render() {
+        return html`<output>${'Ready'}</output>`;
+      }
+    }
+    defineElement('hydration-transport-greeting', TransportGreeting);
+    defineElement('hydration-transport-status', TransportStatus);
+
+    const serialized = await renderToString(html`${renderElement(TransportGreeting)}${renderElement(TransportStatus)}`);
+    const container = document.createElement('div');
+    materializeServerElements(container, serialized);
+    const sourceElements = [...container.children] as Array<TransportGreeting | TransportStatus>;
+    for (const element of sourceElements) element.beginHydration();
+    document.body.append(container);
+    const greeting = container.querySelector('hydration-transport-greeting') as TransportGreeting;
+    const status = container.querySelector('hydration-transport-status') as TransportStatus;
+    const greetingNode = greeting.shadowRoot?.querySelector('p');
+    const statusNode = status.shadowRoot?.querySelector('output');
+    const greetingResult = await hydrateElement(greeting);
+    const statusResult = await hydrateElement(status);
+    expect(greetingResult).toMatchObject({ retained: true, recovered: false, mismatches: [] });
+    expect(statusResult).toMatchObject({ retained: true, recovered: false, mismatches: [] });
+    expect(greeting.shadowRoot?.querySelector('p')).toBe(greetingNode);
+    expect(status.shadowRoot?.querySelector('output')).toBe(statusNode);
+    expect(greeting.hasAttribute('data-gluon-hydration')).toBe(false);
+    expect(status.hasAttribute('data-gluon-hydration')).toBe(false);
+    greeting.remove();
+    status.remove();
+  });
+
+  it('retains two nested ShadowRoot levels with independent transported ranges', async () => {
+    class TransportNestedInner extends GluonElement {
+      protected override render() { return html`<p>${'nested'}</p>`; }
+    }
+    class TransportNestedOuter extends GluonElement {
+      protected override render() { return html`<article><hydration-transport-nested-inner></hydration-transport-nested-inner></article>`; }
+    }
+    defineElement('hydration-transport-nested-inner', TransportNestedInner);
+    defineElement('hydration-transport-nested-outer', TransportNestedOuter);
+
+    const serialized = await renderToString(renderElement(TransportNestedOuter));
+    const nestedSerialized = await renderToString(renderElement(TransportNestedInner));
+    const container = document.createElement('div');
+    materializeServerElements(container, serialized);
+    document.body.append(container);
+    const outer = container.firstElementChild as TransportNestedOuter;
+    const inner = outer.shadowRoot?.querySelector('hydration-transport-nested-inner') as TransportNestedInner;
+    installServerElementShadow(inner, nestedSerialized);
+    const article = outer.shadowRoot?.querySelector('article');
+    const paragraph = inner.shadowRoot?.querySelector('p');
+
+    const result = await hydrateElement(outer);
+    expect(result).toMatchObject({ retained: true, recovered: false, mismatches: [] });
+    expect(outer.shadowRoot?.querySelector('article')).toBe(article);
+    expect(inner.shadowRoot?.querySelector('p')).toBe(paragraph);
+    expect(outer.hasAttribute('data-gluon-hydration')).toBe(false);
+    expect(inner.hasAttribute('data-gluon-hydration')).toBe(false);
+    outer.remove();
+  });
+
+  it('fails closed and categorizes missing or tampered marker transport metadata', async () => {
+    class TransportFailure extends GluonElement {
+      protected override render() { return html`<p>${'stable'}</p>`; }
+    }
+    defineElement('hydration-transport-failure', TransportFailure);
+    const serialized = await renderToString(renderElement(TransportFailure));
+
+    const missingContainer = document.createElement('div');
+    materializeServerElements(missingContainer, serialized);
+    document.body.append(missingContainer);
+    const missing = missingContainer.firstElementChild as TransportFailure;
+    missing.removeAttribute('data-gluon-hydration');
+    await expect(hydrateElement(missing, { requireMarkerTransport: true })).rejects.toMatchObject({
+      mismatch: 'missing',
+    });
+
+    const tamperedContainer = document.createElement('div');
+    materializeServerElements(tamperedContainer, serialized);
+    document.body.append(tamperedContainer);
+    const tampered = tamperedContainer.firstElementChild as TransportFailure;
+    tampered.setAttribute('data-gluon-hydration', 'v1:0:99');
+    await expect(hydrateElement(tampered, { requireMarkerTransport: true })).rejects.toMatchObject({
+      mismatch: 'tampered',
+    });
+
+    const invalidContainer = document.createElement('div');
+    materializeServerElements(invalidContainer, serialized);
+    document.body.append(invalidContainer);
+    const invalid = invalidContainer.firstElementChild as TransportFailure;
+    const invalidParagraph = invalid.shadowRoot?.querySelector('p');
+    invalid.setAttribute('data-gluon-hydration', 'v2:0:1');
+    await expect(hydrateElement(invalid, { requireMarkerTransport: true })).rejects.toMatchObject({
+      mismatch: 'invalid',
+    });
+    expect(invalid.shadowRoot?.querySelector('p')).toBe(invalidParagraph);
+    expect(new HydrationMarkerTransportError('invalid', 'x')).toBeInstanceOf(Error);
+
+    const mismatchContainer = document.createElement('div');
+    materializeServerElements(mismatchContainer, serialized);
+    document.body.append(mismatchContainer);
+    const mismatchElement = mismatchContainer.firstElementChild as TransportFailure;
+    const mismatchParagraph = mismatchElement.shadowRoot?.querySelector('p');
+    const mismatchText = [...(mismatchParagraph?.childNodes ?? [])]
+      .find((node) => node.nodeType === Node.TEXT_NODE);
+    mismatchText!.textContent = 'changed';
+    await expect(hydrateElement(mismatchElement, { recovery: 'throw' })).rejects.toMatchObject({
+      mismatches: [expect.objectContaining({ category: 'text' })],
+    });
+    expect(mismatchElement.shadowRoot?.querySelector('p')).toBe(mismatchParagraph);
+    missingContainer.remove();
+    tamperedContainer.remove();
+    invalidContainer.remove();
+    mismatchContainer.remove();
+  });
+
+  it('retains an empty ShadowRoot transport and rejects duplicate scheduling', async () => {
+    class EmptyTransportElement extends GluonElement {
+      protected override render() { return html``; }
+    }
+    defineElement('hydration-transport-empty', EmptyTransportElement);
+    const serialized = await renderToString(renderElement(EmptyTransportElement));
+    const container = document.createElement('div');
+    materializeServerElements(container, serialized);
+    document.body.append(container);
+    const element = container.firstElementChild as EmptyTransportElement;
+
+    await expect(hydrateElement(element, { hydratedElements: new Set([element]) })).rejects.toThrow(
+      'scheduled for hydration more than once',
+    );
+    const result = await hydrateElement(element);
+    expect(result).toMatchObject({ retained: true, recovered: false, mismatches: [] });
+    expect(element.hasAttribute('data-gluon-hydration')).toBe(false);
+    container.remove();
   });
 
   it('retains hydrated DOM before compiler-marked property updates and cleanup', async () => {
@@ -593,3 +777,54 @@ describe('SSR hydration', () => {
     root.remove();
   });
 });
+
+function materializeServerElements(container: HTMLElement, markup: string): void {
+  const source = document.createElement('template');
+  source.innerHTML = markup;
+  for (const sourceHost of [...source.content.children]) {
+    const host = document.createElement(sourceHost.localName);
+    for (const attribute of [...sourceHost.attributes]) {
+      host.setAttribute(attribute.name, attribute.value);
+    }
+    const shadowTemplate = [...sourceHost.children]
+      .find((child) => child.localName === 'template' && child.hasAttribute('shadowrootmode')) as HTMLTemplateElement | undefined;
+    if (shadowTemplate && host.shadowRoot) {
+      host.shadowRoot.replaceChildren(shadowTemplate.content.cloneNode(true));
+      materializeNestedDeclarativeShadowRoots(host.shadowRoot);
+    }
+    for (const child of [...sourceHost.childNodes]) {
+      if (child !== shadowTemplate) host.append(document.importNode(child, true));
+    }
+    container.append(host);
+  }
+}
+
+function materializeDeclarativeShadowRoots(container: HTMLElement, markup: string): void {
+  container.innerHTML = markup;
+  materializeNestedDeclarativeShadowRoots(container);
+}
+
+function installServerElementShadow(host: GluonElement, markup: string): void {
+  const source = document.createElement('template');
+  source.innerHTML = markup;
+  const sourceHost = source.content.firstElementChild;
+  const shadowTemplate = sourceHost
+    ? [...sourceHost.children].find((child) => child.localName === 'template' && child.hasAttribute('shadowrootmode')) as HTMLTemplateElement | undefined
+    : undefined;
+  if (!sourceHost || !shadowTemplate || !host.shadowRoot) throw new Error('Missing nested DSD test fixture.');
+  const marker = sourceHost.getAttribute('data-gluon-hydration');
+  if (marker) host.setAttribute('data-gluon-hydration', marker);
+  host.shadowRoot.replaceChildren(shadowTemplate.content.cloneNode(true));
+  materializeNestedDeclarativeShadowRoots(host.shadowRoot);
+}
+
+function materializeNestedDeclarativeShadowRoots(root: ParentNode): void {
+  for (const template of [...root.querySelectorAll<HTMLTemplateElement>('template[shadowrootmode]')]) {
+    const host = template.parentElement;
+    if (!host) continue;
+    const shadow = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+    shadow.replaceChildren(template.content.cloneNode(true));
+    template.remove();
+    materializeNestedDeclarativeShadowRoots(shadow);
+  }
+}

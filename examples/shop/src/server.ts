@@ -70,5 +70,21 @@ export function injectProductConfiguratorShadow(html: string, renderedElement: s
   const hostStart = html.indexOf('<gluon-product-configurator');
   const hostOpenEnd = html.indexOf('>', hostStart);
   if (hostStart < 0 || hostOpenEnd < 0) return html;
-  return `${html.slice(0, hostOpenEnd + 1)}${shadowTemplate}${html.slice(hostOpenEnd + 1)}`;
+  const markerPrefix = ` ${'data-gluon-hydration'}="`;
+  const markerStart = renderedElement.indexOf(markerPrefix, renderedElement.indexOf('<gluon-product-configurator'));
+  const markerEnd = markerStart < 0
+    ? -1
+    : renderedElement.indexOf('"', markerStart + markerPrefix.length);
+  if (markerStart < 0 || markerEnd < 0 || markerEnd > renderedElement.indexOf('>', markerStart)) {
+    throw new Error('The product configurator SSR contract did not emit hydration marker transport metadata.');
+  }
+  const markerAttribute = renderedElement.slice(markerStart, markerEnd + 1);
+  const existingMarkerStart = html.indexOf(' data-gluon-hydration="', hostStart);
+  const openingTag = existingMarkerStart >= 0 && existingMarkerStart < hostOpenEnd
+    ? html.slice(hostStart, existingMarkerStart) + markerAttribute + html.slice(
+        html.indexOf('"', existingMarkerStart + ' data-gluon-hydration="'.length) + 1,
+        hostOpenEnd,
+      )
+    : html.slice(hostStart, hostOpenEnd) + markerAttribute;
+  return `${html.slice(0, hostStart)}${openingTag}>${shadowTemplate}${html.slice(hostOpenEnd + 1)}`;
 }

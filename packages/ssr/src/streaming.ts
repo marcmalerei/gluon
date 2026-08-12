@@ -3,12 +3,16 @@ import {
   renderProgressively,
   renderStyleCarriers,
   renderToChunks,
+  type RenderSerializationOptions,
   type ProgressiveRenderOptions,
 } from './index.js';
 
 /** Adapts the ordered SSR chunk iterator to a byte ReadableStream. */
-export function renderToReadableStream(value: TemplateValue): ReadableStream<Uint8Array> {
-  const iterator = renderToChunks(value)[Symbol.asyncIterator]();
+export function renderToReadableStream(
+  value: TemplateValue,
+  options: RenderSerializationOptions = {},
+): ReadableStream<Uint8Array> {
+  const iterator = renderToChunks(value, options)[Symbol.asyncIterator]();
   const encoder = new TextEncoder();
   return new ReadableStream({
     async pull(controller) {
@@ -49,4 +53,8 @@ export function renderProgressiveReadableStream(
 }
 
 export { renderProgressively, renderToChunks } from './index.js';
-export type { ProgressiveRenderChunk, ProgressiveRenderOptions } from './index.js';
+export type {
+  ProgressiveRenderChunk,
+  ProgressiveRenderOptions,
+  RenderSerializationOptions,
+} from './index.js';

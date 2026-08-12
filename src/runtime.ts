@@ -1791,6 +1791,8 @@ export interface HydrationMismatch {
 
 export interface HydrationOptions {
   readonly expectedMarkup: string;
+  /** @internal SSR supplies the deterministic marker range start for a nested root. */
+  readonly markerOffset?: number;
   readonly recovery?: 'replace' | 'throw';
   readonly suppress?: boolean | readonly HydrationMismatchCategory[];
   readonly onMismatch?: (mismatch: HydrationMismatch) => void;
@@ -1841,7 +1843,7 @@ export function hydrate(
   const styleClaim = {};
   styles.claim(styleClaim, result.styleDependencies);
   try {
-    const context = createHydrationAdoptionContext(container, styles);
+    const context = createHydrationAdoptionContext(container, styles, options.markerOffset ?? 0);
     const compiled = getCompiledTemplate(result);
     const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
     setRootInstance(container, {
@@ -2118,6 +2120,7 @@ interface HydrationAdoptionContext {
 function createHydrationAdoptionContext(
   root: Element | DocumentFragment,
   styles: RenderStyleTracker,
+  markerOffset: number,
 ): HydrationAdoptionContext {
   const ranges = new Map<string, HydrationRange>();
   const starts = new Map<string, Comment>();
@@ -2141,7 +2144,7 @@ function createHydrationAdoptionContext(
       if (match?.[1]) attributes.set(Number(match[1]), node as Element);
     }
   }
-  return { marker: 0, ranges, attributes, styles };
+  return { marker: markerOffset, ranges, attributes, styles };
 }
 
 function instantiateHydratedBindings(
@@ -2973,6 +2976,7 @@ function compareHydrationAttributes(
     ...[...actual.attributes].map((attribute) => attribute.name),
   ]);
   for (const name of names) {
+    if (name === 'data-gluon-hydration') continue;
     const expectedValue = expected.getAttribute(name);
     const actualValue = actual.getAttribute(name);
     if (expectedValue === actualValue || equivalentHydrationAttribute(name, expectedValue, actualValue, actual.ownerDocument.baseURI)) continue;

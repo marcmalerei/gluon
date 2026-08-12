@@ -39,10 +39,28 @@ honors explicit `unsafeHTML()`/`unsafeURL()` values. `renderElement()` emits ope
 Declarative Shadow DOM for a class registered through `defineElement()`. Its
 deterministic comment and temporary `data-gluon-h-*` markers let
 `@gluonjs/ssr/hydration` reconstruct client bindings without replacing matching
-nodes. `renderRequest()` derives exact component-style IDs from the resolved
-request tree and merges them between shared UI and application-owned sheets.
-Style manifests use deterministic IDs and ordered CSS text for initial carriers
-and browser handoff.
+nodes. Each element root also carries inert
+`data-gluon-hydration="v1:<start>:<end>"` metadata. The range is local to that
+ShadowRoot; host property and light-DOM child markers remain in the enclosing
+template range. This lets `hydrateApplication()` retain the host before the
+child hydrator adopts its ShadowRoot at the transported offset. Nested and
+adjacent roots remain deterministic and independently validatable in streamed
+output. `hydrateElement()` removes transport and temporary host markers only
+after retained hydration; malformed, missing-required, or tampered transport
+fails closed without root replacement. Direct legacy `hydrateElement()` calls
+without the attribute remain compatible.
+
+`renderRequest()` derives exact component-style IDs from the resolved request
+tree and merges them between shared UI and application-owned sheets. Style
+manifests use deterministic IDs and ordered CSS text for initial carriers and
+browser handoff.
+
+`SsrRequestOptions.signal` is optional. When supplied, the exact signal is
+available as `SsrRequestContext.signal` and reaches request loading, async
+boundaries, serialization, and progressive work. Abort rejects with the
+original `signal.reason` or a platform `AbortError`; the request-local Router,
+Store, application, and effect scope are disposed exactly once for success,
+failure, and abort. Calls without a signal keep the existing behavior.
 
 `serializeSsrState()` accepts finite JSON data made from plain objects and
 arrays and escapes HTML-significant characters plus U+2028/U+2029. The request

@@ -151,8 +151,13 @@ function materializeDeclarativeShadowRoots(container: ParentNode): void {
     const root = host.shadowRoot ?? (scoped
       ? host.attachShadow({ mode, customElementRegistry: null } as unknown as ShadowRootInit)
       : host.attachShadow({ mode }));
-    root.append(template.content.cloneNode(true));
+    // The real DSD parser installs the template before a connected element can
+    // render. Test fixtures may already have an upgraded host, so replace the
+    // constructor's empty/client root with the serialized server root instead
+    // of appending a second render tree.
+    root.replaceChildren(template.content.cloneNode(true));
     template.remove();
+    materializeDeclarativeShadowRoots(root);
   }
 }
 
