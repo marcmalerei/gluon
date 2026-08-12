@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-08-12
+
 ### Added
 
 - Added deterministic local `data-gluon-hydration="v1:start:end"` transport

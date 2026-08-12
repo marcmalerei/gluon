@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "releaseLine": "1.8.0",
+  "releaseLine": "1.8.1",
   "reviewedAt": "2026-07-12",
   "areas": [
     {
@@ -59,7 +59,7 @@
         "DSD marker metadata and state are inert transport surfaces and do not require executable inline bootstrap code."
       ],
       "residualRisk": "The deploying application owns the policy header, nonce generation, hash allowlists, and report handling.",
-      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.8.0/guides/quality/index.md"]
+      "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.8.1/guides/quality/index.md"]
     },
     {
       "id": "trusted-types",

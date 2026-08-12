@@ -7,6 +7,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-08-12
+
 ### Added
 
 - Added retained nested Declarative Shadow DOM hydration with deterministic

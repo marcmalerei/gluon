@@ -1,13 +1,12 @@
 # Release readiness
 
-The `1.8.0` documentation describes the completed lockstep release. All 21
-official manifests are at `1.8.0`. Release run `31404878372` published every
-contracted package under `latest` with npm provenance, confirmed matching
-reviewed archive integrity, clean-room installation, and public type
-declarations, and published immutable GitHub release `v1.8.0` with 101 retained
-assets on 2026-08-10. Canonical tag `v1.8.0` resolves to merge commit
-`1c57fa0c8497b0c6ddd7911f0feb91afc6deda49`, which preserves the tested
-candidate and evidence histories.
+The `1.8.1` documentation describes the prepared lockstep release candidate.
+All 21 official manifests are at `1.8.1`, with `1.8.0` remaining the latest
+published package train until the protected release workflow completes. Issue
+[#367](https://github.com/marcmalerei/gluon/issues/367) tracks retained nested
+SSR hydration and request-local abort propagation. The release cut retains a
+Quality-Gates-tested candidate followed only by its release-cut evidence and
+compatibility manifest.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
