@@ -7,26 +7,32 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.8.1` candidate. Every official
-manifest is public and lockstep at `1.8.1`. Registry preflight on 2026-08-12
-confirmed that all 21 package records expose `1.8.0` as `latest` and that
-`1.8.1` is absent. Immutable GitHub release `v1.8.0` remains the current
-finalized release; the `v1.0.9` GitHub release remains a draft after its
-public-type verification failure. This is enforced locally by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.8.1`. Every official manifest is public and
+lockstep at `1.8.1`. Protected release run
+[#31580641519](https://github.com/marcmalerei/gluon/actions/runs/31580641519)
+published immutable GitHub release [`v1.8.1`](https://github.com/marcmalerei/gluon/releases/tag/v1.8.1)
+from commit `b1c2feeeffd5e1ac6bba2607cf1fae95642e60ab` on 2026-08-12. Its
+clean-room registry verification confirmed all 21 package records at `1.8.1`
+as `latest`, with npm provenance attestations and archive/registry integrity
+matches. The `v1.0.9` GitHub release remains a draft after its public-type
+verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.8.1 train handoff
+## v1.8.1 train completion
 
-Issue [#367](https://github.com/marcmalerei/gluon/issues/367) establishes the
+Issue [#367](https://github.com/marcmalerei/gluon/issues/367) established the
 21-package `1.8.1` patch train for retained nested SSR hydration and
 request-local abort propagation. The train uses the two-commit release cut: a
 Quality-Gates-tested candidate followed only by its release-cut evidence and
-compatibility manifest. The immutable `v1.8.0` release remains the supported
-baseline until the protected `v1.8.1` workflow completes.
+compatibility manifest. PR [#369](https://github.com/marcmalerei/gluon/pull/369)
+merged that cut, and the tag-triggered workflow completed candidate,
+reproducibility, browser-engine, Node-runtime, performance, fixture, registry,
+and publication checks. The immutable release contains 101 reviewed assets;
+the package train is now the supported `latest` baseline.
 
 ## v1.7.0 train completion
 

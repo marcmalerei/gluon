@@ -8,8 +8,8 @@
     "checkedAt": "2026-08-12",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Registry preflight on 2026-08-12 confirmed that all 21 contracted package records expose 1.8.0 as latest and that version 1.8.1 is absent. Scope control and trusted publication remain verified by the completed 1.8.0 release contract."
+    "publicationState": "released",
+    "observation": "Protected release run 31580641519 published immutable GitHub release v1.8.1 from b1c2feeeffd5e1ac6bba2607cf1fae95642e60ab on 2026-08-12. Clean-room registry verification confirmed all 21 contracted package records at 1.8.1 as latest with npm provenance attestations; the published archives and registry integrities match the release evidence."
   },
   "packages": [
     {
