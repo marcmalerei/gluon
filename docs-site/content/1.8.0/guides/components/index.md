@@ -255,6 +255,7 @@ they are not alternative component bases.
 | [`GluonSfcCompileError`](/gluon/1.8.0/api/generated/packages/compiler/src/classes/GluonSfcCompileError.html) | Presentational `.gluon` compilation rejected malformed, stateful, or ambiguous source; inspect `code` and `filename`. |
 | [`SsrRenderError`](/gluon/1.8.0/api/generated/packages/ssr/src/classes/SsrRenderError.html) | SSR received an invalid value or unsupported directive; inspect `code`. |
 | [`ComponentStyleHydrationError`](/gluon/1.8.0/api/generated/packages/ssr/src/hydration/classes/ComponentStyleHydrationError.html) | Component stylesheet hydration reported a typed mismatch; inspect `mismatch`. |
+| [`HydrationMarkerTransportError`](/gluon/1.8.0/api/generated/packages/ssr/src/hydration/classes/HydrationMarkerTransportError.html) | SSR marker transport is missing, invalid, or tampered; inspect `mismatch` and preserve the declarative ShadowRoot. |
 | [`SsrTransportError`](/gluon/1.8.0/api/generated/packages/ssr/src/hydration/classes/SsrTransportError.html) | The hydration style transport is unsupported, malformed, or conflicts with recovery; inspect `code`. |
 | [`AddComponentError`](/gluon/1.8.0/api/generated/packages/create-gluon/src/classes/AddComponentError.html) | `create-gluon` component generation rejected input or a filesystem safety condition; inspect `code`. |
 | [`ScaffoldError`](/gluon/1.8.0/api/generated/packages/create-gluon/src/classes/ScaffoldError.html) | Project scaffolding rejected CLI options, a project name, or the target directory; inspect `code`. |

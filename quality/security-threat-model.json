@@ -42,10 +42,12 @@
       "controls": [
         "SSR state accepts JSON-compatible data only.",
         "Serialization escapes ampersand, angle brackets, U+2028, and U+2029 before embedding in an application/json script.",
-        "Every request owns its app, Router, Store manager, reactive scope, and serialized snapshot."
+        "Every request owns its app, Router, Store manager, reactive scope, and serialized snapshot.",
+        "Nested DSD marker transport is inert, versioned, range-validated, and fails closed on missing, invalid, or tampered metadata.",
+        "An optional request AbortSignal keeps loading, async rendering, and cleanup request-local and preserves the abort reason."
       ],
       "residualRisk": "Applications must not place secrets in browser-visible hydration state.",
-      "evidence": ["tests-node/ssr.spec.ts", "tests-node/quality-property-fuzz.spec.ts", "docs/hydration.md"]
+      "evidence": ["tests-node/ssr.spec.ts", "tests-node/quality-property-fuzz.spec.ts", "tests/hydration.spec.ts", "docs/hydration.md"]
     },
     {
       "id": "csp",
@@ -53,7 +55,8 @@
       "controls": [
         "The renderer transports a request-owned nonce to initial style carriers; module scripts remain external asset URLs.",
         "The renderer never invents, reuses, or weakens a Content Security Policy.",
-        "Static resource URLs are escaped before entering generated markup."
+        "Static resource URLs are escaped before entering generated markup.",
+        "DSD marker metadata and state are inert transport surfaces and do not require executable inline bootstrap code."
       ],
       "residualRisk": "The deploying application owns the policy header, nonce generation, hash allowlists, and report handling.",
       "evidence": ["tests-node/ssr.spec.ts", "docs/deployment.md", "docs-site/content/1.8.0/guides/quality/index.md"]

@@ -7,6 +7,14 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added retained nested Declarative Shadow DOM hydration with deterministic
+  local marker-range transport, fail-closed metadata validation, and automatic
+  first-render deferral for connected server-marked Gluon elements.
+- Added request-isolated SSR abort propagation through `renderRequest()` with
+  exact signal identity and success/failure/abort cleanup.
+
 ## [1.8.0] - 2026-08-10
 
 ### Added

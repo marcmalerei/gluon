@@ -7,6 +7,25 @@ and `npm run check:security` rejects missing threat areas or evidence paths.
 The model defines runtime boundaries; it does not claim that Gluon sanitizes
 application content or supplies an application security policy.
 
+## SSR transport and hydration
+
+SSR state is restricted to finite JSON composed of plain objects and arrays.
+The serializer escapes HTML-significant characters, script/style terminators,
+U+2028, and U+2029 before emitting an inert `application/json` element. It does
+not generate an executable inline bootstrap surface.
+
+Declarative Shadow DOM marker ranges use the inert, versioned
+`data-gluon-hydration` host attribute. The browser validates the canonical
+version, ordered range, marker set, and expected DOM before binding. Missing,
+invalid, or tampered transport fails closed and preserves the existing root;
+consumer code never rewrites marker HTML. Style carriers validate identity,
+digest, exact CSS, order, scope, and target before adoption and are removed only
+after a successful handoff.
+
+`renderRequest()` accepts a request-owned `AbortSignal` and always releases the
+request Router, Store, application, and effect scope. Signals, controllers, and
+cleanup owners are not shared across concurrent requests.
+
 | Area | Runtime control | Application responsibility | Evidence |
 | --- | --- | --- | --- |
 | HTML | Dynamic strings become text; raw markup requires `unsafeHTML()`; renderer-owned destructive properties are rejected. | Sanitize untrusted markup before the explicit escape hatch. | `tests/dom-runtime-contract.spec.ts`, `tests-node/ssr.spec.ts` |

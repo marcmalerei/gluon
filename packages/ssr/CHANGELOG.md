@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added deterministic local `data-gluon-hydration="v1:start:end"` transport
+  for standalone, adjacent, nested, streamed, and progressive DSD roots with
+  categorized fail-closed validation.
+- Added request-local `SsrRequestOptions.signal` and
+  `SsrRequestContext.signal` propagation through loading, async rendering, and
+  cleanup.
+
 ## [1.8.0] - 2026-08-10
 
 ### Changed

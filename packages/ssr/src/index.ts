@@ -34,7 +34,8 @@ import {
   type StoreSnapshot,
 } from '@gluonjs/store';
 
-const serverElementBrand = Symbol('gluon.ssr-element');
+export const SSR_HYDRATION_MARKER_ATTRIBUTE = 'data-gluon-hydration' as const;
+const SSR_HYDRATION_MARKER_VERSION = 1 as const;
 const urlAttributes = new Set([
   'action', 'cite', 'data', 'formaction', 'href', 'manifest', 'ping',
   'poster', 'src', 'srcdoc', 'srcset', 'xlink:href',
@@ -56,14 +57,25 @@ export interface ServerElementOptions {
   readonly registry?: GluonElementDefinitionRegistry;
 }
 
+/** The deterministic marker range carried by every server-serialized Gluon element root. */
+export interface SsrHydrationMarkerTransport {
+  readonly version: 1;
+  /** Inclusive first marker allocated inside the element shadow root. */
+  readonly start: number;
+  /** Exclusive marker after the element shadow root. */
+  readonly end: number;
+}
+
 interface ServerElementValue {
-  readonly [serverElementBrand]: true;
+  readonly host: TemplateResult;
   readonly tagName: `${string}-${string}`;
   readonly properties: Readonly<Record<string, unknown>>;
-  readonly shadow: TemplateResult;
   readonly children: TemplateValue;
+  readonly shadow: TemplateResult;
   readonly scopedRegistry: boolean;
 }
+
+const serverElements = new WeakMap<TemplateResult, ServerElementValue>();
 
 /** Uses the same registered GluonElement class without running connection hooks. */
 export function renderElement<Constructor extends GluonElementClass>(
@@ -71,21 +83,61 @@ export function renderElement<Constructor extends GluonElementClass>(
   options: ServerElementOptions = {},
 ): TemplateValue {
   const properties = options.properties ?? {};
+  if (Object.prototype.hasOwnProperty.call(properties, SSR_HYDRATION_MARKER_ATTRIBUTE)) {
+    throw new TypeError(`${SSR_HYDRATION_MARKER_ATTRIBUTE} is reserved for Gluon SSR marker transport.`);
+  }
   const rendered = renderGluonElementForServer(constructor, properties, { registry: options.registry });
-  return Object.freeze({
-    [serverElementBrand]: true as const,
+  const host = createElementTemplate(
+    rendered.tagName,
+    properties,
+    options.children ?? nothing,
+  ).withStyleDependencies(collectComponentStyleDependencies(rendered.template));
+  serverElements.set(host, Object.freeze({
+    host,
     tagName: rendered.tagName,
     properties,
-    shadow: rendered.template,
     children: options.children ?? nothing,
+    shadow: rendered.template,
     scopedRegistry: rendered.scopedRegistry,
-  }) as unknown as TemplateValue;
+  }));
+  return host;
+}
+
+function createElementTemplate(
+  tagName: `${string}-${string}`,
+  properties: Readonly<Record<string, unknown>>,
+  children: TemplateValue,
+): TemplateResult {
+  const strings = [`<${tagName} ...=`, '>', `</${tagName}>`];
+  Object.defineProperty(strings, 'raw', { value: strings });
+  return new TemplateResult(Object.freeze(strings) as unknown as TemplateStringsArray, [properties, children]);
+}
+
+function collectComponentStyleDependencies(value: unknown): ComponentStyleDependency[] {
+  const dependencies = new Map<string, ComponentStyleDependency>();
+  const visit = (candidate: unknown): void => {
+    if (Array.isArray(candidate)) {
+      for (const child of candidate) visit(child);
+      return;
+    }
+    if (!(candidate instanceof TemplateResult)) return;
+    for (const dependency of candidate.styleDependencies) {
+      const current = dependencies.get(dependency.id);
+      if (current && current.sheet !== dependency.sheet) {
+        throw new Error('Component stylesheet id ' + dependency.id + ' maps to multiple sheet identities.');
+      }
+      dependencies.set(dependency.id, dependency);
+    }
+    for (const child of candidate.values) visit(child);
+  };
+  visit(value);
+  return [...dependencies.values()].sort(compareComponentStyles);
 }
 
 /** Resolves all current async boundaries and returns deterministic HTML. */
 export async function renderToString(
   value: TemplateValue,
-  options: { readonly assets?: AssetManifest } = {},
+  options: RenderSerializationOptions = {},
 ): Promise<string> {
   let html = '';
   for await (const chunk of renderToChunks(value, options)) html += chunk;
@@ -95,9 +147,24 @@ export async function renderToString(
 /** Emits ordered hydration-marked serialization chunks. */
 export async function* renderToChunks(
   value: TemplateValue,
-  options: { readonly assets?: AssetManifest } = {},
+  options: RenderSerializationOptions = {},
 ): AsyncGenerator<string> {
-  yield* serializeValue(value, { marker: 0, assets: options.assets });
+  yield* serializeValue(value, {
+    marker: options.markerOffset ?? 0,
+    assets: options.assets,
+    signal: options.signal,
+    omitServerElementShadowRoots: options.omitServerElementShadowRoots,
+    elementScopes: [],
+  });
+}
+
+export interface RenderSerializationOptions {
+  readonly assets?: AssetManifest;
+  readonly signal?: AbortSignal;
+  /** @internal Used by the official nested DSD hydration handoff. */
+  readonly markerOffset?: number;
+  /** @internal Hydration expectations omit DSD templates already adopted into child roots. */
+  readonly omitServerElementShadowRoots?: boolean;
 }
 
 export type ProgressiveRenderChunk =
@@ -120,7 +187,13 @@ export async function* renderProgressively(
     signal: options.signal,
   };
   const componentStyles = new Map<string, ComponentStyleDependency>();
-  const context: SerializationContext = { marker: 0, progressive, componentStyles };
+  const context: SerializationContext = {
+    marker: 0,
+    progressive,
+    componentStyles,
+    signal: options.signal,
+    elementScopes: [],
+  };
   let shell = '';
   for await (const chunk of serializeValue(value, context)) shell += chunk;
   const shellStyles = createComponentStyleManifest(componentStyles.values());
@@ -129,7 +202,8 @@ export async function* renderProgressively(
 
   while (progressive.tasks.length > 0) {
     throwIfAborted(options.signal);
-    const settled = await Promise.race(progressive.tasks.map((task) => task.promise));
+    const pending = Promise.race(progressive.tasks.map((task) => task.promise));
+    const settled = options.signal ? await abortable(pending, options.signal) : await pending;
     const index = progressive.tasks.findIndex((task) => task.id === settled.id);
     if (index >= 0) progressive.tasks.splice(index, 1);
     if ('error' in settled) throw settled.error;
@@ -151,9 +225,12 @@ export interface PreparedHydration {
 /** Resolves server async contracts once and returns the matching marker HTML and value tree. */
 export async function prepareForHydration(
   value: TemplateValue,
-  options: { readonly assets?: AssetManifest } = {},
+  options: RenderSerializationOptions = {},
 ): Promise<PreparedHydration> {
-  const prepared = await resolveHydrationValue(value);
+  throwIfAborted(options.signal);
+  const pending = resolveHydrationValue(value, options.signal);
+  const prepared = options.signal ? await abortable(pending, options.signal) : await pending;
+  throwIfAborted(options.signal);
   return Object.freeze({ value: prepared, html: await renderToString(prepared, options) });
 }
 
@@ -162,11 +239,13 @@ export interface SsrRequestContext<Data = undefined> {
   readonly router: Router;
   readonly store: StoreManager;
   readonly scope: EffectScope;
+  readonly signal: AbortSignal;
   readonly data: Data;
 }
 
 export interface SsrRequestOptions<Data = undefined> {
   readonly url: string;
+  readonly signal?: AbortSignal;
   readonly routes?: readonly RouteRecordRaw[] | ((store: StoreManager) => readonly RouteRecordRaw[]);
   readonly load?: (context: Omit<SsrRequestContext<Data>, 'data'>) => Promise<Data> | Data;
   readonly createApp: (context: SsrRequestContext<Data>) => GluonApp;
@@ -190,11 +269,14 @@ export interface SsrRequestResult {
 export async function renderRequest<Data = undefined>(
   options: SsrRequestOptions<Data>,
 ): Promise<SsrRequestResult> {
+  const requestController = options.signal ? undefined : new AbortController();
+  const signal = options.signal ?? requestController!.signal;
   const scope = effectScope({ detached: true });
   const store = createStoreManager();
   let router: Router | undefined;
   let app: GluonApp | undefined;
   try {
+    throwIfAborted(signal);
     const routes = typeof options.routes === 'function'
       ? options.routes(store)
       : options.routes ?? [];
@@ -202,17 +284,26 @@ export async function renderRequest<Data = undefined>(
       history: createMemoryHistory([options.url]),
       routes,
     });
-    await router.isReady();
-    const baseContext = { url: options.url, router, store, scope };
+    await abortable(router.isReady(), signal);
+    const baseContext = { url: options.url, router, store, scope, signal };
     const data = options.load
-      ? await options.load(baseContext as Omit<SsrRequestContext<Data>, 'data'>)
+      ? await abortable(
+          options.load(baseContext as Omit<SsrRequestContext<Data>, 'data'>),
+          signal,
+        )
       : undefined as Data;
+    throwIfAborted(signal);
     const context: SsrRequestContext<Data> = { ...baseContext, data };
     app = scope.run(() => options.createApp(context));
     if (!app) throw new Error('The request effect scope stopped before application creation.');
+    throwIfAborted(signal);
     const template = scope.run(() => renderGluonApplicationForServer(app!));
     if (!template) throw new Error('The request effect scope stopped before application rendering.');
-    const prepared = await prepareForHydration(template, { assets: options.assets });
+    const prepared = await abortable(
+      prepareForHydration(template, { assets: options.assets, signal }),
+      signal,
+    );
+    throwIfAborted(signal);
     const html = prepared.html;
     const routerSnapshot = router.dehydrate();
     const storeSnapshot = store.dehydrate();
@@ -222,6 +313,7 @@ export async function renderRequest<Data = undefined>(
       store: storeSnapshot,
       data,
     });
+    throwIfAborted(signal);
     const componentStyles = createComponentStyleSelection(prepared.value);
     const styles = createStyleManifest(mergeRequestStyleSources(options.styles ?? [], componentStyles));
     return Object.freeze({
@@ -234,10 +326,28 @@ export async function renderRequest<Data = undefined>(
       store: storeSnapshot,
     });
   } finally {
-    if (app) await disposeGluonApplicationForServer(app);
-    router?.destroy();
-    store.dispose();
-    scope.stop();
+    let cleanupError: unknown;
+    try {
+      if (app) await disposeGluonApplicationForServer(app);
+    } catch (error) {
+      cleanupError = error;
+    }
+    try {
+      router?.destroy();
+    } catch (error) {
+      cleanupError ??= error;
+    }
+    try {
+      store.dispose();
+    } catch (error) {
+      cleanupError ??= error;
+    }
+    try {
+      scope.stop();
+    } catch (error) {
+      cleanupError ??= error;
+    }
+    if (cleanupError !== undefined) throw cleanupError;
   }
 }
 
@@ -318,9 +428,17 @@ export function serializeSsrState(value: unknown): string {
 
 interface SerializationContext {
   marker: number;
+  readonly elementScopes: ElementMarkerScope[];
+  readonly omitServerElementShadowRoots?: boolean;
   readonly progressive?: ProgressiveCoordinator;
   readonly assets?: AssetManifest;
   readonly componentStyles?: Map<string, ComponentStyleDependency>;
+  readonly signal?: AbortSignal;
+}
+
+interface ElementMarkerScope {
+  readonly start: number;
+  end: number;
 }
 
 interface ProgressiveCoordinator {
@@ -339,6 +457,7 @@ interface ProgressiveTask {
 }
 
 async function* serializeValue(value: unknown, context: SerializationContext): AsyncGenerator<string> {
+  throwIfAborted(context.signal);
   if (value == null || value === false || value === nothing) return;
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint' || value === true) {
     yield escapeText(String(value));
@@ -350,11 +469,43 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
   }
   if (Array.isArray(value)) {
     for (const child of value) {
-      const marker = context.marker++;
+      const marker = allocateMarker(context);
       yield `<!--gluon:i:${marker}-->`;
       yield* serializeValue(child, context);
       yield `<!--gluon:/i:${marker}-->`;
     }
+    return;
+  }
+  const serverElement = getServerElementValue(value);
+  if (serverElement) {
+    const propertyMarker = allocateMarker(context);
+    const childrenMarker = allocateMarker(context);
+    const scope: ElementMarkerScope = { start: context.marker, end: context.marker };
+    context.elementScopes.push(scope);
+    let shadow = '';
+    try {
+      for await (const chunk of serializeTemplate(serverElement.shadow, context)) shadow += chunk;
+    } finally {
+      context.elementScopes.pop();
+    }
+    const start = scope.start;
+    const end = scope.end;
+    yield `<${serverElement.tagName}${serializeSpread(serverElement.properties)} ${SSR_HYDRATION_MARKER_ATTRIBUTE}="${encodeMarkerTransport({
+      version: SSR_HYDRATION_MARKER_VERSION,
+      start,
+      end,
+    })}" data-gluon-h-${propertyMarker}="">`;
+    if (!context.omitServerElementShadowRoots) {
+      yield serverElement.scopedRegistry
+        ? '<template shadowrootmode="open" shadowrootcustomelementregistry>'
+        : '<template shadowrootmode="open">';
+      yield shadow;
+      yield '</template>';
+    }
+    yield `<!--gluon:h:${childrenMarker}-->`;
+    yield* serializeValue(serverElement.children, context);
+    yield `<!--gluon:/h:${childrenMarker}-->`;
+    yield `</${serverElement.tagName}>`;
     return;
   }
   if (isTemplateResult(value)) {
@@ -364,17 +515,6 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
       }
     }
     yield* serializeTemplate(value, context);
-    return;
-  }
-  if (isServerElementValue(value)) {
-    yield `<${value.tagName}${serializeSpread(value.properties)}>`;
-    yield value.scopedRegistry
-      ? '<template shadowrootmode="open" shadowrootcustomelementregistry>'
-      : '<template shadowrootmode="open">';
-    yield* serializeTemplate(value.shadow, context);
-    yield '</template>';
-    yield* serializeValue(value.children, context);
-    yield `</${value.tagName}>`;
     return;
   }
   const builtin = getBuiltinServerContract(value);
@@ -390,14 +530,14 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
       yield* serializeValue(builtin.fallback, context);
       yield `<!--gluon:/async:${id}-->`;
     } else if (builtin.kind === 'suspense') {
-      yield* serializeValue(await builtin.resolve(), context);
+      yield* serializeValue(await builtin.resolve(context.signal), context);
     } else yield* serializeValue(builtin.content, context);
     return;
   }
   const contract = getTemplateValueServerContract(value);
   if (contract?.kind === 'repeat') {
     for (const item of contract.items) {
-      const marker = context.marker++;
+      const marker = allocateMarker(context);
       yield `<!--gluon:k:${marker}-->`;
       yield* serializeValue(item.value, context);
       yield `<!--gluon:/k:${marker}-->`;
@@ -443,7 +583,7 @@ async function* serializeTemplate(
       continue;
     }
     if (!state.inTag) {
-      const marker = context.marker++;
+      const marker = allocateMarker(context);
       yield chunk;
       yield `<!--gluon:h:${marker}-->`;
       yield* serializeValue(result.values[index], context);
@@ -460,7 +600,7 @@ async function* serializeTemplate(
     const name = match[1];
     const nameOffset = chunk.lastIndexOf(name);
     const prefix = chunk.slice(0, nameOffset);
-    const marker = context.marker++;
+    const marker = allocateMarker(context);
     yield /\s$/.test(prefix) ? prefix.slice(0, -1) : prefix;
     yield serializeBinding(name, result.values[index], context.assets);
     yield ` data-gluon-h-${marker}=""`;
@@ -468,25 +608,53 @@ async function* serializeTemplate(
   }
 }
 
-async function resolveHydrationValue(value: TemplateValue): Promise<TemplateValue> {
+function allocateMarker(context: SerializationContext): number {
+  const marker = context.marker++;
+  const scope = context.elementScopes[context.elementScopes.length - 1];
+  if (scope) scope.end = context.marker;
+  return marker;
+}
+
+async function resolveHydrationValue(value: TemplateValue, signal?: AbortSignal): Promise<TemplateValue> {
+  throwIfAborted(signal);
   if (Array.isArray(value)) {
-    return Promise.all(value.map((child) => resolveHydrationValue(child)));
+    return Promise.all(value.map((child) => resolveHydrationValue(child, signal)));
+  }
+  const serverElement = getServerElementValue(value);
+  if (serverElement) {
+    const shadow = await resolveHydrationValue(serverElement.shadow, signal) as TemplateResult;
+    const children = await resolveHydrationValue(serverElement.children, signal);
+    const host = createElementTemplate(
+      serverElement.tagName,
+      serverElement.properties,
+      children,
+    ).withStyleDependencies(serverElement.host.styleDependencies);
+    serverElements.set(host, Object.freeze({
+      host,
+      tagName: serverElement.tagName,
+      properties: serverElement.properties,
+      children,
+      shadow,
+      scopedRegistry: serverElement.scopedRegistry,
+    }));
+    return host;
   }
   if (isTemplateResult(value)) {
-    const values = await Promise.all(value.values.map((child) => resolveHydrationValue(child)));
+    const values = await Promise.all(value.values.map((child) => resolveHydrationValue(child, signal)));
     return new TemplateResult(value.strings, values, value.type, value.styleDependencies);
   }
   const builtin = getBuiltinServerContract(value);
   if (builtin) {
     return resolveHydrationValue(
-      builtin.kind === 'suspense' ? await builtin.resolve() : builtin.content,
+      builtin.kind === 'suspense' ? await builtin.resolve(signal) : builtin.content,
+      signal,
     );
   }
   const contract = getTemplateValueServerContract(value);
   if (contract?.kind === 'repeat') {
     const items = await Promise.all(contract.items.map(async (item) => ({
       key: item.key,
-      value: await resolveHydrationValue(item.value),
+      value: await resolveHydrationValue(item.value, signal),
     })));
     return repeat(items, (item) => item.key, (item) => item.value as TemplateValue);
   }
@@ -612,8 +780,8 @@ function assertSerializableState(value: unknown, seen: WeakSet<object>): void {
   }
 }
 
-function isServerElementValue(value: unknown): value is ServerElementValue {
-  return Boolean(value && typeof value === 'object' && serverElementBrand in value);
+function getServerElementValue(value: unknown): ServerElementValue | undefined {
+  return value instanceof TemplateResult ? serverElements.get(value) : undefined;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -643,6 +811,14 @@ function escapeAttribute(value: string): string {
 
 function escapeStyleText(value: string): string {
   return value.replace(/<\/style/gi, '<\\/style');
+}
+
+function encodeMarkerTransport(transport: SsrHydrationMarkerTransport): string {
+  if (!Number.isSafeInteger(transport.start) || !Number.isSafeInteger(transport.end)
+    || transport.start < 0 || transport.end < transport.start) {
+    throw new TypeError('SSR hydration marker ranges must be ordered non-negative safe integers.');
+  }
+  return `v${transport.version}:${transport.start}:${transport.end}`;
 }
 
 function isStyleSheetSelection(source: StyleManifestSource): source is StyleSheetSelection {
@@ -697,5 +873,38 @@ function updateMarkupState(state: { inTag: boolean; quote: string }, chunk: stri
 }
 
 function throwIfAborted(signal: AbortSignal | undefined): void {
-  if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
+  if (!signal) return;
+  const native = signal as AbortSignal & { readonly throwIfAborted?: () => void };
+  if (typeof native.throwIfAborted === 'function') {
+    native.throwIfAborted();
+    return;
+  }
+  if (signal.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
+}
+
+function abortable<Value>(value: PromiseLike<Value> | Value, signal: AbortSignal): Promise<Value> {
+  throwIfAborted(signal);
+  return new Promise<Value>((resolve, reject) => {
+    let settled = false;
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      reject(signal.reason ?? new DOMException('Aborted', 'AbortError'));
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+    Promise.resolve(value).then(
+      (resolved) => {
+        if (settled) return;
+        settled = true;
+        signal.removeEventListener('abort', onAbort);
+        resolve(resolved);
+      },
+      (error) => {
+        if (settled) return;
+        settled = true;
+        signal.removeEventListener('abort', onAbort);
+        reject(error);
+      },
+    );
+  });
 }
