@@ -1214,6 +1214,7 @@
         "  type MatcherResolution,",
         "  type RouteComponent,",
         "  type RouteComponentSource,",
+        "  type RouteData,",
         "  type RouteMeta,",
         "  type RouteParamPrimitive,",
         "  type RouteParams,",
@@ -1228,12 +1229,13 @@
         "const ProductPage: RouteComponent = ({ route }) => html`<h1>${route.params.id}</h1>`;",
         "const source: RouteComponentSource = lazyRoute(async () => ProductPage);",
         "const meta = { requiresAuth: false } satisfies RouteMeta;",
-        "const record = { path: '/products/:id', name: 'product', component: source, meta } satisfies RouteRecordRaw;",
+        "const data = { section: 'catalog', cache: 'request-free' } satisfies RouteData;",
+        "const record = { path: '/products/:id', name: 'product', component: source, meta, data } satisfies RouteRecordRaw;",
         "const matcher: RouterMatcher = createRouterMatcher([record]);",
         "const resolution: MatcherResolution = matcher.resolveName('product', rawParams);",
         "const params: RouteParams = resolution.params;",
         "const normalized: RouteRecordNormalized = resolution.matched[0]!;",
-        "console.log(resolution.path, params.id, normalized.meta, isLazyRouteComponent(source));"
+        "console.log(resolution.path, params.id, normalized.meta, normalized.data, isLazyRouteComponent(source));"
       ]
     },
     "router-ui": {
@@ -5429,6 +5431,10 @@
     "packages/router/src/type-aliases/RouteComponentSource.md": {
       "recipe": "router-matching",
       "description": "Accept either an eager route component or a branded lazy loader in a route record:"
+    },
+    "packages/router/src/type-aliases/RouteData.md": {
+      "recipe": "router-matching",
+      "description": "Attach request-free, serializable route data that parent and child records can expose to the route location:"
     },
     "packages/router/src/type-aliases/RouteLocationRaw.md": {
       "recipe": "router-navigation",
