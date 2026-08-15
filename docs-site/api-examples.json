@@ -1971,14 +1971,23 @@
       "module": "@gluonjs/ssr/streaming",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';",
+        "import { applyProgressivePatch, applyProgressivePatchTemplate, ProgressivePatchError, renderProgressiveReadableStream, renderToReadableStream, type ProgressiveBoundaryChunk, type ProgressivePatchApplicationOptions, type ProgressivePatchApplicationResult, type ProgressivePatchErrorCode } from '@gluonjs/ssr/streaming';",
         "",
         "const page = html`<main><h1>New arrivals</h1></main>`;",
         "const complete: ReadableStream<Uint8Array> = renderToReadableStream(page);",
         "const progressive: ReadableStream<Uint8Array> = renderProgressiveReadableStream(page, {",
         "  signal: new AbortController().signal,",
         "});",
-        "console.log(await new Response(complete).text(), await new Response(progressive).text());"
+        "const root = document.createElement('main');",
+        "const patch = { kind: 'boundary', id: 1, html: '<p>Ready</p>', styles: { version: 1, entries: [] } } satisfies ProgressiveBoundaryChunk;",
+        "const patchOptions: ProgressivePatchApplicationOptions = { signal: new AbortController().signal };",
+        "const applied: ProgressivePatchApplicationResult = applyProgressivePatch(root, patch, patchOptions);",
+        "const template = document.createElement('template');",
+        "template.setAttribute('data-gluon-async-patch', '1');",
+        "const fromTemplate = applyProgressivePatchTemplate(root, template);",
+        "const code: ProgressivePatchErrorCode = 'GLUON_SSR_PROGRESSIVE_BOUNDARY';",
+        "const failure = new ProgressivePatchError(code, 'Boundary is not available.');",
+        "console.log(await new Response(complete).text(), await new Response(progressive).text(), applied, fromTemplate, failure);"
       ]
     },
     "test-component-fixture": {
@@ -5681,6 +5690,34 @@
     "packages/ssr/src/streaming/functions/renderToReadableStream.md": {
       "recipe": "ssr-streams",
       "description": "Adapt ordered SSR HTML chunks into a cancellable UTF-8 byte stream for a Web Response:"
+    },
+    "packages/ssr/src/streaming/classes/ProgressivePatchError.md": {
+      "recipe": "ssr-streams",
+      "description": "Catch a progressive SSR patch failure by stable code while retaining its boundary or style explanation:"
+    },
+    "packages/ssr/src/streaming/functions/applyProgressivePatch.md": {
+      "recipe": "ssr-streams",
+      "description": "Apply one resolved async boundary to an existing SSR shell without disturbing nested boundary markers:"
+    },
+    "packages/ssr/src/streaming/functions/applyProgressivePatchTemplate.md": {
+      "recipe": "ssr-streams",
+      "description": "Consume one inert streamed async-patch template and apply it through the validated progressive boundary contract:"
+    },
+    "packages/ssr/src/streaming/interfaces/ProgressivePatchApplicationOptions.md": {
+      "recipe": "ssr-streams",
+      "description": "Provide the style root and cancellation signal for one atomic progressive patch application:"
+    },
+    "packages/ssr/src/streaming/interfaces/ProgressivePatchApplicationResult.md": {
+      "recipe": "ssr-streams",
+      "description": "Inspect the boundary ID, inserted-node count, and newly installed style IDs after a patch is applied:"
+    },
+    "packages/ssr/src/streaming/type-aliases/ProgressiveBoundaryChunk.md": {
+      "recipe": "ssr-streams",
+      "description": "Describe one resolved progressive boundary patch emitted by the SSR async stream:"
+    },
+    "packages/ssr/src/streaming/type-aliases/ProgressivePatchErrorCode.md": {
+      "recipe": "ssr-streams",
+      "description": "Handle the stable invalid-patch, boundary, style, and abort codes from progressive SSR application:"
     },
     "packages/ssr/src/type-aliases/ProgressiveRenderChunk.md": {
       "recipe": "ssr-serialization",
