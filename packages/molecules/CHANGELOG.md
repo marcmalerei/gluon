@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added the controlled, router-independent `NavigationMenu` composition for
+  native hierarchical site and product navigation, including keyboard/RTL,
+  dismissal, focus return, SSR/hydration cleanup, and separate styles.
+
 ## [Unreleased]
 
 ### Added

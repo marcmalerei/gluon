@@ -44,6 +44,7 @@ function isLegacyBagLine(value: unknown): value is LegacyBagLine {
 export const shopStoreDefinition = defineStore('shop', () => ({
   bagOpen: false,
   menuOpen: false,
+  navigationOpen: [] as string[],
   searchOpen: false,
   searchQuery: '',
   configuration: createDefaultProductConfiguration(),

@@ -27,6 +27,7 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  NavigationMenu,
   SearchField,
   SearchResults,
   ContextMenu,
@@ -175,10 +176,38 @@ NavigationStrip({
 });
 ```
 
+`NavigationMenu` is the hierarchical counterpart for site and product
+navigation. It renders native `nav`, `ul`, `li`, `a`, and `button` semantics;
+it is not a command menu and does not know a router, permissions, analytics, or
+network state. Pass stable item IDs and a controlled `open` array. Groups with
+an `href` render a native destination plus a separate disclosure button, while
+their nested items remain ordinary links. `active`, `disabled`, and
+`unavailable` are caller-owned decisions; unavailable items remain announced
+with a reason but do not navigate. Escape closes the deepest open group and
+returns focus to its trigger; outside pointer dismissal closes the controlled
+set. Arrow/Home/End traversal skips disabled or unavailable controls and follows
+the document direction. IDs must be unique within the document for deterministic
+SSR and hydration. Applications with a router link adapter may provide its
+native rendered anchor through `link`; the adapter remains responsible for
+navigation and active-class behavior.
+
+```ts
+NavigationMenu({
+  label: 'Primary navigation',
+  open: ['shop'],
+  onOpenChange: (open) => console.log(open),
+  items: [{
+    id: 'shop', label: 'Shop', href: '/shop', active: true,
+    children: [{ id: 'new', label: 'New arrivals', href: '/shop?sort=new' }],
+  }],
+});
+```
+
 Styles use logical properties and shared Atom token names. `ButtonGroup`, `Card`, `ChoiceGroup`,
 `ControlField`, and `FormField` carry separate immutable stylesheet dependencies;
 `NavigationStrip` carries its own layout/control sheet, and `FormField` collects
 its nested `Label` and `Input` sheets through ordinary renderer traversal.
+`NavigationMenu` carries its own separately tree-shakable navigation stylesheet.
 Install the shared foundation and theme once through `installUi()`. The
 deprecated `moleculeStyles` aggregate remains the legacy Card/FormField sheet
 and cannot coexist silently with their exact rendering.
@@ -191,6 +220,10 @@ Applications can set `--gluon-navigation-strip-gap`,
 `--gluon-navigation-strip-control-color` on the root through
 `attributes.class` or `attributes.style` without targeting implementation
 classes.
+`NavigationMenu` exposes `--gluon-navigation-menu-gap`,
+`--gluon-navigation-menu-color`, `--gluon-navigation-menu-hover-background`,
+`--gluon-navigation-menu-surface`, `--gluon-navigation-menu-border`, and
+`--gluon-navigation-menu-shadow`.
 ControlField exposes `--gluon-control-field-required-color`,
 `--gluon-control-field-helper-color`, and `--gluon-control-field-error-color`.
 ChoiceGroup exposes `--gluon-choice-group-gap`,
