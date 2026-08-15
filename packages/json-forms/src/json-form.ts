@@ -271,7 +271,10 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   protected override render(): TemplateResult {
     const messages = this.resolveMessages();
     const fields = getJsonFormFields(this.schema, this.uischema);
-    const configurationErrors = this.validationErrors.filter((error) => error.keyword === 'unsupported' || error.keyword === 'schema' || error.keyword === 'type');
+    const configurationErrors = this.validationErrors.filter((error) => error.keyword === 'unsupported'
+      || error.keyword === 'schema'
+      || error.keyword === 'type'
+      || error.keyword.startsWith('ref-'));
     const title = this.schema.title;
     const disabled = this.disabled || this.disabledByForm;
     return html`

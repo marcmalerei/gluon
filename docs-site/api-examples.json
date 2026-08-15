@@ -7,8 +7,10 @@
         "import {",
         "  createJsonFormsMessageProvider,",
         "  JsonForm,",
+        "  JsonSchemaResolutionError,",
         "  jsonFormsTag,",
         "  registerJsonForms,",
+        "  resolveJsonSchema,",
         "  type JsonFormChangeDetail,",
         "  type JsonFormOptions,",
         "  type JsonFormsElement,",
@@ -20,10 +22,14 @@
         "  type JsonFormValidationError,",
         "  type JsonObject,",
         "  type JsonSchema,",
+        "  type JsonSchemaResolutionOptions,",
         "  type JsonValue,",
         "} from '@gluonjs/json-forms';",
         "",
-        "const schema = { type: 'object', properties: { email: { type: 'string', format: 'email' }, delivery: { type: 'string', enum: ['morning', 'afternoon'] } }, required: ['email'] } satisfies JsonSchema;",
+        "const schema = { type: 'object', properties: { email: { $ref: '#/$defs/email' }, delivery: { type: 'string', enum: ['morning', 'afternoon'] } }, required: ['email'], $defs: { email: { type: 'string', format: 'email' } } } satisfies JsonSchema;",
+        "const referenceOptions = { maxDepth: 8, maxNodes: 64 } satisfies JsonSchemaResolutionOptions;",
+        "const resolvedSchema = resolveJsonSchema(schema, referenceOptions);",
+        "const referenceError = new JsonSchemaResolutionError('ref-pointer', 'Invalid reference.');",
         "const uischema = { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/email', label: 'Email address' }, { type: 'Control', scope: '#/properties/delivery' }] } satisfies JsonFormsUiSchema;",
         "const data = { email: 'hello@example.test', delivery: 'morning' } satisfies JsonObject;",
         "const value: JsonValue = data.delivery;",
@@ -42,7 +48,7 @@
         "element.messages = messages;",
         "const options = { schema, uischema, data, messages, onChange: (event) => console.log(event.detail.data), onValidationChange: (event) => console.log(event.detail.valid) } satisfies JsonFormOptions;",
         "const view = JsonForm(options);",
-        "console.log(element.value, value, change, validation, view);"
+        "console.log(element.value, value, change, validation, view, resolvedSchema, referenceError.keyword);"
       ]
     },
     "i18n-application": {
@@ -3099,6 +3105,10 @@
     }
   },
   "overrides": {
+    "packages/json-forms/src/classes/JsonSchemaResolutionError.md": {
+      "recipe": "json-forms-contract",
+      "description": "Handle a bounded local-reference failure through its stable public diagnostic keyword:"
+    },
     "packages/json-forms/src/classes/JsonFormsElement.md": {
       "recipe": "json-forms-contract",
       "description": "Register and configure a schema-driven form-associated Custom Element through only the public package entry point:"
@@ -3114,6 +3124,10 @@
     "packages/json-forms/src/functions/registerJsonForms.md": {
       "recipe": "json-forms-contract",
       "description": "Register the explicit JSON Forms Custom Element before using it from plain HTML or a host application:"
+    },
+    "packages/json-forms/src/functions/resolveJsonSchema.md": {
+      "recipe": "json-forms-contract",
+      "description": "Resolve the supported local JSON Pointer subset into a deeply immutable schema before application use:"
     },
     "packages/json-forms/src/interfaces/JsonFormChangeDetail.md": {
       "recipe": "json-forms-contract",
@@ -3154,6 +3168,10 @@
     "packages/json-forms/src/interfaces/JsonSchema.md": {
       "recipe": "json-forms-contract",
       "description": "Define the initial direct-property JSON Schema subset as a checked public contract:"
+    },
+    "packages/json-forms/src/interfaces/JsonSchemaResolutionOptions.md": {
+      "recipe": "json-forms-contract",
+      "description": "Set explicit reference-chain and visited-schema budgets for local schema resolution:"
     },
     "packages/json-forms/src/type-aliases/JsonValue.md": {
       "recipe": "json-forms-contract",

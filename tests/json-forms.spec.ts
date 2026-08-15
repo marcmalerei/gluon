@@ -21,6 +21,7 @@ import {
   isJsonObject,
   isJsonSchema,
   validateJsonFormData,
+  resolveJsonSchema,
 } from '../packages/json-forms/src/schema.js';
 
 registerJsonForms();
@@ -140,18 +141,87 @@ describe('JSON Forms component', () => {
     expect(element.data).toEqual({ email: 'restored@example.test', delivery: 'afternoon' });
   });
 
-  it('makes unsupported schemas explicit instead of silently omitting fields', async () => {
+  it('renders and validates an RFC 6901 local ref in a real browser', async () => {
     const element = createForm({
       type: 'object',
       properties: {
-        address: { $ref: '#/$defs/address' },
+        address: { $ref: '#/$defs/address~1line' },
       },
+      $defs: { 'address/line': { type: 'string', title: 'Address line', minLength: 3 } },
+    } as JsonSchema);
+    await settled(element);
+
+    const address = element.shadowRoot!.querySelector('#field-address') as HTMLInputElement;
+    expect(address.labels?.[0]?.textContent).toContain('Address line');
+    address.value = 'x';
+    address.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.errors.some(({ keyword }) => keyword === 'minLength')).toBe(true);
+    expect(address.getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('reports stable adversarial reference diagnostics', () => {
+    const cases: [JsonSchema, string][] = [
+      [{ type: 'object', properties: { x: { $ref: 'https://example.test/schema' } } }, 'ref-remote'],
+      [{ type: 'object', properties: { x: { $ref: '#anchor' } } }, 'ref-pointer'],
+      [{ type: 'object', properties: { x: { $ref: '#/properties/x' } } }, 'ref-pointer'],
+      [{ type: 'object', properties: { x: { $ref: '#/$defs/a~2b' } } }, 'ref-pointer'],
+      [{ type: 'object', properties: { x: { $ref: '#/$defs/%E0%A4%A' } } }, 'ref-pointer'],
+      [{ type: 'object', properties: { x: { $ref: '#/$defs/value' } }, $defs: { value: 'text' as unknown as JsonSchema } }, 'ref-target'],
+      [{ type: 'object', properties: { x: null as unknown as JsonSchema } }, 'ref-target'],
+      [{ type: 'object', properties: { x: { $ref: 3 as unknown as string } } }, 'ref-pointer'],
+      [{ type: 'object', properties: { x: { $ref: '#/$defs/missing' } } }, 'ref-pointer'],
+      [{ type: 'object', properties: { x: { $ref: '#/$defs/a' } }, $defs: { a: { $ref: '#/$defs/b' }, b: { $ref: '#/$defs/a' } } }, 'ref-cycle'],
+    ];
+    for (const [schema, keyword] of cases) expect(validateJsonFormData(schema, {}).errors[0]?.keyword).toBe(keyword);
+    expect(() => resolveJsonSchema(
+      { type: 'object', properties: { x: { $ref: '#/$defs/a' } }, $defs: { a: { $ref: '#/$defs/b' }, b: { type: 'string' } } },
+      { maxDepth: 1 },
+    )).toThrowError(expect.objectContaining({ keyword: 'ref-depth' }));
+    expect(() => resolveJsonSchema(
+      { type: 'object', properties: { x: { $ref: '#/$defs/a' } }, $defs: { a: { type: 'string' } } },
+      { maxNodes: 2 },
+    )).toThrowError(expect.objectContaining({ keyword: 'ref-budget' }));
+    expect(() => resolveJsonSchema({ type: 'object' }, { maxNodes: 0 })).toThrowError(
+      expect.objectContaining({ keyword: 'ref-budget' }),
+    );
+    expect(resolveJsonSchema({ type: 'object', oneOf: [{ type: 'object' }] }).oneOf).toHaveLength(1);
+    expect(getJsonFormsConfigurationErrors({ type: 'object', properties: { unsupported: {} } }, undefined)[0]?.keyword).toBe('unsupported');
+  });
+
+  it('renders reference failures as stable configuration diagnostics', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: { address: { $ref: 'https://example.test/address.json' } },
     });
     await settled(element);
 
-    expect(element.errors.length).toBeGreaterThan(0);
-    expect(element.shadowRoot!.querySelector('[part="configuration-error"]')?.textContent).toContain('address');
+    expect(element.errors).toEqual([expect.objectContaining({ keyword: 'ref-remote' })]);
+    expect(element.shadowRoot!.querySelector('[part="configuration-error"]')?.textContent).toContain('Remote JSON Schema references are not supported');
     expect(element.checkValidity()).toBe(false);
+  });
+
+  it('returns a deterministic deeply immutable local-ref overlay', () => {
+    const schema = {
+      type: 'object',
+      required: ['escaped'],
+      properties: {
+        escaped: { $ref: '#/$defs/a~01', type: 'number', default: { labels: ['kept'] } },
+        legacy: { $ref: '#/definitions/contact' },
+      },
+      $defs: { 'a~1': { type: 'string', title: 'Target title' } },
+      definitions: { contact: { type: 'string' } },
+    } satisfies JsonSchema;
+    const resolved = resolveJsonSchema(schema);
+
+    expect(resolved.properties?.escaped).toMatchObject({ type: 'number', title: 'Target title' });
+    expect(resolved.properties?.legacy?.type).toBe('string');
+    expect(Object.isFrozen(resolved)).toBe(true);
+    expect(Object.isFrozen(resolved.required)).toBe(true);
+    expect(Object.isFrozen(resolved.properties?.escaped?.default)).toBe(true);
+    expect(Object.isFrozen((resolved.properties?.escaped?.default as { labels: readonly string[] }).labels)).toBe(true);
+    expect(JSON.stringify(schema)).toContain('"$ref"');
+    expect(JSON.stringify(resolveJsonSchema(schema))).toBe(JSON.stringify(resolved));
   });
 
   it('renders nested objects and bounded arrays with immutable path updates', async () => {

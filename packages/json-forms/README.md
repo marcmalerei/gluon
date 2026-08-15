@@ -19,6 +19,7 @@ them.
 ```ts
 import {
   registerJsonForms,
+  resolveJsonSchema,
   type JsonFormsElement,
   type JsonSchema,
 } from '@gluonjs/json-forms';
@@ -27,17 +28,20 @@ const schema = {
   type: 'object',
   title: 'Delivery preference',
   properties: {
-    email: { type: 'string', format: 'email', title: 'Email address' },
+    email: { $ref: '#/$defs/email' },
     time: { type: 'string', enum: ['morning', 'afternoon'], enumNames: ['Morning', 'Afternoon'] },
     giftWrap: { type: 'boolean', title: 'Add gift wrap', default: false },
   },
   required: ['email', 'time'],
+  $defs: {
+    email: { type: 'string', format: 'email', title: 'Email address' },
+  },
 } satisfies JsonSchema;
 
 registerJsonForms();
 
 const form = document.querySelector<JsonFormsElement>('gluon-json-form')!;
-form.schema = schema;
+form.schema = resolveJsonSchema(schema, { maxDepth: 8, maxNodes: 64 });
 form.data = { email: 'hello@example.test' };
 form.addEventListener('change', (event) => {
   console.log(event.detail.data, event.detail.errors);
@@ -122,7 +126,28 @@ restore contracts as direct fields. Native labels, keyboard controls, focus
 indicators, error association, disabled state, and reduced motion behavior are
 built into the element.
 
-`$ref`, conditional/composition keywords, JSON Forms rules, custom renderer
+Local `$ref` accepts only fragment JSON Pointers whose first RFC 6901-decoded
+token is `$defs`; the legacy `definitions` token is also accepted explicitly
+for compatibility. Deeper own-property paths below either root container are
+supported, including escaped `/` (`~1`) and `~` (`~0`) tokens. URI/remote,
+anchor, inherited-property, and pointers outside those two containers are not
+resolved. Definition containers are lookup-only and are omitted from the
+normalized output.
+
+References are resolved synchronously with a default maximum reference-chain
+depth of 16 and a maximum of 256 visited schema objects. Call
+`resolveJsonSchema(schema, { maxDepth, maxNodes })` to use lower application
+limits. The function never mutates or retains caller-owned arrays or objects;
+its result is a null-prototype, deeply frozen clone. Keywords beside `$ref`
+form a shallow overlay and take precedence when the target defines the same
+keyword. Remote/URI references, malformed or missing
+pointers, cycles, and limit overflow produce stable configuration diagnostics
+(`ref-remote`, `ref-pointer`, `ref-target`, `ref-cycle`, `ref-depth`, or
+`ref-budget`). A
+resolved target still has exactly the supported field and validation boundary
+above; `$ref` does not enable composition or arbitrary JSON Schema.
+
+Conditional/composition keywords, JSON Forms rules, custom renderer
 registries, localization, async schemas, file widgets, nested arrays, and UI
 layouts other than `VerticalLayout` remain unsupported. An unsupported schema
 or UI schema renders an explicit configuration error rather than silently

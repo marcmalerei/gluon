@@ -7,6 +7,11 @@ All notable changes to this package are documented in the root [Gluon changelog]
 ### Added
 
 - Added nested object fields and bounded array item editors with immutable data events, native form participation, validation, reset, state restore, and explicit fail-closed diagnostics for unsupported schema features.
+- Added the public `resolveJsonSchema()`, `JsonSchemaResolutionOptions`, and
+  `JsonSchemaResolutionError` contract for bounded synchronous local `$ref`
+  resolution below root `$defs` and legacy `definitions`, with RFC 6901 token
+  decoding, deeply immutable output, safe sibling precedence, and stable
+  diagnostics for unsafe or invalid references.
 
 ## [1.9.0] - 2026-08-15
 

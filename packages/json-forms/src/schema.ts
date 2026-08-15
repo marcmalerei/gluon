@@ -30,6 +30,9 @@ export interface JsonSchema {
   readonly readOnly?: boolean;
   readonly additionalProperties?: boolean;
   readonly $ref?: string;
+  readonly $defs?: Readonly<Record<string, JsonSchema>>;
+  /** Legacy JSON Schema definitions are accepted only for local references. */
+  readonly definitions?: Readonly<Record<string, JsonSchema>>;
   readonly oneOf?: readonly JsonSchema[];
   readonly anyOf?: readonly JsonSchema[];
   readonly allOf?: readonly JsonSchema[];
@@ -126,6 +129,151 @@ const defaultJsonFormsMessages = Object.freeze({
   validationMessage: (error: JsonFormValidationError, locale: string, formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string) => defaultValidationMessage(error, locale, formatNumber),
   configurationMessage: (error: JsonFormValidationError, locale: string, formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string) => defaultConfigurationMessage(error, locale, formatNumber),
 } satisfies Required<JsonFormsMessageOverrides>);
+const DEFAULT_REF_DEPTH = 16;
+const DEFAULT_REF_NODES = 256;
+
+export interface JsonSchemaResolutionOptions {
+  readonly maxDepth?: number;
+  readonly maxNodes?: number;
+}
+
+/**
+ * Resolves fragment-only RFC 6901 pointers below the root `$defs` or legacy
+ * `definitions` containers and returns a fully cloned, deeply frozen schema.
+ * Reference siblings are a shallow overlay and take precedence over targets.
+ */
+export function resolveJsonSchema(schema: JsonSchema, options: JsonSchemaResolutionOptions = {}): JsonSchema {
+  const maxDepth = options.maxDepth ?? DEFAULT_REF_DEPTH;
+  const maxNodes = options.maxNodes ?? DEFAULT_REF_NODES;
+  if (!Number.isInteger(maxDepth) || maxDepth < 0 || !Number.isInteger(maxNodes) || maxNodes < 1) {
+    throw new JsonSchemaResolutionError('ref-budget', 'JSON Schema maxDepth must be a non-negative integer and maxNodes must be a positive integer.');
+  }
+  let nodes = 0;
+  const activeTargets = new Set<object>();
+  const visit = (value: unknown, path: string, depth: number): JsonSchema => {
+    if (!isRecord(value)) {
+      throw new JsonSchemaResolutionError('ref-target', `JSON Schema reference target at "${path}" is not an object.`);
+    }
+    if (++nodes > maxNodes) throw new JsonSchemaResolutionError('ref-budget', `JSON Schema reference node budget exceeded at "${path}".`);
+    const refDescriptor = Object.getOwnPropertyDescriptor(value, '$ref');
+    if (refDescriptor) {
+      if (!('value' in refDescriptor) || typeof refDescriptor.value !== 'string') {
+        throw new JsonSchemaResolutionError('ref-pointer', `JSON Schema reference at "${path}" must be a string.`);
+      }
+      const ref = refDescriptor.value;
+      const tokens = parseLocalPointer(ref);
+      if (depth >= maxDepth) throw new JsonSchemaResolutionError('ref-depth', `JSON Schema reference depth exceeded at "${ref}".`);
+      const target = pointer(schema, tokens, ref);
+      if (!isRecord(target)) throw new JsonSchemaResolutionError('ref-target', `JSON Schema reference target is not an object: "${ref}".`);
+      if (activeTargets.has(target)) throw new JsonSchemaResolutionError('ref-cycle', `Cyclic JSON Schema reference: "${ref}".`);
+      activeTargets.add(target);
+      try {
+        return mergeSchemas(visit(target, ref, depth + 1), visitObject(value, path, depth, true));
+      } finally {
+        activeTargets.delete(target);
+      }
+    }
+    return Object.freeze(visitObject(value, path, depth, false)) as JsonSchema;
+  };
+  const visitObject = (input: Record<string, unknown>, path: string, depth: number, skipRef: boolean): Record<string, unknown> => {
+    const output = Object.create(null) as Record<string, unknown>;
+    for (const key of Object.keys(input)) {
+      if ((skipRef && key === '$ref') || key === '$defs' || key === 'definitions') continue;
+      const descriptor = Object.getOwnPropertyDescriptor(input, key);
+      if (!descriptor || !('value' in descriptor)) throw new JsonSchemaResolutionError('ref-pointer', `JSON Schema property at "${path}/${escapeJsonPointer(key)}" must be a data property.`);
+      const child = descriptor.value;
+      let resolved: unknown;
+      if (key === 'properties' && isRecord(child)) resolved = visitSchemaMap(child, `${path}/properties`, depth);
+      else if (key === 'items' && isRecord(child)) resolved = visit(child, `${path}/items`, depth);
+      else if ((key === 'oneOf' || key === 'anyOf' || key === 'allOf') && Array.isArray(child)) {
+        resolved = Object.freeze(child.map((item, index) => visit(item, `${path}/${key}/${index}`, depth)));
+      } else resolved = cloneAndFreeze(child, `${path}/${escapeJsonPointer(key)}`);
+      defineOwn(output, key, resolved);
+    }
+    return Object.freeze(output);
+  };
+  const visitSchemaMap = (input: Record<string, unknown>, path: string, depth: number): Readonly<Record<string, JsonSchema>> => {
+    const output = Object.create(null) as Record<string, JsonSchema>;
+    for (const key of Object.keys(input)) {
+      const descriptor = Object.getOwnPropertyDescriptor(input, key);
+      if (!descriptor || !('value' in descriptor)) throw new JsonSchemaResolutionError('ref-pointer', `JSON Schema property at "${path}/${escapeJsonPointer(key)}" must be a data property.`);
+      defineOwn(output, key, visit(descriptor.value, `${path}/${escapeJsonPointer(key)}`, depth));
+    }
+    return Object.freeze(output);
+  };
+  return visit(schema, '#', 0);
+}
+
+export class JsonSchemaResolutionError extends Error {
+  constructor(readonly keyword: string, message: string) { super(message); this.name = 'JsonSchemaResolutionError'; }
+}
+
+function parseLocalPointer(ref: string): readonly string[] {
+  if (!ref.startsWith('#')) throw new JsonSchemaResolutionError('ref-remote', `Remote JSON Schema references are not supported: "${ref}".`);
+  if (!ref.startsWith('#/')) throw new JsonSchemaResolutionError('ref-pointer', `Malformed local JSON Schema reference: "${ref}".`);
+  const tokens = ref.slice(2).split('/').map((token) => decodePointerToken(token, ref));
+  if (tokens.length < 2 || (tokens[0] !== '$defs' && tokens[0] !== 'definitions')) {
+    throw new JsonSchemaResolutionError('ref-pointer', `Local JSON Schema references must start with "#/$defs/" or "#/definitions/": "${ref}".`);
+  }
+  return Object.freeze(tokens);
+}
+
+function decodePointerToken(token: string, ref: string): string {
+  let decoded: string;
+  try { decoded = decodeURIComponent(token); } catch { throw new JsonSchemaResolutionError('ref-pointer', `Malformed local JSON Schema reference: "${ref}".`); }
+  let output = '';
+  for (let index = 0; index < decoded.length; index += 1) {
+    const character = decoded[index]!;
+    if (character !== '~') { output += character; continue; }
+    const escape = decoded[index + 1];
+    if (escape !== '0' && escape !== '1') throw new JsonSchemaResolutionError('ref-pointer', `Malformed RFC 6901 escape in JSON Schema reference: "${ref}".`);
+    output += escape === '0' ? '~' : '/';
+    index += 1;
+  }
+  return output;
+}
+
+function pointer(root: JsonSchema, tokens: readonly string[], ref: string): unknown {
+  let current: unknown = root;
+  for (const token of tokens) {
+    if ((typeof current !== 'object' && typeof current !== 'function') || current === null || !Object.hasOwn(current, token)) {
+      throw new JsonSchemaResolutionError('ref-pointer', `JSON Schema reference target is missing: "${ref}".`);
+    }
+    const descriptor = Object.getOwnPropertyDescriptor(current, token);
+    if (!descriptor || !('value' in descriptor)) throw new JsonSchemaResolutionError('ref-pointer', `JSON Schema reference target must use data properties: "${ref}".`);
+    current = descriptor.value;
+  }
+  return current;
+}
+
+function mergeSchemas(target: JsonSchema, siblings: Record<string, unknown>): JsonSchema {
+  const output = Object.create(null) as Record<string, unknown>;
+  for (const [key, value] of Object.entries(target)) defineOwn(output, key, value);
+  for (const [key, value] of Object.entries(siblings)) defineOwn(output, key, value);
+  return Object.freeze(output) as JsonSchema;
+}
+
+function cloneAndFreeze(value: unknown, path: string, active = new Set<object>()): unknown {
+  if (value === null || typeof value !== 'object') return value;
+  if (active.has(value)) throw new JsonSchemaResolutionError('ref-cycle', `Cyclic JSON value at "${path}".`);
+  active.add(value);
+  try {
+    if (Array.isArray(value)) return Object.freeze(value.map((item, index) => cloneAndFreeze(item, `${path}/${index}`, active)));
+    const output = Object.create(null) as Record<string, unknown>;
+    for (const key of Object.keys(value)) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (!descriptor || !('value' in descriptor)) throw new JsonSchemaResolutionError('ref-pointer', `JSON Schema property at "${path}/${escapeJsonPointer(key)}" must be a data property.`);
+      defineOwn(output, key, cloneAndFreeze(descriptor.value, `${path}/${escapeJsonPointer(key)}`, active));
+    }
+    return Object.freeze(output);
+  } finally {
+    active.delete(value);
+  }
+}
+
+function defineOwn(target: Record<string, unknown>, key: string, value: unknown): void {
+  Object.defineProperty(target, key, { value, enumerable: true, configurable: true, writable: true });
+}
 
 function isJsonValue(value: unknown): value is JsonValue {
   if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
@@ -229,6 +377,7 @@ export function freezeJson<Value extends JsonValue>(value: Value): Value {
 
 /** Adds object-property schema defaults without mutating caller-owned data. */
 export function applySchemaDefaults(schema: JsonSchema, data: JsonObject): JsonObject {
+  try { schema = resolveJsonSchema(schema); } catch { return cloneJson(data); }
   const properties = schema.properties ?? {};
   const next: Record<string, JsonValue> = { ...cloneJson(data) };
   for (const [name, property] of Object.entries(properties)) {
@@ -248,6 +397,20 @@ export function getJsonFormsConfigurationErrors(
   messages: JsonFormsMessageProvider = createJsonFormsMessageProvider(),
 ): readonly JsonFormValidationError[] {
   const errors: JsonFormValidationError[] = [];
+  try {
+    schema = resolveJsonSchema(schema);
+  } catch (error) {
+    const failure = error as JsonSchemaResolutionError;
+    const source = {
+      instancePath: '',
+      schemaPath: '',
+      keyword: failure.keyword,
+      message: failure.message,
+    } satisfies JsonFormValidationError;
+    return Object.freeze([
+      configurationError('', failure.keyword, messages.configurationMessage(source)),
+    ]);
+  }
   if (schema.type !== 'object') {
     errors.push(configurationError('/type', 'type', messages.configurationMessage({
       instancePath: '',
@@ -287,6 +450,7 @@ export function getJsonFormFields(
   schema: JsonSchema,
   uischema: JsonFormsUiSchema | undefined,
 ): readonly JsonFormField[] {
+  try { schema = resolveJsonSchema(schema); } catch { return Object.freeze([]); }
   const layout = getFieldLayout(uischema);
   const properties = schema.properties ?? {};
   const names = [...layout.order, ...Object.keys(properties).filter((name) => !layout.order.includes(name))];
@@ -300,6 +464,22 @@ export function validateJsonFormData(
   uischema?: JsonFormsUiSchema,
   messages: JsonFormsMessageProvider = createJsonFormsMessageProvider(),
 ): ValidationResult {
+  try {
+    schema = resolveJsonSchema(schema);
+  } catch (error) {
+    const failure = error as JsonSchemaResolutionError;
+    const source = {
+      instancePath: '',
+      schemaPath: '',
+      keyword: failure.keyword,
+      message: failure.message,
+    } satisfies JsonFormValidationError;
+    return Object.freeze({
+      errors: Object.freeze([
+        configurationError('', failure.keyword, messages.configurationMessage(source)),
+      ]),
+    });
+  }
   const configurationErrors = getJsonFormsConfigurationErrors(schema, uischema, messages);
   if (configurationErrors.length > 0) return Object.freeze({ errors: configurationErrors });
   try {
@@ -415,7 +595,7 @@ function validateSchemaNode(
   label: string,
   messages: JsonFormsMessageProvider,
 ): void {
-  const unsupportedKeywords = ['\$ref', 'oneOf', 'anyOf', 'allOf', 'not', 'if', 'then', 'else', 'patternProperties', 'dependencies', 'dependentSchemas', 'contains'];
+  const unsupportedKeywords = ['oneOf', 'anyOf', 'allOf', 'not', 'if', 'then', 'else', 'patternProperties', 'dependencies', 'dependentSchemas', 'contains'];
   for (const keyword of unsupportedKeywords) {
     if (keyword in schema) {
       errors.push(configurationError(`/${schemaPath.join('/')}/${keyword}`, 'unsupported', messages.configurationMessage({
