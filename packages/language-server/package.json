@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/language-server"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/language-server#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/language-server/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

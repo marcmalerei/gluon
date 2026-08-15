@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/vite"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/vite#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/vite/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

@@ -54,3 +54,18 @@ const syncSidebar = () => {
 };
 mobile.addEventListener('change', syncSidebar);
 syncSidebar();
+
+const packageSearch = document.querySelector('[data-package-search]');
+const packageCards = [...document.querySelectorAll('[data-package-card]')];
+const packageSearchStatus = document.querySelector('[data-package-search-status]');
+packageSearch?.addEventListener('input', () => {
+  if (!(packageSearch instanceof HTMLInputElement)) return;
+  const query = packageSearch.value.trim().toLocaleLowerCase();
+  let visible = 0;
+  for (const card of packageCards) {
+    const match = !query || (card.getAttribute('data-package-search-text') ?? '').toLocaleLowerCase().includes(query);
+    card.hidden = !match;
+    if (match) visible += 1;
+  }
+  if (packageSearchStatus) packageSearchStatus.textContent = `${visible} package${visible === 1 ? '' : 's'}`;
+});

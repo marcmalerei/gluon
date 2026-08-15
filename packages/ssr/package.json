@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/ssr"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/ssr#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/ssr/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

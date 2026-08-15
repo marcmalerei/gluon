@@ -32,6 +32,41 @@ for (const version of versions.supported) {
 }
 await access(resolve(outputRoot, 'archive/index.html'));
 await access(resolve(outputRoot, 'latest/index.html'));
+await access(resolve(outputRoot, versions.latest, 'packages/index.html'));
+
+const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
+const packageIndexHtml = await readFile(resolve(outputRoot, versions.latest, 'packages/index.html'), 'utf8');
+if ((packageIndexHtml.match(/data-package-card/g) ?? []).length !== currentPackages.length) {
+  throw new Error(`package portal lists ${(packageIndexHtml.match(/data-package-card/g) ?? []).length} packages; contract requires ${currentPackages.length}`);
+}
+for (const entry of currentPackages) {
+  const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
+  const packageHtml = await readFile(resolve(outputRoot, versions.latest, 'packages', packageSlug, 'index.html'), 'utf8');
+  const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
+  for (const required of [
+    `<title>${entry.name} · Gluon ${versions.latest}</title>`,
+    `<meta name="description" content="${escapeHtml(packageJson.description)}">`,
+    'Install and start',
+    'Public entry points',
+    'Dependencies and peers',
+    'Scope and limits',
+  ]) if (!packageHtml.includes(required)) throw new Error(`${entry.name} package portal is missing: ${required}`);
+}
+
+for (const entry of currentPackages) {
+  const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
+  const sourceRoot = entry.directory === '.' ? 'src' : `${entry.directory}/src`;
+  const html = await readFile(resolve(outputRoot, versions.latest, 'api/generated', sourceRoot, 'index.html'), 'utf8');
+  if (!html.includes(`<title>${escapeHtml(entry.name)} · Gluon ${versions.latest}</title>`)) {
+    throw new Error(`${entry.name} API landing page has no package-specific title`);
+  }
+  if (!html.includes(`<meta name="description" content="${escapeHtml(packageJson.description)}">`)) {
+    throw new Error(`${entry.name} API landing page has no package-specific description`);
+  }
+  if (!html.includes(`>${escapeHtml(entry.name)}</a>`)) {
+    throw new Error(`${entry.name} API landing page has no package-specific breadcrumb`);
+  }
+}
 await access(resolve(outputRoot, 'assets/docs.css'));
 await access(resolve(outputRoot, 'assets/docs.js'));
 const docsStyles = await readFile(resolve(outputRoot, 'assets/docs.css'), 'utf8');
@@ -46,22 +81,6 @@ const apiIndex = await readFile(resolve(root, '.tmp/docs-api/README.md'), 'utf8'
 const documentedEntryPoints = (apiIndex.match(/^- \[[^\]]+\]\([^\)]+README\.md\)$/gm) ?? []).length;
 if (documentedEntryPoints !== expectedEntryPoints) {
   throw new Error(`API reference documents ${documentedEntryPoints} entry points; package contract requires ${expectedEntryPoints}`);
-}
-
-for (const entry of packageContract.packages.filter((candidate) => candidate.state === 'current')) {
-  const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
-  const sourceRoot = entry.directory === '.' ? 'src' : `${entry.directory}/src`;
-  const htmlPath = resolve(outputRoot, versions.latest, 'api/generated', sourceRoot, 'index.html');
-  const html = await readFile(htmlPath, 'utf8');
-  if (!html.includes(`<title>${escapeHtml(entry.name)} · Gluon ${versions.latest}</title>`)) {
-    throw new Error(`${entry.name} API landing page has no package-specific title`);
-  }
-  if (!html.includes(`<meta name="description" content="${escapeHtml(packageJson.description)}">`)) {
-    throw new Error(`${entry.name} API landing page has no package-specific description`);
-  }
-  if (!html.includes(`>${escapeHtml(entry.name)}</a>`)) {
-    throw new Error(`${entry.name} API landing page has no package-specific breadcrumb`);
-  }
 }
 
 const apiExampleManifest = JSON.parse(await readFile(resolve(root, '.tmp/api-examples/manifest.json'), 'utf8'));

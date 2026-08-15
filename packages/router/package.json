@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/router"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/router#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/router/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

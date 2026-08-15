@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/json-forms"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/json-forms#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/json-forms/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },
