@@ -89,8 +89,8 @@
       ]
     },
     "after": {
-      "rawBytes": 37464,
-      "gzipBytes": 5550,
+      "rawBytes": 37664,
+      "gzipBytes": 5572,
       "moduleCount": 27,
       "modules": [
         "packages/atoms/src/button-styles.ts",
