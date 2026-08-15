@@ -5,6 +5,8 @@ and deployment.
 
 [Get started](/gluon/1.8.1/guides/getting-started/) [Browse API →](/gluon/1.8.1/api/)
 
+[Support matrix](/gluon/1.8.1/reference/support-matrix/) · [Package portal](/gluon/1.8.1/packages/)
+
 First framework project? Use the
 [junior learning path](/gluon/1.8.1/guides/learning-path/) for a progressive
 feature and plain-language glossary.

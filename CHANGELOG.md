@@ -7,6 +7,11 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Documentation
+
+- Published the versioned accessibility and compatibility support matrix with
+  package-specific runtime boundaries and explicit evidence limits.
+
 ## [1.8.1] - 2026-08-12
 
 ### Added

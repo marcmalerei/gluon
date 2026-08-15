@@ -210,6 +210,7 @@
     "check:shop-performance": "npm run build:core && npm run build:compiler && npm run build:vite && npm run benchmark:shop-flow",
     "check:budgets": "npm run build:shop && npm run check:quality-budgets",
     "check:docs": "npm run typecheck:docs && npm run build:docs && node scripts/validate-docs.mjs",
+    "check:support-matrix": "node scripts/validate-support-matrix.mjs",
     "release:bootstrap:artifacts": "node scripts/build-npm-bootstrap-artifacts.mjs",
     "release:bootstrap:publish": "node scripts/publish-npm-bootstrap.mjs --directory .tmp/npm-bootstrap",
     "release:validate": "node scripts/validate-release-contract.mjs",

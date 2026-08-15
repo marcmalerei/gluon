@@ -13,6 +13,9 @@ Use the [package portal](/gluon/1.8.1/packages/) to compare every current
 package's purpose, runtime, installation command, peers, public exports, and
 supported scope before opening generated symbol documentation.
 
+See the [accessibility and compatibility support matrix](/gluon/1.8.1/reference/support-matrix/)
+for the evidence boundary shared by the package portal and release line.
+
 ## Runtime
 
 - [`@gluonjs/core`](generated/src/)
