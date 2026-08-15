@@ -28,7 +28,7 @@ const meta = {
 } satisfies Meta<{ summary: string; status: string; action: string; state: 'ready' | 'loading' | 'disabled' | 'error' }>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<{ summary: string; status: string; action: string; state: 'ready' | 'loading' | 'disabled' | 'error' }>;
 export const Default: Story = {};
 export const Ready: Story = {};
 export const Loading: Story = { args: { state: 'loading', status: 'Saving…' } };
@@ -36,7 +36,7 @@ export const Disabled: Story = { args: { state: 'disabled', status: 'Unavailable
 export const Error: Story = { args: { state: 'error', status: 'Please fix the highlighted field.' } };
 export const LongLabel: Story = { args: { summary: 'A deliberately long summary that must wrap without hiding the focused field.', action: 'Continue to the next step' } };
 export const Zoom200: Story = { name: '200% zoom', args: { summary: 'Long label at 200% text zoom', action: 'Continue to the next step' }, parameters: { viewport: { defaultViewport: 'mobile1' } } };
-export const SafeArea: Story = { name: 'safe-area', args: { summary: 'Safe-area padded action', status: 'Ready on a notched device' } };
+export const SafeArea: Story = { name: 'safe-area contract', args: { summary: 'Safe-area padded action', status: 'Safe-area padding is application/device dependent' } };
 export const FocusedInput: Story = { name: 'focused input', play: async ({ canvasElement }) => { canvasElement.querySelector<HTMLInputElement>('input')?.focus(); } };
 
 export const parameters = { a11y: { test: 'error' }, controls: { expanded: true } };

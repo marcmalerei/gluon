@@ -28,6 +28,11 @@ export const responsiveActionBarStyles = css`
     :where(.gluon-responsive-action-bar-action) { display: flex; min-inline-size: 0; justify-content: end; }
     :where(.gluon-responsive-action-bar-action > *) { min-inline-size: min(12rem, 100%); min-block-size: 44px; }
     :where(.gluon-responsive-action-bar-compact) { display: none; min-block-size: 44px; }
+    @media (max-width: 30rem) {
+      :where(.gluon-responsive-action-bar) { grid-template-columns: minmax(0, 1fr); }
+      :where(.gluon-responsive-action-bar-action) { grid-column: 1 / -1; }
+      :where(.gluon-responsive-action-bar-action > *) { inline-size: 100%; }
+    }
     :where(.gluon-responsive-action-bar[data-state="loading"]) { cursor: wait; }
     :where(.gluon-responsive-action-bar[data-state="disabled"]) { cursor: not-allowed; }
     @media (min-width: 48rem) {
