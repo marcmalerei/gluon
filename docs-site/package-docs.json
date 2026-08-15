@@ -1,0 +1,530 @@
+{
+  "version": 1,
+  "packages": [
+    {
+      "name": "@gluonjs/reactivity",
+      "purpose": "DOM-free reactive state primitives for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { computed, effect, reactive, ref } from '@gluonjs/reactivity';\n\nconst count = ref(1);\nconst state = reactive({ multiplier: 2 });\nconst total = computed(() => count.value * state.multiplier);\n\neffect(() => {\n  console.log(total.value);\n});"
+      },
+      "useCases": [
+        "Shared reactive state in browser, Node, and SSR code.",
+        "Signals-style derived state and side effects.",
+        "Core runtime ownership for packages that depend on reactive state."
+      ],
+      "limits": [
+        "Does not provide DOM, component, router, or store APIs.",
+        "Applications that need object lifetime, templating, or elements must use the owning package."
+      ],
+      "relatedGuides": [
+        { "label": "API reference", "href": "/gluon/latest/api/" },
+        { "label": "Application runtime", "href": "/gluon/latest/guides/application/" }
+      ],
+      "integrationNotes": [
+        "Peer dependencies include `@preact/signals-core` and `signal-polyfill`.",
+        "Package manifest exports `.` plus `./signals` and `./preact-signals`."
+      ]
+    },
+    {
+      "name": "@gluonjs/compiler",
+      "purpose": "Source transforms and template location tracking for Gluon tooling.",
+      "starter": {
+        "language": "ts",
+        "code": "import {\n  transformGluonModule,\n  type GluonTransformResult,\n} from '@gluonjs/compiler';\n\nconst source = `\n  import { html } from '@gluonjs/core';\n  export const ProductName = (name: string) => html\\`<h1>\\${name}</h1>\\`;\n`;\n\nconst result: GluonTransformResult = transformGluonModule(\n  source,\n  '/src/product-name.ts',\n  { development: true },\n);\n\nconsole.log(result.templates[0]?.tag); // \"html\"\nconsole.log(result.diagnostics); // source-located compiler diagnostics"
+      },
+      "useCases": [
+        "Track `html`, `svg`, `css`, and aliased `compose()` tagged templates.",
+        "Produce source maps and decorator transforms for tooling.",
+        "Support downstream Vite and language tooling packages."
+      ],
+      "limits": [
+        "Does not render templates or own runtime application state.",
+        "Does not replace the public component model with a private renderer format."
+      ],
+      "relatedGuides": [
+        { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" },
+        { "label": "Diagnostics", "href": "/gluon/latest/reference/diagnostics/" }
+      ],
+      "integrationNotes": [
+        "Used by `@gluonjs/vite` and `@gluonjs/language-server`.",
+        "Public export surface includes `.` and `./diagnostics`."
+      ]
+    },
+    {
+      "name": "@gluonjs/core",
+      "purpose": "Browser runtime and component ownership boundary for Gluon applications.",
+      "starter": {
+        "language": "ts",
+        "code": "import { createApp, html } from '@gluonjs/core';\n\ncreateApp(() => html`<main>Hello Gluon</main>`).mount(document.body);"
+      },
+      "useCases": [
+        "Functional components and stateful custom elements.",
+        "Application mounting, rendering, and event ownership.",
+        "Style transport and public component helpers."
+      ],
+      "limits": [
+        "Does not bundle application features such as routing or storage.",
+        "Applications should import only public entry points, not repository source paths."
+      ],
+      "relatedGuides": [
+        { "label": "Getting started", "href": "/gluon/latest/guides/getting-started/" },
+        { "label": "Components", "href": "/gluon/latest/guides/components/" }
+      ],
+      "integrationNotes": [
+        "Exports `.` plus `./decorators` and `./styles`.",
+        "Owns the browser-only runtime boundary consumed by multiple packages."
+      ]
+    },
+    {
+      "name": "@gluonjs/router",
+      "purpose": "Official Gluon router with browser, hash, and memory histories.",
+      "starter": {
+        "language": "ts",
+        "code": "import { createRouter } from '@gluonjs/router';\n\nconst router = createRouter({\n  routes: [{ path: '/', component: () => import('./home.js') }],\n});"
+      },
+      "useCases": [
+        "Named routes, guards, lazy routes, and scroll restoration.",
+        "Browser, hash, and memory history strategies.",
+        "Application bindings that share the Gluon runtime context."
+      ],
+      "limits": [
+        "Does not own component rendering or application state storage.",
+        "History selection and guards live at the router boundary."
+      ],
+      "relatedGuides": [
+        { "label": "Application runtime", "href": "/gluon/latest/guides/application/" },
+        { "label": "Universal rendering", "href": "/gluon/latest/guides/universal-rendering/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core` and `@gluonjs/reactivity`.",
+        "Package exports `.` and `./memory`."
+      ]
+    },
+    {
+      "name": "@gluonjs/store",
+      "purpose": "Typed, application-scoped state management without a DOM dependency.",
+      "starter": {
+        "language": "ts",
+        "code": "import { createStoreManager, defineStore } from '@gluonjs/store';\n\nconst counter = defineStore('counter', () => ({ count: 0 }), {\n  increment(state) { state.count += 1; },\n});"
+      },
+      "useCases": [
+        "Shared state, getters, and actions for browser or server code.",
+        "Application-scoped store instances with typed inference.",
+        "Structured state ownership in larger Gluon apps."
+      ],
+      "limits": [
+        "Does not provide DOM access or component templating.",
+        "Applications needing reactive presentation still depend on Core and Reactivity."
+      ],
+      "relatedGuides": [
+        { "label": "Application", "href": "/gluon/latest/guides/application/" },
+        { "label": "Store", "href": "/gluon/latest/reference/support-matrix/" }
+      ],
+      "integrationNotes": [
+        "Peers on `@gluonjs/reactivity`.",
+        "Used by SSR and test utilities for application state scenarios."
+      ]
+    },
+    {
+      "name": "@gluonjs/i18n",
+      "purpose": "Locale-aware messages and lazy namespace loading for Gluon applications.",
+      "starter": {
+        "language": "ts",
+        "code": "import { createI18n, useI18n } from '@gluonjs/i18n';\n\nconst i18n = createI18n({ locale: 'en', fallbackLocale: 'en' });"
+      },
+      "useCases": [
+        "Translated messages for application UI.",
+        "Lazy-loaded locale namespaces and ready-state tracking.",
+        "Reactive language switching in browser apps."
+      ],
+      "limits": [
+        "Does not own routing, storage, or component rendering.",
+        "Applications without translated strings do not need this package."
+      ],
+      "relatedGuides": [
+        { "label": "Application runtime", "href": "/gluon/latest/guides/application/" },
+        { "label": "Components", "href": "/gluon/latest/guides/components/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core` and `@gluonjs/reactivity`.",
+        "Browser package with a single public export."
+      ]
+    },
+    {
+      "name": "@gluonjs/ssr",
+      "purpose": "DOM-independent server rendering and request isolation for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { renderToString } from '@gluonjs/ssr';\nimport { html } from '@gluonjs/core';\n\nconst markup = await renderToString(html`<main>Hello</main>`);"
+      },
+      "useCases": [
+        "Server rendering, streaming, static generation, and hydration handoff.",
+        "Request-local effect scopes and declarative ShadowRoot output.",
+        "Shared public component definitions between browser and server."
+      ],
+      "limits": [
+        "Does not replace browser ownership or client hydration logic.",
+        "Rendered output still depends on public component definitions."
+      ],
+      "relatedGuides": [
+        { "label": "Universal rendering", "href": "/gluon/latest/guides/universal-rendering/" },
+        { "label": "Hydration", "href": "/gluon/latest/reference/hydration/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core`, `@gluonjs/reactivity`, `@gluonjs/router`, and `@gluonjs/store`.",
+        "Exports `.` plus `./eleventy`, `./hydration`, `./static`, and `./streaming`."
+      ]
+    },
+    {
+      "name": "@gluonjs/vite",
+      "purpose": "Official Vite integration and state-preserving HMR for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { defineConfig } from 'vite';\nimport gluon from '@gluonjs/vite';\n\nexport default defineConfig({ plugins: [gluon()] });"
+      },
+      "useCases": [
+        "Template source maps, development diagnostics, and HMR.",
+        "Build-time integration for Gluon applications.",
+        "Tooling support for browser-oriented packages."
+      ],
+      "limits": [
+        "Does not own application runtime state or rendering semantics.",
+        "Requires Vite and the public Core package."
+      ],
+      "relatedGuides": [
+        { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" },
+        { "label": "Deployment", "href": "/gluon/latest/guides/deployment/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/compiler` and peers on `@gluonjs/core` plus `vite`.",
+        "Public export surface is `.`."
+      ]
+    },
+    {
+      "name": "@gluonjs/gluon-components-vite",
+      "purpose": "Official Storybook renderer and Vite framework for Gluon components.",
+      "starter": {
+        "language": "ts",
+        "code": "import type { StorybookConfig } from '@gluonjs/gluon-components-vite';\n\nconst config = {\n  stories: ['../src/**/*.stories.ts'],\n  framework: '@gluonjs/gluon-components-vite',\n} satisfies StorybookConfig;\n\nexport default config;"
+      },
+      "useCases": [
+        "Storybook rendering for Gluon component libraries.",
+        "Renderer-owned DOM and stylesheet cleanup when stories change.",
+        "Preview, preset, and renderer-preset integration."
+      ],
+      "limits": [
+        "Does not replace the component library or application runtime.",
+        "Requires Storybook and Vite in the host project."
+      ],
+      "relatedGuides": [
+        { "label": "Components", "href": "/gluon/latest/guides/components/" },
+        { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core` and peers on Storybook plus Vite.",
+        "Exports `.` plus `./entry-preview`, `./preset`, and `./renderer-preset`."
+      ]
+    },
+    {
+      "name": "@gluonjs/test-utils",
+      "purpose": "Black-box component and application test helpers for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { afterEach, expect, it } from 'vitest';\nimport { html } from '@gluonjs/core';\nimport { cleanupFixtures, mountComponent } from '@gluonjs/test-utils';"
+      },
+      "useCases": [
+        "Browser-based mounting of public components and applications.",
+        "Test cleanup helpers and SSR-specific test helpers.",
+        "User-facing behavior checks without private runtime imports."
+      ],
+      "limits": [
+        "Targets the supported browser matrix rather than Node-only unit tests.",
+        "Does not expose private framework internals."
+      ],
+      "relatedGuides": [
+        { "label": "Quality", "href": "/gluon/latest/guides/quality/" },
+        { "label": "Components", "href": "/gluon/latest/guides/components/" }
+      ],
+      "integrationNotes": [
+        "Depends on Core, Reactivity, Router, SSR, and Store.",
+        "Exports `.` and `./ssr`."
+      ]
+    },
+    {
+      "name": "@gluonjs/devtools-api",
+      "purpose": "Versioned, environment-neutral Gluon Devtools protocol.",
+      "starter": {
+        "language": "ts",
+        "code": "import { DevtoolsProtocol } from '@gluonjs/devtools-api';\n\nconst protocol = new DevtoolsProtocol();\nprotocol.handshake();"
+      },
+      "useCases": [
+        "Inspector, overlay, and editor integrations that exchange structured records.",
+        "Protocol handshakes and capability gating across environments.",
+        "Independent application timelines and snapshots."
+      ],
+      "limits": [
+        "Does not render UI or own a browser bridge by itself.",
+        "Protocol consumers must validate capability compatibility."
+      ],
+      "relatedGuides": [
+        { "label": "Devtools", "href": "/gluon/latest/guides/tooling/" },
+        { "label": "Diagnostics", "href": "/gluon/latest/reference/diagnostics/" }
+      ],
+      "integrationNotes": [
+        "Single public export `.`.",
+        "Used by `@gluonjs/devtools`."
+      ]
+    },
+    {
+      "name": "@gluonjs/devtools",
+      "purpose": "Opt-in Gluon development bridge, browser inspector, and Vite integration.",
+      "starter": {
+        "language": "ts",
+        "code": "import { createDevtoolsBridge, mountGluonDevtools } from '@gluonjs/devtools';\n\nconst bridge = createDevtoolsBridge({ enabled: true });"
+      },
+      "useCases": [
+        "Development-only inspection of application, component, render, Router, and Store state.",
+        "Explicit opt-in bridges and app-root registration.",
+        "Browser inspector integration with optional Vite support."
+      ],
+      "limits": [
+        "Disabled by default and never exposes a global automatically.",
+        "Development tooling only; not part of production app behavior."
+      ],
+      "relatedGuides": [
+        { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" },
+        { "label": "Quality", "href": "/gluon/latest/guides/quality/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core` and `@gluonjs/devtools-api`.",
+        "Peers on `vite`."
+      ]
+    },
+    {
+      "name": "@gluonjs/graph",
+      "purpose": "Interactive, dependency-free network graph Custom Element for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import '@gluonjs/graph';\n\nconst graph = document.querySelector('gluon-graph');"
+      },
+      "useCases": [
+        "Canvas-backed graph visualization with deterministic layouts.",
+        "Pan, zoom, selection, and link rendering owned by the element.",
+        "Optional knowledge-map and dependency-map views."
+      ],
+      "limits": [
+        "Does not own graph data modeling or filtering controls.",
+        "Consumers must provide their own labels and persistence."
+      ],
+      "relatedGuides": [
+        { "label": "Components", "href": "/gluon/latest/guides/components/" },
+        { "label": "Application", "href": "/gluon/latest/guides/application/" }
+      ],
+      "integrationNotes": [
+        "Peers on `@gluonjs/core`.",
+        "Browser package with a single public export."
+      ]
+    },
+    {
+      "name": "@gluonjs/language-server",
+      "purpose": "Gluon template language service, LSP server, and CI checker.",
+      "starter": {
+        "language": "sh",
+        "code": "gluon-language-server\n# or\n gluon-project-analyze ."
+      },
+      "useCases": [
+        "Static analysis for imported templates and alias-aware tagged templates.",
+        "Language server, project analyzer, and CI template checks.",
+        "Diagnostics without evaluating application code."
+      ],
+      "limits": [
+        "Does not execute project code or modify source files.",
+        "Reports evidence records rather than browser behavior."
+      ],
+      "relatedGuides": [
+        { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" },
+        { "label": "Quality", "href": "/gluon/latest/guides/quality/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/compiler`.",
+        "Exports `.` and ships `gluon-language-server`, `gluon-project-analyze`, and `gluon-template-check` binaries."
+      ]
+    },
+    {
+      "name": "@gluonjs/vue-migration-analyzer",
+      "purpose": "Static, report-only Vue 3.5 migration inventory for Gluon.",
+      "starter": {
+        "language": "sh",
+        "code": "gluon-vue-analyze .\ngluon-vue-analyze . --format json"
+      },
+      "useCases": [
+        "Inventory Vue source surfaces without executing project code.",
+        "Report-only migration evidence for the Gluon Vue cutover path.",
+        "Schema-backed CLI analysis for repository reviews."
+      ],
+      "limits": [
+        "Does not generate Gluon source or modify files.",
+        "Does not establish behavioral equivalence."
+      ],
+      "relatedGuides": [
+        { "label": "Vue migration analyzer", "href": "/gluon/latest/migration/vue-analyzer/" },
+        { "label": "Vue cutover", "href": "/gluon/latest/migration/vue-to-gluon-cutover/" }
+      ],
+      "integrationNotes": [
+        "Exports `.` and `./schema`.",
+        "Ships the `gluon-vue-analyze` binary."
+      ]
+    },
+    {
+      "name": "@gluonjs/quarks",
+      "purpose": "Typed native-element factories and headless interaction primitives for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { Dialog, Listbox, createFocusScope, q } from '@gluonjs/quarks';"
+      },
+      "useCases": [
+        "Factory helpers for native elements and headless behavior primitives.",
+        "Semantic building blocks without inventing roles or names.",
+        "Low-level interaction helpers for higher UI packages."
+      ],
+      "limits": [
+        "Does not create accessibility semantics on behalf of callers.",
+        "Callers remain responsible for roles, names, and labels."
+      ],
+      "relatedGuides": [
+        { "label": "Components", "href": "/gluon/latest/guides/components/" },
+        { "label": "Accessibility", "href": "/gluon/latest/reference/support-matrix/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core`.",
+        "Browser package with one public export."
+      ]
+    },
+    {
+      "name": "@gluonjs/atoms",
+      "purpose": "Accessible focused UI primitives and reusable Gluon theme styles.",
+      "starter": {
+        "language": "ts",
+        "code": "import { Button, Checkbox, Input, Select, Textarea, installUi } from '@gluonjs/atoms';\n\nconst ui = installUi(document, { theme: 'light' });"
+      },
+      "useCases": [
+        "Focused UI primitives and shared theming boundaries.",
+        "Accessible form controls and theme installation.",
+        "Shared styles for browser-facing Gluon interfaces."
+      ],
+      "limits": [
+        "Does not own larger compositions or app shell layout.",
+        "Depends on Quarks for native primitives and Core for runtime ownership."
+      ],
+      "relatedGuides": [
+        { "label": "Components", "href": "/gluon/latest/guides/components/" },
+        { "label": "Accessibility", "href": "/gluon/latest/reference/support-matrix/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core` and `@gluonjs/quarks`.",
+        "Browser package with a single public export."
+      ]
+    },
+    {
+      "name": "@gluonjs/molecules",
+      "purpose": "Accessible reusable UI compositions for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { Accordion, ButtonGroup, Card, ChoiceGroup } from '@gluonjs/molecules';"
+      },
+      "useCases": [
+        "Reusable mid-level compositions built from Core, Quarks, and Atoms.",
+        "Form fields, control groups, notice surfaces, and dialog patterns.",
+        "Composition helpers that preserve native ownership."
+      ],
+      "limits": [
+        "Does not replace application-specific structure or business logic.",
+        "Some components rely on caller-provided heading and labeling hierarchy."
+      ],
+      "relatedGuides": [
+        { "label": "Components", "href": "/gluon/latest/guides/components/" },
+        { "label": "Component decisions", "href": "/gluon/latest/guides/component-decisions/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core`, `@gluonjs/quarks`, and `@gluonjs/atoms`.",
+        "Browser package with one public export."
+      ]
+    },
+    {
+      "name": "@gluonjs/organisms",
+      "purpose": "Accessible larger interface structures for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { AppShell } from '@gluonjs/organisms';"
+      },
+      "useCases": [
+        "App shell and larger layout structures built from lower-level packages.",
+        "Landmarks, navigation, and responsive composition.",
+        "Structured interface regions for browser apps."
+      ],
+      "limits": [
+        "Does not generate content that the caller has not supplied.",
+        "Layout remains dependent on consumer-owned content and semantics."
+      ],
+      "relatedGuides": [
+        { "label": "Application", "href": "/gluon/latest/guides/application/" },
+        { "label": "Components", "href": "/gluon/latest/guides/components/" }
+      ],
+      "integrationNotes": [
+        "Depends on `@gluonjs/core`, `@gluonjs/quarks`, `@gluonjs/atoms`, and `@gluonjs/molecules`.",
+        "Browser package with one public export."
+      ]
+    },
+    {
+      "name": "@gluonjs/json-forms",
+      "purpose": "Schema-driven, form-associated Custom Elements for Gluon.",
+      "starter": {
+        "language": "ts",
+        "code": "import { registerJsonForms } from '@gluonjs/json-forms';\n\nregisterJsonForms();"
+      },
+      "useCases": [
+        "Accessible form rendering from a documented JSON Schema subset.",
+        "AJV-backed validation and form-associated custom elements.",
+        "Optional schema-driven UI inside browser applications."
+      ],
+      "limits": [
+        "Does not enter the core package runtime.",
+        "Schema rendering is intentionally limited to the documented subset."
+      ],
+      "relatedGuides": [
+        { "label": "Forms", "href": "/gluon/latest/reference/forms/" },
+        { "label": "Application", "href": "/gluon/latest/guides/application/" }
+      ],
+      "integrationNotes": [
+        "Depends on AJV and `ajv-formats` plus `@gluonjs/core`.",
+        "Browser package with one public export."
+      ]
+    },
+    {
+      "name": "create-gluon",
+      "purpose": "Scaffold Gluon TypeScript applications and verified app-local components.",
+      "starter": {
+        "language": "sh",
+        "code": "npm create gluon@latest my-app"
+      },
+      "useCases": [
+        "Project scaffolding with public Gluon package entry points.",
+        "Adding verified app-local component boundaries to an existing project.",
+        "CLI-driven local project setup."
+      ],
+      "limits": [
+        "Does not provide a runtime package or browser component API.",
+        "Scaffolded projects must still follow the public-boundary rules."
+      ],
+      "relatedGuides": [
+        { "label": "Getting started", "href": "/gluon/latest/guides/getting-started/" },
+        { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" }
+      ],
+      "integrationNotes": [
+        "Ships the `create-gluon` binary.",
+        "Package manifest has a single public export."
+      ]
+    }
+  ]
+}

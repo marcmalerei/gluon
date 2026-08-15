@@ -6,7 +6,9 @@ const siteRoot = resolve(root, 'docs-site');
 const outputRoot = resolve(siteRoot, 'dist');
 const versions = JSON.parse(await readFile(resolve(siteRoot, 'versions.json'), 'utf8'));
 const packageContract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
+const packageDocs = JSON.parse(await readFile(resolve(siteRoot, 'package-docs.json'), 'utf8'));
 const base = '/gluon/';
+validatePackageDocs(packageDocs, packageContract);
 
 if (!versions.supported.includes(versions.latest)) {
   throw new Error(`documentation latest ${versions.latest} is not a supported version`);
@@ -40,18 +42,56 @@ const packageIndexHtml = await readFile(resolve(outputRoot, versions.latest, 'pa
 if ((packageIndexHtml.match(/data-package-card/g) ?? []).length !== currentPackages.length) {
   throw new Error(`package portal lists ${(packageIndexHtml.match(/data-package-card/g) ?? []).length} packages; contract requires ${currentPackages.length}`);
 }
+if (!packageIndexHtml.includes('public entry points')) {
+  throw new Error('package portal index must name the displayed metric as public entry points.');
+}
 for (const entry of currentPackages) {
   const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
   const packageHtml = await readFile(resolve(outputRoot, versions.latest, 'packages', packageSlug, 'index.html'), 'utf8');
   const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
+  const docsEntry = packageDocs.packages.find((candidate) => candidate.name === entry.name);
   for (const required of [
     `<title>${entry.name} · Gluon ${versions.latest}</title>`,
     `<meta name="description" content="${escapeHtml(packageJson.description)}">`,
     'Install and start',
+    'Purpose',
+    'Use cases',
     'Public entry points',
     'Dependencies and peers',
     'Scope and limits',
+    'Related guides',
+    'Verified integration notes',
   ]) if (!packageHtml.includes(required)) throw new Error(`${entry.name} package portal is missing: ${required}`);
+  if (!docsEntry) throw new Error(`package docs are missing for ${entry.name}`);
+  if (!packageHtml.includes(escapeHtml(docsEntry.starter.code))) {
+    throw new Error(`${entry.name} package portal does not render the documented starter code.`);
+  }
+  if (!packageHtml.includes(`>${escapeHtml(docsEntry.starter.language)}<`)) {
+    throw new Error(`${entry.name} package portal does not render the documented starter language.`);
+  }
+  if (!packageHtml.includes(escapeHtml(docsEntry.purpose))) {
+    throw new Error(`${entry.name} package portal does not render the documented purpose.`);
+  }
+  for (const item of docsEntry.useCases) {
+    if (!packageHtml.includes(`<li>${escapeHtml(item)}</li>`)) {
+      throw new Error(`${entry.name} package portal does not render use case ${item}.`);
+    }
+  }
+  for (const item of docsEntry.limits) {
+    if (!packageHtml.includes(`<li>${escapeHtml(item)}</li>`)) {
+      throw new Error(`${entry.name} package portal does not render scope limit ${item}.`);
+    }
+  }
+  for (const item of docsEntry.integrationNotes) {
+    if (!packageHtml.includes(`<li>${escapeHtml(item)}</li>`)) {
+      throw new Error(`${entry.name} package portal does not render integration note ${item}.`);
+    }
+  }
+  for (const guide of docsEntry.relatedGuides) {
+    if (!packageHtml.includes(`href="${guide.href}"`) || !packageHtml.includes(`>${escapeHtml(guide.label)}<`)) {
+      throw new Error(`${entry.name} package portal does not render related guide ${guide.label} -> ${guide.href}.`);
+    }
+  }
 }
 
 for (const entry of currentPackages) {
@@ -380,3 +420,65 @@ async function filesWithExtension(directory, extension) {
 
 function slash(value) { return value.split(sep).join('/'); }
 function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
+
+function validatePackageDocs(packageDocs, packageContract) {
+  if (!packageDocs || packageDocs.version !== 1 || !Array.isArray(packageDocs.packages)) {
+    throw new Error('docs-site/package-docs.json must contain version 1 and a packages array.');
+  }
+  const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
+  if (packageDocs.packages.length !== currentPackages.length) {
+    throw new Error(`docs-site/package-docs.json must describe ${currentPackages.length} current packages.`);
+  }
+  const names = new Set();
+  for (const entry of packageDocs.packages) {
+    if (names.has(entry.name)) throw new Error(`docs-site/package-docs.json contains duplicate package metadata for ${entry.name}.`);
+    names.add(entry.name);
+    if (!currentPackages.some((pkg) => pkg.name === entry.name)) {
+      throw new Error(`docs-site/package-docs.json contains unknown package ${entry.name}.`);
+    }
+    for (const field of ['name', 'purpose', 'starter', 'useCases', 'limits', 'relatedGuides', 'integrationNotes']) {
+      if (!(field in entry)) throw new Error(`docs-site/package-docs.json is missing ${field} for ${entry.name}.`);
+    }
+    if (!isTrimmedNonEmptyString(entry.purpose)) {
+      throw new Error(`docs-site/package-docs.json purpose must be a non-empty trimmed string for ${entry.name}.`);
+    }
+    if (!isTrimmedNonEmptyString(entry.starter?.language) || !isTrimmedNonEmptyString(entry.starter?.code)) {
+      throw new Error(`docs-site/package-docs.json starter metadata must include non-empty trimmed language and code for ${entry.name}.`);
+    }
+    for (const listName of ['useCases', 'limits', 'integrationNotes']) {
+      if (!Array.isArray(entry[listName]) || entry[listName].length === 0 || entry[listName].some((value) => !isTrimmedNonEmptyString(value))) {
+        throw new Error(`docs-site/package-docs.json ${listName} must be a non-empty array of non-empty trimmed strings for ${entry.name}.`);
+      }
+    }
+    if (!Array.isArray(entry.relatedGuides) || entry.relatedGuides.length === 0) {
+      throw new Error(`docs-site/package-docs.json relatedGuides must be a non-empty list of {label, href} objects for ${entry.name}.`);
+    }
+    const relatedLabels = new Set();
+    const relatedHrefs = new Set();
+    for (const guide of entry.relatedGuides) {
+      if (!isTrimmedNonEmptyString(guide?.label) || !isTrimmedNonEmptyString(guide?.href)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides entries must include trimmed label and href strings for ${entry.name}.`);
+      }
+      if (!isSupportedGuideHref(guide.href)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides href must use a versioned Gluon docs path for ${entry.name}: ${guide.href}`);
+      }
+      if (relatedLabels.has(guide.label)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides contains duplicate label ${guide.label} for ${entry.name}.`);
+      }
+      if (relatedHrefs.has(guide.href)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides contains duplicate href ${guide.href} for ${entry.name}.`);
+      }
+      relatedLabels.add(guide.label);
+      relatedHrefs.add(guide.href);
+    }
+  }
+}
+
+function isTrimmedNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0 && value === value.trim();
+}
+
+function isSupportedGuideHref(href) {
+  return /^\/gluon\/(?:latest|\d+\.\d+\.\d+)\/(?:api|cookbook|guides|migration|reference|examples)(?:\/[A-Za-z0-9._~!$&'()*+,;=:@/-]*)?\/?$/.test(href)
+    || /^\/gluon\/(?:latest|\d+\.\d+\.\d+)\/(?:api|cookbook|guides|migration|reference|examples)\/(?:[A-Za-z0-9._~!$&'()*+,;=:@/-]+\/)?(?:index\.html|index\.md)?$/.test(href);
+}

@@ -583,6 +583,12 @@ the complete implemented release-group graph, including the analyzer.
 validates every declared package independently and additionally verifies built
 exports, types, license, changelog, README, and `npm pack` contents for
 implemented packages.
+The docs portal keeps its package-specific usage metadata in
+[`docs-site/package-docs.json`](../docs-site/package-docs.json) instead of
+parsing README prose. That file owns purpose, starter code and language, use
+cases, limits, related guides, and verified integration notes for the current
+packages recorded in `package-contract.json`, while the package manifest and package contract continue to
+own public entry points and packaging links.
 Reactivity behavior runs in a Node Vitest configuration; the public generated
 Core and Reactivity declarations are compiled again through
 `tests-node/core.types.ts` and `tests-node/reactivity.types.ts`.
