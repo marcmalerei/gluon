@@ -35,6 +35,7 @@ export default defineConfig({
       '@gluonjs/ssr/eleventy': resolve(import.meta.dirname, 'packages/ssr/src/eleventy.ts'),
       '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
+      '@gluonjs/molecules': resolve(import.meta.dirname, 'packages/molecules/src/index.ts'),
     },
   },
   test: {

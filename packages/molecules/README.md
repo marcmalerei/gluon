@@ -7,7 +7,25 @@
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 ```ts
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, NavigationStrip, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import {
+  Accordion,
+  ButtonGroup,
+  Card,
+  ChoiceGroup,
+  ControlField,
+  DialogSurface,
+  Disclosure,
+  EmptyState,
+  FormField,
+  InlineNotice,
+  NavigationStrip,
+  SearchField,
+  SearchResults,
+  SegmentedControl,
+  TableRegion,
+  Tabs,
+  createDialogSurfaceController,
+} from "@gluonjs/molecules";
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -109,6 +127,24 @@ and the horizontal viewport joins Tab order only when content actually
 overflows. Empty content is an explicit mutually exclusive variant. Captions,
 headers, rows, sorting, pagination, selection, editing, and virtualization stay
 caller-owned; the component deliberately does not implement DataGrid behavior.
+`SearchField` renders a native labelled `type="search"` input and submit button
+inside a `role="search"` form. Pass `query` and `onQueryChange` for controlled
+state, a stable caller-owned `id`, and `onSubmit` for the application's search action; it performs no
+request, ranking, routing, authentication, or analytics work. `SearchResults`
+renders caller-owned result children as grouped sections and lists, with
+optional counts/descriptions and explicit `loading`, `empty`,
+`partial-failure`, and `disabled` presentation states.
+DOM IDs must be non-empty and contain no whitespace; result group IDs must also
+be unique within one result composition. Group-heading relationships are
+namespaced by the root result ID, so separate compositions may reuse the same
+group IDs without colliding. Runtime values outside the documented state and
+heading-level unions fail closed. In a partial failure, available groups remain
+rendered beside the polite status message; its localized content remains its
+accessible announcement without a fixed English `aria-label`. Native input
+and form listener functions or `{ handleEvent }` objects compose before the
+controlled callbacks, and `preventDefault()` suppresses the controlled
+callback where applicable. Submitter `aria-label` values remain caller-owned
+and the accessible name does not change during loading.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -118,11 +154,11 @@ moves, then returns to native disabled behavior.
 
 ```ts
 NavigationStrip({
-  label: 'Project sections',
+  label: "Project sections",
   children: [
-    q.a({ href: '#overview', children: 'Overview' }),
-    q.a({ href: '#activity', 'aria-current': 'page', children: 'Activity' }),
-    q.a({ href: '#settings', children: 'Settings' }),
+    q.a({ href: "#overview", children: "Overview" }),
+    q.a({ href: "#activity", "aria-current": "page", children: "Activity" }),
+    q.a({ href: "#settings", children: "Settings" }),
   ],
 });
 ```
@@ -177,6 +213,9 @@ width and typography, body color, and action-gap custom properties.
 TableRegion exposes gap, summary and hint colors, and
 `--gluon-table-region-content-min-inline-size` for application-owned column
 layouts that need horizontal overflow at constrained widths.
+`SearchField` exposes gap, label weight, control gap/size, submit size, color,
+and focus outline custom properties. `SearchResults` exposes group/list gaps,
+heading weight, colors, state sizing, padding, border, and radius properties.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends

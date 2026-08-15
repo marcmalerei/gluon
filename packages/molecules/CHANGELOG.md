@@ -6,6 +6,10 @@
 
 - Added `ResponsiveDisclosure`, a native responsive disclosure with compact
   breakpoint state, desktop expansion, resettable compact memory, and teardown-safe media-query synchronization.
+- Added request-free `SearchField` and `SearchResults` compositions with native
+  form/search/input/list semantics, controlled query state, grouped results,
+  explicit loading/empty/partial-failure/disabled states, and component-owned
+  responsive custom properties (#372).
 
 - Added `createFormController()` as a DOM-independent, request-free form
   orchestration contract for typed field registration, values, touched/dirty

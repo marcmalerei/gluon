@@ -1026,12 +1026,16 @@
         "  FormField,",
         "  InlineNotice,",
         "  NavigationStrip,",
+        "  SearchField,",
+        "  SearchResults,",
         "  SegmentedControl,",
         "  TableRegion,",
         "  Tabs,",
         "  createDialogSurfaceController,",
         "  moleculeManifest,",
         "  moleculeStyles,",
+        "  searchFieldStyles,",
+        "  searchResultsStyles,",
         "  type AccordionAccessibleName,",
         "  type AccordionAttributes,",
         "  type AccordionChangeEvent,",
@@ -1078,6 +1082,14 @@
         "  type InlineNoticeProps,",
         "  type InlineNoticeTone,",
         "  type NavigationStripProps,",
+        "  type SearchFieldAttributes,",
+        "  type SearchFieldInputAttributes,",
+        "  type SearchFieldProps,",
+        "  type SearchResultGroup,",
+        "  type SearchResultsAttributes,",
+        "  type SearchResultsHeadingLevel,",
+        "  type SearchResultsProps,",
+        "  type SearchResultsState,",
         "  type SegmentedControlAccessibleName,",
         "  type SegmentedControlAttributes,",
         "  type SegmentedControlChangeEvent,",
@@ -1156,6 +1168,14 @@
         "  label: 'Order sections',",
         "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
         "} satisfies NavigationStripProps;",
+        "const searchFieldAttributes = { class: 'catalog-search' } satisfies SearchFieldAttributes;",
+        "const searchInputAttributes = { autocomplete: 'off' } satisfies SearchFieldInputAttributes;",
+        "const searchField = { id: 'catalog-search', label: 'Search products', query: 'cable', inputAttributes: searchInputAttributes, attributes: searchFieldAttributes } satisfies SearchFieldProps;",
+        "const searchGroup = { id: 'products', heading: 'Products', count: 1, children: html`<li><a href=\"/products/cable\">Cobalt cable</a></li>` } satisfies SearchResultGroup;",
+        "const searchResultsAttributes = { class: 'catalog-results' } satisfies SearchResultsAttributes;",
+        "const searchHeadingLevel: SearchResultsHeadingLevel = 2;",
+        "const searchState: SearchResultsState = 'ready';",
+        "const searchResults = { id: 'catalog-results', heading: 'Results', headingLevel: searchHeadingLevel, state: searchState, groups: [searchGroup], attributes: searchResultsAttributes } satisfies SearchResultsProps;",
         "const segmentName = { label: 'Order view' } satisfies SegmentedControlAccessibleName;",
         "const segmentAttributes = { class: 'order-view' } satisfies SegmentedControlAttributes;",
         "const segmentOptions = [{ value: 'summary', label: 'Summary' }, { value: 'details', label: 'Details' }] satisfies readonly SegmentedControlOption[];",
@@ -1169,7 +1189,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${SearchField(searchField)}${SearchResults(searchResults)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -7013,6 +7033,54 @@
     "packages/i18n/src/variables/i18nKey.md": {
       "recipe": "i18n-application",
       "description": "Reference the typed injection key installed by the i18n plugin when composing application integrations:"
+    },
+    "packages/molecules/src/variables/SearchField.md": {
+      "recipe": "molecule-components",
+      "description": "Render a labelled native search form with controlled query state and caller-owned submission:"
+    },
+    "packages/molecules/src/variables/SearchResults.md": {
+      "recipe": "molecule-components",
+      "description": "Render grouped native result lists with explicit caller-owned asynchronous presentation state:"
+    },
+    "packages/molecules/src/variables/searchFieldStyles.md": {
+      "recipe": "molecule-components",
+      "description": "Adopt or inspect the constructable stylesheet for the SearchField composition:"
+    },
+    "packages/molecules/src/variables/searchResultsStyles.md": {
+      "recipe": "molecule-components",
+      "description": "Adopt or inspect the constructable stylesheet for grouped SearchResults:"
+    },
+    "packages/molecules/src/type-aliases/SearchFieldAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible native form attributes while SearchField owns its search role and children:"
+    },
+    "packages/molecules/src/type-aliases/SearchFieldInputAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward typed native input attributes to the SearchField search control:"
+    },
+    "packages/molecules/src/interfaces/SearchFieldProps.md": {
+      "recipe": "molecule-components",
+      "description": "Configure labelled controlled search input and submission semantics without request ownership:"
+    },
+    "packages/molecules/src/interfaces/SearchResultGroup.md": {
+      "recipe": "molecule-components",
+      "description": "Describe one namespaced result group with heading, count, description, and caller-owned list items:"
+    },
+    "packages/molecules/src/type-aliases/SearchResultsAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward compatible result-container attributes while SearchResults owns its region relationships:"
+    },
+    "packages/molecules/src/type-aliases/SearchResultsHeadingLevel.md": {
+      "recipe": "molecule-components",
+      "description": "Choose a valid heading level for the results region and nested result groups:"
+    },
+    "packages/molecules/src/interfaces/SearchResultsProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose grouped results and localized loading, empty, partial-failure, or disabled content:"
+    },
+    "packages/molecules/src/type-aliases/SearchResultsState.md": {
+      "recipe": "molecule-components",
+      "description": "Select the explicit render-only asynchronous state for a SearchResults surface:"
     },
     "packages/molecules/src/functions/createFormController.md": {
       "recipe": "form-controller",
