@@ -41,7 +41,18 @@ gluon-language-server --stdio
 ```
 
 The LSP uses standard `Content-Length` framing and supports full-document sync,
-diagnostics, completion, hover, go-to-definition, rename, and semantic tokens.
+diagnostics, completion, hover, go-to-definition, references, rename, and
+semantic tokens. `.gluon` documents use the compiler's typed SFC block parser;
+template and script ranges remain in the original file and malformed documents
+are isolated. Compiler-backed parsing preserves `component`, `props`, `layer`,
+style ID, default-import, and default-slot block metadata. Editor symbol
+operations link literal `defineElement()` declarations, the template
+`component` attribute, relative default `.gluon` imports, and static template/CSS
+class names across the same open workspace with original-source ranges. Relative
+import navigation is intentionally open-document based, and rename changes local
+component aliases rather than filenames. The server does not replace TypeScript
+or CSS language services; arbitrary expressions, preprocessors, package imports,
+dynamic imports, and filesystem rename remain outside the contract.
 Protocol behavior is tested through `GluonProtocolServer` without VS Code. The
 maintained VS Code client is in `editors/vscode` and starts the lockstep server
 from the workspace or extension configuration.

@@ -8,6 +8,7 @@ import {
   type GluonProjectAnalysis,
   type WorkspaceEdit,
 } from '../packages/language-server/dist/index.js';
+import { parseGluonSfc, type GluonSfcParseResult } from '../packages/compiler/dist/index.js';
 
 const analyses: readonly DocumentAnalysis[] = analyzeGluonProject([{ uri: 'file:///app.ts', text: '' }]);
 const service = new GluonLanguageService();
@@ -19,3 +20,5 @@ new GluonProtocolServer().handle({ jsonrpc: '2.0', id: 1, method: 'initialize' }
 const project: GluonProjectAnalysis = analyzeStaticGluonProject([{ uri: 'src/app.ts', text: '' }]);
 void project.files;
 void PROJECT_ANALYSIS_SCHEMA.properties.schemaVersion.const;
+const sfc: GluonSfcParseResult = parseGluonSfc('<template component="Card" layer="atom"><p /></template>', 'Card.gluon');
+void sfc.blocks[0]?.attributes;

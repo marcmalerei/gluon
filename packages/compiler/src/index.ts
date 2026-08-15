@@ -4,9 +4,13 @@ import ts from 'typescript';
 export {
   GluonSfcCompileError,
   compileGluonSfc,
+  parseGluonSfc,
   type GluonSfcCompileOptions,
   type GluonSfcCompileResult,
   type GluonSfcLayer,
+  type GluonSfcBlock,
+  type GluonSfcParseError,
+  type GluonSfcParseResult,
 } from './sfc.js';
 
 export {

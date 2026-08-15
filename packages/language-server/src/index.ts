@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { getGluonDiagnostic, transformGluonModule } from '@gluonjs/compiler';
+import { compileGluonSfc, getGluonDiagnostic, parseGluonSfc, transformGluonModule, type GluonSfcBlock } from '@gluonjs/compiler';
 
 export {
   PROJECT_ANALYSIS_SCHEMA,
@@ -11,6 +11,7 @@ export {
 } from './project-analyzer.js';
 
 export type TemplateDiagnosticCode =
+  | 'GLUON_SFC_INVALID'
   | 'GLUON_ELEMENT_SETUP_CLEANUP_MISSING'
   | 'GLUON_ELEMENT_SETUP_LIFECYCLE_DEFERRED'
   | 'GLUON_ELEMENT_TAG_INVALID'
@@ -105,9 +106,19 @@ export function declarationsFromCustomElementsManifest(
 
 export interface Hover { readonly contents: string; readonly range?: Range }
 export interface WorkspaceEdit { readonly changes: Readonly<Record<string, readonly TextEdit[]>> }
+export interface ReferenceContext { readonly includeDeclaration?: boolean }
 
 interface TemplateSpan { readonly tag: 'compose' | 'css' | 'html' | 'svg'; readonly start: number; readonly end: number }
 interface OpenDocument { readonly uri: string; readonly text: string; readonly analysis: DocumentAnalysis }
+type SfcSymbolKind = 'component' | 'style-class' | 'import-path';
+interface SfcSymbolOccurrence {
+  readonly kind: SfcSymbolKind;
+  readonly name: string;
+  readonly start: number;
+  readonly end: number;
+  readonly declaration: boolean;
+  readonly targetUri?: string;
+}
 
 const nativeTags = new Set('a article aside button code div footer form h1 h2 h3 h4 h5 h6 header img input label li main nav ol option p section select small span strong textarea ul'.split(' '));
 const svgTags = new Set('circle defs g line path polygon polyline rect svg text use'.split(' '));
@@ -119,6 +130,7 @@ export function analyzeGluonDocument(
   text: string,
   externalDeclarations: readonly CustomElementDeclaration[] = [],
 ): DocumentAnalysis {
+  if (/\.gluon$/i.test(uri)) return analyzeGluonSfc(uri, text, externalDeclarations);
   const source = ts.createSourceFile(uri, text, ts.ScriptTarget.Latest, true, scriptKind(uri));
   const declarations = collectDeclarations(uri, source);
   const declarationMap = new Map([...externalDeclarations, ...declarations].map((entry) => [entry.tagName, entry]));
@@ -197,6 +209,57 @@ export function analyzeGluonDocument(
   return Object.freeze({ uri, diagnostics: Object.freeze(diagnostics), declarations: Object.freeze(declarations) });
 }
 
+function analyzeGluonSfc(uri: string, text: string, external: readonly CustomElementDeclaration[]): DocumentAnalysis {
+  const parsed = parseGluonSfc(text, uri);
+  const diagnostics: TemplateDiagnostic[] = [];
+  for (const error of parsed.errors) diagnostics.push({ code: 'GLUON_SFC_INVALID', message: error.message, range: rangeAtOffset(text, error.range.start, error.range.end), severity: 1, source: 'gluon' });
+  try {
+    compileGluonSfc(text, { filename: uri });
+  } catch (error) {
+    if (parsed.errors.length === 0) {
+      const block = parsed.blocks.find((candidate) => candidate.type === 'template') ?? parsed.blocks[0];
+      const start = block?.range.start ?? 0;
+      const end = block?.range.end ?? Math.min(text.length, 1);
+      diagnostics.push({
+        code: 'GLUON_SFC_INVALID',
+        message: error instanceof Error ? error.message : String(error),
+        range: rangeAtOffset(text, start, end),
+        severity: 1,
+        source: 'gluon',
+      });
+    }
+  }
+  const template = parsed.blocks.find((block) => block.type === 'template');
+  const script = parsed.blocks.find((block) => block.type === 'script');
+  const source = ts.createSourceFile(uri, script ? `${' '.repeat(script.start)}${script.content}` : '', ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const parseDiagnostics = (source as ts.SourceFile & { readonly parseDiagnostics?: readonly ts.DiagnosticWithLocation[] }).parseDiagnostics ?? [];
+  for (const entry of parseDiagnostics) {
+    const start = entry.start ?? script?.start ?? 0;
+    diagnostics.push({
+      code: 'GLUON_SFC_INVALID',
+      message: ts.flattenDiagnosticMessageText(entry.messageText, '\n'),
+      range: rangeAtOffset(text, start, start + Math.max(1, entry.length ?? 1)),
+      severity: 1,
+      source: 'gluon',
+    });
+  }
+  const declarations = collectDeclarations(uri, source);
+  if (template) {
+    const prefix = "import { html } from '@gluonjs/core';\nhtml`";
+    const suffix = '`;';
+    const virtual = `${prefix}${template.content.replace(/`/g, '\\`')}${suffix}`;
+    const virtualAnalysis = analyzeGluonDocument(`${uri}#template.ts`, virtual, [...external, ...declarations]);
+    for (const diagnostic of virtualAnalysis.diagnostics) {
+      const virtualOffset = offsetForRange(virtual, diagnostic.range);
+      const originalOffset = template.start + virtualOffset - prefix.length;
+      if (originalOffset >= template.start && originalOffset <= template.end) {
+        diagnostics.push({ ...diagnostic, range: rangeAtOffset(text, originalOffset, originalOffset + Math.max(1, offsetLength(virtual, diagnostic.range))) });
+      }
+    }
+  }
+  return Object.freeze({ uri, diagnostics: Object.freeze(diagnostics), declarations: Object.freeze(declarations) });
+}
+
 export class GluonLanguageService {
   private readonly documents = new Map<string, OpenDocument>();
 
@@ -218,6 +281,10 @@ export class GluonLanguageService {
     const document = this.documents.get(uri);
     if (!document) return [];
     const offset = offsetAt(document.text, position);
+    if (/\.gluon$/i.test(uri)) {
+      const sfcCompletion = completeGluonSfc(document, offset, this.documents);
+      if (sfcCompletion) return sfcCompletion;
+    }
     const before = document.text.slice(Math.max(0, offset - 80), offset);
     const declarations = this.allDeclarations();
     const customMatch = before.match(/<([\w-]+)\s+[^>]*$/);
@@ -235,6 +302,14 @@ export class GluonLanguageService {
   }
 
   hover(uri: string, position: Position): Hover | undefined {
+    const document = this.documents.get(uri);
+    if (document && /\.gluon$/i.test(uri)) {
+      const symbol = sfcSymbolAt(document, position);
+      if (symbol) return {
+        contents: hoverForSfcSymbol(symbol, this.documents),
+        range: rangeAtOffset(document.text, symbol.start, symbol.end),
+      };
+    }
     const found = this.tagAt(uri, position);
     if (!found) return undefined;
     const declaration = this.allDeclarations().get(found.name);
@@ -244,12 +319,45 @@ export class GluonLanguageService {
   }
 
   definition(uri: string, position: Position): readonly Location[] {
+    const document = this.documents.get(uri);
+    if (document && /\.gluon$/i.test(uri)) {
+      const symbol = sfcSymbolAt(document, position);
+      if (symbol) return definitionsForSfcSymbol(document, symbol, this.documents);
+    }
     const found = this.tagAt(uri, position);
     const declaration = found && this.allDeclarations().get(found.name);
     return declaration ? [{ uri: declaration.uri, range: declaration.range }] : [];
   }
 
+  references(uri: string, position: Position, context: ReferenceContext = {}): readonly Location[] {
+    const document = this.documents.get(uri);
+    if (document && /\.gluon$/i.test(uri)) {
+      const symbol = sfcSymbolAt(document, position);
+      if (symbol) return referencesForSfcSymbol(document, symbol, this.documents, context);
+    }
+    const found = this.tagAt(uri, position);
+    if (!found || !this.allDeclarations().has(found.name)) return [];
+    const locations: Location[] = [];
+    for (const document of this.documents.values()) {
+      const source = ts.createSourceFile(document.uri, document.text, ts.ScriptTarget.Latest, true, scriptKind(document.uri));
+      for (const template of collectTemplates(source)) {
+        const content = document.text.slice(template.start + 1, template.end - 1);
+        for (const match of content.matchAll(new RegExp(`</?\\s*${escapeRegExp(found.name)}\\b`, 'g'))) {
+          const start = template.start + 1 + match.index + match[0].indexOf(found.name);
+          locations.push({ uri: document.uri, range: rangeAt(source, start, start + found.name.length) });
+        }
+      }
+      if (context.includeDeclaration !== false) for (const declaration of document.analysis.declarations.filter((entry) => entry.tagName === found.name)) locations.push({ uri: document.uri, range: declaration.range });
+    }
+    return uniqueLocations(locations);
+  }
+
   rename(uri: string, position: Position, newName: string): WorkspaceEdit | undefined {
+    const document = this.documents.get(uri);
+    if (document && /\.gluon$/i.test(uri)) {
+      const symbol = sfcSymbolAt(document, position);
+      if (symbol) return renameSfcSymbol(document, symbol, newName);
+    }
     const found = this.tagAt(uri, position);
     if (!found || !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)+$/.test(newName)) return undefined;
     const declaration = this.allDeclarations().get(found.name);
@@ -265,12 +373,16 @@ export class GluonLanguageService {
         }
       }
       if (document.uri === declaration.uri) {
-        for (const match of document.text.matchAll(new RegExp(`(['\"])${escapeRegExp(found.name)}\\1`, 'g'))) {
-          const start = match.index + 1;
-          (changes[document.uri] ??= []).push({ range: rangeAt(source, start, start + found.name.length), newText: newName });
+        for (const declared of document.analysis.declarations.filter((entry) => entry.tagName === found.name)) {
+          (changes[document.uri] ??= []).push({ range: declared.range, newText: newName });
         }
       }
     }
+    for (const edits of Object.values(changes)) edits.sort((left, right) =>
+      left.range.start.line - right.range.start.line
+      || left.range.start.character - right.range.start.character
+      || left.range.end.line - right.range.end.line
+      || left.range.end.character - right.range.end.character);
     return { changes };
   }
 
@@ -288,10 +400,22 @@ export class GluonLanguageService {
         tokens.push({ ...position, length: value.length, type: match[1] ? 0 : 1 });
       }
     }
+    if (/\.gluon$/i.test(uri)) {
+      for (const occurrence of collectSfcSymbolOccurrences(document)) {
+        if (occurrence.kind === 'import-path') continue;
+        const position = positionAt(source, occurrence.start);
+        tokens.push({ ...position, length: occurrence.end - occurrence.start, type: occurrence.kind === 'component' ? 0 : 1 });
+      }
+    }
     tokens.sort((a, b) => a.line - b.line || a.character - b.character);
+    const uniqueTokens = tokens.filter((token, index) => index === 0
+      || token.line !== tokens[index - 1]!.line
+      || token.character !== tokens[index - 1]!.character
+      || token.length !== tokens[index - 1]!.length
+      || token.type !== tokens[index - 1]!.type);
     let previousLine = 0;
     let previousCharacter = 0;
-    return tokens.flatMap((token) => {
+    return uniqueTokens.flatMap((token) => {
       const deltaLine = token.line - previousLine;
       const deltaStart = deltaLine === 0 ? token.character - previousCharacter : token.character;
       previousLine = token.line;
@@ -329,7 +453,346 @@ export class GluonLanguageService {
   }
 }
 
+function completeGluonSfc(
+  document: OpenDocument,
+  offset: number,
+  documents: ReadonlyMap<string, OpenDocument>,
+): readonly CompletionItem[] | undefined {
+  const parsed = parseGluonSfc(document.text, document.uri);
+  const template = parsed.blocks.find((block) => block.type === 'template');
+  const script = parsed.blocks.find((block) => block.type === 'script');
+  const componentValue = template && sfcTemplateComponentValue(document.text, template);
+  if (componentValue && offset >= componentValue.valueStart && offset <= componentValue.valueEnd) {
+    const filename = relativeSfcSpecifier(document.uri).replace(/^\.\//, '').replace(/\.gluon$/i, '');
+    return uniqueKeys([componentValue.value, filename].filter(Boolean)).sort().map((label) => ({ label, kind: 12, detail: 'Gluon SFC component name' }));
+  }
+  if (template && offset >= template.start && offset <= template.end) {
+    for (const attribute of sfcTemplateClasses(document.text, template)) {
+      if (offset < attribute.attributeStart || offset > attribute.attributeEnd) continue;
+      const classes = parsed.blocks
+        .filter((block) => block.type === 'style')
+        .flatMap((block) => sfcStyleClasses(document.text, block).map((entry) => entry.name));
+      return uniqueKeys(classes).sort().map((label) => ({ label, kind: 10, detail: 'Gluon SFC style class' }));
+    }
+  }
+  if (script && offset >= script.start && offset <= script.end) {
+    const source = sfcScriptSource(document.text, document.uri, script);
+    const importDeclaration = source.statements.find((statement): statement is ts.ImportDeclaration =>
+      ts.isImportDeclaration(statement)
+      && ts.isStringLiteral(statement.moduleSpecifier)
+      && offset >= statement.moduleSpecifier.getStart(source) + 1
+      && offset <= statement.moduleSpecifier.end - 1);
+    if (importDeclaration) {
+      return [...documents.values()]
+        .filter((candidate) => candidate.uri !== document.uri && /\.gluon$/i.test(candidate.uri))
+        .map((candidate) => ({ label: relativeSfcImportSpecifier(document.uri, candidate.uri), kind: 12 as const, detail: candidate.uri }))
+        .sort((left, right) => left.label.localeCompare(right.label));
+    }
+  }
+  return undefined;
+}
+
+function collectSfcSymbolOccurrences(document: OpenDocument): readonly SfcSymbolOccurrence[] {
+  if (!/\.gluon$/i.test(document.uri)) return [];
+  const parsed = parseGluonSfc(document.text, document.uri);
+  const occurrences: SfcSymbolOccurrence[] = [];
+  const template = parsed.blocks.find((block) => block.type === 'template');
+  const script = parsed.blocks.find((block) => block.type === 'script');
+  const component = template && sfcTemplateComponent(document.text, template);
+  const declarations = script ? sfcScriptDeclarations(document.text, document.uri, script) : [];
+  const importedTargets = new Map(declarations.flatMap((entry) => entry.targetUri ? [[entry.name, entry.targetUri] as const] : []));
+  const componentNames = new Set([
+    ...(component ? [component.name] : []),
+    ...declarations.map((entry) => entry.name),
+  ]);
+
+  if (component) occurrences.push({
+    kind: 'component',
+    name: component.name,
+    start: component.valueStart,
+    end: component.valueEnd,
+    declaration: !importedTargets.has(component.name),
+    ...(importedTargets.get(component.name) ? { targetUri: importedTargets.get(component.name) } : {}),
+  });
+  if (script) {
+    const source = sfcScriptSource(document.text, document.uri, script);
+    const declarationRanges = new Set(declarations.map((entry) => `${entry.start}:${entry.end}`));
+    const visit = (node: ts.Node): void => {
+      if (ts.isIdentifier(node) && componentNames.has(node.text)) {
+        const start = node.getStart(source);
+        const end = node.end;
+        occurrences.push({
+          kind: 'component',
+          name: node.text,
+          start,
+          end,
+          declaration: declarationRanges.has(`${start}:${end}`),
+          ...(importedTargets.get(node.text) ? { targetUri: importedTargets.get(node.text) } : {}),
+        });
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    for (const statement of source.statements) {
+      if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)
+        || !/\.gluon$/i.test(statement.moduleSpecifier.text)) continue;
+      occurrences.push({
+        kind: 'import-path',
+        name: statement.moduleSpecifier.text,
+        start: statement.moduleSpecifier.getStart(source) + 1,
+        end: statement.moduleSpecifier.end - 1,
+        declaration: false,
+        targetUri: resolveSfcImportUri(document.uri, statement.moduleSpecifier.text),
+      });
+    }
+  }
+  if (template) {
+    for (const entry of sfcTemplateClasses(document.text, template)) occurrences.push({
+      kind: 'style-class', name: entry.name, start: entry.start, end: entry.end, declaration: false,
+    });
+  }
+  for (const style of parsed.blocks.filter((block) => block.type === 'style')) {
+    for (const entry of sfcStyleClasses(document.text, style)) occurrences.push({
+      kind: 'style-class', name: entry.name, start: entry.start, end: entry.end, declaration: true,
+    });
+  }
+  const seen = new Set<string>();
+  return occurrences
+    .sort((left, right) => left.start - right.start || left.end - right.end || left.kind.localeCompare(right.kind))
+    .filter((entry) => {
+      const key = `${entry.kind}:${entry.start}:${entry.end}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function sfcSymbolAt(document: OpenDocument, position: Position): SfcSymbolOccurrence | undefined {
+  const offset = offsetAt(document.text, position);
+  return collectSfcSymbolOccurrences(document).find((entry) => offset >= entry.start && offset <= entry.end);
+}
+
+function hoverForSfcSymbol(
+  symbol: SfcSymbolOccurrence,
+  documents: ReadonlyMap<string, OpenDocument>,
+): string {
+  if (symbol.kind === 'style-class') return `Gluon SFC style class \`.${symbol.name}\` shared by static template class attributes and the local \`<style>\` block.`;
+  if (symbol.kind === 'import-path') return symbol.targetUri && documents.has(symbol.targetUri)
+    ? `Open Gluon SFC module \`${symbol.name}\`.`
+    : `Unresolved Gluon SFC module \`${symbol.name}\`; editor navigation is limited to open workspace documents.`;
+  return symbol.targetUri
+    ? `Imported Gluon SFC component \`${symbol.name}\`${documents.has(symbol.targetUri) ? ` from \`${symbol.targetUri}\`` : ''}.`
+    : `Gluon SFC component \`${symbol.name}\` linked across its script and template boundaries.`;
+}
+
+function definitionsForSfcSymbol(
+  document: OpenDocument,
+  symbol: SfcSymbolOccurrence,
+  documents: ReadonlyMap<string, OpenDocument>,
+): readonly Location[] {
+  if (symbol.targetUri) {
+    const target = documents.get(symbol.targetUri);
+    if (!target) return [];
+    const targetOccurrences = collectSfcSymbolOccurrences(target);
+    const publicName = sfcPublicComponentName(target);
+    const preferred = targetOccurrences.filter((entry) => entry.kind === 'component' && entry.declaration
+      && (publicName === undefined || entry.name === publicName));
+    const fallback = targetOccurrences.filter((entry) => entry.kind === 'component');
+    const entries = symbol.kind === 'import-path' ? preferred.length > 0 ? preferred : fallback : preferred;
+    return uniqueLocations(entries.slice(0, 1).map((entry) => sfcLocation(target, entry)));
+  }
+  const occurrences = collectSfcSymbolOccurrences(document).filter((entry) =>
+    entry.kind === symbol.kind && entry.name === symbol.name && entry.declaration);
+  return uniqueLocations(occurrences.map((entry) => sfcLocation(document, entry)));
+}
+
+function referencesForSfcSymbol(
+  document: OpenDocument,
+  symbol: SfcSymbolOccurrence,
+  documents: ReadonlyMap<string, OpenDocument>,
+  context: ReferenceContext,
+): readonly Location[] {
+  const locations: Location[] = [];
+  const append = (candidate: OpenDocument, entry: SfcSymbolOccurrence): void => {
+    if (context.includeDeclaration === false && entry.declaration) return;
+    locations.push(sfcLocation(candidate, entry));
+  };
+  for (const entry of collectSfcSymbolOccurrences(document)) {
+    if (entry.kind === symbol.kind && entry.name === symbol.name) append(document, entry);
+  }
+  const exportsLocalComponent = symbol.kind === 'component' && !symbol.targetUri
+    && collectSfcSymbolOccurrences(document).some((entry) => entry.kind === 'component' && entry.name === symbol.name && entry.declaration);
+  if (exportsLocalComponent) {
+    for (const candidate of documents.values()) {
+      if (candidate.uri === document.uri) continue;
+      for (const entry of collectSfcSymbolOccurrences(candidate)) {
+        if (entry.kind === 'component' && entry.targetUri === document.uri) append(candidate, entry);
+      }
+    }
+  } else if (symbol.kind === 'import-path' && symbol.targetUri) {
+    for (const candidate of documents.values()) {
+      if (candidate.uri === document.uri) continue;
+      for (const entry of collectSfcSymbolOccurrences(candidate)) {
+        if (entry.kind === 'import-path' && entry.targetUri === symbol.targetUri) append(candidate, entry);
+      }
+    }
+  }
+  return uniqueLocations(locations);
+}
+
+function renameSfcSymbol(
+  document: OpenDocument,
+  symbol: SfcSymbolOccurrence,
+  newName: string,
+): WorkspaceEdit | undefined {
+  if (symbol.kind === 'import-path') return undefined;
+  const valid = symbol.kind === 'component'
+    ? /^[$A-Z_a-z][$\w]*$/.test(newName)
+    : /^-?[_a-zA-Z]+[_a-zA-Z0-9-]*$/.test(newName);
+  if (!valid) return undefined;
+  const edits = collectSfcSymbolOccurrences(document)
+    .filter((entry) => entry.kind === symbol.kind && entry.name === symbol.name)
+    .map((entry) => ({ range: rangeAtOffset(document.text, entry.start, entry.end), newText: newName }));
+  return edits.length > 0 ? { changes: { [document.uri]: edits } } : undefined;
+}
+
+function sfcLocation(document: OpenDocument, entry: SfcSymbolOccurrence): Location {
+  return { uri: document.uri, range: rangeAtOffset(document.text, entry.start, entry.end) };
+}
+
+function sfcScriptSource(text: string, uri: string, script: GluonSfcBlock): ts.SourceFile {
+  return ts.createSourceFile(uri, `${' '.repeat(script.start)}${script.content}`, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+}
+
+function sfcScriptDeclarations(
+  text: string,
+  uri: string,
+  script: GluonSfcBlock,
+): readonly { readonly name: string; readonly start: number; readonly end: number; readonly targetUri?: string }[] {
+  const source = sfcScriptSource(text, uri, script);
+  const declarations: Array<{ name: string; start: number; end: number; targetUri?: string }> = [];
+  const add = (name: ts.Identifier, targetUri?: string): void => {
+    declarations.push({
+      name: name.text, start: name.getStart(source), end: name.end, ...(targetUri ? { targetUri } : {}),
+    });
+  };
+  for (const statement of source.statements) {
+    if (ts.isImportDeclaration(statement) && ts.isStringLiteral(statement.moduleSpecifier)
+      && /\.gluon$/i.test(statement.moduleSpecifier.text) && statement.importClause?.name) {
+      add(statement.importClause.name, resolveSfcImportUri(uri, statement.moduleSpecifier.text));
+      continue;
+    }
+  }
+  return declarations;
+}
+
+function sfcTemplateComponent(
+  text: string,
+  template: GluonSfcBlock,
+): { readonly name: string; readonly valueStart: number; readonly valueEnd: number } | undefined {
+  const value = sfcTemplateComponentValue(text, template);
+  if (!value || !/^[$A-Z_a-z][$\w]*$/.test(value.value)) return undefined;
+  return { name: value.value, valueStart: value.valueStart, valueEnd: value.valueEnd };
+}
+
+function sfcTemplateComponentValue(
+  text: string,
+  template: GluonSfcBlock,
+): { readonly value: string; readonly valueStart: number; readonly valueEnd: number } | undefined {
+  const openingStart = text.lastIndexOf('<template', template.start);
+  const openingEnd = openingStart >= 0 ? text.indexOf('>', openingStart) : -1;
+  if (openingStart < 0 || openingEnd < 0) return undefined;
+  const opening = text.slice(openingStart, openingEnd + 1);
+  const match = /\bcomponent\s*=\s*(["'])([^"']*)\1/.exec(opening);
+  if (!match) return undefined;
+  const value = match[2]!;
+  const valueStart = openingStart + match.index + match[0].indexOf(match[1]!) + 1;
+  return { value, valueStart, valueEnd: valueStart + value.length };
+}
+
+function sfcPublicComponentName(document: OpenDocument): string | undefined {
+  const template = parseGluonSfc(document.text, document.uri).blocks.find((block) => block.type === 'template');
+  return template ? sfcTemplateComponent(document.text, template)?.name : undefined;
+}
+
+function sfcTemplateClasses(
+  text: string,
+  template: GluonSfcBlock,
+): readonly { readonly name: string; readonly start: number; readonly end: number; readonly attributeStart: number; readonly attributeEnd: number }[] {
+  const entries: Array<{ name: string; start: number; end: number; attributeStart: number; attributeEnd: number }> = [];
+  for (const attribute of template.content.matchAll(/\bclass\s*=\s*(["'])([^"']*)\1/g)) {
+    const value = attribute[2]!;
+    const valueStart = template.start + attribute.index + attribute[0].indexOf(value);
+    for (const token of value.matchAll(/[A-Za-z_-][\w-]*/g)) {
+      const start = valueStart + token.index;
+      entries.push({ name: token[0], start, end: start + token[0].length, attributeStart: valueStart, attributeEnd: valueStart + value.length });
+    }
+    if (value.length === 0) entries.push({ name: '', start: valueStart, end: valueStart, attributeStart: valueStart, attributeEnd: valueStart });
+  }
+  return entries;
+}
+
+function sfcStyleClasses(
+  _text: string,
+  style: GluonSfcBlock,
+): readonly { readonly name: string; readonly start: number; readonly end: number }[] {
+  const entries: Array<{ name: string; start: number; end: number }> = [];
+  let boundary = 0;
+  for (let index = 0; index < style.content.length; index += 1) {
+    const character = style.content[index];
+    if (character === '}') { boundary = index + 1; continue; }
+    if (character !== '{') continue;
+    const selector = style.content.slice(boundary, index);
+    const selectorOffset = boundary;
+    boundary = index + 1;
+    if (selector.trimStart().startsWith('@')) continue;
+    for (const match of selector.matchAll(/\.([A-Za-z_-][\w-]*)/g)) {
+      const name = match[1]!;
+      const start = style.start + selectorOffset + match.index + 1;
+      entries.push({ name, start, end: start + name.length });
+    }
+  }
+  return entries;
+}
+
+function resolveSfcImportUri(uri: string, specifier: string): string | undefined {
+  if (!specifier.startsWith('.')) return undefined;
+  try { return new URL(specifier, uri).href; } catch { return undefined; }
+}
+
+function relativeSfcSpecifier(uri: string): string {
+  try {
+    const name = decodeURIComponent(new URL(uri).pathname.split('/').at(-1) ?? uri);
+    return `./${name}`;
+  } catch {
+    return uri;
+  }
+}
+
+function relativeSfcImportSpecifier(fromUri: string, targetUri: string): string {
+  try {
+    const from = decodeURIComponent(new URL(fromUri).pathname).split('/');
+    const target = decodeURIComponent(new URL(targetUri).pathname).split('/');
+    from.pop();
+    while (from.length > 0 && target.length > 0 && from[0] === target[0]) {
+      from.shift();
+      target.shift();
+    }
+    const relative = `${'../'.repeat(from.length)}${target.join('/')}`;
+    return relative.startsWith('../') ? relative : `./${relative}`;
+  } catch {
+    return relativeSfcSpecifier(targetUri);
+  }
+}
+
 function collectTemplates(source: ts.SourceFile): TemplateSpan[] {
+  if (/\.gluon$/i.test(source.fileName)) {
+    return parseGluonSfc(source.text, source.fileName).blocks
+      .filter((block) => block.type === 'template')
+      // TemplateSpan includes one delimiter position on either side so every
+      // shared consumer can keep using start + 1/end - 1 for content ranges.
+      .map((block) => ({ tag: 'html', start: block.start - 1, end: block.end + 1 }));
+  }
   const aliases = new Map<string, TemplateSpan['tag']>();
   for (const statement of source.statements) {
     if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || statement.moduleSpecifier.text !== '@gluonjs/core') continue;
@@ -354,6 +817,37 @@ function collectTemplates(source: ts.SourceFile): TemplateSpan[] {
   };
   visit(source);
   return templates;
+}
+
+function rangeAtOffset(text: string, start: number, end: number): Range {
+  const source = ts.createSourceFile('range.ts', text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  return rangeAt(source, Math.max(0, start), Math.max(start, end));
+}
+
+function offsetForRange(text: string, range: Range): number {
+  const source = ts.createSourceFile('range.ts', text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  return source.getPositionOfLineAndCharacter(range.start.line, range.start.character);
+}
+
+function offsetLength(text: string, range: Range): number {
+  const source = ts.createSourceFile('range.ts', text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  return Math.max(1, source.getPositionOfLineAndCharacter(range.end.line, range.end.character) - offsetForRange(text, range));
+}
+
+function uniqueLocations(locations: readonly Location[]): readonly Location[] {
+  const seen = new Set<string>();
+  return [...locations]
+    .sort((left, right) => left.uri.localeCompare(right.uri)
+      || left.range.start.line - right.range.start.line
+      || left.range.start.character - right.range.start.character
+      || left.range.end.line - right.range.end.line
+      || left.range.end.character - right.range.end.character)
+    .filter((location) => {
+      const key = `${location.uri}:${JSON.stringify(location.range)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 function collectDeclarations(uri: string, source: ts.SourceFile): CustomElementDeclaration[] {

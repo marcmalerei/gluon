@@ -6,6 +6,7 @@
 
 - Documented the six stable `GLUON_RESPONSIVE_DISCLOSURE_*` runtime diagnostics
   in the public versioned catalog with actionable remediation.
+- Exposed the shared `parseGluonSfc()` boundary for editor tooling.
 
 ## [1.9.0] - 2026-08-15
 

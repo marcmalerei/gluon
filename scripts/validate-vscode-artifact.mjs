@@ -49,10 +49,23 @@ try {
   const bundledCompilerManifest = await readJson(resolve(extensionRoot, 'server/node_modules/@gluonjs/compiler/package.json'));
   const bundledTypescriptManifest = await readJson(resolve(extensionRoot, 'server/node_modules/typescript/package.json'));
   const extensionSource = await readFile(resolve(extensionRoot, extensionManifest.main), 'utf8');
+  const languageConfiguration = await readFile(resolve(extensionRoot, 'language-configuration.json'), 'utf8');
+  const grammar = await readFile(resolve(extensionRoot, 'syntaxes/gluon.tmLanguage.json'), 'utf8');
 
   if (extensionManifest.version !== version || extensionManifest.name !== manifest.extension
     || extensionManifest.publisher !== manifest.publisher || extensionManifest.main !== './extension.cjs') {
     throw new Error('Extracted VSIX extension metadata is not aligned with the release manifest.');
+  }
+  if (!extensionManifest.activationEvents?.includes('onLanguage:gluon')
+    || !extensionManifest.contributes?.languages?.some((entry) => entry.id === 'gluon' && entry.extensions?.includes('.gluon'))
+    || !extensionManifest.contributes?.grammars?.some((entry) => entry.language === 'gluon')) {
+    throw new Error('Extracted VSIX is missing the first-class .gluon language contribution.');
+  }
+  const configuration = JSON.parse(languageConfiguration);
+  const syntax = JSON.parse(grammar);
+  if (!Array.isArray(configuration.brackets) || !Array.isArray(configuration.autoClosingPairs)
+    || syntax.scopeName !== 'source.gluon' || !syntax.repository?.tag?.patterns?.some((pattern) => pattern.name === 'entity.name.tag.gluon')) {
+    throw new Error('Extracted .gluon language configuration or grammar is incomplete.');
   }
   if (bundledServerManifest.name !== manifest.languageServer || bundledServerManifest.version !== version
     || bundledServerManifest.dependencies?.['@gluonjs/compiler'] !== version
@@ -74,12 +87,18 @@ try {
 
   const serverCli = resolve(extensionRoot, 'server/dist/server-cli.js');
   await activateBundledExtension(extensionRoot, serverCli, extractionRoot);
-  const response = await initializeBundledServer(serverCli, extensionRoot);
-  if (response.jsonrpc !== '2.0' || response.id !== 1 || response.error
-    || response.result?.serverInfo?.name !== '@gluonjs/language-server'
-    || response.result?.serverInfo?.version !== version
-    || typeof response.result?.capabilities !== 'object') {
-    throw new Error('Bundled VSIX language server returned an invalid LSP initialize response.');
+  const responses = await initializeBundledServer(serverCli, extensionRoot);
+  const response = responses.find((candidate) => candidate.id === 1);
+  const resultFor = (id) => responses.find((candidate) => candidate.id === id);
+  if (!response || response.error || response.result?.serverInfo?.name !== '@gluonjs/language-server'
+    || response.result?.serverInfo?.version !== version || typeof response.result?.capabilities !== 'object'
+    || !responses.some((candidate) => candidate.method === 'textDocument/publishDiagnostics')
+    || typeof resultFor(2)?.result?.contents !== 'string'
+    || !Array.isArray(resultFor(3)?.result) || resultFor(4)?.result === null
+    || !Array.isArray(resultFor(4)?.result) || !resultFor(5)?.result?.changes
+    || !Array.isArray(resultFor(6)?.result?.data) || !Array.isArray(resultFor(7)?.result)
+    || !extensionSource.includes("language: 'gluon'")) {
+    throw new Error('Bundled VSIX language server returned invalid LSP evidence.');
   }
 } finally {
   await rm(extractionRoot, { recursive: true, force: true });
@@ -138,8 +157,22 @@ async function extractEntry(zip, entry, destinationRoot, seen, seenFolded) {
 }
 
 async function initializeBundledServer(serverCli, cwd) {
-  const request = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { rootUri: null, capabilities: {} } });
-  const frame = `Content-Length: ${Buffer.byteLength(request)}\r\n\r\n${request}`;
+  const fixture = '<script lang="ts">import { defineElement } from \'@gluonjs/core\'; class Card {} defineElement(\'test-card\', Card);</script>\n<template component="Card" layer="atom"><test-card /></template>';
+  const position = { line: 1, character: fixture.indexOf('test-card', fixture.indexOf('<template')) + 2 - fixture.lastIndexOf('\n', fixture.indexOf('test-card', fixture.indexOf('<template'))) - 1 };
+  const messages = [
+    { jsonrpc: '2.0', id: 1, method: 'initialize', params: { rootUri: null, capabilities: {} } },
+    { jsonrpc: '2.0', method: 'textDocument/didOpen', params: { textDocument: { uri: 'file:///fixture.gluon', languageId: 'gluon', text: fixture } } },
+    { jsonrpc: '2.0', id: 2, method: 'textDocument/hover', params: { textDocument: { uri: 'file:///fixture.gluon' }, position } },
+    { jsonrpc: '2.0', id: 3, method: 'textDocument/definition', params: { textDocument: { uri: 'file:///fixture.gluon' }, position } },
+    { jsonrpc: '2.0', id: 4, method: 'textDocument/references', params: { textDocument: { uri: 'file:///fixture.gluon' }, position, context: { includeDeclaration: false } } },
+    { jsonrpc: '2.0', id: 5, method: 'textDocument/rename', params: { textDocument: { uri: 'file:///fixture.gluon' }, position, newName: 'new-test-card' } },
+    { jsonrpc: '2.0', id: 6, method: 'textDocument/semanticTokens/full', params: { textDocument: { uri: 'file:///fixture.gluon' }, position } },
+    { jsonrpc: '2.0', id: 7, method: 'textDocument/completion', params: { textDocument: { uri: 'file:///fixture.gluon' }, position } },
+  ];
+  const frame = messages.map((message) => {
+    const request = JSON.stringify(message);
+    return `Content-Length: ${Buffer.byteLength(request)}\r\n\r\n${request}`;
+  }).join('');
   const output = await new Promise((resolveOutput, rejectOutput) => {
     const child = spawn(process.execPath, [serverCli], { cwd, stdio: ['pipe', 'pipe', 'pipe'] });
     const stdout = []; const stderr = [];
@@ -154,12 +187,16 @@ async function initializeBundledServer(serverCli, cwd) {
     });
     child.stdin.end(frame);
   });
-  const headerEnd = output.indexOf('\r\n\r\n');
-  const length = Number(/^Content-Length:\s*(\d+)$/im.exec(output.subarray(0, headerEnd).toString('ascii'))?.[1]);
-  if (headerEnd < 0 || !Number.isSafeInteger(length) || output.length !== headerEnd + 4 + length) {
-    throw new Error('Bundled language server returned malformed LSP framing.');
+  const responses = [];
+  let offset = 0;
+  while (offset < output.length) {
+    const headerEnd = output.indexOf('\r\n\r\n', offset);
+    const length = Number(/^Content-Length:\s*(\d+)$/im.exec(output.subarray(offset, headerEnd).toString('ascii'))?.[1]);
+    if (headerEnd < 0 || !Number.isSafeInteger(length) || headerEnd + 4 + length > output.length) throw new Error('Bundled language server returned malformed LSP framing.');
+    responses.push(JSON.parse(output.subarray(headerEnd + 4, headerEnd + 4 + length).toString('utf8')));
+    offset = headerEnd + 4 + length;
   }
-  return JSON.parse(output.subarray(headerEnd + 4).toString('utf8'));
+  return responses;
 }
 
 async function activateBundledExtension(extensionRoot, serverCli, extractionRoot) {

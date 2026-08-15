@@ -10,10 +10,12 @@
   "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
   "engines": { "vscode": "^1.96.0" },
   "categories": ["Programming Languages", "Linters"],
-  "activationEvents": ["onLanguage:typescript", "onLanguage:javascript"],
+  "activationEvents": ["onLanguage:gluon", "onLanguage:typescript", "onLanguage:javascript"],
   "main": "./extension.cjs",
   "scripts": { "package": "vsce package", "check": "node ../../scripts/validate-vscode-client.mjs" },
   "contributes": {
+    "languages": [{ "id": "gluon", "aliases": ["Gluon", ".gluon"], "extensions": [".gluon"], "configuration": "./language-configuration.json" }],
+    "grammars": [{ "language": "gluon", "scopeName": "source.gluon", "path": "./syntaxes/gluon.tmLanguage.json", "embeddedLanguages": { "meta.block.script.gluon": "typescript", "meta.block.style.gluon": "css", "meta.block.template.gluon": "html" } }],
     "configuration": {
       "title": "Gluon",
       "properties": {
