@@ -59,4 +59,62 @@ describe('core i18n', () => {
     await tick();
     expect(host.textContent).toBe('Checkout');
   });
+
+  it('resolves regional locale chains before configured fallbacks', () => {
+    const i18n = createI18n({
+      locale: 'de-AT',
+      fallbackLocale: ['en-US', 'fr'],
+      messages: {
+        de: { greeting: 'Servus' },
+        en: { fallback: 'Hello' },
+        fr: { missing: 'Bonjour' },
+      },
+    });
+
+    expect(i18n.fallbackLocales).toEqual(['en-US', 'fr']);
+    expect(i18n.t('greeting')).toBe('Servus');
+    expect(i18n.t('fallback')).toBe('Hello');
+    expect(i18n.t('missing')).toBe('Bonjour');
+  });
+
+  it('formats plural, ordinal, select, numbers, and dates with the active locale', () => {
+    const i18n = createI18n({
+      locale: 'en-US',
+      messages: {
+        'en-US': {
+          items: '{count, plural, one {# item} other {# items}}',
+          rank: '{count, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}',
+          greeting: '{gender, select, female {Ms. {name}} other {Mx. {name}}}',
+        },
+      },
+    });
+
+    expect(i18n.t('items', { values: { count: 2 } })).toBe('2 items');
+    expect(i18n.t('rank', { values: { count: 2 } })).toBe('2nd');
+    expect(i18n.t('greeting', { values: { gender: 'female', name: 'Ada' } })).toBe('Ms. Ada');
+    expect(i18n.n(1234.5, { minimumFractionDigits: 1 })).toBe('1,234.5');
+    expect(i18n.d(new Date('2024-01-02T00:00:00Z'), { timeZone: 'UTC', dateStyle: 'medium' })).toContain('Jan');
+  });
+
+  it('exposes namespace failures and round-trips loaded state for SSR hydration', async () => {
+    const server = createI18n({
+      locale: 'de',
+      messages: { de: { title: 'Warenkorb' } },
+      namespaces: {
+        checkout: () => ({ cta: 'Kaufen' }),
+        broken: () => { throw new Error('locale bundle unavailable'); },
+      },
+    });
+    await server.loadNamespace('checkout');
+    const snapshot = server.snapshot();
+
+    const client = createI18n({ locale: 'en', namespaces: { checkout: () => ({ cta: 'Buy' }) } });
+    client.hydrate(snapshot);
+    expect(client.locale.value).toBe('de');
+    expect(client.t('title')).toBe('Warenkorb');
+    expect(client.t('cta', { namespace: 'checkout' })).toBe('Kaufen');
+
+    await expect(server.loadNamespace('broken')).rejects.toThrow('locale bundle unavailable');
+    expect(server.namespaceStatus.value.broken).toMatchObject({ state: 'error', error: 'locale bundle unavailable' });
+  });
 });
