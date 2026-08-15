@@ -80,6 +80,11 @@ Button carrier from actual usage. The generated browser regression requires
 retained DOM, no recovery or mismatches, one adopted Button sheet, one adopted
 application sheet, and complete cleanup.
 
+Generated hydration tests materialize their own trusted server response through
+test-only HTML parser sinks. They are not emitted into the starter production
+runtime; applications that enable Chromium Trusted Types configure the public
+Core and SSR policy handoff documented in the security guide.
+
 For stable automation, this is a ready-to-run UI starter command with no
 interactive answers:
 

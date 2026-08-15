@@ -21,6 +21,13 @@ await hydrateRequestState(state, router, store);
 const { mount, hydration } = await hydrateApplication(app, container);
 ```
 
+Under an enforcing Chromium Trusted Types CSP, assign the application-owned
+policy before hydration. Direct `hydrate()` callers pass the same
+`TrustedTypesConfig` as `HydrationOptions.trustedTypes`; application-root
+hydration resolves it from `app.config.trustedTypes`. The policy authorizes the
+detached expected-markup parser and any deterministic recovery render. Missing
+or incompatible policy handoff fails before Gluon reports retained hydration.
+
 For the optional UI packages, create the server style input and browser owner
 from the same public theme value:
 
@@ -116,6 +123,12 @@ used by that shell. Later boundary records contain resolved HTML plus only newly
 required component styles. A resolved boundary may add nested pending
 boundaries. `renderProgressiveReadableStream()` writes each record's carriers
 before its dependent shell or inert `template[data-gluon-async-patch]`.
+
+`applyProgressivePatch()` accepts the same application-owned `trustedTypes`
+configuration. Chromium enforcement rejects a patch without it; malformed,
+throwing, or non-TrustedHTML policies use stable
+`GLUON_SSR_TRUSTED_TYPES_POLICY_*` error codes. The policy does not authorize
+remote content or turn streamed HTML into sanitized input.
 
 Pass the HTTP response or request `AbortSignal` through `signal`. Cancellation
 rejects the iterator with the abort reason and aborts pending Gluon async source

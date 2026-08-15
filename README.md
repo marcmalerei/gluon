@@ -177,6 +177,12 @@ render(view('Gluon'), document.body);
 
 The second call updates the existing text part when the template shape is unchanged.
 
+Chromium Trusted Types deployments can opt into an application-owned
+`app.config.trustedTypes = { policyName, policy }` handoff and use
+`trustedHTML()` for already-reviewed
+markup. Gluon does not create a global policy implicitly and does not sanitize
+arbitrary untrusted HTML.
+
 The [typed UI extension contract](docs/ui-extensibility.md) defines the stable
 native-attribute/ref matrix, preset and custom-icon paths, application-owned
 style hooks, and the exact metadata-only boundary of the component helpers.

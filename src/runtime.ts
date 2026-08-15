@@ -1,4 +1,10 @@
-import { guardEventListener } from './application-context.js';
+import {
+  getActiveApplicationContext,
+  guardEventListener,
+  resolveApplicationContext,
+  validateTrustedTypesConfig,
+  type TrustedTypesConfig,
+} from './application-context.js';
 import {
   compareComponentStyles,
   createComponentStyleOwner,
@@ -16,6 +22,7 @@ const repeatKeys = Symbol('gluon.repeat-keys');
 const repeatValues = Symbol('gluon.repeat-values');
 const eventBindingBrand = Symbol('gluon.event-binding');
 const unsafeHtmlBrand = Symbol('gluon.unsafe-html');
+const trustedHtmlBrand = Symbol('gluon.trusted-html');
 const unsafeUrlBrand = Symbol('gluon.unsafe-url');
 const unsetValue = Symbol('gluon.unset');
 const emptyComponentStyles: readonly ComponentStyleDependency[] = Object.freeze([]);
@@ -42,6 +49,7 @@ export type TemplateValue =
   | DirectiveValue
   | EventBinding
   | UnsafeHtmlResult
+  | TrustedHtmlResult
   | UnsafeUrlResult
   | EventListenerOrEventListenerObject
   | typeof nothing
@@ -234,12 +242,24 @@ export interface UnsafeHtmlResult {
   readonly markup: string;
 }
 
+export interface TrustedHtmlResult {
+  readonly [trustedHtmlBrand]: true;
+  readonly markup: string;
+}
+
 /**
  * Opts a trusted string into raw HTML parsing. Gluon performs no sanitization.
  */
 export function unsafeHTML(markup: string): UnsafeHtmlResult {
   return Object.freeze({
     [unsafeHtmlBrand]: true as const,
+    markup,
+  });
+}
+
+export function trustedHTML(markup: string): TrustedHtmlResult {
+  return Object.freeze({
+    [trustedHtmlBrand]: true as const,
     markup,
   });
 }
@@ -300,6 +320,7 @@ export interface DirectiveValue {
 export type TemplateValueServerContract =
   | { readonly kind: 'repeat'; readonly items: readonly KeyedItem[] }
   | { readonly kind: 'unsafe-html'; readonly markup: string }
+  | { readonly kind: 'trusted-html'; readonly markup: string }
   | { readonly kind: 'unsafe-url'; readonly value: string }
   | { readonly kind: 'event' | 'directive' };
 
@@ -309,6 +330,7 @@ export function getTemplateValueServerContract(
 ): TemplateValueServerContract | undefined {
   if (isRepeatResult(value)) return { kind: 'repeat', items: value.items };
   if (isUnsafeHtmlResult(value)) return { kind: 'unsafe-html', markup: value.markup };
+  if (isTrustedHtmlResult(value)) return { kind: 'trusted-html', markup: value.markup };
   if (isUnsafeUrlResult(value)) return { kind: 'unsafe-url', value: value.value };
   if (isEventBinding(value)) return { kind: 'event' };
   if (isDirectiveValue(value)) return { kind: 'directive' };
@@ -639,6 +661,10 @@ class NodePart implements Part {
       this.unsafeMarkup = value.markup;
       return;
     }
+    if (isTrustedHtmlResult(value)) {
+      this.unsafeMarkup = value.markup;
+      return;
+    }
     throw new Error('The prepared hydration value is not supported by the DOM renderer.');
   }
 
@@ -707,6 +733,11 @@ class NodePart implements Part {
 
     if (isUnsafeHtmlResult(value)) {
       this.setUnsafeHTML(value);
+      return;
+    }
+
+    if (isTrustedHtmlResult(value)) {
+      this.setTrustedHTML(value);
       return;
     }
 
@@ -1121,17 +1152,21 @@ class NodePart implements Part {
     return { marker, part, binding };
   }
 
-  private setUnsafeHTML(result: UnsafeHtmlResult): void {
+  private setUnsafeHTML(result: UnsafeHtmlResult, requirePolicy = false): void {
     if (this.unsafeMarkup === result.markup) {
       this.replaceNodes(this.nodes);
       return;
     }
 
     this.resetChildren();
-    const fragment = createContextualFragment(this.contextMarker, result.markup);
+    const fragment = createContextualFragment(this.contextMarker, result.markup, requirePolicy);
     const nodes = [...fragment.childNodes];
     this.unsafeMarkup = result.markup;
     this.replaceNodes(nodes);
+  }
+
+  private setTrustedHTML(result: TrustedHtmlResult): void {
+    this.setUnsafeHTML({ [unsafeHtmlBrand]: true as const, markup: result.markup }, true);
   }
 
   private replaceNodes(nextNodes: Node[]): void {
@@ -1798,6 +1833,8 @@ export interface HydrationMismatch {
 
 export interface HydrationOptions {
   readonly expectedMarkup: string;
+  /** Application-owned policy used only for browser HTML parser sinks. */
+  readonly trustedTypes?: TrustedTypesConfig;
   /** @internal SSR supplies the deterministic marker range start for a nested root. */
   readonly markerOffset?: number;
   readonly recovery?: 'replace' | 'throw';
@@ -1827,9 +1864,12 @@ export function hydrate(
 ): HydrationResult {
   if (!container) return Object.freeze({ mismatches: [], retained: false, recovered: false });
   if (!isTemplateResult(result)) throw new TypeError('hydrate() expects a TemplateResult created by html or svg.');
+  const trustedTypes = options.trustedTypes ?? resolveApplicationContext(container)?.config.trustedTypes;
+  validateTrustedTypesConfig(trustedTypes);
   const styleDependencies = collectComponentStyleDependencies(result);
+  const compiled = getCompiledTemplate(result, trustedTypes);
   const expectedTemplate = document.createElement('template');
-  expectedTemplate.innerHTML = options.expectedMarkup;
+  assignTemplateHTML(expectedTemplate, options.expectedMarkup, 'hydration expected markup', trustedTypes);
   const mismatches: HydrationMismatch[] = [];
   compareHydrationNodes(
     [...expectedTemplate.content.childNodes],
@@ -1852,7 +1892,6 @@ export function hydrate(
   styles.claim(styleClaim, styleDependencies);
   try {
     const context = createHydrationAdoptionContext(container, styles, options.markerOffset ?? 0);
-    const compiled = getCompiledTemplate(result);
     const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
     setRootInstance(container, {
       template: compiled,
@@ -1905,7 +1944,10 @@ export function unmount(container: Element | DocumentFragment | null): void {
   }
 }
 
-function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
+function getCompiledTemplate(
+  result: TemplateResult,
+  trustedTypes = getActiveApplicationContext()?.config.trustedTypes,
+): CompiledTemplate {
   if (
     result.strings === lastTemplateStrings
     && result.type === lastTemplateType
@@ -1950,11 +1992,11 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
 
   markup += result.strings[result.strings.length - 1] ?? '';
   if (result.type === 'svg') {
-    element.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`;
+    assignTemplateHTML(element, `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'SVG template compilation', trustedTypes);
     const wrapper = element.content.firstElementChild as SVGSVGElement;
     element.content.replaceChildren(...wrapper.childNodes);
   } else {
-    element.innerHTML = markup;
+    assignTemplateHTML(element, markup, 'HTML template compilation', trustedTypes);
   }
   const descriptors = buildDescriptors(element.content, attributeNames, markerPrefix);
   const traversalDescriptors = [...descriptors].sort(
@@ -2643,6 +2685,14 @@ function isUnsafeHtmlResult(value: unknown): value is UnsafeHtmlResult {
   );
 }
 
+function isTrustedHtmlResult(value: unknown): value is TrustedHtmlResult {
+  return Boolean(
+    value
+      && typeof value === 'object'
+      && trustedHtmlBrand in value,
+  );
+}
+
 function isUnsafeUrlResult(value: unknown): value is UnsafeUrlResult {
   return Boolean(
     value
@@ -2707,10 +2757,15 @@ function setElementProperty(element: Element, property: string, value: unknown):
 
   let nextValue = value;
   if (property === 'srcdoc') {
-    if (!isUnsafeHtmlResult(value)) {
-      throw new TypeError(`.${property} requires an explicit unsafeHTML() value.`);
+    if (!isUnsafeHtmlResult(value) && !isTrustedHtmlResult(value)) {
+      throw new TypeError(`.${property} requires an explicit unsafeHTML() or trustedHTML() value.`);
     }
-    nextValue = value.markup;
+    nextValue = toTrustedHTML(
+      value.markup,
+      `.${property}`,
+      undefined,
+      isTrustedHtmlResult(value),
+    );
   }
 
   const urlProperty = property.toLowerCase();
@@ -2733,22 +2788,35 @@ function setElementProperty(element: Element, property: string, value: unknown):
   }
 
   const target = element as unknown as Record<string, unknown>;
-  if (!Object.is(target[property], nextValue)) target[property] = nextValue;
+  if (!Object.is(target[property], nextValue)) {
+    try {
+      target[property] = nextValue;
+    } catch (error) {
+      if (property === 'srcdoc') {
+        throw trustedTypesSinkError(`.${property}`, getActiveApplicationContext()?.config.trustedTypes, error);
+      }
+      throw error;
+    }
+  }
 }
 
 function serializeAttributeValue(name: string, value: unknown): string {
   const normalizedName = name.toLowerCase();
 
   if (normalizedName === 'srcdoc') {
-    if (!isUnsafeHtmlResult(value)) {
-      throw new TypeError('The srcdoc attribute requires an explicit unsafeHTML() value.');
+    if (!isUnsafeHtmlResult(value) && !isTrustedHtmlResult(value)) {
+      throw new TypeError('The srcdoc attribute requires an explicit unsafeHTML() or trustedHTML() value.');
     }
-    return value.markup;
+    return toTrustedHTML(
+      value.markup,
+      'srcdoc attribute',
+      undefined,
+      isTrustedHtmlResult(value),
+    );
   }
 
-  if (isUnsafeHtmlResult(value)) {
-    throw new TypeError('unsafeHTML() can only be used in child content or srcdoc.');
-  }
+  if (isUnsafeHtmlResult(value)) throw new TypeError('unsafeHTML() can only be used in child content or srcdoc.');
+  if (isTrustedHtmlResult(value)) throw new TypeError('trustedHTML() can only be used in child content or srcdoc.');
 
   if (isUnsafeUrlResult(value)) {
     if (!urlAttributes.has(normalizedName)) {
@@ -2787,8 +2855,15 @@ function setOwnedAttribute(element: Element, name: string, value: string): void 
     throw new TypeError('String event-handler attributes are not supported; use an event binding.');
   }
   const namespace = getAttributeNamespace(name);
-  if (namespace) element.setAttributeNS(namespace.uri, name, value);
-  else element.setAttribute(name, value);
+  try {
+    if (namespace) element.setAttributeNS(namespace.uri, name, value);
+    else element.setAttribute(name, value);
+  } catch (error) {
+    if (name.toLowerCase() === 'srcdoc') {
+      throw trustedTypesSinkError('srcdoc attribute', getActiveApplicationContext()?.config.trustedTypes, error);
+    }
+    throw error;
+  }
 }
 
 function removeOwnedAttribute(element: Element, name: string): void {
@@ -2818,15 +2893,92 @@ function getAttributeNamespace(
   };
 }
 
-function createContextualFragment(marker: Comment, markup: string): DocumentFragment {
+function createContextualFragment(marker: Comment, markup: string, requirePolicy: boolean): DocumentFragment {
+  const trustedTypes = getActiveApplicationContext()?.config.trustedTypes;
+  const trustedMarkup = toTrustedHTML(markup, 'dynamic HTML fragment', trustedTypes, requirePolicy);
   if (marker.parentNode) {
     const range = document.createRange();
     range.selectNode(marker);
-    return range.createContextualFragment(markup);
+    try {
+      return range.createContextualFragment(trustedMarkup);
+    } catch (error) {
+      throw trustedTypesSinkError('dynamic HTML fragment', trustedTypes, error);
+    }
   }
   const template = document.createElement('template');
-  template.innerHTML = markup;
+  assignTrustedTemplateHTML(template, trustedMarkup, 'dynamic HTML fragment', trustedTypes);
   return template.content;
+}
+
+function assignTemplateHTML(
+  template: HTMLTemplateElement,
+  markup: string,
+  sink: string,
+  trustedTypes = getActiveApplicationContext()?.config.trustedTypes,
+): void {
+  const trustedMarkup = toTrustedHTML(markup, sink, trustedTypes, false);
+  assignTrustedTemplateHTML(template, trustedMarkup, sink, trustedTypes);
+}
+
+function assignTrustedTemplateHTML(
+  template: HTMLTemplateElement,
+  markup: string,
+  sink: string,
+  trustedTypes: TrustedTypesConfig | undefined,
+): void {
+  try {
+    template.innerHTML = markup;
+  } catch (error) {
+    throw trustedTypesSinkError(sink, trustedTypes, error);
+  }
+}
+
+function toTrustedHTML(
+  markup: string,
+  sink: string,
+  trustedTypes = getActiveApplicationContext()?.config.trustedTypes,
+  requirePolicy = false,
+): string {
+  if (!trustedTypes) {
+    if (requirePolicy) {
+      throw new TypeError(`GLUON_TRUSTED_TYPES_POLICY_REQUIRED: trustedHTML() at ${sink} requires app.config.trustedTypes.`);
+    }
+    return markup;
+  }
+  validateTrustedTypesConfig(trustedTypes);
+  let result: unknown;
+  try {
+    result = trustedTypes.policy.createHTML(markup);
+  } catch (error) {
+    throw new TypeError(`GLUON_TRUSTED_TYPES_POLICY_FAILED: policy "${trustedTypes.policyName}" threw while authorizing ${sink}.`, { cause: error });
+  }
+  const factory = (globalThis as typeof globalThis & {
+    readonly trustedTypes?: { isHTML?(value: unknown): boolean };
+  }).trustedTypes;
+  const compatible = typeof factory?.isHTML === 'function'
+    ? factory.isHTML(result)
+    : typeof result === 'string';
+  if (!compatible) {
+    throw new TypeError(`GLUON_TRUSTED_TYPES_POLICY_INCOMPATIBLE: policy "${trustedTypes.policyName}" did not return TrustedHTML for ${sink}.`);
+  }
+  return result as string;
+}
+
+function trustedTypesSinkError(
+  sink: string,
+  trustedTypes: TrustedTypesConfig | undefined,
+  error: unknown,
+): unknown {
+  if (trustedTypes) {
+    return new TypeError(
+      `GLUON_TRUSTED_TYPES_POLICY_INCOMPATIBLE: policy "${trustedTypes.policyName}" was rejected while authorizing ${sink}.`,
+      { cause: error },
+    );
+  }
+  return new TypeError(
+    `GLUON_TRUSTED_TYPES_POLICY_REQUIRED: ${sink} was rejected by browser enforcement; configure app.config.trustedTypes with an application-owned policy.`,
+    { cause: error },
+  );
 }
 
 function nodesAreInPlace(marker: Comment, nodes: readonly Node[]): boolean {

@@ -2250,6 +2250,35 @@
         "unmount(container);"
       ]
     },
+    "core-trusted-types": {
+      "module": "@gluonjs/core",
+      "code": [
+        "import {",
+        "  createApp,",
+        "  html,",
+        "  hydrate,",
+        "  trustedHTML,",
+        "  type HydrationOptions,",
+        "  type TrustedHtmlResult,",
+        "  type TrustedTypePolicy,",
+        "  type TrustedTypesConfig,",
+        "} from '@gluonjs/core';",
+        "",
+        "const factory = (globalThis as typeof globalThis & {",
+        "  trustedTypes: { createPolicy(name: string, rules: { createHTML(value: string): string }): TrustedTypePolicy };",
+        "}).trustedTypes;",
+        "const policy: TrustedTypePolicy = factory.createPolicy('gluon-shop', { createHTML: (value) => value });",
+        "const trustedTypes = { policyName: 'gluon-shop', policy } satisfies TrustedTypesConfig;",
+        "const reviewedMarkup: TrustedHtmlResult = trustedHTML('<strong>Reviewed application markup</strong>');",
+        "const app = createApp(() => html`<main>${reviewedMarkup}</main>`);",
+        "app.config.trustedTypes = trustedTypes;",
+        "const root = document.querySelector<HTMLElement>('#app')!;",
+        "const mount = app.mount(root);",
+        "const hydrationOptions = { expectedMarkup: root.innerHTML, trustedTypes } satisfies HydrationOptions;",
+        "hydrate(html`<main>${reviewedMarkup}</main>`, root, hydrationOptions);",
+        "mount.unmount();"
+      ]
+    },
     "core-component-layers": {
       "module": "@gluonjs/core",
       "code": [
@@ -3282,6 +3311,10 @@
       "recipe": "core-template-rendering",
       "description": "Mark a previously sanitized trusted string for intentional raw HTML parsing while keeping the unsanitized boundary explicit:"
     },
+    "src/functions/trustedHTML.md": {
+      "recipe": "core-trusted-types",
+      "description": "Mark reviewed raw markup that must cross the active application-owned Trusted Types policy before any browser parser sink:"
+    },
     "src/functions/unsafeURL.md": {
       "recipe": "core-template-rendering",
       "description": "Mark one deliberately trusted URL that may bypass Gluon's unsafe-protocol guard for a URL-valued binding:"
@@ -3292,7 +3325,7 @@
     },
     "src/interfaces/AppConfig.md": {
       "recipe": "core-application",
-      "description": "Configure application-scoped error and warning handlers plus plugin-owned global properties before mounting:"
+      "description": "Configure application-scoped error and warning handlers, an optional application-owned Trusted Types policy, and plugin-owned global properties before mounting:"
     },
     "src/interfaces/AsyncComponentOptions.md": {
       "recipe": "core-async-components",
@@ -3328,11 +3361,23 @@
     },
     "src/interfaces/HydrationOptions.md": {
       "recipe": "core-hydration",
-      "description": "Provide expected server markup, replacement/throw policy, category suppression, mismatch observation, and optional state comparison:"
+      "description": "Provide expected server markup, optional application-owned Trusted Types policy, replacement/throw policy, category suppression, mismatch observation, and state comparison:"
     },
     "src/interfaces/HydrationResult.md": {
       "recipe": "core-hydration",
       "description": "Determine whether hydration retained existing DOM, replaced it, and which structured mismatches were observed:"
+    },
+    "src/interfaces/TrustedHtmlResult.md": {
+      "recipe": "core-trusted-types",
+      "description": "Carry explicit reviewed raw markup whose browser parsing requires the configured application policy:"
+    },
+    "src/interfaces/TrustedTypePolicy.md": {
+      "recipe": "core-trusted-types",
+      "description": "Adapt an application-created browser TrustedTypePolicy without creating or weakening a global policy inside Gluon:"
+    },
+    "src/interfaces/TrustedTypesConfig.md": {
+      "recipe": "core-trusted-types",
+      "description": "Bind one validated CSP policy name to its application-owned createHTML policy for runtime, hydration, and SSR parser handoff:"
     },
     "src/interfaces/KeepAliveProps.md": {
       "recipe": "core-builtins",

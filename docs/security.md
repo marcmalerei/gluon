@@ -26,6 +26,14 @@ after a successful handoff.
 request Router, Store, application, and effect scope. Signals, controllers, and
 cleanup owners are not shared across concurrent requests.
 
+Trusted Types support is opt-in and application-owned. The runtime validates a
+configured policy before HTML/SVG template compilation, dynamic fragments,
+`srcdoc`, hydration expected markup, and progressive patch parsing; it never
+creates a global policy. `quality/trusted-types-sinks.json` is the checked sink
+inventory. Explicit `trustedHTML()` values remain raw markup and are not a
+sanitizer. The enforcing evidence is a real Playwright-managed Chromium page,
+not an assertion inferred from Node serialization.
+
 | Area | Runtime control | Application responsibility | Evidence |
 | --- | --- | --- | --- |
 | HTML | Dynamic strings become text; raw markup requires `unsafeHTML()`; renderer-owned destructive properties are rejected. | Sanitize untrusted markup before the explicit escape hatch. | `tests/dom-runtime-contract.spec.ts`, `tests-node/ssr.spec.ts` |
@@ -33,7 +41,7 @@ cleanup owners are not shared across concurrent requests.
 | Styles | Constructable sheets are the browser runtime; SSR carriers are escaped and digest/order validated before adoption. | Treat `css()` input as author source; do not interpolate untrusted CSS. | `tests/styles-and-element.spec.ts`, `tests/hydration.spec.ts` |
 | SSR state | Only JSON-compatible state is accepted; script-breaking characters are escaped; resources are request-owned. | Keep secrets out of browser-visible state and authorize every serialized field. | `tests-node/ssr.spec.ts`, property/fuzz gate |
 | CSP | A request nonce is transported to initial style carriers without being generated or weakened by Gluon; module scripts use external asset URLs. | Generate unpredictable per-response nonces or hashes, emit policy/report headers, and reject violations. | `tests-node/ssr.spec.ts`, `docs/deployment.md` |
-| Trusted Types | Unsafe sinks are visible in public API names. No Trusted Types enforcement compatibility claim is made. | An enforcing application must own and audit a compatible policy until Gluon defines a public policy contract. | `src/runtime.ts`, `docs/dom-runtime.md` |
+| Trusted Types | Explicit trusted HTML values and an application-owned `trustedTypes.policy` satisfy the inventoried parser sinks under the tested Chromium `require-trusted-types-for` policy. Missing and incompatible configurations fail with stable diagnostics. | Configure and audit the policy and CSP name in the application that owns the HTML trust boundary; keep untrusted content on the escaping path. | `quality/trusted-types-sinks.json`, `scripts/validate-trusted-types-chromium.mjs`, clean-package fixture, browser and SSR suites |
 | Eleventy prerendering | The optional adapter validates route and asset URL boundaries, isolates abort/disposal ownership, escapes default-document attributes, and transports existing SSR carriers unchanged. | Trust and validate Eleventy data, asset manifests, custom document functions, CSP policy, and deployment fallbacks. | `tests-node/ssr.spec.ts`, `tests/hydration.spec.ts`, real and clean Eleventy build gates |
 | Vue source analysis | The Node analyzer realpath-checks one root, never follows symlinks or executes project code, enforces fixed worker/resource budgets, emits no source excerpts/absolute paths, and has no writer/network/plugin hook. | Treat findings as static inventory only; review indeterminate runtime, Router, Store, style, SSR, async, test, and build semantics. | `tests-node/vue-migration-analyzer.spec.ts`, retained adversarial fixtures, RFC 0003 |
 | Gluon project analysis | The CLI realpath-contains one root, skips symlinks and generated/dependency directories, caps source files and bytes, never imports application modules, and writes only JSON to stdout. | Treat exact and structural records as static evidence and review every indeterminate record against runtime behavior. | `tests-node/language-server.spec.ts`, `check:project-analysis`, clean-install fixture |

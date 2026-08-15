@@ -35,7 +35,13 @@ and event/directive hooks do not run.
 
 `renderToString()` escapes child and attribute data, rejects unsafe URL
 protocols, omits event bindings, resolves async built-in server contracts, and
-honors explicit `unsafeHTML()`/`unsafeURL()` values. `renderElement()` emits open
+honors explicit `unsafeHTML()`/`trustedHTML()`/`unsafeURL()` values.
+When an application provides `app.config.trustedTypes`, hydration resolves that
+same policy and direct `hydrate()` or `applyProgressivePatch()` calls accept it
+explicitly. The handoff covers browser parser sinks under the tested Chromium
+Trusted Types CSP without changing SSR serialization or ordinary child-string
+escaping. Gluon does not create a global policy and does not sanitize arbitrary
+untrusted HTML. `renderElement()` emits open
 Declarative Shadow DOM for a class registered through `defineElement()`. Its
 deterministic comment and temporary `data-gluon-h-*` markers let
 `@gluonjs/ssr/hydration` reconstruct client bindings without replacing matching

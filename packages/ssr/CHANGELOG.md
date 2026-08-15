@@ -7,6 +7,8 @@
 - Added the public `applyProgressivePatch()` browser contract for replacing
   streamed async fallbacks in place, retaining nested boundaries, and safely
   installing newly discovered style carriers.
+- Added the shared application-owned Trusted Types policy contract and stable
+  parser-policy diagnostics for progressive patch application.
 
 ## [1.9.0] - 2026-08-15
 

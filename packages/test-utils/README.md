@@ -137,6 +137,12 @@ carrier, and exact head nodes. Failed hydration rolls back all installed DOM.
 `activeSsrFixtureNames()` and `assertNoSsrFixtureLeaks()` expose ownership
 failures.
 
+The fixture materializer uses browser HTML parser sinks because its input is a
+caller-owned, test-only `SsrRequestResult`. It is outside the production
+Trusted Types compatibility claim. Enforcing CSP acceptance must use the
+application-owned runtime and SSR policy options instead of treating this test
+helper as a security boundary.
+
 `create-gluon --ui --testing` generates a complete application-level Chromium
 test rather than an isolated markup sample. It mounts the real starter owner,
 queries the native Button by its app-owned data attribute, checks its accessible

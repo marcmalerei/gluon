@@ -35,10 +35,10 @@ support-matrix check.
 
 | Package/surface | Supported contract | Explicit non-goal or prerequisite |
 | --- | --- | --- |
-| `@gluonjs/core`, `@gluonjs/atoms`, `@gluonjs/molecules`, `@gluonjs/organisms` | Native Custom Elements/templates, constructable styles, semantic controls, and the public UI contracts tested by browser/SSR suites | No framework-specific runtime or branded-browser claim. |
+| `@gluonjs/core`, `@gluonjs/atoms`, `@gluonjs/molecules`, `@gluonjs/organisms` | Native Custom Elements/templates, constructable styles, semantic controls, the public UI contracts, and opt-in Trusted Types parser handoff under the tested Chromium enforcement page | No framework-specific runtime, branded-browser, sanitizer, or cross-browser Trusted Types claim. |
 | `@gluonjs/router` | Browser/hash/memory histories, typed locations, static route data, URL query state, guards, and request-free navigation | Transport, authentication, caching, persistence, and domain requests belong to the application/Store. |
 | `@gluonjs/store` | Request/application isolation, JSON-safe snapshots, persistence plugins, and hydration contracts | No server, database, auth, or cross-request singleton ownership. |
-| `@gluonjs/ssr` | DOM-free Node serialization, request-local cleanup, progressive streaming, and browser hydration handoff | Hydration requires the documented declarative Shadow DOM/style transport. It is not a browser renderer. |
+| `@gluonjs/ssr` | DOM-free Node serialization, request-local cleanup, progressive streaming, browser hydration handoff, and explicit Trusted Types-compatible parser handoff on opt-in application configuration | Hydration requires the documented declarative Shadow DOM/style transport. It is not a browser renderer. |
 | `@gluonjs/json-forms` | Typed native fields for the documented JSON Schema subset, including nested objects and bounded arrays | Unsupported schema keywords fail explicitly; arbitrary JSON Schema, file widgets, and conditional/composed schemas are not supported by default. |
 | `@gluonjs/i18n` | JSON-safe messages, ordered locale fallbacks, `Intl` formatting, plural/select interpolation, lazy namespaces, and SSR state transfer | Message loading, translation content, locale choice, and language-switch product UX remain application-owned. |
 | `@gluonjs/graph` | Deterministic canvas graph for a few hundred nodes plus a synchronized semantic keyboard node list | It is not a large-graph editor, layout persistence system, or assistive-technology replacement for domain-specific graph views. |
@@ -55,7 +55,7 @@ support-matrix check.
 | `@gluonjs/router` | Browser/hash/memory navigation, route data, query state, guards, and links. |
 | `@gluonjs/store` | Isolated store managers, snapshots, persistence plugins, and hydration. |
 | `@gluonjs/i18n` | Optional JSON-safe translation, locale fallback, `Intl`, namespaces, and SSR transfer. |
-| `@gluonjs/ssr` | Node serialization, request ownership, progressive streaming, and hydration transport. |
+| `@gluonjs/ssr` | Node serialization, request ownership, progressive streaming, hydration transport, and opt-in Trusted Types parser handoff. |
 | `@gluonjs/vite` | Vite source maps, diagnostics, HMR, and public package resolution. |
 | `@gluonjs/gluon-components-vite` | Native Gluon Storybook/Vite renderer and component-library integration. |
 | `@gluonjs/test-utils` | Browser and SSR fixture/test ownership; it is not a production runtime. |
@@ -85,7 +85,7 @@ The matrix intentionally does not claim:
 
 - a branded browser, operating system, device, or assistive technology;
 - general performance superiority or a universal bundle-size guarantee;
-- Trusted Types enforcement compatibility;
+- cross-browser Trusted Types enforcement compatibility;
 - Marketplace distribution of the VS Code client;
 - security of arbitrary remote Devtools connections.
 

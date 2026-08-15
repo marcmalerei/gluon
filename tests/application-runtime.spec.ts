@@ -31,6 +31,26 @@ describe('application runtime', () => {
     document.body.replaceChildren();
   });
 
+  it('rejects malformed Trusted Types configuration before claiming a mount root', () => {
+    const invalidName = createApp(html`<p>invalid name</p>`);
+    invalidName.config.trustedTypes = {
+      policyName: 'bad name',
+      policy: { createHTML: (value) => value },
+    };
+    expect(() => invalidName.mount(document.createElement('div'))).toThrow('GLUON_TRUSTED_TYPES_POLICY_NAME_INVALID');
+
+    const missingPolicy = createApp(html`<p>missing policy</p>`);
+    missingPolicy.config.trustedTypes = { policyName: 'missing' } as never;
+    expect(() => missingPolicy.mount(document.createElement('div'))).toThrow('GLUON_TRUSTED_TYPES_POLICY_MISSING');
+
+    const mismatchedPolicy = createApp(html`<p>mismatched policy</p>`);
+    mismatchedPolicy.config.trustedTypes = {
+      policyName: 'expected',
+      policy: { name: 'actual', createHTML: (value) => value },
+    };
+    expect(() => mismatchedPolicy.mount(document.createElement('div'))).toThrow('GLUON_TRUSTED_TYPES_POLICY_NAME_MISMATCH');
+  });
+
   it('isolates plugins, providers, component registries, stores, config, and errors', async () => {
     const storeKey = createInjectionKey<{ name: string }>('store');
     const themeKey = createInjectionKey<string>('theme');

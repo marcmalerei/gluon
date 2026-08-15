@@ -119,10 +119,36 @@ that surrounding namespace.
 ## Dynamic content and URL safety
 
 Ordinary child strings always create text nodes. Dynamic raw markup requires
-the visibly unsafe `unsafeHTML(trustedMarkup)` API. It is also required for
-`srcdoc`. `.innerHTML`, `.outerHTML`, and `.textContent` property bindings are
-rejected because they can destroy renderer-owned marker nodes. Gluon does not
-sanitize an `unsafeHTML` value. Only reviewed, trusted input may use it.
+the visibly unsafe `unsafeHTML(reviewedMarkup)` API. Chromium applications that
+enforce `require-trusted-types-for 'script'` create their own named policy and
+assign it before mount:
+
+```ts
+const policy = trustedTypes.createPolicy('gluon-shop', {
+  createHTML: (markup) => markup,
+});
+app.config.trustedTypes = { policyName: 'gluon-shop', policy };
+```
+
+That explicit opt-in covers HTML/SVG template compilation, dynamic contextual
+fragments, `srcdoc`, and application-owned rendering. `trustedHTML(markup)` is
+the policy-required raw-markup value: it fails with
+`GLUON_TRUSTED_TYPES_POLICY_REQUIRED` when no application policy is active.
+Existing `unsafeHTML()` remains source compatible; under enforcing CSP it also
+needs the configured policy because the browser rejects the parser sink.
+Custom Elements below an application root resolve that policy automatically.
+Code that calls `render()` outside a mounted root can retain explicit ownership
+with `app.run(() => render(view, container))`; a standalone unowned render has
+no policy source and therefore fails closed under enforcement.
+
+Both raw-markup values are accepted for `srcdoc` attribute and property
+bindings. `.innerHTML`, `.outerHTML`, and `.textContent` bindings remain
+rejected because they can destroy renderer-owned marker nodes. Gluon neither
+creates a global policy nor sanitizes markup. Policy creation, allowed policy
+names in CSP, sanitization, and review remain application responsibilities.
+Malformed names, absent or mismatched policies, policy exceptions, and values
+that are not native `TrustedHTML` in a supporting browser produce stable
+`GLUON_TRUSTED_TYPES_*` diagnostics.
 
 String `on*` attributes are rejected. Native listeners must use `@event` or a
 spread event key.
