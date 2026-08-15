@@ -682,6 +682,30 @@
         "focusScope.deactivate();"
       ]
     },
+    "quark-anchored-overlays": {
+      "module": "@gluonjs/quarks",
+      "code": [
+        "import {",
+        "  HoverCard,",
+        "  Tooltip,",
+        "  q,",
+        "  type AnchoredOverlayContentAttributes,",
+        "  type AnchoredOverlayHostAttributes,",
+        "  type AnchoredOverlayTriggerAttributes,",
+        "  type HoverCardProps,",
+        "  type OverlayPlacement,",
+        "  type TooltipProps,",
+        "} from '@gluonjs/quarks';",
+        "",
+        "const trigger = (attributes: AnchoredOverlayTriggerAttributes) => q.button({ ...attributes, type: 'button', children: 'Delivery details' });",
+        "const hostAttributes = { class: 'delivery-help' } satisfies AnchoredOverlayHostAttributes;",
+        "const contentAttributes = { class: 'delivery-tooltip' } satisfies AnchoredOverlayContentAttributes;",
+        "const placement: OverlayPlacement = 'block-end';",
+        "const tooltip = { id: 'delivery-help', trigger, content: 'Timing is confirmed for the configured item.', placement, delay: 300, hostAttributes, contentAttributes } satisfies TooltipProps;",
+        "const hoverCard = { id: 'maker-details', label: 'Maker details', trigger, content: q.a({ href: '/makers/ada', children: 'Read the maker profile' }), placement: 'inline-end' } satisfies HoverCardProps;",
+        "console.log(Tooltip(tooltip), HoverCard(hoverCard));"
+      ]
+    },
     "quark-manifest": {
       "module": "@gluonjs/quarks",
       "code": [
@@ -5511,6 +5535,14 @@
       "recipe": "quark-headless",
       "description": "Render content with the native popover contract and an ID that a separately labeled trigger can target:"
     },
+    "packages/quarks/src/functions/Tooltip.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Attach a delayed, non-interactive description to the actual caller-rendered control with collision-aware logical placement:"
+    },
+    "packages/quarks/src/functions/HoverCard.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Attach labelled interactive detail content while retaining focus on the trigger until intentional keyboard or pointer entry:"
+    },
     "packages/quarks/src/functions/quark.md": {
       "recipe": "quark-elements",
       "description": "Create and cache a typed native-element factory that accepts explicit property, boolean, event, ARIA, data, class, style, and ref bindings:"
@@ -5574,6 +5606,30 @@
     "packages/quarks/src/type-aliases/DialogProps.md": {
       "recipe": "quark-headless",
       "description": "Require either a direct label or `labelledBy` relationship while configuring modal state, content, dismissal, and attributes:"
+    },
+    "packages/quarks/src/type-aliases/AnchoredOverlayContentAttributes.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Style and annotate anchored content without replacing component-owned semantics, visibility, behavior, refs, or positioning:"
+    },
+    "packages/quarks/src/type-aliases/AnchoredOverlayHostAttributes.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Extend the neutral host separately from its trigger and popup while preserving lifecycle ownership:"
+    },
+    "packages/quarks/src/type-aliases/AnchoredOverlayTriggerAttributes.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Apply owned ARIA, interaction, identity, and ref bindings directly to the caller-rendered native trigger:"
+    },
+    "packages/quarks/src/type-aliases/HoverCardProps.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Configure a labelled interactive anchored surface with a typed native trigger renderer and logical placement:"
+    },
+    "packages/quarks/src/type-aliases/OverlayPlacement.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Choose one writing-mode-aware preferred side that can flip and clamp against the viewport:"
+    },
+    "packages/quarks/src/type-aliases/TooltipProps.md": {
+      "recipe": "quark-anchored-overlays",
+      "description": "Configure a non-interactive description with a typed native trigger renderer, delay, and separated extension points:"
     },
     "packages/quarks/src/type-aliases/AriaAttributeName.md": {
       "recipe": "quark-elements",

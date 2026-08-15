@@ -33,7 +33,7 @@ import {
   type JsonSchema,
 } from '../packages/json-forms/src/index.js';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
-import { createComponentLibraryLoader } from '@gluonjs/quarks';
+import { createComponentLibraryLoader, HoverCard, q, Tooltip } from '@gluonjs/quarks';
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   hydrateApplication,
@@ -64,6 +64,28 @@ import {
 
 describe('SSR hydration', () => {
   afterEach(cleanupSsrFixtures);
+
+  it('retains and activates Tooltip and HoverCard server markup', async () => {
+    const value = html`${Tooltip({
+      id: 'hydrated-tip', trigger: (attributes) => q.button({ ...attributes, children: 'Help' }), content: 'Hydrated help.', delay: 0,
+    })}${HoverCard({
+      id: 'hydrated-card', label: 'Hydrated details', trigger: (attributes) => q.button({ ...attributes, children: 'Details' }), content: q.a({ href: '#hydrated', children: 'Read' }), delay: 0,
+    })}`;
+    const prepared = await prepareForHydration(value);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    document.body.append(root);
+    const tooltip = root.querySelector<HTMLElement>('#hydrated-tip-content')!;
+    const result = await hydrateTemplate(value, root);
+    expect(result).toMatchObject({ retained: true, recovered: false });
+    expect(root.querySelector('#hydrated-tip-content')).toBe(tooltip);
+    const trigger = root.querySelector<HTMLButtonElement>('#hydrated-tip-trigger')!;
+    trigger.focus();
+    expect(tooltip.hidden).toBe(false);
+    expect(trigger.getAttribute('aria-describedby')).toBe('hydrated-tip-content');
+    unmount(root);
+    root.remove();
+  });
 
   it('applies progressive boundary patches in place, including nested boundaries and styles', () => {
     const root = document.createElement('main');

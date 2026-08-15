@@ -15,6 +15,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added request-free Tooltip and HoverCard quarks with typed native triggers,
+  nested overlay ownership, collision-aware logical placement, and retained
+  SSR/hydration behavior.
+
 - Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
   `Separator` atoms with native semantics, typed extension contracts, and
   cross-browser evidence.

@@ -15,6 +15,7 @@ import {
 import { customElement, property } from '@gluonjs/core/decorators';
 import { Progress, Radio, Slider, StatusBadge } from '@gluonjs/atoms';
 import { ChoiceGroup } from '@gluonjs/molecules';
+import { q, Tooltip } from '@gluonjs/quarks';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
 import {
@@ -514,7 +515,23 @@ export function ProductConfiguratorLightContent(product: Product) {
       <div><h1 id="product-title">${product.name}</h1><p>${product.description}</p></div>
       <strong>${formatPrice(product.price)}</strong>
     </div>
-    ${renderInventoryStatus(product)}
+    <div slot="inventory" class="inventory-row">
+      ${renderInventoryStatus(product)}
+      ${Tooltip({
+        id: `${product.slug}-availability-help`,
+        trigger: ({ aria, ...attributes }) => q.button({
+          ...attributes,
+          aria: { ...aria, label: 'How workshop availability works' },
+          type: 'button',
+          class: 'availability-help-trigger',
+          children: 'Availability details',
+        }),
+        contentAttributes: { class: 'availability-help-tooltip' },
+        content: 'Workshop availability is checked for this exact configuration before dispatch.',
+        placement: 'block-end',
+        delay: 250,
+      })}
+    </div>
     <ul class="product-facts">
       <li>Ships in 2–3 days</li>
       <li>Repairable parts</li>
@@ -524,7 +541,7 @@ export function ProductConfiguratorLightContent(product: Product) {
 }
 
 function renderInventoryStatus(product: Product): TemplateValue {
-  return html`<div slot="inventory" class="inventory-status" role="status" aria-live="polite">${Suspense({
+  return html`<div class="inventory-status" role="status" aria-live="polite">${Suspense({
     source: (context) => loadInventory(product, context),
     sourceKey: product.slug,
     fallback: html`<span class="inventory-pending">${Progress({

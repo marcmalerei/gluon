@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { css, render } from '../src/index.js';
-import { createComponentLibraryLoader, fragment, htmlTagNames, q, quark, validateComponentLibraryManifest } from '@gluonjs/quarks';
+import { createComponentLibraryLoader, fragment, htmlTagNames, HoverCard, q, quark, Tooltip, validateComponentLibraryManifest } from '@gluonjs/quarks';
 
 describe('quarks', () => {
   beforeEach(() => {
@@ -39,6 +39,34 @@ describe('quarks', () => {
     expect(button.dataset.testId).toBe('save');
     expect(button.getAttribute('aria-label')).toBe('Save changes');
     expect(click).toHaveBeenCalledOnce();
+  });
+
+  it('keeps Tooltip and HoverCard semantics distinct and supports focus/Escape lifecycle', async () => {
+    const root = document.createElement('div');
+    render(fragment([
+      Tooltip({ id: 'tip', trigger: (attributes) => q.button({ ...attributes, children: 'Help' }), content: 'Description', delay: 0 }),
+      HoverCard({ id: 'card', label: 'Details', trigger: (attributes) => q.button({ ...attributes, children: 'Details' }), content: q.a({ href: '#inside', children: 'Read more' }), delay: 0 }),
+    ]), root);
+    document.body.append(root);
+    const tipTrigger = root.querySelector('#tip-trigger') as HTMLElement;
+    const tip = root.querySelector('#tip-content') as HTMLElement;
+    expect(tip.getAttribute('role')).toBe('tooltip');
+    tipTrigger.focus();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(tipTrigger.getAttribute('aria-describedby')).toBe('tip-content');
+    expect(tip.hidden).toBe(false);
+    tip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(tip.hidden).toBe(true);
+    const cardTrigger = root.querySelector('#card-trigger') as HTMLElement;
+    const card = root.querySelector('#card-content') as HTMLElement;
+    expect(card.getAttribute('role')).toBe('dialog');
+    expect(card.getAttribute('aria-label')).toBe('Details');
+    cardTrigger.focus();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(card.hidden).toBe(false);
+    card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(card.hidden).toBe(true);
+    await Promise.resolve();
   });
 
   it('supports custom-element quarks and fragment composition', () => {

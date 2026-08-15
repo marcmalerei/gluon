@@ -43,6 +43,55 @@ diagnostic boundary are documented in
   owner composes it with a focus scope and controls background inertness.
 - `Popover` uses the native `popover` attribute. Its trigger must use the native
   `popovertarget` relationship and retain an accessible name.
+- `Tooltip` and `HoverCard` are separate request-free anchored contracts.
+  Tooltip is a non-interactive `role="tooltip"` description. HoverCard is a
+  labelled, focusable `role="dialog"` surface. Their typed `trigger` renderer
+  receives the ARIA, event, id, data, and ref properties that must be spread
+  onto the actual native trigger; a wrapper is never presented as the control.
+
+```ts
+import { HoverCard, Tooltip, q } from '@gluonjs/quarks';
+
+const help = Tooltip({
+  id: 'delivery-help',
+  trigger: ({ aria, ...owned }) => q.button({
+    ...owned,
+    aria: { ...aria, label: 'How delivery timing works' },
+    type: 'button',
+    children: 'Delivery details',
+  }),
+  content: 'Timing is confirmed for the configured item.',
+  placement: 'block-end',
+  delay: 300,
+  contentAttributes: { class: 'delivery-tooltip' },
+});
+
+const details = HoverCard({
+  id: 'maker-details',
+  label: 'Maker details',
+  trigger: (owned) => q.button({ ...owned, type: 'button', children: 'Maker' }),
+  content: q.a({ href: '/makers/ada', children: 'Read the maker profile' }),
+});
+```
+
+Mouse hover honors `delay`; focus opens without moving focus; touch pointerdown
+and click form one deterministic toggle. Tooltip content is not a focus target
+and must not contain interactive descendants. HoverCard content can be entered
+with Arrow Down or Enter, or by ordinary pointer interaction. Escape closes the
+topmost overlay and restores its trigger when focus was inside the HoverCard.
+Document outside-interaction listeners, resize/scroll listeners,
+`ResizeObserver`, and timers exist only while needed and are removed on close
+or unmount. Reduced-motion preference removes the opening delay.
+
+`placement` accepts `block-start`, `block-end`, `inline-start`, or `inline-end`.
+The opposite main-axis side is selected on collision and both viewport axes are
+clamped to an 8px edge. Logical inline placement follows the trigger's computed
+direction. The contract owns inline `position`, `inset`, `margin`, `left`,
+`top`, and the Tooltip's non-interactive `pointer-events`; consumers style appearance through `contentAttributes.class` and
+constructable stylesheets. `hostAttributes` and `contentAttributes` are
+separate, and owned semantics, behavior, ref, visibility, and position fields
+throw when supplied through the wrong extension point. IDs are unique per live
+document and use the HTML-safe `[A-Za-z][A-Za-z0-9_-]*` subset.
 - `Listbox` requires a stable `id` and label. Arrow Up/Down, Home, and End select
   enabled options; disabled options are skipped. The owner persists `onChange`
   and rerenders the controlled `value`.
@@ -54,8 +103,9 @@ Browser behavior is covered in Chromium, Firefox, and WebKit by
 `tests/ui-system.spec.ts`. The interactive compiled example is
 `docs-site/examples/ui-system.ts`.
 
-The package does not read or mutate `document` at import time. DOM access occurs
-only when a caller invokes a focus behavior.
+The package does not read or mutate `document` at import or SSR construction
+time. Anchored overlays install browser ownership only after a rendered trigger
+opens and release it on close or removal.
 
 All visible strings and accessible names are caller inputs. The package performs
 no locale selection and supports either text direction through native semantics.

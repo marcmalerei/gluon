@@ -55,6 +55,8 @@ import {
   Listbox,
   Overlay,
   Popover,
+  Tooltip,
+  HoverCard,
   createFocusScope,
   q,
 } from '@gluonjs/quarks';
@@ -347,6 +349,8 @@ createApp(() => AppShell({
       q.p({ children: `Selected finish: ${finish.value}` }),
       CheckoutActions({ total: '$128.00' }),
       Popover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
+      Tooltip({ id: 'ui-tooltip', trigger: (attributes) => q.button({ ...attributes, children: 'Hover or focus' }), content: 'A concise description.' }),
+      HoverCard({ id: 'ui-hover-card', label: 'More context', trigger: (attributes) => q.button({ ...attributes, children: 'More context' }), content: q.p({ children: 'A focusable explanation.' }) }),
         dialogOpen.value
           ? DialogSurface({
               id: 'profile-preferences',

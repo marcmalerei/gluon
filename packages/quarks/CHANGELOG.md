@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added separate Tooltip and HoverCard anchored-overlay contracts with typed
+  native trigger ownership, mouse/keyboard/touch dismissal, nested overlays,
+  logical collision-aware placement, and deterministic SSR/hydration.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

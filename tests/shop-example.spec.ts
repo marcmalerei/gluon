@@ -599,6 +599,8 @@ describe('GLUON GOODS reference shop', () => {
   it('retains the reduced-motion and product-owned public-token contracts', () => {
     expect(getStyleSheetText(shopStyles)).toContain('@media (prefers-reduced-motion: reduce)');
     expect(getStyleSheetText(productConfiguratorStyles)).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(getStyleSheetText(shopStyles)).toContain('@media (forced-colors: active)');
+    expect(getStyleSheetText(shopStyles)).toContain('.availability-help-tooltip');
     const tokens = getStyleSheetText(shopUiTokenStyles);
     expect(tokens).toContain('--gluon-color-canvas: #ffffff');
     expect(tokens).toContain('--gluon-color-text: #111111');
