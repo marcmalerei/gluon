@@ -45,7 +45,7 @@ import {
   createDialogSurfaceController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AppShell, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AppShell, ConfirmationDialog, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,

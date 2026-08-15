@@ -46,7 +46,7 @@ import {
   type ResponsiveDisclosureAttributes,
   type ResponsiveDisclosureProps,
 } from '@gluonjs/molecules';
-import { AppShell, WorkflowTimeline, organismManifest, type WorkflowTimelineOverallState, type WorkflowTimelineStatus } from '@gluonjs/organisms';
+import { AppShell, ConfirmationDialog, WorkflowTimeline, createConfirmationDialogController, organismManifest, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type WorkflowTimelineOverallState, type WorkflowTimelineStatus } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -112,6 +112,17 @@ const workflow: TemplateResult = WorkflowTimeline({
   messages: { status: (status) => status.toUpperCase() },
 });
 void workflow;
+const confirmationInitialFocus: ConfirmationDialogInitialFocus = '[data-confirm-primary]';
+const confirmationOptions: ConfirmationDialogControllerOptions = { initialFocus: confirmationInitialFocus };
+const confirmationController = createConfirmationDialogController(confirmationOptions);
+const confirmation: TemplateResult = ConfirmationDialog({
+  id: 'typed-confirmation',
+  title: 'Confirm?',
+  primaryAction: Button({ label: 'Confirm' }),
+  controller: confirmationController,
+  dismissOnBackdrop: false,
+});
+void confirmation;
 
 declare const container: HTMLElement;
 const scope: FocusScope = createFocusScope(container);
@@ -353,3 +364,9 @@ WorkflowTimeline({ steps: [] });
 WorkflowTimeline({ id: 'workflow', steps: [], attributes: { id: 'other' } });
 // @ts-expect-error WorkflowTimeline status values remain closed
 WorkflowTimeline({ id: 'workflow', steps: [{ id: 'one', label: 'One', status: 'running' }] });
+// @ts-expect-error ConfirmationDialog requires a caller-owned primary action
+ConfirmationDialog({ id: 'confirmation', title: 'Confirm?' });
+// @ts-expect-error ConfirmationDialog owns its open state
+ConfirmationDialog({ id: 'confirmation', title: 'Confirm?', primaryAction: 'Confirm', attributes: { open: true } });
+// @ts-expect-error ConfirmationDialog initial focus must be a selector or element
+createConfirmationDialogController({ initialFocus: 1 });

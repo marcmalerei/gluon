@@ -12,7 +12,7 @@ const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['AspectRatio', 'Avatar', 'Button', 'Checkbox', 'Icon', 'Input', 'Label', 'Progress', 'Radio', 'Select', 'Slider', 'StatusBadge', 'ScrollArea', 'Separator', 'Switch', 'Textarea', 'ToggleButton', 'installUi']],
   ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'NavigationStrip', 'SegmentedControl', 'TableRegion', 'Tabs']],
-  ['@gluonjs/organisms', ['AppShell', 'WorkflowTimeline']],
+  ['@gluonjs/organisms', ['AppShell', 'ConfirmationDialog', 'WorkflowTimeline']],
 ]);
 const manifestExports = new Map([
   ['@gluonjs/quarks', 'quarkManifest'],
@@ -164,7 +164,7 @@ try {
     .filter((file) => file.endsWith('.js'))
     .map(async (file) => [file, await readFile(resolve(componentOutput, file), 'utf8')])));
   const initial = entries.get('button-only.js') ?? '';
-  for (const marker of ['gluon-aspect-ratio', 'gluon-avatar', 'gluon-checkbox', 'gluon-progress', 'gluon-radio', 'gluon-scroll-area', 'gluon-separator', 'gluon-slider', 'gluon-status-badge', 'gluon-switch', 'gluon-toggle-button', 'gluon-input', 'gluon-label', 'gluon-icon', 'gluon-select', 'gluon-textarea', 'gluon-accordion', 'gluon-button-group', 'gluon-card', 'gluon-choice-group', 'gluon-control-field', 'gluon-dialog-surface', 'gluon-empty-state', 'gluon-form-field', 'gluon-inline-notice', 'gluon-navigation-strip', 'gluon-segmented-control', 'gluon-tabs', 'gluon-app-shell']) {
+  for (const marker of ['gluon-aspect-ratio', 'gluon-avatar', 'gluon-checkbox', 'gluon-progress', 'gluon-radio', 'gluon-scroll-area', 'gluon-separator', 'gluon-slider', 'gluon-status-badge', 'gluon-switch', 'gluon-toggle-button', 'gluon-input', 'gluon-label', 'gluon-icon', 'gluon-select', 'gluon-textarea', 'gluon-accordion', 'gluon-button-group', 'gluon-card', 'gluon-choice-group', 'gluon-control-field', 'gluon-dialog-surface', 'gluon-empty-state', 'gluon-form-field', 'gluon-inline-notice', 'gluon-navigation-strip', 'gluon-segmented-control', 'gluon-tabs', 'gluon-app-shell', 'gluon-confirmation-dialog']) {
     if (initial.includes(marker)) throw new Error(`Button-only entry contains unselected marker ${marker}.`);
   }
   if (!initial.includes('gluon-button')) throw new Error('Button-only entry does not contain its exact component marker.');

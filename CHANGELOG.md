@@ -7,6 +7,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Added the native, request-free `ConfirmationDialog` organism with caller-owned
+  actions, controlled modal lifecycle, initial and restored focus, inert
+  busy/disabled states, native dismissal events, and responsive styling.
+
 ### Added
 
 - Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and

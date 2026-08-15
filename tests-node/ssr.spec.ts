@@ -62,7 +62,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
-import { WorkflowTimeline } from '@gluonjs/organisms';
+import { ConfirmationDialog, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -108,6 +108,24 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(first).toContain('Receipt 42');
     expect(first).toContain('data-gluon-h-');
   });
+
+  it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(ConfirmationDialog({
+      id: 'server-confirmation',
+      title: 'Archive order?',
+      description: 'The caller owns the mutation.',
+      safeAction: Button({ label: 'Cancel' }),
+      primaryAction: Button({ label: 'Archive' }),
+      open: true,
+      destructive: true,
+    })));
+    expect(rendered).toContain('<dialog');
+    expect(rendered).toContain('open');
+    expect(rendered).toContain('aria-labelledby="server-confirmation-title"');
+    expect(rendered).toContain('aria-describedby="server-confirmation-description"');
+    expect(rendered).toContain('data-destructive');
+  });
+
   it('serializes the DialogSurface ARIA structure without invoking browser focus APIs', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(DialogSurface({
       id: 'server-dialog',

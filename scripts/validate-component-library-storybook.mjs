@@ -83,6 +83,74 @@ const scenarios = [{
     return evidence;
   },
 }, {
+  id: 'component-library-confirmationdialog--destructive',
+  stateSelectors: ['dialog[open]', '.gluon-confirmation-dialog-title'],
+  expectedText: 'Confirm this action?',
+  screenshotSelector: 'dialog[open]',
+  verifyMedia: async (page) => {
+    await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+    const evidence = await page.locator('dialog[open]').evaluate((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        forcedColors: matchMedia('(forced-colors: active)').matches,
+        reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+        boxShadow: styles.boxShadow,
+        animationName: styles.animationName,
+        transitionDuration: styles.transitionDuration,
+      };
+    });
+    await page.emulateMedia({ forcedColors: 'none', reducedMotion: 'no-preference' });
+    if (!evidence.forcedColors || !evidence.reducedMotion || evidence.boxShadow !== 'none'
+      || evidence.animationName !== 'none' || evidence.transitionDuration !== '0s') {
+      throw new Error(`ConfirmationDialog media contract failed: ${JSON.stringify(evidence)}.`);
+    }
+    return evidence;
+  },
+}, {
+  id: 'component-library-confirmationdialog--mobile',
+  stateSelectors: ['dialog[open]', '.gluon-confirmation-dialog-title'],
+  expectedText: 'Remove this saved address?',
+  screenshotSelector: 'dialog[open]',
+  beforeNavigate: async (page) => page.setViewportSize({ width: 320, height: 720 }),
+  interact: async (page) => {
+    await page.locator('html').evaluate((element) => { element.style.fontSize = '200%'; });
+  },
+  verifyMedia: async (page) => {
+    await page.setViewportSize({ width: 320, height: 500 });
+    const evidence = await page.locator('dialog[open]').evaluate(async (dialog) => {
+      const actionSizes = [...dialog.querySelectorAll('button')].map((button) => ({
+        width: button.getBoundingClientRect().width,
+        height: button.getBoundingClientRect().height,
+      }));
+      dialog.scrollTop = dialog.scrollHeight;
+      await new Promise((resolveFrame) => requestAnimationFrame(resolveFrame));
+      const dialogRect = dialog.getBoundingClientRect();
+      const lastActionRect = dialog.querySelector('button:last-of-type')?.getBoundingClientRect();
+      return {
+        clientWidth: dialog.clientWidth,
+        scrollWidth: dialog.scrollWidth,
+        clientHeight: dialog.clientHeight,
+        scrollHeight: dialog.scrollHeight,
+        overflowY: getComputedStyle(dialog).overflowY,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        actionSizes,
+        lastActionReachable: lastActionRect !== undefined
+          && lastActionRect.top >= dialogRect.top - 1
+          && lastActionRect.bottom <= dialogRect.bottom + 1,
+      };
+    });
+    if (evidence.viewportWidth !== 320 || evidence.viewportHeight !== 500
+      || evidence.scrollWidth > evidence.clientWidth || evidence.clientHeight > evidence.viewportHeight
+      || evidence.overflowY !== 'auto' || !evidence.lastActionReachable
+      || evidence.actionSizes.some(({ width, height }) => width < 44 || height < 44)) {
+      throw new Error(`ConfirmationDialog 320px/200% reflow contract failed: ${JSON.stringify(evidence)}.`);
+    }
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.locator('dialog[open]').evaluate((dialog) => { dialog.scrollTop = 0; });
+    return evidence;
+  },
+}, {
   id: 'component-library-workflow-timeline--states-and-responsive-layout',
   stateSelectors: ['.gluon-workflow-timeline[data-state="degraded"]', '[data-state="current"]', '[part="label"]'],
   expectedText: 'Review',
@@ -152,6 +220,7 @@ const results = [];
 try {
   const page = await browser.newPage({ viewport: { width: 800, height: 500 }, deviceScaleFactor: 1 });
   for (const scenario of scenarios) {
+    await scenario.beforeNavigate?.(page);
     await page.goto(`http://127.0.0.1:${address.port}/iframe.html?id=${scenario.id}&viewMode=story`, { waitUntil: 'networkidle' });
     await page.addScriptTag({ content: axe.source });
     const storyRoot = page.locator('#storybook-root');

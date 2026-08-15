@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added the native, request-free `ConfirmationDialog` organism with controlled
+  modal lifecycle, caller-owned actions, initial and restored focus, native
+  cancel/close events, inert unavailable states, opt-in backdrop dismissal,
+  status regions, and constructable per-component styling.
 - Added the SSR-safe, request-free `WorkflowTimeline` organism for bounded
   multi-stage workflows with required instance IDs and truthful derived active,
   blocked, and complete state.
