@@ -34,6 +34,21 @@ the current entry only after guards and lazy components succeed.
 
 ## Navigation pipeline and failures
 
+Static route records can declare `data`. The normalized location exposes the
+parent-to-child merge as `route.data`; this is a request-free
+content/configuration contract. Network data remains application/store-owned.
+URL-owned filters, pagination, and shareable state belong in `route.query`,
+whose parser and serializer preserve repeated values and deterministic key
+ordering.
+
+For asynchronous route data, keep the request-free boundary explicit: the
+application or Store starts the request, passes the request-local `AbortSignal`,
+owns pending/error/retry and revalidation state, and cancels work when the
+route/view owner is replaced. SSR passes the same signal into `renderRequest()`;
+hydration restores the Router/Store snapshots instead of making the Router
+share a client or cache. Authentication, transport, persistence, ranking, and
+cache policy are intentionally outside `@gluonjs/router`.
+
 Navigation runs:
 
 1. location and record redirects;

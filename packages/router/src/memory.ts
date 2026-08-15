@@ -17,6 +17,7 @@ export {
   type RouteComponent,
   type RouteComponentContext,
   type RouteComponentSource,
+  type RouteData,
   type RouteMeta,
   type RouteParamPrimitive,
   type RouteParams,

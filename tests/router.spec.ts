@@ -161,6 +161,34 @@ describe('@gluonjs/router browser integration', () => {
     router.destroy();
   });
 
+  it('keeps static route data and URL query state request-free and serializable', async () => {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [{
+        path: '/catalog',
+        name: 'catalog',
+        data: { title: 'Catalog', pageSize: 24 },
+        children: [{
+          path: 'featured',
+          name: 'featured',
+          data: { title: 'Featured' },
+        }],
+      }],
+    });
+    await router.isReady();
+
+    const resolved = router.resolve('/catalog/featured?tag=lamp&tag=desk&page=2#results');
+    expect(resolved.data).toEqual({ title: 'Featured', pageSize: 24 });
+    expect(resolved.query).toEqual({ page: '2', tag: ['lamp', 'desk'] });
+    expect(Object.isFrozen(resolved.data)).toBe(true);
+    expect(router.dehydrate()).toEqual({ location: '/' });
+
+    await router.push(resolved);
+    expect(router.currentRoute.value.data).toEqual(resolved.data);
+    expect(router.dehydrate()).toEqual({ location: '/catalog/featured?page=2&tag=lamp&tag=desk#results' });
+    router.destroy();
+  });
+
   it('contains rejected link navigation promises', async () => {
     const router = createRouter({
       history: createMemoryHistory(),

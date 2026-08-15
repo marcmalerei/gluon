@@ -73,6 +73,25 @@ light-DOM slots; its official add/retry Button is a functional layer inside the
 same ShadowRoot. Server output retains the product title, inventory status, and
 facts as light DOM before the element upgrades.
 
+## Request-free route data and query pattern
+
+GLUON GOODS is the runnable reference for the ownership boundary:
+
+- `createShopRoutes()` owns route records and static route configuration; pages
+  read `route.query` for URL-owned catalog/category/sort/view state.
+- The Store owns product, bag, checkout, and order domain state. The Router does
+  not fetch or cache domain data.
+- Product availability is an application-owned async boundary. Its source gets
+  the renderer-provided `AbortSignal`, exposes pending/error/retry states, and
+  releases work on route replacement or unmount.
+- `renderShopRequest()` creates request-local Router and Store resources and
+  passes the request signal through SSR. Browser hydration restores the same
+  snapshots; revalidation remains an application decision.
+
+This keeps authorization, transport, caching, persistence, ranking, and retry
+policy outside the Router package while the customer flow remains runnable with
+real deep links, query filters, SSR, hydration, and cancellation tests.
+
 The catalog filter is the reusable constrained-navigation acceptance boundary:
 the official `NavigationStrip` Molecule retains native Router links and exposes
 overflow directions without moving focus from the current destination. The bag
