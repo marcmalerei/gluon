@@ -276,7 +276,7 @@ describe('@gluonjs/store HMR and universal state', () => {
 
 describe('@gluonjs/store persistence and testing', () => {
   it('hydrates and persists selected paths through an explicit storage adapter', () => {
-    const values = new Map<string, string>([['goods:cart', '{"items":["lamp"]}']]);
+    const values = new Map<string, string>([['goods:cart', '{"version":1,"state":{"items":["lamp"]}}']]);
     const storage: StorageLike = {
       getItem: (key) => values.get(key) ?? null,
       setItem: (key, value) => { values.set(key, value); },
@@ -296,26 +296,38 @@ describe('@gluonjs/store persistence and testing', () => {
     expect(store.items).toEqual(['lamp']);
     store.open = true;
     store.add('tray');
-    expect(JSON.parse(values.get('goods:cart')!)).toEqual({ items: ['lamp', 'tray'] });
-    expect(JSON.parse(values.get('goods:cart')!)).not.toHaveProperty('open');
+    expect(JSON.parse(values.get('goods:cart')!)).toEqual({ version: 1, state: { items: ['lamp', 'tray'] } });
+    expect(JSON.parse(values.get('goods:cart')!)).not.toHaveProperty('state.open');
   });
 
   it('reports storage failures and creates isolated testing stores with initial state', () => {
-    const onError = vi.fn();
-    const storage: StorageLike = {
-      getItem: () => { throw new Error('read failed'); },
-      setItem: () => { throw new Error('write failed'); },
-    };
     const persistent = defineStore({
       id: 'persistent',
       state: () => ({ value: 0 }),
       persist: true,
     });
-    const manager = createStoreManager({ plugins: [createPersistencePlugin({ storage, onError })] });
-    const store = manager.use(persistent);
-    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'read failed' }), 'persistent');
+
+    const readErrors = vi.fn();
+    const readStorage: StorageLike = {
+      getItem: () => { throw new Error('read failed'); },
+      setItem: () => { throw new Error('write failed'); },
+    };
+    createStoreManager({ plugins: [createPersistencePlugin({ storage: readStorage, onError: readErrors })] }).use(persistent);
+    expect(readErrors).toHaveBeenCalledWith(expect.objectContaining({ message: 'read failed' }), 'persistent', expect.objectContaining({
+      kind: 'storage-read',
+    }));
+    expect(() => readErrors.mock.calls[0]?.[2]?.recovery.remove()).toThrow('StorageLike.removeItem');
+
+    const writeErrors = vi.fn();
+    const writeStorage: StorageLike = {
+      getItem: () => null,
+      setItem: () => { throw new Error('write failed'); },
+    };
+    const store = createStoreManager({ plugins: [createPersistencePlugin({ storage: writeStorage, onError: writeErrors })] }).use(persistent);
     store.$patch({ value: 1 });
-    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'write failed' }), 'persistent');
+    expect(writeErrors).toHaveBeenCalledWith(expect.objectContaining({ message: 'write failed' }), 'persistent', expect.objectContaining({
+      kind: 'storage-write',
+    }));
 
     const first = createTestingStoreManager({ initialState: { persistent: { value: 4 } } });
     const second = createTestingStoreManager();
@@ -323,31 +335,275 @@ describe('@gluonjs/store persistence and testing', () => {
     expect(second.use(persistent).value).toBe(0);
   });
 
-  it('persists complete state under custom keys and rejects invalid persisted values', () => {
+  it('migrates envelope versions in contiguous steps and quarantines failed payloads on demand', () => {
+    const values = new Map<string, string>([
+      ['gluon:profile', JSON.stringify({ version: 0, state: { count: 2 } })],
+    ]);
+    const storage: StorageLike = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => { values.set(key, value); },
+      removeItem: (key) => { values.delete(key); },
+    };
+    const legacyStore = defineStore({
+      id: 'profile',
+      state: () => ({ count: 0, label: 'ready', migrated: false }),
+      actions: (store) => ({
+        increment() { store.count += 1; },
+      }),
+      persist: {
+        version: 2,
+        migrations: [
+          {
+            from: 0,
+            to: 1,
+            migrate: (state) => ({ count: Number(state.count ?? 0), label: 'legacy' }),
+          },
+          {
+            from: 1,
+            to: 2,
+            migrate: (state) => ({ count: Number(state.count ?? 0), label: String(state.label), migrated: true }),
+          },
+        ],
+      },
+    });
+    const onError = vi.fn();
+    const manager = createStoreManager({ plugins: [createPersistencePlugin({ storage, onError })] });
+    const store = manager.use(legacyStore);
+    expect(store).toMatchObject({ count: 2, label: 'legacy', migrated: true });
+    store.increment();
+    expect(JSON.parse(values.get('gluon:profile')!)).toEqual({ version: 2, state: { count: 3, label: 'legacy', migrated: true } });
+
+    values.set('gluon:profile', JSON.stringify({ version: 5, state: { count: 1 } }));
+    const future = createStoreManager({
+      plugins: [createPersistencePlugin({ storage, onError })],
+    }).use(legacyStore);
+    expect(future.count).toBe(0);
+    expect(onError).toHaveBeenLastCalledWith(
+      expect.any(TypeError),
+      'profile',
+      expect.objectContaining({ kind: 'future', key: 'gluon:profile', targetVersion: 2 }),
+    );
+    onError.mockClear();
+
+    values.set('gluon:profile', '{"version":2,"state":[1,2,3]}');
+    const corrupt = createStoreManager({
+      plugins: [createPersistencePlugin({ storage, onError })],
+    }).use(legacyStore);
+    expect(corrupt.count).toBe(0);
+    expect(onError).toHaveBeenLastCalledWith(
+      expect.any(TypeError),
+      'profile',
+      expect.objectContaining({ kind: 'corrupt-envelope', key: 'gluon:profile' }),
+    );
+    const recovery = onError.mock.calls.at(-1)?.[2]?.recovery;
+    recovery?.quarantine();
+    expect(values.get('gluon:profile:quarantine')).toBe('{"version":2,"state":[1,2,3]}');
+    expect(values.has('gluon:profile')).toBe(false);
+
+    onError.mockClear();
+    values.set('gluon:profile', '{"version":1.5,"state":{"count":1}}');
+    createStoreManager({ plugins: [createPersistencePlugin({ storage, onError })] }).use(legacyStore);
+    expect(onError).toHaveBeenLastCalledWith(
+      expect.any(TypeError),
+      'profile',
+      expect.objectContaining({ kind: 'corrupt-envelope', version: undefined }),
+    );
+  });
+
+  it('rejects invalid migration plans and preserves explicit recovery choices', () => {
     const values = new Map<string, string>();
     const storage: StorageLike = {
       getItem: (key) => values.get(key) ?? null,
       setItem: (key, value) => { values.set(key, value); },
+      removeItem: (key) => { values.delete(key); },
     };
     const definition = defineStore({
       id: 'preferences',
       state: () => ({ theme: 'light', pageSize: 20 }),
-      persist: { key: 'custom-preferences' },
+      persist: { key: 'custom-preferences', version: 1 },
     });
     const manager = createStoreManager({ plugins: [createPersistencePlugin({ storage })] });
     const store = manager.use(definition);
     store.$patch({ theme: 'dark' });
-    expect(JSON.parse(values.get('custom-preferences')!)).toEqual({ theme: 'dark', pageSize: 20 });
+    expect(JSON.parse(values.get('custom-preferences')!)).toEqual({ version: 1, state: { theme: 'dark', pageSize: 20 } });
 
-    values.set('broken', '[]');
+    const invalidPlan = defineStore({
+      id: 'invalid-plan',
+      state: () => ({ value: 0 }),
+      persist: {
+        version: 3,
+        migrations: [
+          { from: 0, to: 1, migrate: (state) => state },
+          { from: 2, to: 3, migrate: (state) => state },
+        ],
+      },
+    });
+    expect(() => createStoreManager({ plugins: [createPersistencePlugin({ storage })] }).use(invalidPlan))
+      .toThrow('must be contiguous');
+    const invalidLegacy = defineStore({
+      id: 'invalid-legacy',
+      state: () => ({ value: 0 }),
+      persist: { version: 1, legacy: { to: 2, migrate: (state) => state } },
+    });
+    expect(() => createStoreManager({ plugins: [createPersistencePlugin({ storage })] }).use(invalidLegacy))
+      .toThrow('integer output version');
+
+    values.set('gluon:broken', '[]');
     const errors = vi.fn();
     const broken = defineStore({
       id: 'broken',
       state: () => ({ value: 1 }),
-      persist: { key: 'broken' },
+      persist: { key: 'gluon:broken', version: 1 },
     });
     createStoreManager({ plugins: [createPersistencePlugin({ storage, onError: errors })] }).use(broken);
-    expect(errors).toHaveBeenCalledWith(expect.any(TypeError), 'broken');
+    expect(errors).toHaveBeenCalledWith(expect.any(TypeError), 'broken', expect.objectContaining({
+      kind: 'corrupt-envelope',
+      recovery: expect.objectContaining({ key: 'gluon:broken' }),
+    }));
     expect((errors.mock.calls[0]?.[0] as Error).message).toContain('plain object');
+    errors.mockClear();
+
+    values.set('gluon:legacy', '{"version":1,"state":{"value":1}}');
+    const legacyMigration = defineStore({
+      id: 'legacy',
+      state: () => ({ value: 0 }),
+      persist: {
+        key: 'gluon:legacy',
+        version: 2,
+        migrations: [
+          { from: 0, to: 1, migrate: (state) => ({ value: Number(state.value ?? 0) }) },
+          { from: 1, to: 2, migrate: () => [] as never },
+        ],
+      },
+    });
+    createStoreManager({ plugins: [createPersistencePlugin({ storage, onError: errors })] }).use(legacyMigration);
+    expect(errors).toHaveBeenCalledWith(expect.any(TypeError), 'legacy', expect.objectContaining({
+      kind: 'migration-invalid-output',
+      key: 'gluon:legacy',
+      raw: '{"version":1,"state":{"value":1}}',
+    }));
+  });
+
+  it('rejects every ambiguous, discontinuous, or out-of-range migration plan', () => {
+    const storage: StorageLike = { getItem: () => null, setItem: () => undefined };
+    const invalidPlans: readonly [string, unknown, string][] = [
+      ['zero-version', { version: 0 }, 'positive integer'],
+      ['fractional-version', { version: 1.5 }, 'positive integer'],
+      ['invalid-step', { version: 1, migrations: [{ from: -1, to: 0, migrate: (state: unknown) => state }] }, 'increasing integer'],
+      ['invalid-migrate', { version: 1, migrations: [{ from: 0, to: 1, migrate: true }] }, 'increasing integer'],
+      ['skipped-version', { version: 2, migrations: [{ from: 0, to: 2, migrate: (state: unknown) => state }] }, 'one version at a time'],
+      ['duplicate-step', { version: 2, migrations: [
+        { from: 0, to: 1, migrate: (state: unknown) => state },
+        { from: 0, to: 1, migrate: (state: unknown) => state },
+      ] }, 'must not duplicate'],
+      ['future-step', { version: 1, migrations: [{ from: 1, to: 2, migrate: (state: unknown) => state }] }, 'future versions'],
+      ['unfinished-step', { version: 3, migrations: [{ from: 0, to: 1, migrate: (state: unknown) => state }] }, 'end at the configured version'],
+      ['legacy-gap', { version: 2, legacy: { to: 1, migrate: (state: unknown) => state } }, 'requires a contiguous step'],
+      ['legacy-fraction', { version: 2, legacy: { to: 0.5, migrate: (state: unknown) => state } }, 'integer output version'],
+      ['legacy-migrate', { version: 1, legacy: { to: 0, migrate: false } }, 'integer output version'],
+    ];
+
+    for (const [id, persist, message] of invalidPlans) {
+      const definition = defineStore({ id, state: () => ({ value: 0 }), persist: persist as never });
+      expect(() => createStoreManager({ plugins: [createPersistencePlugin({ storage })] }).use(definition)).toThrow(message);
+    }
+  });
+
+  it('classifies corrupt, legacy, missing, throwing, and invalid migration payloads', () => {
+    const values = new Map<string, string>();
+    const errors = vi.fn();
+    const storage: StorageLike = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => { values.set(key, value); },
+      removeItem: (key) => { values.delete(key); },
+    };
+    const run = (id: string, payload: string, persist: unknown) => {
+      values.set(`gluon:${id}`, payload);
+      const definition = defineStore({ id, state: () => ({ value: 0, migrated: false }), persist: persist as never });
+      createStoreManager({ plugins: [createPersistencePlugin({ storage, onError: errors })] }).use(definition);
+      return errors.mock.calls.at(-1)?.[2];
+    };
+
+    expect(run('bad-json', '{', true)).toMatchObject({ kind: 'corrupt-json' });
+    expect(run('unowned-legacy', '{"value":1}', true)).toMatchObject({ kind: 'legacy' });
+    expect(run('missing-step', '{"version":0,"state":{"value":1}}', { version: 2 })).toMatchObject({ kind: 'migration-missing', version: 0 });
+    expect(run('throwing-step', '{"version":0,"state":{"value":1}}', {
+      version: 1,
+      migrations: [{ from: 0, to: 1, migrate: () => { throw new Error('step failed'); } }],
+    })).toMatchObject({ kind: 'migration-throw', version: 0 });
+    expect(run('throwing-legacy', '{"value":1}', {
+      version: 1,
+      legacy: { to: 1, migrate: () => { throw new Error('legacy failed'); } },
+    })).toMatchObject({ kind: 'migration-throw', version: 1 });
+    expect(run('invalid-legacy-output', '{"value":1}', {
+      version: 1,
+      legacy: { to: 1, migrate: () => ({ value: new Date() }) },
+    })).toMatchObject({ kind: 'migration-invalid-output' });
+
+    values.set('gluon:legacy-success', '{"value":3}');
+    const successful = defineStore({
+      id: 'legacy-success',
+      state: () => ({ value: 0, migrated: false }),
+      persist: {
+        version: 2,
+        legacy: { to: 1, migrate: (state) => ({ value: Number(state.value), migrated: false }) },
+        migrations: [{ from: 1, to: 2, migrate: (state) => ({ ...state, migrated: true }) }],
+      },
+    });
+    expect(createStoreManager({ plugins: [createPersistencePlugin({ storage })] }).use(successful))
+      .toMatchObject({ value: 3, migrated: true });
+  });
+
+  it('keeps failed persistence blocked until reset, remove, or quarantine explicitly recovers it', () => {
+    const values = new Map<string, string>([['gluon:recoverable', '{']]);
+    const writes: string[] = [];
+    const errors = vi.fn();
+    const storage: StorageLike = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => { values.set(key, value); writes.push(key); },
+      removeItem: (key) => { values.delete(key); },
+    };
+    const definition = defineStore({ id: 'recoverable', state: () => ({ value: 1 }), persist: true });
+    const store = createStoreManager({ plugins: [createPersistencePlugin({ storage, onError: errors })] }).use(definition);
+    store.$patch({ value: 2 });
+    expect(writes).toEqual([]);
+    errors.mock.calls[0]?.[2]?.recovery.reset();
+    expect(JSON.parse(values.get('gluon:recoverable')!)).toEqual({ version: 1, state: { value: 1 } });
+    store.$patch({ value: 3 });
+    expect(JSON.parse(values.get('gluon:recoverable')!)).toEqual({ version: 1, state: { value: 3 } });
+
+    values.set('gluon:recoverable', '{');
+    const removeErrors = vi.fn();
+    const removed = createStoreManager({ plugins: [createPersistencePlugin({ storage, onError: removeErrors })] }).use(definition);
+    removeErrors.mock.calls[0]?.[2]?.recovery.remove();
+    expect(values.has('gluon:recoverable')).toBe(false);
+    removed.$patch({ value: 4 });
+    expect(JSON.parse(values.get('gluon:recoverable')!)).toEqual({ version: 1, state: { value: 4 } });
+
+    let failWrite = true;
+    const writeErrors = vi.fn();
+    const writeStorage: StorageLike = {
+      getItem: () => null,
+      setItem: (key, value) => {
+        if (failWrite) throw new Error('first write fails');
+        values.set(key, value);
+      },
+      removeItem: (key) => { values.delete(key); },
+    };
+    const writeStore = createStoreManager({ plugins: [createPersistencePlugin({ storage: writeStorage, onError: writeErrors })] }).use(definition);
+    writeStore.$patch({ value: 2 });
+    writeStore.$patch({ value: 3 });
+    expect(writeErrors).toHaveBeenCalledTimes(1);
+    failWrite = false;
+    writeErrors.mock.calls[0]?.[2]?.recovery.quarantine();
+    expect(values.get('gluon:recoverable:quarantine')).toBe('');
+    writeStore.$patch({ value: 4 });
+    expect(JSON.parse(values.get('gluon:recoverable')!)).toEqual({ version: 1, state: { value: 4 } });
+  });
+
+  it('rejects non-record and unsafe serialized manager snapshots at the parse boundary', () => {
+    const manager = createStoreManager();
+    expect(() => manager.deserialize('[]')).toThrow('Invalid Gluon store snapshot');
+    expect(() => manager.deserialize('{"version":1,"stores":{"__proto__":{}}}')).toThrow('Unsafe store state key');
   });
 });

@@ -47,7 +47,7 @@ uses the same quantity-control contract for the prior Gluon class API, the
 functional API, pinned Vue, and pinned React. Its metrics and limitations are
 validated independently from the shop's customer-flow evidence.
 | Native dialog and control accessibility | Search, mobile menu, product choices, and bag | `tests/shop-example.spec.ts` + 390px/320px browser QA | Integrated |
-| Official Store | Per-app bag state, configured line items, persisted bag, derived totals | Store Node/type suites + `tests/shop-example.spec.ts` | Integrated |
+| Official Store | Per-app bag state, configured line items, versioned persisted bag envelope, explicit legacy bag migration, derived totals | Store Node/type suites, `tests-node/store.spec.ts`, `tests/shop-example.spec.ts`, `tests-node/store.types.ts`, `npm run check:budgets` | Integrated |
 | Store actions + Router forms | Labeled delivery checkout, order summary, atomic order placement, and confirmation URL | Desktop/mobile shop flow + Store snapshot and browser assertions | Integrated purchase path |
 | `Suspense` and async component contract | Abortable product availability loading, explicit pending/error/retry states | Built-ins browser suite + `tests/shop-example.spec.ts` | Integrated |
 | `@gluonjs/ssr/streaming` progressive async-patch application | GLUON GOODS currently resolves its availability boundary through the request/hydration path; the public browser patch contract is verified with nested boundary and style-carrier fixtures because the shop has no streaming transport client to wire into honestly | `tests/hydration.spec.ts`, `tests-node/ssr.spec.ts`, `npm run typecheck:ssr` | Integrated as SSR infrastructure; shop unchanged for the verified transport-scope reason |

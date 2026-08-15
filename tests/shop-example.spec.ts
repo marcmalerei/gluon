@@ -426,19 +426,68 @@ describe('GLUON GOODS reference shop', () => {
     expect(isolatedA.store.bagCount).toBe(1);
     expect(isolatedB.store.bagCount).toBe(0);
 
+    const values = new Map<string, string>([[
+      'gluon-goods:shop',
+      JSON.stringify({
+        bag: [{
+          productSlug: 'stack-tray',
+          quantity: 2,
+          configuration: {
+            finish: 'Graphite',
+            temperature: 'Clear 3200K',
+            cable: '2.5 m',
+          },
+        }],
+      }),
+    ]]);
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => { values.set(key, value); },
+      removeItem: (key: string) => { values.delete(key); },
+    };
     const first = createShopApplication(createMemoryHistory(['/products/stack-tray']), {
       styleTarget: document,
+      storage,
     });
     await first.router.isReady();
     const firstRoot = document.createElement('div');
     document.body.append(firstRoot);
     first.app.mount(firstRoot);
+    firstRoot.querySelector<HTMLButtonElement>('.bag-action')!.click();
+    await settleShop();
+    expect(document.querySelector('.bag-line h3')?.textContent).toBe('Stack Tray');
+    expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
+    expect(document.querySelector('.bag-line p')?.textContent).toContain('Clear 3200K');
     await getProductConfigurator(firstRoot).updateComplete;
     getProductAddButton(getProductConfigurator(firstRoot)).click();
     await settleShop();
+    expect(JSON.parse(values.get('gluon-goods:shop')!)).toMatchObject({
+      version: 1,
+      state: {
+        bag: [{
+          key: 'stack-tray:Graphite:Clear 3200K:2.5 m',
+          product: expect.objectContaining({ slug: 'stack-tray' }),
+          configuration: {
+            finish: 'Graphite',
+            temperature: 'Clear 3200K',
+            cable: '2.5 m',
+          },
+          quantity: 2,
+        }, {
+          key: 'stack-tray:Cobalt:Warm 2700K:1.5 m',
+          product: expect.objectContaining({ slug: 'stack-tray' }),
+          configuration: {
+            finish: 'Cobalt',
+            temperature: 'Warm 2700K',
+            cable: '1.5 m',
+          },
+          quantity: 1,
+        }],
+      },
+    });
     first.app.unmount();
 
-    const second = createShopApplication(createMemoryHistory(['/']), { styleTarget: document });
+    const second = createShopApplication(createMemoryHistory(['/']), { styleTarget: document, storage });
     await second.router.isReady();
     const secondRoot = document.createElement('div');
     document.body.append(secondRoot);
@@ -446,10 +495,52 @@ describe('GLUON GOODS reference shop', () => {
     secondRoot.querySelector<HTMLButtonElement>('.bag-action')!.click();
     await settleShop();
     expect(document.querySelector('.bag-line h3')?.textContent).toBe('Stack Tray');
-    expect(document.querySelector('.bag-line p')?.textContent).toContain('Cobalt');
+    const restoredConfigurations = [...document.querySelectorAll('.bag-line p')]
+      .map((line) => line.textContent);
+    expect(restoredConfigurations).toEqual(expect.arrayContaining([
+      expect.stringContaining('Graphite'),
+      expect.stringContaining('Cobalt'),
+    ]));
     isolatedA.storeManager.dispose();
     isolatedB.storeManager.dispose();
     second.app.unmount();
+  });
+
+  it('drops malformed and unknown legacy bag entries without inventing products', async () => {
+    const validConfiguration = {
+      finish: 'Graphite',
+      temperature: 'Clear 3200K',
+      cable: '2.5 m',
+    };
+    const payloads = [
+      {
+        bag: [
+          null,
+          {},
+          { productSlug: 42, quantity: 1, configuration: validConfiguration },
+          { productSlug: 'stack-tray', quantity: '1', configuration: validConfiguration },
+          { productSlug: 'stack-tray', quantity: 1.5, configuration: validConfiguration },
+          { productSlug: 'stack-tray', quantity: 0, configuration: validConfiguration },
+          { productSlug: 'stack-tray', quantity: 1, configuration: {} },
+          { productSlug: 'retired-product', quantity: 1, configuration: validConfiguration },
+        ],
+      },
+      { bag: 'not-an-array' },
+    ];
+
+    for (const payload of payloads) {
+      const values = new Map([['gluon-goods:shop', JSON.stringify(payload)]]);
+      const application = createShopApplication(createMemoryHistory(['/']), {
+        storage: {
+          getItem: (key: string) => values.get(key) ?? null,
+          setItem: (key: string, value: string) => { values.set(key, value); },
+          removeItem: (key: string) => { values.delete(key); },
+        },
+      });
+      await application.router.isReady();
+      expect(application.store.bag).toEqual([]);
+      application.storeManager.dispose();
+    }
   });
 
   it('keeps the bag quantity control optimistic state synchronized and cancelable', async () => {
