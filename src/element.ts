@@ -242,21 +242,23 @@ export abstract class GluonElement<
   Events extends object = Record<string, unknown>,
 > extends HTMLElementBase {
   /* v8 ignore start -- production-only shared compiler queue is covered by the built Vite integration. */
-  private static readonly compiledPropertyUpdates = new Set<GluonElement<any>>();
+  private static readonly compiledPropertyUpdates: GluonElement<any>[] = [];
   private static compiledPropertyUpdatesScheduled = false;
   private static compiledPropertyUpdatesOrdered = true;
   private static compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
   private static readonly flushCompiledPropertyUpdates = (): void => {
     GluonElement.compiledPropertyUpdatesScheduled = false;
-    const elements = [...GluonElement.compiledPropertyUpdates];
-    GluonElement.compiledPropertyUpdates.clear();
+    const elements = GluonElement.compiledPropertyUpdates.splice(0);
     if (!GluonElement.compiledPropertyUpdatesOrdered) {
       elements.sort((left, right) => left.updateId - right.updateId);
     }
     GluonElement.compiledPropertyUpdatesOrdered = true;
     GluonElement.compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
-    for (const element of elements) element.performCompiledPropertyUpdate();
-    if (GluonElement.compiledPropertyUpdates.size > 0) {
+    for (const element of elements) {
+      element.compiledPropertyUpdateQueued = false;
+      element.performCompiledPropertyUpdate();
+    }
+    if (GluonElement.compiledPropertyUpdates.length > 0) {
       GluonElement.scheduleCompiledPropertyUpdateFlush();
     }
   };
@@ -268,18 +270,22 @@ export abstract class GluonElement<
   }
 
   private static queueCompiledPropertyUpdate(element: GluonElement<any>): void {
-    if (GluonElement.compiledPropertyUpdates.has(element)) return;
+    if (element.compiledPropertyUpdateQueued) return;
     if (element.updateId < GluonElement.compiledPropertyUpdateLastId) {
       GluonElement.compiledPropertyUpdatesOrdered = false;
     }
     GluonElement.compiledPropertyUpdateLastId = element.updateId;
-    GluonElement.compiledPropertyUpdates.add(element);
+    element.compiledPropertyUpdateQueued = true;
+    GluonElement.compiledPropertyUpdates.push(element);
     GluonElement.scheduleCompiledPropertyUpdateFlush();
   }
   /* v8 ignore stop */
 
   private static cancelCompiledPropertyUpdate(element: GluonElement<any>): void {
-    GluonElement.compiledPropertyUpdates.delete(element);
+    if (!element.compiledPropertyUpdateQueued) return;
+    element.compiledPropertyUpdateQueued = false;
+    const index = GluonElement.compiledPropertyUpdates.indexOf(element);
+    if (index >= 0) GluonElement.compiledPropertyUpdates.splice(index, 1);
   }
 
   /** Declares reactive inputs and their attribute conversion, reflection, and validation rules. */
@@ -306,6 +312,7 @@ export abstract class GluonElement<
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
   private [compiledTextBinding]?: CompiledPrimitiveTextBinding;
+  private compiledPropertyUpdateQueued = false;
   private pendingUpdate?: UpdateDeferred;
   private pendingPropertyUpdate?: string;
   private pendingPropertyValue?: unknown;

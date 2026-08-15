@@ -130,6 +130,41 @@ describe('reactive GluonElement rendering', () => {
     expect(element.renders).toBe(5);
   });
 
+  it('keeps repeated compiled property writes on the same queued DOM root and settles once', async () => {
+    const tagName = `gluon-compiled-queue-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class CompiledQueueElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      renders = 0;
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, CompiledQueueElement);
+    const element = document.createElement(tagName) as CompiledQueueElement;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('A');
+    expect(element.renders).toBe(1);
+
+    element.label = 'B';
+    element.label = 'C';
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('C');
+    expect(element.renders).toBe(2);
+  });
+
   it('stops scoped work on disconnect and recreates it while retaining state and DOM', async () => {
     const tagName = `gluon-scope-${reactiveElementSequence += 1}` as `${string}-${string}`;
 

@@ -70,6 +70,15 @@ medians and p95 values; the paired JSON file preserves every sample, invariant
 snapshot, calibrated batch size, source commit, working-tree state, package and
 browser versions, Node and npm versions, operating system, CPU, and memory.
 
+Issue #415 keeps a separate retained record of the current Lit comparison
+attempts on the same Apple M4 host. Two full production runs after the
+compiled-property queue refactor now show the property path above Lit in
+Chromium and WebKit, and the state path above Lit in Chromium and Firefox, but
+they still leave one Firefox state tie/loss cell and one WebKit state tie cell.
+Those remaining misses sit in sub-0.01 ms/op territory and move with batch
+calibration and timer quantization, so this document does not claim a verified
+12/12 strict result yet.
+
 Every pull request and `main` run additionally retains ten-sample template and
 component Chromium/Firefox/WebKit comparisons plus the production GLUON GOODS
 customer-flow budget output and the expanded runtime scorecard for 30 days in
