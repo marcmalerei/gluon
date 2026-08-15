@@ -46,9 +46,12 @@ const apiPages = (await markdownFiles(apiRoot)).map((source) => ({
   relative: join(versions.latest, 'api', 'generated', relative(apiRoot, source)),
 }));
 const pages = [...maintainedPages, ...apiPages];
+const searchIndex = [];
 
-for (const page of pages) await renderPage(page);
-for (const version of versions.supported) await renderPackagePortal(version);
+for (const page of pages) await renderPage(page, searchIndex);
+for (const version of versions.supported) await renderPackagePortal(version, searchIndex);
+searchIndex.sort((left, right) => left.url < right.url ? -1 : left.url > right.url ? 1 : 0);
+await writeFile(resolve(outputRoot, 'assets', 'search-index.json'), JSON.stringify(searchIndex, null, 2), 'utf8');
 await writeRedirect(resolve(outputRoot, 'index.html'), `${base}${versions.latest}/`);
 await writeFile(resolve(outputRoot, '404.html'), pageShell({
   title: 'Documentation page not found',
@@ -60,7 +63,7 @@ await writeFile(resolve(outputRoot, '404.html'), pageShell({
 
 console.log(`built ${pages.length} documentation pages for ${versions.supported.join(', ')}`);
 
-async function renderPage(page) {
+async function renderPage(page, searchIndex) {
   let markdown = await readFile(page.source, 'utf8');
   markdown = await expandIncludes(markdown, dirname(page.source));
   const apiPackage = packageForApiPage(page.relative);
@@ -75,6 +78,14 @@ async function renderPage(page) {
   const description = apiPackage?.description
     ?? firstParagraph(markdown)
     ?? 'Versioned Gluon framework documentation.';
+  searchIndex.push(searchEntry({
+    title,
+    description,
+    contentType: apiPackage && isApiPackageLanding(page.relative) ? 'API landing page' : pageKind(page.relative),
+    context: pageContext(page.relative, apiPackage),
+    url: pageUrl(page.relative),
+    version: page.relative.split('/')[0],
+  }));
   if (slash(page.relative) === `${versions.latest}/index.md`) {
     content = content.replace(
       /<h2([^>]*)>(.*?)<\/h2>\n<p>(.*?)<\/p>\n<p>(.*?)<\/p>/gs,
@@ -162,6 +173,7 @@ function pageShell({ title, description, content, relativePath, headings }) {
       <a class="brand" href="${base}${version}/">GLUON / DOCS</a>
       <nav class="header-nav" aria-label="Documentation">${headerNavigation.map(([label, href]) => `<a href="${href}"${currentUrl.startsWith(href) ? ' aria-current="page"' : ''}>${label}</a>`).join('')}</nav>
       <label class="version-control"><span>Docs version</span><select data-version-select>${versions.supported.map((entry) => `<option value="${entry}"${entry === version ? ' selected' : ''}>${entry}</option>`).join('')}</select></label>
+      <button class="search-action" type="button" aria-label="Open search" data-search-open>Search</button>
       <a class="playground-action" href="${base}playground/">Playground</a>
     </header>
     <div class="site-grid">
@@ -172,6 +184,8 @@ function pageShell({ title, description, content, relativePath, headings }) {
       ${toc}
     </div>
     <footer class="site-footer"><span>Gluon ${version}</span><a href="https://github.com/marcmalerei/gluon">GitHub</a><a href="${base}playground/">Playground</a><a href="${base}archive/">Release archive</a></footer>
+    ${noScriptSearchMarkup()}
+    ${searchPanelMarkup()}
     <script type="module" src="${base}assets/docs.js"></script>
   </body>
 </html>`;
@@ -262,13 +276,13 @@ function rewriteApiBreadcrumb(markdown, packageName) {
     .replace(/^\[@gluonjs\/core\]/m, `[${packageName}]`);
 }
 
-async function renderPackagePortal(version) {
+async function renderPackagePortal(version, searchIndex) {
   const packages = [...packageMetadata.values()].sort((left, right) => left.name.localeCompare(right.name));
-  await writePackagePage(version, undefined, packages);
-  for (const packageInfo of packages) await writePackagePage(version, packageInfo, packages);
+  await writePackagePage(version, undefined, packages, searchIndex);
+  for (const packageInfo of packages) await writePackagePage(version, packageInfo, packages, searchIndex);
 }
 
-async function writePackagePage(version, packageInfo, packages) {
+async function writePackagePage(version, packageInfo, packages, searchIndex) {
   const destination = packageInfo
     ? resolve(outputRoot, version, 'packages', packageSlug(packageInfo.name), 'index.html')
     : resolve(outputRoot, version, 'packages', 'index.html');
@@ -278,6 +292,14 @@ async function writePackagePage(version, packageInfo, packages) {
   const content = packageInfo
     ? packageDetailContent(version, packageInfo)
     : packageIndexContent(version, packages);
+  searchIndex.push(searchEntry({
+    title,
+    description,
+    contentType: packageInfo ? 'Package landing page' : 'Package index',
+    context: packageInfo ? packageInfo.name : 'Packages',
+    url: packageInfo ? `${base}${version}/packages/${packageSlug(packageInfo.name)}/` : `${base}${version}/packages/`,
+    version,
+  }));
   await writeFile(destination, packagePageShell({ version, title, description, content, packageInfo, packages }), 'utf8');
 }
 
@@ -306,6 +328,7 @@ function packagePageShell({ version, title, description, content, packageInfo, p
       <a class="brand" href="${base}${version}/">GLUON / PACKAGES</a>
       <nav class="header-nav" aria-label="Documentation"><a href="${base}${version}/guides/">Guides</a><a href="${base}${version}/api/">API</a><a href="${base}${version}/cookbook/">Cookbook</a><a href="${base}${version}/packages/" aria-current="page">Packages</a></nav>
       <label class="version-control"><span>Docs version</span><select data-version-select>${versions.supported.map((entry) => `<option value="${entry}"${entry === version ? ' selected' : ''}>${entry}</option>`).join('')}</select></label>
+      <button class="search-action" type="button" aria-label="Open search" data-search-open>Search</button>
       <a class="playground-action" href="${base}playground/">Playground</a>
     </header>
     <div class="site-grid package-grid">
@@ -314,9 +337,33 @@ function packagePageShell({ version, title, description, content, packageInfo, p
       <aside class="toc package-toc" aria-label="Package context"><strong>${packageInfo ? 'Package context' : 'Package map'}</strong><p>${packageInfo ? 'Public package boundary and release metadata.' : `${packages.length} packages in the lockstep train.`}</p></aside>
     </div>
     <footer class="site-footer"><span>Gluon ${version}</span><a href="${base}${version}/">Documentation</a><a href="https://github.com/marcmalerei/gluon">GitHub</a><a href="${base}archive/">Release archive</a></footer>
+    ${noScriptSearchMarkup()}
+    ${searchPanelMarkup()}
     <script type="module" src="${base}assets/docs.js"></script>
   </body>
 </html>`;
+}
+
+function searchPanelMarkup() {
+  return `<section class="search-panel" hidden data-search-panel>
+      <div class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title">
+        <form class="search-bar" role="search">
+          <label id="search-title" for="docs-search-input">Search the docs</label>
+          <div class="search-input-wrap">
+            <input id="docs-search-input" type="search" name="q" placeholder="Search guides, API, migration, and packages" autocomplete="off" spellcheck="false" data-search-input>
+          </div>
+          <button type="button" class="search-close" aria-label="Close search" data-search-close>Esc</button>
+        </form>
+        <p class="search-hint">Use arrow keys to move through results, Enter to open, and Escape to close.</p>
+        <p class="search-noscript">Without JavaScript, use the versioned guides, API pages, migration material, cookbook pages, and package portals directly.</p>
+        <p class="search-status" data-search-status aria-live="polite">Start typing to search the maintained docs.</p>
+        <nav class="search-results" data-search-results aria-label="Search results"></nav>
+      </div>
+    </section>`;
+}
+
+function noScriptSearchMarkup() {
+  return `<noscript><style>.search-action{display:none}@media(max-width:800px){.menu-button{display:none}.sidebar{position:static;transform:none}.site-grid{display:block}}</style><p class="search-noscript-fallback">Search needs JavaScript. All documentation remains available through the versioned navigation links.</p></noscript>`;
 }
 
 function packageIndexContent(version, packages) {
@@ -399,7 +446,7 @@ function firstHeading(markdown) {
 function firstParagraph(markdown) {
   return markdown.split(/\n\s*\n/).map((block) => block.trim())
     .find((block) => block && !/^(#|```|<<<|- |\|)/.test(block))
-    ?.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1').replace(/[`*_]/g, '').replace(/\s+/g, ' ').slice(0, 180);
+    ?.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1').replace(/[`*_]/g, '').replace(/\s+/g, ' ').slice(0, 180).trim();
 }
 
 function slugify(value) {
@@ -416,6 +463,43 @@ function escapeAttribute(value) { return escapeHtml(value).replaceAll("'", '&#39
 
 async function writeRedirect(path, target) {
   await writeFile(path, `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>Gluon documentation</title></head><body><a href="${target}">Open Gluon documentation</a></body></html>`, 'utf8');
+}
+
+function pageKind(relativePath) {
+  if (relativePath === `${versions.latest}/index.md`) return 'Home page';
+  if (relativePath.startsWith(`${versions.latest}/guides/`)) return 'Guide';
+  if (relativePath.startsWith(`${versions.latest}/migration/`)) return 'Migration';
+  if (relativePath.startsWith(`${versions.latest}/cookbook/`)) return 'Cookbook';
+  if (relativePath.startsWith(`${versions.latest}/reference/`)) return 'Reference';
+  if (relativePath.startsWith(`${versions.latest}/api/`)) return 'API reference';
+  return 'Documentation';
+}
+
+function pageContext(relativePath, apiPackage) {
+  if (apiPackage) return apiPackage.name;
+  const parts = relativePath.split('/');
+  if (relativePath === `${versions.latest}/index.md`) return `Gluon ${versions.latest}`;
+  if (parts[1] === 'guides') return 'Guides';
+  if (parts[1] === 'migration') return 'Migration';
+  if (parts[1] === 'cookbook') return 'Cookbook';
+  if (parts[1] === 'reference') return 'Reference';
+  return 'Documentation';
+}
+
+function searchEntry({ title, description, contentType, context, url, version }) {
+  const entry = {
+    title: String(title).trim(),
+    description: String(description).trim(),
+    contentType: String(contentType).trim(),
+    context: String(context).trim(),
+    url: String(url).trim(),
+    version: String(version).trim(),
+  };
+  return { ...entry, terms: normalizeSearchText([entry.title, entry.description, entry.contentType, entry.context, entry.url].join(' ')) };
+}
+
+function normalizeSearchText(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 }
 
 function validatePackageDocs(packageDocs, packageContract) {
