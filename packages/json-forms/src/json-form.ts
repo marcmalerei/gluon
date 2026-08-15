@@ -80,6 +80,14 @@ const jsonFormsStyles = css`
   h2 { font-size: 1.35rem; line-height: 1.15; letter-spacing: -0.02em; }
   .description, .field-description { color: var(--gluon-json-form-muted, #52616b); line-height: 1.45; }
   .fields { display: grid; gap: 16px; }
+  fieldset { min-inline-size: 0; margin: 0; padding: 16px; border: 1px solid var(--gluon-json-form-rule, #c9d2d8); display: grid; gap: 16px; }
+  legend { padding: 0 6px; font-weight: 700; }
+  .array-items { display: grid; gap: 14px; }
+  .array-item { display: grid; gap: 12px; padding: 14px; border-inline-start: 3px solid var(--gluon-json-form-accent, #496900); background: color-mix(in srgb, var(--gluon-json-form-surface, #ffffff) 92%, var(--gluon-json-form-accent, #496900)); }
+  .array-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  button { min-block-size: 44px; border: 1px solid var(--gluon-json-form-border, #7d8a92); padding: 8px 12px; background: var(--gluon-json-form-surface, #ffffff); color: inherit; font: inherit; cursor: pointer; }
+  button:focus-visible { outline: 3px solid var(--gluon-json-form-focus, #005fcc); outline-offset: 2px; }
+  button:disabled { cursor: not-allowed; opacity: .62; }
   .field { display: grid; gap: 7px; }
   .field-label { font-weight: 650; line-height: 1.3; }
   .required { color: var(--gluon-json-form-accent, #496900); }
@@ -104,8 +112,8 @@ const jsonFormsStyles = css`
 `;
 
 /**
- * A form-associated Custom Element that renders the initial, direct-property
- * JSON Forms subset through native, accessible controls.
+ * A form-associated Custom Element that renders the supported object, nested
+ * object, and bounded array JSON Forms subset through native controls.
  */
 export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   static readonly formAssociated = true;
@@ -261,25 +269,53 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   }
 
   private renderField(field: JsonFormField, disabled: boolean): TemplateValue {
-    const id = `field-${field.name}`;
-    const errors = this.errorsForField(field.name);
+    const id = fieldId(field.path);
+    const errors = this.errorsForPath(field.path, field.kind === 'object' || field.kind === 'array');
     const errorId = `${id}-error`;
     const descriptionId = field.description ? `${id}-description` : undefined;
     const describedBy = [descriptionId, errors.length > 0 ? errorId : undefined].filter(Boolean).join(' ') || undefined;
     const fieldDisabled = disabled || field.readOnly;
+    if (field.kind === 'object') {
+      return html`
+        <fieldset class="group" part=${`field field-${id}`}>
+          <legend>${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}</legend>
+          ${field.description ? html`<p id=${descriptionId!} class="field-description">${field.description}</p>` : ''}
+          <div class="fields">${(field.children ?? []).map((child) => this.renderField(child, fieldDisabled))}</div>
+          ${this.renderErrors(errors, errorId)}
+        </fieldset>
+      `;
+    }
+    if (field.kind === 'array') {
+      const value = getJsonPath(this.currentData, field.path);
+      const items = Array.isArray(value) ? value : [];
+      const itemTemplate = field.item;
+      return html`
+        <fieldset class="group array" part=${`field field-${id}`}>
+          <legend>${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}</legend>
+          ${field.description ? html`<p id=${descriptionId!} class="field-description">${field.description}</p>` : ''}
+          <div class="array-items">
+            ${items.map((_, index) => itemTemplate
+              ? html`<div class="array-item">${this.renderField(rebaseField(itemTemplate, [...field.path, String(index)], `Item ${index + 1}`), fieldDisabled)}<button type="button" ?disabled=${fieldDisabled || items.length <= (field.schema.minItems ?? 0)} @click=${() => this.removeArrayItem(field.path, index)}>Remove item ${index + 1}</button></div>`
+              : '')}
+          </div>
+          <div class="array-actions"><button type="button" ?disabled=${fieldDisabled || (field.schema.maxItems !== undefined && items.length >= field.schema.maxItems)} @click=${() => this.addArrayItem(field)}>Add item</button></div>
+          ${this.renderErrors(errors, errorId)}
+        </fieldset>
+      `;
+    }
     if (field.kind === 'boolean') {
       return html`
-        <div class="field" part=${`field field-${field.name}`}>
+        <div class="field" part=${`field field-${id}`}>
           <label class="checkbox-label" for=${id}>
             <input
               id=${id}
               type="checkbox"
-              .checked=${this.currentData[field.name] === true}
+              .checked=${getJsonPath(this.currentData, field.path) === true}
               ?disabled=${fieldDisabled}
               aria-describedby=${describedBy}
               aria-invalid=${errors.length > 0 ? 'true' : 'false'}
               aria-errormessage=${errors.length > 0 ? errorId : undefined}
-              @change=${(event: Event) => this.commitField(field.name, (event.currentTarget as HTMLInputElement).checked)}
+              @change=${(event: Event) => this.commitPath(field.path, (event.currentTarget as HTMLInputElement).checked)}
             >
             <span>${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}</span>
           </label>
@@ -290,7 +326,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     }
     const label = html`<label class="field-label" for=${id}>${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}</label>`;
     return html`
-      <div class="field" part=${`field field-${field.name}`}>
+      <div class="field" part=${`field field-${id}`}>
         ${label}
         ${field.kind === 'select'
           ? this.renderSelect(field, id, fieldDisabled, describedBy, errorId, errors.length > 0)
@@ -309,7 +345,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     errorId: string,
     invalid: boolean,
   ): TemplateValue {
-    const value = this.currentData[field.name];
+    const value = getJsonPath(this.currentData, field.path);
     const isNumber = field.kind === 'number';
     return html`
       <input
@@ -329,8 +365,8 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
         aria-errormessage=${invalid ? errorId : undefined}
         @input=${(event: Event) => {
           const input = event.currentTarget as HTMLInputElement;
-          if (!isNumber) this.commitField(field.name, input.value === '' ? undefined : input.value);
-          else this.commitField(field.name, input.value === '' || Number.isNaN(input.valueAsNumber) ? undefined : input.valueAsNumber);
+          if (!isNumber) this.commitPath(field.path, input.value === '' ? undefined : input.value);
+          else this.commitPath(field.path, input.value === '' || Number.isNaN(input.valueAsNumber) ? undefined : input.valueAsNumber);
         }}
       >
     `;
@@ -344,7 +380,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     errorId: string,
     invalid: boolean,
   ): TemplateValue {
-    const selectedIndex = field.options.findIndex((option) => Object.is(option.value, this.currentData[field.name]));
+    const selectedIndex = field.options.findIndex((option) => Object.is(option.value, getJsonPath(this.currentData, field.path)));
     return html`
       <select
         id=${id}
@@ -357,7 +393,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
         @change=${(event: Event) => {
           const index = Number((event.currentTarget as HTMLSelectElement).value);
           const option = field.options[index];
-          this.commitField(field.name, option?.value);
+          this.commitPath(field.path, option?.value);
         }}
       >
         <option value="" ?selected=${selectedIndex < 0}>${field.required ? 'Select an option' : 'No selection'}</option>
@@ -390,17 +426,31 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     return this.refreshValidation();
   }
 
-  private commitField(name: string, value: JsonValue | undefined): void {
+  private commitPath(path: readonly string[], value: JsonValue | undefined): void {
     if (this.disabled || this.disabledByForm || this.readOnly) return;
-    const next: Record<string, JsonValue> = { ...this.currentData };
-    if (value === undefined) delete next[name];
-    else next[name] = value;
-    this.currentData = Object.freeze(next);
+    this.currentData = updateJsonPath(this.currentData, path, value);
     this.data = this.currentData;
     this.observedData = this.currentData;
     const validationChanged = this.refreshValidation();
     this.emit('change', this.changeDetail());
     if (validationChanged) this.emitValidationChange();
+  }
+
+  private addArrayItem(field: JsonFormField): void {
+    if (this.disabled || this.disabledByForm || this.readOnly) return;
+    const current = getJsonPath(this.currentData, field.path);
+    const items = Array.isArray(current) ? [...current] : [];
+    if (field.schema.maxItems !== undefined && items.length >= field.schema.maxItems) return;
+    items.push(createDefaultValue(field.item?.schema ?? field.schema.items));
+    this.commitPath(field.path, items);
+  }
+
+  private removeArrayItem(path: readonly string[], index: number): void {
+    if (this.disabled || this.disabledByForm || this.readOnly) return;
+    const current = getJsonPath(this.currentData, path);
+    if (!Array.isArray(current)) return;
+    if (current.length <= 0) return;
+    this.commitPath(path, current.filter((_, itemIndex) => itemIndex !== index));
   }
 
   private restoreData(data: JsonObject): void {
@@ -431,9 +481,15 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     }
   }
 
-  private errorsForField(name: string): readonly JsonFormValidationError[] {
-    const instancePath = `/${name.replaceAll('~', '~0').replaceAll('/', '~1')}`;
-    return this.validationErrors.filter((error) => error.property === name || error.instancePath === instancePath);
+  private errorsForPath(path: readonly string[], descendants: boolean): readonly JsonFormValidationError[] {
+    const instancePath = jsonInstancePath(path);
+    const parentPath = jsonInstancePath(path.slice(0, -1));
+    const name = path.at(-1);
+    return this.validationErrors.filter((error) => (
+      error.instancePath === instancePath
+      || (descendants && error.instancePath.startsWith(`${instancePath}/`))
+      || (name !== undefined && error.instancePath === parentPath && error.property === name)
+    ));
   }
 
   private changeDetail(): JsonFormChangeDetail {
@@ -480,4 +536,74 @@ function parseJsonObject(value: string): JsonObject | undefined {
   } catch {
     return undefined;
   }
+}
+
+function rebaseField(field: JsonFormField, path: readonly string[], label = field.label): JsonFormField {
+  const children = field.children?.map((child) => rebaseField(child, [...path, child.name]));
+  return Object.freeze({
+    ...field,
+    name: path.at(-1) ?? field.name,
+    path: Object.freeze([...path]),
+    label,
+    ...(children ? { children: Object.freeze(children) } : {}),
+  });
+}
+
+function createDefaultValue(schema: JsonSchema | undefined): JsonValue {
+  if (!schema) return Object.freeze({});
+  if (schema.default !== undefined) return cloneJson(schema.default);
+  if (schema.enum?.[0] !== undefined) return cloneJson(schema.enum[0]);
+  if (schema.type === 'object') return applySchemaDefaults(schema, Object.freeze({}));
+  if (schema.type === 'array') return Object.freeze([]);
+  if (schema.type === 'boolean') return false;
+  if (schema.type === 'number' || schema.type === 'integer') return 0;
+  return '';
+}
+
+function getJsonPath(root: JsonObject, path: readonly string[]): JsonValue | undefined {
+  let current: unknown = root;
+  for (const segment of path) {
+    if (Array.isArray(current)) current = current[Number(segment)];
+    else if (current !== null && typeof current === 'object') current = (current as Record<string, unknown>)[segment];
+    else return undefined;
+  }
+  return current as JsonValue | undefined;
+}
+
+function updateJsonPath(root: JsonObject, path: readonly string[], value: JsonValue | undefined): JsonObject {
+  const next = cloneJson(root) as JsonObject;
+  if (path.length === 0) return next;
+  let current: unknown = next;
+  for (let index = 0; index < path.length - 1; index += 1) {
+    const segment = path[index]!;
+    const nextSegment = path[index + 1]!;
+    if (Array.isArray(current)) {
+      const itemIndex = Number(segment);
+      if (current[itemIndex] === undefined) current[itemIndex] = /^\d+$/.test(nextSegment) ? [] : {} as never;
+      current = current[itemIndex];
+    } else {
+      const record = current as Record<string, unknown>;
+      if (record[segment] === undefined || record[segment] === null) record[segment] = /^\d+$/.test(nextSegment) ? [] : {};
+      current = record[segment];
+    }
+  }
+  const leaf = path.at(-1)!;
+  if (Array.isArray(current)) {
+    const itemIndex = Number(leaf);
+    if (value === undefined) current.splice(itemIndex, 1);
+    else current[itemIndex] = value;
+  } else {
+    const record = current as Record<string, JsonValue | undefined>;
+    if (value === undefined) delete record[leaf];
+    else record[leaf] = value;
+  }
+  return Object.freeze(next);
+}
+
+function jsonInstancePath(path: readonly string[]): string {
+  return path.length === 0 ? '' : `/${path.map((segment) => segment.replaceAll('~', '~0').replaceAll('/', '~1')).join('/')}`;
+}
+
+function fieldId(path: readonly string[]): string {
+  return `field-${path.map((segment) => segment.replaceAll(/[^A-Za-z0-9_-]/g, '-')).join('-')}`;
 }

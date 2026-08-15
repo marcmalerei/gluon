@@ -4,6 +4,10 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+### Added
+
+- Added nested object fields and bounded array item editors with immutable data events, native form participation, validation, reset, state restore, and explicit fail-closed diagnostics for unsupported schema features.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

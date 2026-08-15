@@ -41,6 +41,21 @@ const deliverySchema = {
     },
     leadTime: { type: 'integer', title: 'Notification lead time (hours)', minimum: 1, maximum: 72, default: 24 },
     signatureRequired: { type: 'boolean', title: 'Require a recipient signature', default: true },
+    recipient: {
+      type: 'object',
+      title: 'Recipient details',
+      properties: {
+        name: { type: 'string', title: 'Recipient name' },
+        city: { type: 'string', title: 'Delivery city' },
+      },
+      required: ['name'],
+    },
+    backupChannels: {
+      type: 'array',
+      title: 'Backup notification channels',
+      items: { type: 'string', enum: ['email', 'sms'], enumNames: ['Email', 'SMS'] },
+      maxItems: 2,
+    },
   },
   required: ['contactEmail', 'deliveryWindow', 'leadTime'],
 } satisfies JsonSchema;

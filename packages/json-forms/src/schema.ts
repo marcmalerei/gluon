@@ -6,16 +6,17 @@ export interface JsonObject {
   readonly [key: string]: JsonValue;
 }
 
-/** A JSON value accepted by the initial JSON Forms component. */
+/** A JSON value accepted by the JSON Forms component. */
 export type JsonValue = string | number | boolean | null | JsonObject | readonly JsonValue[];
 
-/** The supported JSON Schema keywords for the first package slice. */
+/** The supported JSON Schema subset rendered by the JSON Forms component. */
 export interface JsonSchema {
   readonly type?: string | readonly string[];
   readonly title?: string;
   readonly description?: string;
   readonly default?: JsonValue;
   readonly properties?: Readonly<Record<string, JsonSchema>>;
+  readonly items?: JsonSchema;
   readonly required?: readonly string[];
   readonly enum?: readonly (string | number)[];
   readonly enumNames?: readonly string[];
@@ -24,8 +25,14 @@ export interface JsonSchema {
   readonly maxLength?: number;
   readonly minimum?: number;
   readonly maximum?: number;
+  readonly minItems?: number;
+  readonly maxItems?: number;
   readonly readOnly?: boolean;
   readonly additionalProperties?: boolean;
+  readonly $ref?: string;
+  readonly oneOf?: readonly JsonSchema[];
+  readonly anyOf?: readonly JsonSchema[];
+  readonly allOf?: readonly JsonSchema[];
 }
 
 /** A JSON Forms `Control` or top-level `VerticalLayout` UI schema. */
@@ -52,9 +59,10 @@ export interface JsonFormValidationError {
 /** A rendered direct property of a supported root-object schema. */
 export interface JsonFormField {
   readonly name: string;
+  readonly path: readonly string[];
   readonly label: string;
   readonly description?: string;
-  readonly kind: 'text' | 'number' | 'boolean' | 'select';
+  readonly kind: 'text' | 'number' | 'boolean' | 'select' | 'object' | 'array';
   readonly required: boolean;
   readonly readOnly: boolean;
   readonly schema: JsonSchema;
@@ -62,6 +70,8 @@ export interface JsonFormField {
     readonly label: string;
     readonly value: string | number;
   }[];
+  readonly children?: readonly JsonFormField[];
+  readonly item?: JsonFormField;
 }
 
 interface FieldLayout {
@@ -102,7 +112,8 @@ export function isJsonFormsUiSchema(value: unknown): value is JsonFormsUiSchema 
   if (candidate.type !== 'Control' && candidate.type !== 'VerticalLayout') return false;
   if (candidate.label !== undefined && typeof candidate.label !== 'string' && candidate.label !== false) return false;
   if (candidate.scope !== undefined && typeof candidate.scope !== 'string') return false;
-  if (candidate.elements !== undefined && !candidate.elements.every(isJsonFormsUiSchema)) return false;
+  if (candidate.elements !== undefined
+    && (!Array.isArray(candidate.elements) || !candidate.elements.every(isJsonFormsUiSchema))) return false;
   return true;
 }
 
@@ -122,12 +133,16 @@ export function freezeJson<Value extends JsonValue>(value: Value): Value {
   return Object.freeze(value);
 }
 
-/** Adds direct-property schema defaults without mutating the caller's data. */
+/** Adds object-property schema defaults without mutating caller-owned data. */
 export function applySchemaDefaults(schema: JsonSchema, data: JsonObject): JsonObject {
   const properties = schema.properties ?? {};
   const next: Record<string, JsonValue> = { ...cloneJson(data) };
   for (const [name, property] of Object.entries(properties)) {
     if (next[name] === undefined && property.default !== undefined) next[name] = cloneJson(property.default);
+    else if (property.type === 'object' && isJsonObject(next[name])) next[name] = applySchemaDefaults(property, next[name]);
+    else if (property.type === 'array' && property.items?.type === 'object' && Array.isArray(next[name])) {
+      next[name] = next[name].map((item) => isJsonObject(item) ? applySchemaDefaults(property.items!, item) : item);
+    }
   }
   return next;
 }
@@ -142,29 +157,15 @@ export function getJsonFormsConfigurationErrors(
     errors.push(configurationError('/type', 'type', 'The initial renderer requires a root schema with type "object".'));
   }
   for (const [name, property] of Object.entries(schema.properties ?? {})) {
-    const kind = getFieldKind(property);
-    if (!kind) {
-      errors.push(configurationError(
-        `/properties/${escapeJsonPointer(name)}`,
-        'unsupported',
-        `Property "${name}" is not a supported direct string, number, integer, boolean, or string/number enum field.`,
-      ));
-    }
-    if (property.format !== undefined && !supportedFormats.has(property.format)) {
-      errors.push(configurationError(
-        `/properties/${escapeJsonPointer(name)}/format`,
-        'unsupported',
-        `Property "${name}" uses unsupported format "${property.format}".`,
-      ));
-    }
+    validateSchemaNode(property, ['properties', escapeJsonPointer(name)], errors, name);
   }
   if (uischema && uischema.type === 'Control') {
-    errors.push(configurationError('/uischema/type', 'unsupported', 'The initial renderer accepts a VerticalLayout UI schema, not a root Control.'));
+    errors.push(configurationError('/uischema/type', 'unsupported', 'The renderer accepts a VerticalLayout UI schema, not a root Control.'));
   }
   if (uischema?.type === 'VerticalLayout') {
     for (const control of uischema.elements ?? []) {
       if (control.type !== 'Control' || !parsePropertyScope(control.scope)) {
-        errors.push(configurationError('/uischema/elements', 'unsupported', 'UI schemas may contain only direct-property Control elements.'));
+        errors.push(configurationError('/uischema/elements', 'unsupported', 'UI schemas may contain only Control elements with property scopes.'));
       }
     }
   }
@@ -179,32 +180,7 @@ export function getJsonFormFields(
   const layout = getFieldLayout(uischema);
   const properties = schema.properties ?? {};
   const names = [...layout.order, ...Object.keys(properties).filter((name) => !layout.order.includes(name))];
-  const required = new Set(schema.required ?? []);
-  const fields: JsonFormField[] = [];
-  for (const name of names) {
-    const property = properties[name];
-    if (!property) continue;
-    const kind = getFieldKind(property);
-    if (!kind) continue;
-    const layoutLabel = layout.labels.get(name);
-    const label = layoutLabel === false ? humanize(name) : layoutLabel ?? property.title ?? humanize(name);
-    const enumNames = layout.enumNames.get(name) ?? property.enumNames;
-    const options = property.enum?.map((value, index) => ({
-      value,
-      label: enumNames?.[index] ?? String(value),
-    })) ?? [];
-    fields.push(Object.freeze({
-      name,
-      label,
-      ...(property.description ? { description: property.description } : {}),
-      kind,
-      required: required.has(name),
-      readOnly: property.readOnly === true,
-      schema: property,
-      options: Object.freeze(options),
-    }));
-  }
-  return Object.freeze(fields);
+  return Object.freeze(buildFields(schema, names, [], layout));
 }
 
 /** Validates data with AJV and reports stable, serializable JSON Forms diagnostics. */
@@ -238,6 +214,8 @@ function getFieldKind(schema: JsonSchema): JsonFormField['kind'] | undefined {
   if (schema.type === 'string') return 'text';
   if (schema.type === 'number' || schema.type === 'integer') return 'number';
   if (schema.type === 'boolean') return 'boolean';
+  if (schema.type === 'object') return 'object';
+  if (schema.type === 'array') return 'array';
   return undefined;
 }
 
@@ -248,19 +226,103 @@ function getFieldLayout(uischema: JsonFormsUiSchema | undefined): FieldLayout {
   if (uischema?.type !== 'VerticalLayout') return { labels, enumNames, order };
   for (const control of uischema.elements ?? []) {
     if (control.type !== 'Control') continue;
-    const name = parsePropertyScope(control.scope);
-    if (!name || order.includes(name)) continue;
-    order.push(name);
-    if (control.label !== undefined) labels.set(name, control.label);
-    if (control.options?.enumNames) enumNames.set(name, control.options.enumNames);
+    const path = parsePropertyScope(control.scope);
+    if (!path) continue;
+    const key = pathKey(path);
+    if (path.length === 1 && !order.includes(path[0]!)) order.push(path[0]!);
+    if (control.label !== undefined) labels.set(key, control.label);
+    if (control.options?.enumNames) enumNames.set(key, control.options.enumNames);
   }
   return { labels, enumNames, order };
 }
 
-function parsePropertyScope(scope: string | undefined): string | undefined {
-  const match = /^#\/properties\/([^/]+)$/.exec(scope ?? '');
-  return match?.[1] ? unescapeJsonPointer(match[1]) : undefined;
+function parsePropertyScope(scope: string | undefined): readonly string[] | undefined {
+  if (!/^#\/properties\/[^/]+(?:\/properties\/[^/]+)*$/.test(scope ?? '')) return undefined;
+  const tokens = (scope ?? '').slice(2).split('/');
+  const segments = tokens.filter((_, index) => index % 2 === 1).map(unescapeJsonPointer);
+  return segments.length > 0 ? segments : undefined;
 }
+
+function buildFields(
+  schema: JsonSchema,
+  names: readonly string[],
+  parentPath: readonly string[],
+  layout: FieldLayout,
+): readonly JsonFormField[] {
+  const properties = schema.properties ?? {};
+  const required = new Set(schema.required ?? []);
+  return names.flatMap((name) => {
+    const property = properties[name];
+    if (!property) return [];
+    return [buildField(name, property, [...parentPath, name], required.has(name), layout)];
+  });
+}
+
+function buildField(
+  name: string,
+  schema: JsonSchema,
+  path: readonly string[],
+  required: boolean,
+  layout: FieldLayout,
+): JsonFormField {
+  const kind = getFieldKind(schema) ?? 'text';
+  const key = pathKey(path);
+  const layoutLabel = layout.labels.get(key);
+  const label = layoutLabel === false ? humanize(name) : layoutLabel ?? schema.title ?? humanize(name);
+  const enumNames = layout.enumNames.get(key) ?? schema.enumNames;
+  const options = schema.enum?.map((value, index) => ({ value, label: enumNames?.[index] ?? String(value) })) ?? [];
+  const field: JsonFormField = {
+    name,
+    path: Object.freeze([...path]),
+    label,
+    ...(schema.description ? { description: schema.description } : {}),
+    kind,
+    required,
+    readOnly: schema.readOnly === true,
+    schema,
+    options: Object.freeze(options),
+  };
+  if (kind === 'object') {
+    const children = Object.keys(schema.properties ?? {});
+    return Object.freeze({ ...field, children: Object.freeze(buildFields(schema, children, path, layout)) });
+  }
+  if (kind === 'array' && schema.items) {
+    return Object.freeze({ ...field, item: buildField('item', schema.items, [], false, layout) });
+  }
+  return Object.freeze(field);
+}
+
+function validateSchemaNode(
+  schema: JsonSchema,
+  schemaPath: readonly string[],
+  errors: JsonFormValidationError[],
+  label: string,
+): void {
+  const unsupportedKeywords = ['\$ref', 'oneOf', 'anyOf', 'allOf', 'not', 'if', 'then', 'else', 'patternProperties', 'dependencies', 'dependentSchemas', 'contains'];
+  for (const keyword of unsupportedKeywords) {
+    if (keyword in schema) errors.push(configurationError(`/${schemaPath.join('/')}/${keyword}`, 'unsupported', `Property "${label}" uses unsupported schema keyword "${keyword}".`));
+  }
+  const kind = getFieldKind(schema);
+  if (!kind) {
+    errors.push(configurationError(`/${schemaPath.join('/')}`, 'unsupported', `Property "${label}" is not a supported string, number, integer, boolean, object, array, or enum field.`));
+    return;
+  }
+  if (schema.format !== undefined && !supportedFormats.has(schema.format)) {
+    errors.push(configurationError(`/${schemaPath.join('/')}/format`, 'unsupported', `Property "${label}" uses unsupported format "${schema.format}".`));
+  }
+  if (kind === 'object') {
+    for (const [name, child] of Object.entries(schema.properties ?? {})) {
+      validateSchemaNode(child, [...schemaPath, 'properties', escapeJsonPointer(name)], errors, `${label}.${name}`);
+    }
+  }
+  if (kind === 'array') {
+    if (!schema.items) errors.push(configurationError(`/${schemaPath.join('/')}/items`, 'unsupported', `Array property "${label}" must declare supported items.`));
+    else if (getFieldKind(schema.items) === 'array') errors.push(configurationError(`/${schemaPath.join('/')}/items`, 'unsupported', `Nested arrays are not supported for "${label}".`));
+    else validateSchemaNode(schema.items, [...schemaPath, 'items'], errors, `${label} item`);
+  }
+}
+
+function pathKey(path: readonly string[]): string { return path.join('.'); }
 
 function escapeJsonPointer(value: string): string {
   return value.replaceAll('~', '~0').replaceAll('/', '~1');

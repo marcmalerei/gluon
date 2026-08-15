@@ -142,14 +142,55 @@ describe('JSON Forms component', () => {
     const element = createForm({
       type: 'object',
       properties: {
-        address: { type: 'object', properties: { city: { type: 'string' } } },
+        address: { $ref: '#/$defs/address' },
       },
     });
     await settled(element);
 
-    expect(element.errors).toHaveLength(1);
+    expect(element.errors.length).toBeGreaterThan(0);
     expect(element.shadowRoot!.querySelector('[part="configuration-error"]')?.textContent).toContain('address');
     expect(element.checkValidity()).toBe(false);
+  });
+
+  it('renders nested objects and bounded arrays with immutable path updates', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        recipient: {
+          type: 'object',
+          title: 'Recipient details',
+          properties: {
+            name: { type: 'string', title: 'Recipient name' },
+            city: { type: 'string', title: 'Delivery city' },
+          },
+          required: ['name'],
+        },
+        channels: {
+          type: 'array',
+          title: 'Backup channels',
+          items: { type: 'string', enum: ['email', 'sms'] },
+          maxItems: 2,
+        },
+      },
+    } as JsonSchema);
+    element.data = { recipient: { name: 'Ada' }, channels: ['email'] };
+    element.uischema = {
+      type: 'VerticalLayout',
+      elements: [{ type: 'Control', scope: '#/properties/recipient/properties/city', label: 'Town' }],
+    };
+    await settled(element);
+
+    expect(element.shadowRoot!.querySelector('#field-recipient-name')).toBeTruthy();
+    expect(element.shadowRoot!.querySelector('label[for="field-recipient-city"]')?.textContent).toContain('Town');
+    expect(element.shadowRoot!.querySelector('#field-channels-0')).toBeTruthy();
+    const city = element.shadowRoot!.querySelector('#field-recipient-city') as HTMLInputElement;
+    city.value = 'Berlin';
+    city.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    const add = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent === 'Add item')!;
+    add.click();
+    await settled(element);
+    expect(element.data).toEqual({ recipient: { name: 'Ada', city: 'Berlin' }, channels: ['email', 'email'] });
+    expect(element.shadowRoot!.querySelector('#field-channels-1')).toBeTruthy();
   });
 
   it('validates direct text and numeric constraints and removes a cleared number', async () => {
