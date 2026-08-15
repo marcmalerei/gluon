@@ -33,6 +33,7 @@ for (const version of versions.supported) {
 await access(resolve(outputRoot, 'archive/index.html'));
 await access(resolve(outputRoot, 'latest/index.html'));
 await access(resolve(outputRoot, versions.latest, 'packages/index.html'));
+await access(resolve(outputRoot, 'latest', 'packages', 'index.html'));
 
 const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
 const packageIndexHtml = await readFile(resolve(outputRoot, versions.latest, 'packages/index.html'), 'utf8');
@@ -65,6 +66,25 @@ for (const entry of currentPackages) {
   }
   if (!html.includes(`>${escapeHtml(entry.name)}</a>`)) {
     throw new Error(`${entry.name} API landing page has no package-specific breadcrumb`);
+  }
+}
+for (const entry of currentPackages) {
+  const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
+  const latestPackageHtml = await readFile(resolve(outputRoot, 'latest', 'packages', packageSlug, 'index.html'), 'utf8');
+  if (!latestPackageHtml.includes(`<link rel="canonical" href="https://marcmalerei.github.io/gluon/${versions.latest}/packages/${packageSlug}/">`)) {
+    throw new Error(`${entry.name} package portal latest alias does not preserve the versioned canonical URL`);
+  }
+}
+for (const page of [
+  ['latest', 'index.html'],
+  ['latest', 'guides', 'components', 'index.html'],
+  ['latest', 'api', 'index.html'],
+  ['latest', 'migration', 'index.html'],
+  ['latest', 'migration', 'vue-to-gluon-cutover', 'index.html'],
+]) {
+  const html = await readFile(resolve(outputRoot, ...page), 'utf8');
+  if (!html.includes(`<link rel="canonical" href="https://marcmalerei.github.io/gluon/${versions.latest}/`)) {
+    throw new Error(`latest alias page is missing versioned canonical metadata: ${page.join('/')}`);
   }
 }
 await access(resolve(outputRoot, 'assets/docs.css'));

@@ -89,7 +89,7 @@
     "check:component-library-clean-install": "npm run build:component-library-package && node scripts/validate-component-library-clean-install.mjs",
     "check:component-library-loader-build": "npm run build:core && npm run build:compiler && npm run build:vite && npm run build:component-library && node scripts/validate-component-library-loader-build.mjs",
     "docs:api": "typedoc --options typedoc.json --treatWarningsAsErrors && node scripts/generate-api-examples.mjs",
-    "build:docs": "npm run docs:api && node scripts/build-docs.mjs && npm run build:docs-examples",
+    "build:docs": "npm run docs:api && node scripts/build-docs.mjs && npm run build:docs-examples && node scripts/mirror-latest-docs.mjs",
     "build:docs-examples": "vite build --config docs-site/examples/vite.config.ts",
     "dev:shop": "vite --config examples/shop/vite.config.ts",
     "dev:playground": "vite --config examples/playground/vite.config.ts",

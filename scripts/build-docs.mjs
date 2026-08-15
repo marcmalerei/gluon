@@ -48,8 +48,6 @@ const pages = [...maintainedPages, ...apiPages];
 for (const page of pages) await renderPage(page);
 for (const version of versions.supported) await renderPackagePortal(version);
 await writeRedirect(resolve(outputRoot, 'index.html'), `${base}${versions.latest}/`);
-await mkdir(resolve(outputRoot, 'latest'), { recursive: true });
-await writeRedirect(resolve(outputRoot, 'latest', 'index.html'), `${base}${versions.latest}/`);
 await writeFile(resolve(outputRoot, '404.html'), pageShell({
   title: 'Documentation page not found',
   description: 'The requested Gluon documentation page does not exist.',
