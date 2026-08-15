@@ -44,7 +44,7 @@ try {
     const app = createApp(() => html\`<section><p>\${ProductBadge('In stock')}</p><example-product-picker value="1"></example-product-picker></section>\`).mount(document.querySelector('#app')!);
     Object.assign(window, { componentLibraryUnmount: () => { app.unmount(); loader.dispose(); } });
   `);
-  await execFile('npm', ['install', ...archives, 'vite@8.1.4', 'typescript@5.9.3', '--ignore-scripts', '--no-audit', '--no-fund'], {
+  await execFile('npm', ['install', ...archives, 'vite@8.2.1', 'typescript@5.9.3', '--ignore-scripts', '--no-audit', '--no-fund'], {
     cwd: consumer, maxBuffer: 20 * 1024 * 1024,
   });
   await execFile(resolve(consumer, 'node_modules/.bin/tsc'), ['--noEmit'], { cwd: consumer });

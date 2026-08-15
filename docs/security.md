@@ -81,3 +81,24 @@ and the automated browser-engine matrix. A change to a sink, escape hatch, seria
 style carrier, hydration boundary, request-ownership rule, or generator writer
 must update the
 machine-readable model and this review in the same pull request.
+
+## Dependency audit
+
+The current clean-install audit was reproduced from `npm ci --ignore-scripts` and `npm audit` on
+2026-08-15 under Node `v22.12.0`.
+
+| Result | Count | Notes |
+| --- | ---: | --- |
+| `npm audit` | 1 | The only retained finding is the dev-only `js-yaml` chain through `@11ty/eleventy -> gray-matter`. |
+| `npm audit --omit=dev` | 0 | No production dependency paths remain in the audit report. |
+
+The retained `js-yaml` findings are dev-only through `@11ty/eleventy -> gray-matter -> js-yaml@3.15.0` and
+`@11ty/eleventy -> js-yaml@4.3.0`. No Gluon runtime path uses those packages, and the upstream
+`gray-matter` release line still requires the vulnerable `js-yaml@^3.13.1` range. That makes the
+finding reviewable but not currently fixable without a speculative upstream breaking change.
+
+The previously reviewed `@cyclonedx/cdxgen@12.8.3` line was not retained because its installed
+subtree pulled `@appthreat/atom-parsetools@1.3.0` with nested Babel 8 packages whose engine floor
+requires Node `^22.18.0 || >=24.11.0`. The current release line uses
+`@cyclonedx/cdxgen@12.8.0`, which installs `@appthreat/atom-parsetools@1.2.2` instead and remains
+compatible with Gluon's Node `^22.12.0 || ^24.0.0` support floor.

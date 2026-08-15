@@ -434,6 +434,16 @@ creation and requires every dependency declared by an official package,
 including installed peer and optional dependencies, to occur in the aggregate
 SPDX package inventory. It reports the exact missing package and version.
 
+The release dependency audit for issue #396 was reproduced from a clean
+`npm ci --ignore-scripts` install on 2026-08-15 under Node `v22.12.0`. The
+fixable findings were resolved by keeping `@cyclonedx/cdxgen@12.8.0`,
+upgrading `vite` to `8.2.1`, and applying narrow `fast-uri`, `brace-expansion`,
+`tar`, and `undici` overrides. The remaining documented audit residue is the
+dev-only `js-yaml` chain visible through `@11ty/eleventy -> gray-matter`;
+`npm audit --omit=dev` is clean, and the current `gray-matter` parent line
+still requests the vulnerable `js-yaml@^3.13.1` range, so there is no same-line
+upstream fix to adopt without speculation.
+
 SPDX output is validated against the vendored official SPDX 2.3 JSON schema.
 The release contract pins its upstream commit, source URL, and SHA-256; a schema
 change therefore requires an explicit reviewed contract update.

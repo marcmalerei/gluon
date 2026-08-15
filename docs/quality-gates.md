@@ -208,7 +208,9 @@ request through `renderEleventyPage()` and requires identity-preserving shop
 hydration. The adapter package subpath itself has no Eleventy dependency.
 The clean-install gate installs packed local Core, Reactivity, Router, Store,
 and SSR release archives together so an unpublished lockstep candidate never
-resolves its exact internal dependencies from the public registry.
+resolves its exact internal dependencies from the public registry. The
+component-library clean-install fixture now exercises `vite@8.2.1`, matching the
+patched root dependency line used in the audit fix.
 The project-analyzer clean-install gate applies the same release-candidate
 boundary to its packed local Compiler and Language Server archives.
 The canonical shop flow waits for the observable settled inventory copy with a
