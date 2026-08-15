@@ -1176,7 +1176,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, WorkflowTimeline, organismManifest, organismStyles, workflowTimelineStyles, type AppShellProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AppShell, ConfirmationDialog, WorkflowTimeline, createConfirmationDialogController, confirmationDialogStyles, organismManifest, organismStyles, workflowTimelineStyles, type AppShellProps, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1184,12 +1184,17 @@
         "  children: html`<h1>New arrivals</h1>`,",
         "  footer: html`<small>Free shipping over €100</small>`,",
         "} satisfies AppShellProps;",
+        "const initialFocus: ConfirmationDialogInitialFocus = '[data-confirm-primary]';",
+        "const confirmationOptions = { initialFocus } satisfies ConfirmationDialogControllerOptions;",
+        "const confirmationController: ConfirmationDialogController = createConfirmationDialogController(confirmationOptions);",
+        "const confirmationAttributes = { '@close': () => console.log('closed') } satisfies ConfirmationDialogAttributes;",
+        "const confirmation = { id: 'archive-confirmation', title: 'Archive order?', description: 'The caller owns the archive mutation.', safeAction: 'Cancel', primaryAction: html`<button data-confirm-primary>Archive</button>`, dismissOnBackdrop: false, controller: confirmationController, attributes: confirmationAttributes } satisfies ConfirmationDialogProps;",
         "const workflowStep: WorkflowTimelineStep = { id: 'review', label: 'Review', status: 'current' satisfies WorkflowTimelineStatus, role: 'Reviewer', evidence: 'Ticket 42' };",
         "const workflowState: WorkflowTimelineOverallState = 'degraded';",
         "const workflowAttributes: WorkflowTimelineAttributes = { 'aria-label': 'Order workflow' };",
         "const workflowMessages: WorkflowTimelineMessages = { timeline: 'Ablauf', status: (status) => `Status: ${status}`, step: (position, total) => `${position} von ${total}`, evidence: 'Nachweis' };",
         "const workflow: WorkflowTimelineProps = { id: 'order-workflow', steps: [workflowStep], state: workflowState, messages: workflowMessages, role: 'Operations', evidence: 'Import log 42', attributes: workflowAttributes };",
-        "console.log(AppShell(shell), WorkflowTimeline(workflow), organismStyles, workflowTimelineStyles, organismManifest.entries);"
+        "console.log(AppShell(shell), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), confirmationDialogStyles, organismStyles, workflowTimelineStyles, organismManifest.entries);"
       ]
     },
     "router-application": {
@@ -5284,6 +5289,38 @@
     "packages/organisms/src/interfaces/AppShellProps.md": {
       "recipe": "organism-components",
       "description": "Arrange optional header, navigation, and footer content around the required main application content:"
+    },
+    "packages/organisms/src/functions/createConfirmationDialogController.md": {
+      "recipe": "organism-components",
+      "description": "Create the optional native modal lifecycle controller while leaving copy, actions, mutation, and routing with the caller:"
+    },
+    "packages/organisms/src/interfaces/ConfirmationDialogController.md": {
+      "recipe": "organism-components",
+      "description": "Type the small controller boundary used to call native showModal and close without taking ownership of domain state:"
+    },
+    "packages/organisms/src/interfaces/ConfirmationDialogControllerOptions.md": {
+      "recipe": "organism-components",
+      "description": "Configure an optional initial-focus selector or element for the native modal lifecycle:"
+    },
+    "packages/organisms/src/interfaces/ConfirmationDialogProps.md": {
+      "recipe": "organism-components",
+      "description": "Compose caller-owned title, description, actions, status, and native dialog state into a confirmation surface:"
+    },
+    "packages/organisms/src/type-aliases/ConfirmationDialogAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native HTMLDialogElement attributes to the confirmation dialog boundary:"
+    },
+    "packages/organisms/src/type-aliases/ConfirmationDialogInitialFocus.md": {
+      "recipe": "organism-components",
+      "description": "Type the caller-owned element or selector that receives initial focus after showModal:"
+    },
+    "packages/organisms/src/variables/ConfirmationDialog.md": {
+      "recipe": "organism-components",
+      "description": "Render a request-free native confirmation dialog with caller-provided actions and accessible status content:"
+    },
+    "packages/organisms/src/variables/confirmationDialogStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable stylesheet for the native confirmation dialog surface and its per-component custom properties:"
     },
     "packages/organisms/src/interfaces/WorkflowTimelineProps.md": {
       "recipe": "organism-components",

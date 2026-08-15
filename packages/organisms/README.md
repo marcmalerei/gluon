@@ -8,7 +8,7 @@ Larger Gluon interface structures. The package is optional and depends only
 downward on Core, Quarks, Atoms, and Molecules.
 
 ```ts
-import { AppShell } from '@gluonjs/organisms';
+import { AppShell } from "@gluonjs/organisms";
 ```
 
 `WorkflowTimeline` renders a request-free, SSR-safe ordered workflow from typed
@@ -40,6 +40,22 @@ mutation remains prohibited. The deprecated `organismStyles` aggregate cannot
 coexist silently with exact rendering.
 `organismManifest` records the stable contract, compiled interactive example,
 browser coverage, and visual-regression evidence.
+
+`ConfirmationDialog` is a native `<dialog>` composition. Callers provide copy,
+leading content, action controls, status content, and all mutation or routing.
+Use controlled `open` for SSR/Storybook markup; a connected browser upgrades an
+open surface into the modal top layer. Omit `open` when
+`createConfirmationDialogController()` owns `showModal()` and `close()`.
+The controller restores focus after its own close calls, native `close()`, and
+Escape, and accepts an optional initial-focus element or selector. `busy` and
+`disabled` make the caller-owned action region inert and block Escape/backdrop
+dismissal. Backdrop dismissal is opt-in. Native `@cancel`, `@close`, and other
+events remain available through `attributes`; caller listeners run before the
+organism's bounded dismissal policy. At narrow widths and 200% text zoom the
+surface stays horizontally contained and becomes vertically scrollable, so
+every caller-owned action remains reachable within a short viewport. The
+controller owns no domain decisions.
+DOM relationship IDs fail closed when empty or when they contain whitespace.
 
 `AppShell.attributes` extends its outer native div while its landmark children
 remain owned by explicit props. App-local Organisms use the public
