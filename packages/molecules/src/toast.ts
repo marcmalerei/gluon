@@ -22,7 +22,7 @@ export type ToastAttributes = Omit<QuarkProps<HTMLDivElement>, 'children' | 'rol
   readonly aria?: Omit<NonNullable<QuarkProps<HTMLDivElement>['aria']>, 'live' | 'atomic'>;
 };
 export type ToastViewportAttributes = Omit<QuarkProps<HTMLDivElement>, 'children' | 'role' | 'aria'> & {
-  readonly aria?: Omit<NonNullable<QuarkProps<HTMLDivElement>['aria']>, 'label'>;
+  readonly aria?: Omit<NonNullable<QuarkProps<HTMLDivElement>['aria']>, 'label' | 'live' | 'atomic'>;
 };
 
 export interface ToastContent {
@@ -51,6 +51,8 @@ export const Toast = defineMolecule(({
   attributes = {},
 }: ToastProps): TemplateResult => {
   validateId(id);
+  validateTone(tone);
+  validateAnnouncement(announcement);
   const { aria, ...native } = attributes;
   return q.div({
     ...native,
@@ -121,7 +123,8 @@ interface ToastTiming {
 }
 
 const viewportRefCache = new WeakMap<ToastController, {
-  readonly external: QuarkRef<HTMLDivElement> | undefined;
+  external: QuarkRef<HTMLDivElement> | undefined;
+  element: HTMLDivElement | undefined;
   readonly ref: QuarkRef<HTMLDivElement>;
 }>();
 
@@ -338,10 +341,18 @@ function validateToastRequest(request: ToastRequest): void {
   if (!('children' in request)) throw new TypeError('Toast request must define children.');
   if (request.id !== undefined) validateId(request.id);
   if (request.timeout !== undefined) validateDuration('item timeout', request.timeout, 1);
-  if (request.tone !== undefined && !['neutral', 'success', 'warning', 'danger'].includes(request.tone)) {
+  if (request.tone !== undefined) validateTone(request.tone);
+  if (request.announcement !== undefined) validateAnnouncement(request.announcement);
+}
+
+function validateTone(value: ToastTone): void {
+  if (!['neutral', 'success', 'warning', 'danger'].includes(value)) {
     throw new TypeError('Toast tone must be neutral, success, warning, or danger.');
   }
-  if (request.announcement !== undefined && request.announcement !== 'polite' && request.announcement !== 'assertive') {
+}
+
+function validateAnnouncement(value: ToastAnnouncement): void {
+  if (value !== 'polite' && value !== 'assertive') {
     throw new TypeError('Toast announcement must be polite or assertive.');
   }
 }
@@ -397,10 +408,23 @@ function getViewportRef(
   external: QuarkRef<HTMLDivElement> | undefined,
 ): QuarkRef<HTMLDivElement> {
   const cached = viewportRefCache.get(controller);
-  if (cached && cached.external === external) return cached.ref;
+  if (cached) {
+    if (cached.external !== external) {
+      assignRef(cached.external, undefined);
+      cached.external = external;
+      assignRef(external, cached.element);
+    }
+    return cached.ref;
+  }
   let revision = 0;
+  let state: {
+    external: QuarkRef<HTMLDivElement> | undefined;
+    element: HTMLDivElement | undefined;
+    readonly ref: QuarkRef<HTMLDivElement>;
+  };
   const ref: QuarkRef<HTMLDivElement> = (element) => {
-    assignRef(external, element);
+    state.element = element;
+    assignRef(state.external, element);
     const currentRevision = ++revision;
     if (!element) {
       controller.deactivate();
@@ -410,7 +434,8 @@ function getViewportRef(
       if (currentRevision === revision) controller.activate();
     });
   };
-  viewportRefCache.set(controller, { external, ref });
+  state = { external, element: undefined, ref };
+  viewportRefCache.set(controller, state);
   return ref;
 }
 

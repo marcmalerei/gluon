@@ -277,7 +277,10 @@ viewport activates its controller only after its browser ref mounts. Calls to
 renders only the named empty viewport, arms no timer, and hydration cannot replay
 pre-mount feedback. A promoted item starts its complete deadline at promotion,
 while queued items do not age. Re-adding an ID replaces and promotes that record
-with a fresh deadline. `items` is a side-effect-free visible snapshot.
+with a fresh deadline. `items` is a side-effect-free visible snapshot. The
+viewport keeps its internal lifecycle ref stable across controlled rerenders;
+replacing `attributes.ref` transfers the retained element to the new caller ref
+without deactivating the queue.
 
 ```ts
 const toasts = createToastController({ maxVisible: 2, maxQueue: 8 });

@@ -2,7 +2,7 @@ import axe from 'axe-core';
 import { page, userEvent } from 'vitest/browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp, getStyleSheetText } from '@gluonjs/core';
-import { nextTick } from '@gluonjs/reactivity';
+import { nextTick, shallowRef } from '@gluonjs/reactivity';
 import {
   Toast,
   ToastViewport,
@@ -46,6 +46,12 @@ describe('Toast controller lifecycle', () => {
       'Toast item timeout must be a safe integer between 1 and 86400000.',
     );
     expect(() => controller.add({ children: 'Bad', announcement: 'off' as never })).toThrow(
+      'Toast announcement must be polite or assertive.',
+    );
+    expect(() => Toast({ id: 'direct-toast', children: 'Bad', tone: 'critical' as never })).toThrow(
+      'Toast tone must be neutral, success, warning, or danger.',
+    );
+    expect(() => Toast({ id: 'direct-toast', children: 'Bad', announcement: 'off' as never })).toThrow(
       'Toast announcement must be polite or assertive.',
     );
   });
@@ -174,6 +180,36 @@ describe('Toast browser contract', () => {
     expect(root.querySelector('#polite-toast')).toBe(polite);
     expect(root.querySelector('#polite-toast [role="status"]')).toBe(politeLive);
     expect(polite.querySelectorAll('[role="status"], [role="alert"]')).toHaveLength(1);
+    app.unmount();
+    controller.dispose();
+  });
+
+  it('retains active items when the caller replaces its external viewport ref', async () => {
+    const controller = createToastController({ timeout: 60_000 });
+    const firstRef: { value?: HTMLDivElement } = {};
+    const secondRef: { value?: HTMLDivElement } = {};
+    const externalRef = shallowRef(firstRef);
+    const root = document.createElement('div');
+    document.body.append(root);
+    const app = createApp(() => ToastViewport({
+      controller,
+      attributes: { ref: externalRef.value },
+    }));
+    app.mount(root);
+    await Promise.resolve();
+    await nextTick();
+    controller.add({ id: 'retained-toast', children: 'Keep this feedback' });
+    await nextTick();
+    const toast = root.querySelector('#retained-toast');
+
+    externalRef.value = secondRef;
+    await nextTick();
+
+    expect(controller.active).toBe(true);
+    expect(controller.items.map(({ id }) => id)).toEqual(['retained-toast']);
+    expect(root.querySelector('#retained-toast')).toBe(toast);
+    expect(firstRef.value).toBeUndefined();
+    expect(secondRef.value).toBe(root.querySelector('[role="region"]'));
     app.unmount();
     controller.dispose();
   });
