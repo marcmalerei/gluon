@@ -196,11 +196,13 @@ createApp(() => AppShell({
       primaryAction: Button({ label: 'Save profile' }),
     }),
     NavigationMenu({
+      id: 'ui-primary-navigation',
       label: 'Primary navigation',
       open: ['ui-shop-navigation'],
       items: [{
         id: 'ui-shop-navigation',
         label: 'Shop',
+        accessibleLabel: 'Open Shop navigation',
         href: '#profile',
         children: [{ id: 'ui-orders-navigation', label: 'Orders', href: '#orders' }],
       }],

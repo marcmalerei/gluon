@@ -1241,7 +1241,7 @@
         "  label: 'Order sections',",
         "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
         "} satisfies NavigationStripProps;",
-        "const navigationMenu = { label: 'Primary navigation', open: ['shop'], items: [{ id: 'shop', label: 'Shop', href: '/shop', active: true, children: [{ id: 'new', label: 'New arrivals', href: '/shop?sort=new' }] }] } satisfies NavigationMenuProps;",
+        "const navigationMenu = { id: 'primary-navigation', label: 'Primary navigation', open: ['shop'], items: [{ id: 'shop', label: 'Shop', accessibleLabel: 'Open Shop navigation', href: '/shop', active: true, children: [{ id: 'new', label: 'New arrivals', href: '/shop?sort=new' }] }] } satisfies NavigationMenuProps;",
         "const searchFieldAttributes = { class: 'catalog-search' } satisfies SearchFieldAttributes;",
         "const searchInputAttributes = { autocomplete: 'off' } satisfies SearchFieldInputAttributes;",
         "const searchField = { id: 'catalog-search', label: 'Search products', query: 'cable', inputAttributes: searchInputAttributes, attributes: searchFieldAttributes } satisfies SearchFieldProps;",
@@ -5162,7 +5162,7 @@
     },
     "packages/molecules/src/type-aliases/NavigationMenuAttributes.md": {
       "recipe": "molecule-components",
-      "description": "Forward safe native navigation landmark attributes while NavigationMenu owns only its accessible name and hierarchy:"
+      "description": "Forward safe native navigation landmark attributes while NavigationMenu owns its root ID, accessible name, and hierarchy:"
     },
     "packages/molecules/src/type-aliases/NavigationMenuItemAttributes.md": {
       "recipe": "molecule-components",
@@ -5170,7 +5170,7 @@
     },
     "packages/molecules/src/type-aliases/NavigationMenuLinkAttributes.md": {
       "recipe": "molecule-components",
-      "description": "Forward typed native anchor attributes for a NavigationMenu destination while the application owns routing:"
+      "description": "Forward typed native anchor attributes and listeners while NavigationMenu owns href, active, availability, and description relationships:"
     },
     "packages/molecules/src/type-aliases/NavigationMenuOpenChangeEvent.md": {
       "recipe": "molecule-components",
@@ -5178,11 +5178,11 @@
     },
     "packages/molecules/src/type-aliases/NavigationMenuProps.md": {
       "recipe": "molecule-components",
-      "description": "Compose a labelled controlled native navigation hierarchy with caller-owned destinations and nested groups:"
+      "description": "Compose an instance-namespaced labelled controlled native navigation hierarchy with caller-owned destinations and nested groups:"
     },
     "packages/molecules/src/type-aliases/NavigationMenuTriggerAttributes.md": {
       "recipe": "molecule-components",
-      "description": "Forward typed native button attributes for a NavigationMenu disclosure trigger:"
+      "description": "Forward typed native button attributes while NavigationMenu owns disclosure, availability, and control relationships:"
     },
     "packages/molecules/src/type-aliases/AccordionAccessibleName.md": {
       "recipe": "molecule-components",

@@ -56,6 +56,7 @@ export function SiteHeader(store: ShopStore): TemplateValue {
         attributes: { class: 'wordmark', 'aria-label': 'GLUON GOODS home' },
       })`GLUON GOODS`}
       ${NavigationMenu({
+        id: 'desktop-primary-navigation',
         label: 'Primary navigation',
         open: store.navigationOpen,
         onOpenChange: (open) => { store.navigationOpen = [...open]; },
@@ -64,6 +65,7 @@ export function SiteHeader(store: ShopStore): TemplateValue {
           {
             id: 'shop-navigation',
             label: 'Shop',
+            accessibleLabel: 'Open Shop navigation',
             href: '/shop',
             active: route.path === '/shop' || route.path.startsWith('/products/'),
             children: [
@@ -71,7 +73,7 @@ export function SiteHeader(store: ShopStore): TemplateValue {
               { id: 'shop-new', label: 'New arrivals', href: '/shop?sort=new', active: route.path === '/shop' && route.query.sort === 'new' },
             ],
           },
-          { id: 'journal-navigation', label: 'Journal', link: ShopEditorialLink({ href: '#journal', children: 'Journal' }) },
+          { id: 'journal-navigation', label: 'Journal', href: '#journal', linkAttributes: { class: 'shop-editorial-link' } },
         ],
       })}
       ${Toolbar({

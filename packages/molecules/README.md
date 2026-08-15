@@ -179,25 +179,29 @@ NavigationStrip({
 `NavigationMenu` is the hierarchical counterpart for site and product
 navigation. It renders native `nav`, `ul`, `li`, `a`, and `button` semantics;
 it is not a command menu and does not know a router, permissions, analytics, or
-network state. Pass stable item IDs and a controlled `open` array. Groups with
+network state. Pass a document-unique root `id`, stable item IDs, and a
+controlled `open` array. Groups with
 an `href` render a native destination plus a separate disclosure button, while
 their nested items remain ordinary links. `active`, `disabled`, and
 `unavailable` are caller-owned decisions; unavailable items remain announced
 with a reason but do not navigate. Escape closes the deepest open group and
 returns focus to its trigger; outside pointer dismissal closes the controlled
 set. Arrow/Home/End traversal skips disabled or unavailable controls and follows
-the document direction. IDs must be unique within the document for deterministic
-SSR and hydration. Applications with a router link adapter may provide its
-native rendered anchor through `link`; the adapter remains responsible for
-navigation and active-class behavior.
+the document direction. Derived panel and unavailable-message IDs are
+injectively escaped and namespaced by the root ID for deterministic SSR and
+hydration. Linked groups require caller-localized `accessibleLabel` copy for
+their separate disclosure button; unavailable items require an
+`unavailableReason`. Applications retain routing and analytics through native
+`href` and typed `linkAttributes` listeners.
 
 ```ts
 NavigationMenu({
+  id: 'primary-navigation',
   label: 'Primary navigation',
   open: ['shop'],
   onOpenChange: (open) => console.log(open),
   items: [{
-    id: 'shop', label: 'Shop', href: '/shop', active: true,
+    id: 'shop', label: 'Shop', accessibleLabel: 'Open Shop navigation', href: '/shop', active: true,
     children: [{ id: 'new', label: 'New arrivals', href: '/shop?sort=new' }],
   }],
 });

@@ -102,8 +102,8 @@ describe('component layers', () => {
       labelStyles,
       cardStyles,
       formFieldStyles,
-          navigationStripStyles,
-          navigationMenuStyles,
+      navigationStripStyles,
+      navigationMenuStyles,
       appShellStyles,
     ].includes(sheet))).toEqual([
       buttonStyles,

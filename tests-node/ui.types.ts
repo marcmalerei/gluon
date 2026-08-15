@@ -37,6 +37,7 @@ import {
   EmptyState,
   FormField,
   InlineNotice,
+  NavigationMenu,
   NavigationStrip,
   ResponsiveDisclosure,
   ResponsiveActionBar,
@@ -46,6 +47,8 @@ import {
   createToastController,
   moleculeManifest,
   type CardProps,
+  type NavigationMenuLinkAttributes,
+  type NavigationMenuProps,
   type NavigationStripProps,
   type ResponsiveDisclosureAttributes,
   type ResponsiveDisclosureProps,
@@ -230,6 +233,17 @@ Field({ label: 'Email', children: q.input(), attributes: { class: 'app-field' } 
 FormField({ label: 'Email', attributes: { autocomplete: 'email' }, fieldAttributes: { data: { owner: 'app' } } });
 AppShell({ children: Card({ title: 'Card' }), attributes: { data: { owner: 'app' } } });
 NavigationStrip(navigationStripProps);
+const navigationMenuLinkAttributes = {
+  target: '_self',
+  data: { owner: 'catalog' },
+  onClick: (event: MouseEvent) => { void event.currentTarget; },
+} satisfies NavigationMenuLinkAttributes;
+const navigationMenuProps = {
+  id: 'catalog-navigation',
+  label: 'Catalog navigation',
+  items: [{ id: 'catalog', label: 'Catalog', href: '/shop', linkAttributes: navigationMenuLinkAttributes }],
+} satisfies NavigationMenuProps;
+NavigationMenu(navigationMenuProps);
 InlineNotice({
   tone: 'warning',
   announcement: 'assertive',
@@ -355,6 +369,12 @@ FormField({ label: 'Email', attributes: { rows: 4 } });
 NavigationStrip({ children: q.a({ href: '#profile', children: 'Profile' }) });
 // @ts-expect-error NavigationStrip nav attributes reject anchor-only props
 NavigationStrip({ label: 'Sections', attributes: { href: '/other' } });
+// @ts-expect-error NavigationMenu requires a document-unique root id
+NavigationMenu({ label: 'Catalog', items: [] });
+// @ts-expect-error NavigationMenu owns its native root id
+NavigationMenu({ id: 'catalog', label: 'Catalog', items: [], attributes: { id: 'replacement' } });
+// @ts-expect-error NavigationMenu owns active destination semantics
+NavigationMenu({ id: 'catalog', label: 'Catalog', items: [{ id: 'shop', label: 'Shop', href: '/shop', linkAttributes: { aria: { current: 'page' } } }] });
 // @ts-expect-error InlineNotice tones remain closed
 InlineNotice({ tone: 'critical', children: 'Invalid tone' });
 // @ts-expect-error InlineNotice owns the outer role and live-region mapping

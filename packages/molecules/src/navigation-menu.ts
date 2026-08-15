@@ -2,14 +2,14 @@ import { defineMolecule, type TemplateResult, type TemplateValue } from '@gluonj
 import { q, type QuarkProps, type QuarkRef } from '@gluonjs/quarks';
 import { navigationMenuStyleDependency } from './navigation-menu-styles.js';
 
-export type NavigationMenuAttributes = Omit<QuarkProps<HTMLElement>, 'children' | 'aria'> & {
+export type NavigationMenuAttributes = Omit<QuarkProps<HTMLElement>, 'children' | 'id' | '.id' | 'aria' | 'aria-label' | 'aria-labelledby'> & {
   readonly aria?: Omit<NonNullable<QuarkProps<HTMLElement>['aria']>, 'label' | 'labelledby'>;
 };
 export type NavigationMenuItemAttributes = Omit<QuarkProps<HTMLLIElement>, 'children'>;
-export type NavigationMenuLinkAttributes = Omit<QuarkProps<HTMLAnchorElement>, 'children' | 'href' | 'aria'> & {
+export type NavigationMenuLinkAttributes = Omit<QuarkProps<HTMLAnchorElement>, 'children' | 'href' | 'aria' | 'aria-current' | 'aria-disabled' | 'aria-describedby'> & {
   readonly aria?: Omit<NonNullable<QuarkProps<HTMLAnchorElement>['aria']>, 'current' | 'disabled' | 'describedby'>;
 };
-export type NavigationMenuTriggerAttributes = Omit<QuarkProps<HTMLButtonElement>, 'children' | 'type' | 'aria'> & {
+export type NavigationMenuTriggerAttributes = Omit<QuarkProps<HTMLButtonElement>, 'children' | 'type' | 'disabled' | '.disabled' | '?disabled' | 'aria' | 'aria-controls' | 'aria-expanded' | 'aria-disabled' | 'aria-haspopup'> & {
   readonly aria?: Omit<NonNullable<QuarkProps<HTMLButtonElement>['aria']>, 'controls' | 'expanded' | 'disabled' | 'haspopup'>;
 };
 
@@ -18,8 +18,6 @@ export interface NavigationMenuItem {
   readonly label: TemplateValue;
   readonly accessibleLabel?: string;
   readonly href?: string;
-  /** Optional caller-rendered native link, useful for application link adapters. */
-  readonly link?: TemplateValue;
   readonly active?: boolean;
   readonly disabled?: boolean;
   readonly unavailable?: boolean;
@@ -32,6 +30,7 @@ export interface NavigationMenuItem {
 
 export type NavigationMenuOpenChangeEvent = KeyboardEvent | MouseEvent;
 export type NavigationMenuProps = {
+  readonly id: string;
   readonly label: string;
   readonly items: readonly NavigationMenuItem[];
   readonly open?: readonly string[];
@@ -46,53 +45,67 @@ interface NavigationMenuController {
   readonly close: (event: MouseEvent | KeyboardEvent, restoreFocus: boolean) => void;
 }
 
-function renderNavigationMenu({ label, items, open = [], onOpenChange, attributes = {} }: NavigationMenuProps): TemplateResult {
+function renderNavigationMenu({ id, label, items, open = [], onOpenChange, attributes = {} }: NavigationMenuProps): TemplateResult {
+  assertDomId('NavigationMenu.id', id);
+  assertNonEmpty('NavigationMenu.label', label);
+  validateItems(items);
   const controller = createNavigationMenuController(open, onOpenChange);
-  const { aria, ...nativeAttributes } = attributes;
+  const { aria, onKeydown, ...nativeAttributes } = attributes;
   return q.nav({
     ...nativeAttributes,
+    id,
     class: [{ gluon: true, molecule: true, 'gluon-navigation-menu': true }, attributes.class],
     aria: { ...aria, label },
     ref: (element) => {
       controller.rootRef(element);
       assignRef(attributes.ref, element);
     },
-    onKeydown: controller.onKeydown,
+    onKeydown: (event) => {
+      callListener(onKeydown, event);
+      if (!event.defaultPrevented) controller.onKeydown(event);
+    },
     children: q.ul({
       class: 'gluon-navigation-menu-list',
-      children: items.map((item) => renderItem(item, open, controller)),
+      children: items.map((item) => renderItem(id, item, open, controller)),
     }),
   });
 }
 
-function renderItem(item: NavigationMenuItem, open: readonly string[], controller: NavigationMenuController, parentId?: string): TemplateResult {
+function renderItem(rootId: string, item: NavigationMenuItem, open: readonly string[], controller: NavigationMenuController, parentId?: string): TemplateResult {
   const hasChildren = Boolean(item.children?.length);
-  const panelId = `${item.id}-panel`;
+  const itemDomId = `${rootId}-${safeId(item.id)}`;
+  const panelId = `${itemDomId}-panel`;
+  const unavailableId = `${itemDomId}-unavailable`;
   const isOpen = hasChildren && open.includes(item.id);
   const unavailable = item.unavailable === true;
-  const unavailableReason = unavailable ? item.unavailableReason || 'This destination is currently unavailable.' : undefined;
+  const unavailableReason = unavailable ? item.unavailableReason : undefined;
   const groupAttributes = item.attributes ?? {};
   const nativeItemAttributes = groupAttributes;
-  const link = item.link ?? (item.href === undefined ? undefined : q.a({
-    ...item.linkAttributes,
+  const { onClick: linkClick, ...nativeLinkAttributes } = item.linkAttributes ?? {};
+  const link = item.href === undefined ? undefined : q.a({
+    ...nativeLinkAttributes,
     href: unavailable || item.disabled ? undefined : item.href,
     class: [{ 'gluon-navigation-menu-link': true }, item.linkAttributes?.class],
-    aria: { ...item.linkAttributes?.aria, current: item.active ? 'page' : undefined, disabled: unavailable || item.disabled ? 'true' : undefined, describedby: unavailable ? `${item.id}-unavailable` : undefined },
+    aria: { ...item.linkAttributes?.aria, current: item.active ? 'page' : undefined, disabled: unavailable || item.disabled ? 'true' : undefined, describedby: unavailable ? unavailableId : undefined },
     tabIndex: item.disabled ? -1 : item.linkAttributes?.tabIndex,
     data: { ...item.linkAttributes?.data, navigationMenuItem: item.id },
     onClick: (event: MouseEvent) => {
       if (unavailable || item.disabled) event.preventDefault();
+      callListener(linkClick, event);
     },
     children: item.label,
-  }));
+  });
+  const { onClick: triggerClick, ...nativeTriggerAttributes } = item.triggerAttributes ?? {};
   const trigger = hasChildren ? q.button({
-    ...item.triggerAttributes,
+    ...nativeTriggerAttributes,
     type: 'button',
     class: [{ 'gluon-navigation-menu-trigger': true }, item.triggerAttributes?.class],
-    aria: { ...item.triggerAttributes?.aria, expanded: isOpen, controls: panelId, haspopup: 'true', disabled: item.disabled ? 'true' : unavailable ? 'true' : undefined },
+    aria: { ...item.triggerAttributes?.aria, label: item.href === undefined ? undefined : item.accessibleLabel, expanded: isOpen, controls: panelId, disabled: item.disabled ? 'true' : unavailable ? 'true' : undefined },
     disabled: item.disabled,
     data: { ...item.triggerAttributes?.data, navigationMenuTrigger: item.id },
     onClick: (event: MouseEvent) => {
+      callListener(triggerClick, event);
+      if (event.defaultPrevented) return;
       if (unavailable) {
         event.preventDefault();
         return;
@@ -100,7 +113,7 @@ function renderItem(item: NavigationMenuItem, open: readonly string[], controlle
       controller.toggle(item.id, event);
     },
     children: [
-      item.href === undefined ? item.label : q.span({ aria: { hidden: true }, children: item.accessibleLabel || 'More' }),
+      item.href === undefined ? item.label : undefined,
       q.span({ class: 'gluon-navigation-menu-chevron', aria: { hidden: true }, children: '⌄' }),
     ],
   }) : undefined;
@@ -109,7 +122,7 @@ function renderItem(item: NavigationMenuItem, open: readonly string[], controlle
     hidden: !isOpen,
     class: 'gluon-navigation-menu-sublist',
     data: { navigationMenuParent: item.id },
-    children: item.children!.map((child) => renderItem(child, open, controller, item.id)),
+    children: item.children!.map((child) => renderItem(rootId, child, open, controller, item.id)),
   }) : undefined;
   return q.li({
     ...nativeItemAttributes,
@@ -118,8 +131,8 @@ function renderItem(item: NavigationMenuItem, open: readonly string[], controlle
     children: [
       link,
       trigger,
-      link === undefined && trigger === undefined ? q.span({ class: 'gluon-navigation-menu-link', aria: { disabled: unavailable || item.disabled ? 'true' : undefined, describedby: unavailable ? `${item.id}-unavailable` : undefined }, children: item.label }) : undefined,
-      unavailable ? q.span({ id: `${item.id}-unavailable`, class: 'gluon-navigation-menu-unavailable', children: unavailableReason }) : undefined,
+      link === undefined && trigger === undefined ? q.span({ class: 'gluon-navigation-menu-link', aria: { disabled: unavailable || item.disabled ? 'true' : undefined, describedby: unavailable ? unavailableId : undefined }, children: item.label }) : undefined,
+      unavailable ? q.span({ id: unavailableId, class: 'gluon-navigation-menu-unavailable', children: unavailableReason }) : undefined,
       content,
     ],
   });
@@ -177,11 +190,15 @@ function createNavigationMenuController(open: readonly string[], onOpenChange: N
           const id = target.dataset.navigationMenuTrigger;
           if (id) {
             returnTrigger = target;
+            const ownerDocument = root.ownerDocument;
+            const rootId = root.id;
             onOpenChange?.([...open, id], event);
             queueMicrotask(() => {
-              const nextPanel = root?.querySelector<HTMLElement>(`#${escapeSelector(`${id}-panel`)}`);
-              const first = nextPanel?.querySelector<HTMLElement>(':scope > li > .gluon-navigation-menu-link, :scope > li > .gluon-navigation-menu-trigger');
-              first?.focus();
+              const nextRoot = ownerDocument.getElementById(rootId);
+              const nextPanel = nextRoot?.querySelector<HTMLElement>(`#${escapeSelector(`${rootId}-${safeId(id)}-panel`)}`);
+              const entries = [...(nextPanel?.querySelectorAll<HTMLElement>(':scope > li > .gluon-navigation-menu-link, :scope > li > .gluon-navigation-menu-trigger') ?? [])]
+                .filter((element) => !element.hasAttribute('disabled') && element.getAttribute('aria-disabled') !== 'true');
+              (event.key === 'ArrowUp' ? entries.at(-1) : entries[0])?.focus();
             });
           }
           return;
@@ -249,6 +266,44 @@ function targetInteractive(root: HTMLElement, target: HTMLElement): HTMLElement 
 
 function escapeSelector(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function validateItems(items: readonly NavigationMenuItem[], seen = new Set<string>()): void {
+  for (const item of items) {
+    assertNonEmpty('NavigationMenu item id', item.id);
+    if (/\s/u.test(item.id)) throw new TypeError('NavigationMenu item ids must not contain whitespace.');
+    if (seen.has(item.id)) throw new TypeError(`NavigationMenu item ids must be unique; received duplicate ${item.id}.`);
+    seen.add(item.id);
+    if (item.unavailable && !item.unavailableReason?.trim()) throw new TypeError(`NavigationMenu item ${item.id} requires an unavailableReason.`);
+    if (item.href !== undefined && item.children?.length && !item.accessibleLabel?.trim()) {
+      throw new TypeError(`NavigationMenu linked group ${item.id} requires an accessibleLabel for its disclosure button.`);
+    }
+    if (item.children) validateItems(item.children, seen);
+  }
+}
+
+function safeId(value: string): string {
+  let output = '';
+  for (const character of value) {
+    if (/^[A-Za-z0-9-]$/u.test(character)) output += character;
+    else if (character === '_') output += '__';
+    else output += `_x${character.codePointAt(0)!.toString(16)}_`;
+  }
+  return output;
+}
+
+function assertNonEmpty(name: string, value: string): void {
+  if (value.trim().length === 0) throw new TypeError(`${name} must be a non-empty string.`);
+}
+
+function assertDomId(name: string, value: string): void {
+  assertNonEmpty(name, value);
+  if (/\s/u.test(value)) throw new TypeError(`${name} must not contain whitespace.`);
+}
+
+function callListener<EventType extends Event>(listener: ((event: EventType) => unknown) | { handleEvent(event: EventType): void } | null | undefined, event: EventType): void {
+  if (typeof listener === 'function') listener(event);
+  else listener?.handleEvent(event);
 }
 
 function assignRef(ref: QuarkRef<HTMLElement> | undefined, element: HTMLElement | undefined): void {

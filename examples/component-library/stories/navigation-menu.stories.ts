@@ -14,8 +14,8 @@ const meta = {
   render: (args) => html`
     <section class="navigation-menu-story">
       <h2>Product navigation</h2>
-      ${NavigationMenu({ label: 'Product navigation', open: ['story-shop'], items: [
-        { id: 'story-shop', label: args.shopLabel, href: '/shop', active: true, children: [
+      ${NavigationMenu({ id: 'story-product-navigation', label: 'Product navigation', open: ['story-shop'], items: [
+        { id: 'story-shop', label: args.shopLabel, accessibleLabel: 'Open product navigation', href: '/shop', active: true, children: [
           { id: 'story-new', label: 'New arrivals', href: '/shop?sort=new' },
           { id: 'story-objects', label: 'All objects', href: '/shop' },
         ] },
