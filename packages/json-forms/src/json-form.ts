@@ -29,6 +29,12 @@ import {
   type JsonSchema,
   type JsonValue,
 } from './schema.js';
+import {
+  isJsonFormsRendererRegistry,
+  type JsonFormsRendererContext,
+  type JsonFormsRendererRegistration,
+  type JsonFormsRendererRegistry,
+} from './renderer-registry.js';
 
 /** The registered custom-element name. */
 export const jsonFormsTag = 'gluon-json-form';
@@ -58,6 +64,7 @@ interface JsonFormsProperties {
   readonly disabled: boolean;
   readonly readOnly: boolean;
   readonly messages: JsonFormsMessageProviderOptions | JsonFormsMessageProvider | undefined;
+  readonly rendererRegistry: JsonFormsRendererRegistry | undefined;
 }
 
 /** Properties accepted by the {@link JsonForm} Gluon render helper. */
@@ -69,6 +76,7 @@ export interface JsonFormOptions {
   readonly disabled?: boolean;
   readonly readOnly?: boolean;
   readonly messages?: JsonFormsMessageProviderOptions | JsonFormsMessageProvider;
+  readonly rendererRegistry?: JsonFormsRendererRegistry;
   readonly onChange?: (event: CustomEvent<JsonFormChangeDetail>) => void;
   readonly onValidationChange?: (event: CustomEvent<JsonFormValidationChangeDetail>) => void;
 }
@@ -81,7 +89,7 @@ const emptySchema: JsonSchema = Object.freeze({
 const jsonFormsStyles = css`
   :host { display: block; min-inline-size: 0; color: var(--gluon-json-form-ink, #101820); font: inherit; }
   *, *::before, *::after { box-sizing: border-box; }
-  .form, .fields, .field, .group, .array-items, .array-item, .array-actions { min-inline-size: 0; }
+  .form, .fields, .field, .group, .array-items, .array-item, .array-actions, .custom-control { min-inline-size: 0; }
   .form, .fields, .field, fieldset, .array-items, .array-item { grid-template-columns: minmax(0, 1fr); }
   .form { display: grid; gap: 20px; }
   .heading { display: grid; gap: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--gluon-json-form-rule, #c9d2d8); }
@@ -162,6 +170,10 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
       attribute: false,
       validate: (value: unknown) => value === undefined || isJsonFormsMessageProvider(value) || isJsonFormsMessageProviderOptions(value) || 'messages must be a JSON Forms message provider or provider options',
     },
+    rendererRegistry: {
+      attribute: false,
+      validate: (value: unknown) => value === undefined || isJsonFormsRendererRegistry(value) || 'rendererRegistry must be created with createJsonFormsRendererRegistry()',
+    },
   } satisfies PropertyDeclarations<JsonFormsProperties>;
 
   static override readonly styles = jsonFormsStyles;
@@ -172,6 +184,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   declare disabled: boolean;
   declare readOnly: boolean;
   declare messages: JsonFormsMessageProviderOptions | JsonFormsMessageProvider | undefined;
+  declare rendererRegistry: JsonFormsRendererRegistry | undefined;
 
   private readonly internals = typeof this.attachInternals === 'function'
     ? this.attachInternals()
@@ -306,6 +319,31 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     const descriptionId = field.description ? `${id}-description` : undefined;
     const describedBy = [descriptionId, errors.length > 0 ? errorId : undefined].filter(Boolean).join(' ') || undefined;
     const fieldDisabled = disabled || field.readOnly;
+    if (this.rendererRegistry) {
+      const rendererContext = this.createRendererContext(
+        field,
+        id,
+        descriptionId,
+        errorId,
+        describedBy,
+        errors,
+        disabled,
+        fieldDisabled,
+      );
+      const customRenderer = this.rendererRegistry.resolve(rendererContext);
+      if (customRenderer) {
+        return this.renderCustomField(
+          field,
+          customRenderer,
+          rendererContext,
+          id,
+          descriptionId,
+          errorId,
+          describedBy,
+          errors,
+        );
+      }
+    }
     if (field.kind === 'object') {
       return html`
         <fieldset
@@ -374,6 +412,79 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
         ${field.kind === 'select'
           ? this.renderSelect(field, id, fieldDisabled, describedBy, errorId, errors.length > 0)
           : this.renderInput(field, id, fieldDisabled, describedBy, errorId, errors.length > 0)}
+        ${field.description ? html`<p id=${descriptionId!} class="field-description">${field.description}</p>` : ''}
+        ${this.renderErrors(errors, errorId)}
+      </div>
+    `;
+  }
+
+  private createRendererContext(
+    field: JsonFormField,
+    id: string,
+    descriptionId: string | undefined,
+    errorId: string,
+    describedBy: string | undefined,
+    errors: readonly JsonFormValidationError[],
+    disabled: boolean,
+    fieldDisabled: boolean,
+  ): JsonFormsRendererContext {
+    const labelId = `${id}-label`;
+    const control = Object.freeze({
+      id,
+      labelId,
+      ...(descriptionId ? { descriptionId } : {}),
+      errorId,
+      ...(describedBy ? { describedBy } : {}),
+      commit: (value: JsonValue | undefined): void => {
+        if (!isRendererJsonValue(value)) {
+          throw new TypeError('JSON Forms renderer commits must be JSON-compatible values or undefined.');
+        }
+        if (fieldDisabled) return;
+        this.commitPath(field.path, value);
+      },
+    });
+    return Object.freeze({
+      field,
+      schema: field.schema,
+      ...(field.uiSchema ? { uiSchema: field.uiSchema } : {}),
+      ...(this.uischema ? { rootUiSchema: this.uischema } : {}),
+      path: field.path,
+      data: this.currentData,
+      value: getJsonPath(this.currentData, field.path),
+      errors,
+      disabled,
+      readOnly: this.readOnly || field.readOnly,
+      messages: this.resolveMessages(),
+      control,
+    });
+  }
+
+  private renderCustomField(
+    field: JsonFormField,
+    renderer: JsonFormsRendererRegistration,
+    context: JsonFormsRendererContext,
+    id: string,
+    descriptionId: string | undefined,
+    errorId: string,
+    describedBy: string | undefined,
+    errors: readonly JsonFormValidationError[],
+  ): TemplateValue {
+    return html`
+      <div
+        class="field custom-field"
+        part=${`field field-${id}`}
+        data-gluon-json-renderer=${renderer.id}
+        role="group"
+        aria-labelledby=${context.control.labelId}
+        aria-describedby=${describedBy}
+        aria-invalid=${errors.length > 0 ? 'true' : 'false'}
+        aria-errormessage=${errors.length > 0 ? errorId : undefined}
+        aria-disabled=${context.disabled ? 'true' : undefined}
+      >
+        <span id=${context.control.labelId} class="field-label">
+          ${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}
+        </span>
+        <div class="custom-control" part="control custom-control">${renderer.render(context)}</div>
         ${field.description ? html`<p id=${descriptionId!} class="field-description">${field.description}</p>` : ''}
         ${this.renderErrors(errors, errorId)}
       </div>
@@ -466,7 +577,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     this.observedSchema = this.schema;
     this.observedUiSchema = this.uischema;
     this.observedMessages = this.messages;
-    const normalized = applySchemaDefaults(this.schema, this.data);
+    const normalized = freezeJson(applySchemaDefaults(this.schema, this.data));
     this.currentData = normalized;
     this.data = normalized;
     this.observedData = normalized;
@@ -476,7 +587,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
 
   private commitPath(path: readonly string[], value: JsonValue | undefined): void {
     if (this.disabled || this.disabledByForm || this.readOnly) return;
-    this.currentData = updateJsonPath(this.currentData, path, value);
+    this.currentData = freezeJson(updateJsonPath(this.currentData, path, value));
     this.data = this.currentData;
     this.observedData = this.currentData;
     const validationChanged = this.refreshValidation();
@@ -502,7 +613,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   }
 
   private restoreData(data: JsonObject): void {
-    this.currentData = cloneJson(data);
+    this.currentData = freezeJson(cloneJson(data));
     this.data = this.currentData;
     this.observedData = this.currentData;
     if (this.refreshValidation()) this.emitValidationChange();
@@ -582,6 +693,7 @@ export function JsonForm(options: JsonFormOptions): TemplateResult {
       .uischema=${options.uischema as unknown as Record<string, unknown> | undefined}
       .data=${options.data as unknown as Record<string, unknown> | undefined}
       .messages=${options.messages as unknown as Record<string, unknown> | undefined}
+      .rendererRegistry=${options.rendererRegistry as unknown as Record<string, unknown> | undefined}
       ?disabled=${options.disabled ?? false}
       ?readonly=${options.readOnly ?? false}
       @change=${options.onChange as EventListener | undefined}
@@ -667,4 +779,12 @@ function jsonInstancePath(path: readonly string[]): string {
 
 function fieldId(path: readonly string[]): string {
   return `field-${path.map((segment) => segment.replaceAll(/[^A-Za-z0-9_-]/g, '-')).join('-')}`;
+}
+
+function isRendererJsonValue(value: unknown): value is JsonValue | undefined {
+  if (value === undefined || value === null || typeof value === 'string' || typeof value === 'boolean') return true;
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (Array.isArray(value)) return value.every(isRendererJsonValue);
+  if (typeof value !== 'object') return false;
+  return Object.values(value as Record<string, unknown>).every(isRendererJsonValue);
 }

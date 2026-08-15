@@ -6,6 +6,9 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ### Added
 
+- Added a typed custom renderer registry with declarative priority selection,
+  public field context, built-in fallback, and host-owned immutable updates,
+  validation, form participation, reset, restore, and events.
 - Added nested object fields and bounded array item editors with immutable data events, native form participation, validation, reset, state restore, and explicit fail-closed diagnostics for unsupported schema features.
 - Added the public `resolveJsonSchema()`, `JsonSchemaResolutionOptions`, and
   `JsonSchemaResolutionError` contract for bounded synchronous local `$ref`

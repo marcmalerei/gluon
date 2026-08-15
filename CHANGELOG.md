@@ -15,6 +15,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added the native `ResponsiveDisclosure` molecule with persistent compact
   user state, explicit reset tokens, desktop expansion, SSR/hydration, and
   teardown-safe media-query ownership.
+- Added a typed, request-free JSON Forms renderer registry with declarative
+  priority selection, built-in fallback, and host-owned form/event lifecycle.
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.

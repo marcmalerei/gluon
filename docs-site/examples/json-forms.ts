@@ -1,6 +1,7 @@
-import { css } from '@gluonjs/core';
+import { css, html } from '@gluonjs/core';
 import {
   createJsonFormsMessageProvider,
+  createJsonFormsRendererRegistry,
   registerJsonForms,
   type JsonFormChangeDetail,
   type JsonFormsElement,
@@ -71,6 +72,35 @@ registerJsonForms();
 const form = document.querySelector<HTMLFormElement>('#delivery-preferences')!;
 const jsonForm = form.querySelector<JsonFormsElement>('gluon-json-form')!;
 const status = document.querySelector<HTMLElement>('#form-status')!;
+jsonForm.rendererRegistry = createJsonFormsRendererRegistry([{
+  id: 'lead-time-stepper',
+  selector: { kind: 'number', path: ['leadTime'] },
+  priority: 10,
+  render: (context) => {
+    const value = typeof context.value === 'number' ? context.value : 24;
+    return html`
+      <div data-lead-time-stepper>
+        <button
+          type="button"
+          aria-label="Vorlaufzeit verringern"
+          ?disabled=${context.disabled || context.readOnly || value <= 1}
+          @click=${() => context.control.commit(Math.max(1, value - 1))}
+        >−</button>
+        <output
+          id=${context.control.id}
+          aria-labelledby=${context.control.labelId}
+          aria-describedby=${context.control.describedBy}
+        >${context.messages.formatNumber(value)} h</output>
+        <button
+          type="button"
+          aria-label="Vorlaufzeit erhöhen"
+          ?disabled=${context.disabled || context.readOnly || value >= 72}
+          @click=${() => context.control.commit(Math.min(72, value + 1))}
+        >+</button>
+      </div>
+    `;
+  },
+}]);
 jsonForm.messages = createJsonFormsMessageProvider({
   locale: 'de-DE',
   messages: {

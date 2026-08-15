@@ -12,9 +12,9 @@ an optional package: schema rendering and AJV validation do not enter
 ## Stability notes
 
 The package ships as part of the current `1.9.0` release line. Its documented
-schema and UI schema subset is stable; broader JSON Schema features and
-alternative renderer systems remain unsupported unless a later contract adds
-them.
+schema and UI schema subset, host-owned lifecycle, and renderer-registry
+boundary are stable; broader JSON Schema features remain unsupported unless a
+later contract adds them.
 
 ```ts
 import {
@@ -106,7 +106,74 @@ The maintained `docs-site/examples/json-forms.html` application installs the
 German provider in a real delivery-preferences form. Run
 `npm run build:docs-examples && npm run check:json-forms-example-browser` to
 verify localized validation and configuration diagnostics, long array-control
-labels, 390px overflow, and 44px controls in Chromium.
+labels, the custom lead-time renderer, host-owned form state, 390px overflow,
+and 44px controls in Chromium.
+
+## Renderer registry
+
+`createJsonFormsRendererRegistry()` lets an application replace a supported
+field control without forking `JsonFormsElement`. Registrations are synchronous
+and request-free. A declarative selector may match field `kind`, JSON Schema
+`schemaType` or `format`, and an exact data `path`. Higher integer priorities
+win. Duplicate IDs, unsupported properties, invalid selectors, and overlapping
+selectors at the same priority throw an actionable `TypeError` when the
+registry is created, so selection never depends on registration timing.
+
+```ts
+import { html } from '@gluonjs/core';
+import {
+  createJsonFormsRendererRegistry,
+  type JsonFormsElement,
+} from '@gluonjs/json-forms';
+
+const renderers = createJsonFormsRendererRegistry([{
+  id: 'quantity-stepper',
+  selector: { kind: 'number', path: ['quantity'] },
+  priority: 10,
+  render: (context) => {
+    const value = typeof context.value === 'number' ? context.value : 1;
+    return html`
+      <button
+        type="button"
+        aria-labelledby=${context.control.labelId}
+        ?disabled=${context.disabled || context.readOnly}
+        @click=${() => context.control.commit(value + 1)}
+      >Increase</button>
+      <output
+        id=${context.control.id}
+        aria-labelledby=${context.control.labelId}
+        aria-describedby=${context.control.describedBy}
+      >${value}</output>
+    `;
+  },
+}]);
+
+document.querySelector<JsonFormsElement>('gluon-json-form')!.rendererRegistry = renderers;
+```
+
+The frozen renderer context exposes the public field, resolved field schema,
+field and root UI-schema context, exact path, current data/value, validation
+errors, message provider, effective disabled/read-only state, and stable label,
+description, and error IDs. `context.control.commit()` is the only registry
+mutation boundary: the host still owns immutable data updates, AJV validation,
+native form value/validity, reset, restore, and exactly one `change` and
+`validation-change` lifecycle. Invalid non-JSON commits fail closed. Renderers
+must connect their native control to the provided label and description IDs;
+they must not dispatch replacement form events.
+
+If no selector matches, the documented built-in renderer remains the fallback
+for text, number, boolean, select, object, and bounded-array fields. Custom
+controls are wrapped by stable `part="field"`, `part="control custom-control"`,
+`data-gluon-json-renderer`, validation, and ARIA state hooks. Applications may
+return a separately styled Gluon component or custom element when the generic
+native control styles are insufficient; the registry does not inject product
+themes, requests, authorization, persistence, or remote plugins.
+
+Registry functions are deliberately not serialized. Deterministic SSR and
+hydration require the application to provide the same immutable registry while
+rendering and hydrating the element. Field selection depends only on the
+declarative selector, priority, and schema context, so the server and browser
+choose the same renderer.
 
 ## Supported schema boundary
 
@@ -147,9 +214,8 @@ pointers, cycles, and limit overflow produce stable configuration diagnostics
 resolved target still has exactly the supported field and validation boundary
 above; `$ref` does not enable composition or arbitrary JSON Schema.
 
-Conditional/composition keywords, JSON Forms rules, custom renderer
-registries, localization, async schemas, file widgets, nested arrays, and UI
-layouts other than `VerticalLayout` remain unsupported. An unsupported schema
+Conditional/composition keywords, JSON Forms rules, async schemas, file widgets,
+nested arrays, and UI layouts other than `VerticalLayout` remain unsupported. An unsupported schema
 or UI schema renders an explicit configuration error rather than silently
 dropping fields, and that configuration copy also flows through the message
 provider.
