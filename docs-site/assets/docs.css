@@ -34,6 +34,7 @@ button, select { font: inherit; }
 .version-control { align-self: center; margin-right: 14px; border: 1px solid var(--rule); }
 .version-control span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .version-control select { min-width: 112px; min-height: 44px; border: 0; padding: 0 38px 0 16px; color: var(--ink); background: var(--paper); }
+.search-action { align-self: center; min-width: 88px; min-height: 44px; margin-right: 12px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
 .playground-action { align-self: center; display: grid; place-items: center; min-width: 116px; min-height: 44px; margin-right: 30px; padding: 0 18px; background: var(--chartreuse); color: var(--ink); font-size: 14px; }
 .menu-button { display: none; }
 
@@ -112,6 +113,25 @@ button, select { font: inherit; }
 .package-readme-link { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--rule); }
 .package-toc p { color: var(--muted); font-size: 13px; }
 
+.search-panel { position: fixed; inset: 0; z-index: 120; display: grid; place-items: start center; padding: 90px 18px 24px; background: rgba(255,255,255,.92); backdrop-filter: blur(7px); }
+.search-panel[hidden] { display: none; }
+.search-dialog { width: min(820px, 100%); border: 1px solid var(--ink); background: var(--paper); box-shadow: 0 24px 60px rgba(0,0,0,.12); }
+.search-bar { display: grid; grid-template-columns: minmax(180px, 0.42fr) 1fr auto; gap: 14px; align-items: center; min-height: 84px; padding: 18px 20px; border-bottom: 1px solid var(--rule); }
+.search-bar label { font-size: 22px; letter-spacing: -.03em; font-weight: 720; }
+.search-input-wrap { display: flex; align-items: center; border-bottom: 1px solid var(--ink); }
+.search-input-wrap input { width: 100%; min-height: 46px; border: 0; outline: 0; background: transparent; font: inherit; font-size: 18px; letter-spacing: -.015em; }
+.search-input-wrap:focus-within { border-color: var(--cobalt); box-shadow: 0 1px 0 var(--cobalt); }
+.search-close { min-width: 56px; min-height: 44px; border: 0; background: var(--soft); color: var(--ink); }
+.search-hint, .search-noscript, .search-status { margin: 0; padding: 14px 20px 0; color: var(--muted); font-size: 13px; }
+.search-results { display: grid; gap: 10px; max-height: min(56vh, 520px); overflow: auto; padding: 18px 20px 22px; }
+.search-result { display: grid; gap: 4px; padding: 14px 16px; border: 1px solid var(--rule); background: var(--paper); text-align: left; }
+.search-result[data-active] { border-color: var(--cobalt); box-shadow: inset 0 0 0 1px var(--cobalt); }
+.search-result strong { font-size: 16px; line-height: 1.2; }
+.search-result small { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.search-result p { margin: 0; color: var(--ink); font-size: 14px; line-height: 1.45; }
+.search-empty { margin: 0; color: var(--muted); font-size: 14px; }
+.search-open { overflow: hidden; }
+
 @media (max-width: 1050px) {
   .site-grid { grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
   .toc { display: none; }
@@ -126,6 +146,7 @@ button, select { font: inherit; }
   .menu-button span { display: block; width: 18px; height: 1px; background: var(--ink); }
   .brand { padding: 0 8px; font-size: 17px; }
   .header-nav, .playground-action { display: none; }
+  .search-action { margin-right: 8px; font-size: 12px; }
   .version-control { margin-right: 8px; }
   .version-control select { min-width: 76px; min-height: 44px; padding: 0 24px 0 8px; font-size: 11px; }
   .site-grid { display: block; min-height: calc(100vh - 116px); }
@@ -152,6 +173,12 @@ button, select { font: inherit; }
   .package-facts div:nth-child(n + 3) { border-top: 1px solid var(--rule); }
   .package-facts div:nth-child(3) { padding-left: 0; }
   .package-facts div:nth-child(4) { padding-left: 14px; }
+  .search-panel { padding: 68px 8px 12px; }
+  .search-dialog { width: 100%; }
+  .search-bar { grid-template-columns: 1fr auto; gap: 10px; padding: 14px 14px 12px; }
+  .search-bar label { grid-column: 1 / -1; font-size: 18px; }
+  .search-input-wrap input { font-size: 16px; }
+  .search-results { max-height: 54vh; padding: 12px 14px 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

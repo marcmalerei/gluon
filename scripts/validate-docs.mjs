@@ -135,9 +135,40 @@ for (const page of [
 }
 await access(resolve(outputRoot, 'assets/docs.css'));
 await access(resolve(outputRoot, 'assets/docs.js'));
+await access(resolve(outputRoot, 'assets/search-index.json'));
 const docsStyles = await readFile(resolve(outputRoot, 'assets/docs.css'), 'utf8');
 if (!docsStyles.includes('.content h1 { overflow-wrap: anywhere;')) {
   throw new Error('documentation CSS must wrap long generated API titles on mobile');
+}
+if (!docsStyles.includes('.search-panel { position: fixed; inset: 0;')) {
+  throw new Error('documentation CSS must include the global search overlay styles.');
+}
+
+const searchIndex = JSON.parse(await readFile(resolve(outputRoot, 'assets/search-index.json'), 'utf8'));
+if (!Array.isArray(searchIndex) || searchIndex.length === 0) {
+  throw new Error('search index must contain at least one entry.');
+}
+const searchTargets = new Set();
+let previousSearchUrl = '';
+for (const entry of searchIndex) {
+  for (const field of ['title', 'description', 'contentType', 'context', 'url', 'version', 'terms']) {
+    if (!isTrimmedNonEmptyString(entry?.[field])) throw new Error(`search index entry is missing ${field}.`);
+  }
+  if (!entry.url.startsWith('/gluon/')) throw new Error(`search index entry must use a versioned Gluon URL: ${entry.url}`);
+  if (searchTargets.has(entry.url)) throw new Error(`search index contains duplicate URL ${entry.url}`);
+  if (previousSearchUrl && entry.url < previousSearchUrl) throw new Error(`search index is not deterministically ordered: ${entry.url}`);
+  searchTargets.add(entry.url);
+  previousSearchUrl = entry.url;
+}
+const expectedSearchEntries = (await filesWithExtension(resolve(siteRoot, 'content'), '.md')).length
+  + (await filesWithExtension(resolve(root, '.tmp/docs-api'), '.md')).length
+  + versions.supported.length * (currentPackages.length + 1);
+if (searchIndex.length !== expectedSearchEntries) {
+  throw new Error(`search index contains ${searchIndex.length} pages; docs sources and package contract require ${expectedSearchEntries}`);
+}
+for (const entry of searchIndex) {
+  const file = resolve(outputRoot, searchUrlToRelativePath(entry.url));
+  await access(file);
 }
 
 const expectedEntryPoints = packageContract.packages
@@ -450,6 +481,12 @@ if (invalidExternalLinks.length > 0) {
   throw new Error(`documentation rewrote curated GitHub links to generated HTML:\n- ${invalidExternalLinks.join('\n- ')}`);
 }
 
+for (const entry of searchIndex) {
+  if (!htmlFiles.some((file) => slash(relative(outputRoot, file)) === searchUrlToRelativePath(entry.url))) {
+    throw new Error(`search index references missing output: ${entry.url}`);
+  }
+}
+
 const exampleSources = (await filesWithExtension(resolve(siteRoot, 'examples'), '.ts'))
   .filter((file) => !file.endsWith('vite.config.ts'));
 if (exampleSources.length < 8) throw new Error(`expected at least 8 compiled TypeScript examples, found ${exampleSources.length}`);
@@ -468,6 +505,10 @@ async function filesWithExtension(directory, extension) {
 
 function slash(value) { return value.split(sep).join('/'); }
 function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
+function searchUrlToRelativePath(url) {
+  const relativeUrl = url.slice('/gluon/'.length);
+  return relativeUrl.endsWith('/') ? `${relativeUrl}index.html` : relativeUrl;
+}
 
 async function validateSourceDocs() {
   const rootPackage = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));

@@ -77,6 +77,29 @@ package search and keeps the same package navigation on desktop and mobile.
 This docs-only metadata change does not alter `examples/shop`; the regression is
 limited to documentation generation and docs validation, so the shop remains
 unchanged.
+
+## Global search
+
+`build-docs.mjs` also emits a deterministic `assets/search-index.json` file for
+the maintained guide, cookbook, migration, reference, API, and package pages.
+The shared header search button opens an accessible overlay on desktop and
+mobile, with visible focus, Escape to dismiss, and up/down arrow navigation
+through the filtered results. Result cards expose the content type, package or
+guide context, and the stable versioned URL.
+
+The search overlay is a progressive enhancement. Without JavaScript, the docs
+remain browsable through the normal versioned navigation, and the overlay copy
+explicitly points readers to those static pages.
+
+`validate-docs.mjs` checks that the deterministically ordered search index
+matches the complete rendered source and package-page inventory, and that every
+indexed URL exists. `validate-docs-search-browser.mjs` then exercises the
+package-page overlay at 390 px in Chromium: loading, contextual results,
+arrow-key and Enter navigation, focus containment and restoration, Escape,
+empty and failed loads, plus the static no-script navigation path. Stale,
+missing, inaccessible, or interaction-incomplete search output fails
+`check:docs`.
+
 The root package and every package manifest use the stable
 `https://marcmalerei.github.io/gluon/latest/packages/<slug>/` page as their
 homepage; source README links remain explicit inside the portal.
