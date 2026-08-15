@@ -14,10 +14,13 @@ export const statusBadgeStyles = css`
       font-size: 0.75rem;
       font-weight: 650;
       line-height: 1.25;
-      overflow-wrap: anywhere;
+      overflow: hidden;
       padding-block: 0.25rem;
       padding-inline: 0.625rem;
       text-align: start;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-break: normal;
     }
     :where(.gluon-status-badge.is-info) {
       --gluon-status-badge-background: #e7eefc;
