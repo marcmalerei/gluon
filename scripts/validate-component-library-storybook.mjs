@@ -82,6 +82,50 @@ const scenarios = [{
     }
     return evidence;
   },
+}, {
+  id: 'component-library-workflow-timeline--states-and-responsive-layout',
+  stateSelectors: ['.gluon-workflow-timeline[data-state="degraded"]', '[data-state="current"]', '[part="label"]'],
+  expectedText: 'Review',
+  screenshotSelector: '.workflow-timeline-story',
+  verifyMedia: async (page) => {
+    const timeline = page.locator('.gluon-workflow-timeline');
+    const relationships = await timeline.evaluate((element) => ({
+      hasSummary: Boolean(element.querySelector('[part="summary"]')),
+      currentCount: element.querySelectorAll('[aria-current="step"]').length,
+      hasRelationships: [...element.querySelectorAll('li')].every((step) => step.hasAttribute('aria-labelledby')),
+    }));
+    if (!relationships.hasSummary || relationships.currentCount !== 1 || !relationships.hasRelationships) {
+      throw new Error(`Workflow timeline accessibility contract failed: ${JSON.stringify(relationships)}.`);
+    }
+    await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+    const media = await timeline.evaluate((element) => {
+      const markerStyles = getComputedStyle(element.querySelector('[part="marker"]'));
+      return {
+        forcedColors: matchMedia('(forced-colors: active)').matches,
+        reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+        markerBackground: markerStyles.backgroundColor,
+        animationName: markerStyles.animationName,
+        transitionDuration: markerStyles.transitionDuration,
+      };
+    });
+    await page.emulateMedia({ forcedColors: 'none', reducedMotion: 'no-preference' });
+    if (!media.forcedColors || !media.reducedMotion || media.animationName !== 'none' || media.transitionDuration !== '0s') {
+      throw new Error(`Workflow timeline media contract failed: ${JSON.stringify(media)}.`);
+    }
+    await page.setViewportSize({ width: 320, height: 500 });
+    await page.locator('html').evaluate((element) => { element.style.fontSize = '200%'; });
+    const reflow = await timeline.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      actionSizes: [...element.querySelectorAll('[part="actions"] > :is(a, button), .gluon-workflow-timeline-next :is(a, button)')].map((action) => ({ width: action.getBoundingClientRect().width, height: action.getBoundingClientRect().height })),
+    }));
+    await page.locator('html').evaluate((element) => { element.style.removeProperty('font-size'); });
+    await page.setViewportSize({ width: 800, height: 500 });
+    if (reflow.scrollWidth > reflow.clientWidth || reflow.actionSizes.some(({ width, height }) => width < 44 || height < 44)) {
+      throw new Error(`Workflow timeline 320px/200% reflow contract failed: ${JSON.stringify(reflow)}.`);
+    }
+    return { ...relationships, ...media, reflow };
+  },
 }];
 
 const server = createServer(async (request, response) => {

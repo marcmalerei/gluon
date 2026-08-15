@@ -46,7 +46,7 @@ import {
   type ResponsiveDisclosureAttributes,
   type ResponsiveDisclosureProps,
 } from '@gluonjs/molecules';
-import { AppShell, organismManifest } from '@gluonjs/organisms';
+import { AppShell, WorkflowTimeline, organismManifest, type WorkflowTimelineOverallState, type WorkflowTimelineStatus } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -103,6 +103,15 @@ const tree: TemplateResult = AppShell({
     ],
   }),
 });
+const workflowStatus: WorkflowTimelineStatus = 'current';
+const workflowState: WorkflowTimelineOverallState = 'active';
+const workflow: TemplateResult = WorkflowTimeline({
+  id: 'typed-workflow',
+  state: workflowState,
+  steps: [{ id: 'review', label: 'Review', status: workflowStatus }],
+  messages: { status: (status) => status.toUpperCase() },
+});
+void workflow;
 
 declare const container: HTMLElement;
 const scope: FocusScope = createFocusScope(container);
@@ -338,3 +347,9 @@ ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(m
 ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 48rem)', compactResetToken: {}, children: 'Controls' });
 // @ts-expect-error AppShell div attributes reject anchor-only props
 AppShell({ children: 'Content', attributes: { href: '/other' } });
+// @ts-expect-error WorkflowTimeline requires a stable instance id
+WorkflowTimeline({ steps: [] });
+// @ts-expect-error WorkflowTimeline owns its root id separately from native attributes
+WorkflowTimeline({ id: 'workflow', steps: [], attributes: { id: 'other' } });
+// @ts-expect-error WorkflowTimeline status values remain closed
+WorkflowTimeline({ id: 'workflow', steps: [{ id: 'one', label: 'One', status: 'running' }] });
