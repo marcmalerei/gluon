@@ -7,14 +7,17 @@ and `.github/workflows/release.yml` is the only supported publication path.
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.9.0` candidate. Every official
-manifest is public and lockstep at `1.9.0`. Registry preflight on 2026-08-15
-confirmed that all 21 package records expose `1.8.1` as `latest` and that
-`1.9.0` is absent. The immutable GitHub release `v1.8.1` remains the current
-finalized release until the protected `1.9.0` workflow completes. The
-`v1.0.9` GitHub release remains a draft after its public-type verification
-failure. This is enforced locally by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.9.0`. Every official manifest is public and
+lockstep at `1.9.0`. Protected release workflow
+[31890472642](https://github.com/marcmalerei/gluon/actions/runs/31890472642)
+published all 21 package records to `latest` with provenance and verified the
+train from a clean directory. The immutable GitHub release
+[`v1.9.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.9.0) was
+published on 2026-08-15 from tag commit
+`06dc45457bbf9a109ae67f5048db8be63f0fda39` with 101 reviewed assets. The
+`v1.0.9` GitHub release remains a historical draft after its public-type
+verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
@@ -22,12 +25,14 @@ npm run check:release-contract
 
 ## v1.9.0 train handoff
 
-Issue [#374](https://github.com/marcmalerei/gluon/issues/374) establishes the
+Issue [#374](https://github.com/marcmalerei/gluon/issues/374) established the
 21-package `1.9.0` train for the platform-hardening and application-primitive
-work delivered by issues #375-#384. The train uses the two-commit release cut:
-a Quality-Gates-tested candidate followed only by its release-cut evidence and
-compatibility manifest. The immutable `v1.8.1` release remains the supported
-baseline until the protected `1.9.0` workflow completes.
+work delivered by issues #375-#384. PR
+[#388](https://github.com/marcmalerei/gluon/pull/388) merged the tested
+candidate and its release-cut evidence as a preserved merge commit. The
+protected tag workflow completed candidate, reproducibility, browser-engine,
+Node-runtime, performance, fixture, registry, provenance, and publication
+checks. `v1.9.0` is now the supported `latest` baseline.
 
 ## v1.8.1 train completion
 
