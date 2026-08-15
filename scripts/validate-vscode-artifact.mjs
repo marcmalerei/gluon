@@ -1,0 +1,12 @@
+import { readFile, access } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+const run = promisify(execFile); const root = resolve(import.meta.dirname, '..');
+const version = JSON.parse(await readFile(resolve(root, 'package.json'))).version;
+const dir = resolve(root, '.tmp/release/vscode'); const manifest = JSON.parse(await readFile(resolve(dir, 'vscode-release-manifest.json')));
+if (manifest.version !== version || manifest.tag !== `v${version}` || manifest.languageServer !== '@gluonjs/language-server') throw new Error('VSIX release manifest is not lockstep.');
+await access(resolve(dir, manifest.vsix));
+const listing = (await run('unzip', ['-l', resolve(dir, manifest.vsix)])).stdout;
+for (const required of ['extension/package.json', 'extension/extension.cjs', 'extension/server/dist/server-cli.js', 'extension/server/node_modules/@gluonjs/compiler/']) if (!listing.includes(required)) throw new Error(`VSIX is missing ${required}.`);
+console.log(`VSIX artifact valid for Gluon ${version}: bundled server, metadata, and package contents present.`);

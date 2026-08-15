@@ -1,0 +1,34 @@
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { resolve } from 'node:path';
+
+const run = promisify(execFile);
+const root = resolve(import.meta.dirname, '..');
+const extension = resolve(root, 'editors/vscode');
+const server = resolve(root, 'packages/language-server');
+const output = resolve(root, process.argv.includes('--output') ? process.argv[process.argv.indexOf('--output') + 1] : '.tmp/release/vscode');
+const rootManifest = JSON.parse(await readFile(resolve(root, 'package.json')));
+const extensionManifest = JSON.parse(await readFile(resolve(extension, 'package.json')));
+if (extensionManifest.version !== rootManifest.version) throw new Error('VS Code and framework versions must match.');
+if (JSON.parse(await readFile(resolve(server, 'package.json'))).version !== rootManifest.version) throw new Error('VS Code and language-server versions must match.');
+
+await run(process.execPath, ['scripts/validate-vscode-client.mjs'], { cwd: root });
+await run('npm', ['run', 'build:compiler'], { cwd: root });
+await run('npm', ['run', 'build:language-server'], { cwd: root });
+await run('npm', ['ci', '--ignore-scripts'], { cwd: extension });
+await mkdir(output, { recursive: true });
+await rm(resolve(extension, 'server'), { recursive: true, force: true });
+await mkdir(resolve(extension, 'server/node_modules/@gluonjs'), { recursive: true });
+await cp(resolve(server, 'dist'), resolve(extension, 'server/dist'), { recursive: true });
+await writeFile(resolve(extension, 'server/package.json'), JSON.stringify({ type: 'module', private: true }) + '\n');
+await cp(resolve(root, 'packages/compiler/dist'), resolve(extension, 'server/node_modules/@gluonjs/compiler/dist'), { recursive: true });
+await cp(resolve(root, 'packages/compiler/package.json'), resolve(extension, 'server/node_modules/@gluonjs/compiler/package.json'));
+await cp(resolve(root, 'node_modules/typescript'), resolve(extension, 'server/node_modules/typescript'), { recursive: true });
+await run('npm', ['run', 'package', '--', '--out', resolve(output, `gluon-vscode-${rootManifest.version}.vsix`)], { cwd: extension });
+const vsix = resolve(output, `gluon-vscode-${rootManifest.version}.vsix`);
+const digest = createHash('sha256').update(await readFile(vsix)).digest('hex');
+await writeFile(resolve(output, 'VSIX-SHA256SUMS'), `${digest}  ${vsix.split('/').pop()}\n`);
+await writeFile(resolve(output, 'vscode-release-manifest.json'), JSON.stringify({ schemaVersion: 1, version: rootManifest.version, tag: `v${rootManifest.version}`, extension: extensionManifest.name, publisher: extensionManifest.publisher, languageServer: '@gluonjs/language-server', vsix: vsix.split('/').pop(), sha256: digest }, null, 2) + '\n');
+console.log(`VSIX built: ${vsix}`);

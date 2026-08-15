@@ -57,6 +57,8 @@ jobs:
       - run: npm run check:repository
       - run: npm run release:validate -- --candidate "$RELEASE_VERSION"
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION"
+      - run: npm run release:vscode
+      - run: npm run check:release-vscode
       - name: Retain release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -130,6 +132,7 @@ jobs:
             .tmp/release/compatibility-manifest.json
             .tmp/release/reproducibility.json
             .tmp/release/performance/*
+            .tmp/release/vscode/*
       - name: Create immutable-release draft
         env:
           GH_TOKEN: ${{ github.token }}
@@ -142,6 +145,12 @@ jobs:
           fi
       - name: Publish reviewed archives directly to latest through trusted publishing
         run: npm run release:publish -- --version "$RELEASE_VERSION"
+      - name: Publish VS Code extension when publisher credentials are configured
+        if: ${{ secrets.VSCE_PAT != '' }}
+        working-directory: editors/vscode
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx --no-install vsce publish --packagePath ../../.tmp/release/vscode/gluon-vscode-${{ env.RELEASE_VERSION }}.vsix --pat "$VSCE_PAT"
       - name: Verify latest registry train from a clean directory
         run: npm run release:verify-registry -- --version "$RELEASE_VERSION" --directory .tmp/release --output .tmp/release/registry-verification.json
       - run: npm run release:finalize-assets
