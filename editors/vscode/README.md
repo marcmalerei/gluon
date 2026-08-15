@@ -10,9 +10,10 @@ diagnostic escape hatch; it is not part of the release artifact contract.
 
 The extension version advances with the lockstep Gluon release and the
 `publisher`/repository metadata is part of the checked release surface. The
-extension does not bundle a second compiler or language server: the selected
-server executable must be the matching `@gluonjs/language-server` distribution.
-Run `npm run check:vscode-client` from the repository root before packaging.
+VSIX contains one same-version `@gluonjs/language-server` runtime and its
+required compiler and TypeScript runtime dependencies; it does not introduce an
+independently versioned compiler. Run `npm run check:vscode-client` from the
+repository root before packaging.
 
 ## Install and package
 
@@ -21,7 +22,7 @@ Build and install the self-contained VSIX from a clean repository checkout:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run release:vscode
-code --install-extension gluon-vscode-1.9.0.vsix
+code --install-extension .tmp/release/vscode/gluon-vscode-1.9.0.vsix
 ```
 
 The generated `.vsix` is a release artifact and is not committed. The release
@@ -42,6 +43,6 @@ To roll back, unpublish or hide the affected extension version in the
 VSIX manually with `code --install-extension <path> --force`. Never overwrite a
 tag or regenerate a released VSIX under the same version.
 
-The repository currently provides the source and deterministic metadata gate;
-Marketplace publication remains a separate operator action requiring the
-publisher account and a VSIX signing/publishing decision.
+Without `VSCE_PAT`, GitHub still publishes the reviewed VSIX and integrity
+evidence while the guarded Marketplace step is skipped. Configuring that
+credential is an explicit publisher-owner action.

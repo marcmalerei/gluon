@@ -26,9 +26,12 @@ requireValue(extensionPackage.activationEvents?.includes('onLanguage:typescript'
 requireValue(extensionPackage.activationEvents?.includes('onLanguage:javascript'), 'VS Code client must activate for JavaScript.');
 requireValue(extensionPackage.contributes?.configuration?.properties?.['gluon.languageServerPath'], 'VS Code client must expose gluon.languageServerPath.');
 requireValue(extensionPackage.contributes?.configuration?.properties?.['gluon.languageServerArgs'], 'VS Code client must expose gluon.languageServerArgs.');
+requireValue(extensionPackage.contributes.configuration.properties['gluon.languageServerPath'].description.includes('bundled with this extension'), 'VS Code client must describe the bundled default runtime.');
 requireValue(extensionPackage.dependencies?.['vscode-languageclient'], 'VS Code client must declare vscode-languageclient.');
 requireValue(extensionPackage.devDependencies?.['@vscode/vsce'], 'VS Code client must declare the VSIX packager.');
 requireValue(extensionSource.includes("'server', 'dist', 'server-cli.js'"), 'VS Code client must use the bundled language-server fallback.');
+requireValue(extensionSource.includes('{ module: bundledServer, args, transport: TransportKind.stdio }'), 'VS Code client must launch the bundled runtime as a Node module.');
+requireValue(!extensionSource.includes("|| 'gluon-language-server'"), 'VS Code client must not retain an undeclared PATH fallback.');
 requireValue(extensionSource.includes("['--stdio']"), 'VS Code client must keep stdio as the safe default transport.');
 requireValue(extensionSource.includes('TransportKind.stdio'), 'VS Code client must use stdio transport.');
 requireValue(extensionPackage.publisher === 'marcmalerei', 'VS Code publisher ownership must remain explicit.');

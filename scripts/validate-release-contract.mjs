@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import process from 'node:process';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import { resolveVscodeReleaseOptions } from './vscode-release-options.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const candidateIndex = process.argv.indexOf('--candidate');
@@ -37,6 +38,10 @@ const bootstrapBuildScript = await readFile(resolve(root, 'scripts/build-npm-boo
 const bootstrapPublishScript = await readFile(resolve(root, 'scripts/publish-npm-bootstrap.mjs'), 'utf8');
 const hostingScript = await readFile(resolve(root, 'scripts/verify-release-hosting.mjs'), 'utf8');
 const recoveryScript = await readFile(resolve(root, 'scripts/validate-release-recovery.mjs'), 'utf8');
+const vscodeBuildScript = await readFile(resolve(root, 'scripts/build-vscode-artifact.mjs'), 'utf8');
+const vscodeValidationScript = await readFile(resolve(root, 'scripts/validate-vscode-artifact.mjs'), 'utf8');
+const vscodeOptionsScript = await readFile(resolve(root, 'scripts/vscode-release-options.mjs'), 'utf8');
+const vscodeManifest = await readJson('editors/vscode/package.json');
 const officialNames = new Set(packageContract.packages.map((entry) => entry.name));
 const releaseCutEvidenceSchema = await readJson('release/release-cut-evidence.schema.json');
 const compatibilityManifestSchema = await readJson('release/compatibility-manifest.schema.json');
@@ -597,6 +602,7 @@ function validateWorkflow() {
   if (!publishJob || /registry-url:/.test(publishJob)) {
     throw new Error('Release publish must not ask setup-node to create token-backed registry authentication.');
   }
+  validateVscodeDistributionWorkflow(publishJob);
   if (!publishScript.includes('recovery?.recoveryTag')
     || !publishScript.includes('validate-release-recovery.mjs')
     || !hostingScript.includes('validate-release-recovery.mjs')) {
@@ -700,6 +706,100 @@ function validateWorkflow() {
   }
   for (const forbidden of ['NPM_TOKEN', 'NODE_AUTH_TOKEN']) {
     if (workflow.includes(forbidden)) throw new Error(`Release workflow must not reference long-lived ${forbidden}.`);
+  }
+}
+
+function validateVscodeDistributionWorkflow(publishJob) {
+  const candidateJob = workflow.match(/\n  candidate:\n([\s\S]*?)\n  publish:\n/)?.[1] ?? '';
+  const candidateCommands = [...candidateJob.matchAll(/^\s*- run: (.+)$/gm)].map((match) => match[1]);
+  const buildCommand = 'npm run release:vscode -- --version "$RELEASE_VERSION" --tag "$RELEASE_TAG"';
+  const validationCommand = 'npm run check:release-vscode -- --version "$RELEASE_VERSION" --tag "$RELEASE_TAG"';
+  const buildIndex = candidateCommands.indexOf(buildCommand);
+  const validationIndex = candidateCommands.indexOf(validationCommand);
+  if (buildIndex < 0 || validationIndex !== buildIndex + 1) {
+    throw new Error('Release candidate must build and immediately smoke-validate the VSIX for the resolved version and tag.');
+  }
+
+  for (const [name, command] of Object.entries({
+    'release:vscode': 'node scripts/build-vscode-artifact.mjs',
+    'check:release-vscode': 'node scripts/validate-vscode-artifact.mjs',
+  })) {
+    if (rootManifest.scripts?.[name] !== command) throw new Error(`package.json must define ${name} as ${command}.`);
+  }
+
+  const vscodeAssets = [
+    '.tmp/release/vscode/*.vsix',
+    '.tmp/release/vscode/VSIX-SHA256SUMS',
+    '.tmp/release/vscode/vscode-release-manifest.json',
+  ];
+  const assetArray = /assets=\(([^)]*)\)/.exec(publishJob)?.[1]?.split(/\s+/).filter(Boolean) ?? [];
+  for (const asset of vscodeAssets) {
+    if (!assetArray.includes(asset)) throw new Error(`GitHub release attachment array is missing ${asset}.`);
+  }
+  const attestationBlock = /- name: Attest release archives and evidence\n([\s\S]*?)\n\s+- name: Create immutable-release draft/.exec(publishJob)?.[1] ?? '';
+  for (const asset of vscodeAssets) {
+    if (!attestationBlock.includes(asset)) throw new Error(`VSIX provenance attestation is missing ${asset}.`);
+  }
+  if (!publishJob.includes('gh release create "$RELEASE_TAG" "${assets[@]}"')
+    || !publishJob.includes('gh release upload "$RELEASE_TAG" "${assets[@]}"')) {
+    throw new Error('Both GitHub release creation and update paths must attach the complete reviewed asset array.');
+  }
+
+  const secretReferences = workflow.match(/secrets\.VSCE_PAT/g) ?? [];
+  if (secretReferences.length !== 1 || !/^\s+VSCE_PAT: \$\{\{ secrets\.VSCE_PAT \}\}$/m.test(publishJob)) {
+    throw new Error('VSCE_PAT must be promoted exactly once to the publish job environment.');
+  }
+  if (/if:\s*\$\{\{\s*secrets\.VSCE_PAT/.test(workflow)) {
+    throw new Error('Marketplace publication must not reference secrets.VSCE_PAT directly in a step condition.');
+  }
+  const marketplaceStep = /- name: Publish VS Code extension when publisher credentials are configured\n([\s\S]*?)\n\s+- name: Verify latest registry train/.exec(publishJob)?.[1] ?? '';
+  const marketplacePrepareStep = /- name: Prepare VS Code Marketplace publisher when credentials are configured\n([\s\S]*?)\n\s+- name: Publish VS Code extension/.exec(publishJob)?.[1] ?? '';
+  if (!marketplacePrepareStep.includes("if: ${{ env.VSCE_PAT != '' }}")
+    || !marketplacePrepareStep.includes('working-directory: editors/vscode')
+    || !marketplacePrepareStep.includes('run: npm ci --ignore-scripts')) {
+    throw new Error('Marketplace publication must install the editor lockfile in its non-workspace directory under the credential guard.');
+  }
+  if (!marketplaceStep.includes("if: ${{ env.VSCE_PAT != '' }}")
+    || !marketplaceStep.includes('gluon-vscode-${{ env.RELEASE_VERSION }}.vsix')
+    || marketplaceStep.includes('--pat') || marketplaceStep.includes('$VSCE_PAT')) {
+    throw new Error('Marketplace publication must use the job-level token implicitly, guard on env.VSCE_PAT, and never print or pass the token.');
+  }
+
+  if (vscodeManifest.version !== rootManifest.version
+    || vscodeManifest.devDependencies?.yauzl !== '3.4.0'
+    || !vscodeManifest.contributes.configuration.properties['gluon.languageServerPath'].description.includes('bundled with this extension')) {
+    throw new Error('VS Code metadata must align with the package train and document the bundled default runtime.');
+  }
+  for (const [scriptName, source] of [['builder', vscodeBuildScript], ['validator', vscodeValidationScript]]) {
+    for (const required of ['resolveVscodeReleaseOptions', 'process.argv.slice(2)', 'process.env', "defaultOutput: '.tmp/release/vscode'"]) {
+      if (!source.includes(required)) throw new Error(`VSIX ${scriptName} does not enforce release option contract ${required}.`);
+    }
+  }
+  for (const required of ['Option ${name} requires a value.', 'version !== rootVersion', 'tag !== `v${version}`']) {
+    if (!vscodeOptionsScript.includes(required)) throw new Error(`VSIX option resolver is missing ${required}.`);
+  }
+  for (const required of ['createHash', 'VSIX-SHA256SUMS', 'expectedManifestKeys', 'extractVsix', 'Unsafe VSIX entry path', 'activateBundledExtension', 'initializeBundledServer', "response.result?.serverInfo?.version !== version", "extensionSource.includes(\"module: bundledServer\")"]) {
+    if (!vscodeValidationScript.includes(required)) throw new Error(`VSIX validation is missing enforced contract ${required}.`);
+  }
+  for (const required of ["cp(resolve(server, 'package.json')", "dependency === '@gluonjs/compiler'", 'stageRuntimePackage', 'manifest.dependencies', 'finally']) {
+    if (!vscodeBuildScript.includes(required)) throw new Error(`VSIX builder is missing self-contained runtime contract ${required}.`);
+  }
+
+  const resolved = resolveVscodeReleaseOptions({ argv: ['--version', rootManifest.version, '--tag', `v${rootManifest.version}`, '--output', '.tmp/fixture'], env: {}, root, rootVersion: rootManifest.version, defaultOutput: '.tmp/release/vscode' });
+  if (resolved.version !== rootManifest.version || resolved.tag !== `v${rootManifest.version}` || !resolved.output.endsWith('/.tmp/fixture')) {
+    throw new Error('VSIX release option resolver did not preserve an aligned explicit release request.');
+  }
+  for (const fixture of [
+    ['--output'],
+    ['--version', '0.0.1'],
+    ['--version', rootManifest.version, '--tag', `v${rootManifest.version}-other`],
+    ['--unknown', 'value'],
+  ]) {
+    let rejected = false;
+    try {
+      resolveVscodeReleaseOptions({ argv: fixture, env: {}, root, rootVersion: rootManifest.version, defaultOutput: '.tmp/release/vscode' });
+    } catch { rejected = true; }
+    if (!rejected) throw new Error(`VSIX release option resolver accepted invalid fixture ${fixture.join(' ')}.`);
   }
 }
 
