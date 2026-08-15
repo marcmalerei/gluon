@@ -103,6 +103,19 @@ describe('Tooltip and HoverCard anchored overlays', () => {
     expect(popup.hidden).toBe(false);
   });
 
+  it('covers keyboard entry fallback and delayed close ownership', async () => {
+    vi.useFakeTimers();
+    mount(HoverCard({ id: 'fallback-card', label: 'Fallback', trigger: trigger('Fallback'), content: 'No focusable content', delay: 0 }));
+    const control = document.querySelector<HTMLButtonElement>('#fallback-card-trigger')!;
+    const popup = document.querySelector<HTMLElement>('#fallback-card-content')!;
+    control.focus();
+    control.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await Promise.resolve();
+    expect(document.activeElement).toBe(popup);
+    popup.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(popup.hidden).toBe(true);
+  });
+
   it('dismisses nested overlays from the inside out on document-level outside interaction', () => {
     mount(HoverCard({
       id: 'outer-card', label: 'Outer', trigger: trigger('Outer'), delay: 0,
