@@ -168,10 +168,14 @@ describe('core i18n', () => {
       messages: {
         'en-US': {
           plain: 'Hello {name}',
+          trailing: 'Hello {name}!',
           malformed: 'Broken {name',
+          number: '{value, number}',
           pluralExact: '{count, plural, =2 {exact} one {one} other {other}}',
           pluralFallback: '{count, plural, one {one}}',
+          pluralMalformedChoice: '{count, plural, garbage}',
           selectFallback: '{kind, select, known {known} other {other}}',
+          selectMissing: '{kind, select, known {known}}',
           selectMalformed: '{kind, select, known {known}',
           empty: '{, select, other {value}}',
           numericDate: '{when, date}',
@@ -183,12 +187,16 @@ describe('core i18n', () => {
     expect(i18n.t('plain')).toBe('Hello {name}');
     expect(i18n.t('plain', { values: { name: 'Ada' } })).toBe('Hello Ada');
     expect(i18n.t('plain', { values: {} })).toBe('Hello {name}');
+    expect(i18n.t('trailing', { values: { name: 'Ada' } })).toBe('Hello Ada!');
     expect(i18n.t('malformed', { values: { name: 'Ada' } })).toBe('Broken {name');
+    expect(i18n.t('number', { values: { value: 1234.5 } })).toBe('1,234.5');
     expect(i18n.t('pluralExact', { values: { count: 2 } })).toBe('exact');
     expect(i18n.t('pluralExact', { values: { count: 1 } })).toBe('one');
     expect(i18n.t('pluralExact', { values: { count: 3 } })).toBe('other');
     expect(i18n.t('pluralFallback', { values: { count: 2 } })).toBe('{count, plural, one {one}}');
+    expect(i18n.t('pluralMalformedChoice', { values: { count: 1 } })).toBe('{count, plural, garbage}');
     expect(i18n.t('selectFallback', { values: { kind: 'unknown' } })).toBe('other');
+    expect(i18n.t('selectMissing', { values: { kind: 'unknown' } })).toBe('{kind, select, known {known}}');
     expect(i18n.t('selectMalformed', { values: { kind: 'known' } })).toBe('{kind, select, known {known}');
     expect(i18n.t('empty', { values: {} })).toBe('{, select, other {value}}');
     expect(i18n.t('numericDate', { values: { when: 0 } })).toContain('1970');
