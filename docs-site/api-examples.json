@@ -3169,6 +3169,19 @@
         "restore();"
       ]
     },
+    "responsive-action-bar": {
+      "module": "@gluonjs/molecules",
+      "code": [
+        "import { Button } from '@gluonjs/atoms';",
+        "import { ResponsiveActionBar, type ResponsiveActionBarAttributes, type ResponsiveActionBarPresentation, type ResponsiveActionBarProps, type ResponsiveActionBarState, responsiveActionBarStyles } from '@gluonjs/molecules';",
+        "const state: ResponsiveActionBarState = 'ready';",
+        "const presentation: ResponsiveActionBarPresentation = 'sticky';",
+        "const attributes: ResponsiveActionBarAttributes = { 'aria-label': 'Order actions' };",
+        "const props: ResponsiveActionBarProps = { summary: 'Review order', status: 'All fields are valid.', state, presentation, attributes, primaryAction: Button({ label: 'Continue' }) };",
+        "const action = ResponsiveActionBar(props);",
+        "console.log(action, responsiveActionBarStyles);"
+      ]
+    },
     "form-controller": {
       "module": "@gluonjs/molecules",
       "code": [
@@ -7081,6 +7094,30 @@
     "packages/molecules/src/type-aliases/SearchResultsState.md": {
       "recipe": "molecule-components",
       "description": "Select the explicit render-only asynchronous state for a SearchResults surface:"
+    },
+    "packages/molecules/src/variables/ResponsiveActionBar.md": {
+      "recipe": "responsive-action-bar",
+      "description": "Compose one caller-owned primary action with stable status semantics and safe-area-aware responsive layout:"
+    },
+    "packages/molecules/src/interfaces/ResponsiveActionBarProps.md": {
+      "recipe": "responsive-action-bar",
+      "description": "Pass application-owned summary, status, action, and responsive state through the public props contract:"
+    },
+    "packages/molecules/src/type-aliases/ResponsiveActionBarAttributes.md": {
+      "recipe": "responsive-action-bar",
+      "description": "Apply native section attributes without taking live-region ownership away from the molecule:"
+    },
+    "packages/molecules/src/type-aliases/ResponsiveActionBarPresentation.md": {
+      "recipe": "responsive-action-bar",
+      "description": "Select the validated sticky or inline presentation contract:"
+    },
+    "packages/molecules/src/type-aliases/ResponsiveActionBarState.md": {
+      "recipe": "responsive-action-bar",
+      "description": "Use the fail-closed ready, loading, disabled, or error state union:"
+    },
+    "packages/molecules/src/variables/responsiveActionBarStyles.md": {
+      "recipe": "responsive-action-bar",
+      "description": "Install the exact constructable stylesheet when an application owns style selection explicitly:"
     },
     "packages/molecules/src/functions/createFormController.md": {
       "recipe": "form-controller",
