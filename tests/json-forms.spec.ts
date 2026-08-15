@@ -230,6 +230,60 @@ describe('JSON Forms component', () => {
     expect(buttons.find((button) => button.textContent === 'Remove item 1')?.disabled).toBe(true);
   });
 
+  it('applies defaults through existing nested objects and object-array items', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        recipient: {
+          type: 'object',
+          properties: { city: { type: 'string', default: 'Berlin' } },
+        },
+        packages: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: { label: { type: 'string', default: 'Standard' } },
+          },
+        },
+      },
+    } satisfies JsonSchema;
+
+    expect(applySchemaDefaults(schema, { recipient: {}, packages: [{}] })).toEqual({
+      recipient: { city: 'Berlin' },
+      packages: [{ label: 'Standard' }],
+    });
+  });
+
+  it('removes array items and keeps programmatic removal guards fail-closed', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: { tags: { type: 'array', items: { type: 'string' } } },
+    }, { tags: ['first', 'second'] });
+    await settled(element);
+
+    const remove = [...element.shadowRoot!.querySelectorAll('button')]
+      .find((button) => button.textContent === 'Remove item 1')!;
+    remove.click();
+    await settled(element);
+    expect(element.data).toEqual({ tags: ['second'] });
+
+    const internal = element as unknown as {
+      removeArrayItem(path: readonly string[], index: number): void;
+    };
+    internal.removeArrayItem(['missing'], 0);
+    internal.removeArrayItem(['tags'], 0);
+    expect(element.data).toEqual({ tags: [] });
+    internal.removeArrayItem(['tags'], 0);
+    expect(element.data).toEqual({ tags: [] });
+
+    element.disabled = true;
+    internal.removeArrayItem(['tags'], 0);
+    element.disabled = false;
+    element.readOnly = true;
+    internal.removeArrayItem(['tags'], 0);
+    expect(element.data).toEqual({ tags: [] });
+  });
+
   it('updates missing nested object paths and removes cleared nested array items', async () => {
     const element = createForm({
       type: 'object',
@@ -363,6 +417,17 @@ describe('JSON Forms component', () => {
       { type: 'object', properties: { email: { type: 'string' } } },
       { type: 'VerticalLayout', elements: [{ type: 'VerticalLayout' }] },
     )).toHaveLength(1);
+    const arrayConfigurationErrors = getJsonFormsConfigurationErrors({
+      type: 'object',
+      properties: {
+        missingItems: { type: 'array' },
+        nestedArray: { type: 'array', items: { type: 'array', items: { type: 'string' } } },
+      },
+    }, undefined);
+    expect(arrayConfigurationErrors.map(({ message }) => message)).toEqual([
+      'Array property "missingItems" must declare supported items.',
+      'Nested arrays are not supported for "nestedArray".',
+    ]);
     expect(getJsonFormsConfigurationErrors({ type: 'object' }, undefined)).toEqual([]);
     expect(validateJsonFormData(
       { type: 'object', properties: { units: { type: 'number', minimum: 'one' as unknown as number } } },
