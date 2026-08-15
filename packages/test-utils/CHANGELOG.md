@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-15
+
+### Changed
+
+- Advanced the lockstep release with regression coverage for the new forms,
+  i18n, graph, router, tooling, and progressive SSR contracts.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-15
+
+### Changed
+
+- Advanced the lockstep release with the documented Devtools capability
+  handshake and VS Code distribution contract.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

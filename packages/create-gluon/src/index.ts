@@ -24,7 +24,7 @@ export {
 } from './component-generator.js';
 export { componentKinds, type ComponentKind } from './component-template.js';
 
-export const CREATE_GLUON_VERSION = '1.8.1';
+export const CREATE_GLUON_VERSION = '1.9.0';
 
 export interface GluonFeatures {
   readonly router: boolean;

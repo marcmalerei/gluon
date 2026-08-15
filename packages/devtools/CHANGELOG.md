@@ -7,6 +7,13 @@
 - Exposed the Devtools API handshake through `GluonDevtoolsBridge` so host
   panels can negotiate the protocol before subscribing.
 
+## [1.9.0] - 2026-08-15
+
+### Added
+
+- Exposed capability negotiation through `GluonDevtoolsBridge` before panel
+  subscriptions are established.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed
