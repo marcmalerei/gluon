@@ -31,6 +31,7 @@ for (const version of versions.supported) {
   ]) await access(resolve(outputRoot, version, page));
 }
 await access(resolve(outputRoot, 'archive/index.html'));
+await access(resolve(outputRoot, 'latest/index.html'));
 await access(resolve(outputRoot, 'assets/docs.css'));
 await access(resolve(outputRoot, 'assets/docs.js'));
 const docsStyles = await readFile(resolve(outputRoot, 'assets/docs.css'), 'utf8');
@@ -45,6 +46,22 @@ const apiIndex = await readFile(resolve(root, '.tmp/docs-api/README.md'), 'utf8'
 const documentedEntryPoints = (apiIndex.match(/^- \[[^\]]+\]\([^\)]+README\.md\)$/gm) ?? []).length;
 if (documentedEntryPoints !== expectedEntryPoints) {
   throw new Error(`API reference documents ${documentedEntryPoints} entry points; package contract requires ${expectedEntryPoints}`);
+}
+
+for (const entry of packageContract.packages.filter((candidate) => candidate.state === 'current')) {
+  const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
+  const sourceRoot = entry.directory === '.' ? 'src' : `${entry.directory}/src`;
+  const htmlPath = resolve(outputRoot, versions.latest, 'api/generated', sourceRoot, 'index.html');
+  const html = await readFile(htmlPath, 'utf8');
+  if (!html.includes(`<title>${escapeHtml(entry.name)} · Gluon ${versions.latest}</title>`)) {
+    throw new Error(`${entry.name} API landing page has no package-specific title`);
+  }
+  if (!html.includes(`<meta name="description" content="${escapeHtml(packageJson.description)}">`)) {
+    throw new Error(`${entry.name} API landing page has no package-specific description`);
+  }
+  if (!html.includes(`>${escapeHtml(entry.name)}</a>`)) {
+    throw new Error(`${entry.name} API landing page has no package-specific breadcrumb`);
+  }
 }
 
 const apiExampleManifest = JSON.parse(await readFile(resolve(root, '.tmp/api-examples/manifest.json'), 'utf8'));
@@ -272,11 +289,21 @@ for (const required of [
 
 const htmlFiles = await filesWithExtension(outputRoot, '.html');
 const missingLinks = [];
+const invalidExternalLinks = [];
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
   for (const match of html.matchAll(/\shref="([^"]+)"/g)) {
     const href = match[1];
-    if (/^(?:https?:|mailto:|#)/.test(href)) continue;
+    if (/^(?:https?:|mailto:)/.test(href)) {
+      const external = href.startsWith('http') ? new URL(href) : undefined;
+      if (external?.hostname === 'github.com'
+        && external.pathname.startsWith('/marcmalerei/gluon/blob/')
+        && external.pathname.endsWith('.html')) {
+        invalidExternalLinks.push(`${slash(relative(outputRoot, file))} -> ${href}`);
+      }
+      continue;
+    }
+    if (href.startsWith('#')) continue;
     const currentRelative = slash(relative(outputRoot, file));
     const currentPath = currentRelative.endsWith('/index.html')
       ? `${base}${currentRelative.slice(0, -'index.html'.length)}`
@@ -292,6 +319,9 @@ for (const file of htmlFiles) {
   }
 }
 if (missingLinks.length > 0) throw new Error(`documentation has broken internal links:\n- ${missingLinks.join('\n- ')}`);
+if (invalidExternalLinks.length > 0) {
+  throw new Error(`documentation rewrote curated GitHub links to generated HTML:\n- ${invalidExternalLinks.join('\n- ')}`);
+}
 
 const exampleSources = (await filesWithExtension(resolve(siteRoot, 'examples'), '.ts'))
   .filter((file) => !file.endsWith('vite.config.ts'));
@@ -310,3 +340,4 @@ async function filesWithExtension(directory, extension) {
 }
 
 function slash(value) { return value.split(sep).join('/'); }
+function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
