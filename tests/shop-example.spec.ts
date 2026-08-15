@@ -28,7 +28,7 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {
-    const { app, router, store, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
+    const { app, router, store, toastController, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
       storage: null,
       styleTarget: document,
     });
