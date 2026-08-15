@@ -3,7 +3,7 @@ import axe from 'axe-core';
 import { NavigationMenu, navigationMenuStyles } from '@gluonjs/molecules';
 import { createStyleManifest, prepareForHydration, renderStyleCarriers } from '@gluonjs/ssr';
 import { hydrateTemplate } from '@gluonjs/ssr/hydration';
-import { createComponentStyleSelection, getStyleSheetText, html, render, unmount } from '../src/index.js';
+import { createComponentStyleSelection, getStyleSheetText, html, isTemplateResult, render, unmount } from '../src/index.js';
 
 const items = [
   {
@@ -39,7 +39,7 @@ describe('NavigationMenu', () => {
     expect(nav.getAttribute('aria-label')).toBe('Primary navigation');
     expect(nav.querySelectorAll(':scope > ul > li')).toHaveLength(3);
     expect(nav.querySelector('a[href="/shop"]')?.getAttribute('aria-current')).toBe('page');
-    expect(nav.querySelector('#primary-navigation-shop-panel')?.hidden).toBe(false);
+    expect(nav.querySelector<HTMLElement>('#primary-navigation-shop-panel')?.hidden).toBe(false);
     expect(nav.querySelector('button[aria-controls="primary-navigation-shop-panel"]')?.getAttribute('aria-expanded')).toBe('true');
     const unavailable = nav.querySelector('[aria-describedby="primary-navigation-soon-unavailable"]');
     expect(unavailable?.getAttribute('aria-disabled')).toBe('true');
@@ -112,6 +112,7 @@ describe('NavigationMenu', () => {
       onOpenChange: (next) => proposed.push([...next]),
     });
     const prepared = await prepareForHydration(value);
+    if (!isTemplateResult(prepared.value)) throw new TypeError('NavigationMenu hydration must retain a template result.');
     const host = document.createElement('section');
     const styleRoot = host.attachShadow({ mode: 'open' });
     const root = document.createElement('section');
