@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the public `applyProgressivePatch()` browser contract for replacing
+  streamed async fallbacks in place, retaining nested boundaries, and safely
+  installing newly discovered style carriers.
+
 ## [1.8.1] - 2026-08-12
 
 ### Added

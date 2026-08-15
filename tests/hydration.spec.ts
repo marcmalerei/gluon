@@ -35,6 +35,7 @@ import {
 } from '@gluonjs/ssr/hydration';
 import { createStyleManifest, prepareForHydration, renderElement, renderProgressively, renderStyleCarriers, renderToString } from '@gluonjs/ssr';
 import { renderEleventyPage } from '@gluonjs/ssr/eleventy';
+import { applyProgressivePatch, applyProgressivePatchTemplate, ProgressivePatchError } from '@gluonjs/ssr/streaming';
 import type { SsrRequestResult } from '@gluonjs/ssr';
 import {
   injectProductConfiguratorShadow,
@@ -54,6 +55,76 @@ import {
 
 describe('SSR hydration', () => {
   afterEach(cleanupSsrFixtures);
+
+  it('applies progressive boundary patches in place, including nested boundaries and styles', () => {
+    const root = document.createElement('main');
+    root.innerHTML = '<!--gluon:async:1--><span>Loading</span><!--gluon:/async:1-->';
+    const styleRoot = document.createElement('div').attachShadow({ mode: 'open' });
+    const styles = {
+      version: 1 as const,
+      entries: [{ id: 'progressive-card', cssText: '.card { color: red; }', digest: 'digest-1', order: 0 }],
+    };
+
+    const outer = applyProgressivePatch(root, {
+      kind: 'boundary',
+      id: 1,
+      html: '<!--gluon:async:2--><span>Nested loading</span><!--gluon:/async:2-->',
+      styles,
+    }, { styleRoot });
+    expect(outer.insertedNodes).toBe(3);
+    expect(outer.installedStyleIds).toEqual(['progressive-card']);
+    expect(root.textContent).toBe('Nested loading');
+
+    const inner = applyProgressivePatch(root, {
+      kind: 'boundary',
+      id: 2,
+      html: '<strong class="card">Ready</strong>',
+      styles,
+    }, { styleRoot });
+    expect(inner.installedStyleIds).toEqual([]);
+    expect(root.querySelector('strong.card')?.textContent).toBe('Ready');
+    expect(styleRoot.querySelectorAll('style[data-gluon-style="progressive-card"]')).toHaveLength(1);
+  });
+
+  it('fails progressive patches with typed boundary and abort errors before mutation', () => {
+    const root = document.createElement('main');
+    root.innerHTML = '<!--gluon:async:3--><span>Loading</span><!--gluon:/async:3-->';
+    const controller = new AbortController();
+    controller.abort(new Error('navigation changed'));
+
+    expect(() => applyProgressivePatch(root, {
+      kind: 'boundary',
+      id: 3,
+      html: '<strong>Ready</strong>',
+      styles: { version: 1, entries: [] },
+    }, { signal: controller.signal })).toThrow(ProgressivePatchError);
+    expect(root.textContent).toBe('Loading');
+
+    let missingError: unknown;
+    try {
+      applyProgressivePatch(root, {
+        kind: 'boundary',
+        id: 99,
+        html: '<strong>Never</strong>',
+        styles: { version: 1, entries: [] },
+      });
+    } catch (error) {
+      missingError = error;
+    }
+    expect(missingError).toMatchObject({ code: 'GLUON_SSR_PROGRESSIVE_BOUNDARY' });
+    expect(root.textContent).toBe('Loading');
+  });
+
+  it('applies the inert template envelope emitted by the readable stream', () => {
+    const root = document.createElement('main');
+    root.innerHTML = '<!--gluon:async:7--><span>Loading</span><!--gluon:/async:7-->';
+    const template = document.createElement('template');
+    template.dataset.gluonAsyncPatch = '7';
+    template.innerHTML = '<strong>Streamed</strong>';
+
+    expect(applyProgressivePatchTemplate(root, template).insertedNodes).toBe(1);
+    expect(root.textContent).toBe('Streamed');
+  });
 
   it('rejects malformed configurator DSD and leaves unrelated routes unchanged', () => {
     expect(() => injectProductConfiguratorShadow(
