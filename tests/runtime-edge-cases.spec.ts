@@ -150,10 +150,65 @@ describe('template runtime edge cases', () => {
     expect(button.value).toBe('undefined');
   });
 
-  it('rejects expressions that the HTML parser cannot represent as parts', () => {
+  it('rejects raw-text and RCDATA child expressions with targeted diagnostics', () => {
     const root = document.createElement('div');
-    const invalid = (value: string) => html`<textarea>${value}</textarea>`;
 
-    expect(() => render(invalid('content'), root)).toThrow(/complete child or attribute value/i);
+    const cases = [
+      { label: 'textarea', view: (value: string) => html`<textarea>${value}</textarea>`, pattern: /textarea/i },
+      { label: 'title', view: (value: string) => html`<title>${value}</title>`, pattern: /title/i },
+      { label: 'script', view: (value: string) => html`<script>${value}</script>`, pattern: /script/i },
+      { label: 'style', view: (value: string) => html`<style>${value}</style>`, pattern: /style/i },
+    ] as const;
+
+    for (const { view, pattern } of cases) {
+      expect(() => render(view('content'), root)).toThrow(pattern);
+    }
+  });
+
+  it('keeps mixed attribute diagnostics for partial attribute strings', () => {
+    const root = document.createElement('div');
+
+    expect(() => render(html`<p class="prefix ${'value'}"></p>`, root)).toThrow(/complete child or attribute value/i);
+    expect(() => render(html`<template>${'value'}</template>`, root)).toThrow(/complete child or attribute value/i);
+  });
+
+  it('ignores markup-like text and only exits raw-text content on the matching close tag', () => {
+    const root = document.createElement('div');
+
+    expect(() => render(html`<textarea>${'<div>'}${"'script'"}${'<!-- comment -->'}${'<TITLE>'}${'</not-the-tag>'}</textarea><p>${'after'}</p>`, root)).toThrow(
+      /textarea/i,
+    );
+    expect(() => render(html`<textarea>Before ${'<div>'}${'</textarea>'}</textarea><p>${'after'}</p>`, root)).toThrow(/textarea/i);
+  });
+
+  it('treats malformed closing fragments as inert raw-text content', () => {
+    const root = document.createElement('div');
+
+    expect(() => render(html`<textarea>${'</text'}${'area'}${'>'}</textarea>`, root)).toThrow(/textarea/i);
+    expect(() => render(html`<script>${'</scr'}${'ipt'}${'>'}</script>`, root)).toThrow(/script/i);
+  });
+
+  it('preserves state across template literal chunks before the diagnostic fires', () => {
+    const root = document.createElement('div');
+    const value = 'content';
+
+    expect(() => render(html`<textarea>${'first'}${'<div>'}${value}</textarea>`, root)).toThrow(/textarea/i);
+    expect(() => render(html`<style>${'a'}${'/* comment */'}${value}</style>`, root)).toThrow(/style/i);
+  });
+
+  it('allows a valid expression after the matching close tag', () => {
+    const root = document.createElement('div');
+
+    expect(() => render(html`<textarea>Static</textarea><p>${'after'}</p>`, root)).not.toThrow();
+    expect(root.querySelector('p')?.textContent).toBe('after');
+  });
+
+  it('keeps literal renderer-like markers distinct from generated expression markers', () => {
+    const root = document.createElement('div');
+
+    expect(() => render(html`<textarea>Literal <!--gluon:0--></textarea><p>${'after'}</p>`, root)).not.toThrow();
+    expect(root.querySelector('textarea')?.value).toContain('<!--gluon:0-->');
+    expect(root.querySelector('p')?.textContent).toBe('after');
+    expect(() => render(html`<textarea>Literal <!--gluon:0--> ${'dynamic'}</textarea>`, root)).toThrow(/textarea/i);
   });
 });

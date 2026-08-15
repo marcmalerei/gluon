@@ -18,6 +18,9 @@ requirement of the native element it selects. Void elements reject children.
 `q.textarea()` maps primitive `children` to the native `defaultValue` property
 because HTML parses textarea contents as raw text; use `.value` for controlled
 content. Template, Node, directive, and collection children are rejected.
+Direct template child interpolation inside raw-text and RCDATA elements
+(`textarea`, `title`, `script`, and `style`) is rejected with a runtime error
+that points to the supported complete binding form.
 
 `QuarkProps<ElementType>` has no general string index signature. It derives
 native scalar values and explicit property/boolean bindings from the target DOM

@@ -1915,6 +1915,8 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   const element = document.createElement('template');
   const attributeNames = new Map<number, string>();
   const state = { inTag: false, quote: '' };
+  let markerPrefix = 'gluon:';
+  while (result.strings.some((chunk) => chunk.includes(`<!--${markerPrefix}`))) markerPrefix += '_';
   let markup = '';
 
   for (let index = 0; index < result.strings.length - 1; index += 1) {
@@ -1934,7 +1936,7 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
       attributeNames.set(index, match[1]);
       markup += `__gluon_${index}__`;
     } else {
-      markup += `<!--gluon:${index}-->`;
+      markup += `<!--${markerPrefix}${index}-->`;
     }
   }
 
@@ -1946,13 +1948,17 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   } else {
     element.innerHTML = markup;
   }
-  const descriptors = buildDescriptors(element.content, attributeNames);
+  const descriptors = buildDescriptors(element.content, attributeNames, markerPrefix);
   const traversalDescriptors = [...descriptors].sort(
     (left, right) => left.traversalIndex - right.traversalIndex || left.index - right.index,
   );
   const expressionCount = result.strings.length - 1;
 
   if (descriptors.length !== expressionCount) {
+    const rawTextDiagnostic = getRawTextInterpolationDiagnostic(element.content, markerPrefix);
+    if (rawTextDiagnostic) {
+      throw new Error(rawTextDiagnostic);
+    }
     throw new Error(
       'Every Gluon expression must occupy a complete child or attribute value. '
       + 'Mixed attribute strings such as class="prefix ${value}" are not supported; '
@@ -1999,9 +2005,21 @@ function getCompiledTemplate(result: TemplateResult): CompiledTemplate {
   return compiled;
 }
 
+function getRawTextInterpolationDiagnostic(content: DocumentFragment, markerPrefix: string): string | undefined {
+  for (const element of content.querySelectorAll('script, style, textarea, title')) {
+    if (!(element.textContent ?? '').includes(`<!--${markerPrefix}`)) continue;
+    const tagName = element.localName;
+    return tagName === 'textarea'
+      ? 'Interpolation inside <textarea> is unsupported raw text; use .value=${value} for controlled content.'
+      : `Interpolation inside <${tagName}> is unsupported raw text; move the binding outside the element.`;
+  }
+  return undefined;
+}
+
 function buildDescriptors(
   content: DocumentFragment,
   attributeNames: ReadonlyMap<number, string>,
+  markerPrefix: string,
 ): PartDescriptor[] {
   const descriptors: PartDescriptor[] = [];
   const walker = document.createTreeWalker(
@@ -2015,13 +2033,13 @@ function buildDescriptors(
     const node = walker.currentNode;
 
     if (node.nodeType === Node.COMMENT_NODE) {
-      const match = (node as Comment).data.match(/^gluon:(\d+)$/);
-      if (match?.[1]) {
+      const marker = (node as Comment).data;
+      if (marker.startsWith(markerPrefix)) {
         const seededText = document.createTextNode('');
         node.parentNode!.insertBefore(seededText, node.nextSibling);
         descriptors.push({
           kind: 'node',
-          index: Number(match[1]),
+          index: Number(marker.slice(markerPrefix.length)),
           path: pathFromRoot(content, node),
           traversalIndex,
           seededText: true,
