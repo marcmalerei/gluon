@@ -350,4 +350,75 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
     expect(document.activeElement).toBe(currentMenuItem);
     expect(currentMenuItem.tabIndex).toBe(0);
   });
+
+  it('covers controlled menu activation branches and trigger dismissal keys', async () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    let open = false;
+    const checked: string[] = [];
+    const submenus: boolean[] = [];
+    const view = () => DropdownMenu({
+      id: 'branch-menu', label: 'Actions', trigger: 'Actions', open,
+      onOpenChange: (next) => { open = next; render(view(), host); },
+      onCheckedChange: (change) => checked.push(`${change.kind}:${change.checked}`),
+      onSubmenuOpenChange: (_id, next) => submenus.push(next),
+      items: [
+        { id: 'check', kind: 'checkbox', label: 'Check', checked: false },
+        { id: 'radio', kind: 'radio', group: 'mode', label: 'Radio', checked: false },
+        { id: 'nested', label: 'Nested', expanded: true, submenu: [{ id: 'child', label: 'Child' }] },
+      ],
+    });
+    render(view(), host);
+    const trigger = host.querySelector<HTMLButtonElement>('.gluon-menu-trigger')!;
+    trigger.focus();
+    await userEvent.keyboard('{ArrowUp}');
+    await settle();
+    expect(open).toBe(true);
+    expect(host.querySelector('[role="menu"]')).not.toBeNull();
+    await userEvent.keyboard('{Escape}');
+    await settle();
+    expect(open).toBe(false);
+    open = true;
+    render(view(), host);
+    host.querySelector<HTMLElement>('[data-value="check"]')!.click();
+    host.querySelector<HTMLElement>('[data-value="radio"]')!.click();
+    host.querySelector<HTMLElement>('[data-value="nested"]')!.click();
+    expect(checked).toEqual(['checkbox:true', 'radio:true']);
+    expect(submenus).toEqual([false]);
+    const prevented = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+    trigger.dispatchEvent(prevented);
+    expect(prevented.defaultPrevented).toBe(true);
+
+    open = true;
+    render(view(), host);
+    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    trigger.dispatchEvent(escape);
+    expect(escape.defaultPrevented).toBe(true);
+
+    const barHost = document.createElement('div');
+    document.body.append(barHost);
+    const barChanges: string[] = [];
+    render(Menubar({
+      id: 'branch-menubar', label: 'Branch menu',
+      onCheckedChange: (change) => barChanges.push(change.kind),
+      onSubmenuOpenChange: (id, next) => barChanges.push(`${id}:${next}`),
+      items: [
+        { id: 'check', kind: 'checkbox', label: 'Check', checked: false },
+        { id: 'radio', kind: 'radio', group: 'mode', label: 'Radio', checked: false },
+        { id: 'nested', label: 'Nested', expanded: true, submenu: [{ id: 'child', label: 'Child' }] },
+        { id: 'action', label: 'Action', onSelect: () => barChanges.push('action') },
+      ],
+    }), barHost);
+    const outsideBar = document.createElement('button');
+    document.body.append(outsideBar);
+    outsideBar.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(barChanges).toContain('nested:false');
+    barHost.querySelector<HTMLElement>('[data-value="check"]')!.click();
+    barHost.querySelector<HTMLElement>('[data-value="radio"]')!.click();
+    barHost.querySelector<HTMLElement>('[data-value="nested"]')!.click();
+    barHost.querySelector<HTMLElement>('[data-value="action"]')!.click();
+    barHost.querySelector<HTMLElement>('[role="menubar"] > li > [data-value="nested"]')!.focus();
+    await userEvent.keyboard('{Escape}');
+    expect(barChanges).toEqual(['nested:false', 'checkbox', 'radio', 'nested:false', 'action']);
+  });
 });

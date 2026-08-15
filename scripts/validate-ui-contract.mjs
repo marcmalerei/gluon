@@ -206,7 +206,7 @@ for (const marker of [
   'gluon-form-field',
   'gluon-control-field',
   'gluon-choice-group',
-  'gluon-button-group',
+  'gluon-toolbar',
   'gluon-navigation-strip',
   'gluon-segmented-control',
   'gluon-tabs',

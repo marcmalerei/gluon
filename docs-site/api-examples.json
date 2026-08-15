@@ -999,10 +999,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -1043,18 +1043,22 @@
         "  Card,",
         "  ChoiceGroup,",
         "  ControlField,",
+        "  ContextMenu,",
         "  DialogSurface,",
         "  Disclosure,",
         "  ResponsiveDisclosure,",
+        "  DropdownMenu,",
         "  EmptyState,",
         "  FormField,",
         "  InlineNotice,",
         "  NavigationStrip,",
         "  SearchField,",
         "  SearchResults,",
+        "  Menubar,",
         "  SegmentedControl,",
         "  TableRegion,",
         "  Tabs,",
+        "  Toolbar,",
         "  createDialogSurfaceController,",
         "  moleculeManifest,",
         "  moleculeStyles,",
@@ -1082,6 +1086,8 @@
         "  type ControlFieldProps,",
         "  type ControlFieldRelationships,",
         "  type ControlFieldRenderer,",
+        "  type ContextMenuProps,",
+        "  type DropdownMenuProps,",
         "  type DialogSurfaceAccessibleName,",
         "  type DialogSurfaceAttributes,",
         "  type DialogSurfaceController,",
@@ -1114,6 +1120,16 @@
         "  type SearchResultsHeadingLevel,",
         "  type SearchResultsProps,",
         "  type SearchResultsState,",
+        "  type MenuActionItem,",
+        "  type MenuAttributes,",
+        "  type MenuCheckboxItem,",
+        "  type MenuCheckedChange,",
+        "  type MenuItem,",
+        "  type MenuItemKind,",
+        "  type MenuProps,",
+        "  type MenuRadioItem,",
+        "  type MenuSeparatorItem,",
+        "  type MenubarProps,",
         "  type SegmentedControlAccessibleName,",
         "  type SegmentedControlAttributes,",
         "  type SegmentedControlChangeEvent,",
@@ -1131,6 +1147,11 @@
         "  type TabsItem,",
         "  type TabsOrientation,",
         "  type TabsProps,",
+        "  type ToolbarButtonItem,",
+        "  type ToolbarItem,",
+        "  type ToolbarLinkItem,",
+        "  type ToolbarProps,",
+        "  type ToolbarSeparatorItem,",
         "} from '@gluonjs/molecules';",
         "",
         "const email = { label: 'Email', name: 'email', type: 'email', helper: 'Order updates go here.' } satisfies FormFieldProps;",
@@ -1200,6 +1221,23 @@
         "const searchHeadingLevel: SearchResultsHeadingLevel = 2;",
         "const searchState: SearchResultsState = 'ready';",
         "const searchResults = { id: 'catalog-results', heading: 'Results', headingLevel: searchHeadingLevel, state: searchState, groups: [searchGroup], attributes: searchResultsAttributes } satisfies SearchResultsProps;",
+        "const menuAttributes = { class: 'order-menu' } satisfies MenuAttributes;",
+        "const actionItem = { id: 'view', label: 'View order', href: '/orders/GL-1042' } satisfies MenuActionItem;",
+        "const checkboxItem = { id: 'compact', kind: 'checkbox', label: 'Compact rows', checked: false } satisfies MenuCheckboxItem;",
+        "const radioItem = { id: 'comfortable', kind: 'radio', group: 'density', label: 'Comfortable', checked: true } satisfies MenuRadioItem;",
+        "const separatorItem = { id: 'view-separator', kind: 'separator' } satisfies MenuSeparatorItem;",
+        "const menuKind: MenuItemKind = 'checkbox';",
+        "const menuItems = [actionItem, checkboxItem, radioItem, separatorItem] satisfies readonly MenuItem[];",
+        "const checkedChange: MenuCheckedChange = { id: checkboxItem.id, kind: 'checkbox', checked: true };",
+        "const dropdown = { id: 'order-menu', label: 'Order actions', trigger: 'Actions', open: false, onOpenChange: () => {}, attributes: menuAttributes, items: menuItems, onCheckedChange: (change: MenuCheckedChange) => console.log(change.checked) } satisfies DropdownMenuProps;",
+        "const retainedMenuProps: MenuProps = dropdown;",
+        "const contextMenu = { id: 'order-context', label: 'Order actions', children: 'Order GL-1042', open: false, onOpenChange: () => {}, items: menuItems } satisfies ContextMenuProps;",
+        "const menubar = { id: 'order-menubar', label: 'Order menu', items: menuItems } satisfies MenubarProps;",
+        "const toolbarButton = { id: 'save', label: 'Save' } satisfies ToolbarButtonItem;",
+        "const toolbarLink = { id: 'help', kind: 'link', label: 'Help', href: '/help' } satisfies ToolbarLinkItem;",
+        "const toolbarSeparator = { id: 'actions-separator', kind: 'separator' } satisfies ToolbarSeparatorItem;",
+        "const toolbarItems = [toolbarButton, toolbarLink, toolbarSeparator] satisfies readonly ToolbarItem[];",
+        "const toolbar = { id: 'order-toolbar', label: 'Order tools', items: toolbarItems } satisfies ToolbarProps;",
         "const segmentName = { label: 'Order view' } satisfies SegmentedControlAccessibleName;",
         "const segmentAttributes = { class: 'order-view' } satisfies SegmentedControlAttributes;",
         "const segmentOptions = [{ value: 'summary', label: 'Summary' }, { value: 'details', label: 'Details' }] satisfies readonly SegmentedControlOption[];",
@@ -1213,7 +1251,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${SearchField(searchField)}${SearchResults(searchResults)}${Card(order)}${ButtonGroup(orderActions)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${SearchField(searchField)}${SearchResults(searchResults)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -3235,6 +3273,24 @@
     }
   },
   "overrides": {
+    "packages/molecules/src/variables/Toolbar.md": {
+      "description": "Render a named toolbar from the public molecule entry point while keeping native actions and routing caller-owned:",
+      "code": [
+        "import { Toolbar, type ToolbarProps } from '@gluonjs/molecules';",
+        "",
+        "const toolbar = { id: 'order-tools', label: 'Order tools', items: [{ id: 'save', label: 'Save' }, { id: 'help', kind: 'link', label: 'Help', href: '/help' }] } satisfies ToolbarProps;",
+        "const view = Toolbar(toolbar);",
+        "console.log(view);"
+      ]
+    },
+    "packages/molecules/src/variables/toolbarStyles.md": {
+      "description": "Consume the exact toolbar stylesheet as a separately tree-shakable public style carrier:",
+      "code": [
+        "import { toolbarStyles } from '@gluonjs/molecules';",
+        "",
+        "console.log(toolbarStyles);"
+      ]
+    },
     "packages/json-forms/src/classes/JsonSchemaResolutionError.md": {
       "recipe": "json-forms-contract",
       "description": "Handle a bounded local-reference failure through its stable public diagnostic keyword:"
@@ -5307,6 +5363,23 @@
       "recipe": "molecule-components",
       "description": "Compose controlled tab selection, stable items, activation, orientation, and change handling:"
     },
+    "packages/molecules/src/interfaces/ContextMenuProps.md": { "recipe": "molecule-components", "description": "Configure a controlled pointer and keyboard context menu around native target content:" },
+    "packages/molecules/src/interfaces/DropdownMenuProps.md": { "recipe": "molecule-components", "description": "Configure a controlled menu button with a collision-safe instance ID and bounded items:" },
+    "packages/molecules/src/interfaces/MenuActionItem.md": { "recipe": "molecule-components", "description": "Describe one native menu button or link while keeping its effect caller-owned:" },
+    "packages/molecules/src/interfaces/MenuCheckboxItem.md": { "recipe": "molecule-components", "description": "Describe one controlled menuitemcheckbox value:" },
+    "packages/molecules/src/interfaces/MenuCheckedChange.md": { "recipe": "molecule-components", "description": "Handle the exact next checkbox or radio state requested by menu activation:" },
+    "packages/molecules/src/interfaces/MenuRadioItem.md": { "recipe": "molecule-components", "description": "Describe one controlled menuitemradio with an explicit group key:" },
+    "packages/molecules/src/interfaces/MenuSeparatorItem.md": { "recipe": "molecule-components", "description": "Insert a non-focusable semantic menu separator:" },
+    "packages/molecules/src/interfaces/MenubarProps.md": { "recipe": "molecule-components", "description": "Configure an APG menubar with caller-owned items and submenu state:" },
+    "packages/molecules/src/interfaces/ToolbarButtonItem.md": { "recipe": "molecule-components", "description": "Describe one native toolbar button and its caller-owned activation:" },
+    "packages/molecules/src/interfaces/ToolbarLinkItem.md": { "recipe": "molecule-components", "description": "Describe one native toolbar link without transferring routing ownership:" },
+    "packages/molecules/src/interfaces/ToolbarProps.md": { "recipe": "molecule-components", "description": "Configure a named horizontal or vertical toolbar with bounded native items:" },
+    "packages/molecules/src/interfaces/ToolbarSeparatorItem.md": { "recipe": "molecule-components", "description": "Insert a non-focusable semantic toolbar separator:" },
+    "packages/molecules/src/type-aliases/MenuAttributes.md": { "recipe": "molecule-components", "description": "Forward compatible native root attributes without replacing owned menu semantics:" },
+    "packages/molecules/src/type-aliases/MenuItem.md": { "recipe": "molecule-components", "description": "Choose the bounded action, checkbox, radio, or separator menu item contract:" },
+    "packages/molecules/src/type-aliases/MenuItemKind.md": { "recipe": "molecule-components", "description": "Inspect the supported bounded menu item discriminants:" },
+    "packages/molecules/src/type-aliases/MenuProps.md": { "recipe": "molecule-components", "description": "Use the retained DropdownMenu property alias:" },
+    "packages/molecules/src/type-aliases/ToolbarItem.md": { "recipe": "molecule-components", "description": "Choose a native button, native link, or separator toolbar item:" },
     "packages/molecules/src/variables/Accordion.md": {
       "recipe": "molecule-components",
       "description": "Render a labelled controlled Accordion over native Disclosure items while preserving summary activation and Tab order:"
@@ -5363,6 +5436,10 @@
       "recipe": "molecule-components",
       "description": "Keep overflowing navigation destinations discoverable through native controls and automatically reveal the exact current destination:"
     },
+    "packages/molecules/src/variables/ContextMenu.md": { "recipe": "molecule-components", "description": "Render a controlled context menu without adding a synthetic dropdown trigger:" },
+    "packages/molecules/src/variables/DropdownMenu.md": { "recipe": "molecule-components", "description": "Render a controlled keyboard-complete menu button and popup:" },
+    "packages/molecules/src/variables/Menubar.md": { "recipe": "molecule-components", "description": "Render direct APG menubar semantics and controlled nested menus:" },
+    "packages/molecules/src/variables/Toolbar.md": { "recipe": "molecule-components", "description": "Render caller-described native toolbar buttons and links with roving focus:" },
     "packages/molecules/src/variables/SegmentedControl.md": {
       "recipe": "molecule-components",
       "description": "Render a controlled one-of-many toolbar of pressed buttons without tab or radio semantics:"
@@ -5390,6 +5467,10 @@
     "packages/molecules/src/variables/navigationStripStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable NavigationStrip layout and overflow-control stylesheet:"
+    },
+    "packages/molecules/src/variables/menuToolbarStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable menu, menubar, context-menu, and toolbar stylesheet:"
     },
     "packages/molecules/src/variables/tableRegionStyles.md": {
       "recipe": "ui-exact-component-styles",
