@@ -93,6 +93,7 @@ try {
   if (!response || response.error || response.result?.serverInfo?.name !== '@gluonjs/language-server'
     || response.result?.serverInfo?.version !== version || typeof response.result?.capabilities !== 'object'
     || !responses.some((candidate) => candidate.method === 'textDocument/publishDiagnostics')
+    || typeof resultFor(2)?.result?.contents !== 'string'
     || !Array.isArray(resultFor(3)?.result) || resultFor(4)?.result === null
     || !Array.isArray(resultFor(4)?.result) || !resultFor(5)?.result?.changes
     || !Array.isArray(resultFor(6)?.result?.data) || !Array.isArray(resultFor(7)?.result)
