@@ -82,6 +82,7 @@ const jsonFormsStyles = css`
   :host { display: block; min-inline-size: 0; color: var(--gluon-json-form-ink, #101820); font: inherit; }
   *, *::before, *::after { box-sizing: border-box; }
   .form, .fields, .field, .group, .array-items, .array-item, .array-actions { min-inline-size: 0; }
+  .form, .fields, .field, fieldset, .array-items, .array-item { grid-template-columns: minmax(0, 1fr); }
   .form { display: grid; gap: 20px; }
   .heading { display: grid; gap: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--gluon-json-form-rule, #c9d2d8); }
   h2, p { margin: 0; }
@@ -101,6 +102,8 @@ const jsonFormsStyles = css`
   .required { color: var(--gluon-json-form-accent, #496900); }
   input, select {
     contain: inline-size;
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-block-size: 44px;
     min-inline-size: 0;
     inline-size: 100%;
@@ -112,9 +115,12 @@ const jsonFormsStyles = css`
     padding: 9px 11px;
     font: inherit;
   }
+  .select-control { display: grid; min-inline-size: 0; inline-size: 100%; max-inline-size: 100%; overflow: hidden; }
+  select { white-space: nowrap; }
   input[type="checkbox"] { min-block-size: 20px; inline-size: 20px; padding: 0; accent-color: var(--gluon-json-form-accent, #496900); }
   .checkbox-label { display: flex; align-items: center; gap: 10px; min-block-size: 44px; font-weight: 650; }
-  input:focus-visible, select:focus-visible { outline: 3px solid var(--gluon-json-form-focus, #005fcc); outline-offset: 2px; }
+  input:focus-visible { outline: 3px solid var(--gluon-json-form-focus, #005fcc); outline-offset: 2px; }
+  select:focus-visible { outline: 3px solid var(--gluon-json-form-focus, #005fcc); outline-offset: -4px; }
   input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--gluon-json-form-error, #b42318); }
   input:disabled, select:disabled { cursor: not-allowed; opacity: 0.62; }
   h2, p, legend, label, .error { overflow-wrap: anywhere; }
@@ -417,23 +423,25 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     const messages = this.resolveMessages();
     const selectedIndex = field.options.findIndex((option) => Object.is(option.value, getJsonPath(this.currentData, field.path)));
     return html`
-      <select
-        id=${id}
-        .value=${selectedIndex >= 0 ? String(selectedIndex) : ''}
-        ?required=${field.required}
-        ?disabled=${disabled}
-        aria-describedby=${describedBy}
-        aria-invalid=${invalid ? 'true' : 'false'}
-        aria-errormessage=${invalid ? errorId : undefined}
-        @change=${(event: Event) => {
-          const index = Number((event.currentTarget as HTMLSelectElement).value);
-          const option = field.options[index];
-          this.commitPath(field.path, option?.value);
-        }}
-      >
-        <option value="" ?selected=${selectedIndex < 0}>${messages.selectPlaceholder(field.required)}</option>
-        ${field.options.map((option, index) => html`<option value=${String(index)}>${option.label}</option>`)}
-      </select>
+      <div class="select-control">
+        <select
+          id=${id}
+          .value=${selectedIndex >= 0 ? String(selectedIndex) : ''}
+          ?required=${field.required}
+          ?disabled=${disabled}
+          aria-describedby=${describedBy}
+          aria-invalid=${invalid ? 'true' : 'false'}
+          aria-errormessage=${invalid ? errorId : undefined}
+          @change=${(event: Event) => {
+            const index = Number((event.currentTarget as HTMLSelectElement).value);
+            const option = field.options[index];
+            this.commitPath(field.path, option?.value);
+          }}
+        >
+          <option value="" ?selected=${selectedIndex < 0}>${messages.selectPlaceholder(field.required)}</option>
+          ${field.options.map((option, index) => html`<option value=${String(index)}>${option.label}</option>`)}
+        </select>
+      </div>
     `;
   }
 

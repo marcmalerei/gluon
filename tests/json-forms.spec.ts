@@ -328,6 +328,8 @@ describe('JSON Forms component', () => {
     expect((element.shadowRoot!.querySelector('#field-method') as HTMLSelectElement)
       .querySelector('option[value=""]')?.textContent).toBe('Bitte einen Eintrag auswählen, um fortzufahren');
     expect(element.shadowRoot!.querySelector('label[for="field-variants-0"]')?.textContent).toContain('Benachrichtigungskanal 1');
+    expect(element.shadowRoot!.querySelector<HTMLElement>('.select-control')!.clientWidth)
+      .toBeLessThanOrEqual(element.clientWidth + 1);
     expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth + 1);
 
     const invalid = createForm({ type: 'string' } as JsonSchema);
