@@ -33,7 +33,12 @@ function enabledItems(container: HTMLElement): HTMLElement[] {
 
 export function setRoving(container: HTMLElement, target?: HTMLElement): HTMLElement | undefined {
   const items = enabledItems(container);
-  const selected = target && items.includes(target) ? target : items.find((item) => item.tabIndex === 0) ?? items[0];
+  const active = container.ownerDocument.activeElement;
+  const selected = target && items.includes(target)
+    ? target
+    : active instanceof HTMLElement && items.includes(active)
+      ? active
+      : items.find((item) => item.tabIndex === 0) ?? items[0];
   for (const item of items) item.tabIndex = item === selected ? 0 : -1;
   return selected;
 }
@@ -85,8 +90,9 @@ export function callListener<EventType extends Event>(listener: ((event: EventTy
   else listener?.handleEvent(event);
 }
 
-export function connectDismissal(root: HTMLElement, open: boolean, close: (event: Event) => void): void {
+export function connectDismissal(root: HTMLElement, open: boolean, close: (event: PointerEvent) => void): void {
   connectedRoots.get(root)?.abort();
+  connectedRoots.delete(root);
   if (!open) return;
   const controller = new AbortController();
   connectedRoots.set(root, controller);

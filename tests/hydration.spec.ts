@@ -22,7 +22,7 @@ import {
   unmount,
 } from '@gluonjs/core';
 import { Button, Checkbox, Input, Progress, Radio, Select, Slider, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, DropdownMenu, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, DropdownMenu, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import { createComponentLibraryLoader, HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -375,7 +375,8 @@ describe('SSR hydration', () => {
     expect(hydrated.hydration.retained).toBe(true);
     expect(root.querySelector('#product-title')).toBe(heading);
     expect(hydrated.router.currentRoute.value.fullPath).toBe('/products/orbit-lamp');
-    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).toContain(toolbarStyles);
+    expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).toContain(shopStyles);
 
@@ -390,6 +391,7 @@ describe('SSR hydration', () => {
 
     await fixture.cleanup();
     expect(hydrated.uiOwner.disposed).toBe(true);
+    expect(document.adoptedStyleSheets).not.toContain(toolbarStyles);
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopStyles);

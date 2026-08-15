@@ -1,5 +1,5 @@
 import { defineMolecule, type TemplateResult, type TemplateValue } from '@gluonjs/core';
-import { q, type QuarkProps } from '@gluonjs/quarks';
+import { q, type QuarkProps, type QuarkRef } from '@gluonjs/quarks';
 import { toolbarStyleDependency } from './toolbar-styles.js';
 
 type Orientation = 'horizontal' | 'vertical';
@@ -18,6 +18,18 @@ function callListener<EventType extends Event>(listener: ((event: EventType) => 
   else listener?.handleEvent(event);
 }
 const controls = (root: HTMLElement): HTMLElement[] => [...root.querySelectorAll<HTMLElement>(':scope > [data-gluon-toolbar-item]')].filter((item) => !item.matches(':disabled,[aria-disabled="true"]'));
+function assignRef(ref: QuarkRef<HTMLDivElement> | undefined, element: HTMLDivElement | undefined): void {
+  if (typeof ref === 'function') ref(element);
+  else if (ref) ref.value = element;
+}
+function synchronizeRoving(root: HTMLElement): void {
+  const items = controls(root);
+  const active = root.ownerDocument.activeElement;
+  const selected = active instanceof HTMLElement && items.includes(active)
+    ? active
+    : items.find((item) => item.tabIndex === 0) ?? items[0];
+  for (const item of items) item.tabIndex = item === selected ? 0 : -1;
+}
 function focusControl(root: HTMLElement, current: HTMLElement, destination: 'first' | 'last' | -1 | 1): void {
   const items = controls(root);
   const index = items.indexOf(current);
@@ -29,9 +41,10 @@ function focusControl(root: HTMLElement, current: HTMLElement, destination: 'fir
 function renderToolbar(props: ToolbarProps): TemplateResult {
   const orientation = props.orientation ?? 'horizontal';
   const firstEnabled = props.items.find((item) => item.kind !== 'separator' && !item.disabled);
-  const { onFocusIn: attributeFocusIn, onKeydown: attributeKeydown, ...attributes } = props.attributes ?? {};
+  const { ref: attributeRef, onFocusIn: attributeFocusIn, onKeydown: attributeKeydown, ...attributes } = props.attributes ?? {};
   return q.div({
     ...attributes, id: props.id, role: 'toolbar', class: [{ gluon: true, molecule: true, 'gluon-toolbar': true, [`is-${orientation}`]: true }, props.attributes?.class], part: 'toolbar', data: { ...props.attributes?.data, orientation }, aria: { ...props.attributes?.aria, label: props.label, orientation },
+    ref: (element) => { assignRef(attributeRef, element); if (element) queueMicrotask(() => synchronizeRoving(element)); },
     onFocusIn: (event) => { callListener(attributeFocusIn, event); if (event.defaultPrevented) return; const root = event.currentTarget as HTMLElement; const item = (event.target as Element).closest<HTMLElement>('[data-gluon-toolbar-item]'); if (item && !item.matches(':disabled,[aria-disabled="true"]')) { for (const control of controls(root)) control.tabIndex = control === item ? 0 : -1; } },
     onKeydown: (event) => {
       callListener(attributeKeydown, event);

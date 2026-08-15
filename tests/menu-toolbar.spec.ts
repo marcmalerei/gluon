@@ -298,4 +298,56 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
     const results = await axe.run(document, { resultTypes: ['violations'], runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'] } });
     expect(results.violations).toEqual([]);
   });
+
+  it('preserves the active roving item across controlled rerenders and aborts dismissal on teardown', async () => {
+    const menuHost = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.append(menuHost, outside);
+    const onOpenChange = vi.fn();
+    render(DropdownMenu({
+      id: 'teardown-menu',
+      label: 'Actions',
+      trigger: 'Actions',
+      open: true,
+      onOpenChange,
+      items: [{ id: 'open', label: 'Open' }],
+    }), menuHost);
+    render(q.div({ children: 'removed' }), menuHost);
+    outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    const toolbarHost = document.createElement('div');
+    document.body.append(toolbarHost);
+    const toolbarView = () => Toolbar({
+      id: 'rerender-toolbar',
+      label: 'Actions',
+      items: [
+        { id: 'first', label: 'First' },
+        { id: 'current', label: 'Current' },
+      ],
+    });
+    render(toolbarView(), toolbarHost);
+    const current = toolbarHost.querySelector<HTMLElement>('[data-value="current"]')!;
+    current.focus();
+    render(toolbarView(), toolbarHost);
+    await settle();
+    expect(document.activeElement).toBe(current);
+    expect(current.tabIndex).toBe(0);
+    expect(toolbarHost.querySelectorAll('[data-gluon-toolbar-item][tabindex="0"]')).toHaveLength(1);
+
+    const menubarHost = document.createElement('div');
+    document.body.append(menubarHost);
+    const menubarView = () => Menubar({
+      id: 'rerender-menubar',
+      label: 'Navigation',
+      items: [{ id: 'first', label: 'First' }, { id: 'current', label: 'Current' }],
+    });
+    render(menubarView(), menubarHost);
+    const currentMenuItem = menubarHost.querySelector<HTMLElement>('[data-value="current"]')!;
+    currentMenuItem.focus();
+    render(menubarView(), menubarHost);
+    await settle();
+    expect(document.activeElement).toBe(currentMenuItem);
+    expect(currentMenuItem.tabIndex).toBe(0);
+  });
 });

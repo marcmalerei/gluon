@@ -163,7 +163,7 @@ function renderMenuItems(options: RenderMenuOptions, path: readonly string[]): T
         if (item.kind === 'checkbox') options.onCheckedChange?.({ id: item.id, kind: 'checkbox', checked: !item.checked }, event);
         else if (item.kind === 'radio') options.onCheckedChange?.({ id: item.id, kind: 'radio', group: item.group, checked: true }, event);
         else item.onSelect?.(event);
-        if (!((item.kind === undefined || item.kind === 'item') && item.href)) options.closeRoot?.(event);
+        options.closeRoot?.(event);
       },
     };
     const control = (item.kind === undefined || item.kind === 'item') && item.href
@@ -233,7 +233,12 @@ function renderDropdownMenu(props: DropdownMenuProps): TemplateResult {
     class: [{ gluon: true, molecule: true, 'gluon-menu': true, 'gluon-dropdown-menu': true }, props.attributes?.class],
     part: 'root',
     data: { ...props.attributes?.data, state: props.open ? 'open' : 'closed' },
-    ref: (element) => { root = element; assignRef(attributeRef, element); if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event)); },
+    ref: (element) => {
+      if (!element && root) connectDismissal(root, false, (event) => props.onOpenChange(false, event));
+      root = element;
+      assignRef(attributeRef, element);
+      if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event));
+    },
     children: [
       q.button({
         ...triggerAttributes,
@@ -297,7 +302,12 @@ function renderContextMenu(props: ContextMenuProps): TemplateResult {
     class: [{ gluon: true, molecule: true, 'gluon-context-menu': true }, props.attributes?.class],
     part: 'root',
     data: { ...props.attributes?.data, state: props.open ? 'open' : 'closed' },
-    ref: (element) => { root = element; assignRef(attributeRef, element); if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event)); },
+    ref: (element) => {
+      if (!element && root) connectDismissal(root, false, (event) => props.onOpenChange(false, event));
+      root = element;
+      assignRef(attributeRef, element);
+      if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event));
+    },
     children: [
       q.div({
         ...targetAttributes,
@@ -362,7 +372,19 @@ function renderMenubar(props: MenubarProps): TemplateResult {
     part: 'menubar',
     data: { ...props.attributes?.data, orientation },
     aria: { ...props.attributes?.aria, label: props.label, orientation },
-    ref: (element) => { root = element; assignRef(attributeRef, element); if (element) queueMicrotask(() => setRoving(element)); },
+    ref: (element) => {
+      if (!element && root) connectDismissal(root, false, closeSubmenus);
+      root = element;
+      assignRef(attributeRef, element);
+      if (element) {
+        queueMicrotask(() => setRoving(element));
+        connectDismissal(
+          element,
+          props.items.some((item) => item.kind !== 'separator' && Boolean(item.expanded && item.submenu?.length)),
+          closeSubmenus,
+        );
+      }
+    },
     onFocusIn: (event) => { callListener(attributeFocusIn, event); if (event.defaultPrevented) return; const item = (event.target as Element).closest<HTMLElement>(menuItemSelector); if (root && item?.closest('[role="menubar"]') === root && !isDisabled(item)) setRoving(root, item); },
     onKeydown: (event) => {
       callListener(attributeKeydown, event);
