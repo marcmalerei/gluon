@@ -20,7 +20,7 @@
         "gluon.languageServerPath": {
           "type": "string",
           "default": "",
-          "description": "Optional path to the lockstep gluon-language-server executable. Empty uses gluon-language-server from PATH."
+          "description": "Optional path to a lockstep gluon-language-server executable. Empty uses the same-version runtime bundled with this extension."
         },
         "gluon.languageServerArgs": {
           "type": "array",
@@ -32,5 +32,5 @@
     }
   },
   "dependencies": { "vscode-languageclient": "^9.0.1" },
-  "devDependencies": { "@vscode/vsce": "^3.9.2" }
+  "devDependencies": { "@vscode/vsce": "^3.9.2", "yauzl": "3.4.0" }
 }

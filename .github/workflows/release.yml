@@ -57,6 +57,8 @@ jobs:
       - run: npm run check:repository
       - run: npm run release:validate -- --candidate "$RELEASE_VERSION"
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION"
+      - run: npm run release:vscode -- --version "$RELEASE_VERSION" --tag "$RELEASE_TAG"
+      - run: npm run check:release-vscode -- --version "$RELEASE_VERSION" --tag "$RELEASE_TAG"
       - name: Retain release candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -78,6 +80,7 @@ jobs:
     env:
       GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
       GLUON_RELEASE_ENVIRONMENT: npm
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -130,11 +133,14 @@ jobs:
             .tmp/release/compatibility-manifest.json
             .tmp/release/reproducibility.json
             .tmp/release/performance/*
+            .tmp/release/vscode/*.vsix
+            .tmp/release/vscode/VSIX-SHA256SUMS
+            .tmp/release/vscode/vscode-release-manifest.json
       - name: Create immutable-release draft
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          assets=(.tmp/release/packages/*.tgz .tmp/release/sbom/*.json .tmp/release/performance/* .tmp/release/release-evidence.json .tmp/release/release-cut-evidence.json .tmp/release/compatibility-manifest.json .tmp/release/reproducibility.json .tmp/release/SHA256SUMS .tmp/release/CHANGELOG.md .tmp/release/RELEASE_NOTES.md)
+          assets=(.tmp/release/packages/*.tgz .tmp/release/sbom/*.json .tmp/release/performance/* .tmp/release/release-evidence.json .tmp/release/release-cut-evidence.json .tmp/release/compatibility-manifest.json .tmp/release/reproducibility.json .tmp/release/SHA256SUMS .tmp/release/CHANGELOG.md .tmp/release/RELEASE_NOTES.md .tmp/release/vscode/*.vsix .tmp/release/vscode/VSIX-SHA256SUMS .tmp/release/vscode/vscode-release-manifest.json)
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
           else
@@ -142,6 +148,14 @@ jobs:
           fi
       - name: Publish reviewed archives directly to latest through trusted publishing
         run: npm run release:publish -- --version "$RELEASE_VERSION"
+      - name: Prepare VS Code Marketplace publisher when credentials are configured
+        if: ${{ env.VSCE_PAT != '' }}
+        working-directory: editors/vscode
+        run: npm ci --ignore-scripts
+      - name: Publish VS Code extension when publisher credentials are configured
+        if: ${{ env.VSCE_PAT != '' }}
+        working-directory: editors/vscode
+        run: npx --no-install vsce publish --packagePath ../../.tmp/release/vscode/gluon-vscode-${{ env.RELEASE_VERSION }}.vsix
       - name: Verify latest registry train from a clean directory
         run: npm run release:verify-registry -- --version "$RELEASE_VERSION" --directory .tmp/release --output .tmp/release/registry-verification.json
       - run: npm run release:finalize-assets

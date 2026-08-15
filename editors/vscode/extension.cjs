@@ -6,12 +6,14 @@ let client;
 async function activate(context) {
   const configuration = vscode.workspace.getConfiguration('gluon');
   const configuredPath = configuration.get('languageServerPath', '');
-  const command = configuredPath.trim() || 'gluon-language-server';
+  const bundledServer = require('node:path').join(__dirname, 'server', 'dist', 'server-cli.js');
   const configuredArgs = configuration.get('languageServerArgs', ['--stdio']);
   const args = Array.isArray(configuredArgs) && configuredArgs.every((value) => typeof value === 'string')
     ? configuredArgs
     : ['--stdio'];
-  const serverOptions = { command, args, transport: TransportKind.stdio };
+  const serverOptions = configuredPath.trim()
+    ? { command: configuredPath.trim(), args, transport: TransportKind.stdio }
+    : { module: bundledServer, args, transport: TransportKind.stdio };
   const clientOptions = {
     documentSelector: [
       { scheme: 'file', language: 'typescript' },

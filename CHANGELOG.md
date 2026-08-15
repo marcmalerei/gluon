@@ -12,6 +12,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.
+- Bundled the lockstep Gluon language-server runtime in the VS Code extension,
+  with self-contained VSIX smoke validation, integrity evidence, GitHub release
+  assets, and credential-guarded Marketplace publication.
 
 ### Changed
 
