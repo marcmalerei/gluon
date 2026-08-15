@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:17"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 8
+    groups:
+      direct-npm-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      direct-npm-major:
+        patterns:
+          - "*"
+        update-types:
+          - major
+    allow:
+      - dependency-type: direct
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:17"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 4
+    groups:
+      github-actions-updates:
+        patterns:
+          - "actions/*"
+          - "github/*"

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "defaultAction": { "enum": ["report"] },
+    "severityPolicy": {
+      "type": "object",
+      "required": ["critical", "high", "moderate", "low", "info"],
+      "properties": {
+        "critical": { "$ref": "#/$defs/severityMatrix" },
+        "high": { "$ref": "#/$defs/severityMatrix" },
+        "moderate": { "$ref": "#/$defs/severityMatrix" },
+        "low": { "$ref": "#/$defs/severityMatrix" },
+        "info": { "$ref": "#/$defs/severityMatrix" }
+      },
+      "additionalProperties": false
+    },
+    "scopePolicy": {
+      "type": "object",
+      "required": ["production", "development"],
+      "properties": {
+        "production": { "enum": ["release-blocking", "advisory"] },
+        "development": { "enum": ["release-blocking", "advisory"] }
+      },
+      "additionalProperties": false
+    },
+    "exceptionFields": {
+      "type": "array",
+      "items": { "enum": ["owner", "reason", "expiry", "advisory", "package"] },
+      "minItems": 5,
+      "uniqueItems": true
+    }
+  },
+  "required": ["schemaVersion", "defaultAction", "severityPolicy", "scopePolicy", "exceptionFields"],
+  "additionalProperties": false,
+  "$defs": {
+    "severityMatrix": {
+      "type": "object",
+      "required": ["production", "development"],
+      "properties": {
+        "production": { "enum": ["block", "report"] },
+        "development": { "enum": ["block", "report"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

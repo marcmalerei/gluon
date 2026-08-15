@@ -1,0 +1,38 @@
+{
+  "$schema": "../schemas/dependency-security-policy.schema.json",
+  "schemaVersion": 1,
+  "defaultAction": "report",
+  "severityPolicy": {
+    "critical": {
+      "production": "block",
+      "development": "block"
+    },
+    "high": {
+      "production": "block",
+      "development": "report"
+    },
+    "moderate": {
+      "production": "block",
+      "development": "report"
+    },
+    "low": {
+      "production": "report",
+      "development": "report"
+    },
+    "info": {
+      "production": "report",
+      "development": "report"
+    }
+  },
+  "scopePolicy": {
+    "production": "release-blocking",
+    "development": "advisory"
+  },
+  "exceptionFields": [
+    "owner",
+    "reason",
+    "expiry",
+    "advisory",
+    "package"
+  ]
+}

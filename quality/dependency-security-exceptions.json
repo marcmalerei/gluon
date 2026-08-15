@@ -1,0 +1,5 @@
+{
+  "$schema": "../schemas/dependency-security-exceptions.schema.json",
+  "schemaVersion": 1,
+  "exceptions": []
+}
