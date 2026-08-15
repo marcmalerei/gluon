@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added regional and ordered locale fallback chains, ICU-style plural/select
+  interpolation, `Intl` number/date helpers, namespace loading status, and
+  JSON-safe `snapshot()`/`hydrate()` state transfer for SSR.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed
