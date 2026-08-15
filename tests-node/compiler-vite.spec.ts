@@ -447,6 +447,32 @@ describe('@gluonjs/vite real server contract', () => {
       page.on('pageerror', (error) => errors.push(error.message));
       await page.goto(server.resolvedUrls!.local[0]!);
       const result = await page.evaluate(async () => {
+        const labels = [...document.querySelectorAll('compiled-label')] as Array<HTMLElement & {
+          label: string;
+          updateComplete: Promise<void>;
+          shadowRoot: ShadowRoot;
+        }>;
+        const label = labels[0]!;
+        const secondLabel = labels[1]!;
+        const labelPrototype = Object.getPrototypeOf(label) as { render: () => unknown };
+        const labelRender = labelPrototype.render;
+        labelPrototype.render = () => { throw new Error('compiled label update rerendered'); };
+        secondLabel.label = 'Second B';
+        label.label = 'B';
+        await Promise.all([label.updateComplete, secondLabel.updateComplete]);
+        const compiledText = [label.shadowRoot.textContent, secondLabel.shadowRoot.textContent];
+
+        labelPrototype.render = labelRender;
+        label.shadowRoot.replaceChildren(document.createElement('i'));
+        label.label = 'C';
+        await label.updateComplete;
+        secondLabel.label = 'Disconnected';
+        const disconnectedUpdate = secondLabel.updateComplete;
+        secondLabel.remove();
+        await disconnectedUpdate;
+        document.querySelector('#app')!.append(secondLabel);
+        await secondLabel.updateComplete;
+
         const count = document.querySelector('compiled-count') as HTMLElement & {
           count: number;
           updateComplete: Promise<void>;
@@ -467,12 +493,18 @@ describe('@gluonjs/vite real server contract', () => {
         count.count = 3;
         await count.updateComplete;
         return {
+          compiledText,
+          recoveredText: label.shadowRoot.textContent,
+          reconnectedText: secondLabel.shadowRoot.textContent,
           countText,
           countRecoveredText: count.shadowRoot.textContent,
           countNodeRetained,
         };
       });
       expect(result).toEqual({
+        compiledText: ['B', 'Second B'],
+        recoveredText: 'C',
+        reconnectedText: 'Disconnected',
         countText: 'Count: 2',
         countRecoveredText: 'Count: 3',
         countNodeRetained: true,
