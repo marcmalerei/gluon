@@ -33,6 +33,7 @@ import {
   ContextMenu,
   DropdownMenu,
   Menubar,
+  OneTimePasswordField,
   SegmentedControl,
   TableRegion,
   Tabs,
@@ -158,6 +159,15 @@ and form listener functions or `{ handleEvent }` objects compose before the
 controlled callbacks, and `preventDefault()` suppresses the controlled
 callback where applicable. Submitter `aria-label` values remain caller-owned
 and the accessible name does not change during loading.
+`OneTimePasswordField` is a request-free controlled one-time-code composition.
+It renders bounded numeric or alphanumeric segments for keyboard and paste
+editing, while only its optional visually-hidden native value input has a
+`name`, so `FormData` receives exactly one value. `autocomplete="one-time-code"`
+and mode-specific `inputmode` are applied to the editors and native value.
+Pass a stable unique `id`; derived helper/error IDs are deterministic. The
+caller owns validation, submission, authentication, transport, and code
+verification. GLUON GOODS has no honest authentication or one-time-code
+journey, so it remains package-only and is recorded in `examples/shop/FEATURES.md`.
 `NavigationStrip` renders a named native `nav`, keeps destinations in source
 and Tab order, and shows 44px previous/next controls only when its viewport
 overflows. Resize and content changes update the available directions, while
@@ -265,6 +275,8 @@ layouts that need horizontal overflow at constrained widths.
 `SearchField` exposes gap, label weight, control gap/size, submit size, color,
 and focus outline custom properties. `SearchResults` exposes group/list gaps,
 heading weight, colors, state sizing, padding, border, and radius properties.
+`OneTimePasswordField` exposes gap, control size, border, radius, color,
+focus-outline, helper/error color, background, and text color custom properties.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends

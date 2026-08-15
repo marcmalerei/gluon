@@ -61,7 +61,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ConfirmationDialog, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -81,6 +81,18 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-expanded="false"');
     expect(rendered).toContain('aria-haspopup="dialog"');
     expect(rendered).toContain('role="dialog"');
+  });
+
+  it('serializes deterministic OTP fields with one native form value per instance', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString([
+      OneTimePasswordField({ id: 'ssr-otp-a', label: 'Code A', value: '12', name: 'code-a' }),
+      OneTimePasswordField({ id: 'ssr-otp-b', label: 'Code B', value: 'AB', mode: 'alphanumeric', name: 'code-b' }),
+    ]));
+    expect(rendered).toContain('id="ssr-otp-a"');
+    expect(rendered).toContain('id="ssr-otp-b"');
+    expect((rendered.match(/name="code-a"/g) ?? []).length).toBe(1);
+    expect((rendered.match(/name="code-b"/g) ?? []).length).toBe(1);
+    expect(rendered.indexOf('ssr-otp-a-helper')).toBe(-1);
   });
   it('serializes foundation Atom native semantics and caller-owned states', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(html`
