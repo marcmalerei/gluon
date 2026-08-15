@@ -55,6 +55,7 @@ export const Toast = defineMolecule(({
   return q.div({
     ...native,
     id,
+    aria,
     class: [
       { gluon: true, molecule: true, 'gluon-toast': true, [`is-${tone}`]: true },
       attributes.class,
@@ -315,7 +316,9 @@ export const ToastViewport = defineMolecule(({
         onFocusIn: () => controller.pause(item.id, 'focus'),
         onFocusOut: (event) => {
           const next = event.relatedTarget;
-          if (next instanceof Node && (event.currentTarget as HTMLDivElement).contains(next)) return;
+          const current = event.currentTarget as HTMLDivElement;
+          const NodeConstructor = current.ownerDocument.defaultView?.Node;
+          if (NodeConstructor && next instanceof NodeConstructor && current.contains(next)) return;
           controller.resume(item.id, 'focus');
         },
       },

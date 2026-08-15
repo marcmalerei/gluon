@@ -28,6 +28,8 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
   explicit scoped registry, with a global fallback on unsupported browsers and
   the same add-to-bag interaction in either mode
 - a reactive bag with configured line items and quantities
+- transient add-to-bag feedback through the official request-free `Toast`
+  surface and an application-owned controller that is disposed with the shop
 - an app-local `gluon-bag-quantity` autonomous Custom Element authored through
   `defineGluonElement()`, with inferred properties/native events, cancelable
   optimistic quantity state, exposed focus, and 44px actions

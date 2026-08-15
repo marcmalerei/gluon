@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createApp, getStyleSheetText } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
 import {
+  Toast,
   ToastViewport,
   createToastController,
   toastStyles,
@@ -146,6 +147,18 @@ describe('Toast browser contract', () => {
     expect(politeLive.querySelector('button')).toBeNull();
     expect(polite.querySelector('button')?.getAttribute('aria-label')).toBe('Dismiss polite-toast');
     expect(root.querySelector('#assertive-toast [role="alert"]')).not.toBeNull();
+
+    const attributedRoot = document.createElement('div');
+    document.body.append(attributedRoot);
+    const attributedApp = createApp(() => Toast({
+      id: 'attributed-toast',
+      children: 'Attributed',
+      attributes: { aria: { describedby: 'toast-help' } },
+    }));
+    attributedApp.mount(attributedRoot);
+    await nextTick();
+    expect(attributedRoot.querySelector('#attributed-toast')?.getAttribute('aria-describedby')).toBe('toast-help');
+    attributedApp.unmount();
 
     controller.add({ id: 'queued-toast', children: 'Queued' });
     await nextTick();

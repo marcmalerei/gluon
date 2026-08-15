@@ -37,6 +37,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added request-free `SearchField` and grouped `SearchResults` Molecules with
   native form/list semantics and explicit asynchronous presentation states
   (#372).
+- Added request-free `Toast`, `ToastViewport`, and `createToastController()`
+  primitives with bounded queues, deterministic timing and pause ownership,
+  SSR-safe activation, live-region semantics, and GLUON GOODS bag feedback.
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.
