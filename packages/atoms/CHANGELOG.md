@@ -7,6 +7,10 @@
 - Added the native single-value `Slider` Atom with deterministic finite range
   normalization, controlled and uncontrolled state, enforced readonly
   interaction, form/SSR/hydration semantics, and GLUON GOODS configuration.
+- Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
+  `Separator` atoms with typed native attributes, component-scoped CSS
+  properties, native image/region/separator semantics, caller-owned Avatar
+  lifecycle, and browser/visual/SSR/type/Storybook evidence.
 
 ## [1.9.0] - 2026-08-15
 

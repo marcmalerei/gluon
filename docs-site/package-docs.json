@@ -406,11 +406,11 @@
       "purpose": "Accessible focused UI primitives and reusable Gluon theme styles.",
       "starter": {
         "language": "ts",
-        "code": "import { Button, Checkbox, Input, Select, Textarea, installUi } from '@gluonjs/atoms';\n\nconst ui = installUi(document, { theme: 'light' });"
+        "code": "import { AspectRatio, Avatar, ScrollArea, Separator, installUi } from '@gluonjs/atoms';\n\nconst ui = installUi(document, { theme: 'light' });\nconst media = AspectRatio({ ratio: 4 / 3, children: 'Product media' });\nconst avatar = Avatar({ alt: 'Ada Lovelace', fallback: 'AL', status: 'error' });\nconst history = ScrollArea({ label: 'Order history', children: 'Order rows' });\nconst rule = Separator({ decorative: true });\nconsole.log(media, avatar, history, rule, ui.theme);"
       },
       "useCases": [
         "Focused UI primitives and shared theming boundaries.",
-        "Accessible form controls and theme installation.",
+        "Accessible form controls, image/fallback presentation, bounded native scrolling, separators, and theme installation.",
         "Shared styles for browser-facing Gluon interfaces."
       ],
       "limits": [

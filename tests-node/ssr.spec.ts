@@ -60,11 +60,37 @@ import { FunctionalQuantityControl } from '../benchmarks/dx/stateful-form-contro
 import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-control/react.js';
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
-import { Button } from '@gluonjs/atoms';
+import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
+  it('serializes foundation Atom native semantics and caller-owned states', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(html`
+      ${AspectRatio({ ratio: 1.5, attributes: { id: 'server-ratio' }, children: 'Media' })}
+      ${Avatar({ src: '/ada.webp', alt: 'Ada Lovelace', status: 'loaded' })}
+      ${Avatar({ src: '/lin.webp', alt: 'Lin Chen', fallback: 'LC', status: 'loading' })}
+      ${ScrollArea({ label: 'Release notes', orientation: 'both', children: 'Notes' })}
+      ${Separator({})}
+      ${Separator({ orientation: 'vertical' })}
+      ${Separator({ decorative: true })}
+    `));
+
+    expect(rendered).toContain('id="server-ratio"');
+    expect(rendered).toContain('--gluon-aspect-ratio:1.5');
+    expect(rendered).toContain('<img');
+    expect(rendered).toContain('alt="Ada Lovelace"');
+    expect(rendered).toContain('role="img"');
+    expect(rendered).toContain('aria-label="Lin Chen"');
+    expect(rendered).toContain('aria-busy="true"');
+    expect(rendered).toContain('<section');
+    expect(rendered).toContain('aria-label="Release notes"');
+    expect(rendered).toContain('tabIndex="0"');
+    expect(rendered).toContain('aria-orientation="vertical"');
+    expect(rendered).toContain('role="presentation"');
+    expect(rendered).toContain('aria-hidden="true"');
+  });
+
   it('serializes the DialogSurface ARIA structure without invoking browser focus APIs', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(DialogSurface({
       id: 'server-dialog',

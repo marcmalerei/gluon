@@ -1,4 +1,6 @@
 import {
+  AspectRatio,
+  Avatar,
   Button,
   Checkbox,
   Radio,
@@ -7,8 +9,10 @@ import {
   Label,
   Progress,
   Slider,
+  ScrollArea,
   Select,
   StatusBadge,
+  Separator,
   Switch,
   ToggleButton,
   Textarea,
@@ -51,6 +55,7 @@ import {
   q,
 } from '@gluonjs/quarks';
 import { ref } from '@gluonjs/reactivity';
+import examplePortrait from '../../docs/assets/examples/foundation-avatar.svg?url&no-inline';
 
 const theme = ref<'light' | 'dark'>('light');
 const finish = ref('black');
@@ -193,6 +198,36 @@ createApp(() => AppShell({
         Progress({ value: 72, attributes: { 'aria-label': 'Profile completion' } }),
         Slider({ defaultValue: 40, min: 0, max: 100, step: 5, valueText: '40 percent', attributes: { 'aria-label': 'Notification volume' } }),
         StatusBadge({ tone: 'success', children: 'Profile active' }),
+        AspectRatio({
+          ratio: 4 / 3,
+          attributes: { style: { maxInlineSize: '12rem' } },
+          children: q.img({ src: examplePortrait, alt: 'Ada Lovelace profile portrait' }),
+        }),
+        Avatar({
+          src: examplePortrait,
+          alt: 'Ada Lovelace',
+          status: 'loaded',
+          attributes: { loading: 'lazy' },
+        }),
+        Separator({ decorative: true }),
+        ScrollArea({
+          label: 'Profile activity',
+          attributes: {
+            style: {
+              '--gluon-scroll-area-max-block-size': '6rem',
+              border: '1px solid var(--gluon-color-rule)',
+              padding: '0.75rem',
+            },
+          },
+          children: q.div({
+            children: [
+              q.p({ children: 'Profile created.' }),
+              q.p({ children: 'Delivery preference updated.' }),
+              q.p({ children: 'Security key registered.' }),
+              q.p({ children: 'Profile reviewed.' }),
+            ],
+          }),
+        }),
         ControlField({
           id: 'profile-note',
           label: 'Profile note',

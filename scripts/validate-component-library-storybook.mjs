@@ -33,6 +33,11 @@ const scenarios = [{
   stateSelectors: ['[data-loader-story]', '[data-loader-status]'],
   expectedText: 'failed',
 }, {
+  id: 'component-library-foundation-atoms--default',
+  stateSelectors: ['[data-foundation-atoms-story]', 'h2'],
+  expectedText: 'Foundation atoms',
+  screenshotSelector: '[data-foundation-atoms-story]',
+}, {
   id: 'component-library-status-badge--default',
   stateSelectors: ['[data-status-badge-story]', '[data-short-badge]', '.gluon-status-badge'],
   expectedText: 'Eingeschränkt',
@@ -109,6 +114,9 @@ try {
     });
     if (violations.length > 0) throw new Error(`Storybook accessibility violations for ${scenario.id}: ${JSON.stringify(violations)}.`);
     const mediaEvidence = await scenario.verifyMedia?.(page);
+    const compatibility = scenario.id === 'component-library-foundation-atoms--default'
+      ? await validateFoundationAtoms(page)
+      : undefined;
 
     const evidencePath = resolve(evidenceDirectory, `storybook-${scenario.id}.png`);
     const screenshotSelector = scenario.screenshotSelector ?? storyRoot;
@@ -117,7 +125,14 @@ try {
     const baselinePath = resolve(baselineDirectory, `${scenario.id}.png`);
     if (updateBaselines) {
       await writeFile(baselinePath, await readFile(evidencePath));
-      results.push({ id: scenario.id, accessibilityViolations: 0, mismatchRatio: 0, baseline: 'updated', ...(mediaEvidence ? { mediaEvidence } : {}) });
+      results.push({
+        id: scenario.id,
+        accessibilityViolations: 0,
+        mismatchRatio: 0,
+        baseline: 'updated',
+        ...(mediaEvidence ? { mediaEvidence } : {}),
+        ...(compatibility ? { compatibility } : {}),
+      });
       continue;
     }
 
@@ -146,7 +161,14 @@ try {
       await writeFile(resolve(evidenceDirectory, `storybook-${scenario.id}-diff.png`), PNG.sync.write(difference));
       throw new Error(`Storybook visual mismatch for ${scenario.id}: ${(mismatchRatio * 100).toFixed(2)}% exceeds 5.00%.`);
     }
-    results.push({ id: scenario.id, accessibilityViolations: 0, mismatchRatio, baseline: 'matched', ...(mediaEvidence ? { mediaEvidence } : {}) });
+    results.push({
+      id: scenario.id,
+      accessibilityViolations: 0,
+      mismatchRatio,
+      baseline: 'matched',
+      ...(mediaEvidence ? { mediaEvidence } : {}),
+      ...(compatibility ? { compatibility } : {}),
+    });
   }
 
   const report = {
@@ -189,4 +211,162 @@ async function waitForText(locator, expectedText, storyId) {
 function resolveLocator(page, selectors) {
   const [firstSelector, ...descendantSelectors] = selectors;
   return descendantSelectors.reduce((locator, selector) => locator.locator(selector), page.locator(firstSelector));
+}
+
+async function validateFoundationAtoms(page) {
+  const rootSelector = '[data-foundation-atoms-story]';
+  const loadedAvatarSelector = `${rootSelector} .gluon-avatar.is-loaded`;
+  const fallbackSelector = `${rootSelector} .gluon-avatar__fallback[role="img"]`;
+  const scrollSelector = `${rootSelector} .gluon-scroll-area`;
+  const verticalSeparatorSelector = `${rootSelector} .gluon-separator.is-vertical`;
+
+  const semantics = await page.evaluate(({ loadedAvatarSelector, fallbackSelector }) => {
+    const loadedAvatar = document.querySelector(loadedAvatarSelector);
+    const loadedImages = loadedAvatar?.querySelectorAll('img') ?? [];
+    const fallbacks = [...document.querySelectorAll(fallbackSelector)];
+    return {
+      loadedImageCount: loadedImages.length,
+      loadedAlt: loadedImages[0]?.getAttribute('alt') ?? null,
+      loadedOuterRole: loadedAvatar?.getAttribute('role') ?? null,
+      fallbackLabels: fallbacks.map((fallback) => fallback.getAttribute('aria-label')),
+      busyFallbacks: fallbacks.filter((fallback) => fallback.getAttribute('aria-busy') === 'true').length,
+    };
+  }, { loadedAvatarSelector, fallbackSelector });
+  if (
+    semantics.loadedImageCount !== 1
+    || semantics.loadedAlt !== 'Ada Lovelace'
+    || semantics.loadedOuterRole !== null
+    || semantics.fallbackLabels.join('|') !== 'Lin Chen|Sam Rivera'
+    || semantics.busyFallbacks !== 1
+  ) {
+    throw new Error(`Foundation Avatar semantics changed: ${JSON.stringify(semantics)}.`);
+  }
+
+  const initialScroll = await page.locator(scrollSelector).evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    clientHeight: element.clientHeight,
+    scrollWidth: element.scrollWidth,
+    scrollHeight: element.scrollHeight,
+    direction: getComputedStyle(element).direction,
+    overflowX: getComputedStyle(element).overflowX,
+    overflowY: getComputedStyle(element).overflowY,
+  }));
+  if (
+    initialScroll.clientWidth >= initialScroll.scrollWidth
+    || initialScroll.clientHeight >= initialScroll.scrollHeight
+    || initialScroll.direction !== 'rtl'
+    || initialScroll.overflowX !== 'auto'
+    || initialScroll.overflowY !== 'auto'
+  ) {
+    throw new Error(`Foundation ScrollArea is not bounded native RTL overflow: ${JSON.stringify(initialScroll)}.`);
+  }
+  await page.locator(scrollSelector).focus();
+  await page.keyboard.press('ArrowDown');
+  await page.waitForFunction((selector) => {
+    const element = document.querySelector(selector);
+    return element instanceof HTMLElement && element.scrollTop > 0;
+  }, scrollSelector);
+  const focusedScroll = await page.locator(scrollSelector).evaluate((element) => ({
+    tabIndex: element.tabIndex,
+    scrollTop: element.scrollTop,
+    outlineStyle: getComputedStyle(element).outlineStyle,
+  }));
+  if (focusedScroll.tabIndex !== 0 || focusedScroll.scrollTop <= 0 || focusedScroll.outlineStyle !== 'solid') {
+    throw new Error(`Foundation ScrollArea keyboard/focus behavior changed: ${JSON.stringify(focusedScroll)}.`);
+  }
+
+  const responsive = [];
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const geometry = await page.evaluate(() => ({
+      viewportWidth: innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+    }));
+    if (geometry.documentWidth > geometry.viewportWidth) {
+      throw new Error(`Foundation atoms overflow at ${width}px: ${JSON.stringify(geometry)}.`);
+    }
+    await page.locator(rootSelector).screenshot({
+      path: resolve(evidenceDirectory, `storybook-foundation-atoms-${width}.png`),
+      animations: 'disabled',
+    });
+    responsive.push(geometry);
+  }
+
+  await page.setViewportSize({ width: 800, height: 500 });
+  await page.emulateMedia({ reducedMotion: 'reduce', forcedColors: 'none' });
+  const reducedMotion = await page.evaluate(({ rootSelector, scrollSelector }) => {
+    const root = document.querySelector(rootSelector);
+    const scrollArea = document.querySelector(scrollSelector);
+    const loadingFallback = root?.querySelector('.gluon-avatar.is-loading .gluon-avatar__fallback');
+    if (!(scrollArea instanceof HTMLElement) || !(loadingFallback instanceof HTMLElement)) return null;
+    scrollArea.style.setProperty('--gluon-scroll-area-scroll-behavior', 'smooth');
+    return {
+      mediaMatches: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      scrollBehavior: getComputedStyle(scrollArea).scrollBehavior,
+      avatarAnimation: getComputedStyle(loadingFallback, '::after').animationName,
+    };
+  }, { rootSelector, scrollSelector });
+  if (
+    !reducedMotion?.mediaMatches
+    || reducedMotion.scrollBehavior !== 'auto'
+    || reducedMotion.avatarAnimation !== 'none'
+  ) {
+    throw new Error(`Foundation reduced-motion behavior changed: ${JSON.stringify(reducedMotion)}.`);
+  }
+
+  await page.emulateMedia({ reducedMotion: 'no-preference', forcedColors: 'active' });
+  await page.locator(scrollSelector).focus();
+  const forcedColors = await page.evaluate(({ rootSelector, scrollSelector, verticalSeparatorSelector }) => {
+    const root = document.querySelector(rootSelector);
+    const scrollArea = document.querySelector(scrollSelector);
+    const avatar = root?.querySelector('.gluon-avatar');
+    const separator = document.querySelector(verticalSeparatorSelector);
+    if (!(scrollArea instanceof HTMLElement) || !(avatar instanceof HTMLElement) || !(separator instanceof HTMLElement)) return null;
+    return {
+      mediaMatches: matchMedia('(forced-colors: active)').matches,
+      focusOutline: getComputedStyle(scrollArea).outlineStyle,
+      avatarBorder: getComputedStyle(avatar).borderStyle,
+      separatorAdjustment: getComputedStyle(separator).forcedColorAdjust,
+    };
+  }, { rootSelector, scrollSelector, verticalSeparatorSelector });
+  if (
+    !forcedColors?.mediaMatches
+    || forcedColors.focusOutline !== 'solid'
+    || forcedColors.avatarBorder !== 'solid'
+    || forcedColors.separatorAdjustment !== 'none'
+  ) {
+    throw new Error(`Foundation forced-colors behavior changed: ${JSON.stringify(forcedColors)}.`);
+  }
+  await page.locator(rootSelector).screenshot({
+    path: resolve(evidenceDirectory, 'storybook-foundation-atoms-forced-colors.png'),
+    animations: 'disabled',
+  });
+
+  await page.emulateMedia({ reducedMotion: 'no-preference', forcedColors: 'none' });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const zoom = await page.evaluate(({ rootSelector, verticalSeparatorSelector }) => {
+    document.documentElement.style.zoom = '2';
+    const separator = document.querySelector(verticalSeparatorSelector);
+    const geometry = {
+      factor: getComputedStyle(document.documentElement).zoom,
+      separatorWidth: separator?.getBoundingClientRect().width ?? 0,
+      viewportWidth: innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+    };
+    document.documentElement.style.zoom = '';
+    return geometry;
+  }, { rootSelector, verticalSeparatorSelector });
+  if (zoom.factor !== '2' || zoom.separatorWidth < 2 || zoom.documentWidth > zoom.viewportWidth) {
+    throw new Error(`Foundation 200% zoom behavior changed: ${JSON.stringify(zoom)}.`);
+  }
+
+  await page.setViewportSize({ width: 800, height: 500 });
+  return {
+    avatar: semantics,
+    scroll: { ...initialScroll, ...focusedScroll },
+    responsive,
+    reducedMotion,
+    forcedColors,
+    zoom,
+  };
 }
