@@ -3,7 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -41,7 +41,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.documentElement.dataset.gluonTheme).toBe('light');
     expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).toContain(shopStyles);
-    expect(document.adoptedStyleSheets).toContain(menuToolbarStyles);
+    expect(document.adoptedStyleSheets).toContain(toolbarStyles);
     const editorialSheet = document.adoptedStyleSheets.find((sheet) => (
       getStyleSheetText(sheet).includes('.shop-editorial-link')
     ));

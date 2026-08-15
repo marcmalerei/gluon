@@ -12,7 +12,8 @@ export { createFormController, type FormController, type FormControllerOptions, 
 export { InlineNotice, type InlineNoticeAnnouncement, type InlineNoticeAttributes, type InlineNoticeProps, type InlineNoticeTone } from './inline-notice.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
 export { ResponsiveActionBar, type ResponsiveActionBarAttributes, type ResponsiveActionBarPresentation, type ResponsiveActionBarProps, type ResponsiveActionBarState } from './responsive-action-bar.js';
-export { ContextMenu, DropdownMenu, Menubar, Toolbar, type ContextMenuProps, type DropdownMenuProps, type MenuActionItem, type MenuAttributes, type MenuCheckboxItem, type MenuCheckedChange, type MenuItem, type MenuItemKind, type MenuProps, type MenuRadioItem, type MenuSeparatorItem, type MenubarProps, type ToolbarButtonItem, type ToolbarItem, type ToolbarLinkItem, type ToolbarProps, type ToolbarSeparatorItem } from './menu-toolbar.js';
+export { ContextMenu, DropdownMenu, Menubar, type ContextMenuProps, type DropdownMenuProps, type MenuActionItem, type MenuAttributes, type MenuCheckboxItem, type MenuCheckedChange, type MenuItem, type MenuItemKind, type MenuProps, type MenuRadioItem, type MenuSeparatorItem, type MenubarProps } from './menu-toolbar.js';
+export { Toolbar, type ToolbarButtonItem, type ToolbarItem, type ToolbarLinkItem, type ToolbarProps, type ToolbarSeparatorItem } from './toolbar.js';
 export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedControlAttributes, type SegmentedControlChangeEvent, type SegmentedControlOption, type SegmentedControlOrientation, type SegmentedControlProps } from './segmented-control.js';
 export { TableRegion, type TableRegionAccessibleName, type TableRegionAttributes, type TableRegionContent, type TableRegionProps } from './table-region.js';
 export { Tabs, type TabsAccessibleName, type TabsActivation, type TabsAttributes, type TabsChangeEvent, type TabsItem, type TabsOrientation, type TabsProps } from './tabs.js';
@@ -33,6 +34,7 @@ export { inlineNoticeStyles } from './inline-notice-styles.js';
 export { navigationStripStyles } from './navigation-strip-styles.js';
 export { responsiveActionBarStyles } from './responsive-action-bar-styles.js';
 export { menuToolbarStyles } from './menu-toolbar-styles.js';
+export { toolbarStyles } from './toolbar-styles.js';
 export { segmentedControlStyles } from './segmented-control-styles.js';
 export { tableRegionStyles } from './table-region-styles.js';
 export { tabsStyles } from './tabs-styles.js';
