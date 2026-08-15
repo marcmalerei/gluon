@@ -1394,22 +1394,41 @@
         "  createStoreManager,",
         "  defineStore,",
         "  type PersistOptions,",
+        "  type PersistedStateEnvelope,",
+        "  type PersistedStateErrorContext,",
+        "  type PersistedStateRecord,",
+        "  type PersistedStateRecovery,",
+        "  type PersistLegacyMigration,",
+        "  type PersistMigrationStep,",
         "  type PersistencePluginOptions,",
         "  type StorageLike,",
         "} from '@gluonjs/store';",
         "",
         "type CartState = { items: string[]; open: boolean };",
-        "const values = new Map<string, string>([['goods:cart', '{\"items\":[\"lamp\"]}']]);",
+        "const saved: PersistedStateEnvelope = { version: 0, state: { items: ['lamp'] } };",
+        "const values = new Map<string, string>([['goods:cart', JSON.stringify(saved)]]);",
         "const storage: StorageLike = {",
         "  getItem: (key) => values.get(key) ?? null,",
         "  setItem: (key, value) => { values.set(key, value); },",
         "  removeItem: (key) => { values.delete(key); },",
         "};",
-        "const persist = { paths: ['items'] } satisfies PersistOptions<CartState>;",
+        "const migration: PersistMigrationStep = {",
+        "  from: 0,",
+        "  to: 1,",
+        "  migrate: (state) => ({ items: Array.isArray(state.items) ? state.items : [] }),",
+        "};",
+        "const legacy: PersistLegacyMigration = { to: 1, migrate: migration.migrate };",
+        "const migrated: PersistedStateRecord = migration.migrate(saved.state);",
+        "const persist = { paths: ['items'], version: 1, migrations: [migration], legacy } satisfies PersistOptions<CartState>;",
+        "let recovery: PersistedStateRecovery | undefined;",
         "const options = {",
         "  storage,",
         "  namespace: 'goods',",
-        "  onError: (error, storeId) => console.error(storeId, error),",
+        "  onError: (error, storeId, context) => {",
+        "    const errorContext: PersistedStateErrorContext | undefined = context;",
+        "    recovery = errorContext?.recovery;",
+        "    console.error(storeId, error);",
+        "  },",
         "} satisfies PersistencePluginOptions;",
         "const manager = createStoreManager({ plugins: [createPersistencePlugin(options)] });",
         "const cart = manager.use(defineStore({",
@@ -1418,7 +1437,7 @@
         "  persist,",
         "}));",
         "cart.$patch({ items: [...cart.items, 'tray'] });",
-        "console.log(values.get('goods:cart')); // {\"items\":[\"lamp\",\"tray\"]}",
+        "console.log(migrated, recovery, values.get('goods:cart')); // version 1 envelope",
         "manager.dispose();"
       ]
     },
@@ -5768,7 +5787,27 @@
     },
     "packages/store/src/interfaces/PersistOptions.md": {
       "recipe": "store-persistence",
-      "description": "Choose a custom storage key and the exact state properties that a persistent Store is allowed to save:"
+      "description": "Choose a custom storage key, selected state properties, current version, and explicit migration path for a persistent Store:"
+    },
+    "packages/store/src/interfaces/PersistedStateEnvelope.md": {
+      "recipe": "store-persistence",
+      "description": "Represent persisted Store state together with the exact schema version that owns its shape:"
+    },
+    "packages/store/src/interfaces/PersistedStateErrorContext.md": {
+      "recipe": "store-persistence",
+      "description": "Classify a persistence failure and expose the blocked payload, target version, and explicit recovery operations to application code:"
+    },
+    "packages/store/src/interfaces/PersistedStateRecovery.md": {
+      "recipe": "store-persistence",
+      "description": "Let an application deliberately reset, remove, or quarantine invalid persisted state before writes resume:"
+    },
+    "packages/store/src/interfaces/PersistLegacyMigration.md": {
+      "recipe": "store-persistence",
+      "description": "Decode an explicitly supported unversioned payload and name the version of the returned state:"
+    },
+    "packages/store/src/interfaces/PersistMigrationStep.md": {
+      "recipe": "store-persistence",
+      "description": "Advance one persisted Store schema version through a contiguous, application-owned migration step:"
     },
     "packages/store/src/interfaces/PersistencePluginOptions.md": {
       "recipe": "store-persistence",
@@ -5817,6 +5856,10 @@
     "packages/store/src/type-aliases/JsonValue.md": {
       "recipe": "store-runtime",
       "description": "Represent the recursive JSON-compatible arrays and records accepted in Store snapshots:"
+    },
+    "packages/store/src/type-aliases/PersistedStateRecord.md": {
+      "recipe": "store-persistence",
+      "description": "Accept an ordinary typed object record at a migration boundary before Gluon normalizes and validates it as JSON-safe state:"
     },
     "packages/store/src/type-aliases/StateTree.md": {
       "recipe": "store-runtime",

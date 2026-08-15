@@ -74,8 +74,47 @@ const manager = createStoreManager({
 ```
 
 The plugin reads only definitions that opt in through `persist`. Selected paths
-are written after recorded transactions. Storage access failures are reported
-through `onError` when supplied.
+are written after recorded transactions as a versioned persisted-state envelope
+that is independent from `StoreSnapshot`, devtools, or HMR versions. Definitions
+may opt into explicit contiguous `from -> to` migrations and, when needed, an
+explicit legacy decoder for older unversioned payloads. The decoder's `to`
+value names the version of the state it returns; later declared steps then run
+in order up to the store's current persistence version.
+Migration callbacks accept ordinary typed object records; application DTOs do
+not need a string index signature. Gluon normalizes and validates every result
+as JSON-safe state before applying or storing it.
+
+```ts
+const profile = defineStore({
+  id: 'profile',
+  state: () => ({ count: 0, label: 'new' }),
+  persist: {
+    version: 2,
+    legacy: {
+      to: 0,
+      migrate: (state) => ({ count: Number(state.count ?? 0) }),
+    },
+    migrations: [
+      { from: 0, to: 1, migrate: (state) => ({ ...state, label: 'legacy' }) },
+      { from: 1, to: 2, migrate: (state) => ({ ...state, label: String(state.label) }) },
+    ],
+  },
+});
+```
+
+Storage access, parse, future-version, corrupt-envelope, and migration errors
+are reported through `onError` when supplied together with a recovery context.
+The context exposes caller-owned `reset()`, `remove()`, and `quarantine()`
+operations. The plugin never silently overwrites a bad payload; the caller must
+choose the recovery action. `remove()` and `quarantine()` require the supplied
+`StorageLike` adapter to implement `removeItem()`; otherwise they throw and the
+store remains blocked from persistence writes.
+
+A missing key leaves the definition's initial state unchanged. A valid older
+envelope is migrated in memory and is written with the current version after
+the next store transaction. Future, corrupt, missing-step, thrown-migration,
+invalid-output, and storage failures block later persistence writes until one
+of the explicit recovery operations succeeds.
 
 ## SSR, hydration, and HMR
 

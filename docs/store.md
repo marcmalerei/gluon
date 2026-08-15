@@ -83,9 +83,33 @@ the resulting change.
 ## Persistence and testing
 
 `createPersistencePlugin()` requires a `StorageLike` adapter. A definition must
-opt in with `persist: true` or selected state paths. The plugin hydrates at store
-creation and writes after transactions. It never accesses browser globals on
-its own.
+opt in with `persist: true` or selected state paths. The plugin hydrates at
+store creation and writes after transactions.
+
+Persisted records use a versioned envelope that is separate from
+`StoreSnapshot`. Definitions may declare a current persisted `version`, explicit
+contiguous `migrations` with `from`/`to` steps, and an explicit `legacy`
+decoder for older unversioned payloads. The plugin validates the envelope
+before patching state, classifies future/corrupt/migration failures, and
+exposes caller-controlled `reset()`, `remove()`, and `quarantine()` recovery
+hooks through `onError`. It never silently overwrites a bad payload.
+The legacy decoder's `to` field is the version of its returned state; any
+remaining contiguous migration steps run afterward. Removal and quarantine
+require an adapter with `removeItem()` and fail without unblocking writes when
+that capability is absent.
+Migration callbacks may return ordinary typed DTO records without adding a
+string index signature. Every result is still normalized and validated as
+JSON-safe state before it can be applied or persisted.
+
+Missing storage leaves the store defaults intact. Successful older state is
+migrated in memory and receives the current envelope on the next transaction;
+future, corrupt, missing-step, thrown-migration, invalid-output, and storage
+failures block persistence writes until explicit recovery succeeds.
+
+The application owns validation and suitability decisions. Persistence is not a
+security boundary and is only as safe as the application data it stores; use it
+for rollback-compatible app state, not for sensitive data unless the caller has
+audited the full storage lifecycle.
 
 `createTestingStoreManager()` returns an ordinary isolated manager with optional
 initial state. Tests therefore exercise the same actions, getters, plugins,

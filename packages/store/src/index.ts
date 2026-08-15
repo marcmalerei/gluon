@@ -56,6 +56,68 @@ export type StoreActionSubscription = (context: StoreActionContext) => void;
 export interface PersistOptions<State extends StateTree> {
   readonly key?: string;
   readonly paths?: readonly (keyof State & string)[];
+  readonly version?: number;
+  readonly migrations?: readonly PersistMigrationStep[];
+  readonly legacy?: PersistLegacyMigration;
+}
+
+/**
+ * The object shape exposed to migration callbacks.
+ *
+ * Application DTO interfaces do not need a string index signature. Every
+ * migration result is still normalized and validated as JSON before Gluon
+ * patches store state or writes it to storage.
+ */
+export type PersistedStateRecord = Readonly<Record<string, unknown>>;
+
+type PersistedJsonStateRecord = Readonly<Record<string, JsonValue>>;
+
+export interface PersistedStateEnvelope {
+  readonly version: number;
+  readonly state: PersistedStateRecord;
+}
+
+export interface PersistMigrationStep {
+  readonly from: number;
+  readonly to: number;
+  readonly migrate: (state: PersistedStateRecord) => PersistedStateRecord;
+}
+
+export interface PersistLegacyMigration {
+  /** Version of the state returned by migrate(). */
+  readonly to: number;
+  readonly migrate: (state: PersistedStateRecord) => PersistedStateRecord;
+}
+
+export interface PersistedStateRecovery {
+  readonly key: string;
+  reset(): void;
+  remove(): void;
+  quarantine(): void;
+}
+
+export interface PersistedStateErrorContext {
+  readonly key: string;
+  readonly raw: string | null;
+  readonly kind:
+    | 'legacy'
+    | 'future'
+    | 'storage-read'
+    | 'storage-write'
+    | 'corrupt-json'
+    | 'corrupt-envelope'
+    | 'migration-missing'
+    | 'migration-throw'
+    | 'migration-invalid-output';
+  readonly version?: number;
+  readonly targetVersion: number;
+  readonly recovery: PersistedStateRecovery;
+}
+
+interface PersistencePlan {
+  readonly version: number;
+  readonly steps: readonly PersistMigrationStep[];
+  readonly legacy?: PersistLegacyMigration;
 }
 
 export interface DefineStoreOptions<
@@ -606,7 +668,7 @@ export interface StorageLike {
 export interface PersistencePluginOptions {
   readonly storage: StorageLike;
   readonly namespace?: string;
-  readonly onError?: (error: unknown, storeId: string) => void;
+  readonly onError?: (error: unknown, storeId: string, recovery?: PersistedStateErrorContext) => void;
 }
 
 export function createPersistencePlugin(options: PersistencePluginOptions): StorePlugin {
@@ -615,6 +677,7 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
     if (!persist) return;
     const config = persist === true ? {} : persist;
     const key = config.key ?? `${options.namespace ?? 'gluon'}:${definition.id}`;
+    const plan = normalizePersistencePlan(config);
     const select = () => {
       const state = store.$state;
       if (!config.paths) return snapshotState(state);
@@ -624,22 +687,262 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
       }
       return selected;
     };
+    let lastRaw: string | null = null;
+    let recoveryState: 'ready' | 'blocked' = 'ready';
+    const recovery = createRecovery({
+      key,
+      storage: options.storage,
+      store,
+      select,
+      version: plan.version,
+      getRaw: () => lastRaw,
+      setRaw: (raw) => {
+        lastRaw = raw;
+      },
+      onRecover: () => {
+        recoveryState = 'ready';
+      },
+    });
 
     try {
-      const saved = options.storage.getItem(key);
-      if (saved) store.$patch(parseStateRecord(saved), { source: 'persistence' });
+      lastRaw = options.storage.getItem(key);
+      const loaded = loadPersistedState(lastRaw, plan, definition.id);
+      if (loaded.state) {
+        store.$patch(loaded.state, { source: 'persistence' });
+      }
     } catch (error) {
-      options.onError?.(error, definition.id);
+      recoveryState = 'blocked';
+      options.onError?.(error, definition.id, createRecoveryContext(error, {
+        key,
+        raw: lastRaw,
+        targetVersion: plan.version,
+        recovery,
+      }, 'storage-read'));
     }
 
     return store.$subscribe(() => {
+      if (recoveryState === 'blocked') return;
       try {
-        options.storage.setItem(key, JSON.stringify(select()));
+        const raw = JSON.stringify({ version: plan.version, state: select() });
+        options.storage.setItem(key, raw);
+        lastRaw = raw;
       } catch (error) {
-        options.onError?.(error, definition.id);
+        recoveryState = 'blocked';
+        options.onError?.(error, definition.id, createRecoveryContext(error, {
+          key,
+          raw: lastRaw,
+          targetVersion: plan.version,
+          recovery,
+        }, 'storage-write'));
       }
     });
   };
+}
+
+function normalizePersistencePlan<State extends StateTree>(config: PersistOptions<State>): PersistencePlan {
+  const version = config.version ?? 1;
+  if (!Number.isInteger(version) || version < 1) throw new TypeError('Persisted state version must be a positive integer.');
+  const steps = [...(config.migrations ?? [])];
+  for (const step of steps) {
+    if (!Number.isInteger(step.from) || !Number.isInteger(step.to) || step.from < 0 || step.to <= step.from || typeof step.migrate !== 'function') {
+      throw new TypeError('Persisted state migrations must define increasing integer from/to versions.');
+    }
+    if (step.to !== step.from + 1) {
+      throw new TypeError('Persisted state migrations must advance one version at a time.');
+    }
+  }
+  const ordered = [...steps].sort((left, right) => left.from - right.from);
+  for (let index = 0; index < ordered.length; index += 1) {
+    const step = ordered[index]!;
+    const ambiguous = ordered.find((other, otherIndex) => otherIndex !== index && (other.from === step.from || other.to === step.to));
+    if (ambiguous) throw new TypeError('Persisted state migrations must not duplicate from/to versions.');
+    const previous = ordered[index - 1];
+    if (previous && previous.to !== step.from) {
+      throw new TypeError('Persisted state migrations must be contiguous.');
+    }
+    if (step.to > version) throw new TypeError('Persisted state migrations cannot target future versions.');
+  }
+  if (ordered.length > 0 && ordered.at(-1)!.to !== version) {
+    throw new TypeError('Persisted state migrations must end at the configured version.');
+  }
+  if (config.legacy) {
+    if (!Number.isInteger(config.legacy.to) || config.legacy.to < 0 || config.legacy.to > version || typeof config.legacy.migrate !== 'function') {
+      throw new TypeError('Persisted legacy migrations require an integer output version at or below the configured version.');
+    }
+    if (config.legacy.to < version && !ordered.some((step) => step.from === config.legacy!.to)) {
+      throw new TypeError('Persisted legacy migration output requires a contiguous step to the configured version.');
+    }
+  }
+  return { version, steps: ordered, legacy: config.legacy };
+}
+
+function loadPersistedState(
+  saved: string | null,
+  plan: PersistencePlan,
+  storeId: string,
+): { readonly state: PersistedJsonStateRecord | null; readonly version?: number } {
+  if (saved === null) return { state: null };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(saved);
+  } catch (error) {
+    throw new PersistenceFailure('corrupt-json', saved, plan.version, storeId, error);
+  }
+  if (isEnvelopeCandidate(parsed)) {
+    if (!isPersistedEnvelope(parsed)) {
+      throw new PersistenceFailure('corrupt-envelope', saved, plan.version, storeId, new TypeError('Persisted state envelope requires a non-negative integer version and plain-object state.'));
+    }
+    const state = assertPersistedStateRecord(parsed.state, plan.version, storeId, 'corrupt-envelope');
+    return migratePersistedState(state, parsed.version, saved, plan, storeId);
+  }
+  if (isPlainRecord(parsed)) {
+    if (!plan.legacy) {
+      throw new PersistenceFailure('legacy', saved, plan.version, storeId, new TypeError('Legacy persisted state requires an explicit legacy migration policy.'));
+    }
+    const legacyState = assertPersistedStateRecord(parsed, plan.version, storeId, 'corrupt-envelope');
+    let migrated: PersistedStateRecord;
+    try {
+      migrated = plan.legacy.migrate(legacyState);
+    } catch (error) {
+      throw new PersistenceFailure('migration-throw', saved, plan.version, storeId, error, plan.legacy.to);
+    }
+    const state = assertPersistedStateRecord(migrated, plan.version, storeId, 'migration-invalid-output');
+    return migratePersistedState(state, plan.legacy.to, saved, plan, storeId);
+  }
+  throw new PersistenceFailure('corrupt-envelope', saved, plan.version, storeId, new TypeError('Persisted store state must be a plain object or versioned envelope.'));
+}
+
+function migratePersistedState(
+  initialState: PersistedStateRecord,
+  initialVersion: number,
+  raw: string,
+  plan: PersistencePlan,
+  storeId: string,
+): { readonly state: PersistedJsonStateRecord; readonly version: number } {
+  if (initialVersion > plan.version) {
+    throw new PersistenceFailure('future', raw, plan.version, storeId, new TypeError('Persisted state version is newer than the configured store version.'), initialVersion);
+  }
+  let state = assertPersistedStateRecord(initialState, plan.version, storeId, 'migration-invalid-output');
+  let version = initialVersion;
+  while (version < plan.version) {
+    const step = plan.steps.find((candidate) => candidate.from === version);
+    if (!step) {
+      throw new PersistenceFailure('migration-missing', raw, plan.version, storeId, new TypeError(`Missing persisted migration step from version ${version}.`), version);
+    }
+    let output: PersistedStateRecord;
+    try {
+      output = step.migrate(state);
+    } catch (error) {
+      throw new PersistenceFailure('migration-throw', raw, plan.version, storeId, error, version);
+    }
+    state = assertPersistedStateRecord(output, plan.version, storeId, 'migration-invalid-output');
+    version = step.to;
+  }
+  return { state, version };
+}
+
+function createRecovery(options: {
+  readonly key: string;
+  readonly storage: StorageLike;
+  readonly store: StorePluginStore;
+  readonly select: () => Readonly<Record<string, JsonValue>>;
+  readonly version: number;
+  readonly getRaw: () => string | null;
+  readonly setRaw: (raw: string | null) => void;
+  readonly onRecover: () => void;
+}): PersistedStateRecovery {
+  const removePersisted = (): void => {
+    if (!options.storage.removeItem) {
+      throw new Error('Persistence recovery requires StorageLike.removeItem().');
+    }
+    options.storage.removeItem(options.key);
+    options.setRaw(null);
+  };
+  return {
+    key: options.key,
+    reset() {
+      options.store.$reset({ source: 'persistence-recovery', recovery: 'reset' });
+      const raw = JSON.stringify({
+        version: options.version,
+        state: options.select(),
+      });
+      options.storage.setItem(options.key, raw);
+      options.setRaw(raw);
+      options.onRecover();
+    },
+    remove() {
+      removePersisted();
+      options.onRecover();
+    },
+    quarantine() {
+      const quarantineKey = `${options.key}:quarantine`;
+      options.storage.setItem(quarantineKey, options.getRaw() ?? '');
+      removePersisted();
+      options.onRecover();
+    },
+  };
+}
+
+function createRecoveryContext(error: unknown, options: {
+  readonly key: string;
+  readonly raw: string | null;
+  readonly targetVersion: number;
+  readonly recovery: PersistedStateRecovery;
+}, fallbackKind: PersistedStateErrorContext['kind']): PersistedStateErrorContext {
+  const kind = error instanceof PersistenceFailure ? error.kind : fallbackKind;
+  return {
+    key: options.key,
+    raw: options.raw,
+    kind,
+    targetVersion: options.targetVersion,
+    version: error instanceof PersistenceFailure ? error.version : undefined,
+    recovery: options.recovery,
+  };
+}
+
+class PersistenceFailure extends TypeError {
+  constructor(
+    readonly kind: PersistedStateErrorContext['kind'],
+    readonly raw: string | null,
+    readonly targetVersion: number,
+    readonly storeId: string,
+    cause: unknown,
+    readonly version?: number,
+  ) {
+    super(`Persisted state for store "${storeId}" is ${kind}: ${cause instanceof Error ? cause.message : String(cause)}`);
+    this.name = 'PersistenceFailure';
+  }
+}
+
+function isEnvelopeCandidate(value: unknown): value is Record<string, unknown> {
+  return isPlainRecord(value)
+    && Object.prototype.hasOwnProperty.call(value, 'version')
+    && Object.prototype.hasOwnProperty.call(value, 'state');
+}
+
+function isPersistedEnvelope(value: unknown): value is PersistedStateEnvelope {
+  return isEnvelopeCandidate(value)
+    && typeof value.version === 'number'
+    && Number.isInteger(value.version)
+    && value.version >= 0
+    && isPlainRecord(value.state);
+}
+
+function assertPersistedStateRecord(
+  value: unknown,
+  targetVersion: number,
+  storeId: string,
+  kind: PersistedStateErrorContext['kind'],
+): PersistedJsonStateRecord {
+  if (!isPlainRecord(value)) throw new PersistenceFailure(kind, null, targetVersion, storeId, new TypeError('Persisted state must be a plain object.'));
+  try {
+    const normalized = toJsonValue(value, new WeakSet());
+    if (!isPlainRecord(normalized)) throw new TypeError('Persisted state must be a plain object.');
+    return normalized as PersistedJsonStateRecord;
+  } catch (error) {
+    if (error instanceof PersistenceFailure) throw error;
+    throw new PersistenceFailure(kind, null, targetVersion, storeId, error);
+  }
 }
 
 function snapshotState(state: StateTree): Readonly<Record<string, JsonValue>> {
@@ -714,13 +1017,6 @@ function isCompatibleValue(current: unknown, replacement: unknown): boolean {
 
 function cloneJsonCompatible(value: unknown): unknown {
   return JSON.parse(JSON.stringify(toJsonValue(value, new WeakSet()))) as unknown;
-}
-
-function parseStateRecord(serialized: string): Readonly<Record<string, JsonValue>> {
-  const value = JSON.parse(serialized) as unknown;
-  if (!isPlainRecord(value)) throw new TypeError('Persisted store state must be a plain object.');
-  for (const key of Object.keys(value)) assertSafeKey(key);
-  return value as Readonly<Record<string, JsonValue>>;
 }
 
 function assertSnapshot(snapshot: StoreSnapshot): void {

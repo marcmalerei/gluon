@@ -32,7 +32,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
   optimistic quantity state, exposed focus, and 44px actions
 - a labeled checkout form, exact order summary, and URL-addressable confirmation
 - a native captioned checkout order table in an overflow-aware `TableRegion`
-- one isolated Store manager per shop application and persisted configured bag lines
+- one isolated Store manager per shop application and persisted configured bag lines with explicit legacy bag migration
 - abortable product availability with explicit loading, error, timeout, and retry UI
 - TC39 Signal-driven workshop availability through the optional Reactivity adapter
 - cached route views across back/forward traversal

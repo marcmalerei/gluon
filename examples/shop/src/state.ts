@@ -1,7 +1,10 @@
 import { defineStore, type StoreManager } from '@gluonjs/store';
 import type { Product } from './data.js';
+import { products } from './data.js';
 import {
   createDefaultProductConfiguration,
+  cloneProductConfiguration,
+  isProductConfiguration,
   type ProductConfiguration,
 } from './product-configuration.js';
 
@@ -20,6 +23,22 @@ export interface ShopOrder {
   readonly total: number;
   readonly email: string;
   readonly deliveryInstructions: string;
+}
+
+interface LegacyBagLine {
+  readonly productSlug: string;
+  readonly quantity: number;
+  readonly configuration: ProductConfiguration;
+}
+
+function isLegacyBagLine(value: unknown): value is LegacyBagLine {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<LegacyBagLine>;
+  return typeof candidate.productSlug === 'string'
+    && typeof candidate.quantity === 'number'
+    && Number.isInteger(candidate.quantity)
+    && candidate.quantity > 0
+    && isProductConfiguration(candidate.configuration);
 }
 
 export const shopStoreDefinition = defineStore('shop', () => ({
@@ -84,7 +103,29 @@ export const shopStoreDefinition = defineStore('shop', () => ({
       return order;
     },
   }),
-  persist: { paths: ['bag'] },
+  persist: {
+    paths: ['bag'],
+    version: 1,
+    legacy: {
+      to: 1,
+      migrate: (state: Readonly<Record<string, unknown>>) => ({
+        bag: Array.isArray(state.bag)
+          ? state.bag
+              .filter(isLegacyBagLine)
+              .flatMap((line) => {
+                const product = products.find((item) => item.slug === line.productSlug);
+                if (!product) return [];
+                return [{
+                  key: [product.slug, line.configuration.finish, line.configuration.temperature, line.configuration.cable].join(':'),
+                  product,
+                  configuration: cloneProductConfiguration(line.configuration),
+                  quantity: line.quantity,
+                }];
+              })
+          : [],
+      }),
+    },
+  },
 });
 
 export function createShopStore(manager: StoreManager) {
