@@ -1,5 +1,6 @@
 import { access, readFile, readdir } from 'node:fs/promises';
 import { basename, dirname, relative, resolve, sep } from 'node:path';
+import { validateDocsConsistency } from './docs-consistency.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const siteRoot = resolve(root, 'docs-site');
@@ -9,6 +10,7 @@ const packageContract = JSON.parse(await readFile(resolve(root, 'package-contrac
 const packageDocs = JSON.parse(await readFile(resolve(siteRoot, 'package-docs.json'), 'utf8'));
 const base = '/gluon/';
 validatePackageDocs(packageDocs, packageContract);
+await validateSourceDocs();
 
 if (!versions.supported.includes(versions.latest)) {
   throw new Error(`documentation latest ${versions.latest} is not a supported version`);
@@ -466,6 +468,61 @@ async function filesWithExtension(directory, extension) {
 
 function slash(value) { return value.split(sep).join('/'); }
 function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
+
+async function validateSourceDocs() {
+  const rootPackage = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+  const currentVersion = rootPackage.version;
+  if (versions.latest !== currentVersion) {
+    throw new Error(`latest docs version ${versions.latest} does not match root package version ${currentVersion}`);
+  }
+  const packagePaths = [
+    'packages/reactivity/README.md',
+    'packages/router/README.md',
+    'packages/store/README.md',
+    'packages/json-forms/README.md',
+    'packages/test-utils/README.md',
+  ];
+  const upgradePath = `docs-site/content/${versions.latest}/migration/upgrade/index.md`;
+  const releasingPath = `docs-site/content/${versions.latest}/guides/releasing/index.md`;
+  const sourceEntries = await Promise.all([
+    'README.md',
+    'docs/roadmap.md',
+    ...packagePaths,
+    upgradePath,
+    releasingPath,
+  ].map(async (path) => ({ path, text: await readFile(resolve(root, path), 'utf8') })));
+  const packagePolicy = Object.fromEntries(packagePaths.map((path) => [path, [
+    `current \`${currentVersion}\` release line`,
+    '## Stability notes',
+  ]]));
+  validateDocsConsistency(sourceEntries, {
+    currentVersion,
+    releaseLinePaths: packagePaths,
+    requiredPhrasesByPath: {
+      'README.md': [
+        '- stable: the public package surfaces',
+        '- experimental: RFC-backed or opt-in surfaces',
+        '- unsupported: behaviors that the contract documents reject',
+        'Historical RFC decisions remain preserved',
+      ],
+      'docs/roadmap.md': [
+        'provides language tooling, Devtools, and a public',
+        'Milestones M2 through M5 are completed',
+      ],
+      [upgradePath]: [
+        '- stable: public package surfaces',
+        '- experimental: explicitly labeled RFC-backed or opt-in surfaces',
+        '- unsupported: behaviors the contract rejects',
+      ],
+      [releasingPath]: [
+        'stable describes shipped public contracts',
+        'experimental describes explicitly',
+        'unsupported marks boundaries',
+      ],
+      ...packagePolicy,
+    },
+  });
+}
 
 function validatePackageDocs(packageDocs, packageContract) {
   if (!packageDocs || packageDocs.version !== 1 || !Array.isArray(packageDocs.packages)) {

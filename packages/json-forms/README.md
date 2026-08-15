@@ -9,6 +9,13 @@ JSON Forms UI schema into one accessible, form-associated Web Component. It is
 an optional package: schema rendering and AJV validation do not enter
 `@gluonjs/core`.
 
+## Stability notes
+
+The package ships as part of the current `1.9.0` release line. Its documented
+schema and UI schema subset is stable; broader JSON Schema features and
+alternative renderer systems remain unsupported unless a later contract adds
+them.
+
 ```ts
 import {
   registerJsonForms,
@@ -75,7 +82,7 @@ layouts other than `VerticalLayout` remain unsupported. An unsupported schema
 or UI schema renders an explicit configuration error rather than silently
 dropping fields.
 
-## 1.6 delivery decision
+## Historical delivery decision
 
 The direct-property component was the first usable package slice identified in
 issue #256 and delivered in [#257](https://github.com/marcmalerei/gluon/issues/257).

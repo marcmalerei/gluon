@@ -871,9 +871,24 @@ Custom Element component boundaries; `dev:benchmark:components` serves its
 interactive page on port 4175. Current evidence must not be generalized into
 an unsupported superiority claim or an unmeasured hardware claim.
 
+## Stability policy
+
+Gluon 1.9.0 ships three documentation states:
+
+- stable: the public package surfaces, application runtime, component packages,
+  tooling, and release guidance described in the versioned docs and package READMEs;
+- experimental: RFC-backed or opt-in surfaces that are explicitly labeled as such
+  in their own package or guide;
+- unsupported: behaviors that the contract documents reject or leave outside the
+  supported boundary.
+
+Historical RFC decisions remain preserved in `docs/rfcs/` and should be read as
+context, not as current release-state claims.
+
 ## Contributing
 
-The runtime exists, but the API remains experimental. Use [GitHub Issues](https://github.com/marcmalerei/gluon/issues) to discuss changes before implementation.
+Use [GitHub Issues](https://github.com/marcmalerei/gluon/issues) to discuss
+changes before implementation.
 
 ## License
 

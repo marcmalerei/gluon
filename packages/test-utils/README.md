@@ -8,6 +8,13 @@ The official Gluon test utilities mount public components and applications in a
 real browser without private runtime imports. The package targets Gluon's
 currently supported Chromium browser matrix.
 
+## Stability notes
+
+The package ships as part of the current `1.9.0` release line. Browser-facing
+helpers and SSR fixtures are stable; direct access to renderer parts, private
+runtime imports, and browser matrices beyond the documented evidence remain
+unsupported.
+
 ## Functional components
 
 ```ts
