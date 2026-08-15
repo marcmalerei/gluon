@@ -1176,7 +1176,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, organismManifest, organismStyles, type AppShellProps } from '@gluonjs/organisms';",
+        "import { AppShell, WorkflowTimeline, organismManifest, organismStyles, workflowTimelineStyles, type AppShellProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1184,7 +1184,12 @@
         "  children: html`<h1>New arrivals</h1>`,",
         "  footer: html`<small>Free shipping over €100</small>`,",
         "} satisfies AppShellProps;",
-        "console.log(AppShell(shell), organismStyles, organismManifest.entries);"
+        "const workflowStep: WorkflowTimelineStep = { id: 'review', label: 'Review', status: 'current' satisfies WorkflowTimelineStatus, role: 'Reviewer', evidence: 'Ticket 42' };",
+        "const workflowState: WorkflowTimelineOverallState = 'degraded';",
+        "const workflowAttributes: WorkflowTimelineAttributes = { 'aria-label': 'Order workflow' };",
+        "const workflowMessages: WorkflowTimelineMessages = { timeline: 'Ablauf', status: (status) => `Status: ${status}`, step: (position, total) => `${position} von ${total}`, evidence: 'Nachweis' };",
+        "const workflow: WorkflowTimelineProps = { id: 'order-workflow', steps: [workflowStep], state: workflowState, messages: workflowMessages, role: 'Operations', evidence: 'Import log 42', attributes: workflowAttributes };",
+        "console.log(AppShell(shell), WorkflowTimeline(workflow), organismStyles, workflowTimelineStyles, organismManifest.entries);"
       ]
     },
     "router-application": {
@@ -5279,6 +5284,38 @@
     "packages/organisms/src/interfaces/AppShellProps.md": {
       "recipe": "organism-components",
       "description": "Arrange optional header, navigation, and footer content around the required main application content:"
+    },
+    "packages/organisms/src/interfaces/WorkflowTimelineProps.md": {
+      "recipe": "organism-components",
+      "description": "Describe a request-free workflow timeline with typed stages, explicit state, and caller-owned action slots:"
+    },
+    "packages/organisms/src/interfaces/WorkflowTimelineStep.md": {
+      "recipe": "organism-components",
+      "description": "Describe one workflow stage with status, role, evidence, and optional safe content slots:"
+    },
+    "packages/organisms/src/interfaces/WorkflowTimelineMessages.md": {
+      "recipe": "organism-components",
+      "description": "Localize the timeline's framework-owned labels and status text without adding product copy:"
+    },
+    "packages/organisms/src/type-aliases/WorkflowTimelineAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Extend the timeline's outer section with native attributes and an accessible name:"
+    },
+    "packages/organisms/src/type-aliases/WorkflowTimelineOverallState.md": {
+      "recipe": "organism-components",
+      "description": "Select the overall loading, empty, blocked, degraded, or complete workflow state:"
+    },
+    "packages/organisms/src/type-aliases/WorkflowTimelineStatus.md": {
+      "recipe": "organism-components",
+      "description": "Select the semantic status for one ordered workflow stage:"
+    },
+    "packages/organisms/src/variables/WorkflowTimeline.md": {
+      "recipe": "organism-components",
+      "description": "Render a responsive semantic ordered workflow timeline from public package exports:"
+    },
+    "packages/organisms/src/variables/workflowTimelineStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable stylesheet for the WorkflowTimeline organism:"
     },
     "packages/organisms/src/variables/AppShell.md": {
       "recipe": "organism-components",

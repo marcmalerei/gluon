@@ -461,7 +461,8 @@
       "useCases": [
         "App shell and larger layout structures built from lower-level packages.",
         "Landmarks, navigation, and responsive composition.",
-        "Structured interface regions for browser apps."
+        "Structured interface regions for browser apps.",
+        "Bounded multi-stage workflows with explicit status and evidence."
       ],
       "limits": [
         "Does not generate content that the caller has not supplied.",

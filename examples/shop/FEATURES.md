@@ -1,5 +1,11 @@
 # GLUON GOODS capability evidence
 
+`WorkflowTimeline` is intentionally not integrated into GLUON GOODS: the
+current customer journey has no bounded multi-stage status domain with a
+customer-visible responsible role and last evidence. Adding one would be a
+decorative, disconnected surface. The organism is covered by package,
+SSR/hydration, browser, and Storybook contracts instead.
+
 | Gluon capability | Shop surface | Automated evidence | Status |
 | --- | --- | --- | --- |
 | `@gluonjs/atoms` `AspectRatio`, `Avatar`, `ScrollArea`, and `Separator` | No honest current surface: product media already owns its aspect-ratio contract, no account/avatar workflow exists, catalog volume does not need a new scrolling region, and existing rules are not standalone separators. Adding decorative wrappers would manufacture product behavior. | Atom semantics, geometry, accessibility, exact-style, SSR/hydration, type, package, Storybook, and cross-engine visual evidence | Shop unchanged for the verified scope reasons |

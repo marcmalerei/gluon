@@ -45,7 +45,7 @@ import {
   createDialogSurfaceController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AppShell, defineOrganism } from '@gluonjs/organisms';
+import { AppShell, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -151,6 +151,11 @@ createApp(() => AppShell({
   }),
   navigation: q.a({ href: '#profile', children: 'Profile' }),
   children: [
+    WorkflowTimeline({
+      id: 'ui-system-workflow',
+      state: 'complete',
+      steps: [{ id: 'profile', label: 'Profile reviewed', status: 'completed', evidence: 'Example record' }],
+    }),
     NavigationStrip({
       label: 'Account sections',
       children: [

@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the SSR-safe, request-free `WorkflowTimeline` organism for bounded
+  multi-stage workflows with required instance IDs and truthful derived active,
+  blocked, and complete state.
+
+### Changed
+
+- Added typed localized messages, human-readable default status and summary
+  copy, fail-closed state validation, namespaced ARIA relationships, explicit
+  summaries, and complete Storybook state coverage.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

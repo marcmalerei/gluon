@@ -17,7 +17,7 @@ import {
 import { ref } from '@gluonjs/reactivity';
 import { Button, Icon } from '@gluonjs/atoms';
 import { Card, FormField } from '@gluonjs/molecules';
-import { AppShell } from '@gluonjs/organisms';
+import { AppShell, WorkflowTimeline, type WorkflowTimelineProps } from '@gluonjs/organisms';
 import { fragment, q, quark } from '@gluonjs/quarks';
 
 describe('component variants and utilities', () => {
@@ -108,6 +108,106 @@ describe('component variants and utilities', () => {
     expect(root.querySelector('.gluon-app-shell-navigation')).toBeNull();
     expect(root.querySelector('.gluon-app-shell-footer')).toBeNull();
     expect(unnamed.displayName).toBe('AnonymousComponent');
+  });
+
+  it('renders WorkflowTimeline as one accessible ordered list across workflow states', () => {
+    const root = document.createElement('div');
+    render(WorkflowTimeline({
+      id: 'operations-workflow',
+      state: 'degraded',
+      role: 'Operations',
+      evidence: 'Import log 42',
+      nextAction: q.button({ children: 'Retry' }),
+      steps: [
+        { id: 'a', label: 'Received', status: 'completed', evidence: 'Receipt' },
+        { id: 'b', label: 'Review', status: 'current', role: 'Reviewer' },
+        { id: 'c', label: 'Approval', status: 'blocked' },
+        { id: 'd', label: 'Delivery', status: 'pending' },
+        { id: 'e', label: 'Archived', status: 'skipped' },
+      ],
+    }), root);
+    expect(root.querySelectorAll('ol > li')).toHaveLength(5);
+    expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Review');
+    expect(root.textContent).toContain('Next action:');
+    expect(root.textContent).toContain('Responsible role: Operations');
+    expect(root.textContent).toContain('Last evidence: Import log 42');
+    expect(root.querySelector('.gluon-workflow-timeline')).not.toBeNull();
+  });
+
+  it('localizes status messages and creates safe unique relationships', () => {
+    const root = document.createElement('div');
+    render(WorkflowTimeline({
+      id: 'localized-workflow',
+      messages: {
+        timeline: 'Ablauf',
+        status: (status) => `Status ${status}`,
+        step: (position, total) => `Schritt ${position} von ${total}`,
+        evidence: 'Nachweis',
+      },
+      steps: [
+        { id: 'a/b', label: 'Erster', status: 'completed', description: 'Beschreibung' },
+        { id: 'a b', label: 'Zweiter', status: 'current' },
+      ],
+    }), root);
+    const steps = [...root.querySelectorAll('ol > li')];
+    expect(new Set(steps.map((step) => step.id)).size).toBe(2);
+    expect(steps[0]?.id).toMatch(/^localized-workflow-step-a-b/);
+    expect(steps[1]?.id).toMatch(/^localized-workflow-step-a-b-/);
+    expect(steps[0]?.getAttribute('aria-labelledby')).toBe(steps[0]?.querySelector('[id]')?.id);
+    expect(root.textContent).toContain('Status completed');
+    expect(root.textContent).toContain('Schritt 2 von 2');
+    expect(root.textContent).not.toContain('Evidence:');
+    expect(root.querySelector('[data-state="current"]')?.getAttribute('part')).toContain('step-current');
+  });
+
+  it('fails closed for duplicate IDs, multiple current steps, and inconsistent overall state', () => {
+    const root = document.createElement('div');
+    render(WorkflowTimeline({ id: 'invalid-workflow', state: 'complete', steps: [
+      { id: 'same', label: 'One', status: 'current' },
+      { id: 'same', label: 'Two', status: 'current' },
+    ], messages: { invalid: 'Ungültiger Ablauf' } }), root);
+    expect(root.querySelector('[data-state="invalid"]')).not.toBeNull();
+    expect(root.querySelector('ol')).toBeNull();
+    expect(root.textContent).toContain('Ungültiger Ablauf');
+    const invalidCases: WorkflowTimelineProps[] = [
+      { id: 'invalid id', steps: [] },
+      { id: 'invalid-status', steps: [{ id: 'one', label: 'One', status: 'unknown' as never }] },
+      { id: 'invalid-step-id', steps: [{ id: ' ', label: 'One', status: 'pending' }] },
+      { id: 'invalid-step-label', steps: [{ id: 'one', label: ' ', status: 'pending' }] },
+      { id: 'multiple-current', steps: [{ id: 'one', label: 'One', status: 'current' }, { id: 'two', label: 'Two', status: 'current' }] },
+      { id: 'nonempty-empty', state: 'empty', steps: [{ id: 'one', label: 'One', status: 'pending' }] },
+      { id: 'unknown-overall', state: 'unknown' as never, steps: [] },
+      { id: 'empty-active', state: 'active', steps: [] },
+      { id: 'blocked-active', state: 'active', steps: [{ id: 'one', label: 'One', status: 'blocked' }] },
+      { id: 'finished-active', state: 'active', steps: [{ id: 'one', label: 'One', status: 'completed' }] },
+      { id: 'empty-complete', state: 'complete', steps: [] },
+      { id: 'pending-complete', state: 'complete', steps: [{ id: 'one', label: 'One', status: 'pending' }] },
+      { id: 'unblocked-blocked', state: 'blocked', steps: [{ id: 'one', label: 'One', status: 'pending' }] },
+    ];
+    for (const invalid of invalidCases) {
+      const target = document.createElement('div');
+      render(WorkflowTimeline(invalid), target);
+      expect(target.querySelector('[data-state="invalid"]'), invalid.id).not.toBeNull();
+      expect(target.querySelector('ol'), invalid.id).toBeNull();
+    }
+  });
+
+  it('derives active, blocked, and complete states without duplicate root relationships', () => {
+    const root = document.createElement('div');
+    render(q.div({ children: [
+      WorkflowTimeline({ id: 'first-workflow', steps: [{ id: 'review', label: 'Review', status: 'current' }] }),
+      WorkflowTimeline({ id: 'second-workflow', steps: [{ id: 'review', label: 'Review', status: 'pending' }] }),
+      WorkflowTimeline({ id: 'blocked-workflow', steps: [{ id: 'review', label: 'Review', status: 'blocked' }] }),
+      WorkflowTimeline({ id: 'complete-workflow', steps: [{ id: 'review', label: 'Review', status: 'completed' }] }),
+    ] }), root);
+    expect(root.querySelector('#first-workflow')?.getAttribute('data-state')).toBe('active');
+    expect(root.querySelector('#second-workflow')?.getAttribute('data-state')).toBe('active');
+    expect(root.querySelector('#blocked-workflow')?.getAttribute('data-state')).toBe('blocked');
+    expect(root.querySelector('#complete-workflow')?.getAttribute('data-state')).toBe('complete');
+    const ids = [...root.querySelectorAll<HTMLElement>('[id]')].map((element) => element.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(root.textContent).toContain('Current');
+    expect(root.textContent).toContain('Pending');
   });
 
   it('composes typed functional components with an HTML template body and no host boundary', () => {

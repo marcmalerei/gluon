@@ -17,6 +17,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   teardown-safe media-query ownership.
 - Added a typed, request-free JSON Forms renderer registry with declarative
   priority selection, built-in fallback, and host-owned form/event lifecycle.
+- Added the request-free, SSR-safe `WorkflowTimeline` organism with required
+  instance IDs, semantic ordered-list status, truthful derived overall state,
+  localized summaries, role/evidence/action slots, and responsive accessibility
+  contracts.
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.

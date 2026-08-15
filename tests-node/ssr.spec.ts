@@ -62,6 +62,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -91,6 +92,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-hidden="true"');
   });
 
+  it('serializes WorkflowTimeline without DOM or request state', async () => {
+    const first = await renderToString(WorkflowTimeline({
+      id: 'ssr-workflow',
+      state: 'complete',
+      steps: [{ id: 'done', label: 'Done', status: 'completed', evidence: 'Receipt 42' }],
+    }));
+    const second = await renderToString(WorkflowTimeline({
+      id: 'ssr-workflow',
+      state: 'complete',
+      steps: [{ id: 'done', label: 'Done', status: 'completed', evidence: 'Receipt 42' }],
+    }));
+    expect(first).toBe(second);
+    expect(first).toContain('<ol');
+    expect(first).toContain('Receipt 42');
+    expect(first).toContain('data-gluon-h-');
+  });
   it('serializes the DialogSurface ARIA structure without invoking browser focus APIs', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(DialogSurface({
       id: 'server-dialog',
