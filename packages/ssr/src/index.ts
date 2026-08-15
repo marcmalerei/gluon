@@ -548,6 +548,10 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
     yield contract.markup;
     return;
   }
+  if (contract?.kind === 'trusted-html') {
+    yield contract.markup;
+    return;
+  }
   if (contract?.kind === 'unsafe-url') {
     yield escapeText(contract.value);
     return;
@@ -672,6 +676,12 @@ function serializeBinding(name: string, value: unknown, assets?: AssetManifest):
   if (contract?.kind === 'unsafe-html') {
     if (attribute.toLowerCase() !== 'srcdoc') {
       throw new TypeError('unsafeHTML() can only be used in child content or srcdoc.');
+    }
+    return ` ${safeAttributeName(attribute)}="${escapeAttribute(contract.markup)}"`;
+  }
+  if (contract?.kind === 'trusted-html') {
+    if (attribute.toLowerCase() !== 'srcdoc') {
+      throw new TypeError('trustedHTML() can only be used in child content or srcdoc.');
     }
     return ` ${safeAttributeName(attribute)}="${escapeAttribute(contract.markup)}"`;
   }

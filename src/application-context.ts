@@ -35,7 +35,18 @@ export type AppWarningHandler = (info: AppWarningInfo) => void;
 export interface AppConfig {
   errorHandler?: AppErrorHandler;
   warnHandler?: AppWarningHandler;
+  trustedTypes?: TrustedTypesConfig;
   readonly globalProperties: Record<string, unknown>;
+}
+
+export interface TrustedTypesConfig {
+  readonly policyName: string;
+  readonly policy: TrustedTypePolicy;
+}
+
+export interface TrustedTypePolicy {
+  readonly name?: string;
+  createHTML(input: string): unknown;
 }
 
 export type FunctionalComponent<Props = Readonly<Record<string, unknown>>> = (
@@ -157,6 +168,25 @@ export function runWithApplicationContext<Result>(
 
 export function getActiveApplicationContext(): ApplicationContext | undefined {
   return activeFrame?.context;
+}
+
+/** @internal Validates the application-owned policy handoff before an HTML sink is reached. */
+export function validateTrustedTypesConfig(config: TrustedTypesConfig | undefined): void {
+  if (!config) return;
+  if (
+    typeof config.policyName !== 'string'
+    || config.policyName.length === 0
+    || config.policyName.length > 128
+    || !/^[A-Za-z0-9#=_/@.%:-]+$/.test(config.policyName)
+  ) {
+    throw new TypeError('GLUON_TRUSTED_TYPES_POLICY_NAME_INVALID: policyName must be a non-empty CSP policy token of at most 128 characters.');
+  }
+  if (!config.policy || typeof config.policy.createHTML !== 'function') {
+    throw new TypeError(`GLUON_TRUSTED_TYPES_POLICY_MISSING: policy "${config.policyName}" must provide createHTML().`);
+  }
+  if (typeof config.policy.name === 'string' && config.policy.name !== config.policyName) {
+    throw new TypeError(`GLUON_TRUSTED_TYPES_POLICY_NAME_MISMATCH: configured policy "${config.policyName}" received policy "${config.policy.name}".`);
+  }
 }
 
 export function getActiveElement(): Element | undefined {

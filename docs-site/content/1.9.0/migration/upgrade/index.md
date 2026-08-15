@@ -96,6 +96,18 @@ Replace the example workspace paths and package lists with the real consumers.
 If the workspace root itself consumes Gluon, update it with
 `npm install --include-workspace-root --save-exact` and the same target version.
 
+## Opt into Chromium Trusted Types enforcement
+
+Existing applications do not need a policy. An application that enables
+`require-trusted-types-for 'script'` must create and allow one named policy,
+then assign `{ policyName, policy }` to `app.config.trustedTypes` before mount or
+hydration. Pass the same configuration to direct `hydrate()` and
+`applyProgressivePatch()` calls. Replace reviewed `unsafeHTML()` values with
+`trustedHTML()` where policy-required ownership should be explicit; this does
+not sanitize the markup. Test missing-policy and rejected-policy diagnostics in
+the application's CSP environment. Gluon's conformance evidence is Chromium
+specific and does not establish a cross-browser enforcement claim.
+
 ## Rollback
 
 If the upgrade does not validate, first inspect `git diff` and confirm that the

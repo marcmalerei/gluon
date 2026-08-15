@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "claim": "opt-in Chromium require-trusted-types-for compatibility",
+  "sinks": [
+    {
+      "id": "core-html-template",
+      "path": "src/runtime.ts",
+      "token": "'HTML template compilation'",
+      "control": "application-owned policy or actionable enforcement failure",
+      "evidence": "scripts/validate-trusted-types-chromium.mjs"
+    },
+    {
+      "id": "core-svg-template",
+      "path": "src/runtime.ts",
+      "token": "'SVG template compilation'",
+      "control": "application-owned policy before template.innerHTML",
+      "evidence": "scripts/validate-trusted-types-chromium.mjs"
+    },
+    {
+      "id": "core-hydration-expected-markup",
+      "path": "src/runtime.ts",
+      "token": "'hydration expected markup'",
+      "control": "HydrationOptions.trustedTypes or application-root policy",
+      "evidence": "scripts/validate-trusted-types-chromium.mjs"
+    },
+    {
+      "id": "core-dynamic-contextual-fragment",
+      "path": "src/runtime.ts",
+      "token": "range.createContextualFragment(trustedMarkup)",
+      "control": "configured policy; trustedHTML requires opt-in even without enforcement",
+      "evidence": "tests/dom-runtime-contract.spec.ts"
+    },
+    {
+      "id": "core-dynamic-template-fallback",
+      "path": "src/runtime.ts",
+      "token": "assignTrustedTemplateHTML(template, trustedMarkup",
+      "control": "same dynamic-fragment policy contract on detached markers",
+      "evidence": "tests/dom-runtime-contract.spec.ts"
+    },
+    {
+      "id": "core-srcdoc-property",
+      "path": "src/runtime.ts",
+      "token": "`.${property}`",
+      "control": "unsafeHTML or policy-backed trustedHTML only",
+      "evidence": "tests/dom-runtime-contract.spec.ts"
+    },
+    {
+      "id": "core-srcdoc-attribute",
+      "path": "src/runtime.ts",
+      "token": "'srcdoc attribute'",
+      "control": "unsafeHTML or policy-backed trustedHTML only",
+      "evidence": "tests/dom-runtime-contract.spec.ts"
+    },
+    {
+      "id": "ssr-progressive-patch",
+      "path": "packages/ssr/src/streaming.ts",
+      "token": "template.innerHTML = toTrustedHTML",
+      "control": "ProgressivePatchApplicationOptions.trustedTypes with stable errors",
+      "evidence": "scripts/validate-trusted-types-chromium.mjs"
+    },
+    {
+      "id": "ssr-dom-free-serialization",
+      "path": "packages/ssr/src/index.ts",
+      "token": "contract?.kind === 'trusted-html'",
+      "control": "no browser parser sink; deterministic explicit trusted value transport",
+      "evidence": "tests-node/ssr.spec.ts"
+    },
+    {
+      "id": "scoped-registry-probe",
+      "path": "src/element-registry.ts",
+      "token": "root.innerHTML = '<gluon-scoped-registry-probe></gluon-scoped-registry-probe>'",
+      "control": "fixed feature-detection markup; enforcement rejection is caught and selects the documented global-registry fallback",
+      "evidence": "tests/scoped-element-registries.spec.ts"
+    },
+    {
+      "id": "test-utils-head-materialization",
+      "path": "packages/test-utils/src/ssr.ts",
+      "token": "headTemplate.innerHTML = server.head",
+      "control": "test-only caller-owned fixture outside the production runtime claim",
+      "evidence": "packages/test-utils/README.md"
+    },
+    {
+      "id": "test-utils-state-materialization",
+      "path": "packages/test-utils/src/ssr.ts",
+      "token": "stateRoot.innerHTML = server.stateScript",
+      "control": "test-only caller-owned fixture outside the production runtime claim",
+      "evidence": "packages/test-utils/README.md"
+    },
+    {
+      "id": "test-utils-body-materialization",
+      "path": "packages/test-utils/src/ssr.ts",
+      "token": "container.innerHTML = server.html",
+      "control": "test-only caller-owned fixture outside the production runtime claim",
+      "evidence": "packages/test-utils/README.md"
+    },
+    {
+      "id": "generated-test-head-materialization",
+      "path": "packages/create-gluon/src/template.ts",
+      "token": "carriers.innerHTML = response.head",
+      "control": "generated test fixture outside shipped application runtime",
+      "evidence": "tests-node/create-gluon.spec.ts"
+    },
+    {
+      "id": "generated-test-body-materialization",
+      "path": "packages/create-gluon/src/template.ts",
+      "token": "root.innerHTML = response.html",
+      "control": "generated test fixture outside shipped application runtime",
+      "evidence": "tests-node/create-gluon.spec.ts"
+    },
+    {
+      "id": "generated-test-state-materialization",
+      "path": "packages/create-gluon/src/template.ts",
+      "token": "document.body.insertAdjacentHTML('beforeend', response.stateScript)",
+      "control": "generated test fixture outside shipped application runtime",
+      "evidence": "tests-node/create-gluon.spec.ts"
+    }
+  ]
+}

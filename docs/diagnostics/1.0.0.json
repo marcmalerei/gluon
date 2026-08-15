@@ -72,6 +72,66 @@
       "source": "runtime"
     },
     {
+      "id": 1008,
+      "code": "GLUON_TRUSTED_TYPES_POLICY_FAILED",
+      "compactCode": "G1008",
+      "title": "Trusted Types policy failed",
+      "summary": "The application-owned Trusted Types policy threw while creating HTML.",
+      "why": "The configured policy rejected or could not transform the reviewed markup at a parser boundary.",
+      "remediation": "Inspect the application policy, allow the documented policy name in CSP, and keep untrusted content on the escaping path.",
+      "source": "runtime"
+    },
+    {
+      "id": 1009,
+      "code": "GLUON_TRUSTED_TYPES_POLICY_INCOMPATIBLE",
+      "compactCode": "G1009",
+      "title": "Trusted Types policy is incompatible",
+      "summary": "The configured policy did not return a native TrustedHTML value in a supporting browser.",
+      "why": "The policy object or browser realm does not satisfy the explicit Trusted Types handoff contract.",
+      "remediation": "Pass the native application-owned policy from the active browser realm.",
+      "source": "runtime"
+    },
+    {
+      "id": 1010,
+      "code": "GLUON_TRUSTED_TYPES_POLICY_MISSING",
+      "compactCode": "G1010",
+      "title": "Trusted Types policy is missing",
+      "summary": "A Trusted Types configuration names a policy but provides no compatible policy object.",
+      "why": "Gluon never creates a global policy implicitly because the application owns the HTML trust boundary.",
+      "remediation": "Create and pass the named application policy before mount or hydration.",
+      "source": "runtime"
+    },
+    {
+      "id": 1011,
+      "code": "GLUON_TRUSTED_TYPES_POLICY_NAME_INVALID",
+      "compactCode": "G1011",
+      "title": "Trusted Types policy name is invalid",
+      "summary": "The configured Trusted Types policy name is empty or malformed.",
+      "why": "Policy names must be stable non-empty identifiers that can be allowed by the application CSP.",
+      "remediation": "Use a valid application-owned policy name and the same name in CSP.",
+      "source": "runtime"
+    },
+    {
+      "id": 1012,
+      "code": "GLUON_TRUSTED_TYPES_POLICY_NAME_MISMATCH",
+      "compactCode": "G1012",
+      "title": "Trusted Types policy name does not match",
+      "summary": "The configured policy identity differs from the declared application policy name.",
+      "why": "A mismatched handoff makes the reviewed policy boundary ambiguous.",
+      "remediation": "Pass the policy under its exact created name and align the CSP allowlist.",
+      "source": "runtime"
+    },
+    {
+      "id": 1013,
+      "code": "GLUON_TRUSTED_TYPES_POLICY_REQUIRED",
+      "compactCode": "G1013",
+      "title": "Trusted Types policy is required",
+      "summary": "A trusted raw-markup operation reached a parser sink without an application-owned policy.",
+      "why": "The browser enforces Trusted Types or trustedHTML() explicitly requires reviewed policy ownership.",
+      "remediation": "Configure app.config.trustedTypes or pass the documented direct-call option before using the trusted markup path.",
+      "source": "runtime"
+    },
+    {
       "id": 1101,
       "code": "GLUON_TEMPLATE_STYLE_ELEMENT",
       "compactCode": "G1101",
@@ -341,6 +401,26 @@
       "summary": "A progressive SSR patch contains a style carrier that conflicts with the target document.",
       "why": "The existing carrier has different CSS text or digest content.",
       "remediation": "Keep the original manifest and reload the shell before applying the patch.",
+      "source": "ssr"
+    },
+    {
+      "id": 1307,
+      "code": "GLUON_SSR_TRUSTED_TYPES_POLICY_INCOMPATIBLE",
+      "compactCode": "G1307",
+      "title": "SSR Trusted Types policy is incompatible",
+      "summary": "A progressive SSR browser patch policy did not produce native TrustedHTML.",
+      "why": "The supplied policy object or browser realm cannot authorize the progressive parser sink.",
+      "remediation": "Pass the native application-owned policy from the active browser realm before applying patches.",
+      "source": "ssr"
+    },
+    {
+      "id": 1308,
+      "code": "GLUON_SSR_TRUSTED_TYPES_POLICY_REQUIRED",
+      "compactCode": "G1308",
+      "title": "SSR Trusted Types policy is required",
+      "summary": "A progressive SSR browser patch reached its parser sink without an application-owned policy.",
+      "why": "Trusted Types enforcement requires the application to authorize reviewed streamed patch markup explicitly.",
+      "remediation": "Pass the documented trustedTypes configuration to applyProgressivePatch().",
       "source": "ssr"
     },
     {

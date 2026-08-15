@@ -16,6 +16,7 @@ import {
   runActiveGuarded,
   runWithApplicationContext,
   unregisterApplicationRoot,
+  validateTrustedTypesConfig,
   warn,
   type AppConfig,
   type AppContainer,
@@ -63,6 +64,8 @@ export {
   type AppRootRenderContext,
   type AppWarningHandler,
   type AppWarningInfo,
+  type TrustedTypePolicy,
+  type TrustedTypesConfig,
   type FunctionalComponent,
   type GluonApp,
   type GluonAppPlugin,
@@ -201,6 +204,7 @@ class GluonAppImpl<Public> implements GluonApp<Public> {
       throw new TypeError('A Gluon application mount requires a persistent Element or ShadowRoot.');
     }
     if (mountedContainers.has(container)) throw new Error('The mount container already owns a Gluon application.');
+    validateTrustedTypesConfig(this.config.trustedTypes);
     this.state = 'mounted';
     this.container = container;
     mountedContainers.set(container, this as GluonAppImpl<unknown>);

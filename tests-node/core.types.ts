@@ -36,6 +36,7 @@ import {
   suspendRender,
   unmount,
   unsafeHTML,
+  trustedHTML,
   unsafeURL,
   type GluonElementRegistry,
   type DirectiveLifecycle,
@@ -49,6 +50,9 @@ import {
   type ScopedSlot,
   type SlotDeclarations,
   type TemplateValue,
+  type TrustedHtmlResult,
+  type TrustedTypePolicy,
+  type TrustedTypesConfig,
   type VirtualizerHandle,
 } from '@gluonjs/core';
 
@@ -208,6 +212,13 @@ const lifecycle = directive(lifecycleDefinition);
 const click: EventBinding = event(() => undefined, { capture: true, once: true });
 html`<button @click=${click}>${lifecycle('ready')}</button>`;
 html`<div>${unsafeHTML('<strong>trusted</strong>')}</div>`;
+const trustedPolicy: TrustedTypePolicy = { name: 'typed', createHTML: (value) => value };
+const trustedTypes = { policyName: 'typed', policy: trustedPolicy } satisfies TrustedTypesConfig;
+const trustedMarkup: TrustedHtmlResult = trustedHTML('<strong>policy owned</strong>');
+html`<div>${trustedMarkup}</div>`;
+// @ts-expect-error a Trusted Types configuration always requires an application-owned policy
+const invalidTrustedTypes: TrustedTypesConfig = { policyName: 'missing' };
+void invalidTrustedTypes;
 html`<a href=${unsafeURL('data:text/plain,reviewed')}>Reviewed</a>`;
 suspendRender(null);
 unmount(null);
@@ -237,6 +248,7 @@ const application = createApp<{ reset(): void }>((context) => {
 });
 application.config.errorHandler = ({ error, source }) => { void error; void source; };
 application.config.warnHandler = ({ message, code }) => { void message; void code; };
+application.config.trustedTypes = trustedTypes;
 application.use(counterPlugin, { initial: 1 });
 application.component<{ label: string }>('label', ({ label }) => html`<span>${label}</span>`);
 application.onMounted(() => undefined).onUnmounted(() => undefined);

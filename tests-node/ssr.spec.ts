@@ -26,6 +26,7 @@ import {
   repeat,
   svg,
   unsafeHTML,
+  trustedHTML,
   unsafeURL,
 } from '@gluonjs/core';
 import { defineStore } from '@gluonjs/store';
@@ -338,6 +339,8 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(visible).toContain('<b>1</b><b>2</b>');
     expect(visible).toContain('<em>trusted</em>');
     expect(visible).toContain('<svg viewBox="0 0 1 1"><path d="M0 0"></path></svg>');
+    expect(withoutHydrationMarkers(await renderToString(html`<section>${trustedHTML('<i>owned</i>')}</section>`)))
+      .toBe('<section><i>owned</i></section>');
     expect(rendered).toContain('<!--gluon:h:');
     expect(click).not.toHaveBeenCalled();
   });
@@ -349,8 +352,12 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       .toContain('href="javascript:trusted()"');
     expect(await renderToString(html`<iframe srcdoc=${unsafeHTML('<p>trusted</p>')}></iframe>`))
       .toContain('srcdoc="&lt;p&gt;trusted&lt;/p&gt;"');
+    expect(await renderToString(html`<iframe srcdoc=${trustedHTML('<p>policy owned</p>')}></iframe>`))
+      .toContain('srcdoc="&lt;p&gt;policy owned&lt;/p&gt;"');
     await expect(renderToString(html`<p title=${unsafeHTML('<b>bad</b>')}></p>`))
       .rejects.toThrow('unsafeHTML() can only be used');
+    await expect(renderToString(html`<p title=${trustedHTML('<b>bad</b>')}></p>`))
+      .rejects.toThrow('trustedHTML() can only be used');
 
     const browserOnly = directive(() => () => undefined);
     await expect(renderToString(html`${browserOnly()}`)).rejects.toEqual(expect.objectContaining({
@@ -907,6 +914,14 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     template.innerHTML = '<em>Template replacement</em>';
     expect(applyProgressivePatchTemplate(templateRoot, template).insertedNodes).toBe(1);
     expect(templateRoot.textContent).toBe('Template replacement');
+
+    const policyRoot = document.createElement('main');
+    policyRoot.innerHTML = '<!--gluon:async:8--><!--gluon:/async:8-->';
+    const policyResult = applyProgressivePatch(policyRoot, {
+      kind: 'boundary', id: 8, html: '<mark>Policy patch</mark>', styles: { version: 1, entries: [] },
+    }, { trustedTypes: { policyName: 'ssr-test', policy: { name: 'ssr-test', createHTML: (value) => value } } });
+    expect(policyResult.insertedNodes).toBe(1);
+    expect(policyRoot.textContent).toBe('Policy patch');
   });
 
   it('rejects invalid, malformed, aborted, and conflicting progressive patches without mutation', () => {
@@ -954,6 +969,17 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     expect(() => applyProgressivePatch(detachedRoot, {
       kind: 'boundary', id: 1, html: '', styles: { version: 1, entries: [] },
     })).toThrowError(/must belong to a document/);
+
+    const policyRoot = document.createElement('main');
+    policyRoot.innerHTML = '<!--gluon:async:10--><!--gluon:/async:10-->';
+    expect(() => applyProgressivePatch(policyRoot, {
+      kind: 'boundary', id: 10, html: '<b>never</b>', styles: { version: 1, entries: [] },
+    }, { trustedTypes: { policyName: 'missing' } as never })).toThrowError(/requires matching policyName/i);
+    expect(() => applyProgressivePatch(policyRoot, {
+      kind: 'boundary', id: 10, html: '<b>never</b>', styles: { version: 1, entries: [] },
+    }, { trustedTypes: { policyName: 'throws', policy: { createHTML: () => { throw new Error('no'); } } } }))
+      .toThrowError(/threw while parsing/i);
+    expect(policyRoot.textContent).toBe('');
   });
 });
 

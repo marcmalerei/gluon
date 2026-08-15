@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "releaseLine": "1.9.0",
-  "reviewedAt": "2026-07-12",
+  "reviewedAt": "2026-08-15",
   "areas": [
     {
       "id": "html",
@@ -63,13 +63,15 @@
     },
     {
       "id": "trusted-types",
-      "status": "not-claimed",
+      "status": "mitigated",
       "controls": [
-        "Gluon exposes explicit unsafeHTML() and unsafeURL() review points rather than silently trusting strings.",
-        "Version 1.4.0 makes no compatibility claim for require-trusted-types-for enforcement."
+        "An explicit application-owned policy covers HTML and SVG template compilation, dynamic fragments, srcdoc, hydration expected markup, and progressive SSR patch parsing.",
+        "trustedHTML() requires configured policy ownership while ordinary strings remain escaped and unsafeHTML() retains its visible review boundary.",
+        "Missing, malformed, throwing, mismatched, or non-TrustedHTML policies fail with stable actionable diagnostics.",
+        "A real Chromium page enforces require-trusted-types-for and records zero supported-flow CSP violations."
       ],
-      "residualRisk": "Template parsing and explicit raw-markup paths use browser HTML sinks; an enforcing application must supply and review its own compatible Trusted Types policy until Gluon defines a public policy contract.",
-      "evidence": ["src/runtime.ts", "docs/dom-runtime.md", "docs/security.md"]
+      "residualRisk": "The application policy is a trust decision, not a sanitizer supplied by Gluon; the evidence is Chromium-specific and does not claim cross-browser Trusted Types enforcement.",
+      "evidence": ["quality/trusted-types-sinks.json", "scripts/validate-trusted-types-sinks.mjs", "scripts/validate-trusted-types-chromium.mjs", "scripts/validate-trusted-types-package.mjs", "tests/dom-runtime-contract.spec.ts", "tests-node/ssr.spec.ts", "docs/dom-runtime.md", "docs/security.md"]
     },
     {
       "id": "eleventy-prerendering",

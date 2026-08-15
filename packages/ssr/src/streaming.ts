@@ -1,4 +1,4 @@
-import type { TemplateValue } from '@gluonjs/core';
+import type { TemplateValue, TrustedTypesConfig } from '@gluonjs/core';
 import {
   renderProgressively,
   renderStyleCarriers,
@@ -60,6 +60,8 @@ export interface ProgressivePatchApplicationOptions {
   readonly styleRoot?: Document | ShadowRoot;
   /** Cancels the patch before any DOM or style mutation takes place. */
   readonly signal?: AbortSignal;
+  /** Optional application-owned Trusted Types policy for HTML parsing sinks. */
+  readonly trustedTypes?: TrustedTypesConfig;
 }
 
 export interface ProgressivePatchApplicationResult {
@@ -72,7 +74,9 @@ export type ProgressivePatchErrorCode =
   | 'GLUON_SSR_PROGRESSIVE_ABORTED'
   | 'GLUON_SSR_PROGRESSIVE_INVALID_PATCH'
   | 'GLUON_SSR_PROGRESSIVE_BOUNDARY'
-  | 'GLUON_SSR_PROGRESSIVE_STYLE';
+  | 'GLUON_SSR_PROGRESSIVE_STYLE'
+  | 'GLUON_SSR_TRUSTED_TYPES_POLICY_REQUIRED'
+  | 'GLUON_SSR_TRUSTED_TYPES_POLICY_INCOMPATIBLE';
 
 export class ProgressivePatchError extends Error {
   constructor(readonly code: ProgressivePatchErrorCode, message: string) {
@@ -126,7 +130,19 @@ export function applyProgressivePatch(
     throw new ProgressivePatchError('GLUON_SSR_PROGRESSIVE_BOUNDARY', 'A progressive SSR patch root must belong to a document.');
   }
   const template = document.createElement('template');
-  template.innerHTML = patch.html;
+  try {
+    template.innerHTML = toTrustedHTML(patch.html, options.trustedTypes);
+  } catch (error) {
+    if (error instanceof ProgressivePatchError) throw error;
+    throw new ProgressivePatchError(
+      options.trustedTypes
+        ? 'GLUON_SSR_TRUSTED_TYPES_POLICY_INCOMPATIBLE'
+        : 'GLUON_SSR_TRUSTED_TYPES_POLICY_REQUIRED',
+      options.trustedTypes
+        ? `Trusted Types policy "${options.trustedTypes.policyName}" was rejected while parsing a progressive SSR patch.`
+        : 'Browser Trusted Types enforcement rejected a progressive SSR patch; pass an application-owned trustedTypes policy.',
+    );
+  }
   const fragment = template.content;
   const insertedNodes = fragment.childNodes.length;
   throwIfProgressiveAborted(options.signal);
@@ -148,6 +164,49 @@ export function applyProgressivePatch(
     insertedNodes,
     installedStyleIds: Object.freeze(installedStyleIds),
   });
+}
+
+function toTrustedHTML(
+  markup: string,
+  trustedTypes?: ProgressivePatchApplicationOptions['trustedTypes'],
+): string {
+  if (!trustedTypes) return markup;
+  if (
+    typeof trustedTypes.policyName !== 'string'
+    || trustedTypes.policyName.length === 0
+    || trustedTypes.policyName.length > 128
+    || !/^[A-Za-z0-9#=_/@.%:-]+$/.test(trustedTypes.policyName)
+    || !trustedTypes.policy
+    || typeof trustedTypes.policy.createHTML !== 'function'
+    || (typeof trustedTypes.policy.name === 'string' && trustedTypes.policy.name !== trustedTypes.policyName)
+  ) {
+    throw new ProgressivePatchError(
+      'GLUON_SSR_TRUSTED_TYPES_POLICY_INCOMPATIBLE',
+      'A progressive SSR patch requires matching policyName and policy.createHTML() values.',
+    );
+  }
+  let result: unknown;
+  try {
+    result = trustedTypes.policy.createHTML(markup);
+  } catch {
+    throw new ProgressivePatchError(
+      'GLUON_SSR_TRUSTED_TYPES_POLICY_INCOMPATIBLE',
+      `Trusted Types policy "${trustedTypes.policyName}" threw while parsing a progressive SSR patch.`,
+    );
+  }
+  const factory = (globalThis as typeof globalThis & {
+    readonly trustedTypes?: { isHTML?(value: unknown): boolean };
+  }).trustedTypes;
+  const compatible = typeof factory?.isHTML === 'function'
+    ? factory.isHTML(result)
+    : typeof result === 'string';
+  if (!compatible) {
+    throw new ProgressivePatchError(
+      'GLUON_SSR_TRUSTED_TYPES_POLICY_INCOMPATIBLE',
+      `Trusted Types policy "${trustedTypes.policyName}" did not return TrustedHTML for a progressive SSR patch.`,
+    );
+  }
+  return result as string;
 }
 
 interface ProgressiveBoundaryRange {

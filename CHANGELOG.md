@@ -7,6 +7,19 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added opt-in application-owned Trusted Types policy handoff for runtime,
+  hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
+  and clean-package evidence.
+
+### Changed
+
+- Rebased the GLUON GOODS initial JavaScript ceilings to 260,200 bytes raw and
+  71,200 bytes gzip after measuring the opt-in Trusted Types runtime paths on
+  the supported local and Linux CI build environments; the
+  image and document ceilings remain unchanged.
+
 ### Documentation
 
 - Published the versioned accessibility and compatibility support matrix with

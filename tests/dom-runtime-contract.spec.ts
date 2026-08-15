@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   GluonElement,
+  createApp,
   defineElement,
   directive,
   event,
@@ -12,7 +13,9 @@ import {
   svg,
   unmount,
   unsafeHTML,
+  trustedHTML,
   unsafeURL,
+  type TrustedTypesConfig,
 } from '../src/index.js';
 
 let lifecycleElementSequence = 0;
@@ -459,6 +462,20 @@ describe('DOM runtime contract', () => {
       '<p>allowed property</p>',
     );
 
+    const trustedRoot = document.createElement('div');
+    const trustedApp = createApp(() => html`
+      <section>${trustedHTML('<strong id="policy-owned">policy owned</strong>')}</section>
+      <iframe srcdoc=${trustedHTML('<p>trusted attribute</p>')}></iframe>
+      <iframe .srcdoc=${trustedHTML('<p>trusted property</p>')}></iframe>
+    `);
+    trustedApp.config.trustedTypes = createTestTrustedTypesConfig('gluon-dom-runtime-test');
+    const trustedMount = trustedApp.mount(trustedRoot);
+    expect(trustedRoot.querySelector('#policy-owned')?.textContent).toBe('policy owned');
+    expect([...trustedRoot.querySelectorAll('iframe')].map((frame) => frame.srcdoc)).toEqual([
+      '<p>trusted attribute</p>', '<p>trusted property</p>',
+    ]);
+    trustedMount.unmount();
+
     const link = (href: string | ReturnType<typeof unsafeURL>) => html`<a href=${href}>Link</a>`;
     render(link('/safe'), root);
     const originalHref = root.querySelector('a')?.getAttribute('href');
@@ -717,3 +734,14 @@ describe('DOM runtime contract', () => {
     expect(element.shadowRoot?.textContent).toBe('Rendered');
   });
 });
+
+function createTestTrustedTypesConfig(policyName: string): TrustedTypesConfig {
+  const factory = (globalThis as typeof globalThis & {
+    readonly trustedTypes?: { createPolicy(name: string, rules: { createHTML(value: string): string }): TrustedTypesConfig['policy'] };
+  }).trustedTypes;
+  return {
+    policyName,
+    policy: factory?.createPolicy(policyName, { createHTML: (value) => value })
+      ?? { name: policyName, createHTML: (value) => value },
+  };
+}
