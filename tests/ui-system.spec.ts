@@ -3,6 +3,8 @@ import { userEvent } from 'vitest/browser';
 import axe, { type Result } from 'axe-core';
 import {
   Button,
+  AspectRatio,
+  Avatar,
   Checkbox,
   Icon,
   Input,
@@ -17,6 +19,8 @@ import {
   ToggleButton,
   defineToggleButtonPreset,
   Textarea,
+  ScrollArea,
+  Separator,
   atomManifest,
   atomStyles,
   createUiStyleSelection,
@@ -32,6 +36,7 @@ import {
   getStyleSheetText,
   layerOrderStyles,
   render,
+  html,
   unadoptStyles,
 } from '../src/index.js';
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
@@ -74,6 +79,16 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
+  it('keeps foundation atoms native, scoped, and independently style-addressable', () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    render(html`${AspectRatio({ ratio: 1.5, children: 'content' })}${Avatar({ alt: 'Ada', fallback: 'A', status: 'error' })}${ScrollArea({ children: 'scroll content', attributes: { 'aria-label': 'Notes' } })}${Separator({})}`, host);
+    expect(host.querySelector('.gluon-aspect-ratio')).not.toBeNull();
+    expect(host.querySelector('.gluon-avatar__fallback')?.textContent).toBe('A');
+    expect(host.querySelector('.gluon-scroll-area')?.getAttribute('role')).toBeNull();
+    expect(host.querySelector('.gluon-scroll-area')?.getAttribute('tabindex')).toBe('0');
+    expect(host.querySelector('.gluon-separator')?.getAttribute('role')).toBe('separator');
+  });
   it('keeps Checkbox native checked, indeterminate, form-reset, and submission behavior', () => {
     const onChange = vi.fn();
     const form = document.createElement('form');

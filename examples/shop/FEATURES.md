@@ -1,5 +1,7 @@
 # GLUON GOODS capability evidence
 
+| `@gluonjs/atoms` AspectRatio, Avatar, ScrollArea, Separator | No honest current surface: product media already owns its aspect-ratio contract, no account/avatar workflow exists, catalog volume does not need a new scrolling region, and existing rules are not standalone separators. Adding decorative wrappers would manufacture product behavior. | Atom unit/SSR/type/package evidence and Storybook | Shop unchanged for the verified scope reasons |
+
 | Gluon capability | Shop surface | Automated evidence | Status |
 | --- | --- | --- | --- |
 | Optional `@gluonjs/i18n` native i18n plugin | GLUON GOODS remains single-locale in this slice because adding a customer-visible language switch requires translated product, checkout, and editorial copy as product content work; the optional package now provides ordered fallback chains, a DOM-free catalog validator with typed locale/key diagnostics, ICU-style plural/select messages, Intl formatting, namespace diagnostics, and SSR state transfer without pretending those translations exist in the shop | `tests/i18n.spec.ts`, `npm run typecheck:i18n`, `npm run test:i18n` | Integrated as optional i18n infrastructure; shop UI unchanged for the verified content-scope reason |

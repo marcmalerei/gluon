@@ -7,6 +7,13 @@
 Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
+Foundation atoms include `AspectRatio` (inline ratio wrapper), `Avatar` (caller-owned
+`loading`/`loaded`/`error` state with a decorative fallback), `ScrollArea` (native
+section scrolling with focus and direction modes), and `Separator` (native `hr`
+semantics, optionally decorative). Each atom owns a separately tree-shakable
+stylesheet and exposes only `--gluon-*` component properties; none fetches data
+or owns product/account state.
+
 ```ts
 import { Button, Checkbox, Input, Select, Textarea, installUi } from '@gluonjs/atoms';
 
