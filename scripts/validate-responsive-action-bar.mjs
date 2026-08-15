@@ -69,7 +69,7 @@ try {
           };
         }, { expectedPosition: scenario.expectedPosition, textScale: scenario.id === 'mobile-320' });
         if (result.position !== result.expectedPosition) throw new Error(`${browserName}/${scenario.id}: expected ${result.expectedPosition}, got ${result.position}.`);
-        if (result.documentWidth > result.viewportWidth || result.overflow) throw new Error(`${browserName}/${scenario.id}: horizontal overflow at ${result.viewportWidth}px.`);
+        if (result.documentWidth > result.viewportWidth || result.overflow) throw new Error(`${browserName}/${scenario.id}: horizontal overflow at ${result.viewportWidth}px (document ${result.documentWidth}px, root ${result.rootWidth}px, parent ${result.parentWidth}px).`);
         if (result.rootWidth > result.parentWidth + 1) throw new Error(`${browserName}/${scenario.id}: action bar exceeds its containing block.`);
         if (result.actionHeight < 44 || result.actionWidth < 44) throw new Error(`${browserName}/${scenario.id}: primary action is smaller than 44px (${result.actionWidth}x${result.actionHeight}).`);
         if (result.targetSizes.length === 0 || result.targetSizes.some(({ width, height }) => width < 44 || height < 44)) throw new Error(`${browserName}/${scenario.id}: visible target is smaller than 44px (${JSON.stringify(result.targetSizes)}).`);

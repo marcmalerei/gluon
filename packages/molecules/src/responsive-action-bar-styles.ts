@@ -9,6 +9,9 @@ export const responsiveActionBarStyles = css`
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
+      box-sizing: border-box;
+      inline-size: 100%;
+      max-inline-size: 100%;
       gap: var(--gluon-responsive-action-bar-gap, 0.75rem 1rem);
       min-inline-size: 0;
       padding-block: var(--gluon-responsive-action-bar-padding-block, 0.75rem);
@@ -22,11 +25,11 @@ export const responsiveActionBarStyles = css`
       scroll-margin-block-end: var(--gluon-responsive-action-bar-scroll-margin, 1rem);
     }
     :where(.gluon-responsive-action-bar.is-inline) { position: static; }
-    :where(.gluon-responsive-action-bar-summary) { min-inline-size: 0; }
-    :where(.gluon-responsive-action-bar-status) { min-inline-size: 0; color: var(--gluon-responsive-action-bar-status-color, inherit); }
+    :where(.gluon-responsive-action-bar-summary) { min-inline-size: 0; max-inline-size: 100%; }
+    :where(.gluon-responsive-action-bar-status) { min-inline-size: 0; max-inline-size: 100%; color: var(--gluon-responsive-action-bar-status-color, inherit); }
     :where(.gluon-responsive-action-bar-status[role="alert"]) { color: var(--gluon-responsive-action-bar-error-color, #a52222); font-weight: 650; }
-    :where(.gluon-responsive-action-bar-action) { display: flex; min-inline-size: 0; justify-content: end; }
-    :where(.gluon-responsive-action-bar-action > *) { min-inline-size: min(12rem, 100%); min-block-size: 44px; }
+    :where(.gluon-responsive-action-bar-action) { display: flex; min-inline-size: 0; max-inline-size: 100%; justify-content: end; }
+    :where(.gluon-responsive-action-bar-action > *) { box-sizing: border-box; min-inline-size: min(12rem, 100%); max-inline-size: 100%; min-block-size: 44px; }
     :where(.gluon-responsive-action-bar-compact) { display: none; min-block-size: 44px; }
     @media (max-width: 30rem) {
       :where(.gluon-responsive-action-bar) { grid-template-columns: minmax(0, 1fr); }

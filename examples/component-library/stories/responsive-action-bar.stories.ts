@@ -4,8 +4,8 @@ import { Button } from '@gluonjs/atoms';
 import { ResponsiveActionBar } from '@gluonjs/molecules';
 
 const storyStyles = css`
-  .action-bar-story { display: grid; gap: 1rem; min-block-size: 18rem; padding: 1rem; background: white; color: #101010; }
-  .action-bar-story > div { min-block-size: 10rem; padding: 1rem; border: 1px solid #d8d8d8; }
+  .action-bar-story { display: grid; box-sizing: border-box; inline-size: 100%; max-inline-size: 100%; gap: 1rem; min-block-size: 18rem; padding: 1rem; background: white; color: #101010; }
+  .action-bar-story > div { box-sizing: border-box; min-inline-size: 0; max-inline-size: 100%; min-block-size: 10rem; padding: 1rem; border: 1px solid #d8d8d8; }
 `;
 const storyStyleDependency = createComponentStyleDependency({ id: 'example-story-responsive-action-bar', sheet: storyStyles, layer: 'organism', order: 102 });
 
