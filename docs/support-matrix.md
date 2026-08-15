@@ -42,7 +42,7 @@ support-matrix check.
 | `@gluonjs/json-forms` | Typed native fields for the documented JSON Schema subset, including nested objects and bounded arrays | Unsupported schema keywords fail explicitly; arbitrary JSON Schema, file widgets, and conditional/composed schemas are not supported by default. |
 | `@gluonjs/i18n` | JSON-safe messages, ordered locale fallbacks, `Intl` formatting, plural/select interpolation, lazy namespaces, and SSR state transfer | Message loading, translation content, locale choice, and language-switch product UX remain application-owned. |
 | `@gluonjs/graph` | Deterministic canvas graph for a few hundred nodes plus a synchronized semantic keyboard node list | It is not a large-graph editor, layout persistence system, or assistive-technology replacement for domain-specific graph views. |
-| `@gluonjs/devtools` / `@gluonjs/devtools-api` | Opt-in development bridge, immutable protocol handshake, snapshots, and ordered timeline | Production is disabled by default; no browser-extension or remote-inspection security claim exists. |
+| `@gluonjs/devtools` / `@gluonjs/devtools-api` | Opt-in development bridge, immutable protocol handshake, snapshots, ordered timeline, and redacted source-location metadata | Production is disabled by default; no browser-extension or remote-inspection security claim exists, and source labels are basename-redacted with bounded line/column data only. |
 | `@gluonjs/language-server` and VS Code client | Node LSP/CLI and version-matched stdio VS Code client with the checked VSIX contract | Marketplace publication, publisher account, editor version breadth, and bundled server distribution require separate release evidence. |
 
 ## Official package coverage

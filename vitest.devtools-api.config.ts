@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: { alias: {
     '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
     '@gluonjs/devtools-api': resolve(import.meta.dirname, 'packages/devtools-api/src/index.ts'),
+    '@gluonjs/reactivity': resolve(import.meta.dirname, 'packages/reactivity/src/index.ts'),
   } },
   test: {
     environment: 'node',

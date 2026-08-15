@@ -3,6 +3,7 @@ export const GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES = Object.freeze([
   'application-selection',
   'component-snapshots',
   'error-events',
+  'source-locations',
   'render-events',
   'router-events',
   'scheduler-events',
@@ -18,12 +19,30 @@ export interface DevtoolsHandshake {
 export type DevtoolsEventKind = 'application' | 'component' | 'error' | 'event' | 'render' | 'router' | 'scheduler' | 'store';
 export type DevtoolsValue = boolean | null | number | string | readonly DevtoolsValue[] | { readonly [key: string]: DevtoolsValue };
 
+export interface DevtoolsSourceLocation {
+  readonly kind: 'component' | 'error' | 'render' | 'router' | 'store';
+  readonly file: string;
+  readonly line?: number;
+  readonly column?: number;
+  readonly redacted: boolean;
+}
+
+export interface DevtoolsSourceLocationInput {
+  readonly kind: DevtoolsSourceLocation['kind'];
+  readonly file?: string;
+  readonly line?: number;
+  readonly column?: number;
+  /** A transport marker is accepted for round-tripping but never trusted. */
+  readonly redacted?: boolean;
+}
+
 export interface ComponentSnapshot {
   readonly id: string;
   readonly name: string;
   readonly attributes: Readonly<Record<string, string>>;
   readonly properties: Readonly<Record<string, DevtoolsValue>>;
   readonly stylesheets: number;
+  readonly sourceLocation?: DevtoolsSourceLocation;
   readonly children: readonly ComponentSnapshot[];
 }
 
@@ -59,6 +78,26 @@ export interface ApplicationInspector {
   readonly id: string;
   readonly name: string;
   snapshot(selected: boolean): ApplicationSnapshot;
+}
+
+export function toDevtoolsSourceLocation(location: DevtoolsSourceLocationInput | undefined): DevtoolsSourceLocation | undefined {
+  if (!location || !SOURCE_LOCATION_KINDS.has(location.kind)) return undefined;
+  const suppliedFile = typeof location.file === 'string' ? location.file : '';
+  const rawFile = suppliedFile.trim() || 'unknown';
+  const file = redactSourcePath(rawFile);
+  const line = normalizePositiveInteger(location.line, 1_000_000);
+  const column = normalizePositiveInteger(location.column, 100_000);
+  return Object.freeze({
+    kind: location.kind,
+    file,
+    line,
+    column,
+    redacted: location.redacted === true
+      || suppliedFile !== rawFile
+      || file !== rawFile
+      || line !== location.line
+      || column !== location.column,
+  });
 }
 
 export type DevtoolsListener = (snapshot: DevtoolsSnapshot, event?: DevtoolsEvent) => void;
@@ -150,3 +189,18 @@ export function toDevtoolsValue(value: unknown, seen = new WeakSet<object>()): D
   for (const [key, entry] of Object.entries(value)) result[key] = toDevtoolsValue(entry, seen);
   return result;
 }
+
+function redactSourcePath(file: string): string {
+  const trimmed = file.replace(/[\u0000-\u001f\u007f]/g, '').replace(/\\/g, '/').replace(/[?#].*$/, '');
+  const parts = trimmed.split('/').filter(Boolean);
+  const tail = parts.at(-1) || 'unknown';
+  return tail.length > 120 ? `${tail.slice(0, 117)}...` : tail;
+}
+
+function normalizePositiveInteger(value: number | undefined, maximum: number): number | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  const normalized = Math.trunc(value);
+  return normalized > 0 && normalized <= maximum ? normalized : undefined;
+}
+
+const SOURCE_LOCATION_KINDS = new Set<DevtoolsSourceLocation['kind']>(['component', 'error', 'render', 'router', 'store']);

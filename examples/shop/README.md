@@ -57,6 +57,10 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - official `@gluonjs/vite` source maps, diagnostics, and state-preserving HMR
 - an isolated server-rendered deep-product response and browser hydration
   handoff through `@gluonjs/ssr`
+- explicit opt-in Devtools only in development; the shop production bundle does
+  not expose the bridge, globals, or navigation affordances because the
+  protocol only carries redacted source-location labels and the acceptance
+  surface must not leak production paths
 
 Async UI is part of Core because it composes renderer Parts and application
 ownership directly. The shop now exposes `renderShopRequest(url)` through

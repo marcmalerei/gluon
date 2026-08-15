@@ -29,6 +29,18 @@ creates an enabled, discoverable bridge only for Vite `serve`; Vite `build`
 creates a disabled bridge. Merely importing `@gluonjs/devtools` does not define
 elements, mutate the DOM, install hooks, or create globals.
 
+The published package includes `browser-inspector.manifest.json`; the virtual
+module exports the matching `devtoolsArtifactContract`. Together they state the
+ESM inspector export, protocol, serve-only runtime mode, global name, empty
+permission list, disabled remote inspection, and privacy rules. CI compares the
+contract with built exports and the dry-run package contents.
+
+`mountGluonDevtools()` renders component, render, Router, Store, and error
+locations as navigation buttons only when the application supplies a
+`navigateToSource` callback. The callback receives an immutable basename plus
+bounded line and column. Gluon does not construct `file:`, editor, or remote
+URLs, and transports no source excerpts.
+
 ## Snapshot contract
 
 Each registered application retains its own root, mounted state, route, Store

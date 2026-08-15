@@ -444,6 +444,7 @@
         "  DevtoolsProtocol,",
         "  GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,",
         "  GLUON_DEVTOOLS_PROTOCOL_VERSION,",
+        "  toDevtoolsSourceLocation,",
         "  toDevtoolsValue,",
         "  type ApplicationInspector,",
         "  type ApplicationSnapshot,",
@@ -453,15 +454,20 @@
         "  type DevtoolsHandshake,",
         "  type DevtoolsListener,",
         "  type DevtoolsSnapshot,",
+        "  type DevtoolsSourceLocation,",
+        "  type DevtoolsSourceLocationInput,",
         "  type DevtoolsValue,",
         "} from '@gluonjs/devtools-api';",
         "",
+        "const sourceInput = { kind: 'component', file: '/workspace/product-card.ts', line: 12 } satisfies DevtoolsSourceLocationInput;",
+        "const source: DevtoolsSourceLocation | undefined = toDevtoolsSourceLocation(sourceInput);",
         "const component = {",
         "  id: 'shop:product-card:0',",
         "  name: 'product-card',",
         "  attributes: { role: 'article' },",
         "  properties: { productId: 'orbit-lamp' },",
         "  stylesheets: 1,",
+        "  sourceLocation: source,",
         "  children: [],",
         "} satisfies ComponentSnapshot;",
         "const inspector: ApplicationInspector = {",
@@ -493,10 +499,13 @@
         "import {",
         "  GLUON_DEVTOOLS_GLOBAL,",
         "  GluonDevtoolsBridge,",
+        "  createDevtoolsArtifactContract,",
         "  createDevtoolsBridge,",
         "  gluonDevtoolsPlugin,",
         "  mountGluonDevtools,",
         "  type DevtoolsBridgeOptions,",
+        "  type DevtoolsArtifactContract,",
+        "  type DevtoolsInspectorOptions,",
         "  type GluonDevtoolsPluginOptions,",
         "  type InspectableRouter,",
         "  type InspectableStore,",
@@ -518,10 +527,12 @@
         "const bridgeOptions = { enabled: true, exposeGlobal: true, globalObject } satisfies DevtoolsBridgeOptions;",
         "const bridge: GluonDevtoolsBridge = createDevtoolsBridge(bridgeOptions);",
         "const unregister = bridge.registerApplication({ id: 'shop', app, root, router, store });",
-        "const mounted: MountedDevtools = mountGluonDevtools(bridge);",
+        "const inspectorOptions = { navigateToSource: (location) => console.log(location) } satisfies DevtoolsInspectorOptions;",
+        "const mounted: MountedDevtools = mountGluonDevtools(bridge, document.body, inspectorOptions);",
+        "const artifact: DevtoolsArtifactContract = createDevtoolsArtifactContract();",
         "const pluginOptions = { virtualId: 'virtual:shop-devtools' } satisfies GluonDevtoolsPluginOptions;",
         "const vitePlugin = gluonDevtoolsPlugin(pluginOptions);",
-        "console.log(globalObject[GLUON_DEVTOOLS_GLOBAL] === bridge, vitePlugin.name, mounted.element);",
+        "console.log(globalObject[GLUON_DEVTOOLS_GLOBAL] === bridge, vitePlugin.name, mounted.element, artifact.manifest);",
         "mounted.unmount();",
         "unregister();",
         "bridge.dispose();",
@@ -3683,6 +3694,10 @@
       "recipe": "devtools-protocol",
       "description": "Convert arbitrary runtime values, errors, non-finite numbers, unsupported primitives, and circular objects into transport-safe Devtools data:"
     },
+    "packages/devtools-api/src/functions/toDevtoolsSourceLocation.md": {
+      "recipe": "devtools-protocol",
+      "description": "Reduce optional caller-owned source metadata to a validated, bounded basename plus line and column without transporting source paths or excerpts:"
+    },
     "packages/devtools-api/src/interfaces/ApplicationInspector.md": {
       "recipe": "devtools-protocol",
       "description": "Register a stable application identity and produce its current immutable snapshot on demand:"
@@ -3706,6 +3721,14 @@
     "packages/devtools-api/src/interfaces/DevtoolsSnapshot.md": {
       "recipe": "devtools-protocol",
       "description": "Read the selected application, all application snapshots, and the ordered global timeline through one immutable protocol frame:"
+    },
+    "packages/devtools-api/src/interfaces/DevtoolsSourceLocation.md": {
+      "recipe": "devtools-protocol",
+      "description": "Consume immutable redacted source metadata that an app-owned inspector may use as a navigation hint:"
+    },
+    "packages/devtools-api/src/interfaces/DevtoolsSourceLocationInput.md": {
+      "recipe": "devtools-protocol",
+      "description": "Provide optional component, render, Router, Store, or error source metadata for validation and redaction at the protocol boundary:"
     },
     "packages/devtools-api/src/type-aliases/DevtoolsEventKind.md": {
       "recipe": "devtools-protocol",
@@ -3735,6 +3758,10 @@
       "recipe": "devtools-integration",
       "description": "Create an enabled development bridge or inert production-safe bridge from explicit exposure options:"
     },
+    "packages/devtools/src/functions/createDevtoolsArtifactContract.md": {
+      "recipe": "devtools-integration",
+      "description": "Describe the shipped ESM inspector artifact, public manifest, serve-only runtime, and callback-only redacted source-navigation boundary:"
+    },
     "packages/devtools/src/functions/gluonDevtoolsPlugin.md": {
       "recipe": "devtools-integration",
       "description": "Provide a Vite-only virtual module that enables and globally exposes the Devtools bridge during serve but not build:"
@@ -3742,6 +3769,14 @@
     "packages/devtools/src/interfaces/DevtoolsBridgeOptions.md": {
       "recipe": "devtools-integration",
       "description": "Choose bridge enablement and optional exposure on a caller-supplied global object:"
+    },
+    "packages/devtools/src/interfaces/DevtoolsArtifactContract.md": {
+      "recipe": "devtools-integration",
+      "description": "Negotiate the reproducible package artifact and its zero-permission, no-remote-inspection security contract:"
+    },
+    "packages/devtools/src/interfaces/DevtoolsInspectorOptions.md": {
+      "recipe": "devtools-integration",
+      "description": "Provide the only source-navigation boundary: an application-owned callback receiving already redacted immutable metadata:"
     },
     "packages/devtools/src/interfaces/GluonDevtoolsPluginOptions.md": {
       "recipe": "devtools-integration",
