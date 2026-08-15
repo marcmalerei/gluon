@@ -32,6 +32,7 @@ import {
   hydrateElement,
   hydrateTemplate,
   HydrationMarkerTransportError,
+  readHydrationState,
 } from '@gluonjs/ssr/hydration';
 import { createStyleManifest, prepareForHydration, renderElement, renderProgressively, renderStyleCarriers, renderToString } from '@gluonjs/ssr';
 import { renderEleventyPage } from '@gluonjs/ssr/eleventy';
@@ -124,6 +125,24 @@ describe('SSR hydration', () => {
 
     expect(applyProgressivePatchTemplate(root, template).insertedNodes).toBe(1);
     expect(root.textContent).toBe('Streamed');
+  });
+
+  it('reads request state only from a complete JSON carrier', () => {
+    const root = document.createElement('div');
+    const carrier = document.createElement('script');
+    carrier.dataset.gluonState = '';
+    carrier.type = 'application/json';
+    carrier.textContent = JSON.stringify({ router: { location: '/' }, store: { snapshot: {} }, data: { ready: true } });
+    root.append(carrier);
+
+    expect(readHydrationState(root)).toEqual({
+      router: { location: '/' },
+      store: { snapshot: {} },
+      data: { ready: true },
+    });
+
+    carrier.textContent = JSON.stringify({ router: {} });
+    expect(() => readHydrationState(root)).toThrow(TypeError);
   });
 
   it('rejects malformed configurator DSD and leaves unrelated routes unchanged', () => {
