@@ -249,6 +249,7 @@
     "ajv-formats": "3.0.1",
     "axe-core": "^4.12.1",
     "fast-check": "^4.9.0",
+    "happy-dom": "^20.11.2",
     "lit": "3.3.3",
     "lit-html": "3.3.3",
     "markdown-it": "^14.3.0",
