@@ -4,6 +4,10 @@
 
 ### Added
 
+- Added controlled `DropdownMenu`, `ContextMenu`, and `Menubar` compositions
+  over one bounded item model plus a native-action `Toolbar`, including roving
+  focus, typeahead, checked and disabled states, submenus, RTL behavior, and
+  collision-safe ARIA relationships.
 - Added `ResponsiveDisclosure`, a native responsive disclosure with compact
   breakpoint state, desktop expansion, resettable compact memory, and teardown-safe media-query synchronization.
 - Added request-free `SearchField` and `SearchResults` compositions with native

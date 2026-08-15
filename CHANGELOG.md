@@ -18,7 +18,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added request-free Tooltip and HoverCard quarks with typed native triggers,
   nested overlay ownership, collision-aware logical placement, and retained
   SSR/hydration behavior.
-
+- Added controlled, request-free `DropdownMenu`, `ContextMenu`, `Menubar`, and
+  `Toolbar` molecules with native actions, roving focus, typeahead, disabled
+  items, checked items, submenus, RTL behavior, SSR/hydration, and
+  collision-safe ARIA relationships.
 - Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
   `Separator` atoms with native semantics, typed extension contracts, and
   cross-browser evidence.

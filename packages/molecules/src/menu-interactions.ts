@@ -5,7 +5,12 @@ const connectedRoots = new WeakMap<HTMLElement, AbortController>();
 export interface TypeaheadState { buffer: string; at: number; }
 
 export function safeId(value: string): string {
-  return value.replace(/[^a-zA-Z0-9_-]/g, (character) => `-${character.codePointAt(0)?.toString(16)}-`);
+  if (value.length === 0) throw new TypeError('Menu instance and item IDs must not be empty.');
+  return [...value].map((character) => {
+    if (/^[a-zA-Z0-9-]$/.test(character)) return character;
+    if (character === '_') return '__';
+    return `_x${character.codePointAt(0)!.toString(16)}_`;
+  }).join('');
 }
 
 export function itemDomId(instanceId: string, path: readonly string[]): string {

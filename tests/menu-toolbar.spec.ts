@@ -289,12 +289,22 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
   it('keeps duplicate labels collision-safe and passes automated WCAG checks', async () => {
     const firstHost = document.createElement('div');
     const secondHost = document.createElement('div');
-    document.body.append(firstHost, secondHost);
+    const escapedHost = document.createElement('div');
+    const literalHost = document.createElement('div');
+    document.body.append(firstHost, secondHost, escapedHost, literalHost);
     render(DropdownMenu({ id: 'first-actions', label: 'Actions', trigger: 'Actions', open: true, onOpenChange: vi.fn(), items: [{ id: 'open', label: 'Open' }] }), firstHost);
     render(DropdownMenu({ id: 'second-actions', label: 'Actions', trigger: 'Actions', open: false, onOpenChange: vi.fn(), items: [{ id: 'open', label: 'Open' }] }), secondHost);
+    render(DropdownMenu({ id: 'a b', label: 'Escaped', trigger: 'Escaped', open: false, onOpenChange: vi.fn(), items: [{ id: 'open', label: 'Open' }] }), escapedHost);
+    render(DropdownMenu({ id: 'a-20-b', label: 'Literal', trigger: 'Literal', open: false, onOpenChange: vi.fn(), items: [{ id: 'open', label: 'Open' }] }), literalHost);
     expect(document.querySelectorAll('#first-actions-menu')).toHaveLength(1);
     expect(document.querySelectorAll('#second-actions-menu')).toHaveLength(1);
     expect(document.querySelectorAll('[id="first-actions-item-open"]')).toHaveLength(1);
+    const generatedIds = [...document.querySelectorAll('[role="menu"]')].map((menu) => menu.id);
+    expect(new Set(generatedIds).size).toBe(generatedIds.length);
+    expect(escapedHost.querySelector('[role="menu"]')?.id).not.toBe(literalHost.querySelector('[role="menu"]')?.id);
+    expect(() => DropdownMenu({ id: '', label: 'Invalid', trigger: 'Invalid', open: false, onOpenChange: vi.fn(), items: [] })).toThrow(/must not be empty/);
+    escapedHost.remove();
+    literalHost.remove();
     const results = await axe.run(document, { resultTypes: ['violations'], runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'] } });
     expect(results.violations).toEqual([]);
   });
