@@ -7,6 +7,7 @@ import {
   registerJsonForms,
   type JsonFormChangeDetail,
   type JsonFormValidationChangeDetail,
+  type JsonObject,
   type JsonSchema,
 } from '../packages/json-forms/src/index.js';
 import {
@@ -42,7 +43,7 @@ const bookingSchema = {
 
 function createForm(
   schema: JsonSchema = bookingSchema,
-  data: Record<string, string | number | boolean> = {},
+  data: JsonObject = {},
 ): JsonFormsElement {
   const element = document.createElement(jsonFormsTag) as JsonFormsElement;
   element.schema = schema;
