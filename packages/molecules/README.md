@@ -14,6 +14,16 @@ import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface,
 place cards under a compatible heading hierarchy. `FormField` uses implicit
 native label association. An error sets the child input's `aria-invalid` state
 and exposes a visible `role="alert"`; helper text is visible supplementary copy.
+`createFormController()` is the request-free behavioral companion for these
+field compositions. It exposes typed `register()`, values, touched/dirty
+state, field errors, async `validate()`, `submit()`, reset, subscriptions, and
+an abort-owned `signal` for validators and submit handlers. It does not render
+controls, read `FormData`, send requests, or depend on `window`/`document`.
+`snapshot()` and `hydrate()` carry serializable initial/value/error/touched
+state across SSR when the application supplies the same validator and submit
+handler on the browser side. The controller uses shallow record snapshots;
+nested schema traversal remains the responsibility of `@gluonjs/json-forms`
+or the application.
 `ControlField` generalizes that composition for any caller-rendered control. Its
 render callback receives stable control/label/helper/error IDs and matching ARIA
 relationships without cloning the control or owning its value, events, or
@@ -162,10 +172,14 @@ landmark while its internal viewport and controls stay owned. App-local
 Molecules use the public `defineMolecule()` metadata helper described in the
 [extension contract](../../docs/ui-extensibility.md).
 
-GLUON GOODS repeats `FormField` for its five required delivery inputs, uses
+GLUON GOODS creates one `createFormController()` for the checkout lifecycle,
+reuses it through hydration, and updates the same request-free state alongside
+the store-owned order data. It repeats `FormField` for its five required delivery inputs, uses
 `ControlField` for optional delivery instructions with deterministic help, and uses
 an app-local `PurchaseAction` defined with `defineMolecule()` in the same real
-checkout form. Product configuration uses three `ChoiceGroup` fieldsets with
+checkout form. Native constraint validation remains authoritative for required
+controls and terms; the controller adds application-level validation and
+cancellation without taking over submission transport. Product configuration uses three `ChoiceGroup` fieldsets with
 native Radio options. Its catalog filter uses `NavigationStrip` to keep every category
 discoverable at constrained widths. Browser tests verify implicit labels,
 native constraint validation, overflow interaction, SSR/hydration styles, and

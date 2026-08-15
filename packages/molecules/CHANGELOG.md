@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added `createFormController()` as a DOM-independent, request-free form
+  orchestration contract for typed field registration, values, touched/dirty
+  state, field errors, asynchronous validation, submission lifecycle,
+  cancellation, reset, subscriptions, and SSR snapshot/hydration.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

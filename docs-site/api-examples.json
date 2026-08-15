@@ -2924,6 +2924,33 @@
         "console.log(errors[0]?.phase === phase);",
         "restore();"
       ]
+    },
+    "form-controller": {
+      "module": "@gluonjs/molecules",
+      "code": [
+        "import { createFormController, type FormController, type FormControllerOptions, type FormErrors, type FormFieldBinding, type FormFieldName, type FormListener, type FormOperationOptions, type FormSnapshot, type FormState, type FormSubmitHandler, type FormSubmitResult, type FormTouched, type FormValidationContext, type FormValidator } from '@gluonjs/molecules';",
+        "",
+        "type Profile = { email: string; name: string };",
+        "type SubmitResult = { id: string };",
+        "const validate: FormValidator<Profile> = (values, context) => values.email.includes('@') ? {} : { email: 'Enter a valid email.' };",
+        "const submit: FormSubmitHandler<Profile, SubmitResult> = async (values, context) => ({ id: values.email });",
+        "const options = { initialValues: { email: '', name: '' }, validate, onSubmit: submit } satisfies FormControllerOptions<Profile, SubmitResult>;",
+        "const controller: FormController<Profile, SubmitResult> = createFormController(options);",
+        "const email: FormFieldBinding<Profile, 'email'> = controller.register('email');",
+        "const fieldName: FormFieldName<Profile> = email.name;",
+        "const errors: FormErrors<Profile> = controller.state.errors;",
+        "const touched: FormTouched<Profile> = controller.state.touched;",
+        "const state: FormState<Profile> = controller.state;",
+        "const listener: FormListener<Profile> = (nextState) => console.log(nextState.dirty);",
+        "const context: FormValidationContext<Profile> = { values: state.values, touched, signal: new AbortController().signal };",
+        "const operation: FormOperationOptions = { signal: context.signal };",
+        "const snapshot: FormSnapshot<Profile> = controller.snapshot();",
+        "const result: FormSubmitResult<SubmitResult> = await controller.submit(operation);",
+        "controller.subscribe(listener);",
+        "controller.hydrate(snapshot);",
+        "console.log(fieldName, errors, context.signal.aborted, result.ok);",
+        "controller.dispose();"
+      ]
     }
   },
   "overrides": {
@@ -6338,6 +6365,66 @@
     "packages/i18n/src/variables/i18nKey.md": {
       "recipe": "i18n-application",
       "description": "Reference the typed injection key installed by the i18n plugin when composing application integrations:"
+    },
+    "packages/molecules/src/functions/createFormController.md": {
+      "recipe": "form-controller",
+      "description": "Create request-free, typed form state with application-owned native controls, validation, and submission:"
+    },
+    "packages/molecules/src/interfaces/FormController.md": {
+      "recipe": "form-controller",
+      "description": "Consume the controller that coordinates typed field state, validation, submission, and SSR restoration:"
+    },
+    "packages/molecules/src/interfaces/FormControllerOptions.md": {
+      "recipe": "form-controller",
+      "description": "Configure initial values and application-owned validation and submit handlers for one form lifecycle:"
+    },
+    "packages/molecules/src/type-aliases/FormErrors.md": {
+      "recipe": "form-controller",
+      "description": "Represent field-level validation messages without taking presentation ownership away from native controls:"
+    },
+    "packages/molecules/src/interfaces/FormFieldBinding.md": {
+      "recipe": "form-controller",
+      "description": "Bind one application-rendered field to typed value, touched, and error state:"
+    },
+    "packages/molecules/src/type-aliases/FormFieldName.md": {
+      "recipe": "form-controller",
+      "description": "Restrict field registration to the string keys of the application values record:"
+    },
+    "packages/molecules/src/type-aliases/FormListener.md": {
+      "recipe": "form-controller",
+      "description": "Observe immutable form state snapshots when application-owned controls or lifecycle state changes:"
+    },
+    "packages/molecules/src/interfaces/FormOperationOptions.md": {
+      "recipe": "form-controller",
+      "description": "Pass an optional caller-owned abort signal to validation or submission work:"
+    },
+    "packages/molecules/src/interfaces/FormSnapshot.md": {
+      "recipe": "form-controller",
+      "description": "Transport initial values, current values, errors, and touched state between SSR and the browser:"
+    },
+    "packages/molecules/src/interfaces/FormState.md": {
+      "recipe": "form-controller",
+      "description": "Read immutable values, field metadata, and validation/submission lifecycle state:"
+    },
+    "packages/molecules/src/type-aliases/FormSubmitHandler.md": {
+      "recipe": "form-controller",
+      "description": "Implement application-owned submission work with the current values and abort signal:"
+    },
+    "packages/molecules/src/type-aliases/FormSubmitResult.md": {
+      "recipe": "form-controller",
+      "description": "Distinguish a successful application submission from a validation-blocked attempt:"
+    },
+    "packages/molecules/src/type-aliases/FormTouched.md": {
+      "recipe": "form-controller",
+      "description": "Represent which registered application fields have been visited by the user:"
+    },
+    "packages/molecules/src/interfaces/FormValidationContext.md": {
+      "recipe": "form-controller",
+      "description": "Access frozen values, touched state, and cancellation while validation or submission runs:"
+    },
+    "packages/molecules/src/type-aliases/FormValidator.md": {
+      "recipe": "form-controller",
+      "description": "Implement synchronous or asynchronous application-level field validation:"
     }
   }
 }

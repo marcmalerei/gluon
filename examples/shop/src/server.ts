@@ -14,6 +14,7 @@ import {
 } from './product-configurator.js';
 import { createShopStore } from './state.js';
 import { createShopStyleSelection } from './styles.js';
+import { createCheckoutFormController, type CheckoutFormController } from './ui-extensions.js';
 
 export interface ShopServerRequestOptions {
   readonly assets?: AssetManifest;
@@ -26,6 +27,7 @@ export async function renderShopRequest(
   options: ShopServerRequestOptions = {},
 ): Promise<SsrRequestResult> {
   let productConfiguratorShadow: Promise<string> | undefined;
+  let checkoutForm: CheckoutFormController | undefined;
   const renderProductConfiguratorForServer: ProductConfiguratorRenderer = (renderOptions) => {
     productConfiguratorShadow = renderToString(renderElement(ProductConfiguratorElement, {
       properties: {
@@ -41,14 +43,16 @@ export async function renderShopRequest(
     assets: options.assets,
     nonce: options.nonce,
     styles: createShopStyleSelection('light'),
-    routes: (storeManager) => createShopRoutes(
-      createShopStore(storeManager),
-      renderProductConfiguratorForServer,
-    ),
+    routes: (storeManager) => {
+      const store = createShopStore(storeManager);
+      checkoutForm = createCheckoutFormController(store.checkout);
+      return createShopRoutes(store, renderProductConfiguratorForServer, checkoutForm);
+    },
     createApp: ({ router, store }) => createShopApplication(undefined, {
       router,
       storeManager: store,
       storage: null,
+      checkoutForm,
     }).app,
   });
   if (!productConfiguratorShadow) return result;

@@ -48,6 +48,14 @@ host application and the component responsible for rendering and validation.
 
 [Open the JSON Forms reference flow →](/gluon/1.8.1/examples/json-forms.html)
 
+## Request-free forms
+
+For application-owned forms, `@gluonjs/molecules` provides a DOM-independent
+controller for typed field state, async validation, submission lifecycle, and
+SSR snapshots while native controls remain the rendering boundary.
+
+[Read the request-free forms guide →](/gluon/1.8.1/reference/forms/)
+
 ## API reference
 
 Generated, version-matched API documentation for every current public package

@@ -8,7 +8,7 @@ import {
   type ButtonProps,
 } from '@gluonjs/atoms';
 import { html, svg, type Component, type TemplateResult, type TemplateValue } from '@gluonjs/core';
-import { ControlField, FormField, defineMolecule } from '@gluonjs/molecules';
+import { ControlField, FormField, createFormController, defineMolecule, type FormController } from '@gluonjs/molecules';
 import { defineOrganism } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
 import ShopEditorialLinkSfc from './shop-editorial-link.gluon';
@@ -92,8 +92,28 @@ export const PurchaseAction = defineMolecule(({
 
 export type CheckoutFieldName = 'email' | 'name' | 'address' | 'postalCode' | 'city' | 'deliveryInstructions';
 
+export interface CheckoutValues extends Record<string, unknown> {
+  email: string;
+  name: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  deliveryInstructions: string;
+}
+
+export type CheckoutFormController = FormController<CheckoutValues>;
+
+export function createCheckoutFormController(initialValues: CheckoutValues): CheckoutFormController {
+  return createFormController({
+    initialValues,
+    validate: (values) => values.email.includes('@')
+      ? {}
+      : { email: 'Enter a valid email address.' },
+  });
+}
+
 export interface CheckoutExperienceProps {
-  readonly values: Readonly<Record<CheckoutFieldName, string>>;
+  readonly form: CheckoutFormController;
   readonly totalLabel: string;
   readonly summary: TemplateResult;
   readonly onFieldInput: (name: CheckoutFieldName, value: string) => void;
@@ -131,21 +151,24 @@ export const CheckoutExperience = defineOrganism((props: CheckoutExperienceProps
           id: 'checkout-delivery-instructions',
           label: 'Delivery instructions (optional)',
           helper: 'Add access notes for the workshop courier.',
+          error: props.form.state.errors.deliveryInstructions,
           attributes: { class: 'checkout-field' },
           control: (relationships) => Textarea({
             attributes: {
               id: relationships.controlId,
               class: ['checkout-input', 'checkout-textarea'],
               aria: relationships.aria,
+              onBlur: () => props.form.register('deliveryInstructions').setTouched(),
             },
             name: 'deliveryInstructions',
             rows: 3,
-            value: props.values.deliveryInstructions,
+            value: props.form.state.values.deliveryInstructions,
             fullWidth: true,
-            onInput: (event) => props.onFieldInput(
-              'deliveryInstructions',
-              (event.currentTarget as HTMLTextAreaElement).value,
-            ),
+            onInput: (event) => {
+              const value = (event.currentTarget as HTMLTextAreaElement).value;
+              props.form.setValue('deliveryInstructions', value);
+              props.onFieldInput('deliveryInstructions', value);
+            },
           }),
         })}
         ${q.label({
@@ -171,19 +194,23 @@ function checkoutField(
     readonly autocomplete: 'email' | 'name' | 'street-address' | 'postal-code' | 'address-level2';
   },
 ): TemplateResult {
+  const binding = props.form.register(field.name);
   return FormField({
     label: field.label,
     name: field.name,
     type: field.type,
-    value: props.values[field.name],
-    onInput: (event) => props.onFieldInput(
-      field.name,
-      (event.currentTarget as HTMLInputElement).value,
-    ),
+    value: binding.value,
+    error: binding.error,
+    onInput: (event) => {
+      const value = (event.currentTarget as HTMLInputElement).value;
+      binding.setValue(value);
+      props.onFieldInput(field.name, value);
+    },
     attributes: {
       class: 'checkout-input',
       required: true,
       autocomplete: field.autocomplete,
+      onBlur: () => binding.setTouched(),
     },
     fieldAttributes: { class: 'checkout-field' },
   });

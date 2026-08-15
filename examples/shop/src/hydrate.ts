@@ -4,6 +4,7 @@ import { createStoreManager } from '@gluonjs/store';
 import { createShopApplication, createShopRoutes } from './app.js';
 import { createShopStore } from './state.js';
 import { shopHydrationStyleSelection } from './styles.js';
+import { createCheckoutFormController } from './ui-extensions.js';
 
 /** Restores the request snapshots and hydrates the server-rendered GLUON GOODS root. */
 export async function hydrateShop(
@@ -16,9 +17,10 @@ export async function hydrateShop(
   try {
     const state = readHydrationState(stateRoot);
     const store = createShopStore(storeManager);
+    const checkoutForm = createCheckoutFormController(store.checkout);
     router = createRouter({
       history: createWebHistory(),
-      routes: createShopRoutes(store),
+      routes: createShopRoutes(store, undefined, checkoutForm),
       scrollBehavior: (_to, _from, saved) => saved ?? { left: 0, top: 0 },
     });
     await hydrateRequestState(state, router, storeManager);
@@ -26,6 +28,7 @@ export async function hydrateShop(
       router,
       storeManager,
       storage: null,
+      checkoutForm,
       styleTarget: document,
       hydrateStyles: true,
     });
