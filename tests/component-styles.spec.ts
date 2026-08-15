@@ -24,8 +24,14 @@ import {
   unmount,
 } from '@gluonjs/core';
 import {
+  AspectRatio,
+  Avatar,
   Button,
+  ScrollArea,
+  Separator,
+  aspectRatioStyles,
   atomStyles,
+  avatarStyles,
   buttonStyles,
   checkboxStyles,
   iconStyles,
@@ -36,6 +42,8 @@ import {
   radioStyles,
   selectStyles,
   sliderStyles,
+  scrollAreaStyles,
+  separatorStyles,
   statusBadgeStyles,
   switchStyles,
   textareaStyles,
@@ -65,6 +73,8 @@ import { createStyleManifest, prepareForHydration, renderStyleCarriers } from '@
 
 const allComponentSheets = [
   accordionStyles,
+  aspectRatioStyles,
+  avatarStyles,
   buttonStyles,
   checkboxStyles,
   iconStyles,
@@ -74,6 +84,8 @@ const allComponentSheets = [
   radioStyles,
   selectStyles,
   sliderStyles,
+  scrollAreaStyles,
+  separatorStyles,
   statusBadgeStyles,
   switchStyles,
   textareaStyles,
@@ -108,6 +120,23 @@ describe('usage-driven component styles', () => {
     expect(cssText).not.toContain('animation');
     expect(cssText).not.toContain('transition');
     expect(cssText).not.toContain('prefers-reduced-motion');
+  });
+
+  it('keeps every foundation Atom independently tree-shakable', () => {
+    const cases = [
+      [AspectRatio({ children: 'Media' }), aspectRatioStyles],
+      [Avatar({ alt: 'Ada', fallback: 'A', status: 'error' }), avatarStyles],
+      [ScrollArea({ label: 'Notes', children: 'Notes' }), scrollAreaStyles],
+      [Separator({}), separatorStyles],
+    ] as const;
+
+    for (const [value, sheet] of cases) {
+      render(value, document.body);
+      expect(document.adoptedStyleSheets.filter((candidate) => allComponentSheets.includes(candidate)))
+        .toEqual([sheet]);
+      unmount(document.body);
+      expect(document.adoptedStyleSheets).not.toContain(sheet);
+    }
   });
   it('adopts only the exact rendered sheet and releases it on unmount', () => {
     render(Button({ label: 'Add to bag' }), document.body);

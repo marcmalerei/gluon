@@ -11,9 +11,19 @@ export { AspectRatio, type AspectRatioAttributes, type AspectRatioProps } from '
 export { aspectRatioStyles } from './aspect-ratio-styles.js';
 export { Avatar, type AvatarAttributes, type AvatarProps, type AvatarStatus } from './avatar.js';
 export { avatarStyles } from './avatar-styles.js';
-export { ScrollArea, type ScrollAreaAttributes, type ScrollAreaProps } from './scroll-area.js';
+export {
+  ScrollArea,
+  type ScrollAreaAttributes,
+  type ScrollAreaOrientation,
+  type ScrollAreaProps,
+} from './scroll-area.js';
 export { scrollAreaStyles } from './scroll-area-styles.js';
-export { Separator, type SeparatorAttributes, type SeparatorProps } from './separator.js';
+export {
+  Separator,
+  type SeparatorAttributes,
+  type SeparatorOrientation,
+  type SeparatorProps,
+} from './separator.js';
 export { separatorStyles } from './separator-styles.js';
 export {
   Checkbox,

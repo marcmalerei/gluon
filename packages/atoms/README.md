@@ -7,17 +7,26 @@
 Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
-Foundation atoms include `AspectRatio` (inline ratio wrapper), `Avatar` (caller-owned
-`loading`/`loaded`/`error` state with a decorative fallback), `ScrollArea` (native
-section scrolling with focus and direction modes), and `Separator` (native `hr`
-semantics, optionally decorative). Each atom owns a separately tree-shakable
-stylesheet and exposes only `--gluon-*` component properties; none fetches data
-or owns product/account state.
+Foundation atoms include `AspectRatio`, `Avatar`, `ScrollArea`, and `Separator`.
+Each owns a separately tree-shakable stylesheet and exposes only component-scoped
+`--gluon-*` properties. They do not fetch data, load account records, upload
+images, virtualize content, or own product state.
 
 ```ts
-import { Button, Checkbox, Input, Select, Textarea, installUi } from '@gluonjs/atoms';
+import {
+  AspectRatio,
+  Avatar,
+  ScrollArea,
+  Separator,
+  installUi,
+} from '@gluonjs/atoms';
 
 const ui = installUi(document, { theme: 'light' });
+
+const media = AspectRatio({ ratio: 4 / 3, children: productImage });
+const avatar = Avatar({ src: profileImage, alt: 'Ada Lovelace', status: 'loaded' });
+const history = ScrollArea({ label: 'Order history', children: orderRows });
+const rule = Separator({ decorative: true });
 
 ui.setTheme('dark');
 ui.dispose();
@@ -38,8 +47,9 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-`Button`, `Checkbox`, `Icon`, `Input`, `Label`, `Progress`, `Radio`, `Select`, `Slider`,
-`StatusBadge`, `Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
+`AspectRatio`, `Avatar`, `Button`, `Checkbox`, `Icon`, `Input`, `Label`,
+`Progress`, `Radio`, `ScrollArea`, `Select`, `Separator`, `Slider`, `StatusBadge`,
+`Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. Nested composition stays on that same path, so a public Molecule that
@@ -99,6 +109,15 @@ native `button` rule or adopt `atomStyles`.
 
 ## Accessibility contracts
 
+- `AspectRatio` renders a native `div` and adds no role. `ratio` must be finite
+  and greater than zero; invalid geometry throws before rendering. Caller div
+  attributes, classes, and styles remain native and are merged.
+- `Avatar` requires non-empty `alt`. `loaded` with a `src` renders exactly one
+  native `img` carrying that alt. `loading`, `error`, and every no-`src` case
+  render one named fallback image whose visible initials are hidden from the
+  accessibility tree to avoid duplicate announcements. The caller owns `src`,
+  status changes, fallback text, retries, and image policy; `attributes` target
+  only the loaded native image.
 - `Button` renders a native `type="button"`, preserves disabled semantics, has
   a 44px minimum target, and receives a visible `:focus-visible` outline.
 - `Checkbox` preserves native Space-key, label, form, reset, required,
@@ -120,6 +139,16 @@ native `button` rule or adopt `atomStyles`.
   compose it with `Label` or another native labeling relationship. Its public
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
 - `Slider` preserves native range keyboard, pointer, form, and hydration semantics. It is single-value only; use `min`, `max`, `step`, `orientation`, `valueText`, and caller-owned `onInput`/`onChange`. `readonly` is an ARIA/read-only interaction contract because native range has no readonly attribute.
+- `ScrollArea` renders a named native `section` region, uses platform overflow,
+  and defaults to `tabIndex=0`; a caller-supplied `tabIndex` wins. `orientation`
+  selects vertical, horizontal, or two-axis overflow. The Atom does not own
+  wheel/key handlers, scroll position, custom scrollbars, or virtualization.
+  Reduced-motion mode forces `scroll-behavior: auto`, including when an app set
+  the public scroll-behavior property to `smooth`.
+- `Separator` renders a native `hr`: horizontal instances keep the platform's
+  implicit separator orientation, vertical instances add only
+  `aria-orientation="vertical"`, and decorative instances use presentation plus
+  `aria-hidden`. It owns no labeling or layout-container behavior.
 - `StatusBadge` is a presentational span. It owns only neutral, info, success,
   warning, or danger tone styling; applications own domain mapping, translated
   status copy, and whether a surrounding surface is a live region. Its default
@@ -207,7 +236,16 @@ Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
 `--gluon-progress-track-border`, `--gluon-progress-width`, and
 `--gluon-progress-height`. StatusBadge exposes
 `--gluon-status-badge-background`, `--gluon-status-badge-color`, and
-`--gluon-status-badge-border`. Shared public tokens retain their documented
+`--gluon-status-badge-border`. AspectRatio maps its validated `ratio` prop to
+`--gluon-aspect-ratio`; callers may deliberately override that property through
+`attributes.style`. Avatar exposes `--gluon-avatar-size`,
+`--gluon-avatar-border`, `--gluon-avatar-radius`,
+`--gluon-avatar-background`, `--gluon-avatar-color`, and
+`--gluon-avatar-object-fit`. ScrollArea exposes
+`--gluon-scroll-area-max-inline-size`, `--gluon-scroll-area-max-block-size`, and
+`--gluon-scroll-area-scroll-behavior`. Separator exposes
+`--gluon-separator-color`, `--gluon-separator-length`, and
+`--gluon-separator-thickness`. Shared public tokens retain their documented
 `--gluon-*` names. See the
 [extension matrix](../../docs/ui-extensibility.md).
 

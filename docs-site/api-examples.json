@@ -682,6 +682,8 @@
       "code": [
         "import { html, svg } from '@gluonjs/core';",
         "import {",
+        "  AspectRatio,",
+        "  Avatar,",
         "  Button,",
         "  Checkbox,",
         "  Icon,",
@@ -689,14 +691,18 @@
         "  Label,",
         "  Progress,",
         "  Radio,",
+        "  ScrollArea,",
         "  Select,",
         "  Slider,",
+        "  Separator,",
         "  StatusBadge,",
         "  Switch,",
         "  Textarea,",
         "  ToggleButton,",
         "  atomManifest,",
         "  atomStyles,",
+        "  aspectRatioStyles,",
+        "  avatarStyles,",
         "  darkThemeStyles,",
         "  defineButtonPreset,",
         "  defineToggleButtonPreset,",
@@ -708,7 +714,14 @@
         "  normalizeSliderValue,",
         "  renderSlider,",
         "  lightThemeStyles,",
+        "  scrollAreaStyles,",
+        "  separatorStyles,",
         "  uiTokenStyles,",
+        "  type AspectRatioAttributes,",
+        "  type AspectRatioProps,",
+        "  type AvatarAttributes,",
+        "  type AvatarProps,",
+        "  type AvatarStatus,",
         "  type ButtonProps,",
         "  type ButtonAttributes,",
         "  type ButtonPresetOptions,",
@@ -727,12 +740,18 @@
         "  type ProgressProps,",
         "  type RadioAttributes,",
         "  type RadioProps,",
+        "  type ScrollAreaAttributes,",
+        "  type ScrollAreaOrientation,",
+        "  type ScrollAreaProps,",
         "  type SelectAttributes,",
         "  type SelectProps,",
         "  type SelectSize,",
         "  type SliderAttributes,",
         "  type SliderOrientation,",
         "  type SliderProps,",
+        "  type SeparatorAttributes,",
+        "  type SeparatorOrientation,",
+        "  type SeparatorProps,",
         "  type StatusBadgeAttributes,",
         "  type StatusBadgeProps,",
         "  type StatusBadgeTone,",
@@ -752,6 +771,17 @@
         "const removeLegacyTheme = installUiTheme(document, theme);",
         "const variant: ButtonVariant = 'primary';",
         "const size: ButtonSize = 'large';",
+        "const aspectRatioAttributes = { class: 'goods-media' } satisfies AspectRatioAttributes;",
+        "const aspectRatio = { ratio: 4 / 3, attributes: aspectRatioAttributes, children: html`<img src=\"/product.webp\" alt=\"Orbit lamp\">` } satisfies AspectRatioProps;",
+        "const avatarStatus: AvatarStatus = 'loaded';",
+        "const avatarAttributes = { loading: 'lazy', decoding: 'async' } satisfies AvatarAttributes;",
+        "const avatar = { src: '/ada.webp', alt: 'Ada Lovelace', fallback: 'AL', status: avatarStatus, attributes: avatarAttributes } satisfies AvatarProps;",
+        "const scrollOrientation: ScrollAreaOrientation = 'both';",
+        "const scrollAttributes = { tabIndex: 0, style: { '--gluon-scroll-area-max-block-size': '10rem' } } satisfies ScrollAreaAttributes;",
+        "const scrollArea = { label: 'Order history', orientation: scrollOrientation, attributes: scrollAttributes, children: 'Order rows' } satisfies ScrollAreaProps;",
+        "const separatorOrientation: SeparatorOrientation = 'vertical';",
+        "const separatorAttributes = { title: 'Sections' } satisfies SeparatorAttributes;",
+        "const separator = { orientation: separatorOrientation, attributes: separatorAttributes } satisfies SeparatorProps;",
         "const buttonAttributes = { class: 'goods-purchase', data: { analyticsAction: 'purchase' } } satisfies ButtonAttributes;",
         "const presetOptions = { displayName: 'PurchaseButton', class: 'goods-purchase', attributes: buttonAttributes } satisfies ButtonPresetOptions;",
         "const PurchaseButton = defineButtonPreset(presetOptions);",
@@ -793,8 +823,8 @@
         "const togglePreset = { displayName: 'ViewToggle', variant: 'ghost' } satisfies ToggleButtonPresetOptions;",
         "const toggle = { pressed: true, label: 'Grid view', attributes: toggleAttributes } satisfies ToggleButtonProps;",
         "const ViewToggle = defineToggleButtonPreset(togglePreset);",
-        "const checkout = html`${Label(label)}${Input(input)}${Select(select)}${Textarea(textarea)}${Checkbox(checkbox)}${Progress(progress)}${Radio(radio)}${Slider(slider)}${sliderTemplate}${StatusBadge(status)}${Switch(switchControl)}${ToggleButton(toggle)}${ViewToggle(toggle)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
-        "console.log(checkout, sliderRange, getThemeStyles(theme), atomStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
+        "const checkout = html`${AspectRatio(aspectRatio)}${Avatar(avatar)}${Label(label)}${Input(input)}${ScrollArea(scrollArea)}${Separator(separator)}${Select(select)}${Textarea(textarea)}${Checkbox(checkbox)}${Progress(progress)}${Radio(radio)}${Slider(slider)}${sliderTemplate}${StatusBadge(status)}${Switch(switchControl)}${ToggleButton(toggle)}${ViewToggle(toggle)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
+        "console.log(checkout, sliderRange, getThemeStyles(theme), atomStyles, aspectRatioStyles, avatarStyles, scrollAreaStyles, separatorStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
         "ui.setTheme('dark');",
         "ui.dispose();",
         "removeLegacyTheme();"
@@ -4530,6 +4560,22 @@
       "recipe": "ui-owner",
       "description": "Share the selected UI theme and four named style entries between server serialization and browser ownership:"
     },
+    "packages/atoms/src/interfaces/AspectRatioProps.md": {
+      "recipe": "atom-components",
+      "description": "Configure a validated positive finite ratio, caller-owned content, and merged native div attributes:"
+    },
+    "packages/atoms/src/interfaces/AvatarProps.md": {
+      "recipe": "atom-components",
+      "description": "Present caller-owned loaded, loading, error, and no-src Avatar states without account or fetch ownership:"
+    },
+    "packages/atoms/src/interfaces/ScrollAreaProps.md": {
+      "recipe": "atom-components",
+      "description": "Configure a named bounded native scrolling section, orientation, content, and caller-owned native attributes:"
+    },
+    "packages/atoms/src/interfaces/SeparatorProps.md": {
+      "recipe": "atom-components",
+      "description": "Configure native horizontal or vertical separator semantics, or remove semantics for a decorative rule:"
+    },
     "packages/atoms/src/interfaces/ButtonProps.md": {
       "recipe": "atom-components",
       "description": "Configure a Button's content, visual variant, size, disabled state, click handler, and native quark attributes:"
@@ -4609,6 +4655,34 @@
     "packages/atoms/src/interfaces/IconDefinition.md": {
       "recipe": "atom-components",
       "description": "Describe one named app-owned SVG view box and template body without copying the official Icon renderer:"
+    },
+    "packages/atoms/src/type-aliases/AspectRatioAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed HTMLDivElement attributes while AspectRatio retains content and validated ratio ownership:"
+    },
+    "packages/atoms/src/type-aliases/AvatarAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed HTMLImageElement loading, decoding, class, style, data, event, and ref attributes only in the loaded state:"
+    },
+    "packages/atoms/src/type-aliases/AvatarStatus.md": {
+      "recipe": "atom-components",
+      "description": "Declare caller-owned loading, loaded, or error lifecycle state without transferring fetch ownership to Avatar:"
+    },
+    "packages/atoms/src/type-aliases/ScrollAreaAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed native section attributes, including an explicit tabIndex, while ScrollArea retains its accessible label:"
+    },
+    "packages/atoms/src/type-aliases/ScrollAreaOrientation.md": {
+      "recipe": "atom-components",
+      "description": "Choose vertical, horizontal, or two-axis native overflow behavior:"
+    },
+    "packages/atoms/src/type-aliases/SeparatorAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward typed HTMLHRElement attributes while Separator retains role, hidden, and orientation semantics:"
+    },
+    "packages/atoms/src/type-aliases/SeparatorOrientation.md": {
+      "recipe": "atom-components",
+      "description": "Choose horizontal implicit separator geometry or explicit vertical orientation:"
     },
     "packages/atoms/src/type-aliases/ButtonAttributes.md": {
       "recipe": "atom-components",
@@ -4713,6 +4787,38 @@
     "packages/atoms/src/variables/atomStyles.md": {
       "recipe": "atom-components",
       "description": "Adopt the shared constructable stylesheet that implements the public Atom component class contract:"
+    },
+    "packages/atoms/src/variables/AspectRatio.md": {
+      "recipe": "atom-components",
+      "description": "Render a native div constrained by the validated --gluon-aspect-ratio component property:"
+    },
+    "packages/atoms/src/variables/aspectRatioStyles.md": {
+      "recipe": "atom-components",
+      "description": "Inspect or explicitly retain AspectRatio's independently tree-shakable constructable stylesheet:"
+    },
+    "packages/atoms/src/variables/Avatar.md": {
+      "recipe": "atom-components",
+      "description": "Render one meaningful native image when loaded or one accessible fallback image for loading, error, and no-src states:"
+    },
+    "packages/atoms/src/variables/avatarStyles.md": {
+      "recipe": "atom-components",
+      "description": "Inspect or explicitly retain Avatar's independently tree-shakable constructable stylesheet:"
+    },
+    "packages/atoms/src/variables/ScrollArea.md": {
+      "recipe": "atom-components",
+      "description": "Render a named, focusable, bounded native section whose overflow remains platform-owned:"
+    },
+    "packages/atoms/src/variables/scrollAreaStyles.md": {
+      "recipe": "atom-components",
+      "description": "Inspect or explicitly retain ScrollArea's independently tree-shakable constructable stylesheet:"
+    },
+    "packages/atoms/src/variables/Separator.md": {
+      "recipe": "atom-components",
+      "description": "Render a native hr with implicit horizontal, explicit vertical, or decorative semantics:"
+    },
+    "packages/atoms/src/variables/separatorStyles.md": {
+      "recipe": "atom-components",
+      "description": "Inspect or explicitly retain Separator's independently tree-shakable constructable stylesheet:"
     },
     "packages/atoms/src/variables/Button.md": {
       "recipe": "atom-components",

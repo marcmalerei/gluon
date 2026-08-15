@@ -5,6 +5,8 @@ import {
   Button,
   AspectRatio,
   Avatar,
+  aspectRatioStyles,
+  avatarStyles,
   Checkbox,
   Icon,
   Input,
@@ -20,7 +22,9 @@ import {
   defineToggleButtonPreset,
   Textarea,
   ScrollArea,
+  scrollAreaStyles,
   Separator,
+  separatorStyles,
   atomManifest,
   atomStyles,
   createUiStyleSelection,
@@ -79,15 +83,189 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
-  it('keeps foundation atoms native, scoped, and independently style-addressable', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
-    render(html`${AspectRatio({ ratio: 1.5, children: 'content' })}${Avatar({ alt: 'Ada', fallback: 'A', status: 'error' })}${ScrollArea({ children: 'scroll content', attributes: { 'aria-label': 'Notes' } })}${Separator({})}`, host);
-    expect(host.querySelector('.gluon-aspect-ratio')).not.toBeNull();
-    expect(host.querySelector('.gluon-avatar__fallback')?.textContent).toBe('A');
-    expect(host.querySelector('.gluon-scroll-area')?.getAttribute('role')).toBeNull();
-    expect(host.querySelector('.gluon-scroll-area')?.getAttribute('tabindex')).toBe('0');
-    expect(host.querySelector('.gluon-separator')?.getAttribute('role')).toBe('separator');
+  it('renders AspectRatio with typed native attributes, merged classes, exact styles, and validated geometry', () => {
+    render(AspectRatio({
+      ratio: 2,
+      children: 'Media',
+      attributes: {
+        id: 'ratio-media',
+        class: 'catalog-media',
+        title: 'Product media',
+        data: { owner: 'catalog' },
+        style: { inlineSize: '240px' },
+      },
+    }), document.body);
+
+    const ratio = document.querySelector<HTMLDivElement>('#ratio-media')!;
+    const bounds = ratio.getBoundingClientRect();
+    expect(ratio.classList).toContain('gluon-aspect-ratio');
+    expect(ratio.classList).toContain('catalog-media');
+    expect(ratio.dataset.owner).toBe('catalog');
+    expect(ratio.title).toBe('Product media');
+    expect(ratio.style.getPropertyValue('--gluon-aspect-ratio')).toBe('2');
+    expect(bounds.width).toBeCloseTo(240, 0);
+    expect(bounds.height).toBeCloseTo(120, 0);
+    expect(document.adoptedStyleSheets).toContain(aspectRatioStyles);
+
+    for (const invalid of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => AspectRatio({ ratio: invalid })).toThrow(
+        'AspectRatio ratio must be a positive finite number.',
+      );
+    }
+  });
+
+  it('keeps Avatar loaded, loading, error, and no-src announcements singular and native', async () => {
+    const source = '/avatar.svg';
+    render(q.div({ children: [
+      Avatar({
+        src: source,
+        alt: 'Ada Lovelace',
+        status: 'loaded',
+        attributes: { id: 'avatar-loaded-image', class: 'profile-photo', loading: 'lazy' },
+      }),
+      Avatar({ src: source, alt: 'Lin Chen', fallback: 'LC', status: 'loading' }),
+      Avatar({ src: source, alt: 'Sam Rivera', fallback: 'SR', status: 'error' }),
+      Avatar({ alt: 'No Source', fallback: 'NS', status: 'loaded' }),
+    ] }), document.body);
+
+    const avatars = [...document.querySelectorAll<HTMLElement>('.gluon-avatar')];
+    const loaded = avatars[0]!;
+    const loadedImage = loaded.querySelector<HTMLImageElement>('img')!;
+    expect(loaded.getAttribute('role')).toBeNull();
+    expect(loaded.querySelectorAll('img')).toHaveLength(1);
+    expect(loaded.querySelector('.gluon-avatar__fallback')).toBeNull();
+    expect(loadedImage.alt).toBe('Ada Lovelace');
+    expect(loadedImage.classList).toContain('profile-photo');
+    expect(loadedImage.loading).toBe('lazy');
+
+    const loading = avatars[1]!;
+    const loadingFallback = loading.querySelector<HTMLElement>('[role="img"]')!;
+    expect(loading.querySelector('img')).toBeNull();
+    expect(loadingFallback.getAttribute('aria-label')).toBe('Lin Chen');
+    expect(loadingFallback.getAttribute('aria-busy')).toBe('true');
+    expect(loadingFallback.firstElementChild?.getAttribute('aria-hidden')).toBe('true');
+
+    const errorFallback = avatars[2]!.querySelector<HTMLElement>('[role="img"]')!;
+    expect(avatars[2]!.querySelector('img')).toBeNull();
+    expect(errorFallback.getAttribute('aria-label')).toBe('Sam Rivera');
+    expect(errorFallback.hasAttribute('aria-busy')).toBe(false);
+
+    const noSourceFallback = avatars[3]!.querySelector<HTMLElement>('[role="img"]')!;
+    expect(avatars[3]!.classList).toContain('is-error');
+    expect(avatars[3]!.querySelector('img')).toBeNull();
+    expect(noSourceFallback.getAttribute('aria-label')).toBe('No Source');
+    expect(document.adoptedStyleSheets).toContain(avatarStyles);
+    expect(() => Avatar({ alt: ' ' })).toThrow('Avatar alt must be a non-empty');
+
+    const results = await axe.run(document.body, { runOnly: ['wcag2a', 'wcag2aa'] });
+    expect(results.violations).toEqual([]);
+  });
+
+  it('keeps ScrollArea a named, bounded, focusable native overflow region', async () => {
+    render(q.div({ dir: 'rtl', children: [
+      q.button({ children: 'Before' }),
+      ScrollArea({
+        label: 'Release notes',
+        orientation: 'both',
+        attributes: {
+          id: 'release-notes',
+          class: 'release-scroll',
+          data: { owner: 'release' },
+          style: {
+            '--gluon-scroll-area-max-inline-size': '160px',
+            '--gluon-scroll-area-max-block-size': '96px',
+          },
+        },
+        children: q.div({
+          style: { inlineSize: '420px', blockSize: '360px' },
+          children: 'Scrollable release notes',
+        }),
+      }),
+      ScrollArea({
+        label: 'Programmatic history',
+        attributes: { id: 'programmatic-history', tabIndex: -1, class: 'programmatic' },
+        children: q.div({ style: { blockSize: '400px' }, children: 'History' }),
+      }),
+    ] }), document.body);
+
+    const area = document.querySelector<HTMLElement>('#release-notes')!;
+    expect(area.tagName).toBe('SECTION');
+    expect(area.getAttribute('role')).toBeNull();
+    expect(area.getAttribute('aria-label')).toBe('Release notes');
+    expect(area.tabIndex).toBe(0);
+    expect(area.classList).toContain('release-scroll');
+    expect(area.dataset.owner).toBe('release');
+    expect(area.clientWidth).toBeLessThan(area.scrollWidth);
+    expect(area.clientHeight).toBeLessThan(area.scrollHeight);
+    expect(area.clientWidth).toBeLessThanOrEqual(160);
+    expect(area.clientHeight).toBeLessThanOrEqual(96);
+    expect(getComputedStyle(area).direction).toBe('rtl');
+    expect(getComputedStyle(area).overflowX).toBe('auto');
+    expect(getComputedStyle(area).overflowY).toBe('auto');
+
+    await userEvent.tab();
+    await userEvent.tab();
+    expect(document.activeElement).toBe(area);
+    expect(getComputedStyle(area).outlineStyle).toBe('solid');
+    await userEvent.keyboard('{ArrowDown}');
+    await vi.waitFor(() => expect(area.scrollTop).toBeGreaterThan(0));
+    area.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    area.scrollTo({ top: 80, left: -80, behavior: 'instant' });
+    expect(area.scrollTop).toBeGreaterThan(0);
+    expect(Math.abs(area.scrollLeft)).toBeGreaterThan(0);
+
+    const programmatic = document.querySelector<HTMLElement>('#programmatic-history')!;
+    expect(programmatic.tabIndex).toBe(-1);
+    expect(programmatic.classList).toContain('programmatic');
+    expect(document.adoptedStyleSheets).toContain(scrollAreaStyles);
+    expect(getStyleSheetText(scrollAreaStyles)).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(getStyleSheetText(scrollAreaStyles)).toContain('scroll-behavior: auto !important');
+    expect(getStyleSheetText(scrollAreaStyles)).toContain('@media (forced-colors: active)');
+    expect(() => ScrollArea({ label: ' ' })).toThrow('ScrollArea label must be a non-empty');
+  });
+
+  it('preserves native and decorative Separator semantics with logical, zoom-safe geometry', async () => {
+    render(q.div({
+      dir: 'rtl',
+      style: { inlineSize: '240px', blockSize: '80px', display: 'flex', alignItems: 'stretch' },
+      children: [
+        Separator({ attributes: { id: 'horizontal-rule', class: 'section-rule' } }),
+        Separator({
+          orientation: 'vertical',
+          attributes: {
+            id: 'vertical-rule',
+            class: 'column-rule',
+            style: { '--gluon-separator-thickness': '2px' },
+          },
+        }),
+        Separator({ decorative: true, attributes: { id: 'decorative-rule' } }),
+      ],
+    }), document.body);
+
+    const horizontal = document.querySelector<HTMLHRElement>('#horizontal-rule')!;
+    const vertical = document.querySelector<HTMLHRElement>('#vertical-rule')!;
+    const decorative = document.querySelector<HTMLHRElement>('#decorative-rule')!;
+    expect(horizontal.tagName).toBe('HR');
+    expect(horizontal.getAttribute('role')).toBeNull();
+    expect(horizontal.getAttribute('aria-orientation')).toBeNull();
+    expect(horizontal.classList).toContain('section-rule');
+    expect(vertical.getAttribute('role')).toBeNull();
+    expect(vertical.getAttribute('aria-orientation')).toBe('vertical');
+    expect(vertical.classList).toContain('column-rule');
+    expect(vertical.getBoundingClientRect().width).toBeCloseTo(2, 0);
+    expect(vertical.getBoundingClientRect().height).toBeCloseTo(80, 0);
+    expect(decorative.getAttribute('role')).toBe('presentation');
+    expect(decorative.getAttribute('aria-hidden')).toBe('true');
+    expect(getComputedStyle(vertical).direction).toBe('rtl');
+    expect(document.adoptedStyleSheets).toContain(separatorStyles);
+    expect(getStyleSheetText(separatorStyles)).toContain('@media (forced-colors: active)');
+
+    document.body.style.zoom = '2';
+    expect(vertical.getBoundingClientRect().width).toBeCloseTo(4, 0);
+    document.body.style.zoom = '';
+
+    const results = await axe.run(document.body, { runOnly: ['wcag2a', 'wcag2aa'] });
+    expect(results.violations).toEqual([]);
   });
   it('keeps Checkbox native checked, indeterminate, form-reset, and submission behavior', () => {
     const onChange = vi.fn();

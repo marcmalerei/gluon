@@ -9,6 +9,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
+  `Separator` atoms with native semantics, typed extension contracts, and
+  cross-browser evidence.
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.

@@ -1,6 +1,8 @@
 import { beforeEach, expect, test } from 'vitest';
 import { page } from 'vitest/browser';
 import {
+  AspectRatio,
+  Avatar,
   Button,
   Checkbox,
   Icon,
@@ -8,6 +10,8 @@ import {
   Progress,
   Slider,
   Radio,
+  ScrollArea,
+  Separator,
   Switch,
   ToggleButton,
   Select,
@@ -25,6 +29,7 @@ import {
 import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
+import portrait from '../docs/assets/examples/foundation-avatar.svg?url&no-inline';
 
 beforeEach(() => unmount(document.body));
 
@@ -447,6 +452,107 @@ test('matches StatusBadge tones, wrapping, and RTL states', async () => {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.06, threshold: 0.15 },
   });
+  uiOwner.dispose();
+});
+
+test('matches foundation atom image, fallback, overflow, RTL, and separator states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="foundation-atoms-visual"] {
+        box-sizing: border-box;
+        display: grid;
+        gap: 18px;
+        inline-size: min(100%, 420px);
+        padding: 24px;
+        color: #17312f;
+        font: 16px/1.4 system-ui, sans-serif;
+      }
+      [data-testid="foundation-atoms-visual"] h1,
+      [data-testid="foundation-atoms-visual"] p { margin: 0; }
+      .foundation-visual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .foundation-visual-panel { display: grid; align-content: start; gap: 10px; min-inline-size: 0; }
+      .foundation-visual-media { inline-size: 100%; }
+      .foundation-visual-media img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+      .foundation-visual-avatars { display: flex; gap: 10px; }
+      .foundation-visual-scroll {
+        --gluon-scroll-area-max-block-size: 88px;
+        --gluon-scroll-area-max-inline-size: 100%;
+        padding: 8px;
+        border: 1px solid #777;
+      }
+      .foundation-visual-scroll-content { inline-size: 300px; }
+      .foundation-visual-separators { display: flex; block-size: 56px; align-items: stretch; gap: 10px; }
+      @media (max-width: 390px) {
+        [data-testid="foundation-atoms-visual"] { padding: 16px; }
+        .foundation-visual-grid { grid-template-columns: 1fr; }
+      }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+
+  render(q.main({
+    data: { testid: 'foundation-atoms-visual' },
+    children: [
+      q.h1({ children: 'Foundation atom states' }),
+      q.div({ class: 'foundation-visual-grid', children: [
+        q.section({ class: 'foundation-visual-panel', children: [
+          q.p({ children: 'AspectRatio 4:3' }),
+          AspectRatio({
+            ratio: 4 / 3,
+            attributes: { class: 'foundation-visual-media' },
+            children: q.img({ src: portrait, alt: 'Ada Lovelace portrait' }),
+          }),
+        ] }),
+        q.section({ class: 'foundation-visual-panel', children: [
+          q.p({ children: 'Avatar lifecycle' }),
+          q.div({ class: 'foundation-visual-avatars', children: [
+            Avatar({ src: portrait, alt: 'Ada Lovelace', status: 'loaded' }),
+            Avatar({ src: portrait, alt: 'Lin Chen', fallback: 'LC', status: 'loading' }),
+            Avatar({ alt: 'Sam Rivera', fallback: 'SR', status: 'error' }),
+          ] }),
+        ] }),
+      ] }),
+      q.section({ class: 'foundation-visual-panel', dir: 'rtl', children: [
+        q.p({ children: 'RTL native overflow' }),
+        ScrollArea({
+          label: 'Release notes',
+          orientation: 'both',
+          attributes: { class: 'foundation-visual-scroll' },
+          children: q.div({
+            class: 'foundation-visual-scroll-content',
+            children: [
+              q.p({ children: 'Native scrolling remains bounded.' }),
+              q.p({ children: 'Keyboard focus stays visible.' }),
+              q.p({ children: 'Logical layout supports RTL.' }),
+              q.p({ children: 'Applications own scroll position.' }),
+            ],
+          }),
+        }),
+      ] }),
+      q.section({ class: 'foundation-visual-panel', children: [
+        q.p({ children: 'Horizontal, vertical, and decorative separators' }),
+        Separator({}),
+        q.div({ class: 'foundation-visual-separators', dir: 'rtl', children: [
+          q.span({ children: 'Before' }),
+          Separator({ orientation: 'vertical' }),
+          q.span({ children: 'After' }),
+        ] }),
+        Separator({ decorative: true }),
+      ] }),
+    ],
+  }), document.body);
+
+  await expect.element(page.getByTestId('foundation-atoms-visual')).toMatchScreenshot(
+    'foundation-atoms-states-light',
+    {
+      comparatorName: 'pixelmatch',
+      comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
+    },
+  );
   uiOwner.dispose();
 });
 

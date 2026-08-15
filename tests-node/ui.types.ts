@@ -1,10 +1,14 @@
 import { svg, type TemplateResult } from '@gluonjs/core';
 import {
+  AspectRatio,
+  Avatar,
   Button,
   Icon,
   Input,
   Label,
   Slider,
+  ScrollArea,
+  Separator,
   atomManifest,
   createUiStyleSelection,
   defineButtonPreset,
@@ -12,9 +16,20 @@ import {
   defineUiAtom,
   getThemeStyles,
   installUi,
-  type UiOwner,
+  type AspectRatioAttributes,
+  type AspectRatioProps,
+  type AvatarAttributes,
+  type AvatarProps,
+  type AvatarStatus,
   type ButtonProps,
   type SliderProps,
+  type ScrollAreaAttributes,
+  type ScrollAreaOrientation,
+  type ScrollAreaProps,
+  type SeparatorAttributes,
+  type SeparatorOrientation,
+  type SeparatorProps,
+  type UiOwner,
 } from '@gluonjs/atoms';
 import {
   Accordion,
@@ -94,6 +109,7 @@ const componentLibraryStyleSnapshot: Readonly<{ schemaVersion: 1; library: strin
 componentLibraryLoader.validateStyleSnapshot(componentLibraryStyleSnapshot);
 const buttonRef: { value?: HTMLButtonElement } = {};
 const svgRef: { value?: SVGSVGElement } = {};
+const imageRef: { value?: HTMLImageElement } = {};
 const nativeButton = {
   class: 'app-purchase',
   style: { '--app-accent': '#101010' },
@@ -129,6 +145,21 @@ const TextLink = defineUiAtom<{
 
 PurchaseButton({ label: 'Buy', type: 'submit', attributes: { ref: buttonRef } });
 TextLink({ href: '/shop', children: 'Shop', aria: { current: 'page' } });
+const aspectRatioAttributes = { class: 'app-media' } satisfies AspectRatioAttributes;
+const aspectRatioProps = { ratio: 16 / 9, attributes: aspectRatioAttributes, children: 'Media' } satisfies AspectRatioProps;
+const avatarStatus: AvatarStatus = 'loaded';
+const avatarAttributes = { loading: 'lazy', ref: imageRef } satisfies AvatarAttributes;
+const avatarProps = { src: '/ada.webp', alt: 'Ada Lovelace', status: avatarStatus, attributes: avatarAttributes } satisfies AvatarProps;
+const scrollOrientation: ScrollAreaOrientation = 'both';
+const scrollAreaAttributes = { tabIndex: -1, class: 'app-scroll' } satisfies ScrollAreaAttributes;
+const scrollAreaProps = { label: 'Order history', orientation: scrollOrientation, attributes: scrollAreaAttributes, children: 'Orders' } satisfies ScrollAreaProps;
+const separatorOrientation: SeparatorOrientation = 'vertical';
+const separatorAttributes = { class: 'app-separator' } satisfies SeparatorAttributes;
+const separatorProps = { orientation: separatorOrientation, attributes: separatorAttributes } satisfies SeparatorProps;
+AspectRatio(aspectRatioProps);
+Avatar(avatarProps);
+ScrollArea(scrollAreaProps);
+Separator(separatorProps);
 Icon({ icon: customIcon, label: 'Bag', attributes: { ref: svgRef, data: { owner: 'app' } } });
 Input({ attributes: { autocomplete: 'email', ref: { value: undefined } } });
 Label({ children: 'Email', attributes: { data: { owner: 'app' } } });
@@ -219,6 +250,22 @@ Button({ label: 'Submit', attributes: { type: 'submit' } });
 Icon({ name: 'app-bag' });
 // @ts-expect-error Icon role cannot silently replace accessibility semantics
 Icon({ name: 'spark', attributes: { role: 'presentation' } });
+// @ts-expect-error AspectRatio div attributes reject image-only props
+AspectRatio({ attributes: { alt: 'Wrong element' } });
+// @ts-expect-error Avatar attributes cannot replace its accessible image alt
+Avatar({ src: '/ada.webp', alt: 'Ada', attributes: { alt: 'Replacement' } });
+// @ts-expect-error Avatar lifecycle states remain closed
+Avatar({ src: '/ada.webp', alt: 'Ada', status: 'idle' });
+// @ts-expect-error ScrollArea requires an accessible name
+ScrollArea({ children: 'Unnamed' });
+// @ts-expect-error ScrollArea orientation remains closed
+ScrollArea({ label: 'History', orientation: 'inline' });
+// @ts-expect-error ScrollArea preserves its named native region semantics
+ScrollArea({ label: 'History', attributes: { role: 'presentation' } });
+// @ts-expect-error Separator role remains component-owned
+Separator({ attributes: { role: 'menu' } });
+// @ts-expect-error Separator orientation remains closed
+Separator({ orientation: 'diagonal' });
 // @ts-expect-error Input attributes reject textarea-only props
 Input({ attributes: { rows: 4 } });
 // @ts-expect-error Label span attributes reject anchor-only props

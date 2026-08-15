@@ -225,6 +225,8 @@ export const atomStyles = css`
 `;
 
 markLegacyComponentStyleSheet(atomStyles, [
+  'gluon-atom-aspect-ratio',
+  'gluon-atom-avatar',
   'gluon-atom-button',
   'gluon-atom-checkbox',
   'gluon-atom-icon',
@@ -233,6 +235,8 @@ markLegacyComponentStyleSheet(atomStyles, [
   'gluon-atom-progress',
   'gluon-atom-radio',
   'gluon-atom-select',
+  'gluon-atom-scroll-area',
+  'gluon-atom-separator',
   'gluon-atom-status-badge',
   'gluon-atom-switch',
   'gluon-atom-textarea',
