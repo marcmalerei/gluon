@@ -96,9 +96,9 @@
       ]
     },
     "after": {
-      "rawBytes": 37664,
-      "gzipBytes": 5572,
-      "moduleCount": 27,
+      "rawBytes": 39985,
+      "gzipBytes": 5934,
+      "moduleCount": 28,
       "modules": [
         "packages/atoms/src/button-styles.ts",
         "packages/atoms/src/checkbox-styles.ts",
@@ -129,7 +129,7 @@
         "packages/molecules/src/toast-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
-      "stylesheetCount": 27,
+      "stylesheetCount": 28,
       "selectors": [
         ".gluon-accordion",
         ".gluon-accordion-heading",
