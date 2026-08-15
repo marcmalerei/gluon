@@ -35,9 +35,9 @@ import {
   SegmentedControl,
   TableRegion,
   Tabs,
+  Toolbar,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
-import { Toolbar } from "@gluonjs/molecules";
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must

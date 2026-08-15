@@ -7,7 +7,7 @@ const sharedEvidence = {
 
 const menuEvidence = {
   example: 'docs-site/examples/ui-system.ts',
-  tests: ['tests/menu-toolbar.spec.ts', 'tests/ui-system.spec.ts', 'tests/ui-visual.spec.ts', 'tests/hydration.spec.ts', 'tests-node/menu-toolbar-ssr.test.mjs', 'tests/shop-example.spec.ts'],
+  tests: ['tests/menu-toolbar.spec.ts', 'tests/ui-system.spec.ts', 'tests/hydration.spec.ts', 'tests-node/menu-toolbar-ssr.test.mjs', 'tests/shop-example.spec.ts', 'scripts/validate-component-library-storybook.mjs'],
 } as const;
 
 export const moleculeManifest = Object.freeze({
