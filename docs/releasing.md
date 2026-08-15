@@ -189,6 +189,12 @@ language-server packages to that exact release version. Candidate validation
 therefore includes the 20 generated application selections so a published
 `create-gluon --ui` command cannot point at a different framework version.
 
+Dependency security intake is handled separately from release publication. See
+[`docs/security.md`](security.md) for the reviewed audit workflow, policy
+contract, exception rules, and triage procedure. Repository validation checks
+the workflow and policy with network-free fixtures; the scheduled/manual
+workflow owns the live registry audit and its release-blocking result.
+
 Issue #107's weekly DX scorecard is release-adjacent evidence, not publication
 authorization. Its automated run may be retained while `humanPasses` is empty,
 but it cannot satisfy the completed DX contract, replace owner-controlled
