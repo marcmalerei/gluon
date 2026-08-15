@@ -19,11 +19,11 @@ Run `npm run check:vscode-client` from the repository root before packaging.
 Install the matching server and build the VSIX from the repository checkout:
 
 ```sh
-npm install --global @gluonjs/language-server@1.8.1
+npm install --global @gluonjs/language-server@1.9.0
 cd editors/vscode
 npm install
 npm run package
-code --install-extension gluon-vscode-1.8.1.vsix
+code --install-extension gluon-vscode-1.9.0.vsix
 ```
 
 The extension starts the installed server over stdio. The metadata gate and a

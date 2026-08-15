@@ -7,6 +7,13 @@
 - Added an immutable protocol handshake with explicit capability names for
   external browser, Vite, and editor clients.
 
+## [1.9.0] - 2026-08-15
+
+### Added
+
+- Added the immutable capability handshake for external browser, Vite, and
+  editor clients.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

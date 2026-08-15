@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-15
+
+### Changed
+
+- Advanced the lockstep release with the request-free application state and
+  SSR transfer contracts documented for the platform APIs.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

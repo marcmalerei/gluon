@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-15
+
+### Changed
+
+- Advanced the lockstep release with the request-free form, route-data, and
+  SSR state-transfer contracts built on the existing reactive primitives.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

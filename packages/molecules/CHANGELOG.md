@@ -9,6 +9,15 @@
   state, field errors, asynchronous validation, submission lifecycle,
   cancellation, reset, subscriptions, and SSR snapshot/hydration.
 
+## [1.9.0] - 2026-08-15
+
+### Added
+
+- Added `createFormController()` as a DOM-independent, request-free form
+  orchestration contract for field state, asynchronous validation,
+  cancellation, submission lifecycle, reset, subscriptions, and SSR
+  snapshot/hydration.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

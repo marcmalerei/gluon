@@ -5,7 +5,7 @@ this archive resolve to immutable version paths rather than a floating page.
 
 ## Supported
 
-- [Gluon 1.8.1 documentation](/gluon/1.8.1/) — current supported release line.
+- [Gluon 1.9.0 documentation](/gluon/1.9.0/) — current supported release line.
 
 ## Archived
 

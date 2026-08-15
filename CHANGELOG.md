@@ -12,6 +12,27 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Published the versioned accessibility and compatibility support matrix with
   package-specific runtime boundaries and explicit evidence limits.
 
+## [1.9.0] - 2026-08-15
+
+### Added
+
+- Added nested object and bounded array editing to `@gluonjs/json-forms` with
+  immutable updates, validation, reset, restore, and fail-closed diagnostics.
+- Added locale fallback chains, `Intl` number/date formatting, plural/select
+  interpolation, loading state, and JSON-safe SSR transfer to `@gluonjs/i18n`.
+- Added the public progressive SSR patch application contract for streamed
+  async fallbacks and style carriers.
+- Added a keyboard-accessible graph node representation and a reusable,
+  request-free form controller with validation and SSR snapshot support.
+- Added explicit Devtools capability negotiation and the VS Code client /
+  distribution contract.
+
+### Changed
+
+- Added request-free route-record data and query-state guidance to Router.
+- Published generated per-package GitHub Pages documentation, stable package
+  metadata and links, and the accessibility and compatibility support matrix.
+
 ## [1.8.1] - 2026-08-12
 
 ### Added

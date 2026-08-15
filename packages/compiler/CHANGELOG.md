@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-15
+
+### Changed
+
+- Added stable diagnostic catalog entries for progressive SSR and tooling
+  contract failures while retaining the compiler's public API boundary.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed
