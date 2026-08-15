@@ -193,6 +193,90 @@ describe('JSON Forms component', () => {
     expect(element.shadowRoot!.querySelector('#field-channels-1')).toBeTruthy();
   });
 
+  it('creates typed defaults for object array items and enforces min/max bounds', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        packages: {
+          type: 'array',
+          title: 'Packages',
+          minItems: 1,
+          maxItems: 1,
+          items: {
+            type: 'object',
+            properties: {
+              label: { type: 'string', default: 'Standard' },
+              quantity: { type: 'integer', default: 2 },
+              insured: { type: 'boolean', default: true },
+              metadata: { type: 'object', default: { priority: 'normal' } },
+            },
+          },
+        },
+      },
+    } as JsonSchema);
+    element.data = { packages: [] };
+    await settled(element);
+
+    const add = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent === 'Add item')!;
+    expect(add.disabled).toBe(false);
+    add.click();
+    await settled(element);
+    expect(element.data).toEqual({
+      packages: [{ label: 'Standard', quantity: 2, insured: true, metadata: { priority: 'normal' } }],
+    });
+
+    const buttons = [...element.shadowRoot!.querySelectorAll('button')];
+    expect(buttons.find((button) => button.textContent === 'Add item')?.disabled).toBe(true);
+    expect(buttons.find((button) => button.textContent === 'Remove item 1')?.disabled).toBe(true);
+  });
+
+  it('updates missing nested object paths and removes cleared nested array items', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        groups: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              details: {
+                type: 'object',
+                properties: { name: { type: 'string', title: 'Group name' } },
+              },
+              tags: { type: 'array', items: { type: 'string' } },
+            },
+          },
+        },
+      },
+    } as JsonSchema);
+    element.data = { groups: [{}] };
+    await settled(element);
+
+    const name = element.shadowRoot!.querySelector('#field-groups-0-details-name') as HTMLInputElement;
+    name.value = 'Priority';
+    name.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ groups: [{ details: { name: 'Priority' } }] });
+
+    const tagsField = element.shadowRoot!.querySelector('[part*="field-groups-0-tags"]')!;
+    (tagsField.querySelector('button') as HTMLButtonElement).click();
+    await settled(element);
+    const tag = element.shadowRoot!.querySelector('#field-groups-0-tags-0') as HTMLInputElement;
+    tag.value = 'fragile';
+    tag.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ groups: [{ details: { name: 'Priority' }, tags: ['fragile'] }] });
+
+    tag.value = '';
+    tag.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ groups: [{ details: { name: 'Priority' }, tags: [] }] });
+
+    const internal = element as unknown as { commitPath(path: readonly string[], value: unknown): void };
+    internal.commitPath(['groups', '2', 'details', 'name'], 'Detached');
+    expect((element.data.groups as readonly Record<string, unknown>[])[2]?.details).toEqual({ name: 'Detached' });
+  });
+
   it('validates direct text and numeric constraints and removes a cleared number', async () => {
     const element = createForm({
       type: 'object',
