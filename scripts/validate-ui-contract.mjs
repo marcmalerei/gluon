@@ -11,7 +11,7 @@ const componentOutput = resolve(root, '.tmp/ui-component-usage');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Tooltip', 'HoverCard', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['AspectRatio', 'Avatar', 'Button', 'Checkbox', 'Icon', 'Input', 'Label', 'Progress', 'Radio', 'Select', 'Slider', 'StatusBadge', 'ScrollArea', 'Separator', 'Switch', 'Textarea', 'ToggleButton', 'installUi']],
-  ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'NavigationStrip', 'DropdownMenu', 'ContextMenu', 'Menubar', 'Toolbar', 'ResponsiveActionBar', 'SegmentedControl', 'TableRegion', 'Tabs', 'SearchField', 'SearchResults']],
+  ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'NavigationStrip', 'ResponsiveActionBar', 'DropdownMenu', 'ContextMenu', 'Menubar', 'Toolbar', 'SegmentedControl', 'TableRegion', 'Tabs', 'SearchField', 'SearchResults']],
   ['@gluonjs/organisms', ['AppShell', 'ConfirmationDialog', 'WorkflowTimeline']],
 ]);
 const manifestExports = new Map([
