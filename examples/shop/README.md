@@ -126,6 +126,12 @@ the product, checkout, and order families as explicit dynamic fallbacks.
 shop source. `npm run check:project-analysis` regenerates it through the public
 language-tooling package and rejects drift without executing application code.
 
+The optional `@gluonjs/i18n` package gained catalog validation in this slice,
+but GLUON GOODS stays single-locale until the repository has a real translated
+product/content slice to ship. That keeps the shop honest: validation
+infrastructure is verified here, while customer-visible localization waits for
+actual language assets and acceptance coverage.
+
 ## Run
 
 ```bash
