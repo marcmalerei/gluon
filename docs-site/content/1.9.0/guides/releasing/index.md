@@ -2,15 +2,17 @@
 
 The `1.9.0` documentation describes the completed lockstep release. All 21
 official manifests are at `1.9.0`, and the protected release workflow published
-`1.9.0` as the latest package train with npm provenance. Issue
-[#367](https://github.com/marcmalerei/gluon/issues/367) delivered retained
-nested SSR hydration and request-local abort propagation. The release cut
-retains a Quality-Gates-tested candidate followed only by its release-cut
-evidence and compatibility manifest.
+`1.9.0` as the latest package train with npm provenance. Issues
+[#375-#384](https://github.com/marcmalerei/gluon/issues/375) delivered the
+platform-hardening, package-documentation, accessibility, tooling, routing,
+forms, i18n, JSON Forms, and SSR work tracked by epic
+[#374](https://github.com/marcmalerei/gluon/issues/374). The release cut retains
+a Quality-Gates-tested candidate followed only by its release-cut evidence and
+compatibility manifest.
 
 The immutable GitHub release is [`v1.9.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.9.0),
-published from `b1c2feeeffd5e1ac6bba2607cf1fae95642e60ab`. Protected workflow
-run [31580641519](https://github.com/marcmalerei/gluon/actions/runs/31580641519)
+published from `06dc45457bbf9a109ae67f5048db8be63f0fda39`. Protected workflow
+run [31890472642](https://github.com/marcmalerei/gluon/actions/runs/31890472642)
 passed browser, Node, reproducibility, clean-room registry, and publication
 verification for all 21 packages.
 
