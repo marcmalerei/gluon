@@ -8,7 +8,16 @@ const contentRoot = resolve(siteRoot, 'content');
 const apiRoot = resolve(root, '.tmp/docs-api');
 const outputRoot = resolve(siteRoot, 'dist');
 const versions = JSON.parse(await readFile(resolve(siteRoot, 'versions.json'), 'utf8'));
+const packageContract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
 const base = normalizeBase(process.env.DOCS_BASE ?? '/gluon/');
+const packageMetadata = new Map(await Promise.all(
+  packageContract.packages
+    .filter((entry) => entry.state === 'current')
+    .map(async (entry) => {
+      const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
+      return [entry.name, { name: entry.name, entry, description: packageJson.description }];
+    }),
+));
 
 for (const version of versions.supported) {
   const entries = await readdir(resolve(contentRoot, version));
@@ -31,6 +40,8 @@ const pages = [...maintainedPages, ...apiPages];
 
 for (const page of pages) await renderPage(page);
 await writeRedirect(resolve(outputRoot, 'index.html'), `${base}${versions.latest}/`);
+await mkdir(resolve(outputRoot, 'latest'), { recursive: true });
+await writeRedirect(resolve(outputRoot, 'latest', 'index.html'), `${base}${versions.latest}/`);
 await writeFile(resolve(outputRoot, '404.html'), pageShell({
   title: 'Documentation page not found',
   description: 'The requested Gluon documentation page does not exist.',
@@ -44,12 +55,18 @@ console.log(`built ${pages.length} documentation pages for ${versions.supported.
 async function renderPage(page) {
   let markdown = await readFile(page.source, 'utf8');
   markdown = await expandIncludes(markdown, dirname(page.source));
+  const apiPackage = packageForApiPage(page.relative);
+  if (apiPackage) markdown = rewriteApiBreadcrumb(markdown, apiPackage.name);
   const headings = [];
   const environment = { headings, slugs: new Map() };
   const markdownRenderer = createMarkdownRenderer();
   let content = markdownRenderer.render(markdown, environment);
-  const title = firstHeading(markdown) ?? 'Gluon documentation';
-  const description = firstParagraph(markdown) ?? 'Versioned Gluon framework documentation.';
+  const title = apiPackage && isApiPackageLanding(page.relative)
+    ? apiPackage.name
+    : firstHeading(markdown) ?? 'Gluon documentation';
+  const description = apiPackage?.description
+    ?? firstParagraph(markdown)
+    ?? 'Versioned Gluon framework documentation.';
   if (slash(page.relative) === `${versions.latest}/index.md`) {
     content = content.replace(
       /<h2([^>]*)>(.*?)<\/h2>\n<p>(.*?)<\/p>\n<p>(.*?)<\/p>/gs,
@@ -204,11 +221,37 @@ function pageUrl(relativePath) {
 
 function rewriteMarkdownLink(href) {
   const [path, hash = ''] = href.split('#');
+  if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(path)) return href;
   if (!path.endsWith('.md')) return href;
   const rewritten = path.endsWith('README.md')
     ? `${path.slice(0, -'README.md'.length)}index.html`
     : path.replace(/\.md$/, '.html');
   return `${rewritten}${hash ? `#${hash}` : ''}`;
+}
+
+function packageForApiPage(relativePath) {
+  const normalized = slash(relativePath);
+  const marker = `${versions.latest}/api/generated/`;
+  if (!normalized.startsWith(marker)) return undefined;
+  const generatedPath = normalized.slice(marker.length).replace(/\/[^/]+$/, '');
+  const entry = packageContract.packages
+    .filter((candidate) => candidate.state === 'current')
+    .sort((left, right) => right.directory.length - left.directory.length)
+    .find((candidate) => {
+      const sourceRoot = candidate.directory === '.' ? 'src' : `${candidate.directory}/src`;
+      return generatedPath === sourceRoot || generatedPath.startsWith(`${sourceRoot}/`);
+    });
+  return entry ? packageMetadata.get(entry.name) : undefined;
+}
+
+function isApiPackageLanding(relativePath) {
+  return slash(relativePath).endsWith('/README.md');
+}
+
+function rewriteApiBreadcrumb(markdown, packageName) {
+  return markdown
+    .replace(/^\[\*\*@gluonjs\/core\*\*\]/m, `[**${packageName}**]`)
+    .replace(/^\[@gluonjs\/core\]/m, `[${packageName}]`);
 }
 
 function firstHeading(markdown) {

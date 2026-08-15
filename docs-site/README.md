@@ -47,7 +47,7 @@ and emits reviewed Markdown into `.tmp/docs-api`.
 `generate-api-examples.mjs` then derives every public function, class,
 interface, type-alias, and variable page, maps it back to an official package
 entry point, appends an `Example` section, and typechecks the complete generated
-snippet corpus. `api-examples.json` maps all 694 current symbol pages to reviewed
+snippet corpus. `api-examples.json` maps every generated current symbol page to reviewed
 task-oriented examples. Related symbols may share a maintained application
 recipe, but every page has its own purpose statement and the compiled recipe
 must use that documented symbol. Unknown pages, missing catalog entries, private
@@ -58,6 +58,10 @@ symbol coverage fail `npm run docs:api`.
 migration material, examples, and release archive. `validate-docs.mjs` verifies
 the version tree, public API entry-point count, one rendered example per public
 symbol page, required curated content, compiled examples, and internal links.
+The root redirect and the stable `/latest/` alias both resolve to the latest
+supported version. API landing pages derive their title, description, and
+breadcrumb from the package contract and package manifest rather than from the
+TypeDoc root label.
 The maintained component guide is the beginner entry point for properties,
 attributes, events, lifecycle ownership, and the complete public class map.
 TypeDoc excludes externally inherited DOM members so an API page keeps its

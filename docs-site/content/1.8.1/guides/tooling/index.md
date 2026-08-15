@@ -28,7 +28,7 @@ npm run storybook:component-library
 npm run check:storybook:component-library
 ```
 
-The [Storybook guide](../../../../../docs/storybook.md) explains installation,
+The [Storybook guide](https://github.com/marcmalerei/gluon/blob/main/docs/storybook.md) explains installation,
 typed stories, component style dependencies, controls, and cleanup.
 
 The production consumer and clean-install package checks remain the authority

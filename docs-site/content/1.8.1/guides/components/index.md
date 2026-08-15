@@ -63,7 +63,7 @@ receive exact canvas teardown without a Web Components adapter. The catalog
 uses the published exports for controls, interactions, accessibility checks,
 and visual baselines; it is developer evidence, not a replacement for the
 GLUON GOODS application acceptance flow. See the
-[complete Storybook guide](../../../../../docs/storybook.md).
+[complete Storybook guide](https://github.com/marcmalerei/gluon/blob/main/docs/storybook.md).
 
 ## Declare properties
 
