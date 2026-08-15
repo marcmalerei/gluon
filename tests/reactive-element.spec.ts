@@ -165,6 +165,133 @@ describe('reactive GluonElement rendering', () => {
     expect(element.renders).toBe(2);
   });
 
+  it('drops queued compiled property work on disconnect before flush and resumes after reconnect', async () => {
+    const tagName = `gluon-compiled-disconnect-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class DisconnectElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      renders = 0;
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, DisconnectElement);
+    const element = document.createElement(tagName) as DisconnectElement;
+    document.body.append(element);
+    await element.updateComplete;
+    element.label = 'B';
+    element.remove();
+    await Promise.resolve();
+    expect(element.shadowRoot?.textContent).toBe('A');
+    expect(element.renders).toBe(1);
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('B');
+    expect(element.renders).toBe(2);
+  });
+
+  it('handles reentrant compiled property updates through a full follow-up render', async () => {
+    const tagName = `gluon-compiled-reentrant-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class ReentrantElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+        phase: { type: String, default: 'idle' },
+      };
+
+      declare label: string;
+      declare phase: string;
+      renders = 0;
+
+      constructor() {
+        super();
+        this.onUpdated(() => {
+          if (this.label === 'B' && this.phase === 'idle') {
+            this.phase = 'done';
+          }
+        });
+      }
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}:${this.phase}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, ReentrantElement);
+    const element = document.createElement(tagName) as ReentrantElement;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('A:idle');
+
+    element.label = 'B';
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('B:done');
+    expect(element.renders).toBe(3);
+  });
+
+  it('keeps property updates ordered when mixed with cleanup and reconnect', async () => {
+    const tagName = `gluon-compiled-order-${reactiveElementSequence += 1}` as `${string}-${string}`;
+    const order: string[] = [];
+
+    class OrderedElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+
+      constructor() {
+        super();
+        this.onDisconnected(() => {
+          order.push('disconnect');
+        });
+      }
+
+      protected override render() {
+        order.push(`render:${this.label}`);
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, OrderedElement);
+    const element = document.createElement(tagName) as OrderedElement;
+    document.body.append(element);
+    await element.updateComplete;
+    element.label = 'B';
+    element.label = 'C';
+    await element.updateComplete;
+    element.remove();
+    await Promise.resolve();
+    document.body.append(element);
+    await element.updateComplete;
+    expect(order).toEqual([
+      'render:A',
+      'render:C',
+      'disconnect',
+      'render:C',
+    ]);
+  });
+
   it('stops scoped work on disconnect and recreates it while retaining state and DOM', async () => {
     const tagName = `gluon-scope-${reactiveElementSequence += 1}` as `${string}-${string}`;
 
