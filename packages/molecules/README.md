@@ -29,11 +29,15 @@ import {
   NavigationStrip,
   SearchField,
   SearchResults,
+  ContextMenu,
+  DropdownMenu,
+  Menubar,
   SegmentedControl,
   TableRegion,
   Tabs,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
+import { Toolbar } from "@gluonjs/molecules";
 ```
 
 `Card` renders a native article. Its optional title is an `h3`; callers must
@@ -266,3 +270,11 @@ dismissal ownership.
 Checkout uses `TableRegion` around its native captioned order table. The shop
 owns every header, row, price, and total; the molecule adds the region summary
 and narrow-layout overflow affordance without introducing grid interaction.
+
+`DropdownMenu`, `ContextMenu`, and `Menubar` share the bounded `MenuItem` model.
+They provide roving focus, typeahead, disabled and separator semantics,
+checkbox/radio state, nested submenu structure, Escape/focus return, and RTL
+movement while preserving native links and buttons. `Toolbar` is intentionally
+layout-only and preserves the semantics of its caller-owned children. Open and
+checked state callbacks are controlled by the application; routing,
+authorization, and command execution remain outside these compositions.

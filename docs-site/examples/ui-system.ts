@@ -32,9 +32,11 @@ import {
   ButtonGroup,
   ChoiceGroup,
   ControlField,
+  ContextMenu,
   DialogSurface,
   Disclosure,
   ResponsiveDisclosure,
+  DropdownMenu,
   EmptyState,
   FormField,
   InlineNotice,
@@ -42,9 +44,11 @@ import {
   ResponsiveActionBar,
   SearchField,
   SearchResults,
+  Menubar,
   SegmentedControl,
   TableRegion,
   Tabs,
+  Toolbar,
   createDialogSurfaceController,
   defineMolecule,
 } from '@gluonjs/molecules';
@@ -74,6 +78,8 @@ const dialogController = createDialogSurfaceController(dialogFocusOptions);
 // DialogSurface composes these same public headless primitives; applications can still use them directly.
 const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
+const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
+void menuAndToolbarPrimitives;
 const customBagIcon = defineIcon({
   name: 'example-bag',
   viewBox: '0 0 24 24',
