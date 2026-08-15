@@ -11,7 +11,6 @@ export const oneTimePasswordFieldStyles = css`
     :where(.gluon-one-time-password-field-input[aria-invalid="true"]) { border-color: var(--gluon-one-time-password-field-error-color, var(--gluon-color-danger, #a52222)); }
     :where(.gluon-one-time-password-field-helper, .gluon-one-time-password-field-error) { color: var(--gluon-one-time-password-field-helper-color, var(--gluon-color-muted, #51625f)); font-size: 0.8125rem; line-height: 1.4; overflow-wrap: anywhere; }
     :where(.gluon-one-time-password-field-error) { color: var(--gluon-one-time-password-field-error-color, var(--gluon-color-danger, #a52222)); font-weight: 650; }
-    :where(.gluon-one-time-password-field-native-value) { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     @media (max-width: 20rem) { :where(.gluon-one-time-password-field-inputs) { gap: 0.25rem; } :where(.gluon-one-time-password-field-input) { flex-basis: 2.25rem; min-inline-size: 2.25rem; } }
     @media (forced-colors: active) {
       :where(.gluon-one-time-password-field-input) { border-color: ButtonText; background: Canvas; color: CanvasText; }

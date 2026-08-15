@@ -3,8 +3,15 @@ import { q, type QuarkProps } from '@gluonjs/quarks';
 import { oneTimePasswordFieldStyleDependency } from './one-time-password-field-styles.js';
 
 export type OneTimePasswordFieldMode = 'numeric' | 'alphanumeric';
-export type OneTimePasswordFieldAttributes = Omit<QuarkProps<HTMLFieldSetElement>, 'children' | 'id' | '.id' | 'disabled' | '.disabled' | '?disabled' | 'aria'> & { readonly aria?: Omit<NonNullable<QuarkProps<HTMLFieldSetElement>['aria']>, 'describedby' | 'errormessage' | 'invalid'>; };
-export type OneTimePasswordFieldInputAttributes = Omit<QuarkProps<HTMLInputElement>, 'children' | 'id' | '.id' | 'name' | '.name' | 'type' | '.type' | 'value' | '.value' | 'maxlength' | '.maxLength' | 'disabled' | '.disabled' | '?disabled' | 'readonly' | 'readOnly' | '.readOnly' | '?readonly' | 'required' | '.required' | '?required' | 'autocomplete' | 'inputmode' | 'aria' | 'onInput' | 'onKeydown'> & { readonly aria?: Omit<NonNullable<QuarkProps<HTMLInputElement>['aria']>, 'invalid' | 'label' | 'describedby' | 'errormessage'>; };
+export type OneTimePasswordFieldAttributes = Omit<QuarkProps<HTMLFieldSetElement>, 'children' | 'id' | '.id' | 'disabled' | '.disabled' | '?disabled' | 'aria' | 'aria-describedby' | 'aria-errormessage' | 'aria-invalid'> & { readonly aria?: Omit<NonNullable<QuarkProps<HTMLFieldSetElement>['aria']>, 'describedby' | 'errormessage' | 'invalid'>; };
+export type OneTimePasswordFieldInputAttributes = Omit<QuarkProps<HTMLInputElement>, 'children' | 'id' | '.id' | 'name' | '.name' | 'type' | '.type' | 'value' | '.value' | 'maxlength' | '.maxLength' | 'disabled' | '.disabled' | '?disabled' | 'readonly' | 'readOnly' | '.readOnly' | '?readonly' | 'required' | '.required' | '?required' | 'autocomplete' | 'inputmode' | 'inputMode' | '.inputMode' | 'aria' | 'aria-label' | 'aria-describedby' | 'aria-errormessage' | 'aria-invalid' | 'aria-readonly' | 'aria-required' | 'ref' | 'onInput' | 'onKeydown'> & {
+  readonly aria?: Omit<NonNullable<QuarkProps<HTMLInputElement>['aria']>, 'invalid' | 'label' | 'describedby' | 'errormessage' | 'readonly' | 'required'>;
+  readonly '@input'?: never;
+  readonly '@keydown'?: never;
+  readonly '@paste'?: never;
+  readonly '@compositionstart'?: never;
+  readonly '@compositionend'?: never;
+};
 
 export interface OneTimePasswordFieldProps {
   readonly id: string;
@@ -47,7 +54,7 @@ function renderOneTimePasswordField({ id, label, length = 6, mode = 'numeric', v
     syncNativeValue(target, nextValue);
     onValueChange?.(nextValue, event);
   };
-  const setFields = (target: HTMLInputElement, start: number, text: string, event: ClipboardEvent): void => {
+  const setFields = (target: HTMLInputElement, start: number, text: string, event: InputEvent | ClipboardEvent | CompositionEvent): void => {
     const fields = fieldsFor(target);
     const chars = normalizeValue(text, length, mode).slice(0, length - start).split('');
     for (let index = start; index < start + chars.length; index += 1) fields[index]!.value = chars[index - start] ?? '';
@@ -59,10 +66,17 @@ function renderOneTimePasswordField({ id, label, length = 6, mode = 'numeric', v
   };
   const handleInput = (event: InputEvent): void => {
     const target = event.currentTarget as HTMLInputElement;
-    if (composing) return;
+    if (composing || disabled || readOnly) return;
+    const clean = normalizeValue(target.value, length, mode);
+    if (clean.length > 1) {
+      const index = Math.max(0, fieldsFor(target).indexOf(target));
+      setFields(target, clean.length >= length ? 0 : index, clean, event);
+      return;
+    }
     target.value = normalizeValue(target.value, 1, mode);
     emit(target, target.value, event);
-    if (target.value) fieldsFor(target)[fieldsFor(target).indexOf(target) + 1]?.focus();
+    const fields = fieldsFor(target);
+    if (target.value) fields[fields.indexOf(target) + 1]?.focus();
   };
   const handlePaste = (event: ClipboardEvent): void => {
     if (disabled || readOnly) return;
@@ -77,7 +91,13 @@ function renderOneTimePasswordField({ id, label, length = 6, mode = 'numeric', v
     const target = event.currentTarget as HTMLInputElement;
     const fields = fieldsFor(target);
     const index = fields.indexOf(target);
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); fields[index + (event.key === 'ArrowLeft' ? -1 : 1)]?.focus(); return; }
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      const rtl = getComputedStyle(target.closest('.gluon-one-time-password-field-inputs') ?? target).direction === 'rtl';
+      const delta = event.key === 'ArrowLeft' ? (rtl ? 1 : -1) : (rtl ? -1 : 1);
+      fields[index + delta]?.focus();
+      return;
+    }
     if (event.key === 'Home' || event.key === 'End') { event.preventDefault(); fields[event.key === 'Home' ? 0 : fields.length - 1]?.focus(); return; }
     if (readOnly || disabled) return;
     if (event.key === 'Backspace' || event.key === 'Delete') {
@@ -87,12 +107,24 @@ function renderOneTimePasswordField({ id, label, length = 6, mode = 'numeric', v
     }
   };
   const handleCompositionStart = (): void => { composing = true; };
-  const handleCompositionEnd = (event: CompositionEvent): void => { composing = false; const target = event.currentTarget as HTMLInputElement; target.value = normalizeValue(target.value, 1, mode); emit(target, target.value, event); };
+  const handleCompositionEnd = (event: CompositionEvent): void => {
+    composing = false;
+    const target = event.currentTarget as HTMLInputElement;
+    const clean = normalizeValue(target.value, length, mode);
+    if (clean.length > 1) {
+      const index = Math.max(0, fieldsFor(target).indexOf(target));
+      setFields(target, clean.length >= length ? 0 : index, clean, event);
+      return;
+    }
+    target.value = clean;
+    emit(target, clean, event);
+  };
   const fields = Array.from({ length }, (_, index) => q.input({
     ...nativeInputAttributes,
+    id: `${id}-segment-${index + 1}`,
     class: [{ gluon: true, molecule: true, 'gluon-one-time-password-field-input': true }, inputAttributes.class],
-    '.value': normalized[index] ?? '', maxlength: 1, autocomplete: 'one-time-code', inputmode: mode === 'numeric' ? 'numeric' : 'text',
-    '?disabled': disabled, '?readonly': readOnly, '?required': required && index === 0,
+    '.value': normalized[index] ?? '', maxlength: 1, autocomplete: index === 0 ? 'one-time-code' : 'off', inputmode: mode === 'numeric' ? 'numeric' : 'text',
+    '?disabled': disabled, '?readonly': readOnly, '?required': required,
     'aria-label': `${label} ${index + 1} of ${length}`,
     aria: { ...inputAria, describedby: [helperId, errorId].filter(Boolean).join(' ') || undefined, errormessage: errorId, invalid: effectiveInvalid || undefined, readonly: readOnly || undefined, required: required || undefined },
     onInput: handleInput, onKeydown: handleKeydown, '@paste': handlePaste, '@compositionstart': handleCompositionStart, '@compositionend': handleCompositionEnd,
@@ -103,9 +135,10 @@ function renderOneTimePasswordField({ id, label, length = 6, mode = 'numeric', v
   }
   return q.fieldset({ ...nativeAttributes, id, class: [{ gluon: true, molecule: true, 'gluon-one-time-password-field': true }, attributes.class], '?disabled': disabled, aria: { ...aria, describedby: [helperId, errorId].filter(Boolean).join(' ') || undefined, errormessage: errorId, invalid: effectiveInvalid || undefined }, children: [
     q.legend({ class: 'gluon-one-time-password-field-legend', children: label }),
-    q.div({ class: 'gluon-one-time-password-field-inputs', dir: 'auto', children: fields }),
-    name === undefined ? nothing : q.input({ class: 'gluon-one-time-password-field-native-value', type: 'text', name, '.value': normalized, '?disabled': disabled, '?required': required, readonly: readOnly, autocomplete: 'one-time-code', inputMode: mode === 'numeric' ? 'numeric' : 'text', 'aria-hidden': 'true', tabIndex: -1 }),
-    errorId ? q.span({ id: errorId, class: 'gluon-one-time-password-field-error', role: 'alert', children: error }) : helperId ? q.span({ id: helperId, class: 'gluon-one-time-password-field-helper', children: helper }) : nothing,
+    q.div({ class: 'gluon-one-time-password-field-inputs', children: fields }),
+    name === undefined ? nothing : q.input({ class: 'gluon-one-time-password-field-native-value', type: 'hidden', name, '.value': normalized, '?disabled': disabled }),
+    helperId ? q.span({ id: helperId, class: 'gluon-one-time-password-field-helper', children: helper }) : nothing,
+    errorId ? q.span({ id: errorId, class: 'gluon-one-time-password-field-error', role: 'alert', children: error }) : nothing,
   ] });
 }
 

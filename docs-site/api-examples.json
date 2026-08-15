@@ -1275,7 +1275,7 @@
         "const toolbar = { id: 'order-toolbar', label: 'Order tools', items: toolbarItems } satisfies ToolbarProps;",
         "const otpMode: OneTimePasswordFieldMode = 'numeric';",
         "const otpAttributes = { class: 'checkout-code' } satisfies OneTimePasswordFieldAttributes;",
-        "const otpInputAttributes = { inputMode: 'numeric' } satisfies OneTimePasswordFieldInputAttributes;",
+        "const otpInputAttributes = { title: 'One-time code digit' } satisfies OneTimePasswordFieldInputAttributes;",
         "const otpChange = (value: string) => console.log('code length', value.length);",
         "const checkoutCode = { id: 'checkout-code', label: 'One-time code', length: 6, mode: otpMode, value: '123', name: 'code', helper: 'Enter the code from the device.', inputAttributes: otpInputAttributes, attributes: otpAttributes, onValueChange: otpChange } satisfies OneTimePasswordFieldProps;",
         "const segmentName = { label: 'Order view' } satisfies SegmentedControlAccessibleName;",

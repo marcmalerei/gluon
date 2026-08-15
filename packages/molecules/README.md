@@ -160,10 +160,12 @@ controlled callbacks, and `preventDefault()` suppresses the controlled
 callback where applicable. Submitter `aria-label` values remain caller-owned
 and the accessible name does not change during loading.
 `OneTimePasswordField` is a request-free controlled one-time-code composition.
-It renders bounded numeric or alphanumeric segments for keyboard and paste
-editing, while only its optional visually-hidden native value input has a
-`name`, so `FormData` receives exactly one value. `autocomplete="one-time-code"`
-and mode-specific `inputmode` are applied to the editors and native value.
+It renders bounded numeric or alphanumeric segments for keyboard, paste, and
+multi-character autofill editing, while only its optional hidden native value
+input has a `name`, so `FormData` receives exactly one value. The first editor
+owns `autocomplete="one-time-code"`; every editor receives the mode-specific
+`inputmode`. Required state applies to every visible segment so native invalid
+focus never targets the hidden submitted value.
 Pass a stable unique `id`; derived helper/error IDs are deterministic. The
 caller owns validation, submission, authentication, transport, and code
 verification. GLUON GOODS has no honest authentication or one-time-code

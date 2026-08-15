@@ -13,16 +13,23 @@ beforeEach(() => {
 describe('OneTimePasswordField', () => {
   it('keeps one controlled native form value and accessible relationships', async () => {
     const onValueChange = vi.fn();
+    const form = document.createElement('form');
+    document.body.append(form);
     render(OneTimePasswordField({
       id: 'checkout-otp', label: 'One-time code', length: 6, value: '12', name: 'code',
       helper: 'Enter the six-digit code.', required: true, onValueChange,
-    }), document.body);
+    }), form);
     const fieldset = document.querySelector('fieldset')!;
     const inputs = [...fieldset.querySelectorAll<HTMLInputElement>('.gluon-one-time-password-field-input')];
     expect(inputs).toHaveLength(6);
     expect(inputs.map((input) => input.value)).toEqual(['1', '2', '', '', '', '']);
+    expect(inputs.every((input) => input.required)).toBe(true);
+    expect(inputs[0]?.getAttribute('autocomplete')).toBe('one-time-code');
+    expect(inputs.slice(1).every((input) => input.getAttribute('autocomplete') === 'off')).toBe(true);
     expect(fieldset.querySelectorAll('input[name="code"]')).toHaveLength(1);
-    expect(new FormData(fieldset.closest('form') ?? (() => { const form = document.createElement('form'); form.append(fieldset.cloneNode(true)); return form; })()).get('code')).toBe('12');
+    expect(fieldset.querySelector<HTMLInputElement>('input[name="code"]')?.type).toBe('hidden');
+    expect(new FormData(form).get('code')).toBe('12');
+    expect(form.checkValidity()).toBe(false);
     expect(inputs[0]?.getAttribute('aria-describedby')).toBe('checkout-otp-helper');
     expect(inputs[0]?.getAttribute('aria-label')).toBe('One-time code 1 of 6');
     expect(document.adoptedStyleSheets).toContain(oneTimePasswordFieldStyles);
@@ -47,6 +54,10 @@ describe('OneTimePasswordField', () => {
     inputs[1]!.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: '9' }));
     expect(onValueChange).toHaveBeenLastCalledWith('a9b2', expect.any(InputEvent));
     expect(document.querySelector<HTMLInputElement>('input[name="code"]')?.value).toBe('a9b2');
+    inputs[0]!.value = 'C3D4';
+    inputs[0]!.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertReplacementText', data: 'C3D4' }));
+    expect(inputs.map((input) => input.value)).toEqual(['C', '3', 'D', '4']);
+    expect(onValueChange).toHaveBeenLastCalledWith('C3D4', expect.any(InputEvent));
   });
 
   it('supports keyboard movement, deletion, readonly and IME-safe composition', async () => {
@@ -81,6 +92,22 @@ describe('OneTimePasswordField', () => {
     expect(cssText).toContain('@media (forced-colors: active)');
     expect(cssText).toContain('@media (prefers-reduced-motion: reduce)');
     expect(cssText).toContain('@media (max-width: 20rem)');
+  });
+
+  it('moves by visual direction in RTL and retains both helper and error relationships', async () => {
+    render(OneTimePasswordField({
+      id: 'otp-rtl', label: 'RTL code', length: 3, value: '123', helper: 'Keep this help.', error: 'Check the code.', attributes: { dir: 'rtl' },
+    }), document.body);
+    const inputs = [...document.querySelectorAll<HTMLInputElement>('.gluon-one-time-password-field-input')];
+    inputs[0]!.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toBe(inputs[1]);
+    await userEvent.keyboard('{ArrowRight}');
+    expect(document.activeElement).toBe(inputs[0]);
+    expect(document.querySelector('#otp-rtl-helper')?.textContent).toBe('Keep this help.');
+    expect(document.querySelector('#otp-rtl-error')?.textContent).toBe('Check the code.');
+    expect(inputs[0]?.getAttribute('aria-describedby')).toBe('otp-rtl-helper otp-rtl-error');
+    expect((await axe.run(document.querySelector('fieldset')!)).violations).toEqual([]);
   });
 
   it('namespaces derived helper and error relationships per deterministic instance id', () => {
