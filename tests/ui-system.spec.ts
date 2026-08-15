@@ -7,6 +7,9 @@ import {
   Icon,
   Input,
   Progress,
+  Slider,
+  normalizeSliderRange,
+  normalizeSliderValue,
   Radio,
   Select,
   StatusBadge,
@@ -191,6 +194,176 @@ describe('separate UI package contracts', () => {
     expect(indeterminate.hasAttribute('value')).toBe(false);
     expect(indeterminate.classList).toContain('is-full-width');
     expect(indeterminate.getAttribute('aria-label')).toBe('Inventory check');
+  });
+
+  it('normalizes Slider bounds and decimal values deterministically', () => {
+    expect(normalizeSliderRange(Number.NaN, Number.POSITIVE_INFINITY, 0)).toEqual({ min: 0, max: 100, step: 1 });
+    expect(normalizeSliderRange(8, 2, -1)).toEqual({ min: 8, max: 8, step: 1 });
+    const decimal = normalizeSliderRange(0.1, 1, 0.1);
+    expect(normalizeSliderValue(0.30000000000000004, decimal)).toBe(0.3);
+    expect(normalizeSliderValue(-10, decimal)).toBe(0.1);
+    expect(normalizeSliderValue(10, decimal)).toBe(1);
+    expect(normalizeSliderValue(Number.NaN, decimal, 0.5)).toBe(0.5);
+    expect(normalizeSliderValue(Number.NaN, decimal, Number.POSITIVE_INFINITY)).toBe(0.1);
+    expect(normalizeSliderValue(1, normalizeSliderRange(0, 1, 0.3))).toBe(0.9);
+    expect(normalizeSliderValue(9, normalizeSliderRange(5, 2, 1))).toBe(5);
+    expect(normalizeSliderValue(0.0000003, normalizeSliderRange(0, 0.000001, 0.0000001))).toBe(0.0000003);
+    const large = normalizeSliderValue(10_000_000_000_000_055, normalizeSliderRange(10_000_000_000_000_000, 10_000_000_000_000_100, 10));
+    expect(Number.isFinite(large)).toBe(true);
+    expect(large).toBeGreaterThanOrEqual(10_000_000_000_000_000);
+    expect(large).toBeLessThanOrEqual(10_000_000_000_000_100);
+    expect(normalizeSliderValue(0, normalizeSliderRange(-1e308, 1e308, Number.MIN_VALUE))).toBe(-1e308);
+    render(q.div({ children: [
+      Slider({ value: Number.NaN, min: Number.NaN, max: Number.POSITIVE_INFINITY, step: 0, attributes: { id: 'normalized-invalid', 'aria-label': 'Normalized invalid' } }),
+      Slider({ value: 20, min: 8, max: 2, step: -1, attributes: { id: 'normalized-collapsed', 'aria-label': 'Normalized collapsed' } }),
+    ] }), document.body);
+    const invalid = document.querySelector<HTMLInputElement>('#normalized-invalid')!;
+    const collapsed = document.querySelector<HTMLInputElement>('#normalized-collapsed')!;
+    expect({ min: invalid.min, max: invalid.max, step: invalid.step, value: invalid.value }).toEqual({ min: '0', max: '100', step: '1', value: '50' });
+    expect({ min: collapsed.min, max: collapsed.max, step: collapsed.step, value: collapsed.value }).toEqual({ min: '8', max: '8', step: '1', value: '8' });
+  });
+
+  it('keeps Slider native range, form, accessible-name, orientation, and event semantics', async () => {
+    const onInput = vi.fn();
+    const onChange = vi.fn();
+    const form = document.createElement('form');
+    document.body.append(form);
+    render(q.label({ id: 'volume-label', children: ['Volume', Slider({ defaultValue: 25, min: 0, max: 100, step: 5, valueText: '25 percent', onInput, onChange, attributes: { id: 'volume', name: 'volume' } })] }), form);
+    const slider = form.querySelector<HTMLInputElement>('#volume')!;
+    expect(slider.type).toBe('range');
+    expect(slider.value).toBe('25');
+    expect(slider.min).toBe('0');
+    expect(slider.max).toBe('100');
+    expect(slider.step).toBe('5');
+    expect(slider.getAttribute('aria-valuetext')).toBe('25 percent');
+    expect(slider.labels?.[0]?.id).toBe('volume-label');
+    expect(new FormData(form).get('volume')).toBe('25');
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(slider.value).toBe('30');
+    expect(new FormData(form).get('volume')).toBe('30');
+    expect(onInput).toHaveBeenCalledOnce();
+    expect(onChange).toHaveBeenCalledOnce();
+  });
+
+  it('preserves uncontrolled state and restores controlled state on rerender without duplicate events', async () => {
+    const input = vi.fn();
+    const change = vi.fn();
+    const uncontrolled = () => Slider({ defaultValue: 2, min: 0, max: 4, onInput: input, onChange: change, attributes: { id: 'uncontrolled', 'aria-label': 'Uncontrolled' } });
+    render(uncontrolled(), document.body);
+    const slider = document.querySelector<HTMLInputElement>('#uncontrolled')!;
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(slider.value).toBe('3');
+    render(uncontrolled(), document.body);
+    expect(slider.value).toBe('3');
+    expect(input).toHaveBeenCalledOnce();
+    expect(change).toHaveBeenCalledOnce();
+
+    const controlled = (value: number) => Slider({ value, min: 0, max: 4, onInput: input, onChange: change, attributes: { id: 'controlled', 'aria-label': 'Controlled' } });
+    render(controlled(2), document.body);
+    const controlledSlider = document.querySelector<HTMLInputElement>('#controlled')!;
+    controlledSlider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(controlledSlider.value).toBe('3');
+    controlledSlider.blur();
+    render(controlled(2), document.body);
+    expect(controlledSlider.value).toBe('2');
+    render(controlled(4), document.body);
+    expect(controlledSlider.value).toBe('4');
+    expect(input).toHaveBeenCalledTimes(2);
+    expect(change.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(change.mock.calls.length).toBeLessThanOrEqual(2);
+  });
+
+  it('updates a pristine uncontrolled default and preserves a dirty current value across later defaults', async () => {
+    const view = (defaultValue: number) => Slider({ defaultValue, min: 0, max: 5, attributes: { id: 'default-sync', name: 'level', 'aria-label': 'Default sync' } });
+    const form = document.createElement('form');
+    document.body.append(form);
+    render(view(1), form);
+    const slider = form.querySelector<HTMLInputElement>('#default-sync')!;
+    render(view(2), form);
+    expect(slider.value).toBe('2');
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(slider.value).toBe('3');
+    render(view(4), form);
+    expect(slider.value).toBe('3');
+    form.reset();
+    expect(slider.value).toBe('4');
+  });
+
+  it('freezes the last uncontrolled value when readonly is enabled on rerender', async () => {
+    const input = vi.fn();
+    const change = vi.fn();
+    const view = (readonly: boolean) => Slider({ defaultValue: 1, min: 0, max: 4, readonly, onInput: input, onChange: change, attributes: { id: 'readonly-transition', 'aria-label': 'Readonly transition' } });
+    render(view(false), document.body);
+    const slider = document.querySelector<HTMLInputElement>('#readonly-transition')!;
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(slider.value).toBe('2');
+    render(view(true), document.body);
+    await userEvent.keyboard('{ArrowRight}');
+    expect(slider.value).toBe('2');
+    slider.value = '4';
+    slider.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+    expect(slider.value).toBe('2');
+    expect(input).toHaveBeenCalledOnce();
+    expect(change).toHaveBeenCalledOnce();
+  });
+
+  it('rejects readonly keyboard, pointer, input, and change interactions for controlled and uncontrolled sliders', async () => {
+    const input = vi.fn();
+    const change = vi.fn();
+    const renderReadonly = () => q.div({ children: [
+      Slider({ value: 2, min: 0, max: 4, readonly: true, onInput: input, onChange: change, attributes: { id: 'readonly-controlled', 'aria-label': 'Readonly controlled' } }),
+      Slider({ defaultValue: 3, min: 0, max: 4, readonly: true, onInput: input, onChange: change, attributes: { id: 'readonly-uncontrolled', 'aria-label': 'Readonly uncontrolled' } }),
+      Slider({ defaultValue: 1, min: 0, max: 4, disabled: true, onInput: input, onChange: change, attributes: { id: 'disabled-slider', 'aria-label': 'Disabled' } }),
+    ] });
+    render(renderReadonly(), document.body);
+    const controlled = document.querySelector<HTMLInputElement>('#readonly-controlled')!;
+    const uncontrolled = document.querySelector<HTMLInputElement>('#readonly-uncontrolled')!;
+    controlled.focus();
+    await userEvent.keyboard('{ArrowRight}{End}{Home}{PageUp}{PageDown}');
+    await userEvent.click(controlled);
+    expect(controlled.value).toBe('2');
+    uncontrolled.value = '4';
+    uncontrolled.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+    uncontrolled.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    expect(uncontrolled.value).toBe('3');
+    render(renderReadonly(), document.body);
+    expect(uncontrolled.value).toBe('3');
+    expect(controlled.getAttribute('aria-readonly')).toBe('true');
+    const disabled = document.querySelector<HTMLInputElement>('#disabled-slider')!;
+    expect(disabled.disabled).toBe(true);
+    disabled.click();
+    expect(input).not.toHaveBeenCalled();
+    expect(change).not.toHaveBeenCalled();
+  });
+
+  it('supports exact pointer events and horizontal/vertical LTR/RTL contracts', async () => {
+    const input = vi.fn();
+    const change = vi.fn();
+    const functionRef = vi.fn();
+    const objectRef: { value?: HTMLInputElement } = {};
+    render(q.div({ children: [
+      Slider({ defaultValue: 0, min: 0, max: 100, onInput: input, onChange: change, attributes: { id: 'pointer-slider', 'aria-label': 'Pointer', ref: functionRef } }),
+      q.div({ dir: 'rtl', children: Slider({ defaultValue: 5, orientation: 'horizontal', attributes: { id: 'horizontal-rtl', 'aria-label': 'Horizontal RTL', ref: objectRef } }) }),
+      q.div({ dir: 'ltr', children: Slider({ defaultValue: 5, orientation: 'vertical', attributes: { id: 'vertical-ltr', 'aria-label': 'Vertical LTR' } }) }),
+      q.div({ dir: 'rtl', children: Slider({ defaultValue: 5, orientation: 'vertical', attributes: { id: 'vertical-rtl', 'aria-label': 'Vertical RTL' } }) }),
+    ] }), document.body);
+    await userEvent.click(document.querySelector<HTMLInputElement>('#pointer-slider')!);
+    expect(input).toHaveBeenCalledOnce();
+    expect(change).toHaveBeenCalledOnce();
+    expect(functionRef).toHaveBeenCalledWith(document.querySelector('#pointer-slider'));
+    expect(objectRef.value).toBe(document.querySelector('#horizontal-rtl'));
+    expect(getComputedStyle(document.querySelector('#pointer-slider')!).direction).toBe('ltr');
+    expect(getComputedStyle(document.querySelector('#horizontal-rtl')!).direction).toBe('rtl');
+    expect(document.querySelector('#vertical-ltr')?.classList).toContain('is-vertical');
+    expect(document.querySelector('#vertical-ltr')?.parentElement?.dir).toBe('ltr');
+    expect(document.querySelector('#vertical-rtl')?.parentElement?.dir).toBe('rtl');
+    expect(document.querySelector('#vertical-ltr')?.getAttribute('aria-orientation')).toBe('vertical');
+    expect(document.querySelector('#vertical-rtl')?.getAttribute('aria-orientation')).toBe('vertical');
   });
 
   it('keeps StatusBadge presentational while forwarding span attributes and tones', () => {
@@ -1566,6 +1739,7 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
             ],
           }),
           Textarea({ value: 'Only account-related notes', attributes: { 'aria-label': 'Account notes' } }),
+          q.label({ children: ['Notification volume', Slider({ defaultValue: 40, valueText: '40 percent' })] }),
           q.label({ children: [Checkbox({ name: 'updates' }), ' Product updates'] }),
         ],
       }),

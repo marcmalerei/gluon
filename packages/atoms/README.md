@@ -31,7 +31,7 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-`Button`, `Checkbox`, `Icon`, `Input`, `Label`, `Progress`, `Radio`, `Select`,
+`Button`, `Checkbox`, `Icon`, `Input`, `Label`, `Progress`, `Radio`, `Select`, `Slider`,
 `StatusBadge`, `Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
@@ -112,6 +112,7 @@ native `button` rule or adopt `atomStyles`.
 - `Select` preserves native option, keyboard, disabled, and required semantics;
   compose it with `Label` or another native labeling relationship. Its public
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
+- `Slider` preserves native range keyboard, pointer, form, and hydration semantics. It is single-value only; use `min`, `max`, `step`, `orientation`, `valueText`, and caller-owned `onInput`/`onChange`. `readonly` is an ARIA/read-only interaction contract because native range has no readonly attribute.
 - `StatusBadge` is a presentational span. It owns only neutral, info, success,
   warning, or danger tone styling; applications own domain mapping, translated
   status copy, and whether a surrounding surface is a live region. Its default
@@ -128,6 +129,52 @@ native `button` rule or adopt `atomStyles`.
   `pressed` value reflected as `aria-pressed`. Use it for an independent pressed
   choice, not for an on/off setting (`Switch`) or an ordinary action (`Button`).
 
+## Slider state and normalization
+
+`value` makes the Slider controlled: the caller handles native events, updates
+application state, and supplies the next value. A rerender always restores that
+normalized value. Without `value`, the Slider is uncontrolled; `defaultValue`
+sets its initial/reset value while native edits survive rerenders. The two props
+are mutually exclusive in `SliderProps`. Gluon forwards each native `input` and
+`change` once and never synthesizes an extra event.
+
+```ts
+const controlled = Slider({
+  min: 0,
+  max: 1,
+  step: 0.1,
+  value: volume,
+  valueText: `${Math.round(volume * 100)} percent`,
+  onInput: (event) => setVolume((event.currentTarget as HTMLInputElement).valueAsNumber),
+  attributes: { name: 'volume', 'aria-label': 'Volume' },
+});
+
+const uncontrolled = Slider({
+  min: 1.5,
+  max: 2.5,
+  step: 1,
+  defaultValue: 1.5,
+  attributes: { name: 'cable', 'aria-label': 'Cable length' },
+});
+```
+
+The public `normalizeSliderRange()` and `normalizeSliderValue()` helpers expose
+the same deterministic contract used by the Atom. Non-finite `min`/`max` become
+`0`/`100`; `max < min` collapses to `min`; non-finite or non-positive `step`
+becomes `1`. Values are clamped and aligned to the nearest representable decimal
+step rooted at `min`; non-finite values use the supplied finite fallback.
+If the finite range and step cannot produce a finite representable grid index,
+`min` is the deterministic result.
+
+Native range inputs have no HTML `readonly` state. `readonly` therefore exposes
+`aria-readonly="true"`, blocks value-changing keyboard and pointer defaults,
+restores the last confirmed controlled or uncontrolled value if an `input` or
+`change` is dispatched, and does not invoke application callbacks for rejected
+interactions. `disabled` remains the native non-focusable form exclusion state.
+Slider defines no transition or animation, so reduced-motion mode requires no
+override. The public `--gluon-slider-accent` property customizes the native
+accent while forced-colors mode retains platform rendering.
+
 Every compatible Atom uses the named `attributes` extension contract. Use
 `defineButtonPreset()` for app-owned brand/danger classes and analytics/ref/data
 bindings while `ButtonVariant` and `ButtonSize` remain closed. Use
@@ -143,7 +190,7 @@ implementation details. The public Button override properties are
 `--gluon-textarea-color`, `--gluon-textarea-border-color`,
 `--gluon-textarea-readonly-background`, and `--gluon-textarea-resize`.
 Checkbox exposes `--gluon-checkbox-accent`; Radio exposes
-`--gluon-radio-accent`. Switch exposes `--gluon-switch-track`,
+`--gluon-radio-accent`; Slider exposes `--gluon-slider-accent`. Switch exposes `--gluon-switch-track`,
 `--gluon-switch-on`, `--gluon-switch-thumb`, and
 `--gluon-switch-border-color`. ToggleButton exposes
 `--gluon-toggle-button-pressed-background`,

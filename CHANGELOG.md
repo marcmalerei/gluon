@@ -15,6 +15,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Bundled the lockstep Gluon language-server runtime in the VS Code extension,
   with self-contained VSIX smoke validation, integrity evidence, GitHub release
   assets, and credential-guarded Marketplace publication.
+- Added the native single-value `Slider` Atom with deterministic decimal-step
+  normalization, controlled/uncontrolled and readonly contracts, complete UI
+  evidence, and persisted GLUON GOODS cable configuration.
 
 ### Changed
 
@@ -22,6 +25,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   71,200 bytes gzip after measuring the opt-in Trusted Types runtime paths on
   the supported local and Linux CI build environments; the
   image and document ceilings remain unchanged.
+- Rebased those ceilings to 264,200 bytes raw and 72,300 bytes gzip after
+  measuring the Slider-backed product configuration path; image and document
+  ceilings remain unchanged.
 
 ### Documentation
 

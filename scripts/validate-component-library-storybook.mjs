@@ -37,6 +37,36 @@ const scenarios = [{
   stateSelectors: ['[data-status-badge-story]', '[data-short-badge]', '.gluon-status-badge'],
   expectedText: 'Eingeschränkt',
   screenshotSelector: '[data-status-badge-story]',
+}, {
+  id: 'component-library-slider--states-and-interactions',
+  stateSelectors: ['[data-slider-events]'],
+  expectedText: '1 input / 1 change',
+  screenshotSelector: '.slider-story',
+  interact: async (page) => {
+    const slider = page.getByRole('slider', { name: 'Brightness' });
+    await slider.focus();
+    await slider.press('ArrowRight');
+  },
+  verifyMedia: async (page) => {
+    const slider = page.getByRole('slider', { name: 'Brightness' });
+    await page.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+    const evidence = await slider.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        forcedColors: matchMedia('(forced-colors: active)').matches,
+        reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+        forcedColorAdjust: styles.forcedColorAdjust,
+        animationName: styles.animationName,
+        transitionDuration: styles.transitionDuration,
+      };
+    });
+    await page.emulateMedia({ forcedColors: 'none', reducedMotion: 'no-preference' });
+    if (!evidence.forcedColors || !evidence.reducedMotion || evidence.forcedColorAdjust !== 'auto'
+      || evidence.animationName !== 'none' || evidence.transitionDuration !== '0s') {
+      throw new Error(`Slider media contract failed: ${JSON.stringify(evidence)}.`);
+    }
+    return evidence;
+  },
 }];
 
 const server = createServer(async (request, response) => {
@@ -67,6 +97,7 @@ try {
     await page.addScriptTag({ content: axe.source });
     const storyRoot = page.locator('#storybook-root');
     await storyRoot.waitFor();
+    await scenario.interact?.(page);
     await waitForText(resolveLocator(page, scenario.stateSelectors), scenario.expectedText, scenario.id);
     const storyError = page.locator('.sb-errordisplay');
     if (await storyError.isVisible()) throw new Error(`Storybook reported a rendered error for ${scenario.id}.`);
@@ -77,6 +108,7 @@ try {
       return results.violations.map(({ id, impact, nodes }) => ({ id, impact, nodes: nodes.length }));
     });
     if (violations.length > 0) throw new Error(`Storybook accessibility violations for ${scenario.id}: ${JSON.stringify(violations)}.`);
+    const mediaEvidence = await scenario.verifyMedia?.(page);
 
     const evidencePath = resolve(evidenceDirectory, `storybook-${scenario.id}.png`);
     const screenshotSelector = scenario.screenshotSelector ?? storyRoot;
@@ -85,7 +117,7 @@ try {
     const baselinePath = resolve(baselineDirectory, `${scenario.id}.png`);
     if (updateBaselines) {
       await writeFile(baselinePath, await readFile(evidencePath));
-      results.push({ id: scenario.id, accessibilityViolations: 0, mismatchRatio: 0, baseline: 'updated' });
+      results.push({ id: scenario.id, accessibilityViolations: 0, mismatchRatio: 0, baseline: 'updated', ...(mediaEvidence ? { mediaEvidence } : {}) });
       continue;
     }
 
@@ -114,7 +146,7 @@ try {
       await writeFile(resolve(evidenceDirectory, `storybook-${scenario.id}-diff.png`), PNG.sync.write(difference));
       throw new Error(`Storybook visual mismatch for ${scenario.id}: ${(mismatchRatio * 100).toFixed(2)}% exceeds 5.00%.`);
     }
-    results.push({ id: scenario.id, accessibilityViolations: 0, mismatchRatio, baseline: 'matched' });
+    results.push({ id: scenario.id, accessibilityViolations: 0, mismatchRatio, baseline: 'matched', ...(mediaEvidence ? { mediaEvidence } : {}) });
   }
 
   const report = {

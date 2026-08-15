@@ -37,6 +37,7 @@ key checking and adds no runtime validation.
 | Atom `Icon` | `attributes: QuarkProps<SVGSVGElement>` without children, role, size/viewBox, or label/hidden ARIA | No label is decorative and `aria-hidden`; a label is informative with `role=img`; `defineIcon()` supplies only geometry/body |
 | Atom `Input` | `attributes: QuarkProps<HTMLInputElement>` without its explicit value, placeholder, type, name, disabled, or invalid bindings | Explicit props own the live value property and validation semantics |
 | Atom `Label` | `attributes: QuarkProps<HTMLSpanElement>` without children | Visible label content is explicit |
+| Atom `Slider` | `attributes: QuarkProps<HTMLInputElement>` without range bounds/value, readonly, orientation/value-text ARIA, or owned interaction listeners | `value` is controlled; `defaultValue` is uncontrolled; finite normalization, native form behavior, and readonly rejection stay explicit |
 | Atom `installUiTheme` | Stylesheet owner; no rendered element or attributes | Theme ownership remains explicit and reference-counted |
 | Molecule `Card` | `attributes: QuarkProps<HTMLElement>` for its article, without children | Card title, media, actions, and body structure are explicit |
 | Molecule `FormField` | inherited Input `attributes`; `fieldAttributes: QuarkProps<HTMLLabelElement>` without children | Implicit native label, error alert, and child invalid state stay composed |
@@ -47,7 +48,8 @@ All caller-provided classes are application-owned public hooks. Official
 properties are public hooks: the shared `--gluon-color-*`, `--gluon-space-*`,
 `--gluon-radius-*`, `--gluon-font-family`, and `--gluon-focus-width` tokens plus
 the Button-specific `--gluon-button-background`, `--gluon-button-color`, and
-`--gluon-button-border-color`. Applications own the names and compatibility of
+`--gluon-button-border-color`, plus `--gluon-slider-accent` for Slider's native
+accent. Applications own the names and compatibility of
 their own classes and variables.
 
 ## Branded preset, danger action, custom icon, and composition

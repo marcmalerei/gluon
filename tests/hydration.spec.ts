@@ -21,7 +21,7 @@ import {
   unsafeHTML,
   unmount,
 } from '@gluonjs/core';
-import { Button, Checkbox, Input, Progress, Radio, Select, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
+import { Button, Checkbox, Input, Progress, Radio, Select, Slider, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
 import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
@@ -744,7 +744,7 @@ describe('SSR hydration', () => {
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
-    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Progress({ value: 2, max: 4, attributes: { 'aria-label': 'Hydrated progress' } })}${Radio({ checked: true, name: 'finish', attributes: { 'aria-label': 'Hydrated radio' } })}${StatusBadge({ tone: 'success', children: 'Hydrated status' })}${Switch({ checked: true, name: 'network', attributes: { 'aria-label': 'Hydrated switch' } })}${ToggleButton({ pressed: true, label: 'Hydrated toggle' })}${ChoiceGroup({ id: 'hydrated-choice', legend: 'Hydrated choice', children: Radio({ name: 'hydrated', attributes: { 'aria-label': 'Hydrated option' } }) })}${ControlField({ id: 'hydrated-field', label: 'Hydrated field', helper: 'Hydrated help', control: (relationships) => Input({ value: 'Hydrated', attributes: { id: relationships.controlId, aria: relationships.aria } }) })}${Card({ title: 'Hydrated card' })}</main>`;
+    })}${Textarea({ value: 'Hydrated note', attributes: { 'aria-label': 'Hydrated note' } })}${Checkbox({ checked: true, attributes: { 'aria-label': 'Hydrated choice' } })}${Progress({ value: 2, max: 4, attributes: { 'aria-label': 'Hydrated progress' } })}${Radio({ checked: true, name: 'finish', attributes: { 'aria-label': 'Hydrated radio' } })}${Slider({ defaultValue: 0.3, min: 0, max: 1, step: 0.1, valueText: '30 percent', attributes: { id: 'hydrated-slider', name: 'volume', 'aria-label': 'Hydrated volume' } })}${StatusBadge({ tone: 'success', children: 'Hydrated status' })}${Switch({ checked: true, name: 'network', attributes: { 'aria-label': 'Hydrated switch' } })}${ToggleButton({ pressed: true, label: 'Hydrated toggle' })}${ChoiceGroup({ id: 'hydrated-choice', legend: 'Hydrated choice', children: Radio({ name: 'hydrated', attributes: { 'aria-label': 'Hydrated option' } }) })}${ControlField({ id: 'hydrated-field', label: 'Hydrated field', helper: 'Hydrated help', control: (relationships) => Input({ value: 'Hydrated', attributes: { id: relationships.controlId, aria: relationships.aria } }) })}${Card({ title: 'Hydrated card' })}</main>`;
     const prepared = await prepareForHydration(value);
     const selection = createComponentStyleSelection(prepared.value);
     const manifest = createStyleManifest(selection);
@@ -764,6 +764,7 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(inputStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(progressStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(radioStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(sliderStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(statusBadgeStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(switchStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(toggleButtonStyles);
@@ -779,6 +780,9 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(tableRegionStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(choiceGroupStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(controlFieldStyles);
+    const slider = root.querySelector<HTMLInputElement>('#hydrated-slider')!;
+    expect(slider.value).toBe('0.3');
+    expect(slider.getAttribute('aria-valuetext')).toBe('30 percent');
     expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
     unmount(root);
     expect(styleRoot.adoptedStyleSheets).not.toContain(buttonStyles);

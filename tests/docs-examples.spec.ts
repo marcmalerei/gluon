@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { nextTick } from '@gluonjs/reactivity';
-import { radioStyles } from '@gluonjs/atoms';
+import { radioStyles, sliderStyles } from '@gluonjs/atoms';
 import { choiceGroupStyles } from '@gluonjs/molecules';
 import { GluonCounter } from '../docs-site/examples/custom-element.js';
 import { mountVueHost } from '../docs-site/examples/vue-host.js';
@@ -32,9 +32,10 @@ test('runs the Vue 3 migration host around the production Gluon product element'
   await element.updateComplete;
   expect(element.product?.slug).toBe('orbit-lamp');
   const adoptedSheets = element.shadowRoot?.adoptedStyleSheets ?? [];
-  expect(adoptedSheets).toHaveLength(3);
+  expect(adoptedSheets).toHaveLength(4);
   expect(adoptedSheets).toContain(productConfiguratorStyles);
   expect(adoptedSheets).toContain(radioStyles);
+  expect(adoptedSheets).toContain(sliderStyles);
   expect(adoptedSheets).toContain(choiceGroupStyles);
   expect(element.shadowRoot?.querySelector('style')).toBeNull();
   expect(element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="title"]')?.assignedNodes()).toHaveLength(1);

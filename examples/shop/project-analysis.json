@@ -138,7 +138,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 246
+      "line": 249
     }
   ],
   "elements": [
@@ -171,7 +171,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 245
+      "line": 248
     }
   ],
   "templates": [
@@ -645,7 +645,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 378
+      "line": 381
     },
     {
       "value": {
@@ -653,7 +653,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 380
+      "line": 383
     },
     {
       "value": {
@@ -661,7 +661,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 385
+      "line": 388
     },
     {
       "value": {
@@ -669,7 +669,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 386
+      "line": 389
     },
     {
       "value": {
@@ -677,7 +677,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 419
+      "line": 422
     },
     {
       "value": {
@@ -685,7 +685,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 429
+      "line": 432
     },
     {
       "value": {
@@ -693,7 +693,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 483
+      "line": 442
     },
     {
       "value": {
@@ -701,7 +701,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 497
+      "line": 498
     },
     {
       "value": {
@@ -717,23 +717,31 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 515
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "product-configurator.ts",
-      "line": 520
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "product-configurator.ts",
       "line": 527
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 530
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 535
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 542
     },
     {
       "value": {
@@ -1663,7 +1671,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 379
+      "line": 382
     },
     {
       "value": {
@@ -1671,47 +1679,39 @@
         "name": "name"
       },
       "confidence": "structural",
-      "file": "product-configurator.ts",
-      "line": 380
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "product-configurator.ts",
-      "line": 382
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "product-configurator.ts",
-      "line": 382
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
       "file": "product-configurator.ts",
       "line": 383
     },
     {
       "value": {
-        "kind": "attribute",
-        "name": "name"
+        "kind": "child"
       },
-      "confidence": "structural",
+      "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 386
+      "line": 385
     },
     {
       "value": {
         "kind": "child"
       },
       "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 385
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 386
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "name"
+      },
+      "confidence": "structural",
       "file": "product-configurator.ts",
       "line": 389
     },
@@ -1721,7 +1721,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 390
+      "line": 392
     },
     {
       "value": {
@@ -1729,7 +1729,15 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 391
+      "line": 393
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 394
     },
     {
       "value": {
@@ -1738,7 +1746,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 394
+      "line": 397
     },
     {
       "value": {
@@ -1747,7 +1755,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 395
+      "line": 398
     },
     {
       "value": {
@@ -1756,7 +1764,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 396
+      "line": 399
     },
     {
       "value": {
@@ -1765,7 +1773,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 420
+      "line": 423
     },
     {
       "value": {
@@ -1773,24 +1781,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 421
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "product-configurator.ts",
-      "line": 428
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "class"
-      },
-      "confidence": "structural",
-      "file": "product-configurator.ts",
-      "line": 429
+      "line": 424
     },
     {
       "value": {
@@ -1802,12 +1793,46 @@
     },
     {
       "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 432
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 434
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 444
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "for"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 448
+    },
+    {
+      "value": {
         "kind": "property",
         "name": "product"
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 488
+      "line": 503
     },
     {
       "value": {
@@ -1816,7 +1841,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 489
+      "line": 504
     },
     {
       "value": {
@@ -1825,7 +1850,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 490
+      "line": 505
     },
     {
       "value": {
@@ -1834,7 +1859,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 491
+      "line": 506
     },
     {
       "value": {
@@ -1842,7 +1867,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 492
+      "line": 507
     },
     {
       "value": {
@@ -1851,7 +1876,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 499
+      "line": 514
     },
     {
       "value": {
@@ -1859,39 +1884,13 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 499
+      "line": 514
     },
     {
       "value": {
         "kind": "child"
       },
       "confidence": "exact",
-      "file": "product-configurator.ts",
-      "line": 500
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
-      "file": "product-configurator.ts",
-      "line": 502
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "aria-live"
-      },
-      "confidence": "structural",
-      "file": "product-configurator.ts",
-      "line": 512
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "class"
-      },
-      "confidence": "structural",
       "file": "product-configurator.ts",
       "line": 515
     },
@@ -1901,7 +1900,25 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 521
+      "line": 517
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "aria-live"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 527
+    },
+    {
+      "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 530
     },
     {
       "value": {
@@ -1909,7 +1926,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 525
+      "line": 536
     },
     {
       "value": {
@@ -1917,7 +1934,15 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 529
+      "line": 540
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "product-configurator.ts",
+      "line": 544
     },
     {
       "value": {
@@ -2215,11 +2240,11 @@
         "message": "<gluon-product-add-action> does not declare event @click.",
         "range": {
           "start": {
-            "line": 393,
+            "line": 396,
             "character": 10
           },
           "end": {
-            "line": 393,
+            "line": 396,
             "character": 16
           }
         },
@@ -2228,7 +2253,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 394
+      "line": 397
     },
     {
       "value": {
@@ -2236,11 +2261,11 @@
         "message": "<gluon-product-configurator> does not declare event @configuration-change.",
         "range": {
           "start": {
-            "line": 489,
+            "line": 504,
             "character": 6
           },
           "end": {
-            "line": 489,
+            "line": 504,
             "character": 27
           }
         },
@@ -2249,7 +2274,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 490
+      "line": 505
     },
     {
       "value": {
@@ -2257,11 +2282,11 @@
         "message": "<gluon-product-configurator> does not declare event @add-to-bag.",
         "range": {
           "start": {
-            "line": 490,
+            "line": 505,
             "character": 6
           },
           "end": {
-            "line": 490,
+            "line": 505,
             "character": 17
           }
         },
@@ -2270,7 +2295,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 491
+      "line": 506
     }
   ]
 }

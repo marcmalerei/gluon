@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the native single-value `Slider` Atom with deterministic finite range
+  normalization, controlled and uncontrolled state, enforced readonly
+  interaction, form/SSR/hydration semantics, and GLUON GOODS configuration.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

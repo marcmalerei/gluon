@@ -6,6 +6,7 @@ import {
   Icon,
   Input,
   Progress,
+  Slider,
   Radio,
   Switch,
   ToggleButton,
@@ -356,6 +357,52 @@ test('matches Progress determinate, indeterminate, full-width, and RTL states', 
   }), document.body);
 
   await expect.element(page.getByTestId('progress-visual')).toMatchScreenshot('progress-states-light', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
+  });
+  uiOwner.dispose();
+});
+
+test('matches Slider controlled, uncontrolled, readonly, disabled, vertical, RTL, and 200-percent zoom-safe states', async () => {
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`
+    @layer gluon {
+      body { margin: 0; background: #fff; }
+      [data-testid="slider-visual"] { box-sizing: border-box; inline-size: 390px; padding: 10px; color: #17312f; font: 16px/1.25 system-ui, sans-serif; }
+      [data-testid="slider-visual"] h1 { margin: 0 0 12px; font-size: 1.375rem; }
+      .slider-zoom { box-sizing: border-box; inline-size: 50%; margin-block-end: 12px; zoom: 2; }
+      .slider-zoom, .slider-state-grid label { display: grid; min-inline-size: 0; gap: 4px; }
+      .slider-zoom { font-size: 0.625rem; }
+      .slider-state-grid { display: grid; gap: 12px; }
+      .slider-state-grid .vertical { justify-items: start; }
+    }
+  `;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({
+    data: { testid: 'slider-visual' },
+    children: [
+      q.h1({ children: 'Native Slider states' }),
+      q.label({ class: 'slider-zoom', children: ['Controlled 40% at 200% zoom', Slider({ value: 40, valueText: '40 percent' })] }),
+      q.div({ class: 'slider-state-grid', children: [
+        q.label({ children: ['Uncontrolled', Slider({ defaultValue: 60 })] }),
+        q.label({ dir: 'rtl', children: ['Readonly RTL', Slider({ defaultValue: 70, readonly: true })] }),
+        q.label({ children: ['Disabled', Slider({ defaultValue: 30, disabled: true })] }),
+        q.label({ class: 'vertical', children: ['Vertical', Slider({ defaultValue: 50, orientation: 'vertical' })] }),
+      ] }),
+    ],
+  }), document.body);
+  const surface = document.querySelector<HTMLElement>('[data-testid="slider-visual"]')!;
+  expect(surface.getBoundingClientRect().width).toBe(390);
+  for (const slider of surface.querySelectorAll<HTMLInputElement>('input[type="range"]')) {
+    expect(slider.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
+    expect(slider.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+  }
+  const verticalRect = surface.querySelector<HTMLInputElement>('.is-vertical')!.getBoundingClientRect();
+  expect(verticalRect.height).toBeGreaterThan(verticalRect.width);
+  expect(surface.scrollWidth).toBeLessThanOrEqual(surface.clientWidth);
+  await expect.element(page.getByTestId('slider-visual')).toMatchScreenshot('slider-states-200-percent-390px', {
     comparatorName: 'pixelmatch',
     comparatorOptions: { allowedMismatchedPixelRatio: 0.04, threshold: 0.15 },
   });

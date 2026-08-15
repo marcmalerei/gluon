@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
-import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
+import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
 import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -27,7 +28,7 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {
-    const { app, router, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
+    const { app, router, store, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
       storage: null,
       styleTarget: document,
     });
@@ -69,8 +70,20 @@ describe('GLUON GOODS reference shop', () => {
     await configurator.updateComplete;
     expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(radioStyles);
     expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(choiceGroupStyles);
-    expect(configurator.shadowRoot?.querySelectorAll('.gluon-choice-group')).toHaveLength(3);
-    expect(configurator.shadowRoot?.querySelectorAll('.gluon-radio')).toHaveLength(7);
+    expect(configurator.shadowRoot?.querySelectorAll('.gluon-choice-group')).toHaveLength(2);
+    expect(configurator.shadowRoot?.querySelectorAll('.gluon-radio')).toHaveLength(5);
+    expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(sliderStyles);
+    const cableSlider = configurator.shadowRoot?.querySelector<HTMLInputElement>('#product-cable-slider')!;
+    const configurationChange = vi.fn();
+    configurator.addEventListener('configuration-change', configurationChange);
+    expect(cableSlider.labels?.[0]?.textContent).toBe('Cable length');
+    cableSlider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await configurator.updateComplete;
+    expect(cableSlider.value).toBe('2.5');
+    expect(configurator.shadowRoot?.querySelector('output')?.textContent).toBe('2.5 m');
+    expect(configurationChange).toHaveBeenCalledOnce();
+    expect(configurationChange.mock.calls[0]?.[0].detail.configuration.cable).toBe('2.5 m');
     const addAction = configurator.shadowRoot?.querySelector<HTMLElement>('gluon-product-add-action')!;
     const addButton = getProductAddButton(configurator);
     expect(addAction.shadowRoot?.querySelector('slot')).not.toBeNull();
@@ -94,6 +107,8 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 1');
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
+    expect(document.querySelector('.bag-line p')?.textContent).toContain('2.5 m');
+    expect(store.bag[0]?.key).toBe('orbit-lamp:Graphite:Warm 2700K:2.5 m');
     getBagQuantityControl(document).shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="Increase quantity"]')!.click();
     await settleShop();
     expect(document.querySelector('#bag-title')?.textContent).toBe('Bag 2');
@@ -459,7 +474,14 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Clear 3200K');
     await getProductConfigurator(firstRoot).updateComplete;
-    getProductAddButton(getProductConfigurator(firstRoot)).click();
+    const persistedConfigurator = getProductConfigurator(firstRoot);
+    const persistedCableSlider = persistedConfigurator.shadowRoot?.querySelector<HTMLInputElement>('#product-cable-slider')!;
+    persistedCableSlider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await persistedConfigurator.updateComplete;
+    expect(persistedCableSlider.value).toBe('2.5');
+    expect(persistedConfigurator.shadowRoot?.querySelector('output')?.textContent).toBe('2.5 m');
+    getProductAddButton(persistedConfigurator).click();
     await settleShop();
     expect(JSON.parse(values.get('gluon-goods:shop')!)).toMatchObject({
       version: 1,
@@ -474,12 +496,12 @@ describe('GLUON GOODS reference shop', () => {
           },
           quantity: 2,
         }, {
-          key: 'stack-tray:Cobalt:Warm 2700K:1.5 m',
+          key: 'stack-tray:Cobalt:Warm 2700K:2.5 m',
           product: expect.objectContaining({ slug: 'stack-tray' }),
           configuration: {
             finish: 'Cobalt',
             temperature: 'Warm 2700K',
-            cable: '1.5 m',
+            cable: '2.5 m',
           },
           quantity: 1,
         }],

@@ -690,6 +690,7 @@
         "  Progress,",
         "  Radio,",
         "  Select,",
+        "  Slider,",
         "  StatusBadge,",
         "  Switch,",
         "  Textarea,",
@@ -703,6 +704,9 @@
         "  getThemeStyles,",
         "  installUi,",
         "  installUiTheme,",
+        "  normalizeSliderRange,",
+        "  normalizeSliderValue,",
+        "  renderSlider,",
         "  lightThemeStyles,",
         "  uiTokenStyles,",
         "  type ButtonProps,",
@@ -718,6 +722,7 @@
         "  type IconProps,",
         "  type InputProps,",
         "  type LabelProps,",
+        "  type NormalizedSliderRange,",
         "  type ProgressAttributes,",
         "  type ProgressProps,",
         "  type RadioAttributes,",
@@ -725,6 +730,9 @@
         "  type SelectAttributes,",
         "  type SelectProps,",
         "  type SelectSize,",
+        "  type SliderAttributes,",
+        "  type SliderOrientation,",
+        "  type SliderProps,",
         "  type StatusBadgeAttributes,",
         "  type StatusBadgeProps,",
         "  type StatusBadgeTone,",
@@ -771,6 +779,11 @@
         "const radio = { checked: true, name: 'finish', value: 'cobalt', attributes: radioAttributes } satisfies RadioProps;",
         "const progressAttributes = { 'aria-label': 'Order progress' } satisfies ProgressAttributes;",
         "const progress = { value: 2, max: 4, fullWidth: true, attributes: progressAttributes } satisfies ProgressProps;",
+        "const sliderOrientation: SliderOrientation = 'horizontal';",
+        "const sliderRange: NormalizedSliderRange = normalizeSliderRange(1.5, 2.5, 1);",
+        "const sliderAttributes = { id: 'cable-length', name: 'cable', 'aria-label': 'Cable length' } satisfies SliderAttributes;",
+        "const slider = { defaultValue: normalizeSliderValue(1.5, sliderRange), ...sliderRange, orientation: sliderOrientation, valueText: '1.5 metres', attributes: sliderAttributes } satisfies SliderProps;",
+        "const sliderTemplate = renderSlider(slider);",
         "const statusTone: StatusBadgeTone = 'success';",
         "const statusAttributes = { title: 'Current order state' } satisfies StatusBadgeAttributes;",
         "const status = { tone: statusTone, children: 'Ready', attributes: statusAttributes } satisfies StatusBadgeProps;",
@@ -780,8 +793,8 @@
         "const togglePreset = { displayName: 'ViewToggle', variant: 'ghost' } satisfies ToggleButtonPresetOptions;",
         "const toggle = { pressed: true, label: 'Grid view', attributes: toggleAttributes } satisfies ToggleButtonProps;",
         "const ViewToggle = defineToggleButtonPreset(togglePreset);",
-        "const checkout = html`${Label(label)}${Input(input)}${Select(select)}${Textarea(textarea)}${Checkbox(checkbox)}${Progress(progress)}${Radio(radio)}${StatusBadge(status)}${Switch(switchControl)}${ToggleButton(toggle)}${ViewToggle(toggle)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
-        "console.log(checkout, getThemeStyles(theme), atomStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
+        "const checkout = html`${Label(label)}${Input(input)}${Select(select)}${Textarea(textarea)}${Checkbox(checkbox)}${Progress(progress)}${Radio(radio)}${Slider(slider)}${sliderTemplate}${StatusBadge(status)}${Switch(switchControl)}${ToggleButton(toggle)}${ViewToggle(toggle)}${Button(button)}${PurchaseButton({ label: 'Purchase' })}${Icon(icon)}${Icon({ icon: iconDefinition, attributes: iconAttributes })}`;",
+        "console.log(checkout, sliderRange, getThemeStyles(theme), atomStyles, uiTokenStyles, lightThemeStyles, darkThemeStyles, atomManifest.entries);",
         "ui.setTheme('dark');",
         "ui.dispose();",
         "removeLegacyTheme();"
@@ -916,11 +929,11 @@
     "ui-exact-component-styles": {
       "module": "@gluonjs/atoms",
       "code": [
-        "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
+        "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
         "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -4357,6 +4370,18 @@
       "recipe": "atom-components",
       "description": "Select the constructable light or dark theme stylesheet without installing it, for inspection or caller-controlled adoption:"
     },
+    "packages/atoms/src/functions/normalizeSliderRange.md": {
+      "recipe": "atom-components",
+      "description": "Normalize caller-provided Slider bounds and step to the finite native range contract:"
+    },
+    "packages/atoms/src/functions/normalizeSliderValue.md": {
+      "recipe": "atom-components",
+      "description": "Clamp and align a Slider value to the decimal step grid rooted at its normalized minimum:"
+    },
+    "packages/atoms/src/functions/renderSlider.md": {
+      "recipe": "atom-components",
+      "description": "Render the native Slider template directly when composing an application-owned wrapper:"
+    },
     "packages/atoms/src/variables/buttonStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Button stylesheet retained by rendered Button values:"
@@ -4388,6 +4413,10 @@
     "packages/atoms/src/variables/selectStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable Select stylesheet retained by rendered Select values:"
+    },
+    "packages/atoms/src/variables/sliderStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable Slider stylesheet retained by rendered Slider values:"
     },
     "packages/atoms/src/variables/statusBadgeStyles.md": {
       "recipe": "ui-exact-component-styles",
@@ -4517,6 +4546,10 @@
       "recipe": "atom-components",
       "description": "Configure native determinate value/max or indeterminate Progress, responsive width, and native attributes:"
     },
+    "packages/atoms/src/interfaces/NormalizedSliderRange.md": {
+      "recipe": "atom-components",
+      "description": "Use the finite normalized bounds and positive step shared by Slider rendering and application normalization:"
+    },
     "packages/atoms/src/interfaces/StatusBadgeProps.md": {
       "recipe": "atom-components",
       "description": "Configure caller-owned status content, brand-neutral tone, and compatible native span attributes:"
@@ -4592,6 +4625,18 @@
     "packages/atoms/src/type-aliases/ProgressAttributes.md": {
       "recipe": "atom-components",
       "description": "Forward typed HTMLProgressElement attributes while Progress retains value, max, and width ownership:"
+    },
+    "packages/atoms/src/type-aliases/SliderAttributes.md": {
+      "recipe": "atom-components",
+      "description": "Forward compatible native range attributes while Slider retains value, bounds, readonly, ARIA, and interaction ownership:"
+    },
+    "packages/atoms/src/type-aliases/SliderOrientation.md": {
+      "recipe": "atom-components",
+      "description": "Choose the horizontal or vertical native Slider presentation:"
+    },
+    "packages/atoms/src/type-aliases/SliderProps.md": {
+      "recipe": "atom-components",
+      "description": "Choose mutually exclusive controlled value or uncontrolled defaultValue semantics with normalized native range behavior:"
     },
     "packages/atoms/src/type-aliases/StatusBadgeAttributes.md": {
       "recipe": "atom-components",
@@ -4684,6 +4729,10 @@
     "packages/atoms/src/variables/Progress.md": {
       "recipe": "atom-components",
       "description": "Render native determinate progress with value/max or indeterminate progress without a value attribute:"
+    },
+    "packages/atoms/src/variables/Slider.md": {
+      "recipe": "atom-components",
+      "description": "Render one normalized single-value native range with controlled or uncontrolled state and enforced readonly behavior:"
     },
     "packages/atoms/src/variables/StatusBadge.md": {
       "recipe": "atom-components",
