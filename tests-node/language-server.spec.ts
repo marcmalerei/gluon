@@ -185,6 +185,28 @@ describe('Gluon template analysis', () => {
     );
     expect(analysis.diagnostics).toEqual([]);
     expect(declarationsFromCustomElementsManifest('file:///invalid.json', null)).toEqual([]);
+    expect(declarationsFromCustomElementsManifest('file:///missing-modules.json', {})).toEqual([]);
+    expect(declarationsFromCustomElementsManifest('file:///partial.json', {
+      modules: [
+        null,
+        {},
+        { declarations: null },
+        { declarations: [
+          null,
+          {},
+          { customElement: false, tagName: 'not-custom' },
+          { customElement: true, tagName: 42 },
+          { customElement: true, tagName: 'empty-contract' },
+        ] },
+      ],
+    })).toEqual([
+      expect.objectContaining({
+        tagName: 'empty-contract',
+        props: [],
+        events: [],
+        slots: [],
+      }),
+    ]);
   });
 
   test('checks only direct literal light-DOM assignments against the owning element', () => {
@@ -317,6 +339,27 @@ describe('Gluon language service', () => {
     expect(service.rename(useUri, importPathPosition, 'Renamed.gluon')).toBeUndefined();
     expect(service.open('file:///components/BrokenScript.gluon', '<script lang="ts">const =</script><template component="Broken" layer="atom"><div /></template>').diagnostics)
       .toEqual(expect.arrayContaining([expect.objectContaining({ code: 'GLUON_SFC_INVALID' })]));
+  });
+
+  test('keeps unresolved SFC imports and local style symbols navigable without invented targets', () => {
+    const service = new GluonLanguageService();
+    const firstUri = 'file:///components/First.gluon';
+    const secondUri = 'file:///components/Second.gluon';
+    const first = `<script lang="ts">\nimport Missing from './Missing.gluon';\nexport const Selected = Missing;\n</script>\n<template component="First" layer="molecule"><section class="local">First</section></template>\n<style>.local { color: navy; }</style>`;
+    const second = `<script lang="ts">\nimport Missing from './Missing.gluon';\nexport const Selected = Missing;\n</script>\n<template component="Second" layer="molecule"><section>Second</section></template>`;
+    service.open(firstUri, first);
+    service.open(secondUri, second);
+
+    const importPath = positionFor(first, first.indexOf('./Missing.gluon') + 3);
+    const importedComponent = positionFor(first, first.indexOf('Missing') + 2);
+    const localClass = positionFor(first, first.indexOf('local') + 2);
+    expect(service.hover(firstUri, importPath)?.contents).toContain('Unresolved Gluon SFC module');
+    expect(service.hover(firstUri, importedComponent)?.contents).toContain('Imported Gluon SFC component');
+    expect(service.hover(firstUri, localClass)?.contents).toContain('Gluon SFC style class');
+    expect(service.definition(firstUri, importPath)).toEqual([]);
+    expect(service.definition(firstUri, importedComponent)).toEqual([]);
+    expect(service.references(firstUri, importPath)).toHaveLength(2);
+    expect(service.rename(firstUri, localClass, '123 invalid')).toBeUndefined();
   });
 
   test('exposes all typed SFC blocks and protocol features on the real shop fixture', async () => {
