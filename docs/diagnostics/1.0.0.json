@@ -422,6 +422,16 @@
       "why": "Production-safe bridges are disabled by default.",
       "remediation": "Enable the bridge only in a development entry.",
       "source": "devtools"
+    },
+    {
+      "id": 1505,
+      "code": "GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES",
+      "compactCode": "G1505",
+      "title": "Devtools protocol capabilities are declared",
+      "summary": "The Devtools handshake exposes the capabilities supported by the connected bridge.",
+      "why": "Clients need a stable capability list before subscribing to optional protocol surfaces.",
+      "remediation": "Negotiate optional Devtools features from the handshake before consuming them.",
+      "source": "devtools"
     }
   ]
 }
