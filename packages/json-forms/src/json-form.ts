@@ -100,6 +100,7 @@ const jsonFormsStyles = css`
   .field-label { font-weight: 650; line-height: 1.3; }
   .required { color: var(--gluon-json-form-accent, #496900); }
   input, select {
+    contain: inline-size;
     min-block-size: 44px;
     min-inline-size: 0;
     inline-size: 100%;
