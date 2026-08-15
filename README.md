@@ -36,6 +36,7 @@
 - a form-associated `@gluonjs/json-forms` Custom Element for the documented JSON Schema subset
 - request-free, DOM-independent form orchestration through `createFormController()` beside the native UI compositions
 - a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.9.0/migration/vue-to-gluon-cutover/index.md)
+- a versioned [Gluon upgrade guide](docs-site/content/1.9.0/migration/upgrade/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -795,6 +796,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Report-only Vue migration analyzer RFC](docs/rfcs/0003-report-only-vue-migration-analyzer.md)
 - [Bounded Vue codemod no-go decision](docs/vue-codemod-decision.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
+- [Gluon upgrade guide](docs-site/content/1.9.0/migration/upgrade/index.md)
 - [Accessibility and compatibility support matrix](docs/support-matrix.md)
 - [Package, release, and supply-chain governance ADR](docs/adrs/0002-package-release-and-supply-chain-governance.md)
 - [Release operations and protected publication runbook](docs/releasing.md)

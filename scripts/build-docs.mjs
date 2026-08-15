@@ -329,6 +329,7 @@ function packageIndexContent(version, packages) {
   return `<p class="eyebrow">${packages.length} packages · lockstep release train</p>
 <h1>Build with the package that owns the boundary.</h1>
 <p class="package-lede">Gluon is split into small public entry points. Find a package by capability, verify its runtime and peers, then open its API reference and runnable starter.</p>
+<p class="package-lede"><a href="${base}${version}/migration/upgrade/">Read the upgrade guide</a> for the lockstep release rule, rollback commands, and post-upgrade verification matrix.</p>
 <label class="package-search"><span>Search packages</span><input type="search" placeholder="Search by name or capability" data-package-search></label>
 <p class="package-search-status" data-package-search-status aria-live="polite">${packages.length} packages</p>
 <section class="package-cards" aria-label="Gluon packages">${cards}</section>`;

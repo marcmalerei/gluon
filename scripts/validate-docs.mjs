@@ -24,6 +24,7 @@ for (const version of versions.supported) {
     'api/index.html',
     'cookbook/index.html',
     'migration/index.html',
+    'migration/upgrade/index.html',
     'migration/vue-to-gluon-cutover/index.html',
     'migration/vue-analyzer/index.html',
     'migration/vue-codemod-decision/index.html',
@@ -44,6 +45,9 @@ if ((packageIndexHtml.match(/data-package-card/g) ?? []).length !== currentPacka
 }
 if (!packageIndexHtml.includes('public entry points')) {
   throw new Error('package portal index must name the displayed metric as public entry points.');
+}
+if (!packageIndexHtml.includes(`href="/gluon/${versions.latest}/migration/upgrade/"`)) {
+  throw new Error('package portal index must link to the versioned upgrade guide.');
 }
 for (const entry of currentPackages) {
   const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
@@ -156,6 +160,48 @@ const componentGuide = await readFile(resolve(
   versions.latest,
   'guides/components/index.md',
 ), 'utf8');
+const upgradeGuide = await readFile(resolve(
+  siteRoot,
+  'content',
+  versions.latest,
+  'migration/upgrade/index.md',
+), 'utf8');
+const normalizedUpgradeGuide = upgradeGuide.replace(/\s+/g, ' ');
+for (const required of [
+  '# Gluon upgrade guide',
+  'Supported release-to-release upgrades are the versioned lines recorded in the release archive and changelog.',
+  'A deprecated API remains for at least the next stable minor',
+  'Private repository imports and deep package internals are unsupported',
+  'Node `^22.12.0 || ^24.0.0`',
+  'Playwright Chromium, Firefox, and WebKit lanes',
+  'constructable `CSSStyleSheet`, `replaceSync()`, and `adoptedStyleSheets`',
+  'single-package app',
+  'Workspace or root consumer',
+  'Verification matrix',
+]) if (!normalizedUpgradeGuide.includes(required)) throw new Error(`upgrade guide is missing: ${required}`);
+for (const required of [
+  'npm ci',
+  'git diff -- package.json package-lock.json',
+  'npm run typecheck',
+  'npm run build',
+  'npm test',
+  'npm ls --depth=0 @gluonjs/core',
+  'npm install --save-exact @gluonjs/core@1.9.0',
+  'npm install --workspace ./apps/storefront --save-exact',
+  'npm pkg get workspaces',
+  'git restore package.json package-lock.json',
+]) if (!upgradeGuide.includes(required)) throw new Error(`upgrade guide commands are missing: ${required}`);
+for (const required of [
+  '/gluon/1.9.0/reference/diagnostics/',
+  'https://www.npmjs.com/org/gluonjs',
+]) if (!upgradeGuide.includes(required)) throw new Error(`upgrade guide link is missing: ${required}`);
+for (const required of [
+  'SSR and hydration',
+  'Router deep links and back/forward',
+  'Store persistence',
+  'Usage-driven component styles',
+  'Language server and editor tooling',
+]) if (!upgradeGuide.includes(required)) throw new Error(`upgrade guide verification matrix is missing: ${required}`);
 for (const required of [
   'The four terms to know',
   'Choose an authoring model',

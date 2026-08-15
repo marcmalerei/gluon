@@ -4,6 +4,8 @@ Gluon uses one lockstep release for the 21 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
+For day-to-day version upgrades, start with the
+[Gluon upgrade guide](/gluon/1.9.0/migration/upgrade/).
 
 ## Current publication state
 
