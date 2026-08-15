@@ -4,8 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
-DOM-free reactive state primitives for Gluon. The package is part of the
-lockstep Gluon `1.4.0` release line.
+DOM-free reactive state primitives for Gluon. The package ships as part of the
+current `1.9.0` release line.
 
 ```ts
 import { computed, effect, nextTick, reactive, ref } from '@gluonjs/reactivity';
@@ -34,6 +34,12 @@ await nextTick();
 - attached or detached `effectScope` ownership and `onScopeDispose`
 - scheduled `watch` and `watchEffect` with deterministic cleanup
 - global, scope-local, job-local, and effect-local error handlers
+
+## Stability notes
+
+The stable Reactivity entry is the default import path in `@gluonjs/reactivity`.
+Optional peer adapters in subpaths remain explicit and are documented as
+integration boundaries, not replacements for the stable entry.
 
 ## Optional external Signals
 

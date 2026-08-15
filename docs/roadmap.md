@@ -94,8 +94,10 @@ Gluon currently provides:
 - representative Atom, Molecule, and Organism packages
 - ESM builds, TypeScript declarations, Chromium tests, and coverage thresholds
 
-The current repository does not provide language tooling, Devtools, or a public
-release.
+The current repository provides language tooling, Devtools, and a public
+release. The roadmap retains earlier milestone rows as historical delivery
+records; treat them as completed references unless a newer issue explicitly
+reopens the scope.
 
 ## Product principles
 
@@ -216,6 +218,14 @@ production single-page application without Vue.
 - The store covers typed state, getters, actions, subscriptions, plugins, HMR,
   Devtools hooks, and server isolation.
 - The reference SPA uses only public Gluon APIs and passes its end-to-end flows.
+
+## Historical milestone notes
+
+Milestones M2 through M5 are completed as a matter of repository history. The
+remaining GitHub milestone records are administrative references, not active
+implementation work. New documentation should describe the shipped 1.9 surface
+and the current support policy instead of restating those milestones as open
+plans.
 
 ## M3 — Developer Experience
 

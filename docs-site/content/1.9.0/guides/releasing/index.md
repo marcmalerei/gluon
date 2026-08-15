@@ -10,6 +10,10 @@ forms, i18n, JSON Forms, and SSR work tracked by epic
 a Quality-Gates-tested candidate followed only by its release-cut evidence and
 compatibility manifest.
 
+Release-state wording in this documentation follows the repository policy:
+stable describes shipped public contracts, experimental describes explicitly
+labeled opt-in surfaces, and unsupported marks boundaries the contract refuses.
+
 The immutable GitHub release is [`v1.9.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.9.0),
 published from `06dc45457bbf9a109ae67f5048db8be63f0fda39`. Protected workflow
 run [31890472642](https://github.com/marcmalerei/gluon/actions/runs/31890472642)

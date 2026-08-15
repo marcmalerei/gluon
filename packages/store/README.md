@@ -8,7 +8,13 @@ The official Gluon store provides typed, application-scoped state without a
 DOM dependency. Store definitions infer state, computed getter values, action
 arguments, and action results from one definition.
 
-The package is part of the lockstep Gluon `1.4.0` release line.
+The package ships as part of the current `1.9.0` release line.
+
+## Stability notes
+
+The store surface is stable in the current release line. Application-scoped
+managers, snapshots, persistence plugins, and hydration remain supported; a
+process-wide singleton manager is still unsupported.
 
 ## Define and use a store
 

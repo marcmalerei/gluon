@@ -28,6 +28,14 @@ the application's Node or browser baseline in the same upgrade.
 
 ## Policy facts
 
+The current release policy distinguishes three states:
+
+- stable: public package surfaces, release guidance, and shipped runtime
+  contracts that the versioned docs and package READMEs describe;
+- experimental: explicitly labeled RFC-backed or opt-in surfaces;
+- unsupported: behaviors the contract rejects or leaves outside the supported
+  boundary.
+
 - `1.0` introduced the current semver policy: an incompatible public API
   change requires a major release.
 - A deprecated API remains for at least the next stable minor, and the
