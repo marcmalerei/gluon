@@ -25,6 +25,7 @@ import {
   Disclosure,
   EmptyState,
   FormField,
+  PasswordToggleField,
   InlineNotice,
   NavigationStrip,
   NavigationMenu,
@@ -148,6 +149,17 @@ request, ranking, routing, authentication, or analytics work. `SearchResults`
 renders caller-owned result children as grouped sections and lists, with
 optional counts/descriptions and explicit `loading`, `empty`,
 `partial-failure`, and `disabled` presentation states.
+`PasswordToggleField` renders exactly one native input and one native
+`type="button"` toggle. Pass a stable `id`, visible `label`, controlled
+`value`/`visible`, `onInput`, and `onVisibleChange`; callers must provide the
+localized `showLabel` and `hideLabel`. The toggle exposes `aria-pressed` and
+`aria-controls`, never announces or renders the password value, and does not
+submit its enclosing form. Native `name`, `autocomplete`, `disabled`,
+`readOnly`, `required`, `invalid`, helper, error, selection, focus, and DOM
+identity remain part of the input contract across rerenders. The component
+does not perform authentication, strength, breach, storage, transport, or
+policy work. Its IDs are derived from the required caller-owned field ID and
+must be unique per instance.
 DOM IDs must be non-empty and contain no whitespace; result group IDs must also
 be unique within one result composition. Group-heading relationships are
 namespaced by the root result ID, so separate compositions may reuse the same
@@ -279,6 +291,8 @@ and focus outline custom properties. `SearchResults` exposes group/list gaps,
 heading weight, colors, state sizing, padding, border, and radius properties.
 `OneTimePasswordField` exposes gap, control size, border, radius, color,
 focus-outline, helper/error color, background, and text color custom properties.
+`PasswordToggleField` exposes helper/error colors and focus outline custom
+properties through its separately tree-shakable `passwordToggleFieldStyles`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends

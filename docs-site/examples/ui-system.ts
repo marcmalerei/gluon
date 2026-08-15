@@ -44,6 +44,7 @@ import {
   ResponsiveActionBar,
   NavigationMenu,
   OneTimePasswordField,
+  PasswordToggleField,
   SearchField,
   SearchResults,
   Menubar,
@@ -231,6 +232,13 @@ createApp(() => AppShell({
           label: 'Example one-time code',
           value: '123456',
           name: 'example-code',
+        }),
+        PasswordToggleField({
+          id: 'ui-example-password',
+          label: 'Password',
+          value: 'example-password',
+          showLabel: 'Show password',
+          hideLabel: 'Hide password',
         }),
         Select({
           value: finish.value,

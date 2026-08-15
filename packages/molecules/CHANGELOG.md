@@ -15,6 +15,7 @@
 - Added `OneTimePasswordField`, a controlled segmented numeric/alphanumeric
   editor with one submitted native value, complete-code paste/autofill,
   IME-safe input, native required state, and RTL-aware keyboard traversal.
+- Added request-free controlled `PasswordToggleField` with one native password/text input, one localized non-submitting visibility toggle, preserved value/selection/focus/DOM identity, native validation relationships, SSR/hydration retention, and a separately tree-shakable stylesheet (#448).
 - Added `ResponsiveDisclosure`, a native responsive disclosure with compact
   breakpoint state, desktop expansion, resettable compact memory, and teardown-safe media-query synchronization.
 - Added request-free `SearchField` and `SearchResults` compositions with native

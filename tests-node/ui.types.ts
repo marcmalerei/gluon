@@ -46,6 +46,8 @@ import {
   Toast,
   ToastViewport,
   createToastController,
+  PasswordToggleField,
+  type PasswordToggleFieldProps,
   moleculeManifest,
   type CardProps,
   type NavigationMenuLinkAttributes,
@@ -110,6 +112,14 @@ const responsiveActionBarProps: ResponsiveActionBarProps = {
   presentation: 'sticky',
 };
 ResponsiveActionBar(responsiveActionBarProps);
+const passwordToggleProps: PasswordToggleFieldProps = {
+  id: 'typed-password',
+  label: 'Password',
+  showLabel: 'Show password',
+  hideLabel: 'Hide password',
+  visible: false,
+};
+PasswordToggleField(passwordToggleProps);
 const tree: TemplateResult = AppShell({
   children: Card({
     ...cardProps,
