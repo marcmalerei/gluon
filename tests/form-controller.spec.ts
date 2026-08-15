@@ -179,7 +179,7 @@ describe('request-free form controller', () => {
 
     const abortedBeforeStart = new AbortController();
     abortedBeforeStart.abort();
-    const form = createFormController<ProfileValues>({
+    const form = createFormController<ProfileValues, string>({
       initialValues: { email: '', name: '' },
       onSubmit: (_, context) => abortableDelay(context, 80).then(() => 'done'),
     });
