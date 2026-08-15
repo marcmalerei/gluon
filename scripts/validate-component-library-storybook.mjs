@@ -38,6 +38,16 @@ const scenarios = [{
   expectedText: 'Foundation atoms',
   screenshotSelector: '[data-foundation-atoms-story]',
 }, {
+  id: 'component-library-responsive-disclosure--compact-closed',
+  stateSelectors: ['[data-responsive-disclosure-story]', 'summary'],
+  expectedText: 'Catalog filters',
+  screenshotSelector: '[data-responsive-disclosure-story]',
+}, {
+  id: 'component-library-responsive-disclosure--compact-open',
+  stateSelectors: ['[data-responsive-disclosure-story]', '.gluon-disclosure-content'],
+  expectedText: 'Availability, size, and finish filters stay in one semantic content tree.',
+  screenshotSelector: '[data-responsive-disclosure-story]',
+}, {
   id: 'component-library-status-badge--default',
   stateSelectors: ['[data-status-badge-story]', '[data-short-badge]', '.gluon-status-badge'],
   expectedText: 'Eingeschränkt',

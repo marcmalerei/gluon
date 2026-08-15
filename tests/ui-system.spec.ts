@@ -52,6 +52,7 @@ import {
   ControlField,
   DialogSurface,
   Disclosure,
+  ResponsiveDisclosure,
   EmptyState,
   FormField,
   InlineNotice,
@@ -60,6 +61,7 @@ import {
   TableRegion,
   Tabs,
   createDialogSurfaceController,
+  disclosureStyles,
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
@@ -958,6 +960,172 @@ describe('separate UI package contracts', () => {
     summary.click();
     await vi.waitFor(() => expect(details.open).toBe(false));
     await vi.waitFor(() => expect(onToggle).toHaveBeenCalled());
+  });
+
+  it('retains compact disclosure state across parent rerenders and resets only for a new token', async () => {
+    let compact = true;
+    const listeners = new Set<(event: MediaQueryListEvent) => void>();
+    const query = {
+      get matches() { return compact; },
+      media: '(max-width: 48rem)',
+      onchange: null,
+      addEventListener: (_type: string, listener: EventListenerOrEventListenerObject) => {
+        listeners.add(listener as (event: MediaQueryListEvent) => void);
+      },
+      removeEventListener: (_type: string, listener: EventListenerOrEventListenerObject) => {
+        listeners.delete(listener as (event: MediaQueryListEvent) => void);
+      },
+      addListener: (listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
+      removeListener: (listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
+      dispatchEvent: () => true,
+    } as MediaQueryList;
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue(query);
+    const onToggle = vi.fn();
+    const view = (copy: string, resetToken = 0) => ResponsiveDisclosure({
+      id: 'responsive-filters',
+      summary: 'Filters',
+      compactBreakpoint: '(max-width: 48rem)',
+      compactResetToken: resetToken,
+      onToggle,
+      children: q.p({ children: copy }),
+    });
+
+    render(view('Initial facets'), document.body);
+    const details = document.querySelector<HTMLDetailsElement>('#responsive-filters')!;
+    const summary = details.querySelector('summary')!;
+    expect(details.open).toBe(false);
+    summary.click();
+    await vi.waitFor(() => expect(details.open).toBe(true));
+    await vi.waitFor(() => expect(onToggle).toHaveBeenCalled());
+    render(view('Updated facets'), document.body);
+    expect(document.querySelector('#responsive-filters')).toBe(details);
+    expect(details.open).toBe(true);
+    expect(details.textContent).toContain('Updated facets');
+    expect(listeners).toHaveLength(1);
+
+    compact = false;
+    listeners.forEach((listener) => listener({ matches: false } as MediaQueryListEvent));
+    expect(details.open).toBe(true);
+    summary.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(details.open).toBe(true);
+    compact = true;
+    listeners.forEach((listener) => listener({ matches: true } as MediaQueryListEvent));
+    expect(details.open).toBe(true);
+    expect(summary.getAttribute('aria-expanded')).toBe('true');
+
+    render(view('Reset facets', 1), document.body);
+    expect(document.querySelector('#responsive-filters')).toBe(details);
+    expect(details.open).toBe(false);
+    expect(summary.getAttribute('aria-expanded')).toBe('false');
+    render(q.div({ children: 'replaced' }), document.body);
+    expect(listeners).toHaveLength(0);
+    matchMedia.mockRestore();
+  });
+
+  it('supports initial open states, legacy listeners, native keyboard toggles, refs, and callbacks', async () => {
+    let compact = true;
+    const listeners = new Set<(event: MediaQueryListEvent) => void>();
+    const query = {
+      get matches() { return compact; },
+      media: '(max-width: 40rem)',
+      onchange: null,
+      addListener: (listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
+      removeListener: (listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
+      dispatchEvent: () => true,
+    } as unknown as MediaQueryList;
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue(query);
+    const externalRef: { value?: HTMLDetailsElement } = {};
+    const attributeToggle = { handleEvent: vi.fn() };
+    const onToggle = vi.fn();
+    render(ResponsiveDisclosure({
+      id: 'initially-open-filters',
+      summary: 'Filters',
+      compactBreakpoint: '(max-width: 40rem)',
+      compactInitialOpen: true,
+      onToggle,
+      attributes: { ref: externalRef, '@toggle': attributeToggle },
+      children: 'Filters content',
+    }), document.body);
+    const details = externalRef.value!;
+    const summary = details.querySelector<HTMLElement>('summary')!;
+    expect(details.open).toBe(true);
+    expect(summary.getAttribute('aria-expanded')).toBe('true');
+    summary.focus();
+    await userEvent.keyboard('{Enter}');
+    await vi.waitFor(() => expect(details.open).toBe(false));
+    await vi.waitFor(() => expect(onToggle).toHaveBeenCalled());
+    expect(attributeToggle.handleEvent).toHaveBeenCalled();
+    expect(summary.getAttribute('aria-expanded')).toBe('false');
+    compact = false;
+    listeners.forEach((listener) => listener({ matches: false } as MediaQueryListEvent));
+    expect(details.open).toBe(true);
+    compact = true;
+    listeners.forEach((listener) => listener({ matches: true } as MediaQueryListEvent));
+    expect(details.open).toBe(false);
+    render(q.div(), document.body);
+    expect(externalRef.value).toBeUndefined();
+    expect(listeners).toHaveLength(0);
+    matchMedia.mockRestore();
+  });
+
+  it('fails closed with stable diagnostics for invalid configuration and media-query failures', () => {
+    expect(() => ResponsiveDisclosure({ id: '', summary: 'Filters', compactBreakpoint: '(max-width: 40rem)', children: 'Content' }))
+      .toThrow(/GLUON_RESPONSIVE_DISCLOSURE_ID_INVALID/);
+    expect(() => ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: ' ', children: 'Content' }))
+      .toThrow(/GLUON_RESPONSIVE_DISCLOSURE_BREAKPOINT_INVALID/);
+    expect(() => ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 40rem)', compactInitialOpen: 'yes' as never, children: 'Content' }))
+      .toThrow(/GLUON_RESPONSIVE_DISCLOSURE_INITIAL_OPEN_INVALID/);
+    expect(() => ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 40rem)', compactResetToken: Number.NaN, children: 'Content' }))
+      .toThrow(/GLUON_RESPONSIVE_DISCLOSURE_RESET_TOKEN_INVALID/);
+
+    const matchMedia = vi.spyOn(window, 'matchMedia');
+    matchMedia.mockReturnValueOnce({
+      matches: false,
+      media: 'not all',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: () => true,
+    } as unknown as MediaQueryList);
+    render(ResponsiveDisclosure({ id: 'malformed-query', summary: 'Filters', compactBreakpoint: '(invalid query', compactInitialOpen: false, children: 'Content' }), document.body);
+    expect(document.querySelector<HTMLDetailsElement>('#malformed-query')!.dataset.gluonResponsiveDisclosureError)
+      .toBe('GLUON_RESPONSIVE_DISCLOSURE_MATCH_MEDIA_FAILED');
+
+    matchMedia.mockReturnValueOnce({
+      matches: false,
+      media: '(max-width: 40rem)',
+      onchange: null,
+      dispatchEvent: () => true,
+    } as unknown as MediaQueryList);
+    render(ResponsiveDisclosure({ id: 'listenerless-query', summary: 'Filters', compactBreakpoint: '(max-width: 40rem)', compactInitialOpen: false, children: 'Content' }), document.body);
+    expect(document.querySelector<HTMLDetailsElement>('#listenerless-query')!.dataset.gluonResponsiveDisclosureError)
+      .toBe('GLUON_RESPONSIVE_DISCLOSURE_MATCH_MEDIA_FAILED');
+
+    matchMedia.mockImplementation(() => { throw new Error('unavailable'); });
+    render(ResponsiveDisclosure({ id: 'failed-query', summary: 'Filters', compactBreakpoint: '(max-width: 40rem)', compactInitialOpen: false, children: 'Content' }), document.body);
+    const failed = document.querySelector<HTMLDetailsElement>('#failed-query')!;
+    expect(failed.open).toBe(false);
+    expect(failed.dataset.gluonResponsiveDisclosureError).toBe('GLUON_RESPONSIVE_DISCLOSURE_MATCH_MEDIA_FAILED');
+    expect(failed.querySelector('summary')?.getAttribute('aria-expanded')).toBe('false');
+    matchMedia.mockRestore();
+
+    const original = window.matchMedia;
+    Object.defineProperty(window, 'matchMedia', { configurable: true, value: undefined });
+    render(ResponsiveDisclosure({ id: 'missing-query', summary: 'Filters', compactBreakpoint: '(max-width: 40rem)', compactInitialOpen: true, children: 'Content' }), document.body);
+    const missing = document.querySelector<HTMLDetailsElement>('#missing-query')!;
+    expect(missing.open).toBe(true);
+    expect(missing.dataset.gluonResponsiveDisclosureError).toBe('GLUON_RESPONSIVE_DISCLOSURE_MATCH_MEDIA_UNAVAILABLE');
+    Object.defineProperty(window, 'matchMedia', { configurable: true, value: original });
+  });
+
+  it('inherits exact Disclosure RTL, forced-colors, and reduced-motion styles', () => {
+    const styles = getStyleSheetText(disclosureStyles);
+    expect(styles).toContain('@media (forced-colors: active)');
+    expect(styles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(styles).toContain('transition: none');
+    expect(styles).toContain('grid-template-columns: minmax(0, 1fr) auto');
+    expect(styles).toContain('min-block-size: 44px');
   });
 
   it('controls Accordion single and multiple values while preserving native summaries', async () => {

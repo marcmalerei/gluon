@@ -34,6 +34,7 @@ import {
   ControlField,
   DialogSurface,
   Disclosure,
+  ResponsiveDisclosure,
   EmptyState,
   FormField,
   InlineNotice,
@@ -266,6 +267,13 @@ createApp(() => AppShell({
           id: 'profile-delivery-details',
           summary: 'Delivery details',
           children: 'Tracked delivery in 2–3 working days.',
+        }),
+        ResponsiveDisclosure({
+          id: 'responsive-catalog-filters',
+          summary: 'Catalog filters',
+          compactBreakpoint: '(max-width: 48rem)',
+          compactInitialOpen: false,
+          children: 'Availability and finish filters.',
         }),
         Accordion({
           label: 'Account help',

@@ -1006,6 +1006,7 @@
         "  ControlField,",
         "  DialogSurface,",
         "  Disclosure,",
+        "  ResponsiveDisclosure,",
         "  EmptyState,",
         "  FormField,",
         "  InlineNotice,",
@@ -1050,6 +1051,8 @@
         "  type DisclosureProps,",
         "  type DisclosureState,",
         "  type DisclosureSummaryAttributes,",
+        "  type ResponsiveDisclosureAttributes,",
+        "  type ResponsiveDisclosureProps,",
         "  type EmptyStateAttributes,",
         "  type EmptyStateHeadingLevel,",
         "  type EmptyStatePresentation,",
@@ -1100,6 +1103,8 @@
         "const disclosureState = { defaultOpen: false } satisfies DisclosureState;",
         "const disclosureAvailability = { unavailable: false } satisfies DisclosureAvailability;",
         "const deliveryDisclosure = { ...disclosureState, ...disclosureAvailability, id: 'delivery-details', summary: 'Delivery details', children: 'Tracked delivery in 2–3 working days.', attributes: disclosureAttributes, summaryAttributes: disclosureSummaryAttributes } satisfies DisclosureProps;",
+        "const responsiveAttributes = { class: 'catalog-filters' } satisfies ResponsiveDisclosureAttributes;",
+        "const responsiveDisclosure = { id: 'catalog-filters', summary: 'Filters', compactBreakpoint: '(max-width: 48rem)', compactInitialOpen: false, children: 'Availability and finish filters.', attributes: responsiveAttributes } satisfies ResponsiveDisclosureProps;",
         "const accordionName = { label: 'Shipping topics' } satisfies AccordionAccessibleName;",
         "const accordionAttributes = { class: 'shipping-topics' } satisfies AccordionAttributes;",
         "const accordionHeadingLevel: AccordionHeadingLevel = 3;",
@@ -5143,6 +5148,18 @@
     "packages/molecules/src/variables/ButtonGroup.md": {
       "recipe": "molecule-components",
       "description": "Render a named group around caller-owned buttons while preserving their source order and semantics:"
+    },
+    "packages/molecules/src/interfaces/ResponsiveDisclosureProps.md": {
+      "recipe": "molecule-components",
+      "description": "Keep one native disclosure tree expanded on desktop while remembering a compact user's choice:"
+    },
+    "packages/molecules/src/type-aliases/ResponsiveDisclosureAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Style a responsive disclosure through public native details attributes:"
+    },
+    "packages/molecules/src/variables/ResponsiveDisclosure.md": {
+      "recipe": "molecule-components",
+      "description": "Render a responsive native details/summary disclosure for a compact filter panel:"
     },
     "packages/molecules/src/variables/ChoiceGroup.md": {
       "recipe": "molecule-components",

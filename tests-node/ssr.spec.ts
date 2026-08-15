@@ -61,7 +61,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
@@ -123,6 +123,29 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('<summary');
     expect(rendered).toContain('aria-disabled="true"');
     expect(rendered).toContain('aria-describedby="server-disclosure-unavailable"');
+  });
+
+  it('serializes one responsive Disclosure tree with explicit compact initial semantics', async () => {
+    const closed = withoutHydrationMarkers(await renderToString(ResponsiveDisclosure({
+      id: 'server-responsive-closed',
+      summary: 'Catalog filters',
+      compactBreakpoint: '(max-width: 48rem)',
+      compactInitialOpen: false,
+      children: 'One filter content tree.',
+    })));
+    const opened = withoutHydrationMarkers(await renderToString(ResponsiveDisclosure({
+      id: 'server-responsive-open',
+      summary: 'Catalog filters',
+      compactBreakpoint: '(max-width: 48rem)',
+      compactInitialOpen: true,
+      children: 'One filter content tree.',
+    })));
+    expect(closed).toContain('<details');
+    expect(closed).not.toMatch(/<details[^>]*\sopen(?:=|\s|>)/);
+    expect(closed).toContain('aria-expanded="false"');
+    expect(opened).toMatch(/<details[^>]*\sopen(?:=|\s|>)/);
+    expect(opened).toContain('aria-expanded="true"');
+    expect(opened.match(/One filter content tree\./g)).toHaveLength(1);
   });
 
   it('serializes Accordion group, heading, and controlled native disclosures', async () => {

@@ -68,6 +68,21 @@ native state. It deliberately has no silent disabled prop. When content is not
 yet available, pass `unavailable: true` with a concrete `unavailableReason`;
 the summary remains focusable, exposes `aria-disabled`, shows and references
 the reason, and prevents Enter, Space, and pointer activation.
+`ResponsiveDisclosure` is the responsive variant for panels such as mobile
+filters. It keeps one native `details`/`summary` tree, is always open outside
+`compactBreakpoint`, and starts with `compactInitialOpen` in compact view. A
+compact user's toggle is restored after breakpoint round-trips; a new
+`compactResetToken` deliberately replaces that remembered choice. It mirrors
+native `open` to `summary[aria-expanded]`, works during SSR, removes its media
+query listener on disconnect, and uses the same constructable Disclosure
+stylesheet. Consequently its marker uses the existing reduced-motion rule,
+its border remains visible in forced-colors mode, and its logical grid follows
+RTL without a second responsive-specific style contract. Invalid IDs,
+breakpoints, initial state, and reset tokens throw stable
+`GLUON_RESPONSIVE_DISCLOSURE_*_INVALID` diagnostics. If `matchMedia` is missing
+or fails, the server-selected compact initial state is retained and the root
+exposes the corresponding stable diagnostic through
+`data-gluon-responsive-disclosure-error`.
 `Accordion` composes caller-owned Disclosure items inside a labelled group. It
 supports controlled single or multiple open values, stable item IDs, an
 explicit heading level, optional non-collapsible single selection, and

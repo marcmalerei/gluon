@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added `ResponsiveDisclosure`, a native responsive disclosure with compact
+  breakpoint state, desktop expansion, resettable compact memory, and teardown-safe media-query synchronization.
+
 - Added `createFormController()` as a DOM-independent, request-free form
   orchestration contract for typed field registration, values, touched/dirty
   state, field errors, asynchronous validation, submission lifecycle,
