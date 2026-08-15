@@ -36,7 +36,10 @@ The initial release is suited to a few hundred rendered nodes. It deliberately
 does not index files, persist layouts, edit graphs, or emulate another product.
 Use the documented `activeGroups`, `searchQuery`, `nodeScale`, `linkDensity`,
 and `showLabels` properties to wire native host controls. `Escape` recentres the
-canvas, arrow keys pan it, and `+`/`-` zoom it.
+canvas, arrow keys pan it, and `+`/`-` zoom it. The canvas is a visualisation
+surface; the open **Keyboard node list** is the accessible DOM representation.
+Its native buttons follow the same active-group and search filters, expose
+`aria-pressed`, and emit the same `graph-node-select` event as pointer selection.
 
 ## License
 

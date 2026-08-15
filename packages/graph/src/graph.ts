@@ -69,6 +69,13 @@ graphStyles.replaceSync(`
   canvas { display: block; inline-size: 100%; block-size: 100%; min-block-size: 320px; touch-action: none; outline: none; cursor: grab; }
   canvas:active { cursor: grabbing; }
   canvas:focus-visible { outline: 2px solid #b9e635; outline-offset: -4px; }
+  .node-list { position: absolute; inset-block-end: 12px; inset-inline-start: 12px; max-inline-size: min(28rem, calc(100% - 24px)); color: #dce8f7; background: rgb(9 13 18 / 92%); border: 1px solid #3d5068; border-radius: 8px; }
+  .node-list summary { min-block-size: 44px; padding: 11px 14px; cursor: pointer; font-weight: 600; }
+  .node-list summary:focus-visible, .node-list button:focus-visible { outline: 2px solid #b9e635; outline-offset: 2px; }
+  .node-list ul { display: grid; gap: 4px; max-block-size: 14rem; overflow: auto; margin: 0; padding: 0 8px 8px; list-style: none; }
+  .node-list button { display: grid; gap: 2px; inline-size: 100%; min-block-size: 44px; padding: 8px 10px; color: inherit; text-align: start; background: transparent; border: 0; border-radius: 4px; cursor: pointer; }
+  .node-list button:hover, .node-list button[aria-pressed="true"] { background: #263547; }
+  .node-list .node-group { color: #a9b8cb; font-size: 0.8rem; }
   .summary { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) { canvas { cursor: default; } }
 `);
@@ -184,6 +191,26 @@ export class GluonGraphElement extends GluonElement<GluonGraphEvents> {
           @wheel=${this.onWheel}
           @keydown=${this.onKeyDown}
         ></canvas>
+        <details class="node-list">
+          <summary>Keyboard node list (${visible})</summary>
+          <ul aria-label="Visible graph nodes">
+            ${this.visibleNodes().length > 0
+              ? this.visibleNodes().map((node) => html`
+                <li>
+                  <button
+                    type="button"
+                    aria-pressed=${this.selectedNodeId === node.id}
+                    aria-label=${`${node.label}${node.group ? `, ${this.groupLabel(node.group)}` : ''}`}
+                    @click=${() => this.selectNode(node.id)}
+                  >
+                    <span>${node.label}</span>
+                    ${node.group ? html`<span class="node-group">${this.groupLabel(node.group)}</span>` : ''}
+                  </button>
+                </li>
+              `)
+              : html`<li>No visible nodes.</li>`}
+          </ul>
+        </details>
         <p class="summary" aria-live="polite">${this.status}</p>
       </section>
     `;
@@ -243,6 +270,16 @@ export class GluonGraphElement extends GluonElement<GluonGraphEvents> {
     this.status = 'Graph panned.';
     this.publishViewport();
     this.scheduleDraw();
+  };
+
+  private readonly selectNode = (nodeId: string): void => {
+    const node = this.positioned.get(nodeId);
+    if (!node || !this.visibleNodes().some((visible) => visible.id === nodeId)) return;
+    const selected = this.selectedNodeId !== nodeId;
+    this.selectedNodeId = selected ? nodeId : undefined;
+    this.status = selected ? `${node.label} selected.` : `${node.label} cleared.`;
+    this.emit('graph-node-select', { node, selected });
+    void this.requestUpdate();
   };
 
   private setScale(scale: number): void {
@@ -372,6 +409,10 @@ export class GluonGraphElement extends GluonElement<GluonGraphEvents> {
     this.status = selected ? `${closest.node.label} selected.` : `${closest.node.label} cleared.`;
     this.emit('graph-node-select', { node: closest.node, selected });
     void this.requestUpdate();
+  }
+
+  private groupLabel(groupId: string): string {
+    return this.groups.find((group) => group.id === groupId)?.label ?? groupId;
   }
 }
 
