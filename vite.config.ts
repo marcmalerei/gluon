@@ -124,6 +124,7 @@ export default defineConfig({
         'src/**/*.ts',
         'packages/gluon-components-vite/src/entry-preview.ts',
         'packages/i18n/src/**/*.ts',
+        'packages/json-forms/src/schema.ts',
         'packages/quarks/src/**/*.ts',
         'packages/atoms/src/**/*.ts',
         'packages/molecules/src/**/*.ts',

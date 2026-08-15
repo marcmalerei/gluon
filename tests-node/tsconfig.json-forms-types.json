@@ -2,8 +2,12 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "types": [],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
     "paths": {
       "@gluonjs/core": ["dist/types/index.d.ts"],
       "@gluonjs/json-forms": ["packages/json-forms/dist/index.d.ts"]

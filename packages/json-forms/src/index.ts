@@ -9,6 +9,8 @@ export {
 } from './json-form.js';
 export {
   createJsonFormsMessageProvider,
+  JsonSchemaResolutionError,
+  resolveJsonSchema,
   type JsonFormValidationError,
   type JsonFormsMessageOverrides,
   type JsonFormsMessageProvider,
@@ -16,5 +18,6 @@ export {
   type JsonFormsUiSchema,
   type JsonObject,
   type JsonSchema,
+  type JsonSchemaResolutionOptions,
   type JsonValue,
 } from './schema.js';

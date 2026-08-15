@@ -233,7 +233,8 @@ they are not alternative component bases.
 | --- | --- |
 | [`ComponentLibraryLoader`](/gluon/1.9.0/api/generated/packages/quarks/src/classes/ComponentLibraryLoader.html) | Resolve an explicitly requested public component entry, observe cache state, retain target-owned constructable stylesheets, and validate request-local SSR style snapshots before hydration. |
 | [`GluonGraphElement`](/gluon/1.9.0/api/generated/packages/graph/src/classes/GluonGraphElement.html) | Render an optional interactive graph with typed node/group/link input, deterministic layout, selection, pan, and zoom; hosts keep their domain controls and persistence. |
-| [`JsonFormsElement`](/gluon/1.9.0/api/generated/packages/json-forms/src/classes/JsonFormsElement.html) | Render the supported direct-property JSON Forms subset as a form-associated Custom Element; prefer the `JsonForm()` template helper when composing it inside a Gluon render tree. |
+| [`JsonFormsElement`](/gluon/1.9.0/api/generated/packages/json-forms/src/classes/JsonFormsElement.html) | Render the supported JSON Forms subset as a form-associated Custom Element; prefer the `JsonForm()` template helper when composing it inside a Gluon render tree. |
+| [`JsonSchemaResolutionError`](/gluon/1.9.0/api/generated/packages/json-forms/src/classes/JsonSchemaResolutionError.html) | Handle bounded local JSON Pointer failures through the resolver's stable diagnostic keyword. |
 
 ### Tooling classes
 

@@ -32,7 +32,7 @@ const deliverySchema = {
   title: 'Handover rules',
   description: 'The component owns accessible controls and validation; this page owns the saved delivery policy.',
   properties: {
-    contactEmail: { type: 'string', title: 'Dispatch email', format: 'email' },
+    contactEmail: { $ref: '#/$defs/contact' },
     deliveryWindow: {
       type: 'string',
       title: 'Preferred delivery window',
@@ -59,6 +59,11 @@ const deliverySchema = {
     },
   },
   required: ['contactEmail', 'deliveryWindow', 'leadTime'],
+  $defs: {
+    // Local references keep repeated operational fields consistent; this is
+    // not a demonstration of remote or full JSON Schema resolution.
+    contact: { type: 'string', format: 'email', title: 'Dispatch email' },
+  },
 } satisfies JsonSchema;
 
 registerJsonForms();
