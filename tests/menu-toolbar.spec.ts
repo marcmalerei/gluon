@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import axe from 'axe-core';
 import { ContextMenu, DropdownMenu, Menubar, Toolbar, type MenuItem } from '@gluonjs/molecules';
+import { q } from '@gluonjs/quarks';
 import { render } from '../src/index.js';
 
 beforeEach(() => {
@@ -45,6 +46,27 @@ describe('DropdownMenu', () => {
     await userEvent.keyboard('{ArrowUp}');
     await settle();
     expect(document.activeElement?.textContent).toBe('Archive');
+    await userEvent.keyboard('{Escape}');
+    await settle();
+    await userEvent.keyboard('{Enter}');
+    await settle();
+    expect(document.activeElement?.textContent).toBe('New order');
+    await userEvent.keyboard('{Escape}');
+    await settle();
+    await userEvent.keyboard('{Space}');
+    await settle();
+    expect(document.activeElement?.textContent).toBe('New order');
+  });
+
+  it('requests controlled state once without mutating the authoritative closed render', async () => {
+    const onOpenChange = vi.fn();
+    render(DropdownMenu({ id: 'controlled-menu', label: 'Controlled', trigger: 'Open', open: false, items: [{ id: 'one', label: 'One' }], onOpenChange }), document.body);
+    document.querySelector<HTMLButtonElement>('.gluon-menu-trigger')!.click();
+    await settle();
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange.mock.calls[0]?.[0]).toBe(true);
+    expect(document.querySelector<HTMLElement>('[role="menu"]')?.hidden).toBe(true);
+    expect(document.querySelector('.gluon-menu-trigger')?.getAttribute('aria-expanded')).toBe('false');
   });
 
   it('buffers typeahead, cycles repeated characters, and activates with Enter/Space', async () => {
@@ -67,6 +89,8 @@ describe('DropdownMenu', () => {
     expect(document.activeElement?.textContent).toBe('Apple');
     await userEvent.keyboard('{Enter}');
     expect(selected).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard('{Space}');
+    expect(selected).toHaveBeenCalledTimes(2);
   });
 
   it('uses checkbox/radio roles and never toggles a selected radio false', async () => {
@@ -115,18 +139,44 @@ describe('DropdownMenu', () => {
     await settle();
     expect(expanded).toBe(false);
     expect(document.activeElement?.textContent).toContain('Share');
+    await userEvent.keyboard('{ArrowLeft}');
+    await settle();
+    await userEvent.keyboard('{Escape}');
+    await settle();
+    expect(expanded).toBe(false);
+    expect(document.activeElement?.textContent).toContain('Share');
   });
 });
 
 describe('ContextMenu, Menubar, and Toolbar', () => {
-  it('opens a context menu without a trigger and restores target focus on Escape', async () => {
+  it('opens a context menu for pointer and keyboard targets with exact dismissal ownership', async () => {
     const host = document.createElement('div');
-    document.body.append(host);
+    const outside = document.createElement('button');
+    outside.textContent = 'Outside';
+    document.body.append(host, outside);
     let open = false;
-    const view = () => ContextMenu({ id: 'card-context', label: 'Card actions', open, children: 'Order card', items: [{ id: 'duplicate', label: 'Duplicate' }], onOpenChange: (next) => { open = next; render(view(), host); } });
+    const changes: boolean[] = [];
+    const view = () => ContextMenu({ id: 'card-context', label: 'Card actions', open, children: q.span({ data: { nativeTargetContent: true }, children: 'Order card' }), items: [{ id: 'duplicate', label: 'Duplicate' }], onOpenChange: (next) => { changes.push(next); open = next; render(view(), host); } });
     render(view(), host);
     expect(host.querySelector('.gluon-menu-trigger')).toBeNull();
     const target = host.querySelector<HTMLElement>('.gluon-context-menu-target')!;
+    target.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 12, clientY: 18 }));
+    await settle();
+    expect(open).toBe(true);
+    expect(document.activeElement?.textContent).toBe('Duplicate');
+    expect(host.querySelector('[data-native-target-content]')?.textContent).toBe('Order card');
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const contextRoot = host.querySelector<HTMLElement>('.gluon-context-menu')!;
+    const positionedMenu = host.querySelector<HTMLElement>('[role="menu"]')!;
+    expect(Number.parseFloat(contextRoot.style.getPropertyValue('--gluon-context-menu-x'))).toBeGreaterThanOrEqual(8);
+    expect(Number.parseFloat(contextRoot.style.getPropertyValue('--gluon-context-menu-x'))).toBeLessThanOrEqual(12);
+    expect(positionedMenu.getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth);
+    expect(positionedMenu.getBoundingClientRect().bottom).toBeLessThanOrEqual(window.innerHeight);
+    outside.focus();
+    outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    await settle();
+    expect(open).toBe(false);
+    expect(document.activeElement).toBe(outside);
     target.focus();
     await userEvent.keyboard('{Shift>}{F10}{/Shift}');
     await settle();
@@ -136,6 +186,7 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
     await settle();
     expect(open).toBe(false);
     expect(document.activeElement).toBe(host.querySelector('.gluon-context-menu-target'));
+    expect(changes).toEqual([true, false, true, false]);
   });
 
   it('renders a direct APG menubar and honors horizontal RTL and submenu movement', async () => {
@@ -160,6 +211,29 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
     await userEvent.keyboard('{ArrowDown}');
     await settle();
     expect(document.activeElement?.textContent).toBe('New');
+    await userEvent.keyboard('{Escape}');
+    await settle();
+    expect(expanded).toBe(false);
+    expect(document.activeElement?.textContent).toContain('File');
+  });
+
+  it('honors vertical menubar movement, disabled items, End, and typeahead', async () => {
+    render(Menubar({ id: 'vertical-menubar', label: 'Tools', orientation: 'vertical', items: [
+      { id: 'alpha', label: 'Alpha' },
+      { id: 'disabled', label: 'Disabled', disabled: true },
+      { id: 'beta', label: 'Beta' },
+      { id: 'build', label: 'Build' },
+    ] }), document.body);
+    const menubar = document.querySelector<HTMLElement>('[role="menubar"]')!;
+    const alpha = menubar.querySelector<HTMLElement>('[data-value="alpha"]')!;
+    alpha.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement?.textContent).toBe('Beta');
+    await userEvent.keyboard('b');
+    expect(document.activeElement?.textContent).toBe('Build');
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement?.textContent).toBe('Build');
+    expect(menubar.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
   });
 
   it('keeps one enabled native toolbar control tabbable and preserves activation', async () => {
@@ -167,16 +241,24 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
     const host = document.createElement('div');
     host.dir = 'rtl';
     document.body.append(host);
-    render(Toolbar({ id: 'editor-toolbar', label: 'Editor', items: [
-      { id: 'bold', label: 'Bold', onActivate: activated },
+    const rootKeydown = vi.fn();
+    const toolbarRef: { value?: HTMLDivElement } = {};
+    render(Toolbar({ id: 'editor-toolbar', label: 'Editor', attributes: { ref: toolbarRef, data: { owner: 'caller' }, aria: { describedby: 'toolbar-help' }, onKeydown: rootKeydown }, items: [
+      { id: 'bold', label: 'Bold', attributes: { name: 'format', data: { callerItem: true } }, onActivate: activated },
       { id: 'disabled', label: 'Disabled', disabled: true },
       { id: 'help', kind: 'link', label: 'Help', href: '/help' },
+      { id: 'disabled-link', kind: 'link', label: 'Disabled link', href: '/forbidden', disabled: true },
     ] }), host);
     const toolbar = host.querySelector<HTMLElement>('[role="toolbar"]')!;
     const controls = toolbar.querySelectorAll<HTMLElement>('[data-gluon-toolbar-item]');
     expect(toolbar.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
     expect(controls[0]?.tagName).toBe('BUTTON');
     expect(controls[2]?.tagName).toBe('A');
+    expect(toolbar.dataset.owner).toBe('caller');
+    expect(toolbarRef.value).toBe(toolbar);
+    expect(toolbar.getAttribute('aria-describedby')).toBe('toolbar-help');
+    expect(controls[0]?.dataset.callerItem).toBe('true');
+    expect(controls[0]?.getAttribute('name')).toBe('format');
     controls[0]!.focus();
     await userEvent.keyboard('{ArrowLeft}');
     expect(document.activeElement).toBe(controls[2]);
@@ -184,6 +266,24 @@ describe('ContextMenu, Menubar, and Toolbar', () => {
     expect(document.activeElement).toBe(controls[0]);
     controls[0]!.click();
     expect(activated).toHaveBeenCalledTimes(1);
+    const disabledClick = new MouseEvent('click', { bubbles: true, cancelable: true });
+    expect(controls[3]!.dispatchEvent(disabledClick)).toBe(false);
+    expect(disabledClick.defaultPrevented).toBe(true);
+    expect(rootKeydown).toHaveBeenCalled();
+  });
+
+  it('moves a vertical toolbar with native controls and skips disabled entries', async () => {
+    render(Toolbar({ id: 'vertical-toolbar', label: 'Vertical actions', orientation: 'vertical', items: [
+      { id: 'first', label: 'First' },
+      { id: 'disabled', label: 'Disabled', disabled: true },
+      { id: 'last', kind: 'link', label: 'Last', href: '#last' },
+    ] }), document.body);
+    const controls = document.querySelectorAll<HTMLElement>('[data-gluon-toolbar-item]');
+    controls[0]!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(controls[2]);
+    await userEvent.keyboard('{Home}');
+    expect(document.activeElement).toBe(controls[0]);
   });
 
   it('keeps duplicate labels collision-safe and passes automated WCAG checks', async () => {

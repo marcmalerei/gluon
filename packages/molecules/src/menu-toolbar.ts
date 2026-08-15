@@ -1,13 +1,14 @@
 import { defineMolecule, nothing, type TemplateResult, type TemplateValue } from '@gluonjs/core';
-import { q, type QuarkProps } from '@gluonjs/quarks';
+import { q, type QuarkProps, type QuarkRef } from '@gluonjs/quarks';
 import { menuToolbarStyleDependency } from './menu-toolbar-styles.js';
 import { callListener, connectDismissal, enabledMenuItems, isDisabled, itemDomId, menuDomId, menuItemSelector, moveFocus, runTypeahead, safeId, scheduleFocus, setRoving, type TypeaheadState } from './menu-interactions.js';
 
 type MenuEvent = MouseEvent | KeyboardEvent;
 type Orientation = 'horizontal' | 'vertical';
 type MenuNativeAttributes = Omit<QuarkProps<HTMLDivElement>, 'children' | 'role'>;
+type MenubarAttributes = Omit<QuarkProps<HTMLUListElement>, 'children' | 'role'>;
 type MenuTriggerAttributes = Omit<QuarkProps<HTMLButtonElement>, 'children' | 'type' | 'role'>;
-type MenuItemAttributes<ElementType extends HTMLElement> = Omit<QuarkProps<ElementType>, 'children' | 'role' | 'tabIndex' | 'aria'>;
+type MenuItemAttributes<ElementType extends HTMLElement> = Omit<QuarkProps<ElementType>, 'children' | 'role' | 'tabIndex'>;
 
 interface MenuItemBase {
   readonly id: string;
@@ -94,7 +95,7 @@ export interface MenubarProps extends MenuCallbacks {
   readonly label: string;
   readonly items: readonly MenuItem[];
   readonly orientation?: Orientation;
-  readonly attributes?: MenuNativeAttributes;
+  readonly attributes?: MenubarAttributes;
 }
 
 interface RenderMenuOptions extends MenuCallbacks {
@@ -105,6 +106,11 @@ interface RenderMenuOptions extends MenuCallbacks {
   readonly labelledBy?: string;
   readonly label?: string;
   readonly closeRoot?: (event: MenuEvent) => void;
+}
+
+function assignRef<ElementType extends Element>(ref: QuarkRef<ElementType> | undefined, element: ElementType | undefined): void {
+  if (typeof ref === 'function') ref(element);
+  else if (ref) ref.value = element;
 }
 
 function renderMenu(options: RenderMenuOptions): TemplateResult {
@@ -149,7 +155,7 @@ function renderMenuItems(options: RenderMenuOptions, path: readonly string[]): T
       class: [{ 'gluon-menu-item': true, 'has-submenu': hasSubmenu }, item.attributes?.class],
       part: 'item',
       data: { ...item.attributes?.data, value: item.id, kind: item.kind ?? 'item', textValue: item.textValue, radioGroup: item.kind === 'radio' ? item.group : undefined, state: hasSubmenu ? item.expanded ? 'open' : 'closed' : checked ? 'checked' : undefined },
-      aria: { disabled: item.disabled, checked: checked === undefined ? undefined : String(checked), haspopup: hasSubmenu ? 'menu' : undefined, expanded: hasSubmenu ? String(Boolean(item.expanded)) : undefined, controls: childMenuId },
+      aria: { ...item.attributes?.aria, disabled: item.disabled, checked: checked === undefined ? undefined : String(checked), haspopup: hasSubmenu ? 'menu' : undefined, expanded: hasSubmenu ? String(Boolean(item.expanded)) : undefined, controls: childMenuId },
       onClick: (event: MouseEvent) => {
         callListener(attributeClick, event);
         if (event.defaultPrevented || item.disabled) { event.preventDefault(); return; }
@@ -209,21 +215,25 @@ function renderDropdownMenu(props: DropdownMenuProps): TemplateResult {
   const close = (event: MenuEvent): void => {
     const ownerDocument = (event.currentTarget as Element | null)?.ownerDocument ?? root?.ownerDocument;
     props.onOpenChange(false, event);
-    queueMicrotask(() => ownerDocument?.getElementById(triggerId)?.focus());
+    queueMicrotask(() => {
+      const renderedRoot = ownerDocument?.getElementById(props.id);
+      if (renderedRoot?.dataset.state === 'closed') ownerDocument?.getElementById(triggerId)?.focus();
+    });
   };
   const requestOpen = (event: Event, edge: 'first' | 'last' = 'first'): void => {
     const ownerDocument = (event.currentTarget as Element | null)?.ownerDocument ?? root?.ownerDocument;
     props.onOpenChange(true, event);
     scheduleFocus(ownerDocument?.getElementById(props.id) ?? undefined, `#${menuDomId(props.id, [])}`, edge);
   };
+  const { ref: attributeRef, ...attributes } = props.attributes ?? {};
   const { onClick, onKeydown, ...triggerAttributes } = props.triggerAttributes ?? {};
   return q.div({
-    ...props.attributes,
+    ...attributes,
     id: props.id,
     class: [{ gluon: true, molecule: true, 'gluon-menu': true, 'gluon-dropdown-menu': true }, props.attributes?.class],
     part: 'root',
     data: { ...props.attributes?.data, state: props.open ? 'open' : 'closed' },
-    ref: (element) => { root = element; if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event)); },
+    ref: (element) => { root = element; assignRef(attributeRef, element); if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event)); },
     children: [
       q.button({
         ...triggerAttributes,
@@ -254,25 +264,40 @@ function renderContextMenu(props: ContextMenuProps): TemplateResult {
   const close = (event: MenuEvent): void => {
     const ownerDocument = (event.currentTarget as Element | null)?.ownerDocument ?? root?.ownerDocument;
     props.onOpenChange(false, event);
-    queueMicrotask(() => ownerDocument?.getElementById(targetId)?.focus());
+    queueMicrotask(() => {
+      const renderedRoot = ownerDocument?.getElementById(props.id);
+      if (renderedRoot?.dataset.state === 'closed') ownerDocument?.getElementById(targetId)?.focus();
+    });
   };
   const open = (event: MouseEvent | KeyboardEvent): void => {
     const ownerDocument = (event.currentTarget as Element | null)?.ownerDocument ?? root?.ownerDocument;
-    if (event instanceof MouseEvent) {
-      root?.style.setProperty('--gluon-context-menu-x', `${event.clientX}px`);
-      root?.style.setProperty('--gluon-context-menu-y', `${event.clientY}px`);
-    }
+    const target = event.currentTarget as HTMLElement;
+    const targetRect = target.getBoundingClientRect();
+    const requestedX = event instanceof MouseEvent ? event.clientX : targetRect.left;
+    const requestedY = event instanceof MouseEvent ? event.clientY : targetRect.bottom;
     props.onOpenChange(true, event);
+    queueMicrotask(() => {
+      const menu = ownerDocument?.getElementById(menuDomId(props.id, []));
+      const renderedRoot = ownerDocument?.getElementById(props.id);
+      const viewport = ownerDocument?.defaultView;
+      if (!menu || !renderedRoot || !viewport) return;
+      const gutter = 8;
+      const x = Math.max(gutter, Math.min(requestedX, viewport.innerWidth - menu.offsetWidth - gutter));
+      const y = Math.max(gutter, Math.min(requestedY, viewport.innerHeight - menu.offsetHeight - gutter));
+      renderedRoot.style.setProperty('--gluon-context-menu-x', `${x}px`);
+      renderedRoot.style.setProperty('--gluon-context-menu-y', `${y}px`);
+    });
     scheduleFocus(ownerDocument?.getElementById(props.id) ?? undefined, `#${menuDomId(props.id, [])}`);
   };
+  const { ref: attributeRef, ...attributes } = props.attributes ?? {};
   const { onContextMenu, onKeydown, ...targetAttributes } = props.targetAttributes ?? {};
   return q.div({
-    ...props.attributes,
+    ...attributes,
     id: props.id,
     class: [{ gluon: true, molecule: true, 'gluon-context-menu': true }, props.attributes?.class],
     part: 'root',
     data: { ...props.attributes?.data, state: props.open ? 'open' : 'closed' },
-    ref: (element) => { root = element; if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event)); },
+    ref: (element) => { root = element; assignRef(attributeRef, element); if (element) connectDismissal(element, props.open, (event) => props.onOpenChange(false, event)); },
     children: [
       q.div({
         ...targetAttributes,
@@ -298,6 +323,7 @@ function renderMenubar(props: MenubarProps): TemplateResult {
   const typeahead: TypeaheadState = { buffer: '', at: 0 };
   const firstEnabled = props.items.find((item) => item.kind !== 'separator' && !item.disabled);
   let root: HTMLElement | undefined;
+  const { ref: attributeRef, onFocusIn: attributeFocusIn, onKeydown: attributeKeydown, ...attributes } = props.attributes ?? {};
   const closeSubmenus = (event: MenuEvent): void => {
     for (const item of props.items) if (item.kind !== 'separator' && item.submenu?.length && item.expanded) props.onSubmenuOpenChange?.(item.id, false, event);
   };
@@ -307,33 +333,40 @@ function renderMenubar(props: MenubarProps): TemplateResult {
     const id = itemDomId(props.id, [item.id]);
     const role = item.kind === 'checkbox' ? 'menuitemcheckbox' : item.kind === 'radio' ? 'menuitemradio' : 'menuitem';
     const checked = item.kind === 'checkbox' || item.kind === 'radio' ? item.checked : undefined;
+    const { onClick: attributeClick, ...itemAttributes } = item.attributes ?? {};
     const common = {
+      ...itemAttributes,
       id, role, tabIndex: item === firstEnabled ? 0 : -1,
-      class: 'gluon-menu-item', part: 'item',
-      data: { value: item.id, textValue: item.textValue, radioGroup: item.kind === 'radio' ? item.group : undefined },
-      aria: { disabled: item.disabled, checked: checked === undefined ? undefined : String(checked), haspopup: hasSubmenu ? 'menu' : undefined, expanded: hasSubmenu ? String(Boolean(item.expanded)) : undefined, controls: hasSubmenu ? menuDomId(props.id, [item.id]) : undefined },
+      class: ['gluon-menu-item', item.attributes?.class], part: 'item',
+      data: { ...item.attributes?.data, value: item.id, textValue: item.textValue, radioGroup: item.kind === 'radio' ? item.group : undefined, state: item.disabled ? 'disabled' : hasSubmenu ? item.expanded ? 'open' : 'closed' : checked ? 'checked' : 'enabled' },
+      aria: { ...item.attributes?.aria, disabled: item.disabled, checked: checked === undefined ? undefined : String(checked), haspopup: hasSubmenu ? 'menu' : undefined, expanded: hasSubmenu ? String(Boolean(item.expanded)) : undefined, controls: hasSubmenu ? menuDomId(props.id, [item.id]) : undefined },
       onClick: (event: MouseEvent) => {
-        if (item.disabled) { event.preventDefault(); return; }
+        callListener(attributeClick, event);
+        if (event.defaultPrevented || item.disabled) { event.preventDefault(); return; }
         if (hasSubmenu) props.onSubmenuOpenChange?.(item.id, !item.expanded, event);
         else if (item.kind === 'checkbox') props.onCheckedChange?.({ id: item.id, kind: 'checkbox', checked: !item.checked }, event);
         else if (item.kind === 'radio') props.onCheckedChange?.({ id: item.id, kind: 'radio', group: item.group, checked: true }, event);
         else item.onSelect?.(event);
       },
     };
-    const control = (item.kind === undefined || item.kind === 'item') && item.href ? q.a({ ...common, href: item.href, target: item.target, children: item.label }) : q.button({ ...common, type: 'button', children: item.label });
+    const control = (item.kind === undefined || item.kind === 'item') && item.href
+      ? q.a({ ...(common as unknown as QuarkProps<HTMLAnchorElement>), href: item.href, target: item.target, children: item.label })
+      : q.button({ ...(common as unknown as QuarkProps<HTMLButtonElement>), type: 'button', children: item.label });
     return q.li({ role: 'none', class: 'gluon-menu-entry', children: [control, hasSubmenu ? renderMenu({ instanceId: props.id, items: item.submenu!, path: [item.id], hidden: !item.expanded, labelledBy: id, closeRoot: closeSubmenus, onCheckedChange: props.onCheckedChange, onSubmenuOpenChange: props.onSubmenuOpenChange }) : nothing] });
   });
   return q.ul({
-    ...props.attributes,
+    ...attributes,
     id: props.id,
     role: 'menubar',
     class: [{ gluon: true, molecule: true, 'gluon-menubar': true, [`is-${orientation}`]: true }, props.attributes?.class],
     part: 'menubar',
     data: { ...props.attributes?.data, orientation },
-    aria: { label: props.label, orientation },
-    ref: (element) => { root = element; if (element) queueMicrotask(() => setRoving(element)); },
-    onFocusIn: (event) => { const item = (event.target as Element).closest<HTMLElement>(menuItemSelector); if (root && item?.closest('[role="menubar"]') === root && !isDisabled(item)) setRoving(root, item); },
+    aria: { ...props.attributes?.aria, label: props.label, orientation },
+    ref: (element) => { root = element; assignRef(attributeRef, element); if (element) queueMicrotask(() => setRoving(element)); },
+    onFocusIn: (event) => { callListener(attributeFocusIn, event); if (event.defaultPrevented) return; const item = (event.target as Element).closest<HTMLElement>(menuItemSelector); if (root && item?.closest('[role="menubar"]') === root && !isDisabled(item)) setRoving(root, item); },
     onKeydown: (event) => {
+      callListener(attributeKeydown, event);
+      if (event.defaultPrevented) return;
       const menubar = event.currentTarget as HTMLElement;
       const current = (event.target as Element).closest<HTMLElement>(menuItemSelector);
       if (!current || current.closest('[role="menubar"]') !== menubar || isDisabled(current)) return;

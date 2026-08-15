@@ -57,7 +57,8 @@ export function runTypeahead(container: HTMLElement, current: HTMLElement, key: 
   const normalized = state.buffer.toLocaleLowerCase();
   const repeated = normalized.length > 1 && [...normalized].every((character) => character === normalized[0]);
   const needle = repeated ? normalized[0]! : normalized;
-  const start = repeated ? Math.max(0, items.indexOf(current) + 1) : 0;
+  const currentIndex = Math.max(0, items.indexOf(current));
+  const start = normalized.length === 1 || repeated ? currentIndex + 1 : currentIndex;
   const ordered = [...items.slice(start), ...items.slice(0, start)];
   const target = ordered.find((item) => (item.dataset.textValue ?? item.textContent ?? '').trim().toLocaleLowerCase().startsWith(needle));
   if (target) {

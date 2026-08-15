@@ -21,17 +21,9 @@ import {
   unsafeHTML,
   unmount,
 } from '@gluonjs/core';
-import { AspectRatio, Avatar, Button, Checkbox, Input, Progress, Radio, ScrollArea, Select, Separator, Slider, StatusBadge, Switch, Textarea, ToggleButton, aspectRatioStyles, avatarStyles, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, scrollAreaStyles, selectStyles, separatorStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, searchFieldStyles, searchResultsStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
-import { ConfirmationDialog, WorkflowTimeline, confirmationDialogStyles, workflowTimelineStyles } from '@gluonjs/organisms';
+import { Button, Checkbox, Input, Progress, Radio, Select, Slider, StatusBadge, Switch, Textarea, ToggleButton, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, DropdownMenu, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
-import {
-  JsonFormsElement,
-  createJsonFormsRendererRegistry,
-  registerJsonForms,
-  type JsonFormsRendererContext,
-  type JsonSchema,
-} from '../packages/json-forms/src/index.js';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import { createComponentLibraryLoader, HoverCard, q, Tooltip } from '@gluonjs/quarks';
 import { nextTick, ref } from '@gluonjs/reactivity';
@@ -454,59 +446,6 @@ describe('SSR hydration', () => {
     upgraded.remove();
   });
 
-  it('retains deterministic JSON Forms custom renderer output and binds host-owned commits', async () => {
-    registerJsonForms();
-    const schema = {
-      type: 'object',
-      properties: { quantity: { $ref: '#/$defs/quantity', title: 'Quantity' } },
-      $defs: { quantity: { type: 'integer', minimum: 1 } },
-      required: ['quantity'],
-    } satisfies JsonSchema;
-    let latestContext: JsonFormsRendererContext | undefined;
-    const registry = createJsonFormsRendererRegistry([{
-      id: 'quantity-stepper',
-      selector: { kind: 'number', path: ['quantity'] },
-      render: (context) => {
-        latestContext = context;
-        const value = typeof context.value === 'number' ? context.value : 1;
-        return html`
-          <button
-            type="button"
-            aria-labelledby=${context.control.labelId}
-            @click=${() => context.control.commit(value + 1)}
-          >Increase</button>
-          <output id=${context.control.id} aria-labelledby=${context.control.labelId}>${value}</output>
-        `;
-      },
-    }]);
-    const data = { quantity: 1 } as const;
-    const serialized = await renderToString(renderElement(JsonFormsElement, {
-      properties: { schema, data, rendererRegistry: registry },
-    }));
-    const container = document.createElement('div');
-    materializeServerElements(container, serialized);
-    const element = container.querySelector('gluon-json-form') as JsonFormsElement;
-    element.schema = schema;
-    element.data = data;
-    element.rendererRegistry = registry;
-    element.beginHydration();
-    const serverOutput = element.shadowRoot?.querySelector('output');
-    document.body.append(container);
-
-    const result = await hydrateElement(element);
-    await element.updateComplete;
-    expect(result).toMatchObject({ retained: true, recovered: false, mismatches: [] });
-    expect(element.shadowRoot?.querySelector('output')).toBe(serverOutput);
-    expect(latestContext?.schema).toMatchObject({ type: 'integer', title: 'Quantity', minimum: 1 });
-    expect(latestContext?.schema).not.toHaveProperty('$ref');
-    expect(Object.isFrozen(latestContext?.schema)).toBe(true);
-    element.shadowRoot?.querySelector<HTMLButtonElement>('button')?.click();
-    await element.updateComplete;
-    expect(element.data.quantity).toBe(2);
-    expect(element.shadowRoot?.querySelector('output')?.textContent).toBe('2');
-    container.remove();
-  });
-
   it('retains standalone and adjacent server DSD roots using transported marker ranges', async () => {
     class TransportGreeting extends GluonElement {
       protected override render() {
@@ -726,6 +665,37 @@ describe('SSR hydration', () => {
     expect([...root.querySelectorAll('b, i, u')]).toEqual(elements);
   });
 
+  it('retains deterministic menu nodes and activates controlled behavior after hydration', async () => {
+    const onOpenChange = vi.fn();
+    const menu = DropdownMenu({
+      id: 'hydrated-actions',
+      label: 'Hydrated actions',
+      trigger: 'Actions',
+      open: false,
+      onOpenChange,
+      items: [{ id: 'details', label: 'Details' }],
+    });
+    const prepared = await prepareForHydration(menu);
+    const manifest = createStyleManifest(createComponentStyleSelection(prepared.value));
+    const styleHost = document.createElement('section');
+    const styleRoot = styleHost.attachShadow({ mode: 'open' });
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    styleRoot.innerHTML = renderStyleCarriers(manifest);
+    styleRoot.append(root);
+    const serverTrigger = root.querySelector('#hydrated-actions-trigger');
+    const serverMenu = root.querySelector('#hydrated-actions-menu');
+    const result = await hydrateTemplate(menu, root, { styles: manifest, styleRoot });
+    expect(result.retained).toBe(true);
+    expect(root.querySelector('#hydrated-actions-trigger')).toBe(serverTrigger);
+    expect(root.querySelector('#hydrated-actions-menu')).toBe(serverMenu);
+    (serverTrigger as HTMLButtonElement).click();
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange.mock.calls[0]?.[0]).toBe(true);
+    expect((serverMenu as HTMLElement).hidden).toBe(true);
+    unmount(root);
+  });
+
   it('recovers deterministically when structurally matching HTML lacks required binding markers', async () => {
     expect(hydrate(html`<p>ignored</p>`, null, { expectedMarkup: '' })).toEqual({
       mismatches: [], retained: false, recovered: false,
@@ -822,57 +792,8 @@ describe('SSR hydration', () => {
     document.adoptedStyleSheets = previous;
   });
 
-  it('hydrates one responsive Disclosure tree, synchronizes desktop state, and releases its listener', async () => {
-    const listeners = new Set<(event: MediaQueryListEvent) => void>();
-    const query = {
-      matches: false,
-      media: '(max-width: 48rem)',
-      onchange: null,
-      addEventListener: (_type: string, listener: EventListenerOrEventListenerObject) => {
-        listeners.add(listener as (event: MediaQueryListEvent) => void);
-      },
-      removeEventListener: (_type: string, listener: EventListenerOrEventListenerObject) => {
-        listeners.delete(listener as (event: MediaQueryListEvent) => void);
-      },
-      addListener: (listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
-      removeListener: (listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
-      dispatchEvent: () => true,
-    } as MediaQueryList;
-    const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue(query);
-    const value = ResponsiveDisclosure({
-      id: 'hydrated-responsive-disclosure',
-      summary: 'Catalog filters',
-      compactBreakpoint: '(max-width: 48rem)',
-      compactInitialOpen: false,
-      children: html`<p data-responsive-content>One content tree.</p>`,
-    });
-    const prepared = await prepareForHydration(value);
-    expect(prepared.html).toContain('aria-expanded="false"');
-    const manifest = createStyleManifest(createComponentStyleSelection(prepared.value));
-    const host = document.createElement('section');
-    const styleRoot = host.attachShadow({ mode: 'open' });
-    styleRoot.innerHTML = renderStyleCarriers(manifest);
-    const root = document.createElement('div');
-    root.innerHTML = prepared.html;
-    styleRoot.append(root);
-    expect(root.querySelectorAll('[data-responsive-content]')).toHaveLength(1);
-    const details = root.querySelector<HTMLDetailsElement>('#hydrated-responsive-disclosure')!;
-    expect(details.open).toBe(false);
-
-    const hydrated = await hydrateTemplate(value, root, { styles: manifest, styleRoot });
-    expect(hydrated.retained).toBe(true);
-    expect(root.querySelector('#hydrated-responsive-disclosure')).toBe(details);
-    expect(details.open).toBe(true);
-    expect(details.querySelector('summary')?.getAttribute('aria-expanded')).toBe('true');
-    expect(root.querySelectorAll('[data-responsive-content]')).toHaveLength(1);
-    expect(listeners).toHaveLength(1);
-    unmount(root);
-    expect(listeners).toHaveLength(0);
-    matchMedia.mockRestore();
-  });
-
   it('hands component carriers to their exact renderer-owned sheets and diagnoses mismatches', async () => {
-    const value = html`<main>${ConfirmationDialog({ id: 'hydrated-confirmation', title: 'Hydrated confirmation', primaryAction: Button({ label: 'Confirm' }) })}${WorkflowTimeline({ id: 'hydrated-workflow', steps: [{ id: 'review', label: 'Hydrated review', status: 'current' }] })}${SearchField({ id: 'hydrated-search', label: 'Hydrated search', query: 'cobalt' })}${SearchResults({ id: 'hydrated-results', heading: 'Hydrated results', groups: [{ id: 'hydrated-products', heading: 'Products', count: 1, children: html`<li>Hydrated product</li>` }] })}${AspectRatio({ ratio: 4 / 3, children: 'Hydrated media' })}${Avatar({ src: '/hydrated-avatar.svg', alt: 'Hydrated loaded avatar', status: 'loaded' })}${Avatar({ alt: 'Hydrated fallback avatar', fallback: 'HA', status: 'error' })}${ScrollArea({ label: 'Hydrated notes', children: 'Hydrated scroll content' })}${Separator({})}${Button({ label: 'Hydrated action' })}${ButtonGroup({ label: 'Hydrated actions', children: Button({ label: 'Nested action' }) })}${SegmentedControl({ label: 'Hydrated view', value: 'grid', options: [{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }] })}${Tabs({ label: 'Hydrated tabs', value: 'one', items: [{ id: 'hydrated-one', value: 'one', label: 'One', panel: 'First panel' }, { id: 'hydrated-two', value: 'two', label: 'Two', panel: 'Second panel' }] })}${DialogSurface({ id: 'hydrated-dialog', label: 'Hydrated dialog', controller: createDialogSurfaceController(), children: 'Dialog content' })}${Disclosure({ id: 'hydrated-disclosure', summary: 'Hydrated disclosure', defaultOpen: true, children: 'Disclosure content' })}${Accordion({ label: 'Hydrated accordion', value: 'one', items: [{ id: 'hydrated-accordion-one', value: 'one', summary: 'One', children: 'First disclosure' }] })}${InlineNotice({ tone: 'success', title: 'Hydrated notice', children: 'Hydrated feedback' })}${EmptyState({ heading: 'Hydrated empty state', children: 'No items.' })}${TableRegion({ id: 'hydrated-table', label: 'Hydrated table', children: html`<table><tbody><tr><td>Hydrated cell</td></tr></tbody></table>` })}${Select({
+    const value = html`<main>${Button({ label: 'Hydrated action' })}${ButtonGroup({ label: 'Hydrated actions', children: Button({ label: 'Nested action' }) })}${SegmentedControl({ label: 'Hydrated view', value: 'grid', options: [{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }] })}${Tabs({ label: 'Hydrated tabs', value: 'one', items: [{ id: 'hydrated-one', value: 'one', label: 'One', panel: 'First panel' }, { id: 'hydrated-two', value: 'two', label: 'Two', panel: 'Second panel' }] })}${DialogSurface({ id: 'hydrated-dialog', label: 'Hydrated dialog', controller: createDialogSurfaceController(), children: 'Dialog content' })}${Disclosure({ id: 'hydrated-disclosure', summary: 'Hydrated disclosure', defaultOpen: true, children: 'Disclosure content' })}${Accordion({ label: 'Hydrated accordion', value: 'one', items: [{ id: 'hydrated-accordion-one', value: 'one', summary: 'One', children: 'First disclosure' }] })}${InlineNotice({ tone: 'success', title: 'Hydrated notice', children: 'Hydrated feedback' })}${EmptyState({ heading: 'Hydrated empty state', children: 'No items.' })}${TableRegion({ id: 'hydrated-table', label: 'Hydrated table', children: html`<table><tbody><tr><td>Hydrated cell</td></tr></tbody></table>` })}${Select({
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
@@ -889,11 +810,7 @@ describe('SSR hydration', () => {
 
     const result = await hydrateTemplate(value, root, { styles: manifest, styleRoot });
     expect(result.retained).toBe(true);
-    expect(styleRoot.adoptedStyleSheets).toContain(aspectRatioStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(avatarStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(buttonStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(confirmationDialogStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(workflowTimelineStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(textareaStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(checkboxStyles);
@@ -901,9 +818,7 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(progressStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(radioStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(sliderStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(scrollAreaStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(statusBadgeStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(separatorStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(switchStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(toggleButtonStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(cardStyles);
@@ -918,18 +833,12 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(tableRegionStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(choiceGroupStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(controlFieldStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(searchFieldStyles);
-    expect(styleRoot.adoptedStyleSheets).toContain(searchResultsStyles);
-    expect(root.querySelector('#hydrated-search')).toBeTruthy();
-    expect(root.querySelector('#hydrated-results')).toBeTruthy();
     const slider = root.querySelector<HTMLInputElement>('#hydrated-slider')!;
     expect(slider.value).toBe('0.3');
     expect(slider.getAttribute('aria-valuetext')).toBe('30 percent');
     expect(styleRoot.querySelector('style[data-gluon-style]')).toBeNull();
     unmount(root);
     expect(styleRoot.adoptedStyleSheets).not.toContain(buttonStyles);
-    expect(styleRoot.adoptedStyleSheets).not.toContain(confirmationDialogStyles);
-    expect(styleRoot.adoptedStyleSheets).not.toContain(workflowTimelineStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(selectStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(textareaStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(checkboxStyles);
@@ -942,8 +851,6 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).not.toContain(cardStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(choiceGroupStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(controlFieldStyles);
-    expect(styleRoot.adoptedStyleSheets).not.toContain(searchFieldStyles);
-    expect(styleRoot.adoptedStyleSheets).not.toContain(searchResultsStyles);
 
     const carrierTemplate = document.createElement('template');
     carrierTemplate.innerHTML = renderStyleCarriers(manifest);

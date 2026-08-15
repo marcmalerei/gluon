@@ -250,8 +250,9 @@ native Radio options. Its catalog filter uses `NavigationStrip` to keep every ca
 discoverable at constrained widths. Browser tests verify implicit labels,
 native constraint validation, overflow interaction, SSR/hydration styles, and
 teardown.
-The site header uses `ButtonGroup` for the search, bag, and mobile-menu action
-cluster without changing the individual actions' semantics.
+The site header uses `Toolbar` for the search, bag, and mobile-menu action
+cluster. Its single Tab stop and arrow navigation do not change the individual
+native buttons or their existing customer actions.
 The catalog uses `SegmentedControl` for a URL-backed Grid/List view choice; the
 shop owns the route update and the corresponding product layout.
 Product details use `Tabs` for URL-backed Story and Details panels while the
