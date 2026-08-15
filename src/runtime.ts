@@ -324,6 +324,12 @@ export function createComponentStyleSelection(value: TemplateValue): StyleSheetS
     .map(({ id, sheet, scope = 'gluon-component' }) => ({ id, sheet, scope })));
 }
 
+function collectComponentStyleDependencies(value: TemplateValue): readonly ComponentStyleDependency[] {
+  const dependencies = new Map<string, ComponentStyleDependency>();
+  collectComponentStyles(value, dependencies);
+  return [...dependencies.values()];
+}
+
 function collectComponentStyles(
   value: unknown,
   dependencies: Map<string, ComponentStyleDependency>,
@@ -1670,6 +1676,7 @@ export function render(
   if (!isTemplateResult(result)) {
     throw new TypeError('render() expects a TemplateResult created by html or svg.');
   }
+  const styleDependencies = collectComponentStyleDependencies(result);
 
   let current = getRootInstance(container);
   const currentTemplateMatches = current?.template.strings === result.strings
@@ -1685,7 +1692,7 @@ export function render(
     && currentNodesInPlace
     && !current.hydrated
     && current.rootStyleDependenciesEmpty
-    && result.styleDependencies.length === 0
+    && styleDependencies.length === 0
     && fastStringBinding
     && typeof fastStringValue === 'string'
     && !fastStringBinding.directive
@@ -1699,7 +1706,7 @@ export function render(
     && currentNodesInPlace
     && !current.suspended
     && !current.hydrated
-    && result.styleDependencies.length === 0
+    && styleDependencies.length === 0
     && current.styles.isActiveAndEmpty
   ) {
     applyBindings(current.bindings, result.values);
@@ -1723,8 +1730,8 @@ export function render(
     && (currentNodesInPlace || rootNodesAreInPlace(container, current.nodes))
   ) {
     current.styles.resume();
-    current.styles.claim(current.styleClaim, result.styleDependencies);
-    current.rootStyleDependenciesEmpty = result.styleDependencies.length === 0;
+    current.styles.claim(current.styleClaim, styleDependencies);
+    current.rootStyleDependenciesEmpty = styleDependencies.length === 0;
     if (current.hydrated) {
       current.hydrated = false;
       current.suspended = false;
@@ -1749,7 +1756,7 @@ export function render(
   const styles = current?.styles ?? new RenderStyleTracker(styleTarget);
   const styleClaim = current?.styleClaim ?? {};
   styles.resume();
-  styles.claim(styleClaim, result.styleDependencies);
+  styles.claim(styleClaim, styleDependencies);
   if (current) {
     clearRootInstance(container);
     disconnectBindings(current.bindings);
@@ -1767,7 +1774,7 @@ export function render(
       styles,
       styleClaim,
       fastStringBinding: findFastStringBinding(bindings),
-      rootStyleDependenciesEmpty: result.styleDependencies.length === 0,
+      rootStyleDependenciesEmpty: styleDependencies.length === 0,
       nodes,
       suspended: false,
     });
@@ -1820,6 +1827,7 @@ export function hydrate(
 ): HydrationResult {
   if (!container) return Object.freeze({ mismatches: [], retained: false, recovered: false });
   if (!isTemplateResult(result)) throw new TypeError('hydrate() expects a TemplateResult created by html or svg.');
+  const styleDependencies = collectComponentStyleDependencies(result);
   const expectedTemplate = document.createElement('template');
   expectedTemplate.innerHTML = options.expectedMarkup;
   const mismatches: HydrationMismatch[] = [];
@@ -1841,7 +1849,7 @@ export function hydrate(
 
   const styles = new RenderStyleTracker(resolveRenderStyleTarget(container));
   const styleClaim = {};
-  styles.claim(styleClaim, result.styleDependencies);
+  styles.claim(styleClaim, styleDependencies);
   try {
     const context = createHydrationAdoptionContext(container, styles, options.markerOffset ?? 0);
     const compiled = getCompiledTemplate(result);
@@ -1852,7 +1860,7 @@ export function hydrate(
       styles,
       styleClaim,
       fastStringBinding: findFastStringBinding(bindings),
-      rootStyleDependenciesEmpty: result.styleDependencies.length === 0,
+      rootStyleDependenciesEmpty: styleDependencies.length === 0,
       nodes: [...container.childNodes],
       suspended: false,
       hydrated: true,

@@ -35,7 +35,9 @@ provided.
 `StatusBadge`, `Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
-owner. `atomStyles` is deprecated; adopting it with exact rendering throws
+owner. Nested composition stays on that same path, so a public Molecule that
+calls `Radio()` directly still contributes the exact `radioStyles` sheet before
+the first measurable render and through hydration. `atomStyles` is deprecated; adopting it with exact rendering throws
 `GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` rather than applying duplicate rules.
 `installUiTheme()` is deprecated in favor of `installUi()`.
 

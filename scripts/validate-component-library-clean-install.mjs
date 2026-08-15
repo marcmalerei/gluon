@@ -12,7 +12,10 @@ const directory = await mkdtemp(resolve(tmpdir(), 'gluon-component-library-clean
 
 try {
   const archives = [];
-  for (const packageDirectory of ['packages/reactivity', '.', 'packages/quarks', 'examples/component-library/library']) {
+  for (const packageDirectory of ['packages/reactivity', '.', 'packages/quarks', 'packages/atoms', 'examples/component-library/library']) {
+    if (packageDirectory === 'examples/component-library/library') {
+      await execFile('npm', ['run', 'build'], { cwd: resolve(root, packageDirectory), maxBuffer: 20 * 1024 * 1024 });
+    }
     const packed = JSON.parse((await execFile('npm', [
       'pack', '--json', '--ignore-scripts', '--pack-destination', directory,
     ], { cwd: resolve(root, packageDirectory) })).stdout)[0];
@@ -30,56 +33,92 @@ try {
   }, null, 2));
   await writeFile(resolve(consumer, 'index.html'), '<main id="app"></main><script type="module" src="/src/main.ts"></script>');
   await writeFile(resolve(consumer, 'src/main.ts'), `
-    import { createApp, html } from '@gluonjs/core';
+    import { createApp, defineMolecule, html } from '@gluonjs/core';
+    import { Radio } from '@gluonjs/atoms';
     import { createComponentLibraryLoader } from '@gluonjs/quarks';
     import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
+    const RadioField = defineMolecule((props: { readonly name: string; readonly label: string }) => html\`
+      <label class="radio-field">
+        \${Radio({ name: props.name, attributes: { 'aria-label': props.label } })}
+        <span>\${props.label}</span>
+      </label>
+    \`, 'RadioField');
     const loader = createComponentLibraryLoader(componentLibraryManifest, { load: async (entry) => {
       const module: Record<string, unknown> = entry.id === 'product-badge'
         ? await import('@gluonjs/example-component-library/product-badge')
         : await import('@gluonjs/example-component-library/product-picker');
       return module[entry.exportName];
     } });
-    const ProductBadge = (await loader.load('product-badge')).value as (label: string) => ReturnType<typeof html>;
+    const badge = (await loader.load('product-badge')).value as (label: string) => ReturnType<typeof html>;
     await loader.load('product-picker');
-    const app = createApp(() => html\`<section><p>\${ProductBadge('In stock')}</p><example-product-picker value="1"></example-product-picker></section>\`).mount(document.querySelector('#app')!);
+    const app = createApp(() => html\`<section><p>\${badge('In stock')}</p><example-product-picker value="1"></example-product-picker>\${RadioField({ name: 'finish', label: 'Graphite' })}</section>\`).mount(document.querySelector('#app')!);
     Object.assign(window, { componentLibraryUnmount: () => { app.unmount(); loader.dispose(); } });
   `);
-  await execFile('npm', ['install', ...archives, 'vite@8.2.1', 'typescript@5.9.3', '--ignore-scripts', '--no-audit', '--no-fund'], {
+  await execFile('npm', ['install', ...archives, 'vite@8.2.1', 'typescript@5.9.3', '@types/node@22.12.0', '--ignore-scripts', '--no-audit', '--no-fund'], {
     cwd: consumer, maxBuffer: 20 * 1024 * 1024,
   });
   await execFile(resolve(consumer, 'node_modules/.bin/tsc'), ['--noEmit'], { cwd: consumer });
   await execFile(resolve(consumer, 'node_modules/.bin/vite'), ['build'], { cwd: consumer });
 
-  const server = createServer(async (request, response) => {
-    try {
-      const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
-      const relative = pathname === '/' ? 'index.html' : pathname.slice(1);
-      const body = await readFile(resolve(consumer, 'dist', relative));
-      response.writeHead(200, { 'content-type': contentType(relative) });
-      response.end(body);
-    } catch {
-      response.writeHead(404).end();
-    }
-  });
-  await new Promise((resolveServer) => server.listen(0, '127.0.0.1', resolveServer));
-  const address = server.address();
-  if (!address || typeof address === 'string') throw new Error('Clean component-library consumer server did not bind a TCP port.');
   const browser = await chromium.launch();
   try {
-    const page = await browser.newPage();
-    await page.goto(`http://127.0.0.1:${address.port}`);
-    const picker = page.locator('example-product-picker');
-    await picker.locator('[aria-label="Increase quantity"]').click();
-    if (await picker.locator('output').textContent() !== '2' || !await page.getByText('In stock').count()) {
-      throw new Error('Packed component-library consumer browser flow is incomplete.');
+    let server;
+    try {
+      server = createServer(async (request, response) => {
+        try {
+          const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+          const relative = pathname === '/' ? 'index.html' : pathname.slice(1);
+          const body = await readFile(resolve(consumer, 'dist', relative));
+          response.writeHead(200, { 'content-type': contentType(relative) });
+          response.end(body);
+        } catch {
+          response.writeHead(404).end();
+        }
+      });
+      await new Promise((resolveServer) => server.listen(0, '127.0.0.1', resolveServer));
+      const address = server.address();
+      if (!address || typeof address === 'string') throw new Error('Clean component-library consumer server did not bind a TCP port.');
+
+      const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      try {
+        await page.goto(`http://127.0.0.1:${address.port}`);
+        const radioMetrics = await page.locator('input.gluon-radio').evaluate((radio) => {
+          const style = getComputedStyle(radio);
+          return {
+            inlineSize: style.inlineSize,
+            blockSize: style.blockSize,
+          };
+        });
+        if (radioMetrics.inlineSize !== '20px' || radioMetrics.blockSize !== '20px') {
+          throw new Error(`Packed consumer radio measurement is incorrect: ${JSON.stringify(radioMetrics)}`);
+        }
+
+        const picker = page.locator('example-product-picker');
+        await picker.locator('[aria-label="Increase quantity"]').click();
+        if (await picker.locator('output').textContent() !== '2' || !await page.getByText('In stock').count()) {
+          throw new Error('Packed component-library consumer browser flow is incomplete.');
+        }
+
+        await page.evaluate(() => window.componentLibraryUnmount?.());
+        if (await page.locator('example-product-picker').count() !== 0) throw new Error('Packed component-library consumer teardown is incomplete.');
+
+        console.log(JSON.stringify({
+          consumer: 'packed local clean install',
+          archives: Object.fromEntries(archives.map((value) => [value.split('/').at(-1), value.split('/').at(-1)])),
+          viewport: { width: 390, height: 844 },
+          geometry: { radio: radioMetrics },
+        }, null, 2));
+      } finally {
+        await page.close();
+      }
+    } finally {
+      if (server) {
+        await new Promise((resolveServer, rejectServer) => server.close((error) => error ? rejectServer(error) : resolveServer()));
+      }
     }
-    await page.evaluate(() => window.componentLibraryUnmount());
-    if (await page.locator('example-product-picker').count() !== 0) throw new Error('Packed component-library consumer teardown is incomplete.');
   } finally {
     await browser.close();
-    await new Promise((resolveServer, rejectServer) => server.close((error) => error ? rejectServer(error) : resolveServer()));
   }
-  console.log('component-library clean install valid: packed public package, typecheck, production build, browser interaction, and teardown');
 } finally {
   await rm(directory, { recursive: true, force: true });
 }

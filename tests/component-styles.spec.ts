@@ -10,6 +10,7 @@ import {
   createApp,
   compareComponentStyles,
   createComponentStyleDependency,
+  createComponentStyleSelection,
   createComponentStyleOwner,
   css,
   defineMolecule,
@@ -17,6 +18,7 @@ import {
   directive,
   html,
   nothing,
+  repeat,
   render,
   unmount,
 } from '@gluonjs/core';
@@ -29,6 +31,7 @@ import {
   inputStyles,
   labelStyles,
   progressStyles,
+  Radio,
   radioStyles,
   selectStyles,
   statusBadgeStyles,
@@ -55,6 +58,8 @@ import {
 } from '@gluonjs/molecules';
 import { appShellStyles } from '@gluonjs/organisms';
 import { nextTick } from '@gluonjs/reactivity';
+import { hydrateTemplate } from '@gluonjs/ssr/hydration';
+import { createStyleManifest, prepareForHydration, renderStyleCarriers } from '@gluonjs/ssr';
 
 const allComponentSheets = [
   accordionStyles,
@@ -197,6 +202,44 @@ describe('usage-driven component styles', () => {
     expect(document.adoptedStyleSheets).toContain(buttonStyles);
     render(html`${nothing}${nothing}`, first);
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
+  });
+
+  it('collects Radio styles through a molecule wrapper before first measurable render and hydration', async () => {
+    const RadioField = defineMolecule((props: { readonly name: string; readonly label: string }) => html`
+      <label class="radio-field">
+        ${repeat([props], (item) => item.name, (item) => Radio({
+          name: item.name,
+          attributes: { 'aria-label': item.label },
+        }))}
+        <span>${props.label}</span>
+      </label>
+    `, 'RadioField');
+    const value = html`${RadioField({ name: 'finish', label: 'Graphite' })}`;
+
+    expect(createComponentStyleSelection(value).entries).toEqual([
+      { id: 'gluon-atom-radio', sheet: radioStyles, scope: 'gluon-component' },
+    ]);
+
+    const selection = createComponentStyleSelection(value);
+    const manifest = createStyleManifest(selection);
+    const prepared = await prepareForHydration(value);
+    const styleHost = document.createElement('div');
+    const styleRoot = styleHost.attachShadow({ mode: 'open' });
+    styleRoot.innerHTML = renderStyleCarriers(manifest);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const label = root.querySelector('label.radio-field');
+    styleRoot.append(root);
+    document.body.append(styleHost);
+
+    const result = await hydrateTemplate(value, root, { styleRoot, styles: manifest });
+
+    expect(result).toMatchObject({ retained: true, recovered: false });
+    expect(root.querySelector('label.radio-field')).toBe(label);
+    expect(styleRoot.adoptedStyleSheets).toContain(radioStyles);
+    expect(styleRoot.adoptedStyleSheets.filter((sheet) => sheet === radioStyles)).toHaveLength(1);
+    styleHost.remove();
+    root.remove();
   });
 
   it('keeps deterministic layer order and unrelated sheet order', () => {

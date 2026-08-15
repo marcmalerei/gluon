@@ -55,6 +55,11 @@ tree and merges them between shared UI and application-owned sheets. Style
 manifests use deterministic IDs and ordered CSS text for initial carriers and
 browser handoff.
 
+Nested component composition participates in the same traversal. A public
+`defineMolecule()` wrapper that calls a public Atom such as `Radio()` still
+contributes the Atom's exact stylesheet dependency to the resolved request
+tree before the hydrated view becomes measurable or interactive.
+
 `SsrRequestOptions.signal` is optional. When supplied, the exact signal is
 available as `SsrRequestContext.signal` and reaches request loading, async
 boundaries, serialization, and progressive work. Abort rejects with the

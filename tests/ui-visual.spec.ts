@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { beforeEach, expect, test } from 'vitest';
 import { page } from 'vitest/browser';
 import {
   Button,
@@ -19,10 +19,13 @@ import {
   css,
   render,
   unadoptStyles,
+  unmount,
 } from '../src/index.js';
 import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
+
+beforeEach(() => unmount(document.body));
 
 test('matches the stable light-theme UI composition', async () => {
   document.body.replaceChildren();

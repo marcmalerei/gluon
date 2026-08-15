@@ -55,9 +55,10 @@ entries; the example consumer imports the library package entry rather than
 the source implementation. Run `npm run check:component-library-package` to
 build it and inspect the exact tarball contents before a clean-consumer install.
 `npm run check:component-library-clean-install` packs the real library and
-Gluon dependencies, installs them in an empty temporary consumer, typechecks
-and production-builds that consumer, then verifies its browser interaction and
-teardown flow.
+the local Gluon dependencies needed by the consumer, installs them in an empty
+temporary consumer, typechecks and production-builds that consumer, then
+verifies its browser interaction, the propagated `@gluonjs/atoms` Radio
+styles, and teardown flow.
 
 Repository SSR coverage renders both public exports, including the picker's
 declarative Shadow DOM. Browser coverage retains the Atom's server nodes during
