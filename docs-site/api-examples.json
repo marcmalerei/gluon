@@ -49,7 +49,11 @@
         "  type I18nFallbackContext,",
         "  type I18nMessages,",
         "  type I18nNamespaceLoader,",
+        "  type I18nNamespaceState,",
+        "  type I18nNamespaceStatus,",
         "  type I18nOptions,",
+        "  type I18nSnapshot,",
+        "  type I18nValue,",
         "  type LocaleCode,",
         "  type TranslateOptions,",
         "} from '@gluonjs/i18n';",
@@ -69,10 +73,14 @@
         "const plugin = createI18n(options);",
         "const i18n: I18n = plugin;",
         "const translation = { namespace: 'product', values: { name: 'Mara' } } satisfies TranslateOptions;",
+        "const namespaceState: I18nNamespaceState = 'loading';",
+        "const namespaceStatus: I18nNamespaceStatus = { state: namespaceState };",
+        "const value: I18nValue = new Date();",
+        "const snapshot: I18nSnapshot = i18n.snapshot();",
         "",
         "const ProductTitle = () => html`<h1>${useI18n().t('title', translation)}</h1>`;",
         "createApp(ProductTitle).use(plugin).mount(document.querySelector('#app')!);",
-        "console.log(i18n.t('greeting', { values: { name: 'Mara' } }), i18nKey);"
+        "console.log(i18n.t('greeting', { values: { name: 'Mara' } }), i18nKey, namespaceStatus, value, snapshot);"
       ]
     },
     "graph-element": {
@@ -6352,6 +6360,14 @@
       "recipe": "i18n-application",
       "description": "Configure the initial locale, fallback locale, eager messages, lazy namespaces, and missing-message policy together:"
     },
+    "packages/i18n/src/interfaces/I18nNamespaceStatus.md": {
+      "recipe": "i18n-application",
+      "description": "Represent the observable state and optional error of one lazy i18n namespace load:"
+    },
+    "packages/i18n/src/interfaces/I18nSnapshot.md": {
+      "recipe": "i18n-application",
+      "description": "Transport locale and loaded message catalogs across an i18n SSR/browser boundary:"
+    },
     "packages/i18n/src/interfaces/TranslateOptions.md": {
       "recipe": "i18n-application",
       "description": "Select a lazy namespace and typed interpolation values for one translation lookup:"
@@ -6364,9 +6380,17 @@
       "recipe": "i18n-application",
       "description": "Load one locale-specific namespace synchronously or asynchronously through the public package contract:"
     },
+    "packages/i18n/src/type-aliases/I18nNamespaceState.md": {
+      "recipe": "i18n-application",
+      "description": "Keep lazy i18n namespace lifecycle states explicit for loading, success, and error feedback:"
+    },
     "packages/i18n/src/type-aliases/LocaleCode.md": {
       "recipe": "i18n-application",
       "description": "Keep application locale identifiers explicit while allowing project-specific BCP 47 choices:"
+    },
+    "packages/i18n/src/type-aliases/I18nValue.md": {
+      "recipe": "i18n-application",
+      "description": "Pass the supported scalar and date values to locale-aware translation and formatting operations:"
     },
     "packages/i18n/src/variables/i18nKey.md": {
       "recipe": "i18n-application",
