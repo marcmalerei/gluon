@@ -9,7 +9,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/reactivity"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/reactivity#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/reactivity/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

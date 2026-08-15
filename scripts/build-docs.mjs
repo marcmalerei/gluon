@@ -15,7 +15,14 @@ const packageMetadata = new Map(await Promise.all(
     .filter((entry) => entry.state === 'current')
     .map(async (entry) => {
       const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
-      return [entry.name, { name: entry.name, entry, description: packageJson.description }];
+      const readme = await readFile(resolve(root, entry.directory, 'README.md'), 'utf8');
+      return [entry.name, {
+        name: entry.name,
+        entry,
+        packageJson,
+        readme,
+        description: packageJson.description,
+      }];
     }),
 ));
 
@@ -39,6 +46,7 @@ const apiPages = (await markdownFiles(apiRoot)).map((source) => ({
 const pages = [...maintainedPages, ...apiPages];
 
 for (const page of pages) await renderPage(page);
+for (const version of versions.supported) await renderPackagePortal(version);
 await writeRedirect(resolve(outputRoot, 'index.html'), `${base}${versions.latest}/`);
 await mkdir(resolve(outputRoot, 'latest'), { recursive: true });
 await writeRedirect(resolve(outputRoot, 'latest', 'index.html'), `${base}${versions.latest}/`);
@@ -254,6 +262,128 @@ function rewriteApiBreadcrumb(markdown, packageName) {
     .replace(/^\[@gluonjs\/core\]/m, `[${packageName}]`);
 }
 
+async function renderPackagePortal(version) {
+  const packages = [...packageMetadata.values()].sort((left, right) => left.name.localeCompare(right.name));
+  await writePackagePage(version, undefined, packages);
+  for (const packageInfo of packages) await writePackagePage(version, packageInfo, packages);
+}
+
+async function writePackagePage(version, packageInfo, packages) {
+  const destination = packageInfo
+    ? resolve(outputRoot, version, 'packages', packageSlug(packageInfo.name), 'index.html')
+    : resolve(outputRoot, version, 'packages', 'index.html');
+  await mkdir(dirname(destination), { recursive: true });
+  const title = packageInfo ? packageInfo.name : 'Gluon packages';
+  const description = packageInfo?.description ?? 'Choose a Gluon package by purpose, runtime, and public entry point.';
+  const content = packageInfo
+    ? packageDetailContent(version, packageInfo)
+    : packageIndexContent(version, packages);
+  await writeFile(destination, packagePageShell({ version, title, description, content, packageInfo, packages }), 'utf8');
+}
+
+function packagePageShell({ version, title, description, content, packageInfo, packages }) {
+  const currentUrl = packageInfo
+    ? `${base}${version}/packages/${packageSlug(packageInfo.name)}/`
+    : `${base}${version}/packages/`;
+  const packageNavigation = [
+    `<a href="${base}${version}/packages/"${packageInfo ? '' : ' aria-current="page"'}>All packages</a>`,
+    ...packages.map((entry) => `<a href="${base}${version}/packages/${packageSlug(entry.name)}/"${entry.name === packageInfo?.name ? ' aria-current="page"' : ''}>${escapeHtml(entry.name)}</a>`),
+  ].join('');
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="${escapeHtml(description)}">
+    <title>${escapeHtml(title)} · Gluon ${version}</title>
+    <link rel="stylesheet" href="${base}assets/docs.css">
+    <link rel="canonical" href="https://marcmalerei.github.io${currentUrl}">
+  </head>
+  <body class="package-page${packageInfo ? '' : ' package-home'}">
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <button class="menu-button" type="button" aria-label="Open package navigation" aria-expanded="false" data-menu-button><span></span><span></span></button>
+      <a class="brand" href="${base}${version}/">GLUON / PACKAGES</a>
+      <nav class="header-nav" aria-label="Documentation"><a href="${base}${version}/guides/">Guides</a><a href="${base}${version}/api/">API</a><a href="${base}${version}/cookbook/">Cookbook</a><a href="${base}${version}/packages/" aria-current="page">Packages</a></nav>
+      <label class="version-control"><span>Docs version</span><select data-version-select>${versions.supported.map((entry) => `<option value="${entry}"${entry === version ? ' selected' : ''}>${entry}</option>`).join('')}</select></label>
+      <a class="playground-action" href="${base}playground/">Playground</a>
+    </header>
+    <div class="site-grid package-grid">
+      <aside class="sidebar" aria-label="Gluon packages" data-sidebar><nav>${packageNavigation}</nav></aside>
+      <main id="content" class="content"><article>${content}</article></main>
+      <aside class="toc package-toc" aria-label="Package context"><strong>${packageInfo ? 'Package context' : 'Package map'}</strong><p>${packageInfo ? 'Public package boundary and release metadata.' : `${packages.length} current packages in the lockstep train.`}</p></aside>
+    </div>
+    <footer class="site-footer"><span>Gluon ${version}</span><a href="${base}${version}/">Documentation</a><a href="https://github.com/marcmalerei/gluon">GitHub</a><a href="${base}archive/">Release archive</a></footer>
+    <script type="module" src="${base}assets/docs.js"></script>
+  </body>
+</html>`;
+}
+
+function packageIndexContent(version, packages) {
+  const cards = packages.map((entry) => `<article class="package-card" data-package-card data-package-search-text="${escapeAttribute(`${entry.name} ${entry.description} ${entry.entry.environment}`)}">
+  <p class="package-kicker">${escapeHtml(entry.entry.environment)} package</p>
+  <h2><a href="${base}${version}/packages/${packageSlug(entry.name)}/">${escapeHtml(entry.name)}</a></h2>
+  <p>${escapeHtml(entry.description)}</p>
+  <p class="package-card-meta"><code>${escapeHtml(entry.entry.exports.length)} public export${entry.entry.exports.length === 1 ? '' : 's'}</code><a href="${base}${version}/packages/${packageSlug(entry.name)}/">Open package →</a></p>
+</article>`).join('');
+  return `<p class="eyebrow">${packages.length} packages · lockstep release train</p>
+<h1>Build with the package that owns the boundary.</h1>
+<p class="package-lede">Gluon is split into small public entry points. Find a package by capability, verify its runtime and peers, then open its API reference and runnable starter.</p>
+<label class="package-search"><span>Search packages</span><input type="search" placeholder="Search by name or capability" data-package-search></label>
+<p class="package-search-status" data-package-search-status aria-live="polite">${packages.length} packages</p>
+<section class="package-cards" aria-label="Gluon packages">${cards}</section>`;
+}
+
+function packageDetailContent(version, packageInfo) {
+  const { entry, packageJson, readme } = packageInfo;
+  const sourceReadmeUrl = entry.directory === '.'
+    ? 'https://github.com/marcmalerei/gluon#readme'
+    : `https://github.com/marcmalerei/gluon/tree/main/${entry.directory}#readme`;
+  const apiLinks = entry.exports.map((exportName) => {
+    const subpath = exportName === '.' ? '' : `/${exportName.slice(2)}`;
+    const sourceRoot = entry.directory === '.' ? 'src' : `${entry.directory}/src`;
+    return `<li><a href="${base}${version}/api/generated/${sourceRoot}${subpath}/">${escapeHtml(exportName === '.' ? entry.name : `${entry.name}${subpath}`)}</a></li>`;
+  }).join('');
+  const dependencies = [...new Set([
+    ...(entry.dependencies ?? []).map((name) => `${name} · runtime dependency`),
+    ...Object.keys(packageJson.dependencies ?? {}).filter((name) => !name.startsWith('@gluonjs/')).map((name) => `${name} · runtime dependency`),
+  ])];
+  const peers = Object.entries(packageJson.peerDependencies ?? {}).map(([name, range]) => {
+    const optional = packageJson.peerDependenciesMeta?.[name]?.optional ? ' · optional' : '';
+    return `${name}@${range}${optional}`;
+  });
+  const readmeCode = readme.match(/```(?:ts|tsx|js|sh|bash|html)\n([\s\S]+?)```/)?.[1]?.trim() ?? `import '${entry.name}';`;
+  const limits = readme.match(/(?:^|\n)## (?:[^\n]*(?:Limit|Support|Boundary|Compatibility|Scope)[^\n]*)\n([\s\S]*?)(?=\n## |$)/i)?.[1]
+    ?.trim()
+    .split(/\n\s*\n/)
+    .slice(0, 2)
+    .map((paragraph) => `<li>${escapeHtml(paragraph.replace(/\s+/g, ' '))}</li>`)
+    .join('')
+    ?? `<li>See the package README for the maintained scope and unsupported boundaries.</li>`;
+  const dependencyList = dependencies.length > 0 ? dependencies.map((dependency) => `<li>${escapeHtml(dependency)}</li>`).join('') : '<li>None</li>';
+  const peerList = peers.length > 0 ? peers.map((peer) => `<li>${escapeHtml(peer)}</li>`).join('') : '<li>None</li>';
+  return `<p class="eyebrow">Gluon ${escapeHtml(entry.environment)} package · ${escapeHtml(packageJson.version)}</p>
+<h1>${escapeHtml(packageInfo.name)}</h1>
+<p class="package-lede">${escapeHtml(packageInfo.description)}</p>
+<div class="package-actions"><a class="package-primary-action" href="https://www.npmjs.com/package/${encodeURIComponent(entry.name)}">npm package</a><a href="${sourceReadmeUrl}">Source README</a></div>
+<section class="package-facts" aria-label="Package facts"><div><strong>Runtime</strong><span>${escapeHtml(entry.environment)}</span></div><div><strong>Version</strong><span>${escapeHtml(packageJson.version)}</span></div><div><strong>License</strong><span>${escapeHtml(packageJson.license ?? 'MIT')}</span></div><div><strong>Exports</strong><span>${escapeHtml(String(entry.exports.length))}</span></div></section>
+<h2 id="install">Install and start</h2>
+<p>${entry.name === 'create-gluon' ? 'Scaffold a project with the maintained CLI:' : 'Install the public package at the same version as the rest of the Gluon train:'}</p>
+<figure class="code-frame"><figcaption><span>shell</span><button type="button" data-copy-code>Copy</button></figcaption><pre><code class="language-sh">${escapeHtml(entry.name === 'create-gluon' ? 'npm create gluon@latest my-app' : `npm install ${entry.name}`)}</code></pre></figure>
+<figure class="code-frame"><figcaption><span>starter</span><button type="button" data-copy-code>Copy</button></figcaption><pre><code class="language-ts">${escapeHtml(readmeCode)}</code></pre></figure>
+<h2 id="entry-points">Public entry points</h2>
+<p>Only these package exports are part of the supported public boundary.</p><ul class="package-list">${apiLinks}</ul>
+<h2 id="dependencies">Dependencies and peers</h2>
+<div class="package-columns"><div><h3>Installed dependencies</h3><ul class="package-list">${dependencyList}</ul></div><div><h3>Peer dependencies</h3><ul class="package-list">${peerList}</ul></div></div>
+<h2 id="api">API reference</h2>
+<p>Open an entry point above for generated symbol documentation and a reviewed example for every public symbol. Application code must import from this package entry point, never from repository source paths.</p>
+<h2 id="limits">Scope and limits</h2>
+<ul class="package-list">${limits}</ul>
+<p class="package-readme-link"><a href="${sourceReadmeUrl}">Read the complete ${escapeHtml(packageInfo.name)} README →</a></p>`;
+}
+
+function packageSlug(name) { return name === '@gluonjs/core' ? 'core' : name.replace(/^@gluonjs\//, ''); }
+
 function firstHeading(markdown) {
   return /^#\s+(.+)$/m.exec(markdown)?.[1].replace(/[`*_]/g, '').trim();
 }
@@ -274,6 +404,7 @@ function normalizeBase(value) {
 
 function slash(value) { return value.split(sep).join('/'); }
 function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
+function escapeAttribute(value) { return escapeHtml(value).replaceAll("'", '&#39;'); }
 
 async function writeRedirect(path, target) {
   await writeFile(path, `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>Gluon documentation</title></head><body><a href="${target}">Open Gluon documentation</a></body></html>`, 'utf8');

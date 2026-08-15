@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/vue-migration-analyzer"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/vue-migration-analyzer#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/vue-migration-analyzer/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/compiler"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/compiler#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/compiler/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

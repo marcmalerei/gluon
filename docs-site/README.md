@@ -62,6 +62,16 @@ The root redirect and the stable `/latest/` alias both resolve to the latest
 supported version. API landing pages derive their title, description, and
 breadcrumb from the package contract and package manifest rather than from the
 TypeDoc root label.
+The generated package portal lives at `/<version>/packages/` and creates one
+landing page for every current package declared by `package-contract.json`.
+Each landing page is derived from the package manifest and README, and exposes
+purpose, installation, runtime, version, license, public exports, dependencies,
+peer dependencies, starter code, API links, and maintained scope limits. The
+portal index includes a request-free client-side package search and keeps the
+same package navigation on desktop and mobile.
+The root package and every package manifest use the stable
+`https://marcmalerei.github.io/gluon/latest/packages/<slug>/` page as their
+homepage; source README links remain explicit inside the portal.
 The maintained component guide is the beginner entry point for properties,
 attributes, events, lifecycle ownership, and the complete public class map.
 TypeDoc excludes externally inherited DOM members so an API page keeps its

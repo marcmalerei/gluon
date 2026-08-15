@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/test-utils"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/test-utils#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/test-utils/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

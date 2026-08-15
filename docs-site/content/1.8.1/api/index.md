@@ -9,6 +9,10 @@ New to Gluon? Start with [Components: properties, events, and lifecycle](../guid
 before using the signature reference. Its class map explains which public class
 to construct, subclass, receive as an error, or reserve for tooling.
 
+Use the [package portal](/gluon/1.8.1/packages/) to compare every current
+package's purpose, runtime, installation command, peers, public exports, and
+supported scope before opening generated symbol documentation.
+
 ## Runtime
 
 - [`@gluonjs/core`](generated/src/)

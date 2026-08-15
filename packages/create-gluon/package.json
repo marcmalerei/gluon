@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/create-gluon"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/create-gluon#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/create-gluon/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

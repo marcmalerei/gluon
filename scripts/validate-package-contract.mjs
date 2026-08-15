@@ -90,6 +90,11 @@ async function validateCurrentPackage(entry) {
   if (packageJson.name !== entry.name) {
     throw new Error(`${entry.name} does not match ${packageJson.name} in package.json.`);
   }
+  const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
+  const expectedHomepage = `https://marcmalerei.github.io/gluon/latest/packages/${packageSlug}/`;
+  if (packageJson.homepage !== expectedHomepage) {
+    throw new Error(`${entry.name} homepage must point to its version-independent package portal page.`);
+  }
   if (packageJson.license !== 'MIT') {
     throw new Error(`${entry.name} must declare the authorized MIT license.`);
   }

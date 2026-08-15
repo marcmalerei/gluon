@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/gluon-components-vite"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/gluon-components-vite#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/gluon-components-vite/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

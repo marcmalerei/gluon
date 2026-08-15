@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/devtools-api"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/devtools-api#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/devtools-api/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },

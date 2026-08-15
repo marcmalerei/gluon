@@ -10,7 +10,7 @@
     "url": "git+https://github.com/marcmalerei/gluon.git",
     "directory": "packages/i18n"
   },
-  "homepage": "https://github.com/marcmalerei/gluon/tree/main/packages/i18n#readme",
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/i18n/",
   "bugs": {
     "url": "https://github.com/marcmalerei/gluon/issues"
   },
