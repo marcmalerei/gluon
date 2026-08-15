@@ -344,6 +344,66 @@
       "source": "runtime"
     },
     {
+      "id": 1210,
+      "code": "GLUON_RESPONSIVE_DISCLOSURE_ID_INVALID",
+      "compactCode": "G1210",
+      "title": "Responsive disclosure ID is invalid",
+      "summary": "A ResponsiveDisclosure received an empty or non-string relationship ID.",
+      "why": "The summary and content relationship requires one stable caller-owned string ID.",
+      "remediation": "Pass a stable non-empty string through ResponsiveDisclosure.id.",
+      "source": "runtime"
+    },
+    {
+      "id": 1211,
+      "code": "GLUON_RESPONSIVE_DISCLOSURE_BREAKPOINT_INVALID",
+      "compactCode": "G1211",
+      "title": "Responsive disclosure breakpoint is invalid",
+      "summary": "A ResponsiveDisclosure received an empty or non-string compact media query.",
+      "why": "The molecule cannot choose compact and expanded behavior without a stable media-query string.",
+      "remediation": "Pass a non-empty media query such as (max-width: 48rem) through compactBreakpoint.",
+      "source": "runtime"
+    },
+    {
+      "id": 1212,
+      "code": "GLUON_RESPONSIVE_DISCLOSURE_INITIAL_OPEN_INVALID",
+      "compactCode": "G1212",
+      "title": "Responsive disclosure initial state is invalid",
+      "summary": "A ResponsiveDisclosure received a non-boolean compact initial-open value.",
+      "why": "Compact disclosure state must start from an explicit boolean before user toggles are retained.",
+      "remediation": "Pass true or false through compactInitialOpen.",
+      "source": "runtime"
+    },
+    {
+      "id": 1213,
+      "code": "GLUON_RESPONSIVE_DISCLOSURE_RESET_TOKEN_INVALID",
+      "compactCode": "G1213",
+      "title": "Responsive disclosure reset token is invalid",
+      "summary": "A ResponsiveDisclosure received a reset token outside its string, finite-number, or undefined contract.",
+      "why": "Reset identity must compare deterministically and cannot retain NaN or an infinite value.",
+      "remediation": "Pass a string, a finite number, or undefined through compactResetToken.",
+      "source": "runtime"
+    },
+    {
+      "id": 1214,
+      "code": "GLUON_RESPONSIVE_DISCLOSURE_MATCH_MEDIA_UNAVAILABLE",
+      "compactCode": "G1214",
+      "title": "Responsive media queries are unavailable",
+      "summary": "The active document does not expose matchMedia for ResponsiveDisclosure.",
+      "why": "The environment cannot observe compact breakpoint changes.",
+      "remediation": "Use a supported browser environment or accept the documented compact fail-safe behavior.",
+      "source": "runtime"
+    },
+    {
+      "id": 1215,
+      "code": "GLUON_RESPONSIVE_DISCLOSURE_MATCH_MEDIA_FAILED",
+      "compactCode": "G1215",
+      "title": "Responsive media query setup failed",
+      "summary": "ResponsiveDisclosure could not parse or subscribe to its compact media query.",
+      "why": "The query is invalid or the returned MediaQueryList exposes no supported change-listener API.",
+      "remediation": "Correct compactBreakpoint and use a MediaQueryList with addEventListener or legacy addListener support.",
+      "source": "runtime"
+    },
+    {
       "id": 1301,
       "code": "GLUON_SSR_INVALID_VALUE",
       "compactCode": "G1301",

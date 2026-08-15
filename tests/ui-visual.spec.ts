@@ -26,12 +26,12 @@ import {
   unadoptStyles,
   unmount,
 } from '../src/index.js';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, FormField, InlineNotice, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, FormField, InlineNotice, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 import portrait from '../docs/assets/examples/foundation-avatar.svg?url&no-inline';
 
-beforeEach(() => unmount(document.body));
+beforeEach(() => { unmount(document.body); document.body.removeAttribute('style'); });
 
 test('matches the stable light-theme UI composition', async () => {
   document.body.replaceChildren();
@@ -776,6 +776,30 @@ test('matches Disclosure closed, open, unavailable, RTL, and zoom-safe states', 
     comparatorOptions: { allowedMismatchedPixelRatio: 0.1, threshold: 0.15 },
   });
   unadoptStyles(document, visualStyles);
+  uiOwner.dispose();
+});
+
+test('keeps ResponsiveDisclosure usable at narrow widths and 200% text zoom', async () => {
+  document.body.replaceChildren();
+  const uiOwner = installUi(document, { theme: 'light' });
+  for (const width of [320, 390]) {
+    document.body.style.cssText = `margin:0; inline-size:${width}px; max-inline-size:100%; font-size:32px;`;
+    render(q.div({
+      dir: 'rtl',
+      children: ResponsiveDisclosure({
+        id: 'responsive-visual',
+        summary: 'Long catalog filters',
+        compactBreakpoint: '(max-width: 48rem)',
+        children: q.p({ children: 'Content remains available without a duplicate tree.' }),
+      }),
+    }), document.body);
+    const details = document.querySelector<HTMLDetailsElement>('#responsive-visual')!;
+    const summary = details.querySelector('summary')!;
+    expect(summary.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
+    expect(details.querySelectorAll('.gluon-disclosure-content').length).toBe(1);
+    expect(getComputedStyle(summary).direction).toBe('rtl');
+  }
   uiOwner.dispose();
 });
 

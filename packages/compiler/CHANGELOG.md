@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Documented the six stable `GLUON_RESPONSIVE_DISCLOSURE_*` runtime diagnostics
+  in the public versioned catalog with actionable remediation.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

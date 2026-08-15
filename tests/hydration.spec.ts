@@ -22,7 +22,7 @@ import {
   unmount,
 } from '@gluonjs/core';
 import { AspectRatio, Avatar, Button, Checkbox, Input, Progress, Radio, ScrollArea, Select, Separator, Slider, StatusBadge, Switch, Textarea, ToggleButton, aspectRatioStyles, avatarStyles, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, scrollAreaStyles, selectStyles, separatorStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import { createComponentLibraryLoader } from '@gluonjs/quarks';
@@ -737,6 +737,55 @@ describe('SSR hydration', () => {
       .rejects.toMatchObject({ code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT' });
     expect(styleRoot.querySelector('style[data-gluon-style]')).not.toBeNull();
     document.adoptedStyleSheets = previous;
+  });
+
+  it('hydrates one responsive Disclosure tree, synchronizes desktop state, and releases its listener', async () => {
+    const listeners = new Set<(event: MediaQueryListEvent) => void>();
+    const query = {
+      matches: false,
+      media: '(max-width: 48rem)',
+      onchange: null,
+      addEventListener: (_type: string, listener: EventListenerOrEventListenerObject) => {
+        listeners.add(listener as (event: MediaQueryListEvent) => void);
+      },
+      removeEventListener: (_type: string, listener: EventListenerOrEventListenerObject) => {
+        listeners.delete(listener as (event: MediaQueryListEvent) => void);
+      },
+      addListener: (listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
+      removeListener: (listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
+      dispatchEvent: () => true,
+    } as MediaQueryList;
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue(query);
+    const value = ResponsiveDisclosure({
+      id: 'hydrated-responsive-disclosure',
+      summary: 'Catalog filters',
+      compactBreakpoint: '(max-width: 48rem)',
+      compactInitialOpen: false,
+      children: html`<p data-responsive-content>One content tree.</p>`,
+    });
+    const prepared = await prepareForHydration(value);
+    expect(prepared.html).toContain('aria-expanded="false"');
+    const manifest = createStyleManifest(createComponentStyleSelection(prepared.value));
+    const host = document.createElement('section');
+    const styleRoot = host.attachShadow({ mode: 'open' });
+    styleRoot.innerHTML = renderStyleCarriers(manifest);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    styleRoot.append(root);
+    expect(root.querySelectorAll('[data-responsive-content]')).toHaveLength(1);
+    const details = root.querySelector<HTMLDetailsElement>('#hydrated-responsive-disclosure')!;
+    expect(details.open).toBe(false);
+
+    const hydrated = await hydrateTemplate(value, root, { styles: manifest, styleRoot });
+    expect(hydrated.retained).toBe(true);
+    expect(root.querySelector('#hydrated-responsive-disclosure')).toBe(details);
+    expect(details.open).toBe(true);
+    expect(details.querySelector('summary')?.getAttribute('aria-expanded')).toBe('true');
+    expect(root.querySelectorAll('[data-responsive-content]')).toHaveLength(1);
+    expect(listeners).toHaveLength(1);
+    unmount(root);
+    expect(listeners).toHaveLength(0);
+    matchMedia.mockRestore();
   });
 
   it('hands component carriers to their exact renderer-owned sheets and diagnoses mismatches', async () => {

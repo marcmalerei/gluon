@@ -38,10 +38,13 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  ResponsiveDisclosure,
   TableRegion,
   moleculeManifest,
   type CardProps,
   type NavigationStripProps,
+  type ResponsiveDisclosureAttributes,
+  type ResponsiveDisclosureProps,
 } from '@gluonjs/molecules';
 import { AppShell, organismManifest } from '@gluonjs/organisms';
 import {
@@ -73,6 +76,19 @@ const navigationStripProps: NavigationStripProps = {
   children: q.a({ href: '#profile', 'aria-current': 'page', children: 'Profile' }),
   attributes: { data: { owner: 'account' } },
 };
+const responsiveDisclosureAttributes: ResponsiveDisclosureAttributes = {
+  class: 'catalog-filters',
+};
+const responsiveDisclosureProps: ResponsiveDisclosureProps = {
+  id: 'catalog-filters',
+  summary: 'Filters',
+  compactBreakpoint: '(max-width: 48rem)',
+  compactInitialOpen: false,
+  compactResetToken: 1,
+  attributes: responsiveDisclosureAttributes,
+  children: 'Filter controls',
+};
+ResponsiveDisclosure(responsiveDisclosureProps);
 const tree: TemplateResult = AppShell({
   children: Card({
     ...cardProps,
@@ -314,5 +330,11 @@ Accordion({ label: 'Sections', mode: 'multiple', value: 'one', items: [] });
 Accordion({ label: 'Sections', mode: 'multiple', value: [], collapsible: false, items: [] });
 // @ts-expect-error unavailable Accordion items require a visible reason
 Accordion({ label: 'Sections', items: [{ id: 'later', value: 'later', summary: 'Later', children: 'Later', unavailable: true }] });
+// @ts-expect-error ResponsiveDisclosure requires a compact media query
+ResponsiveDisclosure({ id: 'filters', summary: 'Filters', children: 'Controls' });
+// @ts-expect-error ResponsiveDisclosure initial state is boolean
+ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 48rem)', compactInitialOpen: 'open', children: 'Controls' });
+// @ts-expect-error ResponsiveDisclosure reset tokens are string or number
+ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 48rem)', compactResetToken: {}, children: 'Controls' });
 // @ts-expect-error AppShell div attributes reject anchor-only props
 AppShell({ children: 'Content', attributes: { href: '/other' } });

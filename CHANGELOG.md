@@ -12,6 +12,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
   `Separator` atoms with native semantics, typed extension contracts, and
   cross-browser evidence.
+- Added the native `ResponsiveDisclosure` molecule with persistent compact
+  user state, explicit reset tokens, desktop expansion, SSR/hydration, and
+  teardown-safe media-query ownership.
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.
