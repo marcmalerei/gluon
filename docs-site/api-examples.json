@@ -83,6 +83,29 @@
         "console.log(i18n.t('greeting', { values: { name: 'Mara' } }), i18nKey, namespaceStatus, value, snapshot);"
       ]
     },
+    "i18n-catalog-validation": {
+      "module": "@gluonjs/i18n",
+      "code": [
+        "import {",
+        "  validateI18nCatalog,",
+        "  type I18nCatalogDiagnostic,",
+        "  type I18nCatalogInput,",
+        "  type I18nCatalogValue,",
+        "  type I18nDiagnosticCode,",
+        "  type I18nMessagePatternType,",
+        "} from '@gluonjs/i18n';",
+        "",
+        "const messages: I18nCatalogValue = [",
+        "  ['title', 'Bag'],",
+        "  ['count', '{count, plural, one {# item} other {# items}}'],",
+        "];",
+        "const catalog: I18nCatalogInput = new Map([['en', messages]]);",
+        "const diagnostics: readonly I18nCatalogDiagnostic[] = validateI18nCatalog(catalog);",
+        "const code: I18nDiagnosticCode | undefined = diagnostics[0]?.code;",
+        "const pattern: I18nMessagePatternType | undefined = diagnostics[0]?.pattern;",
+        "console.log(code, pattern, diagnostics);"
+      ]
+    },
     "graph-element": {
       "module": "@gluonjs/graph",
       "code": [
@@ -6515,6 +6538,10 @@
       "recipe": "i18n-application",
       "description": "Create one application-owned translation plugin with reactive locale state, deterministic fallback behavior, interpolation, and lazy namespaces:"
     },
+    "packages/i18n/src/functions/validateI18nCatalog.md": {
+      "recipe": "i18n-catalog-validation",
+      "description": "Validate locale catalogs without browser globals and retain stable source-key diagnostics for build tooling or tests:"
+    },
     "packages/i18n/src/functions/useI18n.md": {
       "recipe": "i18n-application",
       "description": "Inject the translation service provided by the current Gluon application inside a component render:"
@@ -6526,6 +6553,10 @@
     "packages/i18n/src/interfaces/I18nFallbackContext.md": {
       "recipe": "i18n-application",
       "description": "Format a deterministic missing-message result from its key, active locale, and optional namespace:"
+    },
+    "packages/i18n/src/interfaces/I18nCatalogDiagnostic.md": {
+      "recipe": "i18n-catalog-validation",
+      "description": "Inspect one stable catalog problem with its code, locale, source key, message, and optional MessageFormat-inspired pattern:"
     },
     "packages/i18n/src/interfaces/I18nOptions.md": {
       "recipe": "i18n-application",
@@ -6546,6 +6577,22 @@
     "packages/i18n/src/type-aliases/I18nMessages.md": {
       "recipe": "i18n-application",
       "description": "Declare an immutable locale message catalog whose string keys remain application-owned:"
+    },
+    "packages/i18n/src/type-aliases/I18nCatalogInput.md": {
+      "recipe": "i18n-catalog-validation",
+      "description": "Provide locale catalogs as ordinary records or iterable pairs when duplicate source keys must remain diagnosable:"
+    },
+    "packages/i18n/src/type-aliases/I18nCatalogValue.md": {
+      "recipe": "i18n-catalog-validation",
+      "description": "Represent one locale catalog as a message record or ordered key/value pairs for validation:"
+    },
+    "packages/i18n/src/type-aliases/I18nDiagnosticCode.md": {
+      "recipe": "i18n-catalog-validation",
+      "description": "Route machine-readable catalog validation failures without parsing human-facing diagnostic text:"
+    },
+    "packages/i18n/src/type-aliases/I18nMessagePatternType.md": {
+      "recipe": "i18n-catalog-validation",
+      "description": "Identify whether a diagnostic belongs to interpolation, plural, ordinal, or select syntax:"
     },
     "packages/i18n/src/type-aliases/I18nNamespaceLoader.md": {
       "recipe": "i18n-application",

@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "paths": {
+      "@gluonjs/core": ["dist/types/index.d.ts"],
+      "@gluonjs/i18n": ["packages/i18n/dist/index.d.ts"],
+      "@gluonjs/reactivity": ["packages/reactivity/dist/index.d.ts"]
+    }
+  },
+  "include": ["i18n.types.ts"]
+}

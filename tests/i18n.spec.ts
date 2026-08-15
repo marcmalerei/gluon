@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createApp, defineAtom, defineMolecule, defineOrganism, html } from '../src/index.js';
-import { createI18n, useI18n } from '@gluonjs/i18n';
+import { createI18n, useI18n, validateI18nCatalog } from '@gluonjs/i18n';
 
 async function tick(): Promise<void> {
   await Promise.resolve();
@@ -8,6 +8,72 @@ async function tick(): Promise<void> {
 }
 
 describe('core i18n', () => {
+  it('validates message catalogs with stable locale and key diagnostics', () => {
+    const diagnostics = validateI18nCatalog([
+      ['en', {
+        'bag.title': 'Bag',
+        'bag.count': '{count, plural, one {# item}}',
+      }],
+      ['de', [
+        ['bag.title', 'Tasche'],
+        ['bag.title', 'Korb'],
+        ['bag.count', '{count, selectordinal, one {#st}}'],
+        ['bag.kind', '{kind, select, known {known}}'],
+        ['bag.bad', '{name, plural, other {oops}'],
+        ['bag.value', 123],
+        ['bag.style', '{amount, number, currency}'],
+        ['bag.close', 'Hello }'],
+        ['bag.invalid-argument', '{invalid argument}'],
+        ['bag.unsupported-format', '{started, time}'],
+        ['bag.empty-choice', '{count, plural,}'],
+        ['bag.duplicate-choice', '{count, plural, one {x} one {y} other {z}}'],
+        ['bag.invalid-selector', '{count, plural, banana {x} other {y}}'],
+        ['bag.offset', '{count, plural, offset:1 one {x} other {y}}'],
+      ]],
+    ]);
+
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_missing_other_branch' && entry.locale === 'en' && entry.key === 'bag.count' && entry.pattern === 'plural')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_duplicate_key' && entry.locale === 'de' && entry.key === 'bag.title')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_missing_other_branch' && entry.locale === 'de' && entry.key === 'bag.count' && entry.pattern === 'selectordinal')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_missing_other_branch' && entry.locale === 'de' && entry.key === 'bag.kind' && entry.pattern === 'select')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_malformed_interpolation' && entry.locale === 'de' && entry.key === 'bag.bad' && entry.pattern === 'message')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_non_string_value' && entry.locale === 'de' && entry.key === 'bag.value')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_malformed_interpolation' && entry.locale === 'de' && entry.key === 'bag.style')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_malformed_interpolation' && entry.locale === 'de' && entry.key === 'bag.close')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_malformed_interpolation' && entry.locale === 'de' && entry.key === 'bag.invalid-argument')).toBe(true);
+    expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_malformed_interpolation' && entry.locale === 'de' && entry.key === 'bag.unsupported-format')).toBe(true);
+    for (const key of ['bag.empty-choice', 'bag.duplicate-choice', 'bag.invalid-selector', 'bag.offset']) {
+      expect(diagnostics.some((entry) => entry.code === 'gluon_i18n_malformed_choice' && entry.locale === 'de' && entry.key === key)).toBe(true);
+    }
+  });
+
+  it('fails closed for malformed or throwing catalog iterables', () => {
+    const throwing = {
+      *[Symbol.iterator](): IterableIterator<unknown> {
+        yield ['en', { valid: 'message' }];
+        throw new Error('untrusted iterator');
+      },
+    };
+    const malformed = [
+      ['en', { valid: 'message' }],
+      [42, { invalid: 'locale' }],
+      ['missing-catalog'],
+      null,
+    ];
+    const nonIterable = Object.create({});
+
+    expect(validateI18nCatalog(throwing as never)).toEqual(expect.arrayContaining([
+      expect.objectContaining({ code: 'gluon_i18n_invalid_catalog', locale: '', key: '' }),
+    ]));
+    expect(validateI18nCatalog(malformed as never).filter(({ code }) => code === 'gluon_i18n_invalid_catalog')).toHaveLength(3);
+    expect(validateI18nCatalog(nonIterable as never)).toEqual([
+      expect.objectContaining({ code: 'gluon_i18n_invalid_catalog' }),
+    ]);
+    expect(validateI18nCatalog(null as never)).toEqual([
+      expect.objectContaining({ code: 'gluon_i18n_invalid_catalog' }),
+    ]);
+  });
+
   it('loads only the active locale namespace lazily', async () => {
     const requested: string[] = [];
     const i18n = createI18n({
@@ -251,5 +317,35 @@ describe('core i18n', () => {
     expect(i18n.t('selectMissing', { values: {} })).toBe('other');
     expect(i18n.t('missing', { namespace: 'not-registered' })).toBe('missing');
     await tick();
+  });
+
+  it('preserves fallback and SSR snapshot behavior when validating catalogs', async () => {
+    const server = createI18n({
+      locale: 'de-AT',
+      fallbackLocale: ['de', 'en'],
+      messages: {
+        de: { title: 'Warenkorb', count: '{count, plural, one {# Artikel} other {# Artikel}}' },
+        en: { title: 'Bag' },
+      },
+    });
+
+    expect(validateI18nCatalog({
+      de: { title: 'Warenkorb', count: '{count, plural, one {# Artikel} other {# Artikel}}' },
+    })).toEqual([]);
+    expect(server.t('title')).toBe('Warenkorb');
+    expect(server.t('count', { values: { count: 3 } })).toBe('3 Artikel');
+
+    await server.loadNamespace('missing').catch(() => undefined);
+    const snapshot = server.snapshot();
+    const client = createI18n({
+      locale: 'en',
+      fallbackLocale: ['de', 'en'],
+      messages: { en: { title: 'Bag' } },
+    });
+    client.hydrate(snapshot);
+
+    expect(client.locale.value).toBe('de-AT');
+    expect(client.t('title')).toBe('Warenkorb');
+    expect(client.t('count', { values: { count: 2 } })).toBe('2 Artikel');
   });
 });

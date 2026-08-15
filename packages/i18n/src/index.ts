@@ -6,6 +6,24 @@ export type I18nValue = string | number | boolean | Date;
 export type I18nMessages = Readonly<Record<string, string>>;
 export type I18nNamespaceLoader = (locale: LocaleCode) => Promise<I18nMessages> | I18nMessages;
 export type I18nNamespaceState = 'idle' | 'loading' | 'loaded' | 'error';
+export type I18nCatalogValue = Readonly<Record<string, unknown>> | ReadonlyArray<readonly [string, unknown]>;
+export type I18nCatalogInput = Readonly<Record<LocaleCode, unknown>> | Iterable<readonly [LocaleCode, unknown]>;
+export type I18nMessagePatternType = 'message' | 'plural' | 'select' | 'selectordinal';
+export type I18nDiagnosticCode =
+  | 'gluon_i18n_invalid_catalog'
+  | 'gluon_i18n_non_string_value'
+  | 'gluon_i18n_duplicate_key'
+  | 'gluon_i18n_malformed_interpolation'
+  | 'gluon_i18n_malformed_choice'
+  | 'gluon_i18n_missing_other_branch';
+
+export interface I18nCatalogDiagnostic {
+  readonly code: I18nDiagnosticCode;
+  readonly locale: LocaleCode;
+  readonly key: string;
+  readonly message: string;
+  readonly pattern?: I18nMessagePatternType;
+}
 
 export interface I18nNamespaceStatus {
   readonly state: I18nNamespaceState;
@@ -52,6 +70,35 @@ export interface I18n {
 }
 
 export const i18nKey = createInjectionKey<I18n>('gluon:i18n');
+
+export function validateI18nCatalog(input: I18nCatalogInput): readonly I18nCatalogDiagnostic[] {
+  const diagnostics: I18nCatalogDiagnostic[] = [];
+  for (const [locale, source] of iterateCatalogEntries(input, diagnostics)) {
+    if (Array.isArray(source)) {
+      const seen = new Set<string>();
+      for (const entry of source) {
+        if (!Array.isArray(entry) || entry.length !== 2 || typeof entry[0] !== 'string') {
+          diagnostics.push(diagnostic('gluon_i18n_invalid_catalog', locale, '', `Catalog entries for locale "${locale}" must be [key, value] pairs.`));
+          continue;
+        }
+        const [key, value] = entry;
+        if (seen.has(key)) {
+          diagnostics.push(diagnostic('gluon_i18n_duplicate_key', locale, key, `Duplicate catalog key "${key}" in locale "${locale}".`));
+          continue;
+        }
+        seen.add(key);
+        validateCatalogValue(locale, key, value, diagnostics);
+      }
+      continue;
+    }
+    if (isCatalogRecord(source)) {
+      for (const [key, value] of Object.entries(source)) validateCatalogValue(locale, key, value, diagnostics);
+      continue;
+    }
+    diagnostics.push(diagnostic('gluon_i18n_invalid_catalog', locale, '', `Catalog for locale "${locale}" must be a message record or iterable of key/value pairs.`));
+  }
+  return Object.freeze(diagnostics);
+}
 
 export function createI18n(options: I18nOptions): I18n & GluonPlugin<void> {
   const locale = shallowRef(options.locale);
@@ -217,6 +264,180 @@ function addLocaleVariants(chain: LocaleCode[], targetLocale: LocaleCode): void 
   if (!chain.includes(targetLocale)) chain.push(targetLocale);
   const base = targetLocale.split('-')[0];
   if (base && base !== targetLocale && !chain.includes(base)) chain.push(base);
+}
+
+function iterateCatalogEntries(
+  input: I18nCatalogInput,
+  diagnostics: I18nCatalogDiagnostic[],
+): readonly (readonly [LocaleCode, unknown])[] {
+  if (input === null || typeof input !== 'object') {
+    diagnostics.push(diagnostic('gluon_i18n_invalid_catalog', '', '', 'Catalog input must be a locale record or iterable of [locale, catalog] pairs.'));
+    return [];
+  }
+
+  const entries: Array<readonly [LocaleCode, unknown]> = [];
+  try {
+    const iterator = (input as { readonly [Symbol.iterator]?: unknown })[Symbol.iterator];
+    if (iterator === undefined && isCatalogRecord(input)) return Object.entries(input);
+    if (typeof iterator !== 'function') {
+      diagnostics.push(diagnostic('gluon_i18n_invalid_catalog', '', '', 'Catalog input must be a locale record or iterable of [locale, catalog] pairs.'));
+      return entries;
+    }
+    for (const entry of input as Iterable<unknown>) {
+      if (!Array.isArray(entry) || entry.length !== 2 || typeof entry[0] !== 'string') {
+        diagnostics.push(diagnostic('gluon_i18n_invalid_catalog', '', '', 'Catalog iterable entries must be [locale, catalog] pairs with a string locale.'));
+        continue;
+      }
+      entries.push([entry[0], entry[1]]);
+    }
+  } catch {
+    diagnostics.push(diagnostic('gluon_i18n_invalid_catalog', '', '', 'Catalog iterable could not be read safely.'));
+  }
+  return entries;
+}
+
+function isCatalogRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function validateCatalogValue(locale: LocaleCode, key: string, value: unknown, diagnostics: I18nCatalogDiagnostic[]): void {
+  if (typeof value !== 'string') {
+    diagnostics.push(diagnostic('gluon_i18n_non_string_value', locale, key, `Catalog value for "${key}" in locale "${locale}" must be a string.`));
+    return;
+  }
+  validateMessagePattern(locale, key, value, diagnostics);
+}
+
+function diagnostic(code: I18nDiagnosticCode, locale: LocaleCode, key: string, message: string, pattern?: I18nMessagePatternType): I18nCatalogDiagnostic {
+  return Object.freeze({ code, locale, key, message, ...(pattern ? { pattern } : {}) });
+}
+
+function validateMessagePattern(locale: LocaleCode, key: string, message: string, diagnostics: I18nCatalogDiagnostic[]): void {
+  for (let index = 0; index < message.length; index += 1) {
+    if (message[index] === '}') {
+      diagnostics.push(diagnostic('gluon_i18n_malformed_interpolation', locale, key, `Unmatched "}" in catalog message "${key}" for locale "${locale}".`, 'message'));
+      return;
+    }
+    if (message[index] !== '{') continue;
+    const result = readBraceExpression(message, index);
+    if (!result) {
+      diagnostics.push(diagnostic('gluon_i18n_malformed_interpolation', locale, key, `Unmatched "{" in catalog message "${key}" for locale "${locale}".`, 'message'));
+      return;
+    }
+    const { expression, end } = result;
+    validateExpression(locale, key, expression, diagnostics);
+    index = end;
+  }
+}
+
+function readBraceExpression(source: string, start: number): { readonly expression: string; readonly end: number } | undefined {
+  let depth = 0;
+  for (let index = start; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '{') depth += 1;
+    else if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return { expression: source.slice(start + 1, index), end: index };
+      if (depth < 0) return undefined;
+    }
+  }
+  return undefined;
+}
+
+function validateExpression(locale: LocaleCode, key: string, expression: string, diagnostics: I18nCatalogDiagnostic[]): void {
+  const parts = splitTopLevelCsv(expression);
+  const argument = parts[0]?.trim();
+  if (!argument || !isValidArgumentName(argument)) {
+    diagnostics.push(diagnostic('gluon_i18n_malformed_interpolation', locale, key, `Invalid argument name in catalog message "${key}" for locale "${locale}".`, 'message'));
+    return;
+  }
+  const type = parts[1]?.trim();
+  if (!type) return;
+  if (type === 'number' || type === 'date') {
+    if (parts.length === 2) return;
+    diagnostics.push(diagnostic('gluon_i18n_malformed_interpolation', locale, key, `Format styles are not supported for "${type}" in catalog message "${key}" for locale "${locale}".`, 'message'));
+    return;
+  }
+  if (type === 'plural' || type === 'selectordinal' || type === 'select') {
+    validateChoiceFormat(locale, key, type, parts.slice(2).join(','), diagnostics);
+    return;
+  }
+  diagnostics.push(diagnostic('gluon_i18n_malformed_interpolation', locale, key, `Unsupported format type "${type}" in catalog message "${key}" for locale "${locale}".`, 'message'));
+}
+
+function validateChoiceFormat(
+  locale: LocaleCode,
+  key: string,
+  pattern: I18nMessagePatternType,
+  remainder: string,
+  diagnostics: I18nCatalogDiagnostic[],
+): void {
+  if (remainder.includes('offset:')) {
+    diagnostics.push(diagnostic('gluon_i18n_malformed_choice', locale, key, `Offset syntax is not supported in ${pattern} message "${key}" for locale "${locale}".`, pattern));
+    return;
+  }
+  const entries = parseChoiceEntries(remainder);
+  if (!entries || entries.length === 0) {
+    diagnostics.push(diagnostic('gluon_i18n_malformed_choice', locale, key, `Malformed ${pattern} options in catalog message "${key}" for locale "${locale}".`, pattern));
+    return;
+  }
+  let hasOther = false;
+  const selectors = new Set<string>();
+  for (const entry of entries) {
+    if (selectors.has(entry.selector)) {
+      diagnostics.push(diagnostic('gluon_i18n_malformed_choice', locale, key, `Duplicate selector "${entry.selector}" in ${pattern} message "${key}" for locale "${locale}".`, pattern));
+      continue;
+    }
+    selectors.add(entry.selector);
+    if (pattern !== 'select' && !/^(?:zero|one|two|few|many|other|=-?(?:\d+(?:\.\d+)?|\.\d+))$/.test(entry.selector)) {
+      diagnostics.push(diagnostic('gluon_i18n_malformed_choice', locale, key, `Invalid selector "${entry.selector}" in ${pattern} message "${key}" for locale "${locale}".`, pattern));
+    }
+    if (entry.selector === 'other') hasOther = true;
+    if (entry.message.includes('{')) validateMessagePattern(locale, key, entry.message, diagnostics);
+  }
+  if (!hasOther) diagnostics.push(diagnostic('gluon_i18n_missing_other_branch', locale, key, `Missing "other" branch in ${pattern} message "${key}" for locale "${locale}".`, pattern));
+}
+
+function parseChoiceEntries(source: string): readonly { selector: string; message: string }[] | undefined {
+  const entries: { selector: string; message: string }[] = [];
+  let index = 0;
+  while (index < source.length) {
+    while (/\s/.test(source[index] ?? '')) index += 1;
+    if (index >= source.length) break;
+    const selectorStart = index;
+    while (index < source.length && source[index] !== '{' && source[index] !== ' ' && source[index] !== '\t') index += 1;
+    const selector = source.slice(selectorStart, index).trim();
+    while (source[index] === ' ' || source[index] === '\t') index += 1;
+    if (!selector || source[index] !== '{') return undefined;
+    const body = readBraceExpression(source, index);
+    if (!body) return undefined;
+    entries.push({ selector, message: body.expression });
+    index = body.end + 1;
+  }
+  return entries;
+}
+
+function splitTopLevelCsv(source: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '{') depth += 1;
+    else if (char === '}') depth -= 1;
+    else if (char === ',' && depth === 0) {
+      parts.push(source.slice(start, index));
+      start = index + 1;
+    }
+  }
+  parts.push(source.slice(start));
+  return parts;
+}
+
+function isValidArgumentName(value: string): boolean {
+  return /^[A-Za-z_][A-Za-z0-9_-]*$/.test(value);
 }
 
 function formatMessage(message: string, values: Readonly<Record<string, I18nValue>> | undefined, targetLocale: LocaleCode, i18n: I18n): string {

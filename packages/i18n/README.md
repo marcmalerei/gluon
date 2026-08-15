@@ -9,6 +9,30 @@ on `@gluonjs/core` for application injection and on `@gluonjs/reactivity` for th
 reactive locale and ready counters, so applications that do not need translated
 strings do not receive i18n exports from the core package.
 
+The package also exports `validateI18nCatalog()` for build-time and test-time
+catalog checks. The validator is DOM-free and returns typed diagnostics that
+include the locale, source key, machine-readable code, and human-readable
+message.
+
+```ts
+import { validateI18nCatalog } from '@gluonjs/i18n';
+
+const diagnostics = validateI18nCatalog(new Map([
+  ['en', [
+    ['bag.title', 'Bag'],
+    ['bag.count', '{count, plural, one {# item} other {# items}}'],
+  ]],
+]));
+```
+
+Record input is convenient for ordinary catalogs. Iterable `[key, value]`
+pairs additionally let build tools diagnose duplicate source keys before an
+object conversion would overwrite them. Diagnostics retain source order and
+do not throw for malformed catalogs. Non-string values and malformed locale
+catalog containers receive explicit diagnostics. Malformed or throwing
+iterables fail closed as `gluon_i18n_invalid_catalog`; the validator never loads
+a catalog or changes runtime fallback state.
+
 ## Install and provide i18n
 
 ```ts
@@ -62,12 +86,27 @@ i18n.d(new Date(), { dateStyle: "medium" });
 ```
 
 Messages support simple ICU-style `plural`, `selectordinal`, and `select`
-expressions. For loading diagnostics, `namespaceStatus` exposes `idle`,
-`loading`, `loaded`, and `error` for the active locale. Namespace errors remain
-available to explicit `loadNamespace` callers and are rendered as the missing
-key by `t` until the application handles them. Unsupported or incomplete
-expressions remain literal text; they do not throw or recursively re-enter the
-formatter.
+expressions. The supported message grammar is intentionally small:
+
+- literal text;
+- a simple argument replacement, written as `{name}`;
+- a typed argument formatter, written as `{name, number}` or `{name, date}`;
+- a choice message, written as `{name, plural, ...}`, `{name, selectordinal,
+  ...}`, or `{name, select, ...}` with `one`, `few`, `many`, `two`, `zero`, and
+  `other` branches plus exact matches such as `=2`.
+
+Unsupported Unicode MessageFormat features are intentionally rejected or left
+literal instead of being claimed as supported. That includes nested plural
+offsets, rich argument style options, selectors other than `plural`,
+`selectordinal`, and `select`, apostrophe escaping rules, list or duration
+formatters, `select` fallback chains beyond `other`, and full ICU/Unicode
+MessageFormat conformance.
+
+For loading diagnostics, `namespaceStatus` exposes `idle`, `loading`, `loaded`,
+and `error` for the active locale. Namespace errors remain available to
+explicit `loadNamespace` callers and are rendered as the missing key by `t`
+until the application handles them. Unsupported or incomplete expressions remain
+literal text; they do not throw or recursively re-enter the formatter.
 
 ## SSR state
 
