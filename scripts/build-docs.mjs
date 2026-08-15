@@ -9,18 +9,20 @@ const apiRoot = resolve(root, '.tmp/docs-api');
 const outputRoot = resolve(siteRoot, 'dist');
 const versions = JSON.parse(await readFile(resolve(siteRoot, 'versions.json'), 'utf8'));
 const packageContract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
+const packageDocs = JSON.parse(await readFile(resolve(siteRoot, 'package-docs.json'), 'utf8'));
 const base = normalizeBase(process.env.DOCS_BASE ?? '/gluon/');
+validatePackageDocs(packageDocs, packageContract);
 const packageMetadata = new Map(await Promise.all(
   packageContract.packages
     .filter((entry) => entry.state === 'current')
     .map(async (entry) => {
       const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
-      const readme = await readFile(resolve(root, entry.directory, 'README.md'), 'utf8');
+      const docs = packageDocs.packages.find((candidate) => candidate.name === entry.name);
       return [entry.name, {
         name: entry.name,
         entry,
         packageJson,
-        readme,
+        docs,
         description: packageJson.description,
       }];
     }),
@@ -309,7 +311,7 @@ function packagePageShell({ version, title, description, content, packageInfo, p
     <div class="site-grid package-grid">
       <aside class="sidebar" aria-label="Gluon packages" data-sidebar><nav>${packageNavigation}</nav></aside>
       <main id="content" class="content"><article>${content}</article></main>
-      <aside class="toc package-toc" aria-label="Package context"><strong>${packageInfo ? 'Package context' : 'Package map'}</strong><p>${packageInfo ? 'Public package boundary and release metadata.' : `${packages.length} current packages in the lockstep train.`}</p></aside>
+      <aside class="toc package-toc" aria-label="Package context"><strong>${packageInfo ? 'Package context' : 'Package map'}</strong><p>${packageInfo ? 'Public package boundary and release metadata.' : `${packages.length} packages in the lockstep train.`}</p></aside>
     </div>
     <footer class="site-footer"><span>Gluon ${version}</span><a href="${base}${version}/">Documentation</a><a href="https://github.com/marcmalerei/gluon">GitHub</a><a href="${base}archive/">Release archive</a></footer>
     <script type="module" src="${base}assets/docs.js"></script>
@@ -322,7 +324,7 @@ function packageIndexContent(version, packages) {
   <p class="package-kicker">${escapeHtml(entry.entry.environment)} package</p>
   <h2><a href="${base}${version}/packages/${packageSlug(entry.name)}/">${escapeHtml(entry.name)}</a></h2>
   <p>${escapeHtml(entry.description)}</p>
-  <p class="package-card-meta"><code>${escapeHtml(entry.entry.exports.length)} public export${entry.entry.exports.length === 1 ? '' : 's'}</code><a href="${base}${version}/packages/${packageSlug(entry.name)}/">Open package →</a></p>
+  <p class="package-card-meta"><code>${escapeHtml(entry.entry.exports.length)} public entry point${entry.entry.exports.length === 1 ? '' : 's'}</code><a href="${base}${version}/packages/${packageSlug(entry.name)}/">Open package →</a></p>
 </article>`).join('');
   return `<p class="eyebrow">${packages.length} packages · lockstep release train</p>
 <h1>Build with the package that owns the boundary.</h1>
@@ -333,7 +335,7 @@ function packageIndexContent(version, packages) {
 }
 
 function packageDetailContent(version, packageInfo) {
-  const { entry, packageJson, readme } = packageInfo;
+  const { entry, packageJson, docs } = packageInfo;
   const sourceReadmeUrl = entry.directory === '.'
     ? 'https://github.com/marcmalerei/gluon#readme'
     : `https://github.com/marcmalerei/gluon/tree/main/${entry.directory}#readme`;
@@ -350,25 +352,28 @@ function packageDetailContent(version, packageInfo) {
     const optional = packageJson.peerDependenciesMeta?.[name]?.optional ? ' · optional' : '';
     return `${name}@${range}${optional}`;
   });
-  const readmeCode = readme.match(/```(?:ts|tsx|js|sh|bash|html)\n([\s\S]+?)```/)?.[1]?.trim() ?? `import '${entry.name}';`;
-  const limits = readme.match(/(?:^|\n)## (?:[^\n]*(?:Limit|Support|Boundary|Compatibility|Scope)[^\n]*)\n([\s\S]*?)(?=\n## |$)/i)?.[1]
-    ?.trim()
-    .split(/\n\s*\n/)
-    .slice(0, 2)
-    .map((paragraph) => `<li>${escapeHtml(paragraph.replace(/\s+/g, ' '))}</li>`)
-    .join('')
-    ?? `<li>See the package README for the maintained scope and unsupported boundaries.</li>`;
+  if (!docs) throw new Error(`missing package docs for ${entry.name}`);
+  const starterCode = docs.starter.code;
+  const starterLanguage = docs.starter.language;
+  const useCases = docs.useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+  const limits = docs.limits.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+  const relatedGuides = docs.relatedGuides.map((guide) => `<li><a href="${escapeHtml(guide.href)}">${escapeHtml(guide.label)}</a></li>`).join('');
+  const integrationNotes = docs.integrationNotes.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
   const dependencyList = dependencies.length > 0 ? dependencies.map((dependency) => `<li>${escapeHtml(dependency)}</li>`).join('') : '<li>None</li>';
   const peerList = peers.length > 0 ? peers.map((peer) => `<li>${escapeHtml(peer)}</li>`).join('') : '<li>None</li>';
   return `<p class="eyebrow">Gluon ${escapeHtml(entry.environment)} package · ${escapeHtml(packageJson.version)}</p>
 <h1>${escapeHtml(packageInfo.name)}</h1>
 <p class="package-lede">${escapeHtml(packageInfo.description)}</p>
 <div class="package-actions"><a class="package-primary-action" href="https://www.npmjs.com/package/${encodeURIComponent(entry.name)}">npm package</a><a href="${sourceReadmeUrl}">Source README</a></div>
-<section class="package-facts" aria-label="Package facts"><div><strong>Runtime</strong><span>${escapeHtml(entry.environment)}</span></div><div><strong>Version</strong><span>${escapeHtml(packageJson.version)}</span></div><div><strong>License</strong><span>${escapeHtml(packageJson.license ?? 'MIT')}</span></div><div><strong>Exports</strong><span>${escapeHtml(String(entry.exports.length))}</span></div></section>
+<section class="package-facts" aria-label="Package facts"><div><strong>Runtime</strong><span>${escapeHtml(entry.environment)}</span></div><div><strong>Version</strong><span>${escapeHtml(packageJson.version)}</span></div><div><strong>License</strong><span>${escapeHtml(packageJson.license ?? 'MIT')}</span></div><div><strong>Public entry points</strong><span>${escapeHtml(String(entry.exports.length))}</span></div></section>
 <h2 id="install">Install and start</h2>
 <p>${entry.name === 'create-gluon' ? 'Scaffold a project with the maintained CLI:' : 'Install the public package at the same version as the rest of the Gluon train:'}</p>
 <figure class="code-frame"><figcaption><span>shell</span><button type="button" data-copy-code>Copy</button></figcaption><pre><code class="language-sh">${escapeHtml(entry.name === 'create-gluon' ? 'npm create gluon@latest my-app' : `npm install ${entry.name}`)}</code></pre></figure>
-<figure class="code-frame"><figcaption><span>starter</span><button type="button" data-copy-code>Copy</button></figcaption><pre><code class="language-ts">${escapeHtml(readmeCode)}</code></pre></figure>
+<figure class="code-frame"><figcaption><span>${escapeHtml(starterLanguage)}</span><button type="button" data-copy-code>Copy</button></figcaption><pre><code class="language-${escapeHtml(starterLanguage)}">${escapeHtml(starterCode)}</code></pre></figure>
+<h2 id="purpose">Purpose</h2>
+  <p>${escapeHtml(docs.purpose)}</p>
+<h2 id="use-cases">Use cases</h2>
+<ul class="package-list">${useCases}</ul>
 <h2 id="entry-points">Public entry points</h2>
 <p>Only these package exports are part of the supported public boundary.</p><ul class="package-list">${apiLinks}</ul>
 <h2 id="dependencies">Dependencies and peers</h2>
@@ -377,6 +382,10 @@ function packageDetailContent(version, packageInfo) {
 <p>Open an entry point above for generated symbol documentation and a reviewed example for every public symbol. Application code must import from this package entry point, never from repository source paths.</p>
 <h2 id="limits">Scope and limits</h2>
 <ul class="package-list">${limits}</ul>
+<h2 id="guides">Related guides</h2>
+<ul class="package-list">${relatedGuides}</ul>
+<h2 id="integration-notes">Verified integration notes</h2>
+<ul class="package-list">${integrationNotes}</ul>
 <p class="package-readme-link"><a href="${sourceReadmeUrl}">Read the complete ${escapeHtml(packageInfo.name)} README →</a></p>`;
 }
 
@@ -406,4 +415,67 @@ function escapeAttribute(value) { return escapeHtml(value).replaceAll("'", '&#39
 
 async function writeRedirect(path, target) {
   await writeFile(path, `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>Gluon documentation</title></head><body><a href="${target}">Open Gluon documentation</a></body></html>`, 'utf8');
+}
+
+function validatePackageDocs(packageDocs, packageContract) {
+  if (!packageDocs || packageDocs.version !== 1 || !Array.isArray(packageDocs.packages)) {
+    throw new Error('docs-site/package-docs.json must contain version 1 and a packages array.');
+  }
+  const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
+  if (packageDocs.packages.length !== currentPackages.length) {
+    throw new Error(`docs-site/package-docs.json must describe ${currentPackages.length} current packages.`);
+  }
+  const names = new Set();
+  for (const entry of packageDocs.packages) {
+    if (names.has(entry.name)) throw new Error(`docs-site/package-docs.json contains duplicate package metadata for ${entry.name}.`);
+    names.add(entry.name);
+    const requiredFields = ['name', 'purpose', 'starter', 'useCases', 'limits', 'relatedGuides', 'integrationNotes'];
+    for (const field of requiredFields) {
+      if (!(field in entry)) throw new Error(`docs-site/package-docs.json is missing ${field} for ${entry.name}.`);
+    }
+    if (!currentPackages.some((pkg) => pkg.name === entry.name)) {
+      throw new Error(`docs-site/package-docs.json contains unknown package ${entry.name}.`);
+    }
+    if (!isTrimmedNonEmptyString(entry.purpose)) {
+      throw new Error(`docs-site/package-docs.json purpose must be a non-empty trimmed string for ${entry.name}.`);
+    }
+    if (!isTrimmedNonEmptyString(entry.starter?.language) || !isTrimmedNonEmptyString(entry.starter?.code)) {
+      throw new Error(`docs-site/package-docs.json starter metadata must include non-empty trimmed language and code for ${entry.name}.`);
+    }
+    for (const listName of ['useCases', 'limits', 'integrationNotes']) {
+      if (!Array.isArray(entry[listName]) || entry[listName].length === 0 || entry[listName].some((value) => !isTrimmedNonEmptyString(value))) {
+        throw new Error(`docs-site/package-docs.json ${listName} must be a non-empty array of non-empty trimmed strings for ${entry.name}.`);
+      }
+    }
+    if (!Array.isArray(entry.relatedGuides) || entry.relatedGuides.length === 0) {
+      throw new Error(`docs-site/package-docs.json relatedGuides must be a non-empty list of {label, href} objects for ${entry.name}.`);
+    }
+    const relatedLabels = new Set();
+    const relatedHrefs = new Set();
+    for (const guide of entry.relatedGuides) {
+      if (!isTrimmedNonEmptyString(guide?.label) || !isTrimmedNonEmptyString(guide?.href)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides entries must include trimmed label and href strings for ${entry.name}.`);
+      }
+      if (!isSupportedGuideHref(guide.href)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides href must use a versioned Gluon docs path for ${entry.name}: ${guide.href}`);
+      }
+      if (relatedLabels.has(guide.label)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides contains duplicate label ${guide.label} for ${entry.name}.`);
+      }
+      if (relatedHrefs.has(guide.href)) {
+        throw new Error(`docs-site/package-docs.json relatedGuides contains duplicate href ${guide.href} for ${entry.name}.`);
+      }
+      relatedLabels.add(guide.label);
+      relatedHrefs.add(guide.href);
+    }
+  }
+}
+
+function isTrimmedNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0 && value === value.trim();
+}
+
+function isSupportedGuideHref(href) {
+  return /^\/gluon\/(?:latest|\d+\.\d+\.\d+)\/(?:api|cookbook|guides|migration|reference|examples)(?:\/[A-Za-z0-9._~!$&'()*+,;=:@/-]*)?\/?$/.test(href)
+    || /^\/gluon\/(?:latest|\d+\.\d+\.\d+)\/(?:api|cookbook|guides|migration|reference|examples)\/(?:[A-Za-z0-9._~!$&'()*+,;=:@/-]+\/)?(?:index\.html|index\.md)?$/.test(href);
 }

@@ -99,6 +99,10 @@ artwork rather than a separate HTML heading. Each README uses an absolute
 not ship the repository `docs/` tree. `npm run check:packages` derives the asset
 name from `package-contract.json` and rejects missing, duplicated, stale,
 wrongly sized, or wrongly referenced package headers.
+The docs portal no longer infers package semantics from README structure. Its
+package-purpose, starter, use-case, limits, guide, and integration metadata live
+in version control under `docs-site/package-docs.json`, and `npm run check:docs`
+validates that every current package in `package-contract.json` is covered.
 
 The immutable `v1.0.0` tag points to commit
 `8f52b4b98fe9e9f5182973cbf5a0655c879df7ea`. Its Release run

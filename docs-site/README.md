@@ -66,11 +66,17 @@ the package contract and package manifest rather than from the TypeDoc root
 label.
 The generated package portal lives at `/<version>/packages/` and creates one
 landing page for every current package declared by `package-contract.json`.
-Each landing page is derived from the package manifest and README, and exposes
-purpose, installation, runtime, version, license, public exports, dependencies,
-peer dependencies, starter code, API links, and maintained scope limits. The
-portal index includes a request-free client-side package search and keeps the
-same package navigation on desktop and mobile.
+Each landing page is derived from the package manifest, `package-contract.json`,
+and the version-controlled `docs-site/package-docs.json` metadata contract.
+That metadata owns purpose, starter code and language, use cases, limits and
+non-goals, related guides, and verified integration notes. The package manifest
+and package contract continue to own installation, runtime, version, license,
+public entry points, dependencies, peer dependencies, npm links, source README
+links, and API links. The portal index includes a request-free client-side
+package search and keeps the same package navigation on desktop and mobile.
+This docs-only metadata change does not alter `examples/shop`; the regression is
+limited to documentation generation and docs validation, so the shop remains
+unchanged.
 The root package and every package manifest use the stable
 `https://marcmalerei.github.io/gluon/latest/packages/<slug>/` page as their
 homepage; source README links remain explicit inside the portal.
