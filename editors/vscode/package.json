@@ -2,24 +2,35 @@
   "name": "gluon-vscode",
   "displayName": "Gluon",
   "description": "Language support for Gluon tagged templates.",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.8.1",
+  "publisher": "marcmalerei",
   "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/marcmalerei/gluon.git", "directory": "editors/vscode" },
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/language-server/",
+  "bugs": { "url": "https://github.com/marcmalerei/gluon/issues" },
   "engines": { "vscode": "^1.96.0" },
   "categories": ["Programming Languages", "Linters"],
   "activationEvents": ["onLanguage:typescript", "onLanguage:javascript"],
   "main": "./extension.cjs",
+  "scripts": { "package": "vsce package", "check": "node ../../scripts/validate-vscode-client.mjs" },
   "contributes": {
     "configuration": {
       "title": "Gluon",
       "properties": {
         "gluon.languageServerPath": {
           "type": "string",
-          "default": "gluon-language-server",
-          "description": "Path to the lockstep gluon-language-server executable."
+          "default": "",
+          "description": "Optional path to the lockstep gluon-language-server executable. Empty uses gluon-language-server from PATH."
+        },
+        "gluon.languageServerArgs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["--stdio"],
+          "description": "Arguments passed to the Gluon language server."
         }
       }
     }
   },
-  "dependencies": { "vscode-languageclient": "^9.0.1" }
+  "dependencies": { "vscode-languageclient": "^9.0.1" },
+  "devDependencies": { "@vscode/vsce": "^3.9.2" }
 }

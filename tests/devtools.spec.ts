@@ -159,6 +159,12 @@ describe('Gluon Devtools browser bridge', () => {
     expect(bridge.snapshot().selectedApplicationId).toBe('two');
   });
 
+  test('exposes the protocol handshake through the browser bridge', () => {
+    const bridge = createDevtoolsBridge({ enabled: true });
+    cleanups.push(() => bridge.dispose());
+    expect(bridge.handshake()).toMatchObject({ protocol: 1, capabilities: expect.arrayContaining(['timeline', 'component-snapshots']) });
+  });
+
   test('renders an initially empty inspector and exposes development-only Vite configuration', () => {
     const bridge = createDevtoolsBridge({ enabled: true });
     cleanups.push(() => bridge.dispose());

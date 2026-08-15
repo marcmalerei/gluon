@@ -442,6 +442,7 @@
       "code": [
         "import {",
         "  DevtoolsProtocol,",
+        "  GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,",
         "  GLUON_DEVTOOLS_PROTOCOL_VERSION,",
         "  toDevtoolsValue,",
         "  type ApplicationInspector,",
@@ -449,6 +450,7 @@
         "  type ComponentSnapshot,",
         "  type DevtoolsEvent,",
         "  type DevtoolsEventKind,",
+        "  type DevtoolsHandshake,",
         "  type DevtoolsListener,",
         "  type DevtoolsSnapshot,",
         "  type DevtoolsValue,",
@@ -471,6 +473,7 @@
         "  }),",
         "};",
         "const protocol = new DevtoolsProtocol();",
+        "const handshake: DevtoolsHandshake = protocol.handshake();",
         "const unregister = protocol.registerApplication(inspector);",
         "const listener: DevtoolsListener = (snapshot: DevtoolsSnapshot, event?: DevtoolsEvent) =>",
         "  console.log(snapshot.selectedApplicationId, event?.sequence);",
@@ -478,7 +481,7 @@
         "const kind: DevtoolsEventKind = 'store';",
         "const payload: DevtoolsValue = toDevtoolsValue({ action: 'add', product: 'orbit-lamp' });",
         "protocol.record('shop', kind, payload);",
-        "console.log(GLUON_DEVTOOLS_PROTOCOL_VERSION, protocol.snapshot());",
+        "console.log(GLUON_DEVTOOLS_PROTOCOL_VERSION, GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES, handshake, protocol.snapshot());",
         "unsubscribe();",
         "unregister();"
       ]
@@ -3668,6 +3671,10 @@
       "recipe": "devtools-protocol",
       "description": "Consume one protocol-versioned, sequenced, timestamped application timeline event with transport-safe payload:"
     },
+    "packages/devtools-api/src/interfaces/DevtoolsHandshake.md": {
+      "recipe": "devtools-protocol",
+      "description": "Inspect the protocol version and advertised capability set before connecting an external Devtools client:"
+    },
     "packages/devtools-api/src/interfaces/DevtoolsSnapshot.md": {
       "recipe": "devtools-protocol",
       "description": "Read the selected application, all application snapshots, and the ordered global timeline through one immutable protocol frame:"
@@ -3687,6 +3694,10 @@
     "packages/devtools-api/src/variables/GLUON_DEVTOOLS_PROTOCOL_VERSION.md": {
       "recipe": "devtools-protocol",
       "description": "Validate snapshots and events against the Devtools wire contract version supported by both producer and inspector:"
+    },
+    "packages/devtools-api/src/variables/GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES.md": {
+      "recipe": "devtools-protocol",
+      "description": "Inspect the immutable capability inventory advertised by the current Devtools protocol:"
     },
     "packages/devtools/src/classes/GluonDevtoolsBridge.md": {
       "recipe": "devtools-integration",

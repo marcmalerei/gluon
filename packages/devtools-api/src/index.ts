@@ -1,4 +1,19 @@
 export const GLUON_DEVTOOLS_PROTOCOL_VERSION = 1 as const;
+export const GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES = Object.freeze([
+  'application-selection',
+  'component-snapshots',
+  'error-events',
+  'render-events',
+  'router-events',
+  'scheduler-events',
+  'store-events',
+  'timeline',
+] as const);
+
+export interface DevtoolsHandshake {
+  readonly protocol: typeof GLUON_DEVTOOLS_PROTOCOL_VERSION;
+  readonly capabilities: typeof GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES;
+}
 
 export type DevtoolsEventKind = 'application' | 'component' | 'error' | 'event' | 'render' | 'router' | 'scheduler' | 'store';
 export type DevtoolsValue = boolean | null | number | string | readonly DevtoolsValue[] | { readonly [key: string]: DevtoolsValue };
@@ -106,6 +121,14 @@ export class DevtoolsProtocol {
     this.listeners.add(listener);
     listener(this.snapshot());
     return () => this.listeners.delete(listener);
+  }
+
+  /** Returns the stable contract external Devtools clients must negotiate. */
+  handshake(): DevtoolsHandshake {
+    return Object.freeze({
+      protocol: GLUON_DEVTOOLS_PROTOCOL_VERSION,
+      capabilities: GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,
+    });
   }
 
   private emit(event?: DevtoolsEvent): void {

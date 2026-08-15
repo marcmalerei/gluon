@@ -58,6 +58,7 @@ const definitions = [
   entry(1502, 'GLUON_DEVTOOLS_APPLICATION_DUPLICATE', 'Devtools application ID is duplicated', 'Two registered applications use the same ID.', 'Protocol snapshots cannot distinguish duplicate identities.', 'Use a unique ID or unregister the previous application.', 'devtools'),
   entry(1503, 'GLUON_DEVTOOLS_APPLICATION_UNKNOWN', 'Devtools application is unknown', 'An operation targets an unregistered application.', 'The application was never registered or was already disposed.', 'Register it before recording or selecting it.', 'devtools'),
   entry(1504, 'GLUON_DEVTOOLS_DISABLED', 'Devtools bridge is disabled', 'A browser inspector mount was requested for an inert bridge.', 'Production-safe bridges are disabled by default.', 'Enable the bridge only in a development entry.', 'devtools'),
+  entry(1505, 'GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES', 'Devtools protocol capabilities are declared', 'The Devtools handshake exposes the capabilities supported by the connected bridge.', 'Clients need a stable capability list before subscribing to optional protocol surfaces.', 'Negotiate optional Devtools features from the handshake before consuming them.', 'devtools'),
 ] as const satisfies readonly GluonDiagnosticDefinition[];
 
 export const gluonDiagnosticCatalog: readonly GluonDiagnosticDefinition[] = Object.freeze(definitions);

@@ -195,7 +195,7 @@
     "check:vue-analyzer-clean-install": "npm run build:vue-analyzer && node scripts/validate-vue-analyzer-clean-install.mjs",
     "check:vue-codemod-decision": "node scripts/validate-vue-codemod-decision.mjs",
     "check:dx-scorecard": "node scripts/validate-dx-scorecard.mjs",
-    "check:vscode-client": "node --check editors/vscode/extension.cjs",
+    "check:vscode-client": "node scripts/validate-vscode-client.mjs",
     "check:language-server-cli": "node scripts/validate-language-server-cli.mjs",
     "check:project-analysis": "npm run build:language-server && node scripts/generate-shop-project-analysis.mjs --check",
     "check:project-analysis-clean-install": "npm run build:language-server && node scripts/validate-project-analyzer-clean-install.mjs",
