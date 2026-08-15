@@ -22,7 +22,7 @@ import {
   ProductRail,
   focusOpenedDialog,
 } from './components.js';
-import { CheckoutExperience } from './ui-extensions.js';
+import { CheckoutExperience, type CheckoutFormController } from './ui-extensions.js';
 
 export function HomePage(_store: ShopStore): TemplateValue {
   return html`
@@ -272,7 +272,7 @@ export function ReturnsPage(_store: ShopStore): TemplateValue {
   );
 }
 
-export function CheckoutPage(store: ShopStore): TemplateValue {
+export function CheckoutPage(store: ShopStore, checkoutForm: CheckoutFormController): TemplateValue {
   const router = useRouter();
   if (store.bag.length === 0) return html`
     <section class="checkout-empty"><h1>Your bag is empty.</h1>
@@ -295,14 +295,19 @@ export function CheckoutPage(store: ShopStore): TemplateValue {
     })}
   </aside>`;
   return CheckoutExperience({
-    values: store.checkout,
+    form: checkoutForm,
     totalLabel: formatPrice(store.bagTotal),
     summary,
     onFieldInput: (name, value) => store.updateCheckout(name, value),
     onSubmit: (event) => {
       event.preventDefault();
-      const order = store.placeOrder();
-      void router.push(`/orders/${encodeURIComponent(order.id)}`);
+      const form = event.currentTarget as HTMLFormElement;
+      if (!form.reportValidity()) return;
+      void checkoutForm.submit().then((result) => {
+        if (!result.ok) return;
+        const order = store.placeOrder();
+        void router.push(`/orders/${encodeURIComponent(order.id)}`);
+      });
     },
   });
 }

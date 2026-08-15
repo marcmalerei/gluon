@@ -461,6 +461,13 @@ and 97 gzip bytes of explicit headroom while preventing unreviewed large
 regressions. Changing a ceiling requires an evidence-backed documentation
 update in the same pull request.
 
+The request-free `createFormController()` checkout integration is measured at
+251,858 raw entry bytes and 68,393 level-9 gzip bytes in the current production
+build. Its reviewed 252,500 / 69,000 ceilings leave 642 raw and 607 gzip bytes
+of explicit headroom. This is a composition-size change caused by a real
+customer-flow capability, not a framework-speed claim; future bundle changes
+must reproduce the measurement and update this record with the owning issue.
+
 ## Customer-flow performance and retained evidence
 
 `quality/shop-performance-budgets.json` is the reviewed p95 source for the

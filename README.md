@@ -34,6 +34,7 @@
 - an interactive, canvas-backed `@gluonjs/graph` Custom Element for knowledge-map and relationship views
 - optional `@gluonjs/i18n` locale-aware messages with lazy namespace loading
 - a form-associated `@gluonjs/json-forms` Custom Element for the documented JSON Schema subset
+- request-free, DOM-independent form orchestration through `createFormController()` beside the native UI compositions
 - a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.8.1/migration/vue-to-gluon-cutover/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values

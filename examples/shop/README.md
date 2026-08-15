@@ -248,6 +248,11 @@ comparative Gluon, Lit, Vue, and Vanilla DOM benchmark belongs to issue #38 and
 must publish its scenarios, browser versions, warm-up, samples, and raw results
 before the repository makes a speed claim.
 
+The current request-free checkout controller integration measures 251,858 raw
+entry bytes and 68,393 level-9 gzip bytes. The reviewed shop budget is
+252,500 / 69,000 bytes; `npm run check:budgets` is the blocking reproducible
+gate for this composition measurement.
+
 Issue #167's renderer hot paths bring the same complete production entry to
 190,536 raw bytes and 55,262 level-9 gzip bytes. The reviewed ceilings are
 191,000 / 55,500 bytes, leaving 464 raw bytes and 238 gzip bytes of explicit

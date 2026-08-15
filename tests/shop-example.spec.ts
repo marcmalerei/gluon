@@ -220,7 +220,7 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('completes bag checkout and renders a durable order confirmation route', async () => {
-    const { app, router, store } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']), {
+    const { app, router, store, checkoutForm } = createShopApplication(createMemoryHistory(['/products/orbit-lamp']), {
       storage: null,
       styleTarget: document,
     });
@@ -281,6 +281,8 @@ describe('GLUON GOODS reference shop', () => {
     expect(root.querySelector('#checkout-delivery-instructions-helper')?.textContent).toContain('workshop courier');
     deliveryInstructions.value = 'Leave with the workshop concierge.';
     deliveryInstructions.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(checkoutForm.state.values.email).toBe('ada@example.com');
+    expect(checkoutForm.state.dirty).toBe(true);
     const terms = root.querySelector<HTMLInputElement>('input[name="terms"]')!;
     expect(terms.required).toBe(true);
     expect(terms.checked).toBe(false);

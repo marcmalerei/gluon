@@ -39,12 +39,14 @@ import {
 import { createShopStore, type ShopStore } from './state.js';
 import type { ProductConfiguratorRenderer } from './product-configurator.js';
 import { installShopUi } from './styles.js';
+import { createCheckoutFormController, type CheckoutFormController } from './ui-extensions.js';
 
 export interface ShopApplication {
   readonly app: GluonApp;
   readonly router: Router;
   readonly storeManager: StoreManager;
   readonly store: ShopStore;
+  readonly checkoutForm: CheckoutFormController;
   readonly uiOwner?: UiOwner;
 }
 
@@ -54,6 +56,7 @@ export interface ShopApplicationOptions {
   readonly storeManager?: StoreManager;
   readonly styleTarget?: StyleTarget;
   readonly hydrateStyles?: boolean;
+  readonly checkoutForm?: CheckoutFormController;
 }
 
 export function createShopApplication(
@@ -71,9 +74,10 @@ export function createShopApplication(
       : [],
   });
   const store = createShopStore(storeManager);
+  const checkoutForm = options.checkoutForm ?? createCheckoutFormController(store.checkout);
   const router = options.router ?? createRouter({
     history: history!,
-    routes: createShopRoutes(store),
+    routes: createShopRoutes(store, undefined, checkoutForm),
     scrollBehavior: (_to, _from, saved) => saved ?? { left: 0, top: 0 },
   });
   router.afterEach(() => {
@@ -110,13 +114,15 @@ export function createShopApplication(
   app.onUnmounted(() => {
     disposeShopDialogs();
     uiOwner?.dispose();
+    checkoutForm.dispose();
   });
-  return { app, router, storeManager, store, ...(uiOwner ? { uiOwner } : {}) };
+  return { app, router, storeManager, store, checkoutForm, ...(uiOwner ? { uiOwner } : {}) };
 }
 
 export function createShopRoutes(
   store: ShopStore,
   renderProductConfigurator?: ProductConfiguratorRenderer,
+  checkoutForm: CheckoutFormController = createCheckoutFormController(store.checkout),
 ): readonly RouteRecordRaw[] {
   return [
     { path: '/', name: 'home', component: () => HomePage(store) },
@@ -128,7 +134,7 @@ export function createShopRoutes(
     },
     { path: '/shipping', name: 'shipping', component: () => ShippingPage(store) },
     { path: '/returns', name: 'returns', component: () => ReturnsPage(store) },
-    { path: '/checkout', name: 'checkout', component: () => CheckoutPage(store) },
+    { path: '/checkout', name: 'checkout', component: () => CheckoutPage(store, checkoutForm) },
     { path: '/orders/:id', name: 'order', component: () => OrderConfirmationPage(store) },
     { path: '/:path*', name: 'not-found', component: () => NotFoundPage(store) },
   ];

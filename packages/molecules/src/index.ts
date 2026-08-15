@@ -7,6 +7,7 @@ export { DialogSurface, createDialogSurfaceController, type DialogSurfaceAccessi
 export { Disclosure, type DisclosureAttributes, type DisclosureAvailability, type DisclosureProps, type DisclosureState, type DisclosureSummaryAttributes } from './disclosure.js';
 export { EmptyState, type EmptyStateAttributes, type EmptyStateHeadingLevel, type EmptyStatePresentation, type EmptyStateProps } from './empty-state.js';
 export { FormField, type FormFieldProps } from './form-field.js';
+export { createFormController, type FormController, type FormControllerOptions, type FormErrors, type FormFieldBinding, type FormFieldName, type FormListener, type FormOperationOptions, type FormSnapshot, type FormState, type FormSubmitHandler, type FormSubmitResult, type FormTouched, type FormValidationContext, type FormValidator } from './form-controller.js';
 export { InlineNotice, type InlineNoticeAnnouncement, type InlineNoticeAttributes, type InlineNoticeProps, type InlineNoticeTone } from './inline-notice.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
 export { SegmentedControl, type SegmentedControlAccessibleName, type SegmentedControlAttributes, type SegmentedControlChangeEvent, type SegmentedControlOption, type SegmentedControlOrientation, type SegmentedControlProps } from './segmented-control.js';
