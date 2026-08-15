@@ -6,6 +6,7 @@ import {
   type MatcherResolution,
   type RouteComponent,
   type RouteComponentSource,
+  type RouteData,
   type RouteMeta,
   type RouteParams,
   type RouteParamsRaw,
@@ -63,6 +64,8 @@ export interface RouteLocationNormalized {
   readonly hash: string;
   readonly params: RouteParams;
   readonly meta: RouteMeta;
+  /** Merged static route-record data; loaders and network clients stay application-owned. */
+  readonly data: RouteData;
   readonly matched: readonly RouteRecordNormalized[];
   readonly state: HistoryState;
   readonly redirectedFrom?: RouteLocationNormalized;
@@ -158,6 +161,7 @@ const startLocation: RouteLocationNormalized = Object.freeze({
   hash: '',
   params: Object.freeze({}),
   meta: Object.freeze({}),
+  data: Object.freeze({}),
   matched: Object.freeze([]),
   state: Object.freeze({}),
 });
@@ -196,6 +200,7 @@ export function createRouter<Routes extends RouteNamedMap = RouteNamedMap>(
     const hash = normalizeHash(parsed.hash);
     const fullPath = `${resolution.path}${stringifyNormalizedQuery(query)}${hash}`;
     const meta = Object.freeze(Object.assign({}, ...resolution.matched.map((record) => record.meta)));
+    const data = Object.freeze(Object.assign({}, ...resolution.matched.map((record) => record.data)));
     return Object.freeze({
       ...(resolution.name ? { name: resolution.name } : {}),
       path: resolution.path,
@@ -205,6 +210,7 @@ export function createRouter<Routes extends RouteNamedMap = RouteNamedMap>(
       hash,
       params: resolution.params,
       meta,
+      data,
       matched: resolution.matched,
       state: Object.freeze({ ...(parsed.state ?? {}) }),
       ...(redirectedFrom ? { redirectedFrom } : {}),

@@ -69,6 +69,35 @@ sorted during serialization; repeated values retain their input order.
 Prototype-like decoded keys remain frozen own data and never participate in
 the parser accumulator's prototype chain.
 
+Route records may also provide static `data`. The router shallow-freezes and
+merges parent-to-child record data onto `currentRoute.value.data`; it never
+fetches, caches, or mutates this data. Keep request-dependent data in the
+application/store layer and use the normalized `query` for URL-owned filters,
+pagination, and shareable view state:
+
+```ts
+const router = createRouter({
+  history: createWebHistory('/app'),
+  routes: [{
+    path: '/catalog',
+    data: { title: 'Catalog', pageSize: 24 },
+    component: ({ route }) => html`
+      <h1>${route.data.title}</h1>
+      <p>Filter: ${route.query.filter ?? 'all'}</p>
+    `,
+  }],
+});
+
+await router.push({ path: '/catalog', query: { filter: 'featured' } });
+```
+
+For request-backed route data, let the application or Store own the client,
+cache, pending/error/retry state, and revalidation. Pass its request-local
+`AbortSignal` through the async source and cancel it when the view owner is
+replaced. SSR and hydration use the request-local Router/Store snapshots; the
+Router itself remains request-free and has no authentication or transport
+policy.
+
 ## Navigation control
 
 `beforeEach`, record `beforeEnter`, and `beforeResolve` run in that order.

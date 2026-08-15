@@ -4,6 +4,11 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ## [Unreleased]
 
+### Added
+
+- Added static, request-free route-record `data` with parent-to-child merging
+  on normalized locations, alongside the documented query-state pattern.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

@@ -6,6 +6,8 @@ export type RouteParamValue = RouteParamPrimitive | readonly RouteParamPrimitive
 export type RouteParamsRaw = Readonly<Record<string, RouteParamValue | null | undefined>>;
 export type RouteParams = Readonly<Record<string, string | readonly string[]>>;
 export type RouteMeta = Readonly<Record<string, unknown>>;
+/** Static, request-free data owned by a route record. */
+export type RouteData = Readonly<Record<string, unknown>>;
 
 export interface RouteComponentContext {
   readonly route: import('./router.js').RouteLocationNormalized;
@@ -42,6 +44,7 @@ export interface RouteRecordRaw {
   readonly redirect?: import('./router.js').RouteLocationRaw | ((to: import('./router.js').RouteLocationNormalized) => import('./router.js').RouteLocationRaw);
   readonly alias?: string | readonly string[];
   readonly meta?: RouteMeta;
+  readonly data?: RouteData;
   readonly beforeEnter?: NavigationGuard | readonly NavigationGuard[];
 }
 
@@ -53,6 +56,7 @@ export interface RouteRecordNormalized {
   readonly children: RouteRecordNormalized[];
   readonly components: Record<string, RouteComponentSource>;
   readonly meta: RouteMeta;
+  readonly data: RouteData;
   readonly redirect?: RouteRecordRaw['redirect'];
   readonly beforeEnter: readonly NavigationGuard[];
 }
@@ -127,6 +131,7 @@ export function createRouterMatcher(routes: readonly RouteRecordRaw[]): RouterMa
         ...(raw.components ?? {}),
       },
       meta: Object.freeze({ ...(raw.meta ?? {}) }),
+      data: Object.freeze({ ...(raw.data ?? {}) }),
       ...(raw.redirect ? { redirect: raw.redirect } : {}),
       beforeEnter: Object.freeze(normalizeGuards(raw.beforeEnter)),
     };
