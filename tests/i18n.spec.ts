@@ -168,10 +168,14 @@ describe('core i18n', () => {
       messages: {
         'en-US': {
           plain: 'Hello {name}',
+          trailing: 'Hello {name}!',
           malformed: 'Broken {name',
+          number: '{value, number}',
           pluralExact: '{count, plural, =2 {exact} one {one} other {other}}',
           pluralFallback: '{count, plural, one {one}}',
+          pluralMalformedChoice: '{count, plural, garbage}',
           selectFallback: '{kind, select, known {known} other {other}}',
+          selectMissing: '{kind, select, known {known}}',
           selectMalformed: '{kind, select, known {known}',
           empty: '{, select, other {value}}',
           numericDate: '{when, date}',
@@ -183,15 +187,69 @@ describe('core i18n', () => {
     expect(i18n.t('plain')).toBe('Hello {name}');
     expect(i18n.t('plain', { values: { name: 'Ada' } })).toBe('Hello Ada');
     expect(i18n.t('plain', { values: {} })).toBe('Hello {name}');
+    expect(i18n.t('trailing', { values: { name: 'Ada' } })).toBe('Hello Ada!');
     expect(i18n.t('malformed', { values: { name: 'Ada' } })).toBe('Broken {name');
+    expect(i18n.t('number', { values: { value: 1234.5 } })).toBe('1,234.5');
     expect(i18n.t('pluralExact', { values: { count: 2 } })).toBe('exact');
     expect(i18n.t('pluralExact', { values: { count: 1 } })).toBe('one');
     expect(i18n.t('pluralExact', { values: { count: 3 } })).toBe('other');
     expect(i18n.t('pluralFallback', { values: { count: 2 } })).toBe('{count, plural, one {one}}');
+    expect(i18n.t('pluralMalformedChoice', { values: { count: 1 } })).toBe('{count, plural, garbage}');
     expect(i18n.t('selectFallback', { values: { kind: 'unknown' } })).toBe('other');
+    expect(i18n.t('selectMissing', { values: { kind: 'unknown' } })).toBe('{kind, select, known {known}}');
     expect(i18n.t('selectMalformed', { values: { kind: 'known' } })).toBe('{kind, select, known {known}');
     expect(i18n.t('empty', { values: {} })).toBe('{, select, other {value}}');
     expect(i18n.t('numericDate', { values: { when: 0 } })).toContain('1970');
     expect(i18n.t('invalidNumber', { values: { value: 'not a number' } })).toBe('{value, number}');
+  });
+
+  it('keeps namespace status request-local when locale changes during loading', async () => {
+    let resolveNamespace: ((messages: { title: string }) => void) | undefined;
+    let rejectNamespace: ((error: unknown) => void) | undefined;
+    const i18n = createI18n({
+      locale: 'en-US',
+      fallbackLocale: ['en-US', 'en'],
+      namespaces: {
+        catalog: () => new Promise<{ title: string }>((resolve) => { resolveNamespace = resolve; }),
+        broken: () => new Promise<{ title: string }>((_, reject) => { rejectNamespace = reject; }),
+      },
+    });
+
+    const catalog = i18n.loadNamespace('catalog');
+    await i18n.setLocale('de');
+    resolveNamespace?.({ title: 'Catalog' });
+    await catalog;
+    expect(i18n.namespaceStatus.value.catalog).toEqual({ state: 'idle' });
+
+    await i18n.setLocale('en-US');
+    expect(i18n.namespaceStatus.value.catalog).toEqual({ state: 'loaded' });
+    expect(i18n.fallbackLocales).toEqual(['en-US', 'en']);
+
+    const broken = i18n.loadNamespace('broken');
+    await i18n.setLocale('de');
+    rejectNamespace?.('late failure');
+    await expect(broken).rejects.toBe('late failure');
+    expect(i18n.namespaceStatus.value.broken).toEqual({ state: 'idle' });
+  });
+
+  it('keeps unsupported values and unknown namespace requests literal', async () => {
+    const i18n = createI18n({
+      locale: 'en',
+      messages: {
+        en: {
+          spaced: '{count, plural,   one {one}   other {other}}',
+          unsupported: '{value, unsupported}',
+          wrongPlural: '{count, plural, one {one} other {other}}',
+          selectMissing: '{kind, select, other {other}}',
+        },
+      },
+    });
+
+    expect(i18n.t('spaced', { values: { count: 1 } })).toBe('one');
+    expect(i18n.t('unsupported', { values: { value: 'value' } })).toBe('{value, unsupported}');
+    expect(i18n.t('wrongPlural', { values: { count: '1' } })).toBe('{count, plural, one {one} other {other}}');
+    expect(i18n.t('selectMissing', { values: {} })).toBe('other');
+    expect(i18n.t('missing', { namespace: 'not-registered' })).toBe('missing');
+    await tick();
   });
 });

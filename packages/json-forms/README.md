@@ -51,33 +51,35 @@ dispatches only when the validation result changes. The application owns the
 authoritative data: update `.data` after a `change` event when the surrounding
 state store accepts or transforms the edit.
 
-## First-slice compatibility
+## Supported schema boundary
 
-The first release renders a root schema with `type: "object"` and direct
-properties of type `string`, `number`, `integer`, `boolean`, or string/number
-`enum`. It supports `title`, `description`, `default`, `required`,
-`minLength`, `maxLength`, `minimum`, `maximum`, `format: "email"`,
+The renderer accepts a root schema with `type: "object"`, primitive fields of
+type `string`, `number`, `integer`, or `boolean`, string/number `enum`, nested
+objects through `properties`, and arrays with one supported `items` schema.
+Nested arrays are rejected so item editing remains bounded and addressable. It
+supports `title`, `description`, `default`, `required`, `minLength`,
+`maxLength`, `minimum`, `maximum`, `minItems`, `maxItems`, `format: "email"`,
 `additionalProperties`, field-level `readOnly`, and `enumNames`.
 
-An optional JSON Forms `VerticalLayout` may order direct-property `Control`
-elements and supply their labels or `options.enumNames`. Native labels, keyboard
-controls, focus indicators, error association, disabled state, and reduced
-motion behavior are built into the element.
+An optional JSON Forms `VerticalLayout` may order root or nested `Control`
+elements and supply their labels or `options.enumNames`. Object fields render
+as fieldsets. Array fields expose 44px Add/Remove controls and preserve the
+same immutable change event, native form value, validation, reset, and state
+restore contracts as direct fields. Native labels, keyboard controls, focus
+indicators, error association, disabled state, and reduced motion behavior are
+built into the element.
 
-Nested objects and layouts, arrays, `$ref`, conditional/composition keywords,
-JSON Forms rules, custom renderer registries, localization, async schemas, and
-file widgets are intentionally unsupported in this slice. An unsupported schema
+`$ref`, conditional/composition keywords, JSON Forms rules, custom renderer
+registries, localization, async schemas, file widgets, nested arrays, and UI
+layouts other than `VerticalLayout` remain unsupported. An unsupported schema
 or UI schema renders an explicit configuration error rather than silently
 dropping fields.
 
 ## 1.6 delivery decision
 
-The direct-property component above is the complete `1.6.0` delivery scope. It
-is the first usable package identified in issue #256 and was delivered in
-[#257](https://github.com/marcmalerei/gluon/issues/257). The listed nested,
-array, reference, composition, rule, registry, localization, and async
-capabilities are not compatibility promises for `1.6.0`; each needs a separate
-future slice that defines its public contract, accessibility behavior, and
-browser evidence before it can become supported. Until then, applications must
-treat the explicit configuration error as the package's only supported response
-to those inputs.
+The direct-property component was the first usable package slice identified in
+issue #256 and delivered in [#257](https://github.com/marcmalerei/gluon/issues/257).
+Nested object and bounded array support is delivered in
+[#377](https://github.com/marcmalerei/gluon/issues/377); the remaining
+unsupported capabilities above still require separate contracts and browser
+evidence.

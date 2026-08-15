@@ -7,6 +7,7 @@ import {
   registerJsonForms,
   type JsonFormChangeDetail,
   type JsonFormValidationChangeDetail,
+  type JsonObject,
   type JsonSchema,
 } from '../packages/json-forms/src/index.js';
 import {
@@ -42,7 +43,7 @@ const bookingSchema = {
 
 function createForm(
   schema: JsonSchema = bookingSchema,
-  data: Record<string, string | number | boolean> = {},
+  data: JsonObject = {},
 ): JsonFormsElement {
   const element = document.createElement(jsonFormsTag) as JsonFormsElement;
   element.schema = schema;
@@ -142,14 +143,195 @@ describe('JSON Forms component', () => {
     const element = createForm({
       type: 'object',
       properties: {
-        address: { type: 'object', properties: { city: { type: 'string' } } },
+        address: { $ref: '#/$defs/address' },
       },
     });
     await settled(element);
 
-    expect(element.errors).toHaveLength(1);
+    expect(element.errors.length).toBeGreaterThan(0);
     expect(element.shadowRoot!.querySelector('[part="configuration-error"]')?.textContent).toContain('address');
     expect(element.checkValidity()).toBe(false);
+  });
+
+  it('renders nested objects and bounded arrays with immutable path updates', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        recipient: {
+          type: 'object',
+          title: 'Recipient details',
+          properties: {
+            name: { type: 'string', title: 'Recipient name' },
+            city: { type: 'string', title: 'Delivery city' },
+          },
+          required: ['name'],
+        },
+        channels: {
+          type: 'array',
+          title: 'Backup channels',
+          items: { type: 'string', enum: ['email', 'sms'] },
+          maxItems: 2,
+        },
+      },
+    } as JsonSchema);
+    element.data = { recipient: { name: 'Ada' }, channels: ['email'] };
+    element.uischema = {
+      type: 'VerticalLayout',
+      elements: [{ type: 'Control', scope: '#/properties/recipient/properties/city', label: 'Town' }],
+    };
+    await settled(element);
+
+    expect(element.shadowRoot!.querySelector('#field-recipient-name')).toBeTruthy();
+    expect(element.shadowRoot!.querySelector('label[for="field-recipient-city"]')?.textContent).toContain('Town');
+    expect(element.shadowRoot!.querySelector('#field-channels-0')).toBeTruthy();
+    const city = element.shadowRoot!.querySelector('#field-recipient-city') as HTMLInputElement;
+    city.value = 'Berlin';
+    city.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    const add = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent === 'Add item')!;
+    add.click();
+    await settled(element);
+    expect(element.data).toEqual({ recipient: { name: 'Ada', city: 'Berlin' }, channels: ['email', 'email'] });
+    expect(element.shadowRoot!.querySelector('#field-channels-1')).toBeTruthy();
+  });
+
+  it('creates typed defaults for object array items and enforces min/max bounds', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        packages: {
+          type: 'array',
+          title: 'Packages',
+          minItems: 1,
+          maxItems: 1,
+          items: {
+            type: 'object',
+            properties: {
+              label: { type: 'string', default: 'Standard' },
+              quantity: { type: 'integer', default: 2 },
+              insured: { type: 'boolean', default: true },
+              metadata: { type: 'object', default: { priority: 'normal' } },
+            },
+          },
+        },
+      },
+    } as JsonSchema);
+    element.data = { packages: [] };
+    await settled(element);
+
+    const add = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent === 'Add item')!;
+    expect(add.disabled).toBe(false);
+    add.click();
+    await settled(element);
+    expect(element.data).toEqual({
+      packages: [{ label: 'Standard', quantity: 2, insured: true, metadata: { priority: 'normal' } }],
+    });
+
+    const buttons = [...element.shadowRoot!.querySelectorAll('button')];
+    expect(buttons.find((button) => button.textContent === 'Add item')?.disabled).toBe(true);
+    expect(buttons.find((button) => button.textContent === 'Remove item 1')?.disabled).toBe(true);
+  });
+
+  it('applies defaults through existing nested objects and object-array items', () => {
+    const schema = {
+      type: 'object',
+      properties: {
+        recipient: {
+          type: 'object',
+          properties: { city: { type: 'string', default: 'Berlin' } },
+        },
+        packages: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: { label: { type: 'string', default: 'Standard' } },
+          },
+        },
+      },
+    } satisfies JsonSchema;
+
+    expect(applySchemaDefaults(schema, { recipient: {}, packages: [{}] })).toEqual({
+      recipient: { city: 'Berlin' },
+      packages: [{ label: 'Standard' }],
+    });
+  });
+
+  it('removes array items and keeps programmatic removal guards fail-closed', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: { tags: { type: 'array', items: { type: 'string' } } },
+    }, { tags: ['first', 'second'] });
+    await settled(element);
+
+    const remove = [...element.shadowRoot!.querySelectorAll('button')]
+      .find((button) => button.textContent === 'Remove item 1')!;
+    remove.click();
+    await settled(element);
+    expect(element.data).toEqual({ tags: ['second'] });
+
+    const internal = element as unknown as {
+      removeArrayItem(path: readonly string[], index: number): void;
+    };
+    internal.removeArrayItem(['missing'], 0);
+    internal.removeArrayItem(['tags'], 0);
+    expect(element.data).toEqual({ tags: [] });
+    internal.removeArrayItem(['tags'], 0);
+    expect(element.data).toEqual({ tags: [] });
+
+    element.disabled = true;
+    internal.removeArrayItem(['tags'], 0);
+    element.disabled = false;
+    element.readOnly = true;
+    internal.removeArrayItem(['tags'], 0);
+    expect(element.data).toEqual({ tags: [] });
+  });
+
+  it('updates missing nested object paths and removes cleared nested array items', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        groups: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              details: {
+                type: 'object',
+                properties: { name: { type: 'string', title: 'Group name' } },
+              },
+              tags: { type: 'array', items: { type: 'string' } },
+            },
+          },
+        },
+      },
+    } as JsonSchema);
+    element.data = { groups: [{}] };
+    await settled(element);
+
+    const name = element.shadowRoot!.querySelector('#field-groups-0-details-name') as HTMLInputElement;
+    name.value = 'Priority';
+    name.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ groups: [{ details: { name: 'Priority' } }] });
+
+    const tagsField = element.shadowRoot!.querySelector('[part*="field-groups-0-tags"]')!;
+    (tagsField.querySelector('button') as HTMLButtonElement).click();
+    await settled(element);
+    const tag = element.shadowRoot!.querySelector('#field-groups-0-tags-0') as HTMLInputElement;
+    tag.value = 'fragile';
+    tag.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ groups: [{ details: { name: 'Priority' }, tags: ['fragile'] }] });
+
+    tag.value = '';
+    tag.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }));
+    await settled(element);
+    expect(element.data).toEqual({ groups: [{ details: { name: 'Priority' }, tags: [] }] });
+
+    const internal = element as unknown as { commitPath(path: readonly string[], value: unknown): void };
+    internal.commitPath(['groups', '2', 'details', 'name'], 'Detached');
+    expect((element.data.groups as readonly Record<string, unknown>[])[2]?.details).toEqual({ name: 'Detached' });
+    internal.commitPath(['groups', '3', '0'], 'Indexed');
+    expect((element.data.groups as readonly unknown[][])[3]?.[0]).toBe('Indexed');
   });
 
   it('validates direct text and numeric constraints and removes a cleared number', async () => {
@@ -238,6 +420,17 @@ describe('JSON Forms component', () => {
       { type: 'object', properties: { email: { type: 'string' } } },
       { type: 'VerticalLayout', elements: [{ type: 'VerticalLayout' }] },
     )).toHaveLength(1);
+    const arrayConfigurationErrors = getJsonFormsConfigurationErrors({
+      type: 'object',
+      properties: {
+        missingItems: { type: 'array' },
+        nestedArray: { type: 'array', items: { type: 'array', items: { type: 'string' } } },
+      },
+    }, undefined);
+    expect(arrayConfigurationErrors.map(({ message }) => message)).toEqual([
+      'Array property "missingItems" must declare supported items.',
+      'Nested arrays are not supported for "nestedArray".',
+    ]);
     expect(getJsonFormsConfigurationErrors({ type: 'object' }, undefined)).toEqual([]);
     expect(validateJsonFormData(
       { type: 'object', properties: { units: { type: 'number', minimum: 'one' as unknown as number } } },
