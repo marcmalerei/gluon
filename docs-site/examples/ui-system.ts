@@ -49,7 +49,9 @@ import {
   TableRegion,
   Tabs,
   Toolbar,
+  ToastViewport,
   createDialogSurfaceController,
+  createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
 import { AppShell, ConfirmationDialog, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
@@ -75,6 +77,7 @@ const purchaseRef: { value?: HTMLButtonElement } = {};
 const analyticsEvents: string[] = [];
 const dialogFocusOptions = { initialFocus: '[data-dialog-initial-focus]' } satisfies Parameters<typeof createFocusScope>[1];
 const dialogController = createDialogSurfaceController(dialogFocusOptions);
+const toastController = createToastController();
 // DialogSurface composes these same public headless primitives; applications can still use them directly.
 const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
@@ -156,6 +159,16 @@ createApp(() => AppShell({
         label: 'Open dialog',
         variant: 'secondary',
         onClick: (event) => openDialog(event.currentTarget as HTMLElement),
+      }),
+      Button({
+        label: 'Show saved notification',
+        variant: 'secondary',
+        onClick: () => toastController.add({
+          id: 'profile-saved-toast',
+          title: 'Profile saved',
+          children: 'Your public details are up to date.',
+          tone: 'success',
+        }),
       }),
       q.button({ type: 'button', popovertarget: 'ui-help', children: 'Open help popover' }),
       ],
@@ -377,6 +390,7 @@ createApp(() => AppShell({
           : null,
       ],
     }),
+    ToastViewport({ controller: toastController, label: 'Profile notifications' }),
   ],
   footer: 'Keyboard: Tab, Shift+Tab, Arrow keys, Home, End',
 })).mount(document.querySelector('#ui-system')!);

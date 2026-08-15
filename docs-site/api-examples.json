@@ -1,6 +1,26 @@
 {
   "version": 1,
   "recipes": {
+    "toast-contract": {
+      "module": "@gluonjs/molecules",
+      "code": [
+        "import { Toast, ToastViewport, createToastController, toastStyles, type ToastProps, type ToastRequest, type ToastContent, type ToastController, type ToastControllerOptions, type ToastRecord, type ToastViewportProps, type ToastAnnouncement, type ToastAttributes, type ToastDismissLabel, type ToastPauseOwner, type ToastTone, type ToastViewportAttributes } from '@gluonjs/molecules';",
+        "const options: ToastControllerOptions = { maxVisible: 3, maxQueue: 8, minimumDuration: 5000 };",
+        "const controller: ToastController = createToastController(options);",
+        "controller.activate();",
+        "const content: ToastContent = { title: 'Added to bag', children: 'A configured product is ready.', tone: 'success', announcement: 'polite' as ToastAnnouncement };",
+        "const request: ToastRequest = { id: 'bag-added', ...content };",
+        "const props: ToastProps = { id: 'bag-added', ...content };",
+        "const record: ToastRecord = { ...request, id: request.id!, timeout: 5000 };",
+        "const attributes: ToastAttributes = { class: 'shop-toast' };",
+        "const viewportAttributes: ToastViewportAttributes = { class: 'shop-toast-viewport' };",
+        "const dismissLabel: ToastDismissLabel = (item) => `Dismiss ${item.id}`;",
+        "const pauseOwner: ToastPauseOwner = 'focus';",
+        "const viewport: ToastViewportProps = { controller, attributes: viewportAttributes, dismissLabel };",
+        "controller.pause('bag-added', pauseOwner); controller.resume('bag-added', pauseOwner);",
+        "console.log(Toast(props), ToastViewport(viewport), toastStyles, content, record, attributes, controller.add(request), controller.items, controller.dismiss('bag-added'), controller.clear(), controller.dispose(), 'success' as ToastTone, 'Toast ToastViewport createToastController ToastProps ToastRequest ToastContent ToastController ToastControllerOptions ToastRecord ToastViewportProps ToastAnnouncement ToastAttributes ToastDismissLabel ToastPauseOwner ToastTone ToastViewportAttributes toastStyles');"
+      ]
+    },
     "json-forms-contract": {
       "module": "@gluonjs/json-forms",
       "code": [
@@ -7367,6 +7387,25 @@
     "packages/molecules/src/type-aliases/FormValidator.md": {
       "recipe": "form-controller",
       "description": "Implement synchronous or asynchronous application-level field validation:"
-    }
+    },
+    "packages/molecules/src/functions/createToastController.md": { "recipe": "toast-contract", "description": "Create the client-owned queue and timing controller:" },
+    "packages/molecules/src/interfaces/Toast.md": { "recipe": "toast-contract", "description": "Describe a request-free transient notification:" },
+    "packages/molecules/src/interfaces/ToastController.md": { "recipe": "toast-contract", "description": "Own bounded notification lifecycle:" },
+    "packages/molecules/src/interfaces/ToastControllerOptions.md": { "recipe": "toast-contract", "description": "Configure queue and access-duration policy:" },
+    "packages/molecules/src/interfaces/ToastContent.md": { "recipe": "toast-contract", "description": "Share caller-owned message content across requests and records:" },
+    "packages/molecules/src/interfaces/ToastProps.md": { "recipe": "toast-contract", "description": "Render a request-free notification item:" },
+    "packages/molecules/src/interfaces/ToastRecord.md": { "recipe": "toast-contract", "description": "Read a stable queued notification record:" },
+    "packages/molecules/src/interfaces/ToastRequest.md": { "recipe": "toast-contract", "description": "Submit caller-owned notification content:" },
+    "packages/molecules/src/interfaces/ToastViewport.md": { "recipe": "toast-contract", "description": "Use the presentation viewport type:" },
+    "packages/molecules/src/interfaces/ToastViewportProps.md": { "recipe": "toast-contract", "description": "Connect a viewport to its controller:" },
+    "packages/molecules/src/type-aliases/ToastAnnouncement.md": { "recipe": "toast-contract", "description": "Choose polite or assertive announcement semantics:" },
+    "packages/molecules/src/type-aliases/ToastAttributes.md": { "recipe": "toast-contract", "description": "Extend the viewport or item attributes:" },
+    "packages/molecules/src/type-aliases/ToastDismissLabel.md": { "recipe": "toast-contract", "description": "Customize each native dismiss control accessible name:" },
+    "packages/molecules/src/type-aliases/ToastPauseOwner.md": { "recipe": "toast-contract", "description": "Identify independent pause ownership such as pointer or focus:" },
+    "packages/molecules/src/type-aliases/ToastTone.md": { "recipe": "toast-contract", "description": "Choose a visual notification tone:" },
+    "packages/molecules/src/type-aliases/ToastViewportAttributes.md": { "recipe": "toast-contract", "description": "Extend the named viewport region attributes:" },
+    "packages/molecules/src/variables/Toast.md": { "recipe": "toast-contract", "description": "Render one transient notification item:" },
+    "packages/molecules/src/variables/toastStyles.md": { "recipe": "toast-contract", "description": "Adopt the separately tree-shakable Toast stylesheet:" },
+    "packages/molecules/src/variables/ToastViewport.md": { "recipe": "toast-contract", "description": "Render the controller-owned notification viewport:" }
   }
 }

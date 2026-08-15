@@ -5,6 +5,7 @@ import { createShopApplication, createShopRoutes } from './app.js';
 import { createShopStore } from './state.js';
 import { shopHydrationStyleSelection } from './styles.js';
 import { createCheckoutFormController } from './ui-extensions.js';
+import { createToastController } from '@gluonjs/molecules';
 
 /** Restores the request snapshots and hydrates the server-rendered GLUON GOODS root. */
 export async function hydrateShop(
@@ -18,9 +19,10 @@ export async function hydrateShop(
     const state = readHydrationState(stateRoot);
     const store = createShopStore(storeManager);
     const checkoutForm = createCheckoutFormController(store.checkout);
+    const toastController = createToastController();
     router = createRouter({
       history: createWebHistory(),
-      routes: createShopRoutes(store, undefined, checkoutForm),
+      routes: createShopRoutes(store, undefined, checkoutForm, toastController),
       scrollBehavior: (_to, _from, saved) => saved ?? { left: 0, top: 0 },
     });
     await hydrateRequestState(state, router, storeManager);
@@ -29,6 +31,7 @@ export async function hydrateShop(
       storeManager,
       storage: null,
       checkoutForm,
+      toastController,
       styleTarget: document,
       hydrateStyles: true,
     });
@@ -38,7 +41,7 @@ export async function hydrateShop(
       styleSelection: shopHydrationStyleSelection,
       styleRoot: document,
     });
-    return Object.freeze({ ...hydrated, router, storeManager, store, uiOwner: shop.uiOwner! });
+    return Object.freeze({ ...hydrated, router, storeManager, store, toastController: shop.toastController, uiOwner: shop.uiOwner! });
   } catch (error) {
     router?.destroy();
     storeManager.dispose();

@@ -268,6 +268,39 @@ order ID, delivery email, total, and caller-owned continue-shopping action.
 The empty bag uses compact `EmptyState` composition with a semantic heading and
 caller-owned shop route while the enclosing DialogSurface retains focus and
 dismissal ownership.
+`Toast` is a request-free transient item. Pair it with `createToastController()`
+and `ToastViewport()` for bounded visible and waiting queues, stable safe DOM
+IDs, timeout, independent hover/focus pause ownership, a minimum five-second
+assistive-technology access window, and manual or programmatic dismissal. The
+viewport activates its controller only after its browser ref mounts. Calls to
+`add()` while inactive are validated but intentionally discarded; SSR therefore
+renders only the named empty viewport, arms no timer, and hydration cannot replay
+pre-mount feedback. A promoted item starts its complete deadline at promotion,
+while queued items do not age. Re-adding an ID replaces and promotes that record
+with a fresh deadline. `items` is a side-effect-free visible snapshot.
+
+```ts
+const toasts = createToastController({ maxVisible: 2, maxQueue: 8 });
+
+// Render once in the application root; mounting activates the controller.
+ToastViewport({
+  controller: toasts,
+  label: 'Bag updates',
+  dismissLabel: (record) => `Dismiss ${record.id}`,
+});
+
+toasts.add({
+  id: 'bag-added',
+  title: 'Added to bag',
+  children: 'Orbit Lamp is ready in your bag.',
+  tone: 'success',
+});
+```
+
+`maxVisible` accepts 1–100, `maxQueue` 0–1000, and timeout values are finite
+safe integers up to 24 hours. `minimumDuration` cannot be below 5000ms. IDs
+must match `[A-Za-z][A-Za-z0-9_-]*`. Dispose the controller with its application
+owner; disposal clears all callbacks and is idempotent.
 Checkout uses `TableRegion` around its native captioned order table. The shop
 owns every header, row, price, and total; the molecule adds the region summary
 and narrow-layout overflow affordance without introducing grid interaction.

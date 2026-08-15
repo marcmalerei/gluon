@@ -307,6 +307,7 @@ export const shopStyles = css`
     .bag-summary > div { display: flex; justify-content: space-between; font-size: 20px; }
     .bag-summary p { margin: 8px 0 18px; color: var(--shop-muted); font-size: 12px; }
     .bag-summary .primary-button { width: 100%; }
+    .shop-toast-viewport { inset-block-start: 88px; inset-inline: 1rem auto; }
 
     .mobile-menu { width: min(440px, 100%); }
     .mobile-menu > nav { display: grid; }

@@ -3,8 +3,8 @@
   "measuredAt": "2026-07-12",
   "fullUiExample": {
     "before": {
-      "rawBytes": 32503,
-      "gzipBytes": 5034,
+      "rawBytes": 34432,
+      "gzipBytes": 5349,
       "moduleCount": 3,
       "modules": [
         "packages/atoms/src/styles.ts",
@@ -85,6 +85,13 @@
         ".gluon-tabs-panel",
         ".gluon-tabs-tab",
         ".gluon-textarea",
+        ".gluon-toast",
+        ".gluon-toast-actions",
+        ".gluon-toast-announcement",
+        ".gluon-toast-dismiss",
+        ".gluon-toast-message",
+        ".gluon-toast-title",
+        ".gluon-toast-viewport",
         ".gluon-toggle-button"
       ]
     },
@@ -119,6 +126,7 @@
         "packages/molecules/src/segmented-control-styles.ts",
         "packages/molecules/src/table-region-styles.ts",
         "packages/molecules/src/tabs-styles.ts",
+        "packages/molecules/src/toast-styles.ts",
         "packages/organisms/src/app-shell-styles.ts"
       ],
       "stylesheetCount": 27,
@@ -200,6 +208,13 @@
         ".gluon-tabs-panel",
         ".gluon-tabs-tab",
         ".gluon-textarea",
+        ".gluon-toast",
+        ".gluon-toast-actions",
+        ".gluon-toast-announcement",
+        ".gluon-toast-dismiss",
+        ".gluon-toast-message",
+        ".gluon-toast-title",
+        ".gluon-toast-viewport",
         ".gluon-toggle-button"
       ]
     }

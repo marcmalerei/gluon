@@ -15,6 +15,9 @@
   explicit loading/empty/partial-failure/disabled states, and component-owned
   responsive custom properties (#372).
 
+- Added request-free `Toast`, client-activated `ToastViewport`, and validated
+  `createToastController()` primitives with keyed live regions, bounded queue
+  promotion, exact pause deadlines, and stale-notification-safe SSR hydration.
 - Added `createFormController()` as a DOM-independent, request-free form
   orchestration contract for typed field registration, values, touched/dirty
   state, field errors, asynchronous validation, submission lifecycle,

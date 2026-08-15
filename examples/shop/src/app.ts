@@ -40,6 +40,7 @@ import { createShopStore, type ShopStore } from './state.js';
 import type { ProductConfiguratorRenderer } from './product-configurator.js';
 import { installShopUi } from './styles.js';
 import { createCheckoutFormController, type CheckoutFormController } from './ui-extensions.js';
+import { createToastController, ToastViewport, type ToastController } from '@gluonjs/molecules';
 
 export interface ShopApplication {
   readonly app: GluonApp;
@@ -48,6 +49,7 @@ export interface ShopApplication {
   readonly store: ShopStore;
   readonly checkoutForm: CheckoutFormController;
   readonly uiOwner?: UiOwner;
+  readonly toastController: ToastController;
 }
 
 export interface ShopApplicationOptions {
@@ -57,6 +59,7 @@ export interface ShopApplicationOptions {
   readonly styleTarget?: StyleTarget;
   readonly hydrateStyles?: boolean;
   readonly checkoutForm?: CheckoutFormController;
+  readonly toastController?: ToastController;
 }
 
 export function createShopApplication(
@@ -75,9 +78,10 @@ export function createShopApplication(
   });
   const store = createShopStore(storeManager);
   const checkoutForm = options.checkoutForm ?? createCheckoutFormController(store.checkout);
+  const toastController = options.toastController ?? createToastController();
   const router = options.router ?? createRouter({
     history: history!,
-    routes: createShopRoutes(store, undefined, checkoutForm),
+    routes: createShopRoutes(store, undefined, checkoutForm, toastController),
     scrollBehavior: (_to, _from, saved) => saved ?? { left: 0, top: 0 },
   });
   router.afterEach(() => {
@@ -97,6 +101,7 @@ export function createShopApplication(
       })}</main>
       ${SiteFooter()}
       ${BagOverlay(store)}
+      ${ToastViewport({ controller: toastController, attributes: { class: 'shop-toast-viewport' } })}
     `;
   });
   app.use(createRouterPlugin(router));
@@ -115,14 +120,16 @@ export function createShopApplication(
     disposeShopDialogs();
     uiOwner?.dispose();
     checkoutForm.dispose();
+    toastController.dispose();
   });
-  return { app, router, storeManager, store, checkoutForm, ...(uiOwner ? { uiOwner } : {}) };
+  return { app, router, storeManager, store, checkoutForm, toastController, ...(uiOwner ? { uiOwner } : {}) };
 }
 
 export function createShopRoutes(
   store: ShopStore,
   renderProductConfigurator?: ProductConfiguratorRenderer,
   checkoutForm: CheckoutFormController = createCheckoutFormController(store.checkout),
+  toastController?: ToastController,
 ): readonly RouteRecordRaw[] {
   return [
     { path: '/', name: 'home', component: () => HomePage(store) },
@@ -130,7 +137,7 @@ export function createShopRoutes(
     {
       path: '/products/:slug',
       name: 'product',
-      component: () => ProductPage(store, renderProductConfigurator),
+      component: () => ProductPage(store, renderProductConfigurator, toastController),
     },
     { path: '/shipping', name: 'shipping', component: () => ShippingPage(store) },
     { path: '/returns', name: 'returns', component: () => ReturnsPage(store) },
