@@ -55,7 +55,7 @@ describe('quarks', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(tipTrigger.getAttribute('aria-describedby')).toBe('tip-content');
     expect(tip.hidden).toBe(false);
-    tip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    tipTrigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(tip.hidden).toBe(true);
     const cardTrigger = root.querySelector('#card-trigger') as HTMLElement;
     const card = root.querySelector('#card-content') as HTMLElement;
