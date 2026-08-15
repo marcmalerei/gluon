@@ -6,6 +6,8 @@
 
 - Added an immutable protocol handshake with explicit capability names for
   external browser, Vite, and editor clients.
+- Added bounded source-location metadata with runtime kind, path, line, and
+  column validation for independent inspector clients.
 
 ## [1.9.0] - 2026-08-15
 

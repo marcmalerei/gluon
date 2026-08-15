@@ -2,12 +2,15 @@ import { setGluonRenderDebugHook, type GluonApp, type GluonRenderDebugEvent } fr
 import {
   DevtoolsProtocol,
   toDevtoolsValue,
+  toDevtoolsSourceLocation,
   type ApplicationSnapshot,
   type ComponentSnapshot,
   type DevtoolsEvent,
   type DevtoolsEventKind,
   type DevtoolsHandshake,
   type DevtoolsSnapshot,
+  type DevtoolsSourceLocation,
+  type DevtoolsSourceLocationInput,
   type DevtoolsValue,
 } from '@gluonjs/devtools-api';
 import type { Plugin } from 'vite';
@@ -43,6 +46,27 @@ export interface DevtoolsBridgeOptions {
 
 interface RegisteredApplication extends RegisterApplicationOptions { readonly cleanups: Array<() => void> }
 
+export interface DevtoolsArtifactContract {
+  readonly name: 'gluon-devtools-browser-inspector';
+  readonly version: 1;
+  readonly format: 'esm-package';
+  readonly packageName: '@gluonjs/devtools';
+  readonly packageExport: '.';
+  readonly manifest: './browser-inspector.manifest.json';
+  readonly inspectorExport: 'mountGluonDevtools';
+  readonly virtualId: string;
+  readonly runtime: {
+    readonly mode: 'serve-only';
+    readonly global: typeof GLUON_DEVTOOLS_GLOBAL;
+    readonly productionExposure: false;
+  };
+  readonly security: {
+    readonly permissions: readonly [];
+    readonly remoteInspection: false;
+    readonly sourceNavigation: 'callback-only-redacted';
+  };
+}
+
 export class GluonDevtoolsBridge {
   readonly protocol = new DevtoolsProtocol();
   readonly enabled: boolean;
@@ -75,11 +99,12 @@ export class GluonDevtoolsBridge {
         to: to?.fullPath ?? to?.path ?? '',
         from: from?.fullPath ?? from?.path ?? '',
         status: failure ? 'failed' : 'completed',
-        failure,
+        failure: sanitizePayload(failure),
+        sourceLocation: routerSourceLocation(to, from, failure),
       });
     }));
     if (options.store) cleanups.push(options.store.subscribe((transaction) => {
-      this.protocol.record(options.id, 'store', transaction);
+      this.protocol.record(options.id, 'store', normalizeStoreTransaction(transaction));
     }));
     return () => {
       if (!this.applications.delete(options.id)) return;
@@ -99,7 +124,7 @@ export class GluonDevtoolsBridge {
   }
 
   recordError(applicationId: string, payload: unknown): DevtoolsEvent | undefined {
-    return this.record(applicationId, 'error', payload);
+    return this.record(applicationId, 'error', normalizeErrorPayload(payload));
   }
 
   snapshot(): DevtoolsSnapshot { return this.protocol.snapshot(); }
@@ -131,7 +156,9 @@ export class GluonDevtoolsBridge {
       dependencies: event.dependencies.length,
       duration: event.duration,
       failed: event.failed,
-      error: event.error,
+      error: sanitizePayload(event.error),
+      sourceLocation: toDevtoolsValue(componentSourceLocation(event.element, 'render')),
+      errorSourceLocation: toDevtoolsValue(sourceLocationForKind(errorSourceLocation(event.error), 'error')),
     }, event.endedAt);
   }
 
@@ -155,18 +182,47 @@ export function createDevtoolsBridge(options: DevtoolsBridgeOptions = {}): Gluon
   return new GluonDevtoolsBridge(options);
 }
 
+export function createDevtoolsArtifactContract(virtualId = 'virtual:gluon-devtools'): DevtoolsArtifactContract {
+  return Object.freeze({
+    name: 'gluon-devtools-browser-inspector',
+    version: 1,
+    format: 'esm-package',
+    packageName: '@gluonjs/devtools',
+    packageExport: '.',
+    manifest: './browser-inspector.manifest.json',
+    inspectorExport: 'mountGluonDevtools',
+    virtualId,
+    runtime: {
+      mode: 'serve-only',
+      global: GLUON_DEVTOOLS_GLOBAL,
+      productionExposure: false,
+    },
+    security: {
+      permissions: [],
+      remoteInspection: false,
+      sourceNavigation: 'callback-only-redacted',
+    },
+  } satisfies DevtoolsArtifactContract);
+}
+
 export interface MountedDevtools { readonly element: HTMLElement; unmount(): void }
+
+export interface DevtoolsInspectorOptions {
+  /** App-owned navigation. Gluon passes redacted metadata and never constructs an editor URI. */
+  readonly navigateToSource?: (location: DevtoolsSourceLocation) => void;
+}
 
 export function mountGluonDevtools(
   bridge: GluonDevtoolsBridge,
   target: Element = document.body,
+  options: DevtoolsInspectorOptions = {},
 ): MountedDevtools {
   if (!bridge.enabled) throw new Error('GLUON_DEVTOOLS_DISABLED');
   const host = document.createElement('aside');
   host.setAttribute('aria-label', 'Gluon Devtools');
   const shadow = host.attachShadow({ mode: 'open' });
   const sheet = new CSSStyleSheet();
-  sheet.replaceSync(`:host{position:fixed;right:12px;bottom:12px;z-index:2147483647;width:min(420px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:#111;color:#fff;border:1px solid #555;font:12px/1.4 ui-monospace,monospace}header{position:sticky;top:0;display:flex;gap:8px;padding:10px;background:#181818}button{min-height:32px;background:#c8ff00;border:0;color:#111}section{padding:10px;border-top:1px solid #444}ol{padding-left:24px}code{white-space:pre-wrap}`);
+  sheet.replaceSync(`:host{position:fixed;right:12px;bottom:12px;z-index:2147483647;width:min(420px,calc(100vw - 24px));max-height:70vh;overflow:auto;background:#111;color:#fff;border:1px solid #555;font:12px/1.4 ui-monospace,monospace}header{position:sticky;top:0;display:flex;gap:8px;padding:10px;background:#181818}button{min-height:32px;background:#c8ff00;border:0;color:#111}section{padding:10px;border-top:1px solid #444}ol{padding-left:24px}code{white-space:pre-wrap}.sources{display:grid;gap:6px;margin:8px 0 0;padding:0;list-style:none}.sources button{width:100%;text-align:left}`);
   shadow.adoptedStyleSheets = [sheet];
   const render = (snapshot: DevtoolsSnapshot) => {
     const selected = snapshot.applications.find((application) => application.selected);
@@ -181,9 +237,16 @@ export function mountGluonDevtools(
       header.append(button);
     }
     shadow.append(header);
+    const timeline = snapshot.timeline.filter((event) => event.applicationId === selected?.id);
     if (selected) shadow.append(
       inspectorSection('Application', JSON.stringify(selected, null, 2)),
-      inspectorSection('Timeline', JSON.stringify(snapshot.timeline.filter((event) => event.applicationId === selected.id), null, 2)),
+      inspectorSourcesSection(selected, timeline, options),
+      inspectorSection('Timeline', JSON.stringify(timeline.map((event) => ({
+        sequence: event.sequence,
+        kind: event.kind,
+        timestamp: event.timestamp,
+        payload: event.payload,
+      })), null, 2)),
     );
   };
   const unsubscribe = bridge.protocol.subscribe(render);
@@ -203,7 +266,7 @@ export function gluonDevtoolsPlugin(options: GluonDevtoolsPluginOptions = {}): P
     resolveId(id) { return id === publicId ? resolvedId : null; },
     load(id) {
       if (id !== resolvedId) return null;
-      return `import { createDevtoolsBridge } from '@gluonjs/devtools';\nexport const devtools = createDevtoolsBridge({ enabled: ${enabled}, exposeGlobal: ${enabled} });`;
+      return `import { createDevtoolsArtifactContract, createDevtoolsBridge } from '@gluonjs/devtools';\nexport const devtoolsArtifactContract = createDevtoolsArtifactContract(${JSON.stringify(publicId)});\nexport const devtools = createDevtoolsBridge({ enabled: ${enabled}, exposeGlobal: ${enabled} });`;
     },
   };
 }
@@ -222,6 +285,7 @@ function componentChildren(root: Element, applicationId: string): ComponentSnaps
       attributes,
       properties,
       stylesheets: element.shadowRoot?.adoptedStyleSheets.length ?? 0,
+      sourceLocation: componentSourceLocation(element, 'component'),
       children,
     }];
   });
@@ -235,4 +299,150 @@ function inspectorSection(title: string, value: string): HTMLElement {
   code.textContent = value;
   section.append(heading, document.createElement('br'), code);
   return section;
+}
+
+interface InspectorSourceTarget {
+  readonly label: string;
+  readonly location: DevtoolsSourceLocation;
+}
+
+function inspectorSourcesSection(
+  application: ApplicationSnapshot,
+  timeline: readonly DevtoolsEvent[],
+  options: DevtoolsInspectorOptions,
+): HTMLElement {
+  const section = document.createElement('section');
+  const heading = document.createElement('strong');
+  heading.textContent = 'Sources';
+  section.append(heading);
+  const targets = [
+    ...componentSourceTargets(application.components),
+    ...timeline.flatMap(eventSourceTargets),
+  ];
+  if (targets.length === 0) {
+    const empty = document.createElement('p');
+    empty.textContent = 'No source locations recorded.';
+    section.append(empty);
+    return section;
+  }
+  const list = document.createElement('ol');
+  list.className = 'sources';
+  for (const target of targets) {
+    const item = document.createElement('li');
+    if (options.navigateToSource) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.sourceKind = target.location.kind;
+      button.textContent = target.label;
+      button.addEventListener('click', () => options.navigateToSource?.(target.location));
+      item.append(button);
+    } else {
+      const label = document.createElement('code');
+      label.textContent = target.label;
+      item.append(label);
+    }
+    list.append(item);
+  }
+  section.append(list);
+  return section;
+}
+
+function componentSourceTargets(components: readonly ComponentSnapshot[]): InspectorSourceTarget[] {
+  return components.flatMap((component) => {
+    const current = component.sourceLocation
+      ? [{ label: `${component.name}: ${formatSourceLocation(component.sourceLocation)}`, location: component.sourceLocation }]
+      : [];
+    return [...current, ...componentSourceTargets(component.children)];
+  });
+}
+
+function eventSourceTargets(event: DevtoolsEvent): InspectorSourceTarget[] {
+  if (!event.payload || typeof event.payload !== 'object' || Array.isArray(event.payload)) return [];
+  const payload = event.payload as Readonly<Record<string, DevtoolsValue>>;
+  return ['sourceLocation', 'errorSourceLocation'].flatMap((key) => {
+    const location = toDevtoolsSourceLocation(payload[key] as unknown as DevtoolsSourceLocationInput | undefined);
+    return location ? [{ label: `${event.kind} #${event.sequence}: ${formatSourceLocation(location)}`, location }] : [];
+  });
+}
+
+function formatSourceLocation(location: DevtoolsSourceLocation): string {
+  const line = location.line ? `:${location.line}` : '';
+  const column = location.column ? `:${location.column}` : '';
+  return `${location.kind} ${location.file}${line}${column}`;
+}
+
+function routerSourceLocation(to: any, from: any, failure: unknown): DevtoolsSourceLocation | undefined {
+  return sourceLocationForKind(
+    sourceLocationCandidate(to) ?? sourceLocationCandidate(from) ?? sourceLocationCandidate(failure),
+    'router',
+  );
+}
+
+function normalizeStoreTransaction(transaction: unknown): unknown {
+  if (!transaction || typeof transaction !== 'object' || Array.isArray(transaction)) return transaction;
+  const snapshot = transaction as Record<string, unknown>;
+  const location = sourceLocationCandidate(snapshot);
+  const sanitized = sanitizePayload(snapshot) as Record<string, unknown>;
+  const sourceLocation = sourceLocationForKind(location, 'store');
+  return sourceLocation ? { ...sanitized, sourceLocation } : sanitized;
+}
+
+function normalizeErrorPayload(payload: unknown): unknown {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload;
+  const snapshot = payload as Record<string, unknown>;
+  const location = sourceLocationCandidate(snapshot) ?? errorSourceLocation(snapshot.error);
+  const sanitized = sanitizePayload(snapshot) as Record<string, unknown>;
+  const sourceLocation = sourceLocationForKind(location, 'error');
+  return sourceLocation ? { ...sanitized, sourceLocation } : sanitized;
+}
+
+function errorSourceLocation(value: unknown): DevtoolsSourceLocationInput | undefined {
+  return sourceLocationCandidate(value);
+}
+
+function sourceLocationCandidate(value: unknown): DevtoolsSourceLocationInput | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const candidate = value as { readonly sourceLocation?: DevtoolsSourceLocationInput; readonly location?: DevtoolsSourceLocationInput };
+  return candidate.sourceLocation ?? candidate.location;
+}
+
+function sourceLocationForKind(
+  location: DevtoolsSourceLocationInput | undefined,
+  kind: DevtoolsSourceLocation['kind'],
+): DevtoolsSourceLocation | undefined {
+  if (!location) return undefined;
+  return toDevtoolsSourceLocation({
+    kind,
+    file: location.file,
+    line: location.line,
+    column: location.column,
+    redacted: location.redacted,
+  });
+}
+
+function sanitizePayload(value: unknown, seen = new WeakSet<object>()): unknown {
+  if (value instanceof Error) return { name: value.name, message: value.message };
+  if (!value || typeof value !== 'object') return value;
+  if (seen.has(value)) return '[Circular]';
+  seen.add(value);
+  if (Array.isArray(value)) return value.map((entry) => sanitizePayload(entry, seen));
+  const result: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (key === 'location' || key === 'sourceLocation') continue;
+    result[key] = sanitizePayload(entry, seen);
+  }
+  return result;
+}
+
+function componentSourceLocation(
+  element: Element,
+  kind: DevtoolsSourceLocationInput['kind'],
+): DevtoolsSourceLocation | undefined {
+  const constructor = element.constructor as typeof HTMLElement & {
+    readonly sourceLocation?: DevtoolsSourceLocationInput | DevtoolsSourceLocation;
+    readonly renderLocation?: DevtoolsSourceLocationInput | DevtoolsSourceLocation;
+  };
+  const location = constructor.sourceLocation ?? constructor.renderLocation;
+  if (!location) return undefined;
+  return sourceLocationForKind(location, kind);
 }

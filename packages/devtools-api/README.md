@@ -7,14 +7,15 @@
 Environment-neutral protocol version 1 for independent Gluon Devtools clients.
 `DevtoolsProtocol` owns application selection and one globally ordered timeline
 of application, component, render, Router, Store, scheduler, event, and error
-records. Snapshots are JSON-safe and preserve independent application IDs.
+records. Snapshots are JSON-safe, preserve independent application IDs, and can
+carry redacted source-location metadata for supported navigation targets.
 
 External clients begin with `protocol.handshake()`. It returns the protocol
 version and immutable capability names, so a browser inspector, Vite overlay,
 or editor integration can refuse an incompatible bridge before subscribing to
 records. The current capabilities are application selection, component
-snapshots, the ordered timeline, and application/render/Router/Store/scheduler/
-event/error records.
+snapshots, source locations, the ordered timeline, and application/render/
+Router/Store/scheduler/event/error records.
 
 The package has no browser or framework dependency.
 
@@ -63,6 +64,13 @@ unregister();
 application IDs. `snapshot()` returns immutable application and timeline
 arrays; `clearTimeline()` removes recorded events without unregistering
 applications.
+
+`toDevtoolsSourceLocation()` converts caller-owned source references into a
+bounded protocol record. It keeps only a basename-like file label, positive
+line and column numbers, and a `redacted` flag so clients can navigate without
+receiving production paths or excerpts. Runtime input is untrusted: kinds,
+bounds, separators, URL suffixes, control characters, and even an existing
+`redacted` marker are validated again.
 
 ## License
 

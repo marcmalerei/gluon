@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "name": "gluon-devtools-browser-inspector",
+  "package": "@gluonjs/devtools",
+  "format": "esm-package",
+  "packageExport": ".",
+  "inspectorExport": "mountGluonDevtools",
+  "protocolVersion": 1,
+  "runtime": {
+    "mode": "serve-only",
+    "productionExposure": false
+  },
+  "security": {
+    "permissions": [],
+    "remoteInspection": false,
+    "sourceNavigation": "callback-only-redacted",
+    "sourceExcerpts": false
+  }
+}

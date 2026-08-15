@@ -3,9 +3,10 @@ import {
   DevtoolsProtocol,
   GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,
   GLUON_DEVTOOLS_PROTOCOL_VERSION,
+  toDevtoolsSourceLocation,
   toDevtoolsValue,
 } from '../packages/devtools-api/src/index.js';
-import { gluonDevtoolsPlugin } from '../packages/devtools/src/index.js';
+import { createDevtoolsArtifactContract, gluonDevtoolsPlugin } from '../packages/devtools/src/index.js';
 
 describe('Devtools protocol', () => {
   test('selects and snapshots multiple applications independently', () => {
@@ -37,6 +38,7 @@ describe('Devtools protocol', () => {
       protocol: GLUON_DEVTOOLS_PROTOCOL_VERSION,
       capabilities: GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,
     });
+    expect(GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES).toContain('source-locations');
     expect(Object.isFrozen(protocol.handshake())).toBe(true);
   });
 
@@ -55,6 +57,65 @@ describe('Devtools protocol', () => {
     expect(toDevtoolsValue(circular)).toEqual({ count: 1, value: 'NaN', missing: 'undefined', self: '[Circular]' });
     expect(toDevtoolsValue(new Error('broken'))).toEqual({ name: 'Error', message: 'broken' });
     expect(toDevtoolsValue([1n, Symbol('x'), () => undefined])).toEqual(['1', 'Symbol(x)', expect.any(String)]);
+  });
+
+  test('redacts source locations to a bounded basename and positive line metadata', () => {
+    expect(toDevtoolsSourceLocation({
+      kind: 'component',
+      file: '/private/worktrees/gluon/packages/devtools/src/index.ts?cache=1',
+      line: 12.8,
+      column: 0,
+    })).toEqual({
+      kind: 'component',
+      file: 'index.ts',
+      line: 12,
+      column: undefined,
+      redacted: true,
+    });
+    expect(toDevtoolsSourceLocation({
+      kind: 'store',
+      file: 'C:\\private\\store\\bag\u0000.ts#L4',
+      line: 1_000_001,
+      column: Number.POSITIVE_INFINITY,
+      redacted: false,
+    })).toEqual({
+      kind: 'store',
+      file: 'bag.ts',
+      line: undefined,
+      column: undefined,
+      redacted: true,
+    });
+    expect(toDevtoolsSourceLocation({
+      kind: 'error',
+      file: `${'a'.repeat(130)}.ts`,
+      line: 1,
+      column: 100_000,
+      redacted: true,
+    })).toMatchObject({ file: `${'a'.repeat(117)}...`, redacted: true });
+    expect(toDevtoolsSourceLocation({ kind: 'unknown', file: '/private/leak.ts' } as never)).toBeUndefined();
+  });
+
+  test('publishes a reproducible browser inspector artifact contract', () => {
+    expect(createDevtoolsArtifactContract()).toEqual({
+      name: 'gluon-devtools-browser-inspector',
+      version: 1,
+      format: 'esm-package',
+      packageName: '@gluonjs/devtools',
+      packageExport: '.',
+      manifest: './browser-inspector.manifest.json',
+      inspectorExport: 'mountGluonDevtools',
+      virtualId: 'virtual:gluon-devtools',
+      runtime: {
+        mode: 'serve-only',
+        global: '__GLUON_DEVTOOLS__',
+        productionExposure: false,
+      },
+      security: {
+        permissions: [],
+        remoteInspection: false,
+        sourceNavigation: 'callback-only-redacted',
+      },
+    });
   });
 });
 

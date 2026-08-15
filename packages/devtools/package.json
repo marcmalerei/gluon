@@ -26,6 +26,7 @@
   },
   "files": [
     "dist",
+    "browser-inspector.manifest.json",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"

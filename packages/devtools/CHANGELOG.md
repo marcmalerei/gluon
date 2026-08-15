@@ -6,6 +6,8 @@
 
 - Exposed the Devtools API handshake through `GluonDevtoolsBridge` so host
   panels can negotiate the protocol before subscribing.
+- Added app-owned navigation for redacted component, render, Router, Store, and
+  error locations plus a validated browser-inspector package manifest.
 
 ## [1.9.0] - 2026-08-15
 

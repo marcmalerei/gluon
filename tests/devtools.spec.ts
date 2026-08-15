@@ -11,6 +11,7 @@ import {
 import { nextTick, ref } from '@gluonjs/reactivity';
 import {
   GLUON_DEVTOOLS_GLOBAL,
+  createDevtoolsArtifactContract,
   createDevtoolsBridge,
   gluonDevtoolsPlugin,
   mountGluonDevtools,
@@ -71,12 +72,12 @@ describe('Gluon Devtools browser bridge', () => {
       context: () => ({ locale: 'en' }),
     });
     bridge.registerApplication({ id: 'second', app: { mounted: false }, root: second, state: () => ({ ready: true }) });
-    routerHook?.({ fullPath: '/next' }, { fullPath: '/first' });
-    routerHook?.({ path: '/failed' }, { path: '/next' }, new Error('blocked'));
-    storeHook?.({ id: 1, type: 'action' });
+    routerHook?.({ fullPath: '/next', sourceLocation: { kind: 'router', file: '/private/routes/catalog.ts', line: 7 } }, { fullPath: '/first' });
+    routerHook?.({ path: '/failed' }, { path: '/next' }, { message: 'blocked', location: { kind: 'error', file: '/private/router/failure.ts' } });
+    storeHook?.({ id: 1, type: 'action', sourceLocation: { kind: 'store', file: '/private/store/bag.ts', line: 19, column: 4 }, nested: { location: { file: '/private/store/nested.ts' } } });
     bridge.recordScheduler('first', { phase: 'pre' });
     bridge.recordEvent('first', { name: 'save' });
-    bridge.recordError('first', new Error('broken'));
+    bridge.recordError('first', { error: { message: 'broken', location: { kind: 'error', file: '/private/errors/nested.ts' } }, sourceLocation: { kind: 'error', file: '/private/errors/handler.ts', line: 4 } });
     bridge.selectApplication('second');
     const snapshot = bridge.snapshot();
     expect(globalObject[GLUON_DEVTOOLS_GLOBAL]).toBe(bridge);
@@ -87,6 +88,18 @@ describe('Gluon Devtools browser bridge', () => {
     expect(snapshot.timeline.map((entry) => entry.kind)).toEqual([
       'application', 'application', 'router', 'router', 'store', 'scheduler', 'event', 'error', 'application',
     ]);
+    expect(snapshot.timeline.filter((entry) => entry.kind === 'router')[0]?.payload).toMatchObject({
+      sourceLocation: { file: 'catalog.ts', line: 7, redacted: true },
+    });
+    expect(snapshot.timeline.filter((entry) => entry.kind === 'store')[0]?.payload).toMatchObject({
+      sourceLocation: { file: 'bag.ts', line: 19, column: 4, redacted: true },
+    });
+    expect(snapshot.timeline.filter((entry) => entry.kind === 'error')[0]?.payload).toMatchObject({
+      sourceLocation: { file: 'handler.ts', line: 4, redacted: true },
+    });
+    expect(JSON.stringify(snapshot)).not.toContain('/private/');
+    storeHook?.(null);
+    bridge.recordError('first', 'plain error');
     unregisterFirst();
     unregisterFirst();
     expect(removeRouter).toHaveBeenCalledOnce();
@@ -99,6 +112,12 @@ describe('Gluon Devtools browser bridge', () => {
     const signal = ref(0);
     class DebugCounter extends GluonElement {
       static override readonly properties = { count: Number };
+      static readonly sourceLocation = {
+        kind: 'component' as const,
+        file: '/private/worktrees/gluon/examples/shop/src/product-configurator.ts',
+        line: 42,
+        column: 7,
+      };
       declare count: number;
       protected override render() { return html`<button>${this.count}:${signal.value}</button>`; }
     }
@@ -129,6 +148,7 @@ describe('Gluon Devtools browser bridge', () => {
     const snapshot = bridge.snapshot();
     expect(snapshot.applications[0]?.components[0]).toMatchObject({
       name: 'devtools-debug-counter', properties: { count: 2 }, stylesheets: 0,
+      sourceLocation: { kind: 'component', file: 'product-configurator.ts', line: 42, column: 7, redacted: true },
     });
     expect(snapshot.applications[0]?.components.find(({ name }) => name === 'devtools-functional-counter')).toMatchObject({
       name: 'devtools-functional-counter', properties: { count: 3 }, stylesheets: 0,
@@ -142,6 +162,7 @@ describe('Gluon Devtools browser bridge', () => {
       expect.objectContaining({ type: 'property', name: 'count' }),
       expect.objectContaining({ type: 'reactive' }),
     ]));
+    expect(debugRenders.some((render) => (render.payload as any).sourceLocation?.file === 'product-configurator.ts')).toBe(true);
   });
 
   test('mounts a selectable browser-hosted inspector with a constructed sheet', () => {
@@ -157,6 +178,48 @@ describe('Gluon Devtools browser bridge', () => {
     expect([...buttons].map((button) => button.textContent)).toEqual(['One', 'Two']);
     (buttons[1] as HTMLButtonElement).click();
     expect(bridge.snapshot().selectedApplicationId).toBe('two');
+  });
+
+  test('delegates redacted component, render, Router, Store, and error navigation to the application', async () => {
+    class SourceTarget extends GluonElement {
+      static readonly sourceLocation = { kind: 'component' as const, file: '/private/components/source-target.ts', line: 8 };
+      protected override render() { return html`<p>Target</p>`; }
+    }
+    if (!customElements.get('devtools-source-target')) defineElement('devtools-source-target', SourceTarget);
+    const bridge = createDevtoolsBridge({ enabled: true });
+    cleanups.push(() => bridge.dispose());
+    const root = document.createElement('div');
+    document.body.append(root);
+    cleanups.push(() => root.remove());
+    let routerHook: ((to: any, from: any, failure?: unknown) => void) | undefined;
+    let storeHook: ((transaction: unknown) => void) | undefined;
+    bridge.registerApplication({
+      id: 'sources', app: { mounted: true }, root,
+      router: { currentRoute: { value: { path: '/' } }, afterEach(hook) { routerHook = hook; return () => undefined; } },
+      store: { subscribe(hook) { storeHook = hook; return () => undefined; }, dehydrate: () => ({}) },
+    });
+    root.append(document.createElement('devtools-source-target'));
+    await nextTick();
+    routerHook?.({ path: '/next', sourceLocation: { kind: 'error', file: '/private/routes/source.ts', line: 2 } }, { path: '/' });
+    storeHook?.({ action: 'save', location: { kind: 'error', file: '/private/stores/source.ts', line: 3 } });
+    bridge.recordError('sources', { message: 'broken', location: { kind: 'store', file: '/private/errors/source.ts', line: 4 } });
+    const navigateToSource = vi.fn();
+    const mounted = mountGluonDevtools(bridge, document.body, { navigateToSource });
+    cleanups.push(() => mounted.unmount());
+    const sourceButtons = [...mounted.element.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-source-kind]')];
+    expect(new Set(sourceButtons.map((button) => button.dataset.sourceKind))).toEqual(new Set(['component', 'render', 'router', 'store', 'error']));
+    for (const button of sourceButtons) button.click();
+    expect(navigateToSource).toHaveBeenCalled();
+    for (const [location] of navigateToSource.mock.calls) {
+      expect(location.file).not.toContain('/');
+      expect(location.redacted).toBe(true);
+      expect(Object.isFrozen(location)).toBe(true);
+    }
+    expect(mounted.element.shadowRoot!.textContent).not.toContain('/private/');
+    const labelsOnly = mountGluonDevtools(bridge);
+    cleanups.push(() => labelsOnly.unmount());
+    expect(labelsOnly.element.shadowRoot!.querySelectorAll('button[data-source-kind]')).toHaveLength(0);
+    expect(labelsOnly.element.shadowRoot!.querySelector('.sources code')?.textContent).toContain('source-target.ts');
   });
 
   test('exposes the protocol handshake through the browser bridge', () => {
@@ -179,6 +242,10 @@ describe('Gluon Devtools browser bridge', () => {
     const id = plugin.resolveId('virtual:custom-devtools');
     expect(plugin.load('other')).toBeNull();
     expect(plugin.load(id)).toContain('enabled: false');
+    expect(plugin.load(id)).toContain('devtoolsArtifactContract');
+    expect(createDevtoolsArtifactContract('virtual:custom-devtools')).toMatchObject({
+      format: 'esm-package', manifest: './browser-inspector.manifest.json', virtualId: 'virtual:custom-devtools',
+    });
     plugin.config({}, { command: 'serve' });
     expect(plugin.load(id)).toContain('enabled: true');
   });
