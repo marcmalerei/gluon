@@ -330,6 +330,8 @@ describe('JSON Forms component', () => {
     const internal = element as unknown as { commitPath(path: readonly string[], value: unknown): void };
     internal.commitPath(['groups', '2', 'details', 'name'], 'Detached');
     expect((element.data.groups as readonly Record<string, unknown>[])[2]?.details).toEqual({ name: 'Detached' });
+    internal.commitPath(['groups', '3', '0'], 'Indexed');
+    expect((element.data.groups as readonly unknown[][])[3]?.[0]).toBe('Indexed');
   });
 
   it('validates direct text and numeric constraints and removes a cleared number', async () => {
