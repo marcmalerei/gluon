@@ -32,6 +32,11 @@ const scenarios = [{
   id: 'component-library-loader--error-state',
   stateSelectors: ['[data-loader-story]', '[data-loader-status]'],
   expectedText: 'failed',
+}, {
+  id: 'component-library-status-badge--default',
+  stateSelectors: ['[data-status-badge-story]', '[data-short-badge]', '.gluon-status-badge'],
+  expectedText: 'Eingeschränkt',
+  screenshotSelector: '[data-status-badge-story]',
 }];
 
 const server = createServer(async (request, response) => {
@@ -74,7 +79,9 @@ try {
     if (violations.length > 0) throw new Error(`Storybook accessibility violations for ${scenario.id}: ${JSON.stringify(violations)}.`);
 
     const evidencePath = resolve(evidenceDirectory, `storybook-${scenario.id}.png`);
-    await storyRoot.screenshot({ path: evidencePath, animations: 'disabled' });
+    const screenshotSelector = scenario.screenshotSelector ?? storyRoot;
+    await (typeof screenshotSelector === 'string' ? page.locator(screenshotSelector) : screenshotSelector)
+      .screenshot({ path: evidencePath, animations: 'disabled' });
     const baselinePath = resolve(baselineDirectory, `${scenario.id}.png`);
     if (updateBaselines) {
       await writeFile(baselinePath, await readFile(evidencePath));

@@ -112,7 +112,11 @@ native `button` rule or adopt `atomStyles`.
   sizes are `small`, `medium`, and `large`, and `fullWidth` is opt-in.
 - `StatusBadge` is a presentational span. It owns only neutral, info, success,
   warning, or danger tone styling; applications own domain mapping, translated
-  status copy, and whether a surrounding surface is a live region.
+  status copy, and whether a surrounding surface is a live region. Its default
+  presentation stays on one line and bounds pathological tokens with an ellipsis
+  instead of breaking short labels mid-word. When a product genuinely needs a
+  multiline badge, apply that behavior in the consuming surface rather than by
+  changing the atom contract.
 - `Switch` is a native checkbox with `role="switch"` for binary on/off settings.
   Keep its caller-owned accessible label stable when the checked state changes.
 - `Textarea` preserves native multiline editing, selection, resize, form,
