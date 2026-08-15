@@ -8,7 +8,11 @@ export {
   type JsonFormValidationChangeDetail,
 } from './json-form.js';
 export {
+  createJsonFormsMessageProvider,
   type JsonFormValidationError,
+  type JsonFormsMessageOverrides,
+  type JsonFormsMessageProvider,
+  type JsonFormsMessageProviderOptions,
   type JsonFormsUiSchema,
   type JsonObject,
   type JsonSchema,
