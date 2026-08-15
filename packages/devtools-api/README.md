@@ -9,6 +9,13 @@ Environment-neutral protocol version 1 for independent Gluon Devtools clients.
 of application, component, render, Router, Store, scheduler, event, and error
 records. Snapshots are JSON-safe and preserve independent application IDs.
 
+External clients begin with `protocol.handshake()`. It returns the protocol
+version and immutable capability names, so a browser inspector, Vite overlay,
+or editor integration can refuse an incompatible bridge before subscribing to
+records. The current capabilities are application selection, component
+snapshots, the ordered timeline, and application/render/Router/Store/scheduler/
+event/error records.
+
 The package has no browser or framework dependency.
 
 ## Record an application timeline

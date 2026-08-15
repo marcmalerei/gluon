@@ -6,6 +6,7 @@ import {
   type ComponentSnapshot,
   type DevtoolsEvent,
   type DevtoolsEventKind,
+  type DevtoolsHandshake,
   type DevtoolsSnapshot,
   type DevtoolsValue,
 } from '@gluonjs/devtools-api';
@@ -102,6 +103,8 @@ export class GluonDevtoolsBridge {
   }
 
   snapshot(): DevtoolsSnapshot { return this.protocol.snapshot(); }
+
+  handshake(): DevtoolsHandshake { return this.protocol.handshake(); }
 
   dispose(): void {
     for (const application of [...this.applications.values()]) {

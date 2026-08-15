@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import {
   DevtoolsProtocol,
+  GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,
   GLUON_DEVTOOLS_PROTOCOL_VERSION,
   toDevtoolsValue,
 } from '../packages/devtools-api/src/index.js';
@@ -28,6 +29,15 @@ describe('Devtools protocol', () => {
     expect(protocol.snapshot().timeline).toEqual([]);
     unsubscribe();
     expect(listener).toHaveBeenCalled();
+  });
+
+  test('publishes a stable handshake for external Devtools clients', () => {
+    const protocol = new DevtoolsProtocol();
+    expect(protocol.handshake()).toEqual({
+      protocol: GLUON_DEVTOOLS_PROTOCOL_VERSION,
+      capabilities: GLUON_DEVTOOLS_PROTOCOL_CAPABILITIES,
+    });
+    expect(Object.isFrozen(protocol.handshake())).toBe(true);
   });
 
   test('rejects duplicate and unknown applications', () => {

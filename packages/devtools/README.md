@@ -44,6 +44,10 @@ failure, and error data from the public Core debug hook. Router after-hooks and
 Store subscriptions feed one ordered protocol timeline. Host integrations can
 record scheduler, emitted-event, and error facts explicitly.
 
+`bridge.handshake()` exposes the versioned `@gluonjs/devtools-api` capability
+contract to external panels. Consumers can negotiate this before reading
+`bridge.snapshot()` or subscribing to the timeline.
+
 `gluonDevtoolsPlugin()` exposes `virtual:gluon-devtools`: its bridge is enabled
 and globally discoverable only for Vite `serve`; production `build` emits a
 disabled bridge. The browser inspector lists registered applications and shows
