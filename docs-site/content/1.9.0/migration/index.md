@@ -34,6 +34,11 @@ For a reversible route from coexistence to full application ownership, follow
 the [tested Vue-to-Gluon cutover playbook](./vue-to-gluon-cutover/). It uses the
 production GLUON GOODS product configurator below as one continuous case study.
 
+For version upgrades inside the current release train, follow the
+[Gluon upgrade guide](./upgrade/). It documents the lockstep package rule,
+supported Node and browser boundaries, semver and deprecation policy, and the
+verification commands that match the released `1.9.0` line.
+
 ## Vue-to-Gluon concept map
 
 | Vue concept | Gluon contract | Migration work |

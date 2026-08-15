@@ -96,6 +96,9 @@ observable results, lifecycle ownership, failure handling, and cleanup where the
 API requires them. The gate rejects compiler-only constructs such as declared
 argument tuples, empty type aliases, or bare value reads, as well as the former
 generic runtime-owner copy.
+The versioned migration tree also includes a maintained release-upgrade guide
+for lockstep package moves, semver policy, deprecation handling, rollback, and
+upgrade verification.
 
 All TypeScript and Vue example sources live in `examples/` and are compiled
 through `examples/tsconfig.json` plus the maintained Vite configurations;
