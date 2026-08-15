@@ -58,10 +58,12 @@ symbol coverage fail `npm run docs:api`.
 migration material, examples, and release archive. `validate-docs.mjs` verifies
 the version tree, public API entry-point count, one rendered example per public
 symbol page, required curated content, compiled examples, and internal links.
-The root redirect and the stable `/latest/` alias both resolve to the latest
-supported version. API landing pages derive their title, description, and
-breadcrumb from the package contract and package manifest rather than from the
-TypeDoc root label.
+The root redirect resolves to the latest supported version, and the stable
+`/latest/` tree is a static mirror of that version so deep links under
+`/latest/` keep working on GitHub Pages while preserving versioned canonical
+URLs. API landing pages derive their title, description, and breadcrumb from
+the package contract and package manifest rather than from the TypeDoc root
+label.
 The generated package portal lives at `/<version>/packages/` and creates one
 landing page for every current package declared by `package-contract.json`.
 Each landing page is derived from the package manifest and README, and exposes
@@ -72,6 +74,9 @@ same package navigation on desktop and mobile.
 The root package and every package manifest use the stable
 `https://marcmalerei.github.io/gluon/latest/packages/<slug>/` page as their
 homepage; source README links remain explicit inside the portal.
+This docs-only fix does not change `examples/shop`, because the regression is
+limited to documentation generation and package-portal validation rather than an
+honest shop flow.
 The maintained component guide is the beginner entry point for properties,
 attributes, events, lifecycle ownership, and the complete public class map.
 TypeDoc excludes externally inherited DOM members so an API page keeps its
