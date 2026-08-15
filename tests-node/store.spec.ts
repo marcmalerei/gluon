@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   createPersistencePlugin,
+  createAsyncPersistencePlugin,
   createStoreManager,
   createTestingStoreManager,
   defineStore,
@@ -275,6 +276,223 @@ describe('@gluonjs/store HMR and universal state', () => {
 });
 
 describe('@gluonjs/store persistence and testing', () => {
+  it('hydrates async storage in a defined lifecycle and ignores stale reads after a mutation', async () => {
+    let resolveRead!: (value: string | null) => void;
+    const values = new Map([['gluon:async-cart', JSON.stringify({ version: 1, state: { count: 9 } })]]);
+    const storage = {
+      getItem: vi.fn(() => new Promise<string | null>((resolve) => { resolveRead = resolve; })),
+      setItem: vi.fn(async (key: string, value: string) => { values.set(key, value); }),
+    };
+    const plugin = createAsyncPersistencePlugin({ storage });
+    const definition = defineStore({ id: 'async-cart', state: () => ({ count: 0 }), persist: true });
+    const manager = createStoreManager({ plugins: [plugin] });
+    const store = manager.use(definition);
+    expect(plugin.lifecycle.status).toBe('hydrating');
+    store.$patch({ count: 3 });
+    resolveRead(values.get('gluon:async-cart')!);
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('ready');
+    expect(store.count).toBe(3);
+    expect(storage.setItem).toHaveBeenCalledWith('gluon:async-cart', expect.stringContaining('"count":3'), expect.objectContaining({ aborted: false }));
+    manager.dispose();
+    expect(plugin.lifecycle.status).toBe('ready');
+  });
+
+  it('isolates async applications and exposes stable failed lifecycle errors', async () => {
+    const error = new Error('offline');
+    const first = createAsyncPersistencePlugin({ storage: { getItem: async () => { throw error; }, setItem: async () => undefined } });
+    const second = createAsyncPersistencePlugin({ storage: { getItem: async () => null, setItem: async () => undefined } });
+    const definition = defineStore({ id: 'async-isolated', state: () => ({ value: 1 }), persist: true });
+    createStoreManager({ plugins: [first] }).use(definition);
+    createStoreManager({ plugins: [second] }).use(definition);
+    await first.lifecycle.ready;
+    await second.lifecycle.ready;
+    expect(first.lifecycle.status).toBe('failed');
+    expect(first.lifecycle.error).toBe(error);
+    expect(second.lifecycle.status).toBe('ready');
+  });
+
+  it('does not write an unchanged successful restore back to storage', async () => {
+    const setItem = vi.fn(async () => undefined);
+    const plugin = createAsyncPersistencePlugin({
+      storage: {
+        getItem: async () => JSON.stringify({ version: 1, state: { value: 4 } }),
+        setItem,
+      },
+    });
+    const store = createStoreManager({ plugins: [plugin] }).use(defineStore({
+      id: 'async-clean-restore', state: () => ({ value: 0 }), persist: true,
+    }));
+
+    await plugin.lifecycle.ready;
+    expect(store.value).toBe(4);
+    expect(setItem).not.toHaveBeenCalled();
+  });
+
+  it('supports disposal and a DOM-free abort signal while selecting persisted paths', async () => {
+    let abortListener!: () => void;
+    const signal = {
+      aborted: false,
+      addEventListener: (_type: 'abort', listener: () => void) => { abortListener = listener; },
+    };
+    const getItem = vi.fn(() => new Promise<string | null>(() => undefined));
+    const plugin = createAsyncPersistencePlugin({
+      signal,
+      storage: { getItem, setItem: async () => undefined },
+    });
+    const definition = defineStore({
+      id: 'async-dispose', state: () => ({ value: 1, ignored: true }),
+      persist: { paths: ['value'] },
+    });
+    const manager = createStoreManager({ plugins: [plugin] });
+    manager.use(definition);
+    expect(getItem).toHaveBeenCalledWith('gluon:async-dispose', expect.objectContaining({ aborted: false }));
+    plugin.lifecycle.dispose();
+    abortListener?.();
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('failed');
+  });
+
+  it('settles an externally aborted never-settling adapter without reporting cancellation', async () => {
+    let abortListener!: () => void;
+    const signal = {
+      aborted: false,
+      addEventListener: (_type: 'abort', listener: () => void) => { abortListener = listener; },
+    };
+    const onError = vi.fn();
+    const plugin = createAsyncPersistencePlugin({
+      signal,
+      onError,
+      storage: { getItem: async () => new Promise<string | null>(() => undefined), setItem: async () => undefined },
+    });
+    createStoreManager({ plugins: [plugin] }).use(defineStore({ id: 'async-abort', state: () => ({ value: 1 }), persist: true }));
+    abortListener();
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('failed');
+    expect(plugin.lifecycle.error).toMatchObject({ name: 'AbortError', message: expect.stringContaining('aborted') });
+    expect(onError).not.toHaveBeenCalled();
+  });
+
+  it('settles dispose immediately even when the adapter ignores cancellation', async () => {
+    const plugin = createAsyncPersistencePlugin({
+      storage: { getItem: async () => new Promise<string | null>(() => undefined), setItem: async () => undefined },
+    });
+    createStoreManager({ plugins: [plugin] }).use(defineStore({ id: 'async-dispose-never', state: () => ({ value: 1 }), persist: true }));
+    plugin.lifecycle.dispose();
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('failed');
+    expect(plugin.lifecycle.error).toMatchObject({ name: 'AbortError' });
+  });
+
+  it('creates a new ready promise for a later hydration cycle', async () => {
+    const reads: Array<(value: string | null) => void> = [];
+    const plugin = createAsyncPersistencePlugin({
+      storage: {
+        getItem: () => new Promise<string | null>((resolve) => reads.push(resolve)),
+        setItem: async () => undefined,
+      },
+    });
+    const manager = createStoreManager({ plugins: [plugin] });
+    const definition = defineStore({ id: 'async-cycles', state: () => ({ value: 0 }), persist: true });
+    manager.use(definition);
+    const firstReady = plugin.lifecycle.ready;
+    reads.shift()!('{"version":1,"state":{"value":2}}');
+    await firstReady;
+    expect(plugin.lifecycle.status).toBe('ready');
+    manager.use(defineStore({ id: 'async-cycles-2', state: () => ({ value: 0 }), persist: true }));
+    const secondReady = plugin.lifecycle.ready;
+    expect(secondReady).not.toBe(firstReady);
+    reads.shift()!(null);
+    await secondReady;
+    expect(plugin.lifecycle.status).toBe('ready');
+  });
+
+  it('serializes deferred writes in transaction order and fails on a rejected write', async () => {
+    const writes: Array<{ value: string; resolve: () => void }> = [];
+    const onError = vi.fn();
+    const plugin = createAsyncPersistencePlugin({
+      onError,
+      storage: {
+        getItem: async () => null,
+        setItem: async (_key, value) => new Promise<void>((resolve) => writes.push({ value, resolve })),
+      },
+    });
+    const store = createStoreManager({ plugins: [plugin] }).use(defineStore({
+      id: 'async-order', state: () => ({ value: 0 }), persist: true,
+    }));
+    await plugin.lifecycle.ready;
+    store.$patch({ value: 1 });
+    store.$patch({ value: 2 });
+    await Promise.resolve();
+    expect(writes).toHaveLength(1);
+    expect(JSON.parse(writes[0]!.value).state.value).toBe(1);
+    writes[0]!.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(writes).toHaveLength(2);
+    expect(JSON.parse(writes[1]!.value).state.value).toBe(2);
+    writes[1]!.resolve();
+    await Promise.resolve();
+    expect(plugin.lifecycle.status).toBe('ready');
+  });
+
+  it('transitions to failed and reports a real write failure', async () => {
+    const onError = vi.fn();
+    const plugin = createAsyncPersistencePlugin({
+      onError,
+      storage: { getItem: async () => null, setItem: async () => { throw new Error('write offline'); } },
+    });
+    const store = createStoreManager({ plugins: [plugin] }).use(defineStore({
+      id: 'async-write-failure', state: () => ({ value: 0 }), persist: true,
+    }));
+    await plugin.lifecycle.ready;
+    store.$patch({ value: 1 });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(plugin.lifecycle.status).toBe('failed');
+    expect(plugin.lifecycle.error).toMatchObject({ message: 'write offline' });
+    expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'write offline' }), 'async-write-failure');
+  });
+
+  it('blocks already queued writes after the first storage failure', async () => {
+    let rejectFirst!: (reason: unknown) => void;
+    const setItem = vi.fn((_key: string, _value: string) => new Promise<void>((_resolve, reject) => { rejectFirst = reject; }));
+    const onError = vi.fn();
+    const plugin = createAsyncPersistencePlugin({
+      onError,
+      storage: { getItem: async () => null, setItem },
+    });
+    const store = createStoreManager({ plugins: [plugin] }).use(defineStore({
+      id: 'async-write-stop', state: () => ({ value: 0 }), persist: true,
+    }));
+    await plugin.lifecycle.ready;
+    store.$patch({ value: 1 });
+    store.$patch({ value: 2 });
+    await Promise.resolve();
+    expect(setItem).toHaveBeenCalledTimes(1);
+    rejectFirst(new Error('first write failed'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(plugin.lifecycle.status).toBe('failed');
+    expect(setItem).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes only configured async persistence paths after hydration', async () => {
+    const writes: string[] = [];
+    const plugin = createAsyncPersistencePlugin({
+      storage: {
+        getItem: async () => null,
+        setItem: async (_key, value) => { writes.push(value); },
+      },
+    });
+    const store = createStoreManager({ plugins: [plugin] }).use(defineStore({
+      id: 'async-paths', state: () => ({ value: 1, ignored: true }), persist: { paths: ['value'] },
+    }));
+    await plugin.lifecycle.ready;
+    store.$patch({ value: 2, ignored: false });
+    await Promise.resolve();
+    expect(JSON.parse(writes.at(-1)!)).toEqual({ version: 1, state: { value: 2 } });
+  });
+
   it('hydrates and persists selected paths through an explicit storage adapter', () => {
     const values = new Map<string, string>([['goods:cart', '{"version":1,"state":{"items":["lamp"]}}']]);
     const storage: StorageLike = {

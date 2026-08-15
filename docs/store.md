@@ -106,6 +106,38 @@ migrated in memory and receives the current envelope on the next transaction;
 future, corrupt, missing-step, thrown-migration, invalid-output, and storage
 failures block persistence writes until explicit recovery succeeds.
 
+### Async persistence lifecycle
+
+`createAsyncPersistencePlugin()` adds promise-based persistence without changing
+`StorageLike` or the synchronous plugin. It is request-free and application-local:
+
+```ts
+const persistence = createAsyncPersistencePlugin({ storage: indexedDbAdapter });
+const manager = createStoreManager({ plugins: [persistence] });
+const store = definition.use(manager); // defaults are available immediately
+await persistence.lifecycle.ready;       // restored state is now safe to observe
+```
+
+The lifecycle is `idle` before a persistent store is used, `hydrating` while
+reads are pending, `ready` after all reads finish, and `failed` after a read or
+write error. `ready` is a getter for the current hydration-cycle promise: the
+first same-turn bootstrap promise is retained, and a later store that starts a
+new cycle receives a new promise. Restore runs before the ready boundary;
+actions and subscriptions may run during hydration, but a generation check
+prevents a stale read from overwriting newer state. Writes are strictly
+serialized in transaction order. Read/write failures set `failed` and invoke
+`onError`. Passing an aborted signal or calling `lifecycle.dispose()` sets a
+stable DOM-free `Error` named `AbortError`, settles the current `ready`
+immediately, and intentionally does not invoke `onError`; an adapter that
+ignores cancellation cannot hang bootstrap. Each plugin instance has isolated
+state and storage operations.
+Successful unchanged restores are not written back, and the first write failure
+prevents later queued transactions from reaching the adapter.
+
+GLUON GOODS remains on synchronous storage because its current bag flow does
+not benefit from an asynchronous customer-facing bootstrap boundary. This is
+an honest gap record, not an async adapter implementation in the shop.
+
 The application owns validation and suitability decisions. Persistence is not a
 security boundary and is only as safe as the application data it stores; use it
 for rollback-compatible app state, not for sensitive data unless the caller has
