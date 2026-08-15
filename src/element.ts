@@ -254,12 +254,22 @@ export abstract class GluonElement<
     }
     GluonElement.compiledPropertyUpdatesOrdered = true;
     GluonElement.compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
-    for (const element of elements) {
-      element.compiledPropertyUpdateQueued = false;
-      element.performCompiledPropertyUpdate();
-    }
-    if (GluonElement.compiledPropertyUpdates.length > 0) {
-      GluonElement.scheduleCompiledPropertyUpdateFlush();
+    let index = 0;
+    try {
+      while (index < elements.length) {
+        const element = elements[index++]!;
+        if (!element.compiledPropertyUpdateQueued) continue;
+        element.compiledPropertyUpdateQueued = false;
+        element.performCompiledPropertyUpdate();
+      }
+    } catch (error) {
+      for (; index < elements.length; index += 1) {
+        const element = elements[index]!;
+        if (!GluonElement.compiledPropertyUpdates.includes(element)) {
+          element.compiledPropertyUpdateQueued = false;
+        }
+      }
+      throw error;
     }
   };
 
@@ -282,10 +292,7 @@ export abstract class GluonElement<
   /* v8 ignore stop */
 
   private static cancelCompiledPropertyUpdate(element: GluonElement<any>): void {
-    if (!element.compiledPropertyUpdateQueued) return;
     element.compiledPropertyUpdateQueued = false;
-    const index = GluonElement.compiledPropertyUpdates.indexOf(element);
-    if (index >= 0) GluonElement.compiledPropertyUpdates.splice(index, 1);
   }
 
   /** Declares reactive inputs and their attribute conversion, reflection, and validation rules. */

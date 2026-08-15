@@ -292,6 +292,51 @@ describe('reactive GluonElement rendering', () => {
     ]);
   });
 
+  it('releases unprocessed compiled queue entries after a flush throws', async () => {
+    const tagName = `gluon-compiled-throw-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class ThrowingElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      renders = 0;
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, ThrowingElement);
+    const first = document.createElement(tagName) as ThrowingElement & {
+      performCompiledPropertyUpdate: () => void;
+    };
+    const second = document.createElement(tagName) as ThrowingElement;
+    document.body.append(first, second);
+    await Promise.all([first.updateComplete, second.updateComplete]);
+    expect(first.shadowRoot?.textContent).toBe('A');
+    expect(second.shadowRoot?.textContent).toBe('A');
+
+    first.performCompiledPropertyUpdate = () => {
+      throw new Error('compiled flush failure');
+    };
+    first.label = 'B';
+    second.label = 'B';
+    await Promise.resolve();
+    expect(second.shadowRoot?.textContent).toBe('A');
+
+    second.label = 'C';
+    await second.updateComplete;
+    expect(second.shadowRoot?.textContent).toBe('C');
+    expect(second.renders).toBe(2);
+  });
+
   it('stops scoped work on disconnect and recreates it while retaining state and DOM', async () => {
     const tagName = `gluon-scope-${reactiveElementSequence += 1}` as `${string}-${string}`;
 

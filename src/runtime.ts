@@ -684,14 +684,16 @@ class NodePart implements Part {
   }
 
   setStableStringValue(value: string): void {
-    if (!this.textNode || this.textNode.previousSibling !== this.marker) {
-      this.setStringValue(value);
-      return;
-    }
+    if (!this.setExactStablePrimitiveValue(value)) this.setStringValue(value);
+  }
+
+  setExactStablePrimitiveValue(value: string | number | bigint | true): boolean {
+    if (!this.textNode || this.textNode.previousSibling !== this.marker) return false;
     if (value !== this.lastPrimitive) {
-      this.textNode.data = value;
+      this.textNode.data = String(value);
       this.lastPrimitive = value;
     }
+    return true;
   }
 
   setValue(value: TemplateValue, assumeInPlace = false): void {
@@ -1698,7 +1700,11 @@ export function updateCompiledPrimitiveTextBinding(
     || !(binding.part instanceof NodePart)
     || binding.directive
   ) return false;
-  if (typeof value === 'string') binding.part.setStableStringValue(value);
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint' || value === true) {
+    if (!binding.part.setExactStablePrimitiveValue(value)) {
+      binding.part.setValue(value);
+    }
+  }
   else binding.part.setValue(value);
   return true;
 }

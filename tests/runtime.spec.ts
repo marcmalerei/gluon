@@ -40,7 +40,7 @@ describe('template runtime', () => {
 
   it('commits compiler-proven primitive text bindings and rejects unsafe fast paths', () => {
     const root = document.createElement('div');
-    const view = (value: string) => markCompiledPrimitiveTextBinding(
+    const view = (value: string | number | bigint | boolean | null | undefined) => markCompiledPrimitiveTextBinding(
       html`<output>${value}</output>`,
       'label',
       0,
@@ -54,11 +54,26 @@ describe('template runtime', () => {
     const output = root.querySelector('output');
     const text = output?.firstChild;
 
+    for (const value of ['B', 2, 2n, true, 0, -0, Number.NaN] as const) {
+      expect(updateCompiledPrimitiveTextBinding(root, 0, value)).toBe(true);
+      expect(output?.textContent).toBe(String(value));
+      expect(output?.firstChild).toBe(text);
+    }
     expect(updateCompiledPrimitiveTextBinding(root, 0, 'B')).toBe(true);
     expect(output?.textContent).toBe('B');
     expect(output?.firstChild).toBe(text);
     expect(updateCompiledPrimitiveTextBinding(root, 0, 2)).toBe(true);
     expect(output?.textContent).toBe('2');
+    expect(output?.firstChild).toBe(text);
+    expect(updateCompiledPrimitiveTextBinding(root, 0, true)).toBe(true);
+    expect(output?.textContent).toBe('true');
+    expect(output?.firstChild).toBe(text);
+    expect(updateCompiledPrimitiveTextBinding(root, 0, Number.NaN)).toBe(true);
+    expect(output?.textContent).toBe('NaN');
+    expect(output?.firstChild).toBe(text);
+    expect(updateCompiledPrimitiveTextBinding(root, 0, Number.NaN)).toBe(true);
+    expect(output?.textContent).toBe('NaN');
+    expect(output?.firstChild).toBe(text);
     expect(updateCompiledPrimitiveTextBinding(root, 0, { unsafe: true })).toBe(false);
     expect(updateCompiledPrimitiveTextBinding(root, 1, 'wrong binding')).toBe(false);
     expect(updateCompiledPrimitiveTextBinding(null, 0, 'missing root')).toBe(false);

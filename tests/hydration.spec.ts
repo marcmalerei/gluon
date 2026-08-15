@@ -714,6 +714,42 @@ describe('SSR hydration', () => {
     await nextTick();
   });
 
+  it('retains hydrated compiled primitive text bindings across primitive kinds and disturbed DOM fallback', async () => {
+    const prepared = await prepareForHydration(html`<output>${'1'}</output>`);
+    const host = document.createElement('hydrated-compiled-value');
+    const shadow = host.attachShadow({ mode: 'open' });
+    shadow.innerHTML = prepared.html;
+    const output = shadow.querySelector('output');
+    document.body.append(host);
+
+    class HydratedCompiledValue extends GluonElement {
+      static override readonly properties = {
+        value: { type: Number, default: 1 },
+      } as const;
+      declare value: number;
+      protected override render() {
+        return markCompiledPrimitiveTextBinding(html`<output>${this.value}</output>`, 'value', 0);
+      }
+    }
+    defineElement('hydrated-compiled-value', HydratedCompiledValue);
+    const upgraded = host as HydratedCompiledValue;
+    const result = await hydrateElement(upgraded);
+    await upgraded.updateComplete;
+    expect(result.retained).toBe(true);
+    expect(upgraded.shadowRoot?.querySelector('output')).toBe(output);
+
+    upgraded.value = 2;
+    await upgraded.updateComplete;
+    expect(output?.textContent).toBe('2');
+
+    upgraded.shadowRoot!.replaceChildren(document.createElement('i'));
+    upgraded.value = 3;
+    await upgraded.updateComplete;
+    expect(upgraded.shadowRoot?.textContent).toBe('3');
+    upgraded.remove();
+    await nextTick();
+  });
+
   it('hydrates a functional GluonElement through the same identity-preserving path', async () => {
     const prepared = await prepareForHydration(html`<button>${'Server quantity 2'}</button>`);
     const host = document.createElement('hydrated-functional-quantity');
