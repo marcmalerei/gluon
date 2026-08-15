@@ -47,6 +47,7 @@ import {
   ToastViewport,
   createToastController,
   PasswordToggleField,
+  type PasswordToggleFieldInputAttributes,
   type PasswordToggleFieldProps,
   moleculeManifest,
   type CardProps,
@@ -120,6 +121,11 @@ const passwordToggleProps: PasswordToggleFieldProps = {
   visible: false,
 };
 PasswordToggleField(passwordToggleProps);
+const passwordToggleInputAttributes = {
+  title: 'Current account password',
+  data: { owner: 'account' },
+} satisfies PasswordToggleFieldInputAttributes;
+PasswordToggleField({ ...passwordToggleProps, inputAttributes: passwordToggleInputAttributes });
 const tree: TemplateResult = AppShell({
   children: Card({
     ...cardProps,
@@ -406,6 +412,12 @@ OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { '@input': (
 OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { aria: { describedby: 'other' } } });
 // @ts-expect-error OneTimePasswordField owns segment refs for focus management
 OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { ref: { value: undefined } } });
+// @ts-expect-error PasswordToggleField owns its native input id
+PasswordToggleField({ ...passwordToggleProps, inputAttributes: { id: 'replacement' } });
+// @ts-expect-error PasswordToggleField owns password visibility through its controlled state
+PasswordToggleField({ ...passwordToggleProps, inputAttributes: { type: 'email' } });
+// @ts-expect-error PasswordToggleField owns its input validation relationship
+PasswordToggleField({ ...passwordToggleProps, inputAttributes: { aria: { describedby: 'replacement' } } });
 // @ts-expect-error InlineNotice tones remain closed
 InlineNotice({ tone: 'critical', children: 'Invalid tone' });
 // @ts-expect-error InlineNotice owns the outer role and live-region mapping

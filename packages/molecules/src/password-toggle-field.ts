@@ -3,8 +3,30 @@ import { defineMolecule, nothing, type TemplateResult } from '@gluonjs/core';
 import { q, type QuarkProps } from '@gluonjs/quarks';
 import { passwordToggleFieldStyleDependency } from './password-toggle-field-styles.js';
 
-export type PasswordToggleFieldAttributes = Omit<QuarkProps<HTMLDivElement>, 'children'>;
-export type PasswordToggleFieldInputAttributes = InputProps['attributes'];
+export type PasswordToggleFieldAttributes = Omit<QuarkProps<HTMLDivElement>, 'children' | 'id' | '.id'>;
+export type PasswordToggleFieldInputAttributes = Omit<
+  NonNullable<InputProps['attributes']>,
+  | 'id'
+  | '.id'
+  | 'autocomplete'
+  | 'readonly'
+  | 'readOnly'
+  | '.readOnly'
+  | '?readonly'
+  | 'required'
+  | '.required'
+  | '?required'
+  | 'aria'
+  | 'aria-labelledby'
+  | 'aria-describedby'
+  | 'aria-errormessage'
+  | 'aria-invalid'
+> & {
+  readonly aria?: Omit<
+    NonNullable<NonNullable<InputProps['attributes']>['aria']>,
+    'labelledby' | 'describedby' | 'errormessage' | 'invalid'
+  >;
+};
 
 export interface PasswordToggleFieldProps {
   readonly id: string;
@@ -14,7 +36,7 @@ export interface PasswordToggleFieldProps {
   readonly onVisibleChange?: (visible: boolean, event: MouseEvent) => void;
   readonly onInput?: (event: InputEvent) => void;
   readonly name?: string;
-  readonly autocomplete?: NonNullable<PasswordToggleFieldInputAttributes>['autocomplete'];
+  readonly autocomplete?: NonNullable<InputProps['attributes']>['autocomplete'];
   readonly disabled?: boolean;
   readonly readOnly?: boolean;
   readonly required?: boolean;
@@ -58,8 +80,8 @@ function renderPasswordToggleField({
   const helperId = helper === undefined ? undefined : `${id}-helper`;
   const errorId = error === undefined ? undefined : `${id}-error`;
   const { onInput: attributeInput, aria: inputAria, ...nativeInputAttributes } = inputAttributes;
-  const describedby = joinIds(typeof inputAria?.describedby === 'string' ? inputAria.describedby : undefined, helperId, errorId);
-  const labelledby = typeof inputAria?.labelledby === 'string' ? inputAria.labelledby : labelId;
+  const describedby = joinIds(helperId, errorId);
+  const labelledby = labelId;
   const { onClick: attributeClick, ...nativeToggleAttributes } = toggleAttributes;
   const fieldInvalid = invalid || error !== undefined;
 

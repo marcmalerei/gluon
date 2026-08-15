@@ -43,6 +43,7 @@ describe('PasswordToggleField', () => {
     expect(document.querySelectorAll('button')).toHaveLength(1);
     expect(input.type).toBe('password');
     expect(input.getAttribute('autocomplete')).toBe('current-password');
+    expect(new FormData(form).get('password')).toBe('secret-value');
     expect(toggle.type).toBe('button');
     expect(toggle.getAttribute('aria-pressed')).toBe('false');
     input.focus();
@@ -59,6 +60,7 @@ describe('PasswordToggleField', () => {
     expect(updated).toBe(input);
     expect(updated.type).toBe('text');
     expect(updated.value).toBe('secret-value');
+    expect(new FormData(form).get('password')).toBe('secret-value');
     expect([updated.selectionStart, updated.selectionEnd]).toEqual(selection);
     expect(document.querySelector<HTMLButtonElement>('[aria-controls="account-password-input"]')?.textContent).toBe('Passwort verbergen');
     expect(submit).not.toHaveBeenCalled();
