@@ -248,12 +248,14 @@ function formatExpression(expression: string, values: Readonly<Record<string, I1
     const choices = parseChoices(parts.slice(2).join(','));
     const exact = choices[`=${value}`];
     const category = new Intl.PluralRules(targetLocale, { type: type === 'selectordinal' ? 'ordinal' : 'cardinal' }).select(value);
-    const selected = exact ?? choices[category] ?? choices.other ?? `{${expression}}`;
+    const selected = exact ?? choices[category] ?? choices.other;
+    if (selected === undefined) return `{${expression}}`;
     return formatMessage(selected.replaceAll('#', i18n.n(value)), values, targetLocale, i18n);
   }
   if (type === 'select') {
     const choices = parseChoices(parts.slice(2).join(','));
-    return formatMessage(choices[String(value)] ?? choices.other ?? `{${expression}}`, values, targetLocale, i18n);
+    const selected = choices[String(value)] ?? choices.other;
+    return selected === undefined ? `{${expression}}` : formatMessage(selected, values, targetLocale, i18n);
   }
   return `{${expression}}`;
 }

@@ -65,7 +65,9 @@ Messages support simple ICU-style `plural`, `selectordinal`, and `select`
 expressions. For loading diagnostics, `namespaceStatus` exposes `idle`,
 `loading`, `loaded`, and `error` for the active locale. Namespace errors remain
 available to explicit `loadNamespace` callers and are rendered as the missing
-key by `t` until the application handles them.
+key by `t` until the application handles them. Unsupported or incomplete
+expressions remain literal text; they do not throw or recursively re-enter the
+formatter.
 
 ## SSR state
 

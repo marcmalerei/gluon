@@ -117,4 +117,81 @@ describe('core i18n', () => {
     await expect(server.loadNamespace('broken')).rejects.toThrow('locale bundle unavailable');
     expect(server.namespaceStatus.value.broken).toMatchObject({ state: 'error', error: 'locale bundle unavailable' });
   });
+
+  it('tracks namespace state across locale changes, caching, and concurrent loads', async () => {
+    let resolveNamespace: ((messages: { title: string }) => void) | undefined;
+    let requests = 0;
+    const i18n = createI18n({
+      locale: 'en',
+      namespaces: {
+        catalog: () => {
+          requests += 1;
+          return new Promise<{ title: string }>((resolve) => { resolveNamespace = resolve; });
+        },
+      },
+    });
+
+    const first = i18n.loadNamespace('catalog');
+    expect(i18n.namespaceStatus.value.catalog).toEqual({ state: 'loading' });
+    const second = i18n.loadNamespace('catalog');
+    expect(requests).toBe(1);
+    resolveNamespace?.({ title: 'Catalog' });
+    await Promise.all([first, second]);
+    expect(i18n.namespaceStatus.value.catalog).toEqual({ state: 'loaded' });
+    await i18n.loadNamespace('catalog');
+    expect(requests).toBe(1);
+
+    await i18n.setLocale('de');
+    expect(i18n.namespaceStatus.value.catalog).toEqual({ state: 'idle' });
+    await i18n.setLocale('de');
+    expect(i18n.namespaceStatus.value.catalog).toEqual({ state: 'idle' });
+  });
+
+  it('reports missing loaders and non-Error loader failures', async () => {
+    const i18n = createI18n({ locale: 'en', namespaces: { sync: () => { throw 'sync failure'; } } });
+    await expect(i18n.loadNamespace('missing')).rejects.toThrow('Missing Gluon i18n namespace loader');
+    expect(i18n.namespaceStatus.value.missing).toMatchObject({ state: 'error' });
+    await expect(i18n.loadNamespace('sync')).rejects.toBe('sync failure');
+    expect(i18n.namespaceStatus.value.sync).toEqual({ state: 'error', error: 'sync failure' });
+
+    const rejected = createI18n({
+      locale: 'en',
+      namespaces: { async: () => Promise.reject('async failure') },
+    });
+    await expect(rejected.loadNamespace('async')).rejects.toBe('async failure');
+    expect(rejected.namespaceStatus.value.async).toEqual({ state: 'error', error: 'async failure' });
+  });
+
+  it('keeps malformed and unsupported message expressions safe', () => {
+    const i18n = createI18n({
+      locale: 'en-US',
+      messages: {
+        'en-US': {
+          plain: 'Hello {name}',
+          malformed: 'Broken {name',
+          pluralExact: '{count, plural, =2 {exact} one {one} other {other}}',
+          pluralFallback: '{count, plural, one {one}}',
+          selectFallback: '{kind, select, known {known} other {other}}',
+          selectMalformed: '{kind, select, known {known}',
+          empty: '{, select, other {value}}',
+          numericDate: '{when, date}',
+          invalidNumber: '{value, number}',
+        },
+      },
+    });
+
+    expect(i18n.t('plain')).toBe('Hello {name}');
+    expect(i18n.t('plain', { values: { name: 'Ada' } })).toBe('Hello Ada');
+    expect(i18n.t('plain', { values: {} })).toBe('Hello {name}');
+    expect(i18n.t('malformed', { values: { name: 'Ada' } })).toBe('Broken {name');
+    expect(i18n.t('pluralExact', { values: { count: 2 } })).toBe('exact');
+    expect(i18n.t('pluralExact', { values: { count: 1 } })).toBe('one');
+    expect(i18n.t('pluralExact', { values: { count: 3 } })).toBe('other');
+    expect(i18n.t('pluralFallback', { values: { count: 2 } })).toBe('{count, plural, one {one}}');
+    expect(i18n.t('selectFallback', { values: { kind: 'unknown' } })).toBe('other');
+    expect(i18n.t('selectMalformed', { values: { kind: 'known' } })).toBe('{kind, select, known {known}');
+    expect(i18n.t('empty', { values: {} })).toBe('{, select, other {value}}');
+    expect(i18n.t('numericDate', { values: { when: 0 } })).toContain('1970');
+    expect(i18n.t('invalidNumber', { values: { value: 'not a number' } })).toBe('{value, number}');
+  });
 });
