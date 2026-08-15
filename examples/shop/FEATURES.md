@@ -50,6 +50,7 @@ validated independently from the shop's customer-flow evidence.
 | Official Store | Per-app bag state, configured line items, persisted bag, derived totals | Store Node/type suites + `tests/shop-example.spec.ts` | Integrated |
 | Store actions + Router forms | Labeled delivery checkout, order summary, atomic order placement, and confirmation URL | Desktop/mobile shop flow + Store snapshot and browser assertions | Integrated purchase path |
 | `Suspense` and async component contract | Abortable product availability loading, explicit pending/error/retry states | Built-ins browser suite + `tests/shop-example.spec.ts` | Integrated |
+| `@gluonjs/ssr/streaming` progressive async-patch application | GLUON GOODS currently resolves its availability boundary through the request/hydration path; the public browser patch contract is verified with nested boundary and style-carrier fixtures because the shop has no streaming transport client to wire into honestly | `tests/hydration.spec.ts`, `tests-node/ssr.spec.ts`, `npm run typecheck:ssr` | Integrated as SSR infrastructure; shop unchanged for the verified transport-scope reason |
 | `Teleport` and `Transition` | Application-owned, animated accessible bag overlay | Built-ins context/cleanup suite + shop browser test | Integrated |
 | `KeepAlive` | Route view retention across product back/forward traversal | Built-ins LRU suite + shop node-identity assertion | Integrated |
 | `TransitionGroup` | Keyed bag line insertion/removal/movement | Built-ins identity/reduced-motion suite + shop bag flow | Integrated |

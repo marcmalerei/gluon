@@ -79,6 +79,22 @@ component styles, and the stream writes their carriers before dependent HTML.
 Resolved nested boundaries arrive as inert patch records or templates. An external `AbortSignal` cancels
 pending response work and reaches async sources.
 
+For browser consumers, `applyProgressivePatch(root, boundary, { styleRoot })`
+or `applyProgressivePatchTemplate(root, template)` is the public handoff for a
+resolved boundary record or the inert `<template data-gluon-async-patch="id">`
+envelope from `renderProgressiveReadableStream`. It validates the matching
+`<!--gluon:async:id-->` pair, replaces only that fallback range, preserves any
+nested boundary markers for later records, and installs each new style carrier
+once after validating its digest and CSS text. Missing, duplicate, or malformed
+boundary markers fail closed instead of appending content at an unrelated
+location.
+
+The helper accepts an `AbortSignal` and throws `ProgressivePatchError` with a
+stable `code` (`...ABORTED`, `...BOUNDARY`, `...INVALID_PATCH`, or `...STYLE`)
+before mutating the target. Consumers can therefore distinguish navigation
+cancellation from malformed transport and report recovery through their own
+stream lifecycle.
+
 `createStyleManifest()` accepts either an ordered sheet array or Core's named
 `StyleSheetSelection`. Named entries retain their public ID and optional scope
 in the carrier, so `@gluonjs/atoms` can serialize

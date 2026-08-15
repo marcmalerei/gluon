@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { Window } from 'happy-dom';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -42,7 +43,13 @@ import {
   serializeSsrState,
   type SsrRequestResult,
 } from '@gluonjs/ssr';
-import { renderProgressiveReadableStream, renderToReadableStream } from '@gluonjs/ssr/streaming';
+import {
+  applyProgressivePatch,
+  applyProgressivePatchTemplate,
+  ProgressivePatchError,
+  renderProgressiveReadableStream,
+  renderToReadableStream,
+} from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
 import { gluonEleventyPlugin, renderEleventyPage } from '@gluonjs/ssr/eleventy';
 import { renderShopRequest } from '../examples/shop/src/server.js';
@@ -860,6 +867,93 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     expect(transport).toContain('loading');
     expect(transport).toContain('data-gluon-async-patch="0"');
     expect(transport).toContain('done');
+  });
+
+  it('applies progressive patches to a DOM, installs styles, and handles nested boundaries', () => {
+    const window = new Window();
+    const document = window.document;
+    const root = document.createElement('main');
+    root.innerHTML = '<!--gluon:async:1--><span>Loading</span><!--gluon:/async:1-->';
+    const styleRoot = document.createElement('div').attachShadow({ mode: 'open' });
+    const styles = {
+      version: 1 as const,
+      entries: [{ id: 'progressive-card', scope: 'shop', cssText: '.card { color: red; }', digest: 'digest-1', order: 0 }],
+    };
+
+    const outer = applyProgressivePatch(root, {
+      kind: 'boundary',
+      id: 1,
+      html: '<!--gluon:async:2--><span>Nested loading</span><!--gluon:/async:2-->',
+      styles,
+    }, { styleRoot });
+    expect(outer).toEqual({ id: 1, insertedNodes: 3, installedStyleIds: ['progressive-card'] });
+    expect(root.textContent).toBe('Nested loading');
+    expect(styleRoot.querySelector('style[data-gluon-style="progressive-card"]')?.dataset.gluonStyleScope).toBe('shop');
+
+    const inner = applyProgressivePatch(root, {
+      kind: 'boundary',
+      id: 2,
+      html: '<strong class="card">Ready</strong>',
+      styles,
+    }, { styleRoot });
+    expect(inner.installedStyleIds).toEqual([]);
+    expect(root.querySelector('strong.card')?.textContent).toBe('Ready');
+    expect(styleRoot.querySelectorAll('style[data-gluon-style="progressive-card"]')).toHaveLength(1);
+
+    const templateRoot = document.createElement('main');
+    templateRoot.innerHTML = '<!--gluon:async:7--><span>Loading</span><!--gluon:/async:7-->';
+    const template = document.createElement('template');
+    template.dataset.gluonAsyncPatch = '7';
+    template.innerHTML = '<em>Template replacement</em>';
+    expect(applyProgressivePatchTemplate(templateRoot, template).insertedNodes).toBe(1);
+    expect(templateRoot.textContent).toBe('Template replacement');
+  });
+
+  it('rejects invalid, malformed, aborted, and conflicting progressive patches without mutation', () => {
+    const window = new Window();
+    const document = window.document;
+    const root = document.createElement('main');
+    root.innerHTML = '<!--gluon:async:3--><span>Loading</span><!--gluon:/async:3-->';
+    const controller = new AbortController();
+    controller.abort(new Error('navigation changed'));
+
+    expect(() => applyProgressivePatch(root, {
+      kind: 'boundary', id: 3, html: '<strong>Ready</strong>', styles: { version: 1, entries: [] },
+    }, { signal: controller.signal })).toThrowError(new ProgressivePatchError('GLUON_SSR_PROGRESSIVE_ABORTED', 'navigation changed'));
+    expect(root.textContent).toBe('Loading');
+
+    expect(() => applyProgressivePatch(root, {
+      kind: 'boundary', id: -1, html: '<strong>Never</strong>', styles: { version: 1, entries: [] },
+    })).toThrowError(ProgressivePatchError);
+    const invalidTemplate = document.createElement('template');
+    expect(() => applyProgressivePatchTemplate(root, invalidTemplate)).toThrowError(ProgressivePatchError);
+
+    expect(() => applyProgressivePatch(root, {
+      kind: 'boundary', id: 99, html: '<strong>Never</strong>', styles: { version: 1, entries: [] },
+    })).toThrowError(/missing or malformed/);
+
+    const duplicate = document.createElement('main');
+    duplicate.innerHTML = '<!--gluon:async:4--><!--gluon:async:4--><!--gluon:/async:4-->';
+    expect(() => applyProgressivePatch(duplicate, {
+      kind: 'boundary', id: 4, html: '<strong>Never</strong>', styles: { version: 1, entries: [] },
+    })).toThrowError(/duplicate start markers/);
+
+    const styleRoot = document.createElement('div');
+    const style = document.createElement('style');
+    style.dataset.gluonStyle = 'conflict';
+    style.dataset.gluonDigest = 'old';
+    style.textContent = '.old {}';
+    styleRoot.append(style);
+    expect(() => applyProgressivePatch(root, {
+      kind: 'boundary', id: 3, html: '<strong>Never</strong>',
+      styles: { version: 1, entries: [{ id: 'conflict', cssText: '.new {}', digest: 'new', order: 0 }] },
+    }, { styleRoot })).toThrowError(/does not match its manifest/);
+    expect(root.textContent).toBe('Loading');
+
+    const detachedRoot = { nodeType: 1, ownerDocument: null } as unknown as ParentNode;
+    expect(() => applyProgressivePatch(detachedRoot, {
+      kind: 'boundary', id: 1, html: '', styles: { version: 1, entries: [] },
+    })).toThrowError(/must belong to a document/);
   });
 });
 

@@ -304,6 +304,46 @@
       "source": "ssr"
     },
     {
+      "id": 1303,
+      "code": "GLUON_SSR_PROGRESSIVE_ABORTED",
+      "compactCode": "G1303",
+      "title": "Progressive SSR patch was aborted",
+      "summary": "A progressive SSR boundary patch was cancelled before it could be applied.",
+      "why": "The owning navigation, request, or stream signal was aborted.",
+      "remediation": "Stop consuming the stream or begin a new request for the active route.",
+      "source": "ssr"
+    },
+    {
+      "id": 1304,
+      "code": "GLUON_SSR_PROGRESSIVE_INVALID_PATCH",
+      "compactCode": "G1304",
+      "title": "Progressive SSR patch is invalid",
+      "summary": "A progressive SSR patch does not contain a valid non-negative boundary ID.",
+      "why": "The streamed transport is malformed or was produced by an incompatible renderer.",
+      "remediation": "Reject the patch and request a fresh shell from the same renderer version.",
+      "source": "ssr"
+    },
+    {
+      "id": 1305,
+      "code": "GLUON_SSR_PROGRESSIVE_BOUNDARY",
+      "compactCode": "G1305",
+      "title": "Progressive SSR boundary is malformed",
+      "summary": "A progressive SSR patch cannot find exactly one matching comment boundary in the target DOM.",
+      "why": "The shell and patch are out of order, duplicated, or from different render requests.",
+      "remediation": "Discard the patch and restart the progressive render with one request-local shell.",
+      "source": "ssr"
+    },
+    {
+      "id": 1306,
+      "code": "GLUON_SSR_PROGRESSIVE_STYLE",
+      "compactCode": "G1306",
+      "title": "Progressive SSR style carrier conflicts",
+      "summary": "A progressive SSR patch contains a style carrier that conflicts with the target document.",
+      "why": "The existing carrier has different CSS text or digest content.",
+      "remediation": "Keep the original manifest and reload the shell before applying the patch.",
+      "source": "ssr"
+    },
+    {
       "id": 1401,
       "code": "GLUON_UNIVERSAL_ENTRY_MISSING",
       "compactCode": "G1401",
