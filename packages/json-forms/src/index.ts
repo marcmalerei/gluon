@@ -11,6 +11,7 @@ export {
   createJsonFormsMessageProvider,
   JsonSchemaResolutionError,
   resolveJsonSchema,
+  type JsonFormField,
   type JsonFormValidationError,
   type JsonFormsMessageOverrides,
   type JsonFormsMessageProvider,
@@ -21,3 +22,13 @@ export {
   type JsonSchemaResolutionOptions,
   type JsonValue,
 } from './schema.js';
+export {
+  createJsonFormsRendererRegistry,
+  isJsonFormsRendererRegistry,
+  type JsonFormsRendererContext,
+  type JsonFormsRendererControl,
+  type JsonFormsRendererKind,
+  type JsonFormsRendererRegistration,
+  type JsonFormsRendererRegistry,
+  type JsonFormsRendererSelector,
+} from './renderer-registry.js';

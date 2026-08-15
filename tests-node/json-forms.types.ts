@@ -3,10 +3,14 @@ import {
   JsonSchemaResolutionError,
   createJsonFormsMessageProvider,
   resolveJsonSchema,
+  createJsonFormsRendererRegistry,
   type JsonFormValidationError,
   type JsonFormsMessageOverrides,
   type JsonFormsMessageProvider,
   type JsonFormsMessageProviderOptions,
+  type JsonFormsRendererContext,
+  type JsonFormsRendererRegistration,
+  type JsonFormsRendererSelector,
   type JsonSchema,
   type JsonSchemaResolutionOptions,
 } from '@gluonjs/json-forms';
@@ -25,7 +29,18 @@ const messages = {
 } satisfies JsonFormsMessageOverrides;
 const options = { locale: 'de-DE', messages } satisfies JsonFormsMessageProviderOptions;
 const provider: JsonFormsMessageProvider = createJsonFormsMessageProvider(options);
-const view = JsonForm({ schema, data: { quantity: 1 }, messages: provider });
+const selector = { kind: 'number', path: ['quantity'] } satisfies JsonFormsRendererSelector;
+const renderer = {
+  id: 'quantity-output',
+  selector,
+  priority: 1,
+  render(context: JsonFormsRendererContext) {
+    context.control.commit(typeof context.value === 'number' ? context.value + 1 : 1);
+    return String(context.value ?? '');
+  },
+} satisfies JsonFormsRendererRegistration;
+const rendererRegistry = createJsonFormsRendererRegistry([renderer]);
+const view = JsonForm({ schema, data: { quantity: 1 }, messages: provider, rendererRegistry });
 
 console.log(provider.locale, provider.formatNumber(1000), view);
 
@@ -38,3 +53,8 @@ void error.keyword;
 
 // @ts-expect-error limits are numeric
 resolveJsonSchema(referencedSchema, { maxDepth: '8' });
+
+// @ts-expect-error renderer selectors accept only supported field kinds
+createJsonFormsRendererRegistry([{ id: 'invalid', selector: { kind: 'remote' }, render: () => '' }]);
+
+console.log(rendererRegistry.registrations);

@@ -40,6 +40,9 @@ try {
   ));
   await page.waitForFunction(() => [...document.querySelector('gluon-json-form')?.shadowRoot?.querySelectorAll('button') ?? []]
     .some((button) => button.textContent?.includes('hinzufügen')));
+  await page.waitForFunction(() => Boolean(
+    document.querySelector('gluon-json-form')?.shadowRoot?.querySelector('[data-lead-time-stepper]'),
+  ));
 
   const initial = await page.locator('gluon-json-form').evaluate((element) => {
     const form = element;
@@ -47,10 +50,29 @@ try {
       label: form.shadowRoot?.querySelector('[part="form"]')?.getAttribute('aria-label'),
       addLabel: [...form.shadowRoot?.querySelectorAll('button') ?? []]
         .find((button) => button.textContent?.includes('hinzufügen'))?.textContent?.trim(),
+      renderer: form.shadowRoot?.querySelector('[data-gluon-json-renderer]')?.getAttribute('data-gluon-json-renderer'),
+      leadTime: form.shadowRoot?.querySelector('[data-lead-time-stepper] output')?.textContent?.trim(),
     };
   });
   if (initial.label !== 'Handover rules') throw new Error('maintained example did not preserve the application-authored schema title');
   if (initial.addLabel !== 'Weiteren Benachrichtigungskanal hinzufügen') throw new Error('maintained example did not render localized array controls');
+  if (initial.renderer !== 'lead-time-stepper' || initial.leadTime !== '24 h') {
+    throw new Error(`maintained example did not select the custom renderer: ${JSON.stringify(initial)}`);
+  }
+
+  const stepped = await page.locator('gluon-json-form').evaluate(async (element) => {
+    const form = element;
+    form.shadowRoot?.querySelector('[aria-label="Vorlaufzeit erhöhen"]')?.click();
+    await form.updateComplete;
+    return {
+      leadTime: form.data.leadTime,
+      output: form.shadowRoot?.querySelector('[data-lead-time-stepper] output')?.textContent?.trim(),
+      formValue: new FormData(form.form).get(form.name),
+    };
+  });
+  if (stepped.leadTime !== 25 || stepped.output !== '25 h' || !String(stepped.formValue).includes('"leadTime":25')) {
+    throw new Error(`custom renderer bypassed host-owned data or form state: ${JSON.stringify(stepped)}`);
+  }
 
   const valid = await page.locator('gluon-json-form').evaluate(async (element) => {
     const form = element;
@@ -97,7 +119,7 @@ try {
   await new Promise((accept, reject) => server.close((error) => error ? reject(error) : accept()));
 }
 
-console.log('JSON Forms maintained example browser contract valid: German copy, validation, diagnostics, 390px layout, and 44px controls');
+console.log('JSON Forms maintained example browser contract valid: custom renderer, German copy, validation, form state, diagnostics, 390px layout, and 44px controls');
 
 function contentType(file) {
   return ({

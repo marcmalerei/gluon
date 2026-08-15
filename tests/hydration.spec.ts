@@ -24,6 +24,13 @@ import {
 import { AspectRatio, Avatar, Button, Checkbox, Input, Progress, Radio, ScrollArea, Select, Separator, Slider, StatusBadge, Switch, Textarea, ToggleButton, aspectRatioStyles, avatarStyles, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, scrollAreaStyles, selectStyles, separatorStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
 import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
+import {
+  JsonFormsElement,
+  createJsonFormsRendererRegistry,
+  registerJsonForms,
+  type JsonFormsRendererContext,
+  type JsonSchema,
+} from '../packages/json-forms/src/index.js';
 import { componentLibraryManifest } from '@gluonjs/example-component-library/manifest';
 import { createComponentLibraryLoader } from '@gluonjs/quarks';
 import { nextTick, ref } from '@gluonjs/reactivity';
@@ -422,6 +429,59 @@ describe('SSR hydration', () => {
     expect(upgraded.shadowRoot).toBe(shadow);
     expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
     upgraded.remove();
+  });
+
+  it('retains deterministic JSON Forms custom renderer output and binds host-owned commits', async () => {
+    registerJsonForms();
+    const schema = {
+      type: 'object',
+      properties: { quantity: { $ref: '#/$defs/quantity', title: 'Quantity' } },
+      $defs: { quantity: { type: 'integer', minimum: 1 } },
+      required: ['quantity'],
+    } satisfies JsonSchema;
+    let latestContext: JsonFormsRendererContext | undefined;
+    const registry = createJsonFormsRendererRegistry([{
+      id: 'quantity-stepper',
+      selector: { kind: 'number', path: ['quantity'] },
+      render: (context) => {
+        latestContext = context;
+        const value = typeof context.value === 'number' ? context.value : 1;
+        return html`
+          <button
+            type="button"
+            aria-labelledby=${context.control.labelId}
+            @click=${() => context.control.commit(value + 1)}
+          >Increase</button>
+          <output id=${context.control.id} aria-labelledby=${context.control.labelId}>${value}</output>
+        `;
+      },
+    }]);
+    const data = { quantity: 1 } as const;
+    const serialized = await renderToString(renderElement(JsonFormsElement, {
+      properties: { schema, data, rendererRegistry: registry },
+    }));
+    const container = document.createElement('div');
+    materializeServerElements(container, serialized);
+    const element = container.querySelector('gluon-json-form') as JsonFormsElement;
+    element.schema = schema;
+    element.data = data;
+    element.rendererRegistry = registry;
+    element.beginHydration();
+    const serverOutput = element.shadowRoot?.querySelector('output');
+    document.body.append(container);
+
+    const result = await hydrateElement(element);
+    await element.updateComplete;
+    expect(result).toMatchObject({ retained: true, recovered: false, mismatches: [] });
+    expect(element.shadowRoot?.querySelector('output')).toBe(serverOutput);
+    expect(latestContext?.schema).toMatchObject({ type: 'integer', title: 'Quantity', minimum: 1 });
+    expect(latestContext?.schema).not.toHaveProperty('$ref');
+    expect(Object.isFrozen(latestContext?.schema)).toBe(true);
+    element.shadowRoot?.querySelector<HTMLButtonElement>('button')?.click();
+    await element.updateComplete;
+    expect(element.data.quantity).toBe(2);
+    expect(element.shadowRoot?.querySelector('output')?.textContent).toBe('2');
+    container.remove();
   });
 
   it('retains standalone and adjacent server DSD roots using transported marker ranges', async () => {

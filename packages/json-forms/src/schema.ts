@@ -101,6 +101,8 @@ export interface JsonFormField {
   readonly required: boolean;
   readonly readOnly: boolean;
   readonly schema: JsonSchema;
+  /** The field-specific Control UI schema, when one was supplied. */
+  readonly uiSchema?: JsonFormsUiSchema;
   readonly options: readonly {
     readonly label: string;
     readonly value: string | number;
@@ -112,6 +114,7 @@ export interface JsonFormField {
 interface FieldLayout {
   readonly labels: ReadonlyMap<string, string | false>;
   readonly enumNames: ReadonlyMap<string, readonly string[]>;
+  readonly controls: ReadonlyMap<string, JsonFormsUiSchema>;
   readonly order: readonly string[];
 }
 
@@ -518,18 +521,20 @@ function getFieldKind(schema: JsonSchema): JsonFormField['kind'] | undefined {
 function getFieldLayout(uischema: JsonFormsUiSchema | undefined): FieldLayout {
   const labels = new Map<string, string | false>();
   const enumNames = new Map<string, readonly string[]>();
+  const controls = new Map<string, JsonFormsUiSchema>();
   const order: string[] = [];
-  if (uischema?.type !== 'VerticalLayout') return { labels, enumNames, order };
+  if (uischema?.type !== 'VerticalLayout') return { labels, enumNames, controls, order };
   for (const control of uischema.elements ?? []) {
     if (control.type !== 'Control') continue;
     const path = parsePropertyScope(control.scope);
     if (!path) continue;
     const key = pathKey(path);
+    controls.set(key, control);
     if (path.length === 1 && !order.includes(path[0]!)) order.push(path[0]!);
     if (control.label !== undefined) labels.set(key, control.label);
     if (control.options?.enumNames) enumNames.set(key, control.options.enumNames);
   }
-  return { labels, enumNames, order };
+  return { labels, enumNames, controls, order };
 }
 
 function parsePropertyScope(scope: string | undefined): readonly string[] | undefined {
@@ -576,6 +581,7 @@ function buildField(
     required,
     readOnly: schema.readOnly === true,
     schema,
+    ...(layout.controls.get(key) ? { uiSchema: layout.controls.get(key) } : {}),
     options: Object.freeze(options),
   };
   if (kind === 'object') {

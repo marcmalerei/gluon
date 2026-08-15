@@ -1,13 +1,16 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import axe, { type Result } from 'axe-core';
 import { html, render } from '../src/index.js';
 import {
   JsonForm,
   JsonFormsElement,
+  createJsonFormsRendererRegistry,
   jsonFormsTag,
   registerJsonForms,
   type JsonFormChangeDetail,
   type JsonFormValidationChangeDetail,
   type JsonObject,
+  type JsonFormsRendererContext,
   type JsonSchema,
 } from '../packages/json-forms/src/index.js';
 import {
@@ -82,6 +85,156 @@ describe('JSON Forms component', () => {
     expect((element.shadowRoot!.querySelector('#field-units') as HTMLInputElement).value).toBe('1');
     expect((element.data as Record<string, unknown>).units).toBe(1);
     expect((element.data as Record<string, unknown>).giftWrap).toBe(false);
+  });
+
+  it('selects custom renderers deterministically and keeps mutation, validation, and form events host-owned', async () => {
+    let latestContext: JsonFormsRendererContext | undefined;
+    const registry = createJsonFormsRendererRegistry([{
+      id: 'quantity-stepper',
+      selector: { kind: 'number', path: ['units'] },
+      priority: 10,
+      render: (context) => {
+        latestContext = context;
+        const value = typeof context.value === 'number' ? context.value : 0;
+        return html`
+          <div data-quantity-stepper>
+            <button
+              type="button"
+              aria-label="Decrease units"
+              ?disabled=${context.disabled || context.readOnly}
+              @click=${() => context.control.commit(value - 1)}
+            >−</button>
+            <output
+              id=${context.control.id}
+              aria-labelledby=${context.control.labelId}
+              aria-describedby=${context.control.describedBy}
+            >${value}</output>
+            <button
+              type="button"
+              aria-label="Increase units"
+              ?disabled=${context.disabled || context.readOnly}
+              @click=${() => context.control.commit(value + 1)}
+            >+</button>
+          </div>
+        `;
+      },
+    }]);
+    const outerForm = document.createElement('form');
+    const element = document.createElement(jsonFormsTag) as JsonFormsElement;
+    element.name = 'booking';
+    element.schema = bookingSchema;
+    element.uischema = {
+      type: 'VerticalLayout',
+      elements: [{ type: 'Control', scope: '#/properties/units', label: 'Order units' }],
+    };
+    element.data = { email: 'hello@example.test', delivery: 'morning', units: 1 };
+    element.rendererRegistry = registry;
+    const changes: JsonFormChangeDetail[] = [];
+    element.addEventListener('change', (event) => changes.push((event as CustomEvent<JsonFormChangeDetail>).detail));
+    outerForm.append(element);
+    document.body.append(outerForm);
+    await settled(element);
+
+    const customField = element.shadowRoot!.querySelector('[data-gluon-json-renderer="quantity-stepper"]')!;
+    expect(customField.getAttribute('role')).toBe('group');
+    expect(customField.querySelector('[data-quantity-stepper]')).toBeTruthy();
+    expect(customField.querySelector('.field-label')?.textContent).toContain('Order units');
+    expect(element.shadowRoot!.querySelector('#field-email')).toBeInstanceOf(HTMLInputElement);
+    expect(latestContext?.path).toEqual(['units']);
+    expect(latestContext?.schema).toEqual(bookingSchema.properties.units);
+    expect(latestContext?.schema).not.toBe(bookingSchema.properties.units);
+    expect(Object.isFrozen(latestContext?.schema)).toBe(true);
+    expect(latestContext?.uiSchema?.scope).toBe('#/properties/units');
+    expect(latestContext?.rootUiSchema).toBe(element.uischema);
+    expect(latestContext?.data).toBe(element.data);
+    expect(Object.isFrozen(latestContext?.data)).toBe(true);
+    expect(Object.isFrozen(latestContext?.control)).toBe(true);
+    const accessibility = await axe.run(outerForm, {
+      resultTypes: ['violations'],
+      runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'] },
+    });
+    expect(accessibility.violations, formatViolations(accessibility.violations)).toEqual([]);
+
+    customField.querySelector<HTMLButtonElement>('[aria-label="Decrease units"]')!.click();
+    await settled(element);
+    expect(element.data.units).toBe(0);
+    expect(element.errors.some((error) => error.keyword === 'minimum')).toBe(true);
+    expect(changes).toHaveLength(1);
+    expect(changes[0]?.data.units).toBe(0);
+    expect(new FormData(outerForm).get('booking')).toBe(JSON.stringify(element.data));
+    expect(() => latestContext!.control.commit({ invalid: (() => undefined) as never })).toThrow('JSON-compatible');
+
+    element.readOnly = true;
+    await settled(element);
+    const disabledIncrease = element.shadowRoot!.querySelector<HTMLButtonElement>('[aria-label="Increase units"]')!;
+    expect(disabledIncrease.disabled).toBe(true);
+    latestContext!.control.commit(2);
+    expect(element.data.units).toBe(0);
+
+    element.readOnly = false;
+    element.formStateRestoreCallback(JSON.stringify({ email: 'restored@example.test', delivery: 'afternoon', units: 3 }));
+    await settled(element);
+    expect(element.shadowRoot!.querySelector('output')?.textContent).toBe('3');
+    outerForm.reset();
+    await settled(element);
+    expect(element.data.units).toBe(1);
+  });
+
+  it('rejects unsupported or ambiguous renderer registrations and resolves explicit priority', async () => {
+    const renderText = (context: JsonFormsRendererContext) => html`<span>${String(context.value ?? '')}</span>`;
+    expect(() => createJsonFormsRendererRegistry(null as never)).toThrow('must be an array');
+    expect(() => createJsonFormsRendererRegistry([null as never])).toThrow('must be an object');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad id', selector: { kind: 'number' }, render: renderText,
+    }])).toThrow('stable id');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'missing-render', selector: { kind: 'number' }, render: undefined as never,
+    }])).toThrow('render function');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'duplicate', selector: { kind: 'text' }, render: renderText,
+    }, {
+      id: 'duplicate', selector: { kind: 'number' }, render: renderText,
+    }])).toThrow('registered more than once');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'generic', selector: { kind: 'number' }, render: renderText,
+    }, {
+      id: 'specific', selector: { kind: 'number', path: ['units'] }, render: renderText,
+    }])).toThrow('overlap at priority 0');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad-kind', selector: { kind: 'unsupported' as never }, render: renderText,
+    }])).toThrow('supported field kind');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'empty-kinds', selector: { kind: [] }, render: renderText,
+    }])).toThrow('supported field kind');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad-schema-type', selector: { kind: 'number', schemaType: 'null' as never }, render: renderText,
+    }])).toThrow('unsupported schemaType');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad-format', selector: { kind: 'number', format: ' ' }, render: renderText,
+    }])).toThrow('non-empty string');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad-path', selector: { kind: 'number', path: [''] }, render: renderText,
+    }])).toThrow('non-empty string segments');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad-selector', selector: { kind: 'number', request: true } as never, render: renderText,
+    }])).toThrow('supported declarative selector');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'bad-priority', selector: { kind: 'number' }, priority: 0.5, render: renderText,
+    }])).toThrow('safe integer');
+    expect(() => createJsonFormsRendererRegistry([{
+      id: 'unknown-key', selector: { kind: 'number' }, render: renderText, remote: true,
+    } as never])).toThrow('unsupported property');
+
+    const registry = createJsonFormsRendererRegistry([{
+      id: 'generic', selector: { kind: 'number' }, render: () => html`<span>generic</span>`,
+    }, {
+      id: 'specific', selector: { kind: 'number', path: ['units'] }, priority: 1, render: () => html`<span>specific</span>`,
+    }]);
+    const element = createForm();
+    element.rendererRegistry = registry;
+    await settled(element);
+    expect(element.shadowRoot!.querySelector('[data-gluon-json-renderer="specific"]')?.textContent).toContain('specific');
+    expect(element.shadowRoot!.querySelector('[data-gluon-json-renderer="generic"]')).toBeNull();
   });
 
   it('emits frozen data and validation diagnostics as people edit native fields', async () => {
@@ -741,3 +894,10 @@ describe('JSON Forms component', () => {
     expect(helper.data).toMatchObject({ email: 'helper@example.test', delivery: 'morning' });
   });
 });
+
+function formatViolations(violations: readonly Result[]): string {
+  return violations.map((violation) => [
+    `${violation.id}: ${violation.help}`,
+    ...violation.nodes.map((node) => `${node.target.join(' ')} — ${node.failureSummary ?? 'failed'}`),
+  ].join('\n')).join('\n');
+}

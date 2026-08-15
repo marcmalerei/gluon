@@ -6,17 +6,25 @@
       "code": [
         "import {",
         "  createJsonFormsMessageProvider,",
+        "  createJsonFormsRendererRegistry,",
+        "  isJsonFormsRendererRegistry,",
         "  JsonForm,",
         "  JsonSchemaResolutionError,",
         "  jsonFormsTag,",
         "  registerJsonForms,",
         "  resolveJsonSchema,",
         "  type JsonFormChangeDetail,",
+        "  type JsonFormField,",
         "  type JsonFormOptions,",
         "  type JsonFormsElement,",
         "  type JsonFormsMessageOverrides,",
         "  type JsonFormsMessageProvider,",
         "  type JsonFormsMessageProviderOptions,",
+        "  type JsonFormsRendererContext,",
+        "  type JsonFormsRendererControl,",
+        "  type JsonFormsRendererKind,",
+        "  type JsonFormsRendererRegistration,",
+        "  type JsonFormsRendererSelector,",
         "  type JsonFormsUiSchema,",
         "  type JsonFormValidationChangeDetail,",
         "  type JsonFormValidationError,",
@@ -39,6 +47,10 @@
         "const messageOverrides = { selectPlaceholder: (required: boolean) => required ? 'Choose one' : 'No selection' } satisfies JsonFormsMessageOverrides;",
         "const messageOptions = { locale: 'en-GB', messages: messageOverrides } satisfies JsonFormsMessageProviderOptions;",
         "const messages: JsonFormsMessageProvider = createJsonFormsMessageProvider(messageOptions);",
+        "const rendererKind: JsonFormsRendererKind = 'select';",
+        "const rendererSelector = { kind: rendererKind, path: ['delivery'] } satisfies JsonFormsRendererSelector;",
+        "const rendererRegistration = { id: 'delivery-summary', selector: rendererSelector, priority: 10, render: (context: JsonFormsRendererContext) => String(context.value ?? '') } satisfies JsonFormsRendererRegistration;",
+        "const rendererRegistry = createJsonFormsRendererRegistry([rendererRegistration]);",
         "",
         "registerJsonForms();",
         "const element = document.createElement(jsonFormsTag) as JsonFormsElement;",
@@ -46,9 +58,12 @@
         "element.uischema = uischema;",
         "element.data = data;",
         "element.messages = messages;",
-        "const options = { schema, uischema, data, messages, onChange: (event) => console.log(event.detail.data), onValidationChange: (event) => console.log(event.detail.valid) } satisfies JsonFormOptions;",
+        "element.rendererRegistry = rendererRegistry;",
+        "const rendererControl: JsonFormsRendererControl | undefined = undefined;",
+        "const field: JsonFormField | undefined = undefined;",
+        "const options = { schema, uischema, data, messages, rendererRegistry, onChange: (event) => console.log(event.detail.data), onValidationChange: (event) => console.log(event.detail.valid) } satisfies JsonFormOptions;",
         "const view = JsonForm(options);",
-        "console.log(element.value, value, change, validation, view, resolvedSchema, referenceError.keyword);"
+        "console.log(element.value, value, change, validation, isJsonFormsRendererRegistry(rendererRegistry), rendererControl, field, view, resolvedSchema, referenceError.keyword);"
       ]
     },
     "i18n-application": {
@@ -3169,6 +3184,14 @@
       "recipe": "json-forms-contract",
       "description": "Create a synchronous locale-aware infrastructure message provider with complete English fallbacks and no i18n dependency:"
     },
+    "packages/json-forms/src/functions/createJsonFormsRendererRegistry.md": {
+      "recipe": "json-forms-contract",
+      "description": "Validate request-free custom renderer registrations and reject duplicate, unsupported, or ambiguous contracts before rendering:"
+    },
+    "packages/json-forms/src/functions/isJsonFormsRendererRegistry.md": {
+      "recipe": "json-forms-contract",
+      "description": "Validate that an element property received a registry created by the active JSON Forms package instance:"
+    },
     "packages/json-forms/src/functions/registerJsonForms.md": {
       "recipe": "json-forms-contract",
       "description": "Register the explicit JSON Forms Custom Element before using it from plain HTML or a host application:"
@@ -3180,6 +3203,10 @@
     "packages/json-forms/src/interfaces/JsonFormChangeDetail.md": {
       "recipe": "json-forms-contract",
       "description": "Receive frozen changed JSON data and the validation diagnostics that describe that exact edit:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormField.md": {
+      "recipe": "json-forms-contract",
+      "description": "Inspect the public resolved field metadata supplied to custom renderers without reaching private element state:"
     },
     "packages/json-forms/src/interfaces/JsonFormOptions.md": {
       "recipe": "json-forms-contract",
@@ -3200,6 +3227,26 @@
     "packages/json-forms/src/interfaces/JsonFormsMessageProviderOptions.md": {
       "recipe": "json-forms-contract",
       "description": "Configure the provider locale and a typed partial set of application-owned message overrides:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsRendererContext.md": {
+      "recipe": "json-forms-contract",
+      "description": "Render from immutable field, schema, UI-schema, data, validation, state, and host-owned control context:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsRendererControl.md": {
+      "recipe": "json-forms-contract",
+      "description": "Connect custom controls to stable label and error IDs and commit values through the host lifecycle:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsRendererRegistration.md": {
+      "recipe": "json-forms-contract",
+      "description": "Register a stable renderer ID, declarative selector, explicit priority, and synchronous render function:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsRendererRegistry.md": {
+      "recipe": "json-forms-contract",
+      "description": "Resolve one immutable declarative renderer registry by explicit priority while retaining the built-in fallback:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsRendererSelector.md": {
+      "recipe": "json-forms-contract",
+      "description": "Select supported fields by kind, schema type or format, and exact data path without arbitrary request-time predicates:"
     },
     "packages/json-forms/src/interfaces/JsonFormValidationChangeDetail.md": {
       "recipe": "json-forms-contract",
@@ -3224,6 +3271,10 @@
     "packages/json-forms/src/type-aliases/JsonValue.md": {
       "recipe": "json-forms-contract",
       "description": "Use the JSON value union when retaining a serializable schema value or form field value:"
+    },
+    "packages/json-forms/src/type-aliases/JsonFormsRendererKind.md": {
+      "recipe": "json-forms-contract",
+      "description": "Constrain renderer selectors to the supported text, number, boolean, select, object, and array field kinds:"
     },
     "packages/json-forms/src/variables/jsonFormsTag.md": {
       "recipe": "json-forms-contract",
