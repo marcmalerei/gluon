@@ -794,6 +794,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Report-only Vue migration analyzer RFC](docs/rfcs/0003-report-only-vue-migration-analyzer.md)
 - [Bounded Vue codemod no-go decision](docs/vue-codemod-decision.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
+- [Accessibility and compatibility support matrix](docs/support-matrix.md)
 - [Package, release, and supply-chain governance ADR](docs/adrs/0002-package-release-and-supply-chain-governance.md)
 - [Release operations and protected publication runbook](docs/releasing.md)
 - [Machine-readable package contract](package-contract.json)

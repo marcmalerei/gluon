@@ -1,5 +1,10 @@
 # Accessibility evidence and future manual protocol
 
+The current browser/runtime boundary is summarized in the
+[Gluon support matrix](support-matrix.md). This page contains the detailed
+accessibility evidence and the manual protocol required before making an
+assistive-technology claim.
+
 Gluon 1.0 publishes automated accessibility regression evidence and makes no
 assistive-technology support claim. `tests/accessibility-gates.spec.ts` runs
 axe-core WCAG 2 A/AA, 2.1 AA, and 2.2 AA rules against the GLUON GOODS home,
