@@ -25,6 +25,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   instance IDs, semantic ordered-list status, truthful derived overall state,
   localized summaries, role/evidence/action slots, and responsive accessibility
   contracts.
+- Added request-free `SearchField` and grouped `SearchResults` Molecules with
+  native form/list semantics and explicit asynchronous presentation states
+  (#372).
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.

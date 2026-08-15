@@ -26,7 +26,7 @@ import {
   unadoptStyles,
   unmount,
 } from '../src/index.js';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, FormField, InlineNotice, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, FormField, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AppShell } from '@gluonjs/organisms';
 import { Listbox, q } from '@gluonjs/quarks';
 import portrait from '../docs/assets/examples/foundation-avatar.svg?url&no-inline';
@@ -88,6 +88,40 @@ test('matches the stable light-theme UI composition', async () => {
       threshold: 0.15,
     },
   });
+  uiOwner.dispose();
+});
+
+test('matches SearchField and SearchResults responsive failure composition', async () => {
+  unmount(document.body);
+  document.body.replaceChildren();
+  document.adoptedStyleSheets = [];
+  const visualStyles = css`@layer gluon { body { margin: 0; } [data-testid="search-visual"] { box-sizing: border-box; inline-size: 100%; max-inline-size: 390px; padding: 16px; font: 16px/1.4 system-ui, sans-serif; } }`;
+  const uiOwner = installUi(document, { theme: 'light' });
+  adoptStyles(document, visualStyles);
+  render(q.main({
+    data: { testid: 'search-visual' },
+    children: [
+      SearchField({ id: 'visual-search', label: 'Search products with a deliberately long label', query: 'graphite cable', submitLabel: 'Find products', loading: true }),
+      SearchResults({ id: 'visual-results', heading: 'Results', state: 'partial-failure', partialFailureContent: 'Some long result groups are unavailable right now.', groups: [{ id: 'visual-group', heading: 'Available products with a long heading', count: 12, description: 'Description remains readable in narrow layouts.', children: [q.li({ children: 'A long result that remains visible' })] }] }),
+    ],
+  }), document.body);
+  const visual = document.querySelector<HTMLElement>('[data-testid="search-visual"]')!;
+  expect(visual.clientWidth).toBe(390);
+  expect(visual.scrollWidth).toBeLessThanOrEqual(visual.clientWidth);
+  visual.style.inlineSize = '320px';
+  expect(visual.clientWidth).toBe(320);
+  expect(visual.scrollWidth).toBeLessThanOrEqual(visual.clientWidth);
+  visual.style.inlineSize = '390px';
+  await expect.element(page.getByTestId('search-visual')).toMatchScreenshot('search-compositions-responsive', {
+    comparatorName: 'pixelmatch',
+    comparatorOptions: {
+      // Preserve layout and color sensitivity while allowing cross-OS font rasterization.
+      allowedMismatchedPixelRatio: 0.1,
+      threshold: 0.15,
+    },
+  });
+  unmount(document.body);
+  unadoptStyles(document, visualStyles);
   uiOwner.dispose();
 });
 

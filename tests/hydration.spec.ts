@@ -22,7 +22,7 @@ import {
   unmount,
 } from '@gluonjs/core';
 import { AspectRatio, Avatar, Button, Checkbox, Input, Progress, Radio, ScrollArea, Select, Separator, Slider, StatusBadge, Switch, Textarea, ToggleButton, aspectRatioStyles, avatarStyles, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, scrollAreaStyles, selectStyles, separatorStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, searchFieldStyles, searchResultsStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
 import { ConfirmationDialog, WorkflowTimeline, confirmationDialogStyles, workflowTimelineStyles } from '@gluonjs/organisms';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import {
@@ -850,7 +850,7 @@ describe('SSR hydration', () => {
   });
 
   it('hands component carriers to their exact renderer-owned sheets and diagnoses mismatches', async () => {
-    const value = html`<main>${ConfirmationDialog({ id: 'hydrated-confirmation', title: 'Hydrated confirmation', primaryAction: Button({ label: 'Confirm' }) })}${WorkflowTimeline({ id: 'hydrated-workflow', steps: [{ id: 'review', label: 'Hydrated review', status: 'current' }] })}${AspectRatio({ ratio: 4 / 3, children: 'Hydrated media' })}${Avatar({ src: '/hydrated-avatar.svg', alt: 'Hydrated loaded avatar', status: 'loaded' })}${Avatar({ alt: 'Hydrated fallback avatar', fallback: 'HA', status: 'error' })}${ScrollArea({ label: 'Hydrated notes', children: 'Hydrated scroll content' })}${Separator({})}${Button({ label: 'Hydrated action' })}${ButtonGroup({ label: 'Hydrated actions', children: Button({ label: 'Nested action' }) })}${SegmentedControl({ label: 'Hydrated view', value: 'grid', options: [{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }] })}${Tabs({ label: 'Hydrated tabs', value: 'one', items: [{ id: 'hydrated-one', value: 'one', label: 'One', panel: 'First panel' }, { id: 'hydrated-two', value: 'two', label: 'Two', panel: 'Second panel' }] })}${DialogSurface({ id: 'hydrated-dialog', label: 'Hydrated dialog', controller: createDialogSurfaceController(), children: 'Dialog content' })}${Disclosure({ id: 'hydrated-disclosure', summary: 'Hydrated disclosure', defaultOpen: true, children: 'Disclosure content' })}${Accordion({ label: 'Hydrated accordion', value: 'one', items: [{ id: 'hydrated-accordion-one', value: 'one', summary: 'One', children: 'First disclosure' }] })}${InlineNotice({ tone: 'success', title: 'Hydrated notice', children: 'Hydrated feedback' })}${EmptyState({ heading: 'Hydrated empty state', children: 'No items.' })}${TableRegion({ id: 'hydrated-table', label: 'Hydrated table', children: html`<table><tbody><tr><td>Hydrated cell</td></tr></tbody></table>` })}${Select({
+    const value = html`<main>${ConfirmationDialog({ id: 'hydrated-confirmation', title: 'Hydrated confirmation', primaryAction: Button({ label: 'Confirm' }) })}${WorkflowTimeline({ id: 'hydrated-workflow', steps: [{ id: 'review', label: 'Hydrated review', status: 'current' }] })}${SearchField({ id: 'hydrated-search', label: 'Hydrated search', query: 'cobalt' })}${SearchResults({ id: 'hydrated-results', heading: 'Hydrated results', groups: [{ id: 'hydrated-products', heading: 'Products', count: 1, children: html`<li>Hydrated product</li>` }] })}${AspectRatio({ ratio: 4 / 3, children: 'Hydrated media' })}${Avatar({ src: '/hydrated-avatar.svg', alt: 'Hydrated loaded avatar', status: 'loaded' })}${Avatar({ alt: 'Hydrated fallback avatar', fallback: 'HA', status: 'error' })}${ScrollArea({ label: 'Hydrated notes', children: 'Hydrated scroll content' })}${Separator({})}${Button({ label: 'Hydrated action' })}${ButtonGroup({ label: 'Hydrated actions', children: Button({ label: 'Nested action' }) })}${SegmentedControl({ label: 'Hydrated view', value: 'grid', options: [{ value: 'grid', label: 'Grid' }, { value: 'list', label: 'List' }] })}${Tabs({ label: 'Hydrated tabs', value: 'one', items: [{ id: 'hydrated-one', value: 'one', label: 'One', panel: 'First panel' }, { id: 'hydrated-two', value: 'two', label: 'Two', panel: 'Second panel' }] })}${DialogSurface({ id: 'hydrated-dialog', label: 'Hydrated dialog', controller: createDialogSurfaceController(), children: 'Dialog content' })}${Disclosure({ id: 'hydrated-disclosure', summary: 'Hydrated disclosure', defaultOpen: true, children: 'Disclosure content' })}${Accordion({ label: 'Hydrated accordion', value: 'one', items: [{ id: 'hydrated-accordion-one', value: 'one', summary: 'One', children: 'First disclosure' }] })}${InlineNotice({ tone: 'success', title: 'Hydrated notice', children: 'Hydrated feedback' })}${EmptyState({ heading: 'Hydrated empty state', children: 'No items.' })}${TableRegion({ id: 'hydrated-table', label: 'Hydrated table', children: html`<table><tbody><tr><td>Hydrated cell</td></tr></tbody></table>` })}${Select({
       value: 'cobalt',
       attributes: { 'aria-label': 'Hydrated finish' },
       children: html`<option value="black">Black</option><option value="cobalt">Cobalt</option>`,
@@ -896,6 +896,10 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).toContain(tableRegionStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(choiceGroupStyles);
     expect(styleRoot.adoptedStyleSheets).toContain(controlFieldStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(searchFieldStyles);
+    expect(styleRoot.adoptedStyleSheets).toContain(searchResultsStyles);
+    expect(root.querySelector('#hydrated-search')).toBeTruthy();
+    expect(root.querySelector('#hydrated-results')).toBeTruthy();
     const slider = root.querySelector<HTMLInputElement>('#hydrated-slider')!;
     expect(slider.value).toBe('0.3');
     expect(slider.getAttribute('aria-valuetext')).toBe('30 percent');
@@ -916,6 +920,8 @@ describe('SSR hydration', () => {
     expect(styleRoot.adoptedStyleSheets).not.toContain(cardStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(choiceGroupStyles);
     expect(styleRoot.adoptedStyleSheets).not.toContain(controlFieldStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(searchFieldStyles);
+    expect(styleRoot.adoptedStyleSheets).not.toContain(searchResultsStyles);
 
     const carrierTemplate = document.createElement('template');
     carrierTemplate.innerHTML = renderStyleCarriers(manifest);

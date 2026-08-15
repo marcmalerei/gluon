@@ -61,7 +61,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ConfirmationDialog, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 
@@ -124,6 +124,17 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-labelledby="server-confirmation-title"');
     expect(rendered).toContain('aria-describedby="server-confirmation-description"');
     expect(rendered).toContain('data-destructive');
+  });
+
+  it('serializes request-free search compositions with native semantics', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString([
+      SearchField({ id: 'server-search', label: 'Search', query: 'cobalt', submitLabel: 'Find' }),
+      SearchResults({ id: 'server-results', heading: 'Results', groups: [{ id: 'products', heading: 'Products', count: 1, children: html`<li>Cobalt</li>` }] }),
+    ]));
+    expect(rendered).toContain('role="search"');
+    expect(rendered).toContain('type="search"');
+    expect(rendered).toContain('Products');
+    expect(rendered).toContain('<ul');
   });
 
   it('serializes the DialogSurface ARIA structure without invoking browser focus APIs', async () => {

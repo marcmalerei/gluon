@@ -39,6 +39,8 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  SearchField,
+  SearchResults,
   SegmentedControl,
   TableRegion,
   Tabs,
@@ -60,6 +62,7 @@ import examplePortrait from '../../docs/assets/examples/foundation-avatar.svg?ur
 
 const theme = ref<'light' | 'dark'>('light');
 const finish = ref('black');
+const searchQuery = ref('cable');
 const dialogOpen = ref(false);
 const purchaseRef: { value?: HTMLButtonElement } = {};
 const analyticsEvents: string[] = [];
@@ -170,6 +173,18 @@ createApp(() => AppShell({
       subtitle: 'Stable atoms, molecules, and headless choices',
       actions: Button({ label: 'Save profile' }),
       children: [
+        SearchField({
+          id: 'ui-example-search',
+          label: 'Search products',
+          query: searchQuery.value,
+          submitLabel: 'Find',
+          onQueryChange: (query) => { searchQuery.value = query; },
+        }),
+        SearchResults({
+          id: 'ui-example-results',
+          heading: 'Search results',
+          groups: [{ id: 'example-products', heading: 'Products', count: 1, children: q.li({ children: q.a({ href: '#cobalt', children: 'Cobalt cable' }) }) }],
+        }),
         Select({
           value: finish.value,
           attributes: { 'aria-label': 'Native finish selector' },

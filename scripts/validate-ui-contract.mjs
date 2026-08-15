@@ -11,7 +11,7 @@ const componentOutput = resolve(root, '.tmp/ui-component-usage');
 const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['AspectRatio', 'Avatar', 'Button', 'Checkbox', 'Icon', 'Input', 'Label', 'Progress', 'Radio', 'Select', 'Slider', 'StatusBadge', 'ScrollArea', 'Separator', 'Switch', 'Textarea', 'ToggleButton', 'installUi']],
-  ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'NavigationStrip', 'SegmentedControl', 'TableRegion', 'Tabs']],
+  ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'NavigationStrip', 'SegmentedControl', 'TableRegion', 'Tabs', 'SearchField', 'SearchResults']],
   ['@gluonjs/organisms', ['AppShell', 'ConfirmationDialog', 'WorkflowTimeline']],
 ]);
 const manifestExports = new Map([
