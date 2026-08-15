@@ -470,6 +470,12 @@ of explicit headroom. This is a composition-size change caused by a real
 customer-flow capability, not a framework-speed claim; future bundle changes
 must reproduce the measurement and update this record with the owning issue.
 
+Issue #413's native Slider product configuration raises the complete production
+entry to 263,798 raw bytes and 72,205 level-9 gzip bytes. The reviewed 264,200 /
+72,300 ceilings leave 402 raw and 95 gzip bytes of explicit headroom. HTML,
+image-byte, and image-count ceilings remain unchanged; this records customer-
+flow composition cost and is not a runtime-speed claim.
+
 ## Customer-flow performance and retained evidence
 
 `quality/shop-performance-budgets.json` is the reviewed p95 source for the

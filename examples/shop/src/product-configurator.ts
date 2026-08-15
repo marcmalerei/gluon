@@ -13,7 +13,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { customElement, property } from '@gluonjs/core/decorators';
-import { Progress, Radio, StatusBadge } from '@gluonjs/atoms';
+import { Progress, Radio, Slider, StatusBadge } from '@gluonjs/atoms';
 import { ChoiceGroup } from '@gluonjs/molecules';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
@@ -140,6 +140,9 @@ export const productConfiguratorStyles = css`
   }
   .choice-temperature > div,
   .choice-cable > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cable-slider { display: grid; gap: 8px; padding: 18px 0 20px; border-bottom: 1px solid var(--shop-rule, #d5d5d1); }
+  .cable-slider input { inline-size: 100%; --gluon-slider-accent: var(--shop-cobalt, #173f91); }
+  .cable-slider output { font-variant-numeric: tabular-nums; }
   .finish-swatch { width: 18px; height: 18px; border: 1px solid #888888; border-radius: 50%; }
   .swatch-graphite { background: #313131; }
   .swatch-cobalt { background: var(--shop-cobalt, #173f91); }
@@ -388,7 +391,7 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
         `}</slot>
         ${this.renderChoiceGroup('Finish', 'finish', productConfigurationChoices.finish, disabled)}
         ${this.renderChoiceGroup('Light temperature', 'temperature', productConfigurationChoices.temperature, disabled)}
-        ${this.renderChoiceGroup('Cable length', 'cable', productConfigurationChoices.cable, disabled)}
+        ${this.renderCableSlider(disabled)}
         <gluon-product-add-action
           class="product-add-action"
           @click=${() => this.requestAddToBag()}
@@ -432,6 +435,18 @@ export class ProductConfiguratorElement extends GluonElement<ProductConfigurator
           </label>
         `),
     });
+  }
+
+  private renderCableSlider(disabled: boolean): TemplateValue {
+    const value = this.configuration.cable === '2.5 m' ? 2.5 : 1.5;
+    return html`<div class="cable-slider">
+      <label id="product-cable-label" for="product-cable-slider">Cable length</label>
+      ${Slider({ min: 1.5, max: 2.5, step: 1, value, disabled, valueText: `${value.toFixed(1)} m`, onChange: (event) => {
+        const next = Number((event.currentTarget as HTMLInputElement).value);
+        this.select('cable', next === 2.5 ? '2.5 m' : '1.5 m');
+      }, attributes: { id: 'product-cable-slider', 'aria-labelledby': 'product-cable-label' } })}
+      <output for="product-cable-slider">${value.toFixed(1)} m</output>
+    </div>`;
   }
 
   private select<Key extends keyof ProductConfiguration>(

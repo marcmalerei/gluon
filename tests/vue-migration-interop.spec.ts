@@ -1,6 +1,6 @@
 import { beforeEach, expect, test, vi } from 'vitest';
 import { defineElement } from '@gluonjs/core';
-import { radioStyles } from '@gluonjs/atoms';
+import { radioStyles, sliderStyles } from '@gluonjs/atoms';
 import { choiceGroupStyles } from '@gluonjs/molecules';
 import { products } from '../examples/shop/src/data.js';
 import {
@@ -137,9 +137,10 @@ test('preserves native slots, adopted styles, host identity, lifecycle retention
   expect(titleSlot.assignedNodes()).toEqual([title]);
   expect(defaultSlot.assignedNodes()).toEqual([facts]);
   expect(title.parentNode).toBe(element);
-  expect(shadow.adoptedStyleSheets).toHaveLength(3);
+  expect(shadow.adoptedStyleSheets).toHaveLength(4);
   expect(shadow.adoptedStyleSheets).toContain(productConfiguratorStyles);
   expect(shadow.adoptedStyleSheets).toContain(radioStyles);
+  expect(shadow.adoptedStyleSheets).toContain(sliderStyles);
   expect(shadow.adoptedStyleSheets).toContain(choiceGroupStyles);
   expect(shadow.adoptedStyleSheets.every((sheet) => sheet.cssRules.length > 0)).toBe(true);
   expect(shadow.querySelector('style')).toBeNull();

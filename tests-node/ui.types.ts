@@ -4,6 +4,7 @@ import {
   Icon,
   Input,
   Label,
+  Slider,
   atomManifest,
   createUiStyleSelection,
   defineButtonPreset,
@@ -13,6 +14,7 @@ import {
   installUi,
   type UiOwner,
   type ButtonProps,
+  type SliderProps,
 } from '@gluonjs/atoms';
 import {
   Accordion,
@@ -45,6 +47,11 @@ import {
 } from '@gluonjs/quarks';
 
 const buttonProps: ButtonProps = { label: 'Save', variant: 'primary' };
+const controlledSliderProps: SliderProps = { value: 0.4, min: 0, max: 1, step: 0.1 };
+const uncontrolledSliderProps: SliderProps = { defaultValue: 0.4, min: 0, max: 1, step: 0.1 };
+// @ts-expect-error controlled and uncontrolled Slider values are mutually exclusive
+const ambiguousSliderProps: SliderProps = { value: 0.4, defaultValue: 0.5 };
+void ambiguousSliderProps;
 const cardProps: CardProps = { title: 'Profile', actions: Button(buttonProps) };
 const navigationStripProps: NavigationStripProps = {
   label: 'Account sections',
@@ -125,6 +132,8 @@ TextLink({ href: '/shop', children: 'Shop', aria: { current: 'page' } });
 Icon({ icon: customIcon, label: 'Bag', attributes: { ref: svgRef, data: { owner: 'app' } } });
 Input({ attributes: { autocomplete: 'email', ref: { value: undefined } } });
 Label({ children: 'Email', attributes: { data: { owner: 'app' } } });
+Slider({ ...controlledSliderProps, onInput: (event) => { void event.currentTarget; } });
+Slider(uncontrolledSliderProps);
 q.textarea({ rows: 4, '.value': 'Notes', aria: { label: 'Notes' } });
 Overlay({ children: 'Overlay', attributes: { ref: { value: undefined }, data: { owner: 'app' } } });
 Dialog({ label: 'Dialog', children: 'Body', attributes: { class: 'app-dialog' } });

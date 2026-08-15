@@ -6,6 +6,7 @@ import {
   Input,
   Label,
   Progress,
+  Slider,
   Select,
   StatusBadge,
   Switch,
@@ -190,6 +191,7 @@ createApp(() => AppShell({
         q.label({ children: [Switch({ name: 'network' }), ' Allow network access'] }),
         ToggleButton({ pressed: true, label: 'Grid view', variant: 'ghost' }),
         Progress({ value: 72, attributes: { 'aria-label': 'Profile completion' } }),
+        Slider({ defaultValue: 40, min: 0, max: 100, step: 5, valueText: '40 percent', attributes: { 'aria-label': 'Notification volume' } }),
         StatusBadge({ tone: 'success', children: 'Profile active' }),
         ControlField({
           id: 'profile-note',

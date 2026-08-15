@@ -22,7 +22,8 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 - a realistic product catalog and product-detail surface
 - keyboard-operable product configuration through the same typed,
   form-associated `gluon-product-configurator` Custom Element consumed by the
-  maintained Vue 3 host
+  maintained Vue 3 host: native Radio groups own finish/temperature and the
+  natively labeled Slider owns cable length, exact line keys, and persistence
 - an internal `gluon-product-add-action` registered in the configurator's
   explicit scoped registry, with a global fallback on unsupported browsers and
   the same add-to-bag interaction in either mode
@@ -308,6 +309,13 @@ and 56,403 level-9 gzip bytes. The reviewed ceilings are 196,000 / 56,500 bytes,
 leaving 353 raw bytes and 97 gzip bytes of explicit regression headroom. HTML,
 image-byte, and image-count ceilings remain unchanged; this is a composition
 measurement, not a runtime-speed claim.
+
+Issue #413 integrates the native Slider into product cable configuration. The
+complete production entry measures 263,798 raw bytes and 72,205 level-9 gzip
+bytes. The reviewed ceilings are 264,200 / 72,300 bytes, leaving 402 raw bytes
+and 95 gzip bytes of explicit headroom. HTML, image-byte, and image-count
+ceilings remain unchanged; this is a composition measurement, not a runtime-
+speed claim.
 
 That comparison is now available through `npm run benchmark:rendering` and
 documented in [`docs/performance.md`](../../docs/performance.md). It remains a

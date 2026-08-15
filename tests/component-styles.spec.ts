@@ -16,6 +16,7 @@ import {
   defineMolecule,
   defineElement,
   directive,
+  getStyleSheetText,
   html,
   nothing,
   repeat,
@@ -34,6 +35,7 @@ import {
   Radio,
   radioStyles,
   selectStyles,
+  sliderStyles,
   statusBadgeStyles,
   switchStyles,
   textareaStyles,
@@ -71,6 +73,7 @@ const allComponentSheets = [
   progressStyles,
   radioStyles,
   selectStyles,
+  sliderStyles,
   statusBadgeStyles,
   switchStyles,
   textareaStyles,
@@ -98,6 +101,14 @@ afterEach(() => {
 });
 
 describe('usage-driven component styles', () => {
+  it('keeps Slider native in forced colors and defines no motion to reduce', () => {
+    const cssText = getStyleSheetText(sliderStyles);
+    expect(cssText).toContain('@media (forced-colors: active)');
+    expect(cssText).toContain('forced-color-adjust: auto');
+    expect(cssText).not.toContain('animation');
+    expect(cssText).not.toContain('transition');
+    expect(cssText).not.toContain('prefers-reduced-motion');
+  });
   it('adopts only the exact rendered sheet and releases it on unmount', () => {
     render(Button({ label: 'Add to bag' }), document.body);
     expect(document.adoptedStyleSheets).toContain(buttonStyles);

@@ -51,6 +51,8 @@ export {
   type ProgressProps,
 } from './progress.js';
 export { progressStyles } from './progress-styles.js';
+export { Slider, normalizeSliderRange, normalizeSliderValue, renderSlider, type NormalizedSliderRange, type SliderAttributes, type SliderOrientation, type SliderProps } from './slider.js';
+export { sliderStyles } from './slider-styles.js';
 export {
   StatusBadge,
   type StatusBadgeAttributes,
