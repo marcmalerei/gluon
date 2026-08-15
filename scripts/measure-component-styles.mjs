@@ -45,6 +45,7 @@ const disclosureStyles = await sheet('packages/molecules/src/disclosure-styles.t
 const emptyStateStyles = await sheet('packages/molecules/src/empty-state-styles.ts', 'emptyStateStyles');
 const formFieldStyles = await sheet('packages/molecules/src/form-field-styles.ts', 'formFieldStyles');
 const inlineNoticeStyles = await sheet('packages/molecules/src/inline-notice-styles.ts', 'inlineNoticeStyles');
+const responsiveActionBarStyles = await sheet('packages/molecules/src/responsive-action-bar-styles.ts', 'responsiveActionBarStyles');
 const segmentedControlStyles = await sheet('packages/molecules/src/segmented-control-styles.ts', 'segmentedControlStyles');
 const tableRegionStyles = await sheet('packages/molecules/src/table-region-styles.ts', 'tableRegionStyles');
 const tabsStyles = await sheet('packages/molecules/src/tabs-styles.ts', 'tabsStyles');
@@ -59,7 +60,7 @@ const actual = {
       ['packages/atoms/src/styles.ts', 'packages/molecules/src/styles.ts', 'packages/organisms/src/styles.ts'],
     ),
     after: measure(
-      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles],
+      [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, responsiveActionBarStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, appShellStyles],
       [
         'packages/atoms/src/button-styles.ts',
         'packages/atoms/src/checkbox-styles.ts',
@@ -83,6 +84,7 @@ const actual = {
         'packages/molecules/src/empty-state-styles.ts',
         'packages/molecules/src/form-field-styles.ts',
         'packages/molecules/src/inline-notice-styles.ts',
+        'packages/molecules/src/responsive-action-bar-styles.ts',
         'packages/molecules/src/segmented-control-styles.ts',
         'packages/molecules/src/table-region-styles.ts',
         'packages/molecules/src/tabs-styles.ts',
