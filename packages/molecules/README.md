@@ -272,9 +272,14 @@ owns every header, row, price, and total; the molecule adds the region summary
 and narrow-layout overflow affordance without introducing grid interaction.
 
 `DropdownMenu`, `ContextMenu`, and `Menubar` share the bounded `MenuItem` model.
-They provide roving focus, typeahead, disabled and separator semantics,
-checkbox/radio state, nested submenu structure, Escape/focus return, and RTL
-movement while preserving native links and buttons. `Toolbar` is intentionally
-layout-only and preserves the semantics of its caller-owned children. Open and
-checked state callbacks are controlled by the application; routing,
-authorization, and command execution remain outside these compositions.
+Every instance requires a caller-owned `id`; `DropdownMenu` and `ContextMenu`
+also require authoritative `open` and `onOpenChange` props. They provide true
+roving focus, buffered typeahead, disabled and separator semantics, explicit
+checkbox/radio groups, nested controlled submenu state, Escape/focus return,
+and RTL movement while preserving native links and buttons. `Menubar` renders
+an APG menubar without a synthetic dropdown trigger. `Toolbar` renders
+caller-described native buttons and links with horizontal/vertical roving
+focus. Styling is exposed through `part`, `data-state`, stable `gluon-*`
+classes, and component-scoped `--gluon-menu-*`/`--gluon-toolbar-*` properties.
+Routing, authorization, persistence, and command execution remain outside
+these compositions.
