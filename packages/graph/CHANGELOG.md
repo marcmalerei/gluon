@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added a native, filter-aware keyboard node list beside the canvas so graph
+  nodes can be inspected and selected without pointer or canvas interaction.
+
 ## [1.8.1] - 2026-08-12
 
 ### Changed

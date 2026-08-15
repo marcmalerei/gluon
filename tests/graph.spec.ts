@@ -33,6 +33,28 @@ describe('gluon-graph', () => {
     graph.activeGroups = ['product'];
     await graph.updateComplete;
     expect(graph.shadowRoot?.querySelector('canvas')?.getAttribute('aria-label')).toContain('1 visible nodes');
+    expect(graph.shadowRoot?.querySelectorAll('.node-list button')).toHaveLength(1);
+  });
+
+  it('provides a keyboard-operable DOM node list that mirrors canvas selection', async () => {
+    const graph = mountGraph();
+    await graph.updateComplete;
+    const buttons = [...(graph.shadowRoot?.querySelectorAll<HTMLButtonElement>('.node-list button') ?? [])];
+    expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
+      'Research brief, Research',
+      'Product roadmap, Product',
+      'Customer signal, Research',
+    ]);
+    expect(buttons.every((button) => button.getAttribute('type') === 'button')).toBe(true);
+
+    buttons[0]!.click();
+    await graph.updateComplete;
+    expect(buttons[0]!.getAttribute('aria-pressed')).toBe('true');
+    expect(graph.shadowRoot?.textContent).toContain('Research brief selected.');
+
+    graph.activeGroups = ['product'];
+    await graph.updateComplete;
+    expect(graph.shadowRoot?.querySelector('.node-list button')?.textContent).toContain('Product roadmap');
   });
 
   it('emits an immutable camera snapshot for zoom and reset operations', async () => {
