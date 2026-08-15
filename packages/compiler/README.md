@@ -8,6 +8,10 @@
 foundation. It records `html` and `css` tagged-template boundaries and
 interpolation locations, produces high-resolution source maps, and supplies the
 development wrappers consumed by `@gluonjs/vite`.
+
+`parseGluonSfc()` is the public parser boundary used by editor tooling. It
+returns template/script/style block ranges and parser errors so editor
+diagnostics do not implement a second `.gluon` grammar.
 Aliased `compose(Component, props)\`body\`` calls are recorded as template
 boundaries with the same source-location and inline-style behavior as `html`.
 Imports from `@gluonjs/core/decorators` are detected explicitly. The compiler

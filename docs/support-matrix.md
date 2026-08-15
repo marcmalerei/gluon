@@ -43,7 +43,7 @@ support-matrix check.
 | `@gluonjs/i18n` | JSON-safe messages, ordered locale fallbacks, `Intl` formatting, plural/select interpolation, lazy namespaces, and SSR state transfer | Message loading, translation content, locale choice, and language-switch product UX remain application-owned. |
 | `@gluonjs/graph` | Deterministic canvas graph for a few hundred nodes plus a synchronized semantic keyboard node list | It is not a large-graph editor, layout persistence system, or assistive-technology replacement for domain-specific graph views. |
 | `@gluonjs/devtools` / `@gluonjs/devtools-api` | Opt-in development bridge, immutable protocol handshake, snapshots, ordered timeline, and redacted source-location metadata | Production is disabled by default; no browser-extension or remote-inspection security claim exists, and source labels are basename-redacted with bounded line/column data only. |
-| `@gluonjs/language-server` and VS Code client | Node LSP/CLI and version-matched stdio VS Code client with the checked VSIX contract | Marketplace publication, publisher account, editor version breadth, and bundled server distribution require separate release evidence. |
+| `@gluonjs/language-server` and VS Code client | Node LSP/CLI and version-matched stdio VS Code client; `.gluon` language id, maintained syntax/configuration, compiler-backed diagnostics and editor references are covered by protocol and VSIX checks | Marketplace publication, publisher account, editor version breadth, and bundled server distribution require separate release evidence; the client is not a general HTML/CSS/TypeScript replacement. |
 
 ## Official package coverage
 

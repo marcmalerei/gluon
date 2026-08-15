@@ -30,10 +30,20 @@ schema; `analyzeStaticGluonProject()` is the equivalent zero-I/O API.
 
 The server implements LSP `Content-Length` framing and full-document sync. Its
 capabilities are template semantic tokens, completion, hover,
-go-to-definition, workspace rename, and diagnostics. Protocol tests call
-`GluonProtocolServer` directly, independently of VS Code. The maintained client
-in `editors/vscode` activates for TypeScript and JavaScript and starts the
-configured same-version server executable.
+go-to-definition, references, workspace rename, and diagnostics. `.gluon`
+documents use the compiler's shared SFC parser; malformed files are isolated
+to that document. `.gluon` template and script ranges are mapped to the
+original source through the compiler's typed block contract. Static component
+declarations and default `.gluon` imports in the script block, the template
+`component` attribute, static template class values, and local CSS class selectors
+support completion, hover, definition, references, and rename with original-source
+ranges. Import navigation resolves relative `.gluon` modules that are open in the
+workspace; rename changes an imported local component alias but deliberately does
+not perform a filesystem rename. Arbitrary TypeScript or CSS expressions, CSS
+preprocessors, non-relative packages, and dynamic imports are not resolved by this
+server. Protocol tests call `GluonProtocolServer` directly, independently of VS Code. The maintained
+client in `editors/vscode` activates for `.gluon`, TypeScript, and JavaScript and
+starts the configured same-version server executable.
 
 ## Declaration inference
 

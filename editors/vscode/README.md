@@ -1,7 +1,9 @@
 # Gluon for VS Code
 
 This client bundles the same-version `@gluonjs/language-server` runtime and
-starts it over stdio for TypeScript and JavaScript documents. Leave
+starts it over stdio for TypeScript, JavaScript, and first-class `.gluon`
+documents. `.gluon` files use the registered `gluon` language id, maintained
+language configuration, and TextMate syntax definition. Leave
 `gluon.languageServerPath` empty to use that self-contained runtime, or set an
 absolute/workspace-specific path for a deliberate override. The override is a
 diagnostic escape hatch; it is not part of the release artifact contract.
@@ -28,6 +30,11 @@ code --install-extension .tmp/release/vscode/gluon-vscode-1.9.0.vsix
 The generated `.vsix` is a release artifact and is not committed. The release
 job attaches it together with `VSIX-SHA256SUMS` and
 `vscode-release-manifest.json` to the matching immutable GitHub release tag.
+
+GLUON GOODS runtime remains unchanged: its existing
+`src/shop-editorial-link.gluon` source is an honest parser and editor fixture,
+while this issue changes authoring and protocol behavior rather than the
+compiled customer flow.
 
 ## Publishing, signing, and recovery
 

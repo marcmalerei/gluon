@@ -16,6 +16,7 @@ async function activate(context) {
     : { module: bundledServer, args, transport: TransportKind.stdio };
   const clientOptions = {
     documentSelector: [
+      { scheme: 'file', language: 'gluon' },
       { scheme: 'file', language: 'typescript' },
       { scheme: 'file', language: 'typescriptreact' },
       { scheme: 'file', language: 'javascript' },

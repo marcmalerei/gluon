@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { describe, expect, test } from 'vitest';
 import {
   GluonLanguageService,
@@ -7,6 +8,7 @@ import {
   analyzeStaticGluonProject,
   declarationsFromCustomElementsManifest,
 } from '../packages/language-server/src/index.js';
+import { parseGluonSfc } from '../packages/compiler/src/index.js';
 
 const declaration = `
 import { GluonElement, defineElement, html } from '@gluonjs/core';
@@ -200,6 +202,179 @@ describe('Gluon template analysis', () => {
 });
 
 describe('Gluon language service', () => {
+  test('parses .gluon SFCs through the compiler and isolates malformed input', () => {
+    const service = new GluonLanguageService();
+    const valid = '<template component="Status" props="StatusProps" layer="atom"><p>{{ label }}</p></template>\n<script lang="ts">export interface StatusProps { label: string; }</script>\n<style id="status" />';
+    expect(service.open('file:///Status.gluon', valid).diagnostics).toEqual([]);
+    expect(service.open('file:///Broken.gluon', '<template><div></template>').diagnostics.length).toBeGreaterThan(0);
+    expect(service.analysis('file:///Status.gluon')).toBeDefined();
+  });
+
+  test('maps every SFC feature to exact template and script offsets', () => {
+    const service = new GluonLanguageService();
+    const componentUri = 'file:///Card.gluon';
+    const useUri = 'file:///Use.gluon';
+    const component = `<script lang="ts">\nimport { defineElement } from '@gluonjs/core';\nclass Card { static properties = { status: String }; static events = { save: null }; }\nconst unrelated = 'status-card';\ndefineElement('status-card', Card);\n</script>\n<template component="Card" layer="atom">\n  <status-card></status-card>\n</template>\n<style>.card { color: red; }</style>`;
+    const use = `<script lang="ts">\nimport Card from './Card.gluon';\nexport const view = Card;\n</script>\n<template component="Use" layer="molecule">\n  <status-card .status="ready" @save="save"></status-card>\n</template>`;
+    service.open(componentUri, component);
+    service.open(useUri, use);
+
+    const tagOffset = use.indexOf('status-card');
+    const tagPosition = positionFor(use, tagOffset + 2);
+    const tagRange = (value: { range: { start: Position; end: Position } }) =>
+      textForRange(use, value.range);
+    const completion = service.complete(useUri, positionFor(use, use.indexOf('.status') + 2));
+    expect(completion).toEqual(expect.arrayContaining([
+      { label: '.status', kind: 10, detail: 'Gluon property' },
+    ]));
+    const hover = service.hover(useUri, tagPosition);
+    expect(hover?.contents).toContain('**<status-card>**');
+    expect(hover && tagRange(hover)).toBe('status-card');
+    const definition = service.definition(useUri, tagPosition);
+    expect(definition).toEqual([{ uri: componentUri, range: rangeForText(component, 'status-card', 1) }]);
+    expect(service.references(useUri, tagPosition, { includeDeclaration: false })).toEqual([
+      { uri: componentUri, range: rangeForText(component, 'status-card', 2) },
+      { uri: componentUri, range: rangeForText(component, 'status-card', 3) },
+      { uri: useUri, range: rangeForText(use, 'status-card') },
+      { uri: useUri, range: rangeForText(use, 'status-card', 1) },
+    ]);
+    const rename = service.rename(useUri, tagPosition, 'state-card');
+    expect(rename?.changes[useUri]).toEqual([
+      { range: rangeForText(use, 'status-card'), newText: 'state-card' },
+      { range: rangeForText(use, 'status-card', 1), newText: 'state-card' },
+    ]);
+    expect(rename?.changes[componentUri]).toEqual([
+      { range: rangeForText(component, 'status-card', 1), newText: 'state-card' },
+      { range: rangeForText(component, 'status-card', 2), newText: 'state-card' },
+      { range: rangeForText(component, 'status-card', 3), newText: 'state-card' },
+    ]);
+  });
+
+  test('keeps malformed SFCs isolated and does not invent cross-boundary results', () => {
+    const service = new GluonLanguageService();
+    const valid = '<template component="Valid" layer="atom"><status-card /></template>';
+    service.open('file:///valid.gluon', valid);
+    const malformed = '<template component="Broken"><status-card></template><script>';
+    const analysis = service.open('file:///broken.gluon', malformed);
+    expect(analysis.diagnostics.some((entry) => entry.code === 'GLUON_SFC_INVALID')).toBe(true);
+    expect(service.hover('file:///valid.gluon', positionFor(valid, valid.indexOf('status-card') + 2))).toBeUndefined();
+    expect(service.references('file:///broken.gluon', { line: 0, character: 20 })).toEqual([]);
+  });
+
+  test('links component imports and static style classes across every SFC block boundary', () => {
+    const service = new GluonLanguageService();
+    const cardUri = 'file:///components/Card.gluon';
+    const useUri = 'file:///components/Use.gluon';
+    const card = `<script lang="ts">\nexport interface CardProps { label: string }\n</script>\n<template component="Card" props="CardProps" layer="atom"><article class="card">Card</article></template>\n<style id="card-style">.card { color: navy; }</style>`;
+    const use = `<script lang="ts">\nimport Card from './Card.gluon';\nexport const Selected = Card;\n</script>\n<template component="Use" layer="molecule"><section class="card featured">Use</section></template>\n<style id="use-style">.card { padding: 1rem; }\n.featured { font-weight: 700; }</style>`;
+    service.open(cardUri, card);
+    service.open(useUri, use);
+
+    const componentPosition = positionFor(use, use.indexOf('Use', use.indexOf('<template')) + 1);
+    const importedComponentPosition = positionFor(use, use.indexOf('Card') + 1);
+    const importPathPosition = positionFor(use, use.indexOf('./Card.gluon') + 3);
+    const classPosition = positionFor(use, use.indexOf('card featured') + 2);
+    expect(service.complete(useUri, componentPosition)).toEqual(expect.arrayContaining([
+      { label: 'Use', kind: 12, detail: 'Gluon SFC component name' },
+    ]));
+    expect(service.complete(useUri, classPosition)).toEqual(expect.arrayContaining([
+      { label: 'card', kind: 10, detail: 'Gluon SFC style class' },
+      { label: 'featured', kind: 10, detail: 'Gluon SFC style class' },
+    ]));
+    expect(service.complete(useUri, importPathPosition)).toEqual(expect.arrayContaining([
+      { label: './Card.gluon', kind: 12, detail: cardUri },
+    ]));
+    expect(service.hover(useUri, importPathPosition)?.contents).toContain('Open Gluon SFC module');
+    expect(service.definition(useUri, importPathPosition)).toEqual([
+      { uri: cardUri, range: rangeForText(card, 'Card', 1) },
+    ]);
+    expect(service.definition(useUri, importedComponentPosition)).toEqual([
+      { uri: cardUri, range: rangeForText(card, 'Card', 1) },
+    ]);
+    expect(service.definition(useUri, componentPosition)).toEqual([
+      { uri: useUri, range: rangeForText(use, 'Use') },
+    ]);
+    expect(service.references(cardUri, positionFor(card, card.indexOf('Card', card.indexOf('<template')) + 1))).toEqual(expect.arrayContaining([
+      { uri: cardUri, range: rangeForText(card, 'Card', 1) },
+      { uri: useUri, range: rangeForText(use, 'Card') },
+      { uri: useUri, range: rangeForText(use, 'Card', 2) },
+    ]));
+    expect(service.rename(useUri, importedComponentPosition, 'ProductCard')).toEqual({ changes: {
+      [useUri]: [
+        { range: rangeForText(use, 'Card'), newText: 'ProductCard' },
+        { range: rangeForText(use, 'Card', 2), newText: 'ProductCard' },
+      ],
+    } });
+    expect(service.rename(useUri, componentPosition, 'ProductView')).toEqual({ changes: {
+      [useUri]: [{ range: rangeForText(use, 'Use'), newText: 'ProductView' }],
+    } });
+    expect(service.rename(useUri, classPosition, 'product-card')).toEqual({ changes: {
+      [useUri]: [
+        { range: rangeForText(use, 'card'), newText: 'product-card' },
+        { range: rangeForText(use, 'card', 1), newText: 'product-card' },
+      ],
+    } });
+    expect(service.rename(useUri, importPathPosition, 'Renamed.gluon')).toBeUndefined();
+    expect(service.open('file:///components/BrokenScript.gluon', '<script lang="ts">const =</script><template component="Broken" layer="atom"><div /></template>').diagnostics)
+      .toEqual(expect.arrayContaining([expect.objectContaining({ code: 'GLUON_SFC_INVALID' })]));
+  });
+
+  test('exposes all typed SFC blocks and protocol features on the real shop fixture', async () => {
+    const source = await readFile(new URL('../examples/shop/src/shop-editorial-link.gluon', import.meta.url), 'utf8');
+    const parsed = parseGluonSfc(source, 'shop-editorial-link.gluon');
+    expect(parsed.errors).toEqual([]);
+    expect(parsed.blocks.map((block) => block.type)).toEqual(['template', 'script', 'style']);
+    expect(parsed.blocks.every((block) => block.range.end > block.range.start)).toBe(true);
+
+    const server = new GluonProtocolServer();
+    const uri = 'file:///shop-editorial-link.gluon';
+    const opened = server.handle({
+      jsonrpc: '2.0',
+      method: 'textDocument/didOpen',
+      params: { textDocument: { uri, languageId: 'gluon', text: source } },
+    });
+    expect(opened[0]?.params).toMatchObject({ uri });
+    const featureUri = 'file:///feature.gluon';
+    const featureSource = `<script lang="ts">
+import { defineElement } from '@gluonjs/core';
+class DemoCard {}
+defineElement('demo-card', DemoCard);
+</script>
+<template component="Feature" layer="atom"><demo-card /></template>`;
+    server.handle({ jsonrpc: '2.0', method: 'textDocument/didOpen', params: { textDocument: { uri: featureUri, languageId: 'gluon', text: featureSource } } });
+    const templateOffset = featureSource.lastIndexOf('demo-card') + 2;
+    const position = positionFor(featureSource, templateOffset);
+    const requests = [
+      ['textDocument/completion', { textDocument: { uri: featureUri }, position }],
+      ['textDocument/hover', { textDocument: { uri: featureUri }, position }],
+      ['textDocument/definition', { textDocument: { uri: featureUri }, position }],
+      ['textDocument/references', { textDocument: { uri: featureUri }, position, context: { includeDeclaration: false } }],
+      ['textDocument/rename', { textDocument: { uri: featureUri }, position, newName: 'new-demo-card' }],
+      ['textDocument/semanticTokens/full', { textDocument: { uri: featureUri }, position }],
+    ] as const;
+    const responses = requests.map(([method, params], index) => server.handle({ jsonrpc: '2.0', id: index + 1, method, params })[0]);
+    expect(responses[0]?.result).toEqual(expect.arrayContaining([
+      { label: 'demo-card', kind: 12, detail: 'Gluon Custom Element' },
+    ]));
+    expect(responses[1]?.result).toEqual({
+      contents: '**<demo-card>**\n\nProperties: none\n\nEvents: none',
+      range: rangeForText(featureSource, 'demo-card', 1),
+    });
+    expect(responses[2]?.result).toEqual([
+      { uri: featureUri, range: rangeForText(featureSource, 'demo-card') },
+    ]);
+    expect(responses[3]?.result).toEqual([
+      { uri: featureUri, range: rangeForText(featureSource, 'demo-card', 1) },
+    ]);
+    expect(responses[4]?.result).toEqual({ changes: {
+      [featureUri]: [
+        { range: rangeForText(featureSource, 'demo-card'), newText: 'new-demo-card' },
+        { range: rangeForText(featureSource, 'demo-card', 1), newText: 'new-demo-card' },
+      ],
+    } });
+    expect(responses[5]?.result).toEqual({ data: expect.arrayContaining([expect.any(Number)]) });
+  });
+
   test('provides completion, hover, definition, rename, and semantic tokens across documents', () => {
     const service = new GluonLanguageService();
     service.open('file:///component.ts', declaration);
@@ -217,6 +392,10 @@ describe('Gluon language service', () => {
       expect.objectContaining({ newText: 'state-card' }),
     ]));
     expect(rename?.changes['file:///use.ts']).toHaveLength(2);
+    expect(service.references('file:///use.ts', position)).toEqual(expect.arrayContaining([
+      expect.objectContaining({ uri: 'file:///use.ts' }),
+      expect.objectContaining({ uri: 'file:///component.ts' }),
+    ]));
     expect(service.semanticTokens('file:///use.ts').length).toBeGreaterThan(0);
     expect(service.rename('file:///use.ts', position, 'Invalid')).toBeUndefined();
     service.close('file:///component.ts');
@@ -308,4 +487,11 @@ function positionFor(text: string, offset: number) {
 function textForRange(text: string, range: { start: { line: number; character: number }; end: { line: number; character: number } }): string {
   const line = text.split('\n')[range.start.line] ?? '';
   return line.slice(range.start.character, range.end.character);
+}
+
+function rangeForText(text: string, value: string, occurrence = 0) {
+  let offset = -1;
+  for (let index = 0; index <= occurrence; index += 1) offset = text.indexOf(value, offset + 1);
+  if (offset < 0) throw new Error(`fixture text not found: ${value}#${occurrence}`);
+  return { start: positionFor(text, offset), end: positionFor(text, offset + value.length) };
 }

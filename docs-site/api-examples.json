@@ -3215,6 +3215,58 @@
       "recipe": "json-forms-contract",
       "description": "Handle a bounded local-reference failure through its stable public diagnostic keyword:"
     },
+    "packages/compiler/src/functions/parseGluonSfc.md": {
+      "module": "@gluonjs/compiler",
+      "description": "Parse one presentational component through the same typed boundary used by the editor:",
+      "code": [
+        "import { parseGluonSfc } from '@gluonjs/compiler';",
+        "",
+        "const result = parseGluonSfc('<template component=\"Card\" layer=\"atom\"><p /></template>', 'Card.gluon');",
+        "const template = result.blocks.find((block) => block.type === 'template');",
+        "console.log(template?.range, result.errors);"
+      ]
+    },
+    "packages/compiler/src/interfaces/GluonSfcBlock.md": {
+      "module": "@gluonjs/compiler",
+      "description": "Inspect a readonly parsed block and its original source range:",
+      "code": [
+        "import { parseGluonSfc, type GluonSfcBlock } from '@gluonjs/compiler';",
+        "",
+        "const block: GluonSfcBlock | undefined = parseGluonSfc('<style id=\"card\">.card {}</style>', 'Card.gluon').blocks[0];",
+        "console.log(block?.type, block?.attributes, block?.range);"
+      ]
+    },
+    "packages/compiler/src/interfaces/GluonSfcParseError.md": {
+      "module": "@gluonjs/compiler",
+      "description": "Report a structured parser error without losing its source range:",
+      "code": [
+        "import { parseGluonSfc, type GluonSfcParseError } from '@gluonjs/compiler';",
+        "",
+        "const error: GluonSfcParseError | undefined = parseGluonSfc('<template>', 'Broken.gluon').errors[0];",
+        "console.log(error?.message, error?.range);"
+      ]
+    },
+    "packages/compiler/src/interfaces/GluonSfcParseResult.md": {
+      "module": "@gluonjs/compiler",
+      "description": "Keep the complete typed SFC parse result as the shared compiler/editor input:",
+      "code": [
+        "import { parseGluonSfc, type GluonSfcParseResult } from '@gluonjs/compiler';",
+        "",
+        "const result: GluonSfcParseResult = parseGluonSfc('<template component=\"Card\" layer=\"atom\"><p /></template>', 'Card.gluon');",
+        "console.log(result.blocks.length, result.errors.length);"
+      ]
+    },
+    "packages/language-server/src/interfaces/ReferenceContext.md": {
+      "module": "@gluonjs/language-server",
+      "description": "Request references without including the declaration when building an editor result:",
+      "code": [
+        "import { GluonLanguageService, type ReferenceContext } from '@gluonjs/language-server';",
+        "",
+        "const context: ReferenceContext = { includeDeclaration: false };",
+        "const service = new GluonLanguageService();",
+        "console.log(service.references('file:///Card.ts', { line: 0, character: 0 }, context));"
+      ]
+    },
     "packages/json-forms/src/classes/JsonFormsElement.md": {
       "recipe": "json-forms-contract",
       "description": "Register and configure a schema-driven form-associated Custom Element through only the public package entry point:"

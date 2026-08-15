@@ -1,4 +1,4 @@
-import { parse } from '@vue/compiler-sfc';
+import { parse, type CompilerError, type SFCBlock } from '@vue/compiler-sfc';
 
 export type GluonSfcLayer = 'atom' | 'molecule' | 'organism';
 
@@ -11,6 +11,51 @@ export interface GluonSfcCompileResult {
   readonly componentName: string;
   readonly layer: GluonSfcLayer;
   readonly styleId?: string;
+}
+
+export interface GluonSfcBlock {
+  readonly type: 'template' | 'script' | 'style';
+  readonly content: string;
+  readonly attributes: Readonly<Record<string, string | true>>;
+  readonly start: number;
+  readonly end: number;
+  readonly range: Readonly<{ start: number; end: number }>;
+}
+
+export interface GluonSfcParseError {
+  readonly message: string;
+  readonly range: Readonly<{ start: number; end: number }>;
+}
+
+export interface GluonSfcParseResult {
+  readonly blocks: readonly GluonSfcBlock[];
+  readonly errors: readonly GluonSfcParseError[];
+}
+
+/** The parser boundary shared by compilation and language tooling. */
+export function parseGluonSfc(source: string, filename: string): GluonSfcParseResult {
+  const parsed = parse(source, { filename, sourceMap: false });
+  const blocks = [parsed.descriptor.template, parsed.descriptor.script, parsed.descriptor.scriptSetup, ...parsed.descriptor.styles, ...parsed.descriptor.customBlocks]
+    .filter((block): block is SFCBlock => Boolean(block))
+    .filter((block): block is SFCBlock & { type: GluonSfcBlock['type'] } => block.type === 'template' || block.type === 'script' || block.type === 'style')
+    .map((block) => Object.freeze({
+      type: block.type,
+      content: block.content,
+      attributes: Object.freeze({ ...block.attrs }),
+      start: block.loc.start.offset,
+      end: block.loc.end.offset,
+      range: Object.freeze({ start: block.loc.start.offset, end: block.loc.end.offset }),
+    }));
+  const errors = parsed.errors.map((error: CompilerError | SyntaxError) => Object.freeze({
+    message: error.message,
+    range: Object.freeze({ start: compilerErrorOffset(error, 'start'), end: compilerErrorOffset(error, 'end') }),
+  }));
+  return Object.freeze({ blocks: Object.freeze(blocks), errors: Object.freeze(errors) });
+}
+
+function compilerErrorOffset(error: CompilerError | SyntaxError, side: 'start' | 'end'): number {
+  if (!('loc' in error) || !error.loc) return 0;
+  return error.loc[side].offset;
 }
 
 export class GluonSfcCompileError extends Error {

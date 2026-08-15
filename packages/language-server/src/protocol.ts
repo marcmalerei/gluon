@@ -65,6 +65,7 @@ export class GluonProtocolServer {
     if (message.method === 'textDocument/completion') return { value: this.service.complete(uri, position), notifications: [] };
     if (message.method === 'textDocument/hover') return { value: this.service.hover(uri, position) ?? null, notifications: [] };
     if (message.method === 'textDocument/definition') return { value: this.service.definition(uri, position), notifications: [] };
+    if (message.method === 'textDocument/references') return { value: this.service.references(uri, position, params.context), notifications: [] };
     if (message.method === 'textDocument/rename') return { value: this.service.rename(uri, position, params.newName) ?? null, notifications: [] };
     if (message.method === 'textDocument/semanticTokens/full') return { value: { data: this.service.semanticTokens(uri) }, notifications: [] };
     throw new Error(`LSP_METHOD_NOT_FOUND: ${message.method}`);
@@ -75,9 +76,10 @@ const initializeResult = Object.freeze({
   serverInfo: { name: '@gluonjs/language-server', version: '1.9.0' },
   capabilities: {
     textDocumentSync: 1,
-    completionProvider: { triggerCharacters: ['<', ' ', '.', '@'] },
+    completionProvider: { triggerCharacters: ['<', ' ', '.', '@', '"', "'"] },
     hoverProvider: true,
     definitionProvider: true,
+    referencesProvider: true,
     renameProvider: { prepareProvider: false },
     semanticTokensProvider: {
       full: true,

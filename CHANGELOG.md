@@ -10,6 +10,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added the native, request-free `ConfirmationDialog` organism with caller-owned
   actions, controlled modal lifecycle, initial and restored focus, inert
   busy/disabled states, native dismissal events, and responsive styling.
+- Added first-class `.gluon` language registration, syntax support, and
+  compiler-backed editor analysis in the language-server and VS Code client.
 
 ### Added
 
