@@ -103,6 +103,47 @@ describe('Tooltip and HoverCard anchored overlays', () => {
     expect(popup.hidden).toBe(false);
   });
 
+  it('retains an interactive surface across pointer entry and closes after pointer and focus leave', () => {
+    vi.useFakeTimers();
+    mount(HoverCard({
+      id: 'ownership-card',
+      label: 'Ownership',
+      trigger: trigger('Ownership'),
+      content: q.button({ type: 'button', children: 'Inside' }),
+      delay: 0,
+    }));
+    const control = document.querySelector<HTMLButtonElement>('#ownership-card-trigger')!;
+    const popup = document.querySelector<HTMLElement>('#ownership-card-content')!;
+    control.focus();
+    expect(popup.hidden).toBe(false);
+
+    pointer(control, 'pointerdown', 'mouse');
+    pointer(control, 'pointercancel', 'mouse');
+    pointer(control, 'pointerleave', 'mouse');
+    pointer(popup, 'pointerenter', 'mouse');
+    vi.advanceTimersByTime(80);
+    expect(popup.hidden).toBe(false);
+
+    document.body.tabIndex = -1;
+    document.body.focus();
+    popup.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: document.body }));
+    pointer(popup, 'pointerleave', 'mouse');
+    vi.advanceTimersByTime(79);
+    expect(popup.hidden).toBe(false);
+    vi.advanceTimersByTime(1);
+    expect(popup.hidden).toBe(true);
+
+    unmount(document.body);
+    document.body.replaceChildren();
+    expect(() => mount(HoverCard({
+      id: 'ownership-card',
+      label: 'Replacement',
+      trigger: trigger('Replacement'),
+      content: 'Replacement details',
+      delay: 0,
+    }))).not.toThrow();
+  });
+
   it('covers keyboard entry fallback and delayed close ownership', async () => {
     vi.useFakeTimers();
     mount(HoverCard({ id: 'fallback-card', label: 'Fallback', trigger: trigger('Fallback'), content: 'No focusable content', delay: 0 }));

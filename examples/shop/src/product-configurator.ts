@@ -15,7 +15,6 @@ import {
 import { customElement, property } from '@gluonjs/core/decorators';
 import { Progress, Radio, Slider, StatusBadge } from '@gluonjs/atoms';
 import { ChoiceGroup } from '@gluonjs/molecules';
-import { q, Tooltip } from '@gluonjs/quarks';
 import { formatPrice, type Product } from './data.js';
 import { InventoryRetryAction } from './ui-extensions.js';
 import {
@@ -517,20 +516,7 @@ export function ProductConfiguratorLightContent(product: Product) {
     </div>
     <div slot="inventory" class="inventory-row">
       ${renderInventoryStatus(product)}
-      ${Tooltip({
-        id: `${product.slug}-availability-help`,
-        trigger: ({ aria, ...attributes }) => q.button({
-          ...attributes,
-          aria: { ...aria, label: 'How workshop availability works' },
-          type: 'button',
-          class: 'availability-help-trigger',
-          children: 'Availability details',
-        }),
-        contentAttributes: { class: 'availability-help-tooltip' },
-        content: 'Workshop availability is checked for this exact configuration before dispatch.',
-        placement: 'block-end',
-        delay: 250,
-      })}
+      ${renderAvailabilityTooltip(product)}
     </div>
     <ul class="product-facts">
       <li>Ships in 2–3 days</li>
@@ -538,6 +524,28 @@ export function ProductConfiguratorLightContent(product: Product) {
       <li>5-year warranty</li>
     </ul>
   `;
+}
+
+function renderAvailabilityTooltip(product: Product): TemplateValue {
+  return Suspense({
+    source: () => import('@gluonjs/quarks'),
+    sourceKey: `${product.slug}:availability-tooltip`,
+    fallback: '',
+    children: ({ q, Tooltip }) => Tooltip({
+      id: `${product.slug}-availability-help`,
+      trigger: ({ aria, ...attributes }) => q.button({
+        ...attributes,
+        aria: { ...aria, label: 'How workshop availability works' },
+        type: 'button',
+        class: 'availability-help-trigger',
+        children: 'Availability details',
+      }),
+      contentAttributes: { class: 'availability-help-tooltip' },
+      content: 'Workshop availability is checked for this exact configuration before dispatch.',
+      placement: 'block-end',
+      delay: 250,
+    }),
+  });
 }
 
 function renderInventoryStatus(product: Product): TemplateValue {

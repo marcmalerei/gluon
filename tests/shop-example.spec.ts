@@ -101,6 +101,15 @@ describe('GLUON GOODS reference shop', () => {
     expect(inventoryBadge?.textContent).toBe('In stock');
     expect(inventoryBadge?.classList).toContain('is-success');
     expect(configurator.shadowRoot?.adoptedStyleSheets).toContain(statusBadgeStyles);
+    await expect.poll(
+      () => configurator.querySelector<HTMLButtonElement>('.availability-help-trigger'),
+      { timeout: 2_000 },
+    ).not.toBeNull();
+    const availabilityHelp = configurator.querySelector<HTMLButtonElement>('.availability-help-trigger')!;
+    availabilityHelp.focus();
+    const availabilityTooltip = configurator.querySelector<HTMLElement>('[role="tooltip"]')!;
+    expect(availabilityTooltip.hidden).toBe(false);
+    expect(availabilityTooltip.textContent).toContain('checked for this exact configuration');
 
     configurator.shadowRoot?.querySelector<HTMLInputElement>('input[name="finish"]:not(:checked)')!.click();
     addButton.click();
