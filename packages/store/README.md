@@ -122,6 +122,34 @@ the next store transaction. Future, corrupt, missing-step, thrown-migration,
 invalid-output, and storage failures block later persistence writes until one
 of the explicit recovery operations succeeds.
 
+### Async bootstrap
+
+For adapters such as IndexedDB, use `createAsyncPersistencePlugin()` without
+changing the synchronous `StorageLike` contract:
+
+```ts
+const persistence = createAsyncPersistencePlugin({ storage: asyncStorage });
+const manager = createStoreManager({ plugins: [persistence] });
+const appStore = cartDefinition.use(manager);
+
+// Defaults are available synchronously; restored state is ready at this boundary.
+await persistence.lifecycle.ready;
+startRouterAndRendering(appStore);
+```
+
+The lifecycle is `idle`, `hydrating`, `ready`, or `failed`. The `ready` getter
+returns the current hydration-cycle promise: it preserves same-turn bootstrap
+when the first store is used and changes for a later store that starts a new
+cycle. Actions and subscriptions can run during hydration; a generation check
+prevents an older read from overwriting those mutations, and persistence writes
+are strictly serialized in transaction order. Read/write failures set
+`failed`, stop queued writes, and call `onError` once. A successful unchanged
+restore is not redundantly written back. External abort or `lifecycle.dispose()` also set
+`failed` with a DOM-free `Error` named `AbortError`, settle `ready` immediately,
+and do not call `onError`; adapters that ignore cancellation therefore cannot
+hold application bootstrap open forever. Each plugin instance is isolated to
+one application lifecycle.
+
 ## SSR, hydration, and HMR
 
 `dehydrate()` returns the versioned DOM-free snapshot contract. `serialize()`

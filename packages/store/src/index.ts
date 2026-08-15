@@ -785,7 +785,7 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
   let disposed = false;
   let pending = 0;
   let resolveReady!: () => void;
-  const ready = new Promise<void>((resolve) => { resolveReady = resolve; });
+  let ready = new Promise<void>((resolve) => { resolveReady = resolve; });
   let aborted = Boolean(options.signal?.aborted);
   const listeners = new Set<() => void>();
   const controller: StoreAbortSignal = {
@@ -794,19 +794,40 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
     addEventListener(_type, listener) { listeners.add(listener); },
   };
   const abort = () => { aborted = true; for (const listener of listeners) listener(); listeners.clear(); };
+  const abortError = (): Error => {
+    const failure = new Error('Async store persistence was aborted.');
+    failure.name = 'AbortError';
+    return failure;
+  };
+  const settleFailure = (failure: unknown): void => {
+    if (status === 'failed') return;
+    status = 'failed';
+    error = failure;
+    resolveReady();
+  };
+  const beginCycle = (): void => {
+    if (status !== 'ready') return;
+    ready = new Promise<void>((resolve) => { resolveReady = resolve; });
+    error = undefined;
+  };
   if (options.signal) {
-    if (options.signal.aborted) abort();
-    else options.signal.addEventListener?.('abort', abort, { once: true });
+    if (options.signal.aborted) {
+      aborted = true;
+      settleFailure(abortError());
+    } else options.signal.addEventListener?.('abort', () => {
+      settleFailure(abortError());
+      abort();
+    }, { once: true });
   }
   const lifecycle: AsyncPersistenceLifecycle = {
     get status() { return status; },
     get error() { return error; },
-    ready,
+    get ready() { return ready; },
     dispose() {
       if (disposed) return;
       disposed = true;
       abort();
-      resolveReady();
+      settleFailure(abortError());
     },
   };
   const finish = () => {
@@ -818,7 +839,8 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
   };
   const plugin = (({ definition, store }: StorePluginContext) => {
     const persist = definition.options.persist;
-    if (!persist || disposed) return;
+    if (!persist || disposed || aborted || status === 'failed') return;
+    if (pending === 0) beginCycle();
     const config = persist === true ? {} : persist;
     const key = config.key ?? `${options.namespace ?? 'gluon'}:${definition.id}`;
     const plan = normalizePersistencePlan(config);
@@ -829,26 +851,32 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
     pending += 1;
     status = 'hydrating';
     const report = (failure: unknown) => {
-      if (disposed || (typeof failure === 'object' && failure !== null && 'name' in failure && failure.name === 'AbortError')) return;
-      error = failure;
-      status = 'failed';
+      if (disposed || status === 'failed' || (typeof failure === 'object' && failure !== null && 'name' in failure && failure.name === 'AbortError')) return;
+      settleFailure(failure);
       options.onError?.(failure, definition.id);
     };
     const unsubscribe = store.$subscribe(() => {
       revision += 1;
       if (!hydrated || disposed || disposedStore || status === 'failed') return;
       const raw = JSON.stringify({ version: plan.version, state: selectPersistedState(store, config.paths) });
-      writeQueue = writeQueue.then(() => options.storage.setItem(key, raw, controller)).catch(report);
+      writeQueue = writeQueue.then(() => {
+        if (disposed || disposedStore || status === 'failed') return;
+        return options.storage.setItem(key, raw, controller);
+      }).catch(report);
     });
     const readRevision = revision;
     const task = options.storage.getItem(key, controller).then((raw) => {
       if (disposed || disposedStore) return;
       const loaded = loadPersistedState(raw, plan, definition.id);
-      if (readRevision === revision && loaded.state) store.$patch(loaded.state, { source: 'async-persistence' });
+      const stale = readRevision !== revision;
+      if (!stale && loaded.state) store.$patch(loaded.state, { source: 'async-persistence' });
       hydrated = true;
-      if (revision !== readRevision && !disposed && status !== 'failed') {
+      if (stale && !disposed && status !== 'failed') {
         const current = JSON.stringify({ version: plan.version, state: selectPersistedState(store, config.paths) });
-        writeQueue = writeQueue.then(() => options.storage.setItem(key, current, controller)).catch(report);
+        writeQueue = writeQueue.then(() => {
+          if (disposed || disposedStore || status === 'failed') return;
+          return options.storage.setItem(key, current, controller);
+        }).catch(report);
       }
     }).catch(report).finally(finish);
     return () => {
@@ -858,7 +886,7 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
     };
   }) as AsyncPersistencePlugin;
   Object.defineProperty(plugin, 'lifecycle', { value: lifecycle, enumerable: true });
-  Promise.resolve().then(() => { if (pending === 0 && !disposed) { status = 'ready'; resolveReady(); } });
+  Promise.resolve().then(() => { if (pending === 0 && !disposed && status === 'idle') { status = 'ready'; resolveReady(); } });
   return plugin;
 }
 

@@ -1475,6 +1475,39 @@
         "manager.dispose();"
       ]
     },
+    "store-async-persistence": {
+      "module": "@gluonjs/store",
+      "code": [
+        "import {",
+        "  createAsyncPersistencePlugin,",
+        "  createStoreManager,",
+        "  defineStore,",
+        "  type AsyncPersistenceLifecycle,",
+        "  type AsyncPersistencePlugin,",
+        "  type AsyncPersistencePluginOptions,",
+        "  type AsyncPersistenceStatus,",
+        "  type AsyncStorageLike,",
+        "  type StoreAbortSignal,",
+        "} from '@gluonjs/store';",
+        "",
+        "declare function indexedDbGet(key: string, signal?: StoreAbortSignal): Promise<string | null>;",
+        "declare function indexedDbSet(key: string, value: string, signal?: StoreAbortSignal): Promise<void>;",
+        "const storage: AsyncStorageLike = {",
+        "  async getItem(key, signal) { return await indexedDbGet(key, signal); },",
+        "  async setItem(key, value, signal) { await indexedDbSet(key, value, signal); },",
+        "};",
+        "const signal: StoreAbortSignal | undefined = undefined;",
+        "const pluginOptions: AsyncPersistencePluginOptions = { storage, signal };",
+        "const persistence: AsyncPersistencePlugin = createAsyncPersistencePlugin(pluginOptions);",
+        "const manager = createStoreManager({ plugins: [persistence] });",
+        "const cart = manager.use(defineStore({ id: 'cart', state: () => ({ items: [] as string[] }), persist: true }));",
+        "const lifecycle: AsyncPersistenceLifecycle = persistence.lifecycle;",
+        "const status: AsyncPersistenceStatus = lifecycle.status;",
+        "await lifecycle.ready;",
+        "if (lifecycle.status === 'ready') console.log('bootstrap restored store', cart.items);",
+        ""
+      ]
+    },
     "compiler-transform": {
       "module": "@gluonjs/compiler",
       "code": [
@@ -5879,6 +5912,34 @@
     "packages/store/src/functions/createPersistencePlugin.md": {
       "recipe": "store-persistence",
       "description": "Hydrate selected Store state from an explicit storage adapter and persist later transactions under a stable namespaced key:"
+    },
+    "packages/store/src/functions/createAsyncPersistencePlugin.md": {
+      "recipe": "store-async-persistence",
+      "description": "Bootstrap an application from promise-based Store persistence while awaiting its current hydration lifecycle:"
+    },
+    "packages/store/src/interfaces/AsyncStorageLike.md": {
+      "recipe": "store-async-persistence",
+      "description": "Implement a DOM-free promise-based persistence adapter without changing the synchronous StorageLike contract:"
+    },
+    "packages/store/src/interfaces/AsyncPersistenceLifecycle.md": {
+      "recipe": "store-async-persistence",
+      "description": "Observe the current async Store hydration cycle, terminal error, and deterministic ready boundary:"
+    },
+    "packages/store/src/interfaces/AsyncPersistencePlugin.md": {
+      "recipe": "store-async-persistence",
+      "description": "Install the async persistence plugin in one application and retain its lifecycle handle for bootstrap and disposal:"
+    },
+    "packages/store/src/interfaces/AsyncPersistencePluginOptions.md": {
+      "recipe": "store-async-persistence",
+      "description": "Configure an async Store adapter, namespace, abort signal, and real storage-error callback:"
+    },
+    "packages/store/src/interfaces/StoreAbortSignal.md": {
+      "recipe": "store-async-persistence",
+      "description": "Pass a DOM-free abort capability from an application or native adapter into Store persistence:"
+    },
+    "packages/store/src/type-aliases/AsyncPersistenceStatus.md": {
+      "recipe": "store-async-persistence",
+      "description": "Branch application bootstrap on the explicit async Store persistence lifecycle status:"
     },
     "packages/store/src/functions/createStoreManager.md": {
       "recipe": "store-runtime",
