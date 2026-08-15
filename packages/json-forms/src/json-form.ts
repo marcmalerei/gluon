@@ -11,14 +11,19 @@ import {
 import {
   applySchemaDefaults,
   cloneJson,
+  createJsonFormsMessageProvider,
   freezeJson,
   getJsonFormFields,
   isJsonFormsUiSchema,
+  isJsonFormsMessageProvider,
+  isJsonFormsMessageProviderOptions,
   isJsonObject,
   isJsonSchema,
   validateJsonFormData,
   type JsonFormField,
   type JsonFormValidationError,
+  type JsonFormsMessageProvider,
+  type JsonFormsMessageProviderOptions,
   type JsonFormsUiSchema,
   type JsonObject,
   type JsonSchema,
@@ -52,6 +57,7 @@ interface JsonFormsProperties {
   readonly data: JsonObject;
   readonly disabled: boolean;
   readonly readOnly: boolean;
+  readonly messages: JsonFormsMessageProviderOptions | JsonFormsMessageProvider | undefined;
 }
 
 /** Properties accepted by the {@link JsonForm} Gluon render helper. */
@@ -62,6 +68,7 @@ export interface JsonFormOptions {
   readonly name?: string;
   readonly disabled?: boolean;
   readonly readOnly?: boolean;
+  readonly messages?: JsonFormsMessageProviderOptions | JsonFormsMessageProvider;
   readonly onChange?: (event: CustomEvent<JsonFormChangeDetail>) => void;
   readonly onValidationChange?: (event: CustomEvent<JsonFormValidationChangeDetail>) => void;
 }
@@ -72,8 +79,9 @@ const emptySchema: JsonSchema = Object.freeze({
 } satisfies JsonSchema);
 
 const jsonFormsStyles = css`
-  :host { display: block; color: var(--gluon-json-form-ink, #101820); font: inherit; }
+  :host { display: block; min-inline-size: 0; color: var(--gluon-json-form-ink, #101820); font: inherit; }
   *, *::before, *::after { box-sizing: border-box; }
+  .form, .fields, .field, .group, .array-items, .array-item, .array-actions { min-inline-size: 0; }
   .form { display: grid; gap: 20px; }
   .heading { display: grid; gap: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--gluon-json-form-rule, #c9d2d8); }
   h2, p { margin: 0; }
@@ -85,7 +93,7 @@ const jsonFormsStyles = css`
   .array-items { display: grid; gap: 14px; }
   .array-item { display: grid; gap: 12px; padding: 14px; border-inline-start: 3px solid var(--gluon-json-form-accent, #496900); background: color-mix(in srgb, var(--gluon-json-form-surface, #ffffff) 92%, var(--gluon-json-form-accent, #496900)); }
   .array-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-  button { min-block-size: 44px; border: 1px solid var(--gluon-json-form-border, #7d8a92); padding: 8px 12px; background: var(--gluon-json-form-surface, #ffffff); color: inherit; font: inherit; cursor: pointer; }
+  button { min-block-size: 44px; min-inline-size: 0; max-inline-size: 100%; border: 1px solid var(--gluon-json-form-border, #7d8a92); padding: 8px 12px; background: var(--gluon-json-form-surface, #ffffff); color: inherit; font: inherit; cursor: pointer; overflow-wrap: anywhere; white-space: normal; }
   button:focus-visible { outline: 3px solid var(--gluon-json-form-focus, #005fcc); outline-offset: 2px; }
   button:disabled { cursor: not-allowed; opacity: .62; }
   .field { display: grid; gap: 7px; }
@@ -93,7 +101,9 @@ const jsonFormsStyles = css`
   .required { color: var(--gluon-json-form-accent, #496900); }
   input, select {
     min-block-size: 44px;
+    min-inline-size: 0;
     inline-size: 100%;
+    max-inline-size: 100%;
     border: 1px solid var(--gluon-json-form-border, #7d8a92);
     border-radius: 4px;
     background: var(--gluon-json-form-surface, #ffffff);
@@ -106,6 +116,7 @@ const jsonFormsStyles = css`
   input:focus-visible, select:focus-visible { outline: 3px solid var(--gluon-json-form-focus, #005fcc); outline-offset: 2px; }
   input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--gluon-json-form-error, #b42318); }
   input:disabled, select:disabled { cursor: not-allowed; opacity: 0.62; }
+  h2, p, legend, label, .error { overflow-wrap: anywhere; }
   .error { color: var(--gluon-json-form-error, #b42318); font-weight: 600; line-height: 1.4; }
   .configuration-error { border-inline-start: 3px solid var(--gluon-json-form-error, #b42318); padding-inline-start: 10px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
@@ -140,6 +151,10 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     },
     disabled: { type: Boolean, reflect: true, default: false },
     readOnly: { type: Boolean, attribute: 'readonly', reflect: true, default: false },
+    messages: {
+      attribute: false,
+      validate: (value: unknown) => value === undefined || isJsonFormsMessageProvider(value) || isJsonFormsMessageProviderOptions(value) || 'messages must be a JSON Forms message provider or provider options',
+    },
   } satisfies PropertyDeclarations<JsonFormsProperties>;
 
   static override readonly styles = jsonFormsStyles;
@@ -149,15 +164,19 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   declare data: JsonObject;
   declare disabled: boolean;
   declare readOnly: boolean;
+  declare messages: JsonFormsMessageProviderOptions | JsonFormsMessageProvider | undefined;
 
   private readonly internals = typeof this.attachInternals === 'function'
     ? this.attachInternals()
     : undefined;
   private currentData: JsonObject = Object.freeze({});
+  private currentMessages: JsonFormsMessageProvider = createJsonFormsMessageProvider();
+  private resolvedMessagesSource: JsonFormsMessageProviderOptions | JsonFormsMessageProvider | undefined;
   private initialData: JsonObject | undefined;
   private observedSchema: JsonSchema | undefined;
   private observedUiSchema: JsonFormsUiSchema | undefined;
   private observedData: JsonObject | undefined;
+  private observedMessages: JsonFormsMessageProviderOptions | JsonFormsMessageProvider | undefined;
   private validationErrors: readonly JsonFormValidationError[] = Object.freeze([]);
   private validationSignature = '';
   private disabledByForm = false;
@@ -243,12 +262,13 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   }
 
   protected override render(): TemplateResult {
+    const messages = this.resolveMessages();
     const fields = getJsonFormFields(this.schema, this.uischema);
     const configurationErrors = this.validationErrors.filter((error) => error.keyword === 'unsupported' || error.keyword === 'schema' || error.keyword === 'type');
     const title = this.schema.title;
     const disabled = this.disabled || this.disabledByForm;
     return html`
-      <section class="form" part="form" aria-label=${title ?? 'Schema form'}>
+      <section class="form" part="form" aria-label=${title ?? messages.rootLabel()}>
         ${title || this.schema.description ? html`
           <header class="heading">
             ${title ? html`<h2 part="title">${title}</h2>` : ''}
@@ -269,6 +289,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   }
 
   private renderField(field: JsonFormField, disabled: boolean): TemplateValue {
+    const messages = this.resolveMessages();
     const id = fieldId(field.path);
     const errors = this.errorsForPath(field.path, field.kind === 'object' || field.kind === 'array');
     const errorId = `${id}-error`;
@@ -277,7 +298,13 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     const fieldDisabled = disabled || field.readOnly;
     if (field.kind === 'object') {
       return html`
-        <fieldset class="group" part=${`field field-${id}`}>
+        <fieldset
+          class="group"
+          part=${`field field-${id}`}
+          aria-describedby=${describedBy}
+          aria-invalid=${errors.length > 0 ? 'true' : 'false'}
+          aria-errormessage=${errors.length > 0 ? errorId : undefined}
+        >
           <legend>${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}</legend>
           ${field.description ? html`<p id=${descriptionId!} class="field-description">${field.description}</p>` : ''}
           <div class="fields">${(field.children ?? []).map((child) => this.renderField(child, fieldDisabled))}</div>
@@ -290,15 +317,21 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
       const items = Array.isArray(value) ? value : [];
       const itemTemplate = field.item;
       return html`
-        <fieldset class="group array" part=${`field field-${id}`}>
+        <fieldset
+          class="group array"
+          part=${`field field-${id}`}
+          aria-describedby=${describedBy}
+          aria-invalid=${errors.length > 0 ? 'true' : 'false'}
+          aria-errormessage=${errors.length > 0 ? errorId : undefined}
+        >
           <legend>${field.label}${field.required ? html` <span class="required" aria-hidden="true">*</span>` : ''}</legend>
           ${field.description ? html`<p id=${descriptionId!} class="field-description">${field.description}</p>` : ''}
           <div class="array-items">
             ${items.map((_, index) => itemTemplate
-              ? html`<div class="array-item">${this.renderField(rebaseField(itemTemplate, [...field.path, String(index)], `Item ${index + 1}`), fieldDisabled)}<button type="button" ?disabled=${fieldDisabled || items.length <= (field.schema.minItems ?? 0)} @click=${() => this.removeArrayItem(field.path, index)}>Remove item ${index + 1}</button></div>`
+              ? html`<div class="array-item">${this.renderField(rebaseField(itemTemplate, [...field.path, String(index)], messages.itemLabel(index + 1)), fieldDisabled)}<button type="button" ?disabled=${fieldDisabled || items.length <= (field.schema.minItems ?? 0)} @click=${() => this.removeArrayItem(field.path, index)}>${messages.removeItemLabel(index + 1)}</button></div>`
               : '')}
           </div>
-          <div class="array-actions"><button type="button" ?disabled=${fieldDisabled || (field.schema.maxItems !== undefined && items.length >= field.schema.maxItems)} @click=${() => this.addArrayItem(field)}>Add item</button></div>
+          <div class="array-actions"><button type="button" ?disabled=${fieldDisabled || (field.schema.maxItems !== undefined && items.length >= field.schema.maxItems)} @click=${() => this.addArrayItem(field)}>${messages.addItemLabel()}</button></div>
           ${this.renderErrors(errors, errorId)}
         </fieldset>
       `;
@@ -380,6 +413,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
     errorId: string,
     invalid: boolean,
   ): TemplateValue {
+    const messages = this.resolveMessages();
     const selectedIndex = field.options.findIndex((option) => Object.is(option.value, getJsonPath(this.currentData, field.path)));
     return html`
       <select
@@ -396,7 +430,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
           this.commitPath(field.path, option?.value);
         }}
       >
-        <option value="" ?selected=${selectedIndex < 0}>${field.required ? 'Select an option' : 'No selection'}</option>
+        <option value="" ?selected=${selectedIndex < 0}>${messages.selectPlaceholder(field.required)}</option>
         ${field.options.map((option, index) => html`<option value=${String(index)}>${option.label}</option>`)}
       </select>
     `;
@@ -415,9 +449,11 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
       this.schema === this.observedSchema
       && this.uischema === this.observedUiSchema
       && this.data === this.observedData
+      && this.messages === this.observedMessages
     ) return false;
     this.observedSchema = this.schema;
     this.observedUiSchema = this.uischema;
+    this.observedMessages = this.messages;
     const normalized = applySchemaDefaults(this.schema, this.data);
     this.currentData = normalized;
     this.data = normalized;
@@ -461,7 +497,7 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
   }
 
   private refreshValidation(): boolean {
-    this.validationErrors = validateJsonFormData(this.schema, this.currentData, this.uischema).errors;
+    this.validationErrors = validateJsonFormData(this.schema, this.currentData, this.uischema, this.resolveMessages()).errors;
     const nextSignature = JSON.stringify(this.validationErrors);
     const changed = nextSignature !== this.validationSignature;
     this.validationSignature = nextSignature;
@@ -505,6 +541,18 @@ export class JsonFormsElement extends GluonElement<JsonFormsEvents> {
       errors: Object.freeze(this.validationErrors.map((error) => Object.freeze({ ...error }))),
     }));
   }
+
+  private resolveMessages(): JsonFormsMessageProvider {
+    const provided = this.messages;
+    if (provided === this.resolvedMessagesSource) return this.currentMessages;
+    this.resolvedMessagesSource = provided;
+    this.currentMessages = provided === undefined
+      ? createJsonFormsMessageProvider()
+      : isJsonFormsMessageProvider(provided)
+        ? provided
+        : createJsonFormsMessageProvider(provided);
+    return this.currentMessages;
+  }
 }
 
 /** Registers the component in the supplied Custom Element registry. */
@@ -513,7 +561,7 @@ export function registerJsonForms(): typeof JsonFormsElement {
 }
 
 /** Renders the registered element from a Gluon application template. */
-export function JsonForm(options: JsonFormOptions): TemplateValue {
+export function JsonForm(options: JsonFormOptions): TemplateResult {
   registerJsonForms();
   return html`
     <gluon-json-form
@@ -521,6 +569,7 @@ export function JsonForm(options: JsonFormOptions): TemplateValue {
       .schema=${options.schema as unknown as Record<string, unknown>}
       .uischema=${options.uischema as unknown as Record<string, unknown> | undefined}
       .data=${options.data as unknown as Record<string, unknown> | undefined}
+      .messages=${options.messages as unknown as Record<string, unknown> | undefined}
       ?disabled=${options.disabled ?? false}
       ?readonly=${options.readOnly ?? false}
       @change=${options.onChange as EventListener | undefined}

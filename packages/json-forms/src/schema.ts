@@ -54,6 +54,38 @@ export interface JsonFormValidationError {
   readonly message: string;
   /** The direct property associated with the error, when AJV exposes one. */
   readonly property?: string;
+  /** Immutable AJV keyword parameters available to message formatters. */
+  readonly params?: Readonly<Record<string, unknown>>;
+}
+
+/** Typed locale-aware messages used by the JSON Forms infrastructure copy. */
+export interface JsonFormsMessageProvider {
+  readonly locale: string;
+  rootLabel(): string;
+  itemLabel(index: number): string;
+  addItemLabel(): string;
+  removeItemLabel(index: number): string;
+  selectPlaceholder(required: boolean): string;
+  validationMessage(error: JsonFormValidationError): string;
+  configurationMessage(error: JsonFormValidationError): string;
+  formatNumber(value: number, options?: Intl.NumberFormatOptions): string;
+}
+
+/** Partial overrides accepted by {@link createJsonFormsMessageProvider}. */
+export interface JsonFormsMessageOverrides {
+  readonly rootLabel?: string;
+  readonly itemLabel?: (index: number, locale: string) => string | null | undefined;
+  readonly addItemLabel?: string;
+  readonly removeItemLabel?: (index: number, locale: string) => string | null | undefined;
+  readonly selectPlaceholder?: (required: boolean, locale: string) => string | null | undefined;
+  readonly validationMessage?: (error: JsonFormValidationError, locale: string, formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string) => string | null | undefined;
+  readonly configurationMessage?: (error: JsonFormValidationError, locale: string, formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string) => string | null | undefined;
+}
+
+/** Options for creating a synchronous locale-aware JSON Forms message provider. */
+export interface JsonFormsMessageProviderOptions {
+  readonly locale?: string;
+  readonly messages?: JsonFormsMessageOverrides;
 }
 
 /** A rendered direct property of a supported root-object schema. */
@@ -85,6 +117,15 @@ interface ValidationResult {
 }
 
 const supportedFormats = new Set(['email']);
+const defaultJsonFormsMessages = Object.freeze({
+  rootLabel: 'Schema form',
+  addItemLabel: 'Add item',
+  itemLabel: (index: number, locale: string) => `Item ${formatLocalizedNumber(index, locale)}`,
+  removeItemLabel: (index: number, locale: string) => `Remove item ${formatLocalizedNumber(index, locale)}`,
+  selectPlaceholder: (required: boolean) => required ? 'Select an option' : 'No selection',
+  validationMessage: (error: JsonFormValidationError, locale: string, formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string) => defaultValidationMessage(error, locale, formatNumber),
+  configurationMessage: (error: JsonFormValidationError, locale: string, formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string) => defaultConfigurationMessage(error, locale, formatNumber),
+} satisfies Required<JsonFormsMessageOverrides>);
 
 function isJsonValue(value: unknown): value is JsonValue {
   if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
@@ -126,6 +167,59 @@ export function cloneJson<Value extends JsonValue>(value: Value): Value {
   return value;
 }
 
+/** Creates a synchronous message provider with built-in English fallbacks. */
+export function createJsonFormsMessageProvider(options: JsonFormsMessageProviderOptions = {}): JsonFormsMessageProvider {
+  if (!isJsonFormsMessageProviderOptions(options)) {
+    throw new TypeError('JSON Forms message provider options require a locale string and known string or formatter overrides.');
+  }
+  const locale = options.locale ?? 'en';
+  const overrides = options.messages ?? {};
+  const formatNumber = (value: number, numberOptions?: Intl.NumberFormatOptions): string => (
+    new Intl.NumberFormat(locale, numberOptions).format(value)
+  );
+  return Object.freeze({
+    locale,
+    rootLabel: () => overrides.rootLabel ?? defaultJsonFormsMessages.rootLabel,
+    itemLabel: (index: number) => overrides.itemLabel?.(index, locale) ?? defaultJsonFormsMessages.itemLabel(index, locale),
+    addItemLabel: () => overrides.addItemLabel ?? defaultJsonFormsMessages.addItemLabel,
+    removeItemLabel: (index: number) => overrides.removeItemLabel?.(index, locale) ?? defaultJsonFormsMessages.removeItemLabel(index, locale),
+    selectPlaceholder: (required: boolean) => overrides.selectPlaceholder?.(required, locale) ?? defaultJsonFormsMessages.selectPlaceholder(required),
+    validationMessage: (error: JsonFormValidationError) => overrides.validationMessage?.(error, locale, formatNumber) ?? defaultJsonFormsMessages.validationMessage(error, locale, formatNumber),
+    configurationMessage: (error: JsonFormValidationError) => overrides.configurationMessage?.(error, locale, formatNumber) ?? defaultJsonFormsMessages.configurationMessage(error, locale, formatNumber),
+    formatNumber,
+  });
+}
+
+export function isJsonFormsMessageProvider(value: unknown): value is JsonFormsMessageProvider {
+  if (!isRecord(value)) return false;
+  return typeof value.locale === 'string'
+    && typeof value.rootLabel === 'function'
+    && typeof value.itemLabel === 'function'
+    && typeof value.addItemLabel === 'function'
+    && typeof value.removeItemLabel === 'function'
+    && typeof value.selectPlaceholder === 'function'
+    && typeof value.validationMessage === 'function'
+    && typeof value.configurationMessage === 'function'
+    && typeof value.formatNumber === 'function';
+}
+
+export function isJsonFormsMessageProviderOptions(value: unknown): value is JsonFormsMessageProviderOptions {
+  if (!isRecord(value) || (value.locale !== undefined && (typeof value.locale !== 'string' || value.locale.trim() === ''))) return false;
+  if (!Object.keys(value).every((key) => key === 'locale' || key === 'messages')) return false;
+  if (value.messages === undefined) return true;
+  if (!isRecord(value.messages)) return false;
+  const expected = {
+    rootLabel: 'string',
+    itemLabel: 'function',
+    addItemLabel: 'string',
+    removeItemLabel: 'function',
+    selectPlaceholder: 'function',
+    validationMessage: 'function',
+    configurationMessage: 'function',
+  } as const;
+  return Object.entries(value.messages).every(([key, entry]) => key in expected && typeof entry === expected[key as keyof typeof expected]);
+}
+
 /** Deep-freezes a JSON value before it is exposed in an event detail. */
 export function freezeJson<Value extends JsonValue>(value: Value): Value {
   if (Array.isArray(value)) value.forEach(freezeJson);
@@ -151,21 +245,37 @@ export function applySchemaDefaults(schema: JsonSchema, data: JsonObject): JsonO
 export function getJsonFormsConfigurationErrors(
   schema: JsonSchema,
   uischema: JsonFormsUiSchema | undefined,
+  messages: JsonFormsMessageProvider = createJsonFormsMessageProvider(),
 ): readonly JsonFormValidationError[] {
   const errors: JsonFormValidationError[] = [];
   if (schema.type !== 'object') {
-    errors.push(configurationError('/type', 'type', 'The initial renderer requires a root schema with type "object".'));
+    errors.push(configurationError('/type', 'type', messages.configurationMessage({
+      instancePath: '',
+      schemaPath: '/type',
+      keyword: 'type',
+      message: 'The initial renderer requires a root schema with type "object".',
+    })));
   }
   for (const [name, property] of Object.entries(schema.properties ?? {})) {
-    validateSchemaNode(property, ['properties', escapeJsonPointer(name)], errors, name);
+    validateSchemaNode(property, ['properties', escapeJsonPointer(name)], errors, name, messages);
   }
   if (uischema && uischema.type === 'Control') {
-    errors.push(configurationError('/uischema/type', 'unsupported', 'The renderer accepts a VerticalLayout UI schema, not a root Control.'));
+    errors.push(configurationError('/uischema/type', 'unsupported', messages.configurationMessage({
+      instancePath: '',
+      schemaPath: '/uischema/type',
+      keyword: 'unsupported',
+      message: 'The renderer accepts a VerticalLayout UI schema, not a root Control.',
+    })));
   }
   if (uischema?.type === 'VerticalLayout') {
     for (const control of uischema.elements ?? []) {
       if (control.type !== 'Control' || !parsePropertyScope(control.scope)) {
-        errors.push(configurationError('/uischema/elements', 'unsupported', 'UI schemas may contain only Control elements with property scopes.'));
+        errors.push(configurationError('/uischema/elements', 'unsupported', messages.configurationMessage({
+          instancePath: '',
+          schemaPath: '/uischema/elements',
+          keyword: 'unsupported',
+          message: 'UI schemas may contain only Control elements with property scopes.',
+        })));
       }
     }
   }
@@ -188,8 +298,9 @@ export function validateJsonFormData(
   schema: JsonSchema,
   data: JsonObject,
   uischema?: JsonFormsUiSchema,
+  messages: JsonFormsMessageProvider = createJsonFormsMessageProvider(),
 ): ValidationResult {
-  const configurationErrors = getJsonFormsConfigurationErrors(schema, uischema);
+  const configurationErrors = getJsonFormsConfigurationErrors(schema, uischema, messages);
   if (configurationErrors.length > 0) return Object.freeze({ errors: configurationErrors });
   try {
     const ajv = new Ajv({ allErrors: true, strict: false });
@@ -197,11 +308,16 @@ export function validateJsonFormData(
     const validate = ajv.compile(schema as object) as ValidateFunction<JsonObject>;
     const valid = validate(data);
     return Object.freeze({
-      errors: Object.freeze(valid ? [] : (validate.errors ?? []).map(toValidationError)),
+      errors: Object.freeze(valid ? [] : (validate.errors ?? []).map((error) => toValidationError(error, messages))),
     });
   } catch (error) {
     return Object.freeze({
-      errors: Object.freeze([configurationError('', 'schema', error instanceof Error ? error.message : 'The schema could not be compiled.')]),
+      errors: Object.freeze([configurationError('', 'schema', messages.configurationMessage({
+        instancePath: '',
+        schemaPath: '',
+        keyword: 'schema',
+        message: error instanceof Error ? error.message : 'The schema could not be compiled.',
+      }))]),
     });
   }
 }
@@ -297,28 +413,56 @@ function validateSchemaNode(
   schemaPath: readonly string[],
   errors: JsonFormValidationError[],
   label: string,
+  messages: JsonFormsMessageProvider,
 ): void {
   const unsupportedKeywords = ['\$ref', 'oneOf', 'anyOf', 'allOf', 'not', 'if', 'then', 'else', 'patternProperties', 'dependencies', 'dependentSchemas', 'contains'];
   for (const keyword of unsupportedKeywords) {
-    if (keyword in schema) errors.push(configurationError(`/${schemaPath.join('/')}/${keyword}`, 'unsupported', `Property "${label}" uses unsupported schema keyword "${keyword}".`));
+    if (keyword in schema) {
+      errors.push(configurationError(`/${schemaPath.join('/')}/${keyword}`, 'unsupported', messages.configurationMessage({
+        instancePath: '',
+        schemaPath: `/${schemaPath.join('/')}/${keyword}`,
+        keyword: 'unsupported',
+        message: `Property "${label}" uses unsupported schema keyword "${keyword}".`,
+      })));
+    }
   }
   const kind = getFieldKind(schema);
   if (!kind) {
-    errors.push(configurationError(`/${schemaPath.join('/')}`, 'unsupported', `Property "${label}" is not a supported string, number, integer, boolean, object, array, or enum field.`));
+    errors.push(configurationError(`/${schemaPath.join('/')}`, 'unsupported', messages.configurationMessage({
+      instancePath: '',
+      schemaPath: `/${schemaPath.join('/')}`,
+      keyword: 'unsupported',
+      message: `Property "${label}" is not a supported string, number, integer, boolean, object, array, or enum field.`,
+    })));
     return;
   }
   if (schema.format !== undefined && !supportedFormats.has(schema.format)) {
-    errors.push(configurationError(`/${schemaPath.join('/')}/format`, 'unsupported', `Property "${label}" uses unsupported format "${schema.format}".`));
+    errors.push(configurationError(`/${schemaPath.join('/')}/format`, 'unsupported', messages.configurationMessage({
+      instancePath: '',
+      schemaPath: `/${schemaPath.join('/')}/format`,
+      keyword: 'unsupported',
+      message: `Property "${label}" uses unsupported format "${schema.format}".`,
+    })));
   }
   if (kind === 'object') {
     for (const [name, child] of Object.entries(schema.properties ?? {})) {
-      validateSchemaNode(child, [...schemaPath, 'properties', escapeJsonPointer(name)], errors, `${label}.${name}`);
+      validateSchemaNode(child, [...schemaPath, 'properties', escapeJsonPointer(name)], errors, `${label}.${name}`, messages);
     }
   }
   if (kind === 'array') {
-    if (!schema.items) errors.push(configurationError(`/${schemaPath.join('/')}/items`, 'unsupported', `Array property "${label}" must declare supported items.`));
-    else if (getFieldKind(schema.items) === 'array') errors.push(configurationError(`/${schemaPath.join('/')}/items`, 'unsupported', `Nested arrays are not supported for "${label}".`));
-    else validateSchemaNode(schema.items, [...schemaPath, 'items'], errors, `${label} item`);
+    if (!schema.items) errors.push(configurationError(`/${schemaPath.join('/')}/items`, 'unsupported', messages.configurationMessage({
+      instancePath: '',
+      schemaPath: `/${schemaPath.join('/')}/items`,
+      keyword: 'unsupported',
+      message: `Array property "${label}" must declare supported items.`,
+    })));
+    else if (getFieldKind(schema.items) === 'array') errors.push(configurationError(`/${schemaPath.join('/')}/items`, 'unsupported', messages.configurationMessage({
+      instancePath: '',
+      schemaPath: `/${schemaPath.join('/')}/items`,
+      keyword: 'unsupported',
+      message: `Nested arrays are not supported for "${label}".`,
+    })));
+    else validateSchemaNode(schema.items, [...schemaPath, 'items'], errors, `${label} item`, messages);
   }
 }
 
@@ -343,15 +487,45 @@ function configurationError(schemaPath: string, keyword: string, message: string
   return Object.freeze({ instancePath: '', schemaPath, keyword, message });
 }
 
-function toValidationError(error: ErrorObject): JsonFormValidationError {
+function toValidationError(error: ErrorObject, messages: JsonFormsMessageProvider): JsonFormValidationError {
   const property = error.keyword === 'required' && typeof error.params.missingProperty === 'string'
     ? error.params.missingProperty
     : undefined;
-  return Object.freeze({
+  const source = {
     instancePath: error.instancePath,
     schemaPath: error.schemaPath,
     keyword: error.keyword,
     message: error.message ?? 'Invalid value.',
     ...(property ? { property } : {}),
+    params: Object.freeze({ ...error.params }),
+  } satisfies JsonFormValidationError;
+  const message = messages.validationMessage(source);
+  return Object.freeze({
+    ...source,
+    message,
   });
+}
+
+function defaultValidationMessage(
+  error: JsonFormValidationError,
+  _locale: string,
+  _formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string,
+): string {
+  return error.message || 'Invalid value.';
+}
+
+function defaultConfigurationMessage(
+  error: JsonFormValidationError,
+  _locale: string,
+  _formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string,
+): string {
+  return error.message || 'The schema could not be compiled.';
+}
+
+function formatLocalizedNumber(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale).format(value);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

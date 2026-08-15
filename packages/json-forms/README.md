@@ -58,6 +58,52 @@ dispatches only when the validation result changes. The application owns the
 authoritative data: update `.data` after a `change` event when the surrounding
 state store accepts or transforms the edit.
 
+## Message provider
+
+JSON Forms infrastructure copy is owned by a synchronous message provider. The
+package exports `createJsonFormsMessageProvider()` and typed provider
+interfaces so applications can swap locale-aware strings without importing
+`@gluonjs/i18n` or making network requests. The provider covers the root form
+label, array item numbering, add/remove controls, selection placeholders,
+validation diagnostics, and configuration diagnostics.
+
+```ts
+import {
+  createJsonFormsMessageProvider,
+  registerJsonForms,
+  type JsonFormsMessageProvider,
+} from '@gluonjs/json-forms';
+
+const messages: JsonFormsMessageProvider = createJsonFormsMessageProvider({
+  locale: 'de-DE',
+  messages: {
+    selectPlaceholder: (required, locale) =>
+      required ? `Bitte auswählen (${locale})` : `Keine Auswahl (${locale})`,
+  },
+});
+
+const form = document.querySelector('gluon-json-form')!;
+form.messages = messages;
+```
+
+`createJsonFormsMessageProvider()` always falls back to the built-in English
+defaults when a caller omits a specific override. Formatter overrides may
+return `undefined` or `null` to leave a key unresolved; the provider then uses
+the English fallback for that key. Validation formatters receive immutable AJV
+keyword `params`, including numeric limits and missing-property names. Locale-
+aware number formatting comes from `Intl.NumberFormat`, so item numbering and
+validation thresholds can follow the active locale without depending on the
+i18n package. The provider does not translate application-authored titles or
+descriptions. Object and array validation messages are associated with their
+own fieldset through `aria-describedby`, `aria-errormessage`, and
+`aria-invalid`, just as primitive fields associate their controls.
+
+The maintained `docs-site/examples/json-forms.html` application installs the
+German provider in a real delivery-preferences form. Run
+`npm run build:docs-examples && npm run check:json-forms-example-browser` to
+verify localized validation and configuration diagnostics, long array-control
+labels, 390px overflow, and 44px controls in Chromium.
+
 ## Supported schema boundary
 
 The renderer accepts a root schema with `type: "object"`, primitive fields of
@@ -80,7 +126,8 @@ built into the element.
 registries, localization, async schemas, file widgets, nested arrays, and UI
 layouts other than `VerticalLayout` remain unsupported. An unsupported schema
 or UI schema renders an explicit configuration error rather than silently
-dropping fields.
+dropping fields, and that configuration copy also flows through the message
+provider.
 
 ## Historical delivery decision
 

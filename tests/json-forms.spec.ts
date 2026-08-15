@@ -13,6 +13,7 @@ import {
 import {
   applySchemaDefaults,
   cloneJson,
+  createJsonFormsMessageProvider,
   freezeJson,
   getJsonFormFields,
   getJsonFormsConfigurationErrors,
@@ -192,6 +193,150 @@ describe('JSON Forms component', () => {
     await settled(element);
     expect(element.data).toEqual({ recipient: { name: 'Ada', city: 'Berlin' }, channels: ['email', 'email'] });
     expect(element.shadowRoot!.querySelector('#field-channels-1')).toBeTruthy();
+  });
+
+  it('uses English defaults when caller overrides only a subset of JSON Forms messages', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        decision: { type: 'string', enum: ['yes', 'no'] },
+        choices: {
+          type: 'array',
+          title: 'Choices',
+          minItems: 1,
+          items: {
+            type: 'string',
+            enum: ['alpha', 'beta'],
+          },
+        },
+      },
+      required: ['decision'],
+    } as JsonSchema);
+    element.messages = createJsonFormsMessageProvider({
+      locale: 'en-GB',
+      messages: {
+        itemLabel: () => undefined,
+        selectPlaceholder: (required) => required ? 'Choose one item' : 'Choose nothing',
+      },
+    });
+    element.data = { choices: [] };
+    await settled(element);
+
+    const arrayGroup = element.shadowRoot!.querySelector('fieldset.array')!;
+    expect(arrayGroup.getAttribute('aria-invalid')).toBe('true');
+    const arrayErrorId = arrayGroup.getAttribute('aria-errormessage')!;
+    expect(arrayGroup.getAttribute('aria-describedby')).toContain(arrayErrorId);
+    expect(element.shadowRoot!.querySelector(`#${arrayErrorId}`)).toBeTruthy();
+
+    const add = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent === 'Add item')!;
+    add.click();
+    await settled(element);
+    const select = element.shadowRoot!.querySelector('#field-choices-0') as HTMLSelectElement;
+    expect(select.querySelector('option[value=""]')?.textContent).toBe('Choose nothing');
+    expect((element.shadowRoot!.querySelector('#field-decision') as HTMLSelectElement)
+      .querySelector('option[value=""]')?.textContent).toBe('Choose one item');
+    expect([...element.shadowRoot!.querySelectorAll('button')].some((button) => button.textContent === 'Remove item 1')).toBe(true);
+    expect(element.shadowRoot!.querySelector('label[for="field-choices-0"]')?.textContent).toContain('Item 1');
+    expect(element.shadowRoot!.querySelector('[part="form"]')?.getAttribute('aria-label')).toBe('Schema form');
+
+    expect(() => createJsonFormsMessageProvider({ locale: '' })).toThrow('locale string');
+    expect(() => createJsonFormsMessageProvider({ messages: { addItemLabel: (() => 'invalid') as never } })).toThrow('formatter overrides');
+  });
+
+  it('localizes the public JsonForm helper path and associates nested group errors', async () => {
+    const host = document.createElement('main');
+    document.body.append(host);
+    const messages = createJsonFormsMessageProvider({
+      locale: 'de-DE',
+      messages: {
+        rootLabel: 'Öffentliches Schema-Formular',
+        validationMessage: () => 'Verschachteltes Pflichtfeld fehlt',
+      },
+    });
+    render(JsonForm({
+      schema: {
+        type: 'object',
+        properties: {
+          recipient: {
+            type: 'object',
+            title: 'Empfänger',
+            properties: { name: { type: 'string', title: 'Name' } },
+            required: ['name'],
+          },
+        },
+      },
+      data: { recipient: {} },
+      messages,
+    }), host);
+    const element = host.querySelector(jsonFormsTag) as JsonFormsElement;
+    await settled(element);
+
+    expect(element.shadowRoot!.querySelector('[part="form"]')?.getAttribute('aria-label')).toBe('Öffentliches Schema-Formular');
+    const group = element.shadowRoot!.querySelector('fieldset.group')!;
+    expect(group.getAttribute('aria-invalid')).toBe('true');
+    const errorId = group.getAttribute('aria-errormessage')!;
+    expect(group.getAttribute('aria-describedby')).toContain(errorId);
+    expect(element.shadowRoot!.querySelector(`#${errorId}`)?.textContent).toContain('Verschachteltes Pflichtfeld fehlt');
+  });
+
+  it('formats localized control copy and diagnostics with long second-locale strings', async () => {
+    const element = createForm({
+      type: 'object',
+      properties: {
+        amount: { type: 'number', minimum: 1000 },
+        method: { type: 'string', enum: ['standard', 'express'] },
+        variants: {
+          type: 'array',
+          title: 'Varianten',
+          maxItems: 1,
+          items: { type: 'string', enum: ['eins', 'zwei'] },
+        },
+      },
+      required: ['amount', 'method'],
+    } as JsonSchema);
+    element.style.width = '320px';
+    element.messages = createJsonFormsMessageProvider({
+      locale: 'de-DE',
+      messages: {
+        rootLabel: 'Schema-Formular für sehr lange, lokalisierte Infrastrukturtexte',
+        itemLabel: (index, locale) => `Benachrichtigungskanal ${new Intl.NumberFormat(locale).format(index)}`,
+        addItemLabel: 'Element mit ausführlicher deutscher Beschriftung hinzufügen',
+        removeItemLabel: (index, locale) => `Element ${new Intl.NumberFormat(locale).format(index)} mit ausführlicher deutscher Beschriftung entfernen`,
+        selectPlaceholder: (required) => required ? 'Bitte einen Eintrag auswählen, um fortzufahren' : 'Keine Auswahl getroffen',
+        validationMessage: (error, locale, formatNumber) => {
+          if (error.keyword === 'minimum') return `Bitte mindestens ${formatNumber(Number(error.params?.limit))} auswählen`;
+          if (error.keyword === 'required') return 'Dieses Feld muss ausgefüllt werden';
+          return `Fehler in deutscher Sprache: ${error.message}`;
+        },
+        configurationMessage: (error) => `Konfigurationshinweis in deutscher Sprache: ${error.message}`,
+      },
+    });
+    element.data = { amount: 1, variants: [] };
+    await settled(element);
+
+    expect(element.shadowRoot!.querySelector('[part="form"]')?.getAttribute('aria-label')).toBe('Schema-Formular für sehr lange, lokalisierte Infrastrukturtexte');
+    const amount = element.shadowRoot!.querySelector('#field-amount') as HTMLInputElement;
+    expect(amount.getAttribute('aria-invalid')).toBe('true');
+    expect(element.shadowRoot!.querySelector('[part="error"]')?.textContent).toContain('1.000');
+    const add = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent?.startsWith('Element mit ausführlicher deutscher Beschriftung hinzufügen'))!;
+    add.click();
+    await settled(element);
+    const remove = [...element.shadowRoot!.querySelectorAll('button')].find((button) => button.textContent?.startsWith('Element 1 mit ausführlicher deutscher Beschriftung entfernen'))!;
+    expect(remove.textContent).toContain('Element 1');
+    const select = element.shadowRoot!.querySelector('#field-variants-0') as HTMLSelectElement;
+    expect(select.querySelector('option[value=""]')?.textContent).toBe('Keine Auswahl getroffen');
+    expect((element.shadowRoot!.querySelector('#field-method') as HTMLSelectElement)
+      .querySelector('option[value=""]')?.textContent).toBe('Bitte einen Eintrag auswählen, um fortzufahren');
+    expect(element.shadowRoot!.querySelector('label[for="field-variants-0"]')?.textContent).toContain('Benachrichtigungskanal 1');
+    expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth + 1);
+
+    const invalid = createForm({ type: 'string' } as JsonSchema);
+    invalid.messages = createJsonFormsMessageProvider({
+      locale: 'de-DE',
+      messages: { configurationMessage: (error) => `Deutsche Konfigurationsdiagnose: ${error.message}` },
+    });
+    await settled(invalid);
+    expect(invalid.shadowRoot!.querySelector('[part="configuration-error"]')?.textContent).toContain('Deutsche Konfigurationsdiagnose');
   });
 
   it('creates typed defaults for object array items and enforces min/max bounds', async () => {

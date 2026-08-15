@@ -1,5 +1,6 @@
 import { css } from '@gluonjs/core';
 import {
+  createJsonFormsMessageProvider,
   registerJsonForms,
   type JsonFormChangeDetail,
   type JsonFormsElement,
@@ -65,6 +66,22 @@ registerJsonForms();
 const form = document.querySelector<HTMLFormElement>('#delivery-preferences')!;
 const jsonForm = form.querySelector<JsonFormsElement>('gluon-json-form')!;
 const status = document.querySelector<HTMLElement>('#form-status')!;
+jsonForm.messages = createJsonFormsMessageProvider({
+  locale: 'de-DE',
+  messages: {
+    rootLabel: 'Schema-Formular für Lieferpräferenzen',
+    itemLabel: (index, locale) => `Benachrichtigungskanal ${new Intl.NumberFormat(locale).format(index)}`,
+    addItemLabel: 'Weiteren Benachrichtigungskanal hinzufügen',
+    removeItemLabel: (index, locale) => `Benachrichtigungskanal ${new Intl.NumberFormat(locale).format(index)} entfernen`,
+    selectPlaceholder: (required) => required ? 'Bitte eine Option auswählen' : 'Keine Auswahl',
+    validationMessage: (error, locale, formatNumber) => {
+      if (error.keyword === 'required') return 'Dieses Feld ist erforderlich.';
+      if (error.keyword === 'minimum') return `Bitte mindestens ${formatNumber(Number(error.params?.limit))} eingeben.`;
+      return `Ungültige Eingabe: ${error.message}`;
+    },
+    configurationMessage: (error) => `Konfigurationshinweis: ${error.message}`,
+  },
+});
 let deliveryPreferences: JsonObject = {
   contactEmail: 'dispatch@gluongoods.example',
 };

@@ -5,12 +5,16 @@
       "module": "@gluonjs/json-forms",
       "code": [
         "import {",
+        "  createJsonFormsMessageProvider,",
         "  JsonForm,",
         "  jsonFormsTag,",
         "  registerJsonForms,",
         "  type JsonFormChangeDetail,",
         "  type JsonFormOptions,",
         "  type JsonFormsElement,",
+        "  type JsonFormsMessageOverrides,",
+        "  type JsonFormsMessageProvider,",
+        "  type JsonFormsMessageProviderOptions,",
         "  type JsonFormsUiSchema,",
         "  type JsonFormValidationChangeDetail,",
         "  type JsonFormValidationError,",
@@ -26,13 +30,17 @@
         "const errors: readonly JsonFormValidationError[] = [];",
         "const change: JsonFormChangeDetail = { data, errors };",
         "const validation: JsonFormValidationChangeDetail = { valid: true, errors };",
+        "const messageOverrides = { selectPlaceholder: (required: boolean) => required ? 'Choose one' : 'No selection' } satisfies JsonFormsMessageOverrides;",
+        "const messageOptions = { locale: 'en-GB', messages: messageOverrides } satisfies JsonFormsMessageProviderOptions;",
+        "const messages: JsonFormsMessageProvider = createJsonFormsMessageProvider(messageOptions);",
         "",
         "registerJsonForms();",
         "const element = document.createElement(jsonFormsTag) as JsonFormsElement;",
         "element.schema = schema;",
         "element.uischema = uischema;",
         "element.data = data;",
-        "const options = { schema, uischema, data, onChange: (event) => console.log(event.detail.data), onValidationChange: (event) => console.log(event.detail.valid) } satisfies JsonFormOptions;",
+        "element.messages = messages;",
+        "const options = { schema, uischema, data, messages, onChange: (event) => console.log(event.detail.data), onValidationChange: (event) => console.log(event.detail.valid) } satisfies JsonFormOptions;",
         "const view = JsonForm(options);",
         "console.log(element.value, value, change, validation, view);"
       ]
@@ -3099,6 +3107,10 @@
       "recipe": "json-forms-contract",
       "description": "Render the same registered JSON Forms element from a Gluon template while keeping schema, data, and events typed:"
     },
+    "packages/json-forms/src/functions/createJsonFormsMessageProvider.md": {
+      "recipe": "json-forms-contract",
+      "description": "Create a synchronous locale-aware infrastructure message provider with complete English fallbacks and no i18n dependency:"
+    },
     "packages/json-forms/src/functions/registerJsonForms.md": {
       "recipe": "json-forms-contract",
       "description": "Register the explicit JSON Forms Custom Element before using it from plain HTML or a host application:"
@@ -3114,6 +3126,18 @@
     "packages/json-forms/src/interfaces/JsonFormsUiSchema.md": {
       "recipe": "json-forms-contract",
       "description": "Order direct schema properties and provide a JSON Forms control label with the supported VerticalLayout subset:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsMessageOverrides.md": {
+      "recipe": "json-forms-contract",
+      "description": "Override only the JSON Forms infrastructure messages owned by an application while retaining per-key defaults:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsMessageProvider.md": {
+      "recipe": "json-forms-contract",
+      "description": "Pass a complete synchronous message and locale-formatting boundary to the form element or render helper:"
+    },
+    "packages/json-forms/src/interfaces/JsonFormsMessageProviderOptions.md": {
+      "recipe": "json-forms-contract",
+      "description": "Configure the provider locale and a typed partial set of application-owned message overrides:"
     },
     "packages/json-forms/src/interfaces/JsonFormValidationChangeDetail.md": {
       "recipe": "json-forms-contract",
