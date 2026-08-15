@@ -1,12 +1,21 @@
 import {
   createStoreManager,
   createTestingStoreManager,
+  createAsyncPersistencePlugin,
   defineStore,
   type PersistedStateEnvelope,
   type StoreTransaction,
 } from '../packages/store/dist/index.js';
 
 const manager = createStoreManager();
+const asyncPlugin = createAsyncPersistencePlugin({
+  storage: {
+    async getItem(_key, _signal) { return null; },
+    async setItem(_key, _value, _signal) {},
+  },
+});
+const asyncStatus: 'idle' | 'hydrating' | 'ready' | 'failed' = asyncPlugin.lifecycle.status;
+void asyncStatus;
 const useCounter = defineStore('counter', () => ({ count: 1, label: 'ready' }), {
   getters: (state) => ({
     doubled: state.count * 2,

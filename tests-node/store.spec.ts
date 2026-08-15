@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   createPersistencePlugin,
+  createAsyncPersistencePlugin,
   createStoreManager,
   createTestingStoreManager,
   defineStore,
@@ -275,6 +276,83 @@ describe('@gluonjs/store HMR and universal state', () => {
 });
 
 describe('@gluonjs/store persistence and testing', () => {
+  it('hydrates async storage in a defined lifecycle and ignores stale reads after a mutation', async () => {
+    let resolveRead!: (value: string | null) => void;
+    const values = new Map([['gluon:async-cart', JSON.stringify({ version: 1, state: { count: 9 } })]]);
+    const storage = {
+      getItem: vi.fn(() => new Promise<string | null>((resolve) => { resolveRead = resolve; })),
+      setItem: vi.fn(async (key: string, value: string) => { values.set(key, value); }),
+    };
+    const plugin = createAsyncPersistencePlugin({ storage });
+    const definition = defineStore({ id: 'async-cart', state: () => ({ count: 0 }), persist: true });
+    const manager = createStoreManager({ plugins: [plugin] });
+    const store = manager.use(definition);
+    expect(plugin.lifecycle.status).toBe('hydrating');
+    store.$patch({ count: 3 });
+    resolveRead(values.get('gluon:async-cart')!);
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('ready');
+    expect(store.count).toBe(3);
+    expect(storage.setItem).toHaveBeenCalledWith('gluon:async-cart', expect.stringContaining('"count":3'), expect.objectContaining({ aborted: false }));
+    manager.dispose();
+    expect(plugin.lifecycle.status).toBe('ready');
+  });
+
+  it('isolates async applications and exposes stable failed lifecycle errors', async () => {
+    const error = new Error('offline');
+    const first = createAsyncPersistencePlugin({ storage: { getItem: async () => { throw error; }, setItem: async () => undefined } });
+    const second = createAsyncPersistencePlugin({ storage: { getItem: async () => null, setItem: async () => undefined } });
+    const definition = defineStore({ id: 'async-isolated', state: () => ({ value: 1 }), persist: true });
+    createStoreManager({ plugins: [first] }).use(definition);
+    createStoreManager({ plugins: [second] }).use(definition);
+    await first.lifecycle.ready;
+    await second.lifecycle.ready;
+    expect(first.lifecycle.status).toBe('failed');
+    expect(first.lifecycle.error).toBe(error);
+    expect(second.lifecycle.status).toBe('ready');
+  });
+
+  it('supports disposal and a DOM-free abort signal while selecting persisted paths', async () => {
+    let abortListener!: () => void;
+    const signal = {
+      aborted: false,
+      addEventListener: (_type: 'abort', listener: () => void) => { abortListener = listener; },
+    };
+    const getItem = vi.fn(() => new Promise<string | null>(() => undefined));
+    const plugin = createAsyncPersistencePlugin({
+      signal,
+      storage: { getItem, setItem: async () => undefined },
+    });
+    const definition = defineStore({
+      id: 'async-dispose', state: () => ({ value: 1, ignored: true }),
+      persist: { paths: ['value'] },
+    });
+    const manager = createStoreManager({ plugins: [plugin] });
+    manager.use(definition);
+    expect(getItem).toHaveBeenCalledWith('gluon:async-dispose', expect.objectContaining({ aborted: false }));
+    plugin.lifecycle.dispose();
+    abortListener?.();
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('hydrating');
+  });
+
+  it('writes only configured async persistence paths after hydration', async () => {
+    const writes: string[] = [];
+    const plugin = createAsyncPersistencePlugin({
+      storage: {
+        getItem: async () => null,
+        setItem: async (_key, value) => { writes.push(value); },
+      },
+    });
+    const store = createStoreManager({ plugins: [plugin] }).use(defineStore({
+      id: 'async-paths', state: () => ({ value: 1, ignored: true }), persist: { paths: ['value'] },
+    }));
+    await plugin.lifecycle.ready;
+    store.$patch({ value: 2, ignored: false });
+    await Promise.resolve();
+    expect(JSON.parse(writes.at(-1)!)).toEqual({ version: 1, state: { value: 2 } });
+  });
+
   it('hydrates and persists selected paths through an explicit storage adapter', () => {
     const values = new Map<string, string>([['goods:cart', '{"version":1,"state":{"items":["lamp"]}}']]);
     const storage: StorageLike = {

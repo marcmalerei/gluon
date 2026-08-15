@@ -665,6 +665,40 @@ export interface StorageLike {
   removeItem?(key: string): void;
 }
 
+/** Promise-based persistence adapter. The synchronous StorageLike contract is intentionally unchanged. */
+export interface AsyncStorageLike {
+  getItem(key: string, signal?: StoreAbortSignal): Promise<string | null>;
+  setItem(key: string, value: string, signal?: StoreAbortSignal): Promise<void>;
+  removeItem?(key: string, signal?: StoreAbortSignal): Promise<void>;
+}
+
+/** DOM-free subset accepted by async adapters, also compatible with AbortSignal. */
+export interface StoreAbortSignal {
+  readonly aborted: boolean;
+  readonly reason?: unknown;
+  addEventListener?(type: 'abort', listener: () => void, options?: { readonly once?: boolean }): void;
+}
+
+export type AsyncPersistenceStatus = 'idle' | 'hydrating' | 'ready' | 'failed';
+
+export interface AsyncPersistenceLifecycle {
+  readonly status: AsyncPersistenceStatus;
+  readonly error: unknown;
+  readonly ready: Promise<void>;
+  dispose(): void;
+}
+
+export interface AsyncPersistencePluginOptions {
+  readonly storage: AsyncStorageLike;
+  readonly namespace?: string;
+  readonly signal?: StoreAbortSignal;
+  readonly onError?: (error: unknown, storeId: string) => void;
+}
+
+export interface AsyncPersistencePlugin extends StorePlugin {
+  readonly lifecycle: AsyncPersistenceLifecycle;
+}
+
 export interface PersistencePluginOptions {
   readonly storage: StorageLike;
   readonly namespace?: string;
@@ -737,6 +771,102 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
       }
     });
   };
+}
+
+/**
+ * Creates an application-local async persistence plugin. `use()` is synchronous:
+ * stores expose their defaults while the lifecycle is `hydrating`; callers that
+ * need restored state await `plugin.lifecycle.ready` before starting rendering,
+ * routing, or SSR hydration.
+ */
+export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOptions): AsyncPersistencePlugin {
+  let status: AsyncPersistenceStatus = 'idle';
+  let error: unknown;
+  let disposed = false;
+  let pending = 0;
+  let resolveReady!: () => void;
+  const ready = new Promise<void>((resolve) => { resolveReady = resolve; });
+  let aborted = Boolean(options.signal?.aborted);
+  const listeners = new Set<() => void>();
+  const controller: StoreAbortSignal = {
+    get aborted() { return aborted; },
+    get reason() { return options.signal?.reason; },
+    addEventListener(_type, listener) { listeners.add(listener); },
+  };
+  const abort = () => { aborted = true; for (const listener of listeners) listener(); listeners.clear(); };
+  if (options.signal) {
+    if (options.signal.aborted) abort();
+    else options.signal.addEventListener?.('abort', abort, { once: true });
+  }
+  const lifecycle: AsyncPersistenceLifecycle = {
+    get status() { return status; },
+    get error() { return error; },
+    ready,
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      abort();
+      resolveReady();
+    },
+  };
+  const finish = () => {
+    pending -= 1;
+    if (pending === 0 && !disposed && status !== 'failed') {
+      status = 'ready';
+      resolveReady();
+    } else if (pending === 0) resolveReady();
+  };
+  const plugin = (({ definition, store }: StorePluginContext) => {
+    const persist = definition.options.persist;
+    if (!persist || disposed) return;
+    const config = persist === true ? {} : persist;
+    const key = config.key ?? `${options.namespace ?? 'gluon'}:${definition.id}`;
+    const plan = normalizePersistencePlan(config);
+    let revision = 0;
+    let hydrated = false;
+    let writeQueue = Promise.resolve();
+    let disposedStore = false;
+    pending += 1;
+    status = 'hydrating';
+    const report = (failure: unknown) => {
+      if (disposed || (typeof failure === 'object' && failure !== null && 'name' in failure && failure.name === 'AbortError')) return;
+      error = failure;
+      status = 'failed';
+      options.onError?.(failure, definition.id);
+    };
+    const unsubscribe = store.$subscribe(() => {
+      revision += 1;
+      if (!hydrated || disposed || disposedStore || status === 'failed') return;
+      const raw = JSON.stringify({ version: plan.version, state: selectPersistedState(store, config.paths) });
+      writeQueue = writeQueue.then(() => options.storage.setItem(key, raw, controller)).catch(report);
+    });
+    const readRevision = revision;
+    const task = options.storage.getItem(key, controller).then((raw) => {
+      if (disposed || disposedStore) return;
+      const loaded = loadPersistedState(raw, plan, definition.id);
+      if (readRevision === revision && loaded.state) store.$patch(loaded.state, { source: 'async-persistence' });
+      hydrated = true;
+      if (revision !== readRevision && !disposed && status !== 'failed') {
+        const current = JSON.stringify({ version: plan.version, state: selectPersistedState(store, config.paths) });
+        writeQueue = writeQueue.then(() => options.storage.setItem(key, current, controller)).catch(report);
+      }
+    }).catch(report).finally(finish);
+    return () => {
+      disposedStore = true;
+      unsubscribe();
+      void task;
+    };
+  }) as AsyncPersistencePlugin;
+  Object.defineProperty(plugin, 'lifecycle', { value: lifecycle, enumerable: true });
+  Promise.resolve().then(() => { if (pending === 0 && !disposed) { status = 'ready'; resolveReady(); } });
+  return plugin;
+}
+
+function selectPersistedState(store: StorePluginStore, paths?: readonly string[]): Readonly<Record<string, JsonValue>> {
+  if (!paths) return snapshotState(store.$state);
+  const selected: Record<string, JsonValue> = Object.create(null);
+  for (const path of paths) if (path in store.$state) selected[path] = toJsonValue(store.$state[path], new WeakSet());
+  return selected;
 }
 
 function normalizePersistencePlan<State extends StateTree>(config: PersistOptions<State>): PersistencePlan {
