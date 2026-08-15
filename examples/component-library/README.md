@@ -46,6 +46,15 @@ with axe-core, and writes screenshots plus a machine-readable report to
 directory before later repository analysis runs. Set
 `UPDATE_STORYBOOK_SCREENSHOTS=1` only when intentionally reviewing and updating
 those baselines. The catalog is not a replacement for GLUON GOODS.
+`npm run check:responsive-action-bar` additionally validates the
+`ResponsiveActionBar` story in Chromium, Firefox, and WebKit at real 320x844,
+390x844, 390x240, and 768x500 viewports. It measures the primary action's
+minimum 44px target, checks horizontal containment, simulates 200% text by
+using a 32px root font at 320px, and exercises reduced-motion and forced-colors
+styles. Safe-area padding is covered by the stylesheet contract; this validator
+does not claim to emulate a notched device or a platform safe-area inset.
+The validator is part of `check:storybook:component-library`, so the three-engine
+geometry evidence runs in the repository quality gate.
 See the [Storybook with Gluon guide](../../docs/storybook.md) for a minimal
 configuration, typed story, style ownership, and lifecycle explanation.
 

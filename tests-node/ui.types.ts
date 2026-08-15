@@ -39,12 +39,14 @@ import {
   InlineNotice,
   NavigationStrip,
   ResponsiveDisclosure,
+  ResponsiveActionBar,
   TableRegion,
   moleculeManifest,
   type CardProps,
   type NavigationStripProps,
   type ResponsiveDisclosureAttributes,
   type ResponsiveDisclosureProps,
+  type ResponsiveActionBarProps,
 } from '@gluonjs/molecules';
 import { AppShell, ConfirmationDialog, WorkflowTimeline, createConfirmationDialogController, organismManifest, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type WorkflowTimelineOverallState, type WorkflowTimelineStatus } from '@gluonjs/organisms';
 import {
@@ -89,6 +91,13 @@ const responsiveDisclosureProps: ResponsiveDisclosureProps = {
   children: 'Filter controls',
 };
 ResponsiveDisclosure(responsiveDisclosureProps);
+const responsiveActionBarProps: ResponsiveActionBarProps = {
+  summary: 'Ready',
+  primaryAction: Button({ label: 'Continue' }),
+  state: 'ready',
+  presentation: 'sticky',
+};
+ResponsiveActionBar(responsiveActionBarProps);
 const tree: TemplateResult = AppShell({
   children: Card({
     ...cardProps,
@@ -356,6 +365,10 @@ ResponsiveDisclosure({ id: 'filters', summary: 'Filters', children: 'Controls' }
 ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 48rem)', compactInitialOpen: 'open', children: 'Controls' });
 // @ts-expect-error ResponsiveDisclosure reset tokens are string or number
 ResponsiveDisclosure({ id: 'filters', summary: 'Filters', compactBreakpoint: '(max-width: 48rem)', compactResetToken: {}, children: 'Controls' });
+// @ts-expect-error ResponsiveActionBar state remains closed
+ResponsiveActionBar({ summary: 'Ready', primaryAction: 'Continue', state: 'queued' });
+// @ts-expect-error ResponsiveActionBar owns busy and disabled ARIA state
+ResponsiveActionBar({ summary: 'Ready', primaryAction: 'Continue', attributes: { aria: { busy: true } } });
 // @ts-expect-error AppShell div attributes reject anchor-only props
 AppShell({ children: 'Content', attributes: { href: '/other' } });
 // @ts-expect-error WorkflowTimeline requires a stable instance id

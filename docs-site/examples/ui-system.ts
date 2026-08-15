@@ -39,6 +39,7 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  ResponsiveActionBar,
   SearchField,
   SearchResults,
   SegmentedControl,
@@ -166,6 +167,11 @@ createApp(() => AppShell({
         q.a({ href: '#orders', children: 'Orders' }),
         q.a({ href: '#security', children: 'Security' }),
       ],
+    }),
+    ResponsiveActionBar({
+      summary: 'Profile changes ready',
+      status: 'All fields are valid.',
+      primaryAction: Button({ label: 'Save profile' }),
     }),
     Card({
       attributes: { id: 'profile' },

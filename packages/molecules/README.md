@@ -6,6 +6,14 @@
 
 Reusable compositions built only from Core, Quarks, and Atoms.
 
+`ResponsiveActionBar` composes one caller-owned primary action with optional
+summary, status, and compact control content. It exposes request-free
+ready/loading/disabled/error semantics, safe-area-aware sticky mobile and
+inline wide layouts, short-viewport static fallback, forced-colors and
+reduced-motion handling, and a 44px minimum action target. Safe-area behavior
+uses the platform environment variables; applications remain responsible for
+device-specific inset behavior.
+
 ```ts
 import {
   Accordion,
