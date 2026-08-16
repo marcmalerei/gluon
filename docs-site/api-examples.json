@@ -1077,6 +1077,7 @@
         "  SearchResults,",
         "  Menubar,",
         "  OneTimePasswordField,",
+        "  PasswordToggleField,",
         "  SegmentedControl,",
         "  TableRegion,",
         "  Tabs,",
@@ -1084,6 +1085,7 @@
         "  createDialogSurfaceController,",
         "  moleculeManifest,",
         "  moleculeStyles,",
+        "  passwordToggleFieldStyles,",
         "  searchFieldStyles,",
         "  searchResultsStyles,",
         "  oneTimePasswordFieldStyles,",
@@ -1164,6 +1166,9 @@
         "  type OneTimePasswordFieldInputAttributes,",
         "  type OneTimePasswordFieldMode,",
         "  type OneTimePasswordFieldProps,",
+        "  type PasswordToggleFieldAttributes,",
+        "  type PasswordToggleFieldInputAttributes,",
+        "  type PasswordToggleFieldProps,",
         "  type SegmentedControlAccessibleName,",
         "  type SegmentedControlAttributes,",
         "  type SegmentedControlChangeEvent,",
@@ -1278,6 +1283,7 @@
         "const otpInputAttributes = { title: 'One-time code digit' } satisfies OneTimePasswordFieldInputAttributes;",
         "const otpChange = (value: string) => console.log('code length', value.length);",
         "const checkoutCode = { id: 'checkout-code', label: 'One-time code', length: 6, mode: otpMode, value: '123', name: 'code', helper: 'Enter the code from the device.', inputAttributes: otpInputAttributes, attributes: otpAttributes, onValueChange: otpChange } satisfies OneTimePasswordFieldProps;",
+        "const passwordToggle = { id: 'account-password', label: 'Password', value: 'secret', visible: false, showLabel: 'Show password', hideLabel: 'Hide password', autocomplete: 'current-password' } satisfies PasswordToggleFieldProps;",
         "const segmentName = { label: 'Order view' } satisfies SegmentedControlAccessibleName;",
         "const segmentAttributes = { class: 'order-view' } satisfies SegmentedControlAttributes;",
         "const segmentOptions = [{ value: 'summary', label: 'Summary' }, { value: 'details', label: 'Details' }] satisfies readonly SegmentedControlOption[];",
@@ -1291,7 +1297,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -7327,6 +7333,26 @@
     "packages/molecules/src/variables/searchResultsStyles.md": {
       "recipe": "molecule-components",
       "description": "Adopt or inspect the constructable stylesheet for grouped SearchResults:"
+    },
+    "packages/molecules/src/variables/PasswordToggleField.md": {
+      "recipe": "molecule-components",
+      "description": "Render one controlled native password input and one localized non-submitting visibility toggle:"
+    },
+    "packages/molecules/src/variables/passwordToggleFieldStyles.md": {
+      "recipe": "molecule-components",
+      "description": "Adopt or inspect the separately tree-shakable PasswordToggleField stylesheet:"
+    },
+    "packages/molecules/src/interfaces/PasswordToggleFieldProps.md": {
+      "recipe": "molecule-components",
+      "description": "Configure controlled password visibility, native input semantics, localized labels, validation copy, and caller-owned attributes:"
+    },
+    "packages/molecules/src/type-aliases/PasswordToggleFieldAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward native outer-field attributes while PasswordToggleField retains its labelled input and toggle structure:"
+    },
+    "packages/molecules/src/type-aliases/PasswordToggleFieldInputAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward typed native input and password-manager attributes without replacing the controlled value or input type:"
     },
     "packages/molecules/src/type-aliases/SearchFieldAttributes.md": {
       "recipe": "molecule-components",

@@ -47,6 +47,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Added request-free `Toast`, `ToastViewport`, and `createToastController()`
   primitives with bounded queues, deterministic timing and pause ownership,
   SSR-safe activation, live-region semantics, and GLUON GOODS bag feedback.
+- Added request-free controlled `PasswordToggleField` with localized
+  visibility labels, native password-manager and validation semantics,
+  retained DOM identity across rerenders and hydration, and responsive
+  accessibility evidence (#448).
 - Added opt-in application-owned Trusted Types policy handoff for runtime,
   hydration, `srcdoc`, and progressive SSR parser sinks with real Chromium CSP
   and clean-package evidence.
