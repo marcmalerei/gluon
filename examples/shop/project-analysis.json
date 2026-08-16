@@ -717,7 +717,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 527
+      "line": 552
     },
     {
       "value": {
@@ -725,7 +725,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 530
+      "line": 555
     },
     {
       "value": {
@@ -733,7 +733,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 535
+      "line": 560
     },
     {
       "value": {
@@ -741,7 +741,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 542
+      "line": 567
     },
     {
       "value": {
@@ -1896,11 +1896,20 @@
     },
     {
       "value": {
+        "kind": "attribute",
+        "name": "class"
+      },
+      "confidence": "structural",
+      "file": "product-configurator.ts",
+      "line": 518
+    },
+    {
+      "value": {
         "kind": "child"
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 517
+      "line": 519
     },
     {
       "value": {
@@ -1909,7 +1918,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 527
+      "line": 552
     },
     {
       "value": {
@@ -1918,7 +1927,7 @@
       },
       "confidence": "structural",
       "file": "product-configurator.ts",
-      "line": 530
+      "line": 555
     },
     {
       "value": {
@@ -1926,7 +1935,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 536
+      "line": 561
     },
     {
       "value": {
@@ -1934,7 +1943,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 540
+      "line": 565
     },
     {
       "value": {
@@ -1942,7 +1951,7 @@
       },
       "confidence": "exact",
       "file": "product-configurator.ts",
-      "line": 544
+      "line": 569
     },
     {
       "value": {

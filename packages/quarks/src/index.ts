@@ -21,6 +21,8 @@ export {
   Listbox,
   Overlay,
   Popover,
+  Tooltip,
+  HoverCard,
   createFocusScope,
   getFocusableElements,
   type DialogProps,
@@ -31,6 +33,12 @@ export {
   type ListboxProps,
   type OverlayProps,
   type PopoverProps,
+  type TooltipProps,
+  type HoverCardProps,
+  type AnchoredOverlayTriggerAttributes,
+  type AnchoredOverlayHostAttributes,
+  type AnchoredOverlayContentAttributes,
+  type OverlayPlacement,
 } from './headless.js';
 export {
   quarkManifest,

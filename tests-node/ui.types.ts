@@ -52,15 +52,19 @@ import { AppShell, ConfirmationDialog, WorkflowTimeline, createConfirmationDialo
 import {
   Dialog,
   Field,
+  HoverCard,
   Listbox,
   Overlay,
   Popover,
+  Tooltip,
   createFocusScope,
   createComponentLibraryLoader,
   q,
   quarkManifest,
   unsafeQuarkProps,
   type FocusScope,
+  type AnchoredOverlayTriggerAttributes,
+  type HoverCardProps,
   type QuarkProps,
   type ComponentLibraryManifest,
   validateComponentLibraryManifest,
@@ -214,6 +218,10 @@ q.textarea({ rows: 4, '.value': 'Notes', aria: { label: 'Notes' } });
 Overlay({ children: 'Overlay', attributes: { ref: { value: undefined }, data: { owner: 'app' } } });
 Dialog({ label: 'Dialog', children: 'Body', attributes: { class: 'app-dialog' } });
 Popover({ id: 'help', children: 'Help', attributes: { ref: { value: undefined } } });
+const tooltipTrigger = (attributes: AnchoredOverlayTriggerAttributes) => q.button({ ...attributes, type: 'button', children: 'Help' });
+Tooltip({ id: 'typed-tooltip', trigger: tooltipTrigger, content: 'Typed help', placement: 'inline-end', hostAttributes: { class: 'help-owner' }, contentAttributes: { class: 'help-popup' } });
+const hoverCardProps = { id: 'typed-hover-card', label: 'Details', trigger: tooltipTrigger, content: q.a({ href: '#details', children: 'Details' }) } satisfies HoverCardProps;
+HoverCard(hoverCardProps);
 Listbox({ id: 'finish', label: 'Finish', options: [], attributes: { data: { owner: 'app' } } });
 Field({ label: 'Email', children: q.input(), attributes: { class: 'app-field' } });
 FormField({ label: 'Email', attributes: { autocomplete: 'email' }, fieldAttributes: { data: { owner: 'app' } } });
@@ -321,6 +329,12 @@ Overlay({ children: 'Body', attributes: { children: 'Replacement' } });
 Dialog({ label: 'Dialog', children: 'Body', attributes: { role: 'alert' } });
 // @ts-expect-error Popover id stays explicit
 Popover({ id: 'help', children: 'Help', attributes: { id: 'other' } });
+// @ts-expect-error Tooltip placement uses logical anchored values only
+Tooltip({ id: 'help', trigger: tooltipTrigger, content: 'Help', placement: 'center' });
+// @ts-expect-error Tooltip content role stays component-owned
+Tooltip({ id: 'help', trigger: tooltipTrigger, content: 'Help', contentAttributes: { role: 'dialog' } });
+// @ts-expect-error HoverCard requires an accessible label
+HoverCard({ id: 'card', trigger: tooltipTrigger, content: 'Card' });
 // @ts-expect-error Listbox role stays component-owned
 Listbox({ id: 'finish', label: 'Finish', options: [], attributes: { role: 'menu' } });
 // @ts-expect-error Field children stay component-owned

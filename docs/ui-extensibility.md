@@ -30,7 +30,9 @@ key checking and adds no runtime validation.
 | Quark `createFocusScope` | Behavior over a caller-owned `HTMLElement`; no rendered element or attributes | Focus activation, containment, restoration, and explicit deactivation |
 | Quark `Overlay` | `attributes: QuarkProps<HTMLDivElement>` without `children` | The wrapper owns children and composes caller pointer listeners before dismissal |
 | Quark `Dialog` | `attributes: QuarkProps<HTMLDivElement>` without children, role, or naming/modal ARIA keys | `label`/`labelledBy`, `modal`, and `onDismiss` explicitly own dialog naming, role, modal state, and Escape behavior |
-| Quark `Popover` | `attributes: QuarkProps<HTMLDivElement>` without children, id, or popover mode | `id` and `mode` are explicit props |
+| Quark `Popover` | `attributes: QuarkProps<HTMLDivElement>` without children, id, or popover mode | `id`, `mode`, and `focusable` are explicit props |
+| Quark `Tooltip` | Typed `trigger(ownedAttributes)` renderer plus separate `hostAttributes` and `contentAttributes` | The actual native trigger owns initial `aria-describedby`; tooltip role, visibility, non-interactivity, positioning, lifecycle refs/events, and IDs are protected |
+| Quark `HoverCard` | Typed `trigger(ownedAttributes)` renderer plus separate `hostAttributes` and `contentAttributes` | The actual native trigger owns initial `aria-controls`, `aria-expanded`, and `aria-haspopup`; dialog naming, visibility, positioning, lifecycle refs/events, and IDs are protected |
 | Quark `Listbox` | `attributes: QuarkProps<HTMLDivElement>` without children, id, role, label, or active-descendant | `id`, `label`, `value`, options, and keyboard selection own the ARIA listbox contract |
 | Quark `Field` | `attributes: QuarkProps<HTMLLabelElement>` without children | Visible label/helper/error composition stays intact |
 | Atom `Button` | `attributes: QuarkProps<HTMLButtonElement>` without children, type, or disabled bindings | `children`/`label`, `type`, and `disabled` are explicit; preset and caller click listeners compose, and cancellation suppresses the higher-level callback |

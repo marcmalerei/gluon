@@ -64,8 +64,24 @@ import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/ato
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { ConfirmationDialog, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
+import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
 describe('@gluonjs/ssr DOM-independent serialization', () => {
+  it('serializes anchored-overlay semantics without evaluating browser globals', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(html`${Tooltip({
+      id: 'server-tip', trigger: (attributes) => q.button({ ...attributes, children: 'Shipping help' }), content: 'Ships tomorrow.',
+    })}${HoverCard({
+      id: 'server-card', label: 'Maker details', trigger: (attributes) => q.button({ ...attributes, children: 'Maker' }), content: q.a({ href: '/makers/ada', children: 'Ada' }),
+    })}`));
+    expect(rendered).toContain('id="server-tip-trigger"');
+    expect(rendered).toContain('aria-describedby="server-tip-content"');
+    expect(rendered).toContain('role="tooltip"');
+    expect(rendered).not.toMatch(/server-tip-content[^>]*tabindex/);
+    expect(rendered).toContain('aria-controls="server-card-content"');
+    expect(rendered).toContain('aria-expanded="false"');
+    expect(rendered).toContain('aria-haspopup="dialog"');
+    expect(rendered).toContain('role="dialog"');
+  });
   it('serializes foundation Atom native semantics and caller-owned states', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(html`
       ${AspectRatio({ ratio: 1.5, attributes: { id: 'server-ratio' }, children: 'Media' })}

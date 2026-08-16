@@ -399,9 +399,13 @@ export const shopStyles = css`
     .product-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 19px 0; margin: 0; border-bottom: 1px solid var(--shop-rule); list-style: none; font-size: 11px; }
     .product-facts li { padding-right: 8px; border-right: 1px solid var(--shop-rule); }
     .product-facts li:last-child { border-right: 0; }
-    .inventory-status { min-height: 44px; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--shop-rule); border-bottom: 1px solid var(--shop-rule); font-size: 12px; }
+    .inventory-row { display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--shop-rule); border-bottom: 1px solid var(--shop-rule); }
+    .inventory-status { min-height: 44px; display: flex; flex: 1; align-items: center; gap: 8px; font-size: 12px; }
     .inventory-pending { color: var(--shop-muted); }
     .inventory-retry { min-height: 44px; border: 0; background: transparent; color: inherit; }
+    .availability-help-trigger { min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--shop-cobalt); font: inherit; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .availability-help-tooltip { z-index: 20; max-inline-size: min(280px, calc(100vw - 16px)); padding: 12px 14px; border: 1px solid var(--shop-black); background: var(--shop-white); color: var(--shop-black); font-size: 12px; line-height: 1.5; }
+    @media (forced-colors: active) { .availability-help-tooltip { border: 1px solid CanvasText; background: Canvas; color: CanvasText; } }
     .product-story { display: grid; grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr); gap: clamp(30px, 5vw, 90px); margin-top: 70px; padding-top: 34px; border-top: 1px solid var(--shop-black); }
     .product-info-tabs { --gluon-tabs-selected-border-color: var(--shop-cobalt); --gluon-tabs-selected-color: var(--shop-cobalt); --gluon-tabs-panel-padding: 24px 0 0; }
     .product-story h2 { font-size: 19px; font-weight: 560; }
