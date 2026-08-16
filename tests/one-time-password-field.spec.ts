@@ -117,4 +117,61 @@ describe('OneTimePasswordField', () => {
     expect(document.querySelector('#otp-first input')?.getAttribute('aria-describedby')).toBe('otp-first-helper');
     expect(document.querySelector('#otp-second input')?.getAttribute('aria-describedby')).toBe('otp-second-error');
   });
+
+  it('rejects ambiguous public contracts before producing markup', () => {
+    expect(() => OneTimePasswordField({ id: '', label: 'Code' })).toThrow(/non-empty/u);
+    expect(() => OneTimePasswordField({ id: 'two words', label: 'Code' })).toThrow(/whitespace/u);
+    expect(() => OneTimePasswordField({ id: 'otp-label', label: ' ' })).toThrow(/non-empty/u);
+    expect(() => OneTimePasswordField({ id: 'otp-name', label: 'Code', name: ' ' })).toThrow(/non-empty/u);
+    expect(() => OneTimePasswordField({ id: 'otp-short', label: 'Code', length: 0 })).toThrow(/integer from 1 through 12/u);
+    expect(() => OneTimePasswordField({ id: 'otp-fraction', label: 'Code', length: 1.5 })).toThrow(/integer from 1 through 12/u);
+    expect(() => OneTimePasswordField({ id: 'otp-long', label: 'Code', length: 13 })).toThrow(/integer from 1 through 12/u);
+    expect(() => OneTimePasswordField({ id: 'otp-mode', label: 'Code', mode: 'letters' as 'numeric' })).toThrow(/numeric or alphanumeric/u);
+  });
+
+  it('covers native editing boundaries, blocked edits, and multi-character composition', async () => {
+    const onValueChange = vi.fn();
+    render(OneTimePasswordField({ id: 'otp-boundaries', label: 'Code', length: 4, onValueChange }), document.body);
+    const inputs = [...document.querySelectorAll<HTMLInputElement>('.gluon-one-time-password-field-input')];
+    inputs[0]!.value = '5';
+    inputs[0]!.dispatchEvent(new InputEvent('input', { bubbles: true, data: '5' }));
+    expect(document.activeElement).toBe(inputs[1]);
+    inputs[1]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true }));
+    expect(inputs[0]!.value).toBe('');
+    inputs[2]!.value = '7';
+    inputs[2]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true, cancelable: true }));
+    expect(inputs[2]!.value).toBe('');
+    inputs[2]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(inputs[0]);
+    inputs[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(inputs[1]);
+
+    const partialTransfer = new DataTransfer();
+    partialTransfer.setData('text/plain', '89');
+    const partialPaste = new ClipboardEvent('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(partialPaste, 'clipboardData', { configurable: true, value: partialTransfer });
+    inputs[1]!.dispatchEvent(partialPaste);
+    expect(inputs.map((input) => input.value)).toEqual(['', '8', '9', '']);
+
+    inputs[0]!.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }));
+    inputs[0]!.value = '123';
+    inputs[0]!.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true }));
+    expect(inputs.map((input) => input.value)).toEqual(['1', '2', '3', '']);
+    expect(onValueChange).toHaveBeenLastCalledWith('123', expect.any(CompositionEvent));
+
+    document.body.replaceChildren();
+    render(OneTimePasswordField({ id: 'otp-blocked', label: 'Blocked', length: 2, value: '12', readOnly: true }), document.body);
+    const readOnlyInput = document.querySelector<HTMLInputElement>('.gluon-one-time-password-field-input')!;
+    readOnlyInput.value = '9';
+    readOnlyInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: '9' }));
+    readOnlyInput.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true }));
+    readOnlyInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true, cancelable: true }));
+    expect(readOnlyInput.value).toBe('9');
+
+    document.body.replaceChildren();
+    render(OneTimePasswordField({ id: 'otp-disabled', label: 'Disabled', length: 2, disabled: true }), document.body);
+    const disabledInput = document.querySelector<HTMLInputElement>('.gluon-one-time-password-field-input')!;
+    disabledInput.dispatchEvent(new InputEvent('input', { bubbles: true, data: '1' }));
+    expect(disabledInput.value).toBe('');
+  });
 });
