@@ -1,6 +1,6 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
 import { Select } from '@gluonjs/atoms';
-import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, TableRegion, Tabs } from '@gluonjs/molecules';
+import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, TableRegion, Tabs, type ToastController } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -150,6 +150,7 @@ function sortProducts(items: readonly Product[], sort: string): readonly Product
 export function ProductPage(
   store: ShopStore,
   renderProductConfigurator: ProductConfiguratorRenderer = ProductConfigurator,
+  toastController?: ToastController,
 ): TemplateValue {
   const route = useRoute();
   const router = useRouter();
@@ -186,6 +187,7 @@ export function ProductPage(
             store.configure('temperature', event.detail.configuration.temperature);
             store.configure('cable', event.detail.configuration.cable);
             store.addToBag(event.detail.product);
+            toastController?.add({ id: 'bag-added', title: 'Added to bag', children: `${event.detail.product.name} is ready in your bag.`, tone: 'success' });
             focusOpenedDialog('bag', event.currentTarget as HTMLElement);
           },
         })}

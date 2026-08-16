@@ -114,6 +114,17 @@ export const moleculeStyles = css`
     :where(.gluon-inline-notice-actions > *) { min-inline-size: 0; }
     :where(.gluon-inline-notice-actions :is(a, button)) { display: inline-flex; align-items: center; min-block-size: 44px; }
 
+    :where(.gluon-toast-viewport) { position: fixed; z-index: 100; inset-block-start: max(1rem, env(safe-area-inset-top)); inset-inline-end: max(1rem, env(safe-area-inset-right)); display: grid; gap: 0.75rem; inline-size: min(24rem, calc(100vw - 2rem)); pointer-events: none; }
+    :where(.gluon-toast) { pointer-events: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem 1rem; padding: 1rem; border: 1px solid currentColor; border-radius: var(--gluon-toast-radius, var(--gluon-radius-medium, 0.5rem)); background: var(--gluon-toast-background, Canvas); color: var(--gluon-toast-color, CanvasText); box-shadow: var(--gluon-toast-shadow, 0 8px 30px rgb(0 0 0 / 0.16)); overflow-wrap: anywhere; }
+    :where(.gluon-toast.is-success) { --gluon-toast-color: #14532d; }
+    :where(.gluon-toast.is-warning) { --gluon-toast-color: #5b3a00; }
+    :where(.gluon-toast.is-danger) { --gluon-toast-color: #7f1d1d; }
+    :where(.gluon-toast-announcement, .gluon-toast-message) { min-inline-size: 0; }
+    :where(.gluon-toast-title) { display: block; font-weight: 700; }
+    :where(.gluon-toast-actions) { align-self: start; }
+    :where(.gluon-toast-dismiss) { display: inline-grid; place-items: center; min-inline-size: 44px; min-block-size: 44px; margin: -0.625rem; border: 1px solid transparent; background: transparent; color: inherit; cursor: pointer; font: inherit; }
+    :where(.gluon-toast-dismiss:focus-visible) { outline: 2px solid currentColor; outline-offset: 2px; }
+
     :where(.gluon-empty-state) { display: grid; justify-items: center; align-content: center; gap: var(--gluon-empty-state-gap, 1rem); inline-size: 100%; min-inline-size: 0; min-block-size: var(--gluon-empty-state-min-block-size, 18rem); padding: var(--gluon-empty-state-padding, clamp(2rem, 8vw, 5rem) clamp(1rem, 5vw, 3rem)); text-align: center; overflow-wrap: anywhere; }
     :where(.gluon-empty-state.is-compact) { --gluon-empty-state-min-block-size: auto; --gluon-empty-state-padding: 1.25rem; --gluon-empty-state-gap: 0.75rem; }
     :where(.gluon-empty-state-media) { display: grid; place-items: center; max-inline-size: var(--gluon-empty-state-media-size, 12rem); }
@@ -158,6 +169,8 @@ export const moleculeStyles = css`
       :where(.gluon-dialog-surface-overlay) { background: Canvas; }
       :where(.gluon-dialog-surface) { border: 2px solid CanvasText; box-shadow: none; }
       :where(.gluon-disclosure) { border-color: CanvasText; }
+      :where(.gluon-toast) { border: 2px solid CanvasText; background: Canvas; color: CanvasText; box-shadow: none; }
+      :where(.gluon-toast-dismiss) { border-color: ButtonText; }
       :where(.gluon-disclosure-summary[aria-disabled="true"]) { color: GrayText; opacity: 1; }
       :where(.gluon-accordion) { color: CanvasText; }
       :where(.gluon-inline-notice) { border: 2px solid CanvasText; background: Canvas; color: CanvasText; }
@@ -171,6 +184,8 @@ export const moleculeStyles = css`
     @media (prefers-reduced-motion: reduce) { :where(.gluon-inline-notice, .gluon-inline-notice *) { animation: none !important; transition: none !important; } }
     @media (prefers-reduced-motion: reduce) { :where(.gluon-empty-state, .gluon-empty-state *) { animation: none !important; transition: none !important; } }
     @media (prefers-reduced-motion: reduce) { :where(.gluon-table-region-viewport) { scroll-behavior: auto; } }
+    @media (prefers-reduced-motion: reduce) { :where(.gluon-toast, .gluon-toast *) { animation: none !important; transition: none !important; } }
+    @media (max-width: 480px) { :where(.gluon-toast-viewport) { inset-inline: 1rem; inline-size: auto; } }
   }
 `;
 
@@ -188,4 +203,5 @@ markLegacyComponentStyleSheet(moleculeStyles, [
   'gluon-molecule-disclosure',
   'gluon-molecule-empty-state',
   'gluon-molecule-table-region',
+  'gluon-molecule-toast',
 ]);

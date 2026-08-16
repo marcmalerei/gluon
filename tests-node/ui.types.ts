@@ -41,6 +41,9 @@ import {
   ResponsiveDisclosure,
   ResponsiveActionBar,
   TableRegion,
+  Toast,
+  ToastViewport,
+  createToastController,
   moleculeManifest,
   type CardProps,
   type NavigationStripProps,
@@ -235,6 +238,9 @@ InlineNotice({
   action: Button({ label: 'Review' }),
   attributes: { data: { owner: 'checkout' } },
 });
+const toastController = createToastController();
+Toast({ id: 'saved-toast', children: 'Saved', tone: 'success' });
+ToastViewport({ controller: toastController, attributes: { data: { owner: 'app' } } });
 EmptyState({
   presentation: 'compact',
   heading: 'No objects',
@@ -355,6 +361,12 @@ InlineNotice({ tone: 'critical', children: 'Invalid tone' });
 InlineNotice({ children: 'Feedback', attributes: { role: 'alert' } });
 // @ts-expect-error InlineNotice live and atomic semantics stay on its bounded announcement region
 InlineNotice({ children: 'Feedback', attributes: { aria: { live: 'assertive' } } });
+// @ts-expect-error Toast tones remain closed
+Toast({ id: 'invalid-toast', children: 'Feedback', tone: 'critical' });
+// @ts-expect-error Toast owns the atomic live-region mapping
+Toast({ id: 'feedback-toast', children: 'Feedback', attributes: { aria: { atomic: true } } });
+// @ts-expect-error ToastViewport cannot add a second live region around each Toast announcement
+ToastViewport({ controller: toastController, attributes: { aria: { live: 'polite' } } });
 // @ts-expect-error EmptyState presentation remains closed
 EmptyState({ presentation: 'drawer', heading: 'Empty' });
 // @ts-expect-error EmptyState intentionally cannot become a repeated live region

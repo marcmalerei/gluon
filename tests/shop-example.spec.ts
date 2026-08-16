@@ -28,7 +28,7 @@ describe('GLUON GOODS reference shop', () => {
   });
 
   it('browses, deep-links, configures, and manages a bag through public APIs', async () => {
-    const { app, router, store, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
+    const { app, router, store, toastController, uiOwner } = createShopApplication(createMemoryHistory(['/']), {
       storage: null,
       styleTarget: document,
     });
@@ -127,6 +127,15 @@ describe('GLUON GOODS reference shop', () => {
     root.querySelector<HTMLButtonElement>('.bag-action')!.click();
     await settleShop();
     expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 2');
+    vi.useFakeTimers();
+    toastController.add({ id: 'bag-timeout', children: 'Bag feedback timeout' });
+    await nextTick();
+    expect(document.querySelector('#bag-timeout')).not.toBeNull();
+    vi.advanceTimersByTime(5_000);
+    await nextTick();
+    expect(document.querySelector('#bag-timeout')).toBeNull();
+    expect(document.querySelector('[role="dialog"] #bag-title')?.textContent).toBe('Bag 2');
+    vi.useRealTimers();
     expect(document.querySelector('.bag-line p')?.textContent).toContain('Graphite');
     document.querySelector<HTMLButtonElement>('[aria-label="Close bag"]')!.click();
     router.back();
@@ -137,6 +146,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');
     expect(root.querySelector('.product-page')).toBe(productPage);
     app.unmount();
+    expect(toastController.disposed).toBe(true);
     expect(uiOwner?.disposed).toBe(true);
     expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopStyles);

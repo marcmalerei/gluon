@@ -22,7 +22,7 @@ import {
   unmount,
 } from '@gluonjs/core';
 import { AspectRatio, Avatar, Button, Checkbox, Input, Progress, Radio, ScrollArea, Select, Separator, Slider, StatusBadge, Switch, Textarea, ToggleButton, aspectRatioStyles, avatarStyles, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, scrollAreaStyles, selectStyles, separatorStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, DropdownMenu, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, searchFieldStyles, searchResultsStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, DropdownMenu, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, ToastViewport, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, createToastController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, searchFieldStyles, searchResultsStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toastStyles, toolbarStyles } from '@gluonjs/molecules';
 import { ConfirmationDialog, WorkflowTimeline, confirmationDialogStyles, workflowTimelineStyles } from '@gluonjs/organisms';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import {
@@ -84,6 +84,38 @@ describe('SSR hydration', () => {
     expect(tooltip.hidden).toBe(false);
     expect(trigger.getAttribute('aria-describedby')).toBe('hydrated-tip-content');
     unmount(root);
+    root.remove();
+  });
+
+  it('hydrates an empty Toast viewport before activating client-only notifications', async () => {
+    const controller = createToastController({ timeout: 60_000 });
+    controller.add({ id: 'pre-hydration-toast', children: 'Stale server feedback' });
+    const app = createApp(() => ToastViewport({ controller, label: 'Hydrated notifications' }));
+    const root = document.createElement('div');
+    const prepared = await prepareForHydration(renderGluonApplicationForServer(app));
+    expect(prepared.html).not.toContain('pre-hydration-toast');
+    const manifest = createStyleManifest(createComponentStyleSelection(prepared.value));
+    root.innerHTML = prepared.html;
+    document.head.insertAdjacentHTML('beforeend', renderStyleCarriers(manifest));
+    document.body.append(root);
+    const serverRegion = root.querySelector('[role="region"]');
+
+    const hydrated = await hydrateApplication(app, root, { styles: manifest, styleRoot: document });
+    await Promise.resolve();
+    await nextTick();
+    expect(hydrated.hydration).toEqual(expect.objectContaining({ retained: true, recovered: false }));
+    expect(root.querySelector('[role="region"]')).toBe(serverRegion);
+    expect(controller.active).toBe(true);
+    expect(root.querySelector('#pre-hydration-toast')).toBeNull();
+
+    controller.add({ id: 'post-hydration-toast', children: 'Fresh client feedback' });
+    await nextTick();
+    expect(root.querySelector('#post-hydration-toast [role="status"]')?.textContent)
+      .toContain('Fresh client feedback');
+    hydrated.mount.unmount();
+    expect(controller.active).toBe(false);
+    expect(controller.items).toEqual([]);
+    controller.dispose();
     root.remove();
   });
 
