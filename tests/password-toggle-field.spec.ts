@@ -141,4 +141,33 @@ describe('PasswordToggleField', () => {
     expect(toggle.getAttribute('aria-pressed')).toBe('true');
     expect(styleRoot.adoptedStyleSheets).toContain(passwordToggleFieldStyles);
   });
+
+  it('validates labels and composes consumer input and toggle listeners', () => {
+    expect(() => PasswordToggleField({ id: '', label: 'Password', showLabel: 'Show', hideLabel: 'Hide' })).toThrow(/non-empty/u);
+    expect(() => PasswordToggleField({ id: 'two words', label: 'Password', showLabel: 'Show', hideLabel: 'Hide' })).toThrow(/whitespace/u);
+    expect(() => PasswordToggleField({ id: 'empty-label', label: ' ', showLabel: 'Show', hideLabel: 'Hide' })).toThrow(/non-empty/u);
+    expect(() => PasswordToggleField({ id: 'empty-show', label: 'Password', showLabel: ' ', hideLabel: 'Hide' })).toThrow(/non-empty/u);
+    expect(() => PasswordToggleField({ id: 'empty-hide', label: 'Password', showLabel: 'Show', hideLabel: ' ' })).toThrow(/non-empty/u);
+
+    const attributeInput = vi.fn();
+    const consumerInput = vi.fn();
+    const visibleChange = vi.fn();
+    render(PasswordToggleField({
+      id: 'listener-password',
+      label: 'Password',
+      showLabel: 'Show',
+      hideLabel: 'Hide',
+      onInput: consumerInput,
+      onVisibleChange: visibleChange,
+      inputAttributes: { onInput: attributeInput },
+      toggleAttributes: { onClick: (event) => event.preventDefault() },
+    }), document.body);
+    const input = document.querySelector<HTMLInputElement>('#listener-password-input')!;
+    input.value = 'typed';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, data: 'typed' }));
+    expect(attributeInput).toHaveBeenCalledOnce();
+    expect(consumerInput).toHaveBeenCalledOnce();
+    expect(document.querySelector<HTMLButtonElement>('[aria-controls="listener-password-input"]')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))).toBe(false);
+    expect(visibleChange).not.toHaveBeenCalled();
+  });
 });
