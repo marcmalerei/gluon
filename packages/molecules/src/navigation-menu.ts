@@ -42,7 +42,6 @@ interface NavigationMenuController {
   readonly rootRef: (element: HTMLElement | undefined) => void;
   readonly onKeydown: (event: KeyboardEvent) => void;
   readonly toggle: (id: string, event: MouseEvent | KeyboardEvent) => void;
-  readonly close: (event: MouseEvent | KeyboardEvent, restoreFocus: boolean) => void;
 }
 
 function renderNavigationMenu({ id, label, items, open = [], onOpenChange, attributes = {} }: NavigationMenuProps): TemplateResult {
@@ -244,7 +243,6 @@ function createNavigationMenuController(open: readonly string[], onOpenChange: N
         onOpenChange?.([...open, id], event);
       }
     },
-    close: (event, restoreFocus) => close(event, restoreFocus),
   };
 }
 
