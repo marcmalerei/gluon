@@ -181,7 +181,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 90
+      "line": 94
     },
     {
       "value": {
@@ -501,7 +501,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 159
+      "line": 160
     },
     {
       "value": {
@@ -509,7 +509,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 203
+      "line": 205
     },
     {
       "value": {
@@ -517,7 +517,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 209
+      "line": 211
     },
     {
       "value": {
@@ -525,23 +525,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 233
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "pages.ts",
-      "line": 257
-    },
-    {
-      "value": {
-        "kind": "html"
-      },
-      "confidence": "exact",
-      "file": "pages.ts",
-      "line": 258
+      "line": 235
     },
     {
       "value": {
@@ -557,7 +541,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 277
+      "line": 260
     },
     {
       "value": {
@@ -565,7 +549,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 282
+      "line": 261
     },
     {
       "value": {
@@ -573,7 +557,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 289
+      "line": 279
     },
     {
       "value": {
@@ -581,7 +565,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 292
+      "line": 284
     },
     {
       "value": {
@@ -589,7 +573,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 319
+      "line": 291
     },
     {
       "value": {
@@ -597,7 +581,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 326
+      "line": 294
     },
     {
       "value": {
@@ -605,7 +589,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 333
+      "line": 321
     },
     {
       "value": {
@@ -613,7 +597,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 344
+      "line": 328
     },
     {
       "value": {
@@ -621,7 +605,23 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 349
+      "line": 335
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 346
+    },
+    {
+      "value": {
+        "kind": "html"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 351
     },
     {
       "value": {
@@ -783,7 +783,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 92
+      "line": 96
     },
     {
       "value": {
@@ -792,7 +792,7 @@
       },
       "confidence": "structural",
       "file": "app.ts",
-      "line": 93
+      "line": 97
     },
     {
       "value": {
@@ -800,7 +800,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 98
+      "line": 102
     },
     {
       "value": {
@@ -808,7 +808,15 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 99
+      "line": 103
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "app.ts",
+      "line": 104
     },
     {
       "value": {
@@ -1416,7 +1424,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 162
+      "line": 163
     },
     {
       "value": {
@@ -1424,7 +1432,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 164
+      "line": 165
     },
     {
       "value": {
@@ -1433,7 +1441,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 169
+      "line": 170
     },
     {
       "value": {
@@ -1442,7 +1450,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 172
+      "line": 173
     },
     {
       "value": {
@@ -1450,25 +1458,25 @@
         "name": "class"
       },
       "confidence": "structural",
-      "file": "pages.ts",
-      "line": 175
-    },
-    {
-      "value": {
-        "kind": "child"
-      },
-      "confidence": "exact",
       "file": "pages.ts",
       "line": 176
     },
     {
       "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 177
+    },
+    {
+      "value": {
         "kind": "attribute",
         "name": "class"
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 194
+      "line": 196
     },
     {
       "value": {
@@ -1476,7 +1484,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 203
+      "line": 205
     },
     {
       "value": {
@@ -1484,7 +1492,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 225
+      "line": 227
     },
     {
       "value": {
@@ -1492,7 +1500,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 237
+      "line": 239
     },
     {
       "value": {
@@ -1500,7 +1508,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 279
+      "line": 281
     },
     {
       "value": {
@@ -1508,7 +1516,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 283
+      "line": 285
     },
     {
       "value": {
@@ -1517,7 +1525,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 292
+      "line": 294
     },
     {
       "value": {
@@ -1526,7 +1534,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 292
+      "line": 294
     },
     {
       "value": {
@@ -1534,7 +1542,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 292
+      "line": 294
     },
     {
       "value": {
@@ -1542,7 +1550,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 292
+      "line": 294
     },
     {
       "value": {
@@ -1551,7 +1559,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 293
+      "line": 295
     },
     {
       "value": {
@@ -1559,7 +1567,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 321
+      "line": 323
     },
     {
       "value": {
@@ -1568,7 +1576,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 326
+      "line": 328
     },
     {
       "value": {
@@ -1576,7 +1584,7 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 326
+      "line": 328
     },
     {
       "value": {
@@ -1585,7 +1593,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 334
+      "line": 336
     },
     {
       "value": {
@@ -1594,25 +1602,7 @@
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 335
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "src"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 335
-    },
-    {
-      "value": {
-        "kind": "attribute",
-        "name": "src"
-      },
-      "confidence": "structural",
-      "file": "pages.ts",
-      "line": 336
+      "line": 337
     },
     {
       "value": {
@@ -1626,25 +1616,27 @@
     {
       "value": {
         "kind": "attribute",
-        "name": "class"
+        "name": "src"
       },
       "confidence": "structural",
       "file": "pages.ts",
-      "line": 346
+      "line": 338
     },
     {
       "value": {
-        "kind": "child"
+        "kind": "attribute",
+        "name": "src"
       },
-      "confidence": "exact",
+      "confidence": "structural",
       "file": "pages.ts",
-      "line": 347
+      "line": 339
     },
     {
       "value": {
-        "kind": "child"
+        "kind": "attribute",
+        "name": "class"
       },
-      "confidence": "exact",
+      "confidence": "structural",
       "file": "pages.ts",
       "line": 348
     },
@@ -1662,7 +1654,23 @@
       },
       "confidence": "exact",
       "file": "pages.ts",
-      "line": 349
+      "line": 350
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 351
+    },
+    {
+      "value": {
+        "kind": "child"
+      },
+      "confidence": "exact",
+      "file": "pages.ts",
+      "line": 351
     },
     {
       "value": {
@@ -2089,7 +2097,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 128
+      "line": 135
     },
     {
       "value": {
@@ -2097,7 +2105,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 129
+      "line": 136
     },
     {
       "value": {
@@ -2105,7 +2113,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 131
+      "line": 138
     },
     {
       "value": {
@@ -2113,7 +2121,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 135
+      "line": 142
     },
     {
       "value": {
@@ -2121,7 +2129,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 136
+      "line": 143
     },
     {
       "value": {
@@ -2129,7 +2137,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 137
+      "line": 144
     },
     {
       "value": {
@@ -2137,7 +2145,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 138
+      "line": 145
     },
     {
       "value": {
@@ -2145,7 +2153,7 @@
       },
       "confidence": "exact",
       "file": "app.ts",
-      "line": 139
+      "line": 146
     }
   ],
   "stores": [
@@ -2165,7 +2173,7 @@
       },
       "confidence": "structural",
       "file": "hydrate.ts",
-      "line": 18
+      "line": 19
     },
     {
       "value": {
@@ -2173,7 +2181,7 @@
       },
       "confidence": "structural",
       "file": "hydrate.ts",
-      "line": 26
+      "line": 28
     },
     {
       "value": {
@@ -2181,7 +2189,7 @@
       },
       "confidence": "structural",
       "file": "hydrate.ts",
-      "line": 36
+      "line": 39
     },
     {
       "value": {
