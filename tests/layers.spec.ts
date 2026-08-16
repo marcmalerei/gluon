@@ -15,9 +15,11 @@ import {
   Card,
   FormField,
   NavigationStrip,
+  NavigationMenu,
   cardStyles,
   formFieldStyles,
   navigationStripStyles,
+  navigationMenuStyles,
 } from '@gluonjs/molecules';
 import { AppShell, appShellStyles } from '@gluonjs/organisms';
 import { q } from '@gluonjs/quarks';
@@ -36,6 +38,7 @@ describe('component layers', () => {
     expect(Card.layer).toBe('molecule');
     expect(FormField.layer).toBe('molecule');
     expect(NavigationStrip.layer).toBe('molecule');
+    expect(NavigationMenu.layer).toBe('molecule');
     expect(AppShell.layer).toBe('organism');
     for (const component of [Button, Card, AppShell]) {
       expect(Object.keys(component)).toEqual(['layer', 'displayName', 'styles']);
@@ -59,6 +62,8 @@ describe('component layers', () => {
     expect(FormField.styles.map(({ id }) => id)).toEqual(['gluon-molecule-form-field']);
     expect(NavigationStrip.styles.map(({ id }) => id))
       .toEqual(['gluon-molecule-navigation-strip']);
+    expect(NavigationMenu.styles.map(({ id }) => id))
+      .toEqual(['gluon-molecule-navigation-menu']);
     expect(AppShell.styles.map(({ id }) => id)).toEqual(['gluon-organism-app-shell']);
   });
 
@@ -98,6 +103,7 @@ describe('component layers', () => {
       cardStyles,
       formFieldStyles,
       navigationStripStyles,
+      navigationMenuStyles,
       appShellStyles,
     ].includes(sheet))).toEqual([
       buttonStyles,

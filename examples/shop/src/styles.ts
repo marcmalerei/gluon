@@ -146,10 +146,10 @@ export const shopStyles = css`
       letter-spacing: -0.045em;
     }
 
-    .desktop-nav { display: flex; gap: clamp(30px, 5vw, 78px); }
+    .desktop-nav { gap: clamp(30px, 5vw, 78px); }
     .desktop-nav a, .header-actions button { font-size: 15px; }
-    .desktop-nav a { position: relative; padding: 20px 0; }
-    .desktop-nav a::after {
+    .desktop-nav > ul > li > a { position: relative; padding: 20px 0; }
+    .desktop-nav > ul > li > a::after {
       position: absolute;
       right: 0;
       bottom: 14px;
@@ -161,8 +161,8 @@ export const shopStyles = css`
       transform-origin: right;
       transition: transform 180ms ease;
     }
-    .desktop-nav a:hover::after,
-    .desktop-nav a.router-link-active::after { transform: scaleX(1); transform-origin: left; }
+    .desktop-nav > ul > li > a:hover::after,
+    .desktop-nav > ul > li > a[aria-current='page']::after { transform: scaleX(1); transform-origin: left; }
 
     .header-actions {
       justify-self: end;

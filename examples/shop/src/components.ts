@@ -15,10 +15,11 @@ import {
   DialogSurface,
   EmptyState,
   Toolbar,
+  NavigationMenu,
   createDialogSurfaceController,
 } from '@gluonjs/molecules';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
-import { RouterLink } from '@gluonjs/router';
+import { RouterLink, useRoute } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
 import type { ShopStore } from './state.js';
 import {
@@ -47,17 +48,34 @@ const bagDialogController = createDialogSurfaceController({
 });
 
 export function SiteHeader(store: ShopStore): TemplateValue {
+  const route = useRoute();
   return html`
     <header class="site-header">
       ${compose(RouterLink, {
         to: '/',
         attributes: { class: 'wordmark', 'aria-label': 'GLUON GOODS home' },
       })`GLUON GOODS`}
-      <nav class="desktop-nav" aria-label="Primary navigation">
-        ${compose(RouterLink, { to: '/shop' })`Shop`}
-        ${compose(RouterLink, { to: '/shop?sort=new' })`New`}
-        ${ShopEditorialLink({ href: '#journal', children: 'Journal' })}
-      </nav>
+      ${NavigationMenu({
+        id: 'desktop-primary-navigation',
+        label: 'Primary navigation',
+        open: store.navigationOpen,
+        onOpenChange: (open) => { store.navigationOpen = [...open]; },
+        attributes: { class: 'desktop-nav' },
+        items: [
+          {
+            id: 'shop-navigation',
+            label: 'Shop',
+            accessibleLabel: 'Open Shop navigation',
+            href: '/shop',
+            active: route.path === '/shop' || route.path.startsWith('/products/'),
+            children: [
+              { id: 'shop-all', label: 'All objects', href: '/shop', active: route.path === '/shop' && route.query.category === undefined },
+              { id: 'shop-new', label: 'New arrivals', href: '/shop?sort=new', active: route.path === '/shop' && route.query.sort === 'new' },
+            ],
+          },
+          { id: 'journal-navigation', label: 'Journal', href: '#journal', linkAttributes: { class: 'shop-editorial-link' } },
+        ],
+      })}
       ${Toolbar({
         id: 'shop-header-actions',
         label: 'Store actions',

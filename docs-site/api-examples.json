@@ -1019,10 +1019,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -1071,6 +1071,7 @@
         "  EmptyState,",
         "  FormField,",
         "  InlineNotice,",
+        "  NavigationMenu,",
         "  NavigationStrip,",
         "  SearchField,",
         "  SearchResults,",
@@ -1131,6 +1132,13 @@
         "  type InlineNoticeAttributes,",
         "  type InlineNoticeProps,",
         "  type InlineNoticeTone,",
+        "  type NavigationMenuAttributes,",
+        "  type NavigationMenuItem,",
+        "  type NavigationMenuItemAttributes,",
+        "  type NavigationMenuLinkAttributes,",
+        "  type NavigationMenuOpenChangeEvent,",
+        "  type NavigationMenuProps,",
+        "  type NavigationMenuTriggerAttributes,",
         "  type NavigationStripProps,",
         "  type SearchFieldAttributes,",
         "  type SearchFieldInputAttributes,",
@@ -1233,6 +1241,7 @@
         "  label: 'Order sections',",
         "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
         "} satisfies NavigationStripProps;",
+        "const navigationMenu = { id: 'primary-navigation', label: 'Primary navigation', open: ['shop'], items: [{ id: 'shop', label: 'Shop', accessibleLabel: 'Open Shop navigation', href: '/shop', active: true, children: [{ id: 'new', label: 'New arrivals', href: '/shop?sort=new' }] }] } satisfies NavigationMenuProps;",
         "const searchFieldAttributes = { class: 'catalog-search' } satisfies SearchFieldAttributes;",
         "const searchInputAttributes = { autocomplete: 'off' } satisfies SearchFieldInputAttributes;",
         "const searchField = { id: 'catalog-search', label: 'Search products', query: 'cable', inputAttributes: searchInputAttributes, attributes: searchFieldAttributes } satisfies SearchFieldProps;",
@@ -1271,7 +1280,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${SearchField(searchField)}${SearchResults(searchResults)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
+        "console.log(html`${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -5147,6 +5156,34 @@
       "recipe": "molecule-components",
       "description": "Compose a Card's heading, tone, media, actions, body, and native article attributes as one typed surface:"
     },
+    "packages/molecules/src/interfaces/NavigationMenuItem.md": {
+      "recipe": "molecule-components",
+      "description": "Describe one caller-owned native navigation destination or nested disclosure group with stable IDs and availability state:"
+    },
+    "packages/molecules/src/type-aliases/NavigationMenuAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward safe native navigation landmark attributes while NavigationMenu owns its root ID, accessible name, and hierarchy:"
+    },
+    "packages/molecules/src/type-aliases/NavigationMenuItemAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Extend one native navigation list item without replacing its caller-owned children or state:"
+    },
+    "packages/molecules/src/type-aliases/NavigationMenuLinkAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward typed native anchor attributes and listeners while NavigationMenu owns href, active, availability, and description relationships:"
+    },
+    "packages/molecules/src/type-aliases/NavigationMenuOpenChangeEvent.md": {
+      "recipe": "molecule-components",
+      "description": "Type the pointer or keyboard event that proposes a caller-owned NavigationMenu open-state change:"
+    },
+    "packages/molecules/src/type-aliases/NavigationMenuProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose an instance-namespaced labelled controlled native navigation hierarchy with caller-owned destinations and nested groups:"
+    },
+    "packages/molecules/src/type-aliases/NavigationMenuTriggerAttributes.md": {
+      "recipe": "molecule-components",
+      "description": "Forward typed native button attributes while NavigationMenu owns disclosure, availability, and control relationships:"
+    },
     "packages/molecules/src/type-aliases/AccordionAccessibleName.md": {
       "recipe": "molecule-components",
       "description": "Require either a direct accessible label or a labelled-by relationship for the Accordion group:"
@@ -5460,6 +5497,10 @@
     "packages/molecules/src/variables/DropdownMenu.md": { "recipe": "molecule-components", "description": "Render a controlled keyboard-complete menu button and popup:" },
     "packages/molecules/src/variables/Menubar.md": { "recipe": "molecule-components", "description": "Render direct APG menubar semantics and controlled nested menus:" },
     "packages/molecules/src/variables/Toolbar.md": { "recipe": "molecule-components", "description": "Render caller-described native toolbar buttons and links with roving focus:" },
+    "packages/molecules/src/variables/NavigationMenu.md": {
+      "recipe": "molecule-components",
+      "description": "Render a controlled native hierarchical navigation while routing, active state, authorization, and domain copy remain caller-owned:"
+    },
     "packages/molecules/src/variables/SegmentedControl.md": {
       "recipe": "molecule-components",
       "description": "Render a controlled one-of-many toolbar of pressed buttons without tab or radio semantics:"
@@ -5491,6 +5532,10 @@
     "packages/molecules/src/variables/menuToolbarStyles.md": {
       "recipe": "ui-exact-component-styles",
       "description": "Inspect the exact separately tree-shakable dropdown-menu, context-menu, and menubar stylesheet:"
+    },
+    "packages/molecules/src/variables/navigationMenuStyles.md": {
+      "recipe": "ui-exact-component-styles",
+      "description": "Inspect the exact separately tree-shakable NavigationMenu hierarchy and responsive stylesheet:"
     },
     "packages/molecules/src/variables/tableRegionStyles.md": {
       "recipe": "ui-exact-component-styles",

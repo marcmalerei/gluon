@@ -8,6 +8,10 @@
   over one bounded item model plus a native-action `Toolbar`, including roving
   focus, typeahead, checked and disabled states, submenus, RTL behavior, and
   collision-safe ARIA relationships.
+- Added the controlled, router-independent `NavigationMenu` composition for
+  native hierarchical site and product navigation, including instance-scoped
+  IDs, keyboard/RTL traversal, dismissal, focus return, SSR/hydration cleanup,
+  and separate styles (#446).
 - Added `ResponsiveDisclosure`, a native responsive disclosure with compact
   breakpoint state, desktop expansion, resettable compact memory, and teardown-safe media-query synchronization.
 - Added request-free `SearchField` and `SearchResults` compositions with native

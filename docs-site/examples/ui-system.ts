@@ -42,6 +42,7 @@ import {
   InlineNotice,
   NavigationStrip,
   ResponsiveActionBar,
+  NavigationMenu,
   SearchField,
   SearchResults,
   Menubar,
@@ -193,6 +194,18 @@ createApp(() => AppShell({
       summary: 'Profile changes ready',
       status: 'All fields are valid.',
       primaryAction: Button({ label: 'Save profile' }),
+    }),
+    NavigationMenu({
+      id: 'ui-primary-navigation',
+      label: 'Primary navigation',
+      open: ['ui-shop-navigation'],
+      items: [{
+        id: 'ui-shop-navigation',
+        label: 'Shop',
+        accessibleLabel: 'Open Shop navigation',
+        href: '#profile',
+        children: [{ id: 'ui-orders-navigation', label: 'Orders', href: '#orders' }],
+      }],
     }),
     Card({
       attributes: { id: 'profile' },

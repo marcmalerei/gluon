@@ -22,6 +22,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   `Toolbar` molecules with native actions, roving focus, typeahead, disabled
   items, checked items, submenus, RTL behavior, SSR/hydration, and
   collision-safe ARIA relationships.
+- Added a controlled, router-independent `NavigationMenu` molecule with native
+  navigation/list/link/button semantics, instance-scoped IDs, nested keyboard
+  traversal, dismissal, SSR/hydration, and an honest GLUON GOODS header flow
+  (#446).
 - Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
   `Separator` atoms with native semantics, typed extension contracts, and
   cross-browser evidence.

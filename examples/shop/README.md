@@ -103,9 +103,10 @@ The catalog filter is the reusable constrained-navigation acceptance boundary:
 the official `NavigationStrip` Molecule retains native Router links and exposes
 overflow directions without moving focus from the current destination. The bag
 quantity/remove surface is the concise stateful-authoring acceptance boundary.
-The global Journal navigation is the concise presentational boundary:
-the app-local `ShopEditorialLink` Atom has declarative anchor/span selection and
-one props object. Its canonical implementation is a `.gluon` Single-File
+The mobile Journal navigation is the concise presentational boundary: the
+desktop header now uses the official native-link `NavigationMenu` contract,
+while the app-local mobile `ShopEditorialLink` Atom retains declarative
+anchor/span selection and one props object. Its canonical implementation is a `.gluon` Single-File
 Component: typed props, native markup, slot composition, and its owned
 stylesheet remain together while Vite emits ordinary public Atom and Quark
 contracts. `defineUiAtom()` remains the equivalent handwritten TypeScript path.
