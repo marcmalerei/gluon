@@ -48,12 +48,40 @@ describe('Toast controller lifecycle', () => {
     expect(() => controller.add({ children: 'Bad', announcement: 'off' as never })).toThrow(
       'Toast announcement must be polite or assertive.',
     );
+    expect(() => controller.add({ children: 'Bad', tone: 'critical' as never })).toThrow(
+      'Toast tone must be neutral, success, warning, or danger.',
+    );
     expect(() => Toast({ id: 'direct-toast', children: 'Bad', tone: 'critical' as never })).toThrow(
       'Toast tone must be neutral, success, warning, or danger.',
     );
     expect(() => Toast({ id: 'direct-toast', children: 'Bad', announcement: 'off' as never })).toThrow(
       'Toast announcement must be polite or assertive.',
     );
+    expect(() => ToastViewport({ controller, label: '  ' })).toThrow(
+      'Toast viewport label must be a non-empty string.',
+    );
+
+    controller.add({ id: 'dismiss-label-toast', children: 'Bad label' });
+    expect(() => ToastViewport({ controller, dismissLabel: () => '' })).toThrow(
+      'Toast dismiss label must be a non-empty string.',
+    );
+  });
+
+  it('generates collision-free IDs and drops the oldest queued request at capacity', () => {
+    vi.useFakeTimers();
+    const inactive = createToastController();
+    expect(inactive.add({ children: 'Not yet visible' })).toBe('gluon-toast-1');
+    expect(inactive.items).toEqual([]);
+
+    const controller = createToastController({ maxVisible: 1, maxQueue: 1 });
+    controller.activate();
+    controller.add({ id: 'gluon-toast-1', children: 'Visible' });
+    expect(controller.add({ children: 'Generated around collision' })).toBe('gluon-toast-2');
+    controller.add({ id: 'latest-queued', children: 'Latest queued' });
+
+    expect(controller.items.map(({ id }) => id)).toEqual(['gluon-toast-1']);
+    controller.dismiss('gluon-toast-1');
+    expect(controller.items.map(({ id }) => id)).toEqual(['latest-queued']);
   });
 
   it('keeps reads side-effect free and starts queued countdowns only upon promotion', () => {
@@ -111,6 +139,25 @@ describe('Toast controller lifecycle', () => {
     expect(controller.items).toHaveLength(0);
   });
 
+  it('expires immediately when a paused deadline has already elapsed and ignores invalid owners', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000);
+    const controller = createToastController();
+    controller.activate();
+    controller.add({ id: 'elapsed-pause', children: 'Already elapsed' });
+
+    controller.pause('missing-toast');
+    controller.resume('missing-toast');
+    controller.resume('elapsed-pause', 'not-an-owner');
+    vi.setSystemTime(6_001);
+    controller.pause('elapsed-pause', 'clock-drift');
+    controller.pause('elapsed-pause', 'clock-drift');
+    controller.resume('elapsed-pause', 'clock-drift');
+
+    expect(controller.items).toEqual([]);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it('makes dismiss, clear, deactivate, and dispose idempotent without surviving callbacks', () => {
     vi.useFakeTimers();
     const controller = createToastController();
@@ -123,6 +170,11 @@ describe('Toast controller lifecycle', () => {
     controller.deactivate();
     controller.dispose();
     controller.dispose();
+    controller.activate();
+    controller.dismiss('cleanup-toast');
+    controller.pause('cleanup-toast');
+    controller.resume('cleanup-toast');
+    controller.clear();
     expect(controller.items).toEqual([]);
     expect(controller.active).toBe(false);
     expect(controller.disposed).toBe(true);
