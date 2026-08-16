@@ -43,6 +43,7 @@ import {
   NavigationStrip,
   ResponsiveActionBar,
   NavigationMenu,
+  OneTimePasswordField,
   SearchField,
   SearchResults,
   Menubar,
@@ -224,6 +225,12 @@ createApp(() => AppShell({
           id: 'ui-example-results',
           heading: 'Search results',
           groups: [{ id: 'example-products', heading: 'Products', count: 1, children: q.li({ children: q.a({ href: '#cobalt', children: 'Cobalt cable' }) }) }],
+        }),
+        OneTimePasswordField({
+          id: 'ui-example-otp',
+          label: 'Example one-time code',
+          value: '123456',
+          name: 'example-code',
         }),
         Select({
           value: finish.value,

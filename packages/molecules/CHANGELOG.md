@@ -12,6 +12,9 @@
   native hierarchical site and product navigation, including instance-scoped
   IDs, keyboard/RTL traversal, dismissal, focus return, SSR/hydration cleanup,
   and separate styles (#446).
+- Added `OneTimePasswordField`, a controlled segmented numeric/alphanumeric
+  editor with one submitted native value, complete-code paste/autofill,
+  IME-safe input, native required state, and RTL-aware keyboard traversal.
 - Added `ResponsiveDisclosure`, a native responsive disclosure with compact
   breakpoint state, desktop expansion, resettable compact memory, and teardown-safe media-query synchronization.
 - Added request-free `SearchField` and `SearchResults` compositions with native

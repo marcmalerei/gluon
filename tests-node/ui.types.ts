@@ -39,6 +39,7 @@ import {
   InlineNotice,
   NavigationMenu,
   NavigationStrip,
+  OneTimePasswordField,
   ResponsiveDisclosure,
   ResponsiveActionBar,
   TableRegion,
@@ -50,6 +51,7 @@ import {
   type NavigationMenuLinkAttributes,
   type NavigationMenuProps,
   type NavigationStripProps,
+  type OneTimePasswordFieldInputAttributes,
   type ResponsiveDisclosureAttributes,
   type ResponsiveDisclosureProps,
   type ResponsiveActionBarProps,
@@ -244,6 +246,17 @@ const navigationMenuProps = {
   items: [{ id: 'catalog', label: 'Catalog', href: '/shop', linkAttributes: navigationMenuLinkAttributes }],
 } satisfies NavigationMenuProps;
 NavigationMenu(navigationMenuProps);
+const oneTimePasswordInputAttributes = {
+  title: 'Verification code segment',
+  data: { owner: 'checkout' },
+} satisfies OneTimePasswordFieldInputAttributes;
+OneTimePasswordField({
+  id: 'checkout-code',
+  label: 'Verification code',
+  value: '123456',
+  name: 'verificationCode',
+  inputAttributes: oneTimePasswordInputAttributes,
+});
 InlineNotice({
   tone: 'warning',
   announcement: 'assertive',
@@ -375,6 +388,14 @@ NavigationMenu({ label: 'Catalog', items: [] });
 NavigationMenu({ id: 'catalog', label: 'Catalog', items: [], attributes: { id: 'replacement' } });
 // @ts-expect-error NavigationMenu owns active destination semantics
 NavigationMenu({ id: 'catalog', label: 'Catalog', items: [{ id: 'shop', label: 'Shop', href: '/shop', linkAttributes: { aria: { current: 'page' } } }] });
+// @ts-expect-error OneTimePasswordField owns each segment input mode
+OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { inputMode: 'email' } });
+// @ts-expect-error OneTimePasswordField owns segment input handling
+OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { '@input': () => undefined } });
+// @ts-expect-error OneTimePasswordField owns segment ARIA relationships
+OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { aria: { describedby: 'other' } } });
+// @ts-expect-error OneTimePasswordField owns segment refs for focus management
+OneTimePasswordField({ id: 'code', label: 'Code', inputAttributes: { ref: { value: undefined } } });
 // @ts-expect-error InlineNotice tones remain closed
 InlineNotice({ tone: 'critical', children: 'Invalid tone' });
 // @ts-expect-error InlineNotice owns the outer role and live-region mapping

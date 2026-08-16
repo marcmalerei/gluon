@@ -26,6 +26,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   navigation/list/link/button semantics, instance-scoped IDs, nested keyboard
   traversal, dismissal, SSR/hydration, and an honest GLUON GOODS header flow
   (#446).
+- Added a controlled, request-free `OneTimePasswordField` molecule with one
+  submitted form value, bounded segmented editing, paste/autofill distribution,
+  IME safety, validation relationships, and RTL keyboard behavior.
 - Added independently tree-shakable `AspectRatio`, `Avatar`, `ScrollArea`, and
   `Separator` atoms with native semantics, typed extension contracts, and
   cross-browser evidence.
