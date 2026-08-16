@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
+### Changed
+
+- Advanced the lockstep test surface for the `1.10.0` runtime, UI, SSR, and
+  hydration contracts.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

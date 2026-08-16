@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 ### Added
 
 - Added the public `applyProgressivePatch()` browser contract for replacing

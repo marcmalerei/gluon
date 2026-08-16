@@ -8,7 +8,7 @@ The official Gluon router provides deterministic route matching, browser/hash/
 memory histories, typed named routes, guards, failures, lazy route components,
 scroll restoration, and Gluon application bindings.
 
-The package ships as part of the current `1.9.0` release line. Core and
+The package ships as part of the current `1.10.0` release line. Core and
 Reactivity are peers so an application has one shared application context and
 reactive identity.
 

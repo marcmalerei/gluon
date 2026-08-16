@@ -5,25 +5,32 @@ Gluon uses one lockstep release for the 21 packages in
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
 For day-to-day version upgrades, start with the
-[Gluon upgrade guide](/gluon/1.9.0/migration/upgrade/).
+[Gluon upgrade guide](/gluon/1.10.0/migration/upgrade/).
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for `1.9.0`. Every official manifest is public and
-lockstep at `1.9.0`. Protected release workflow
-[31890472642](https://github.com/marcmalerei/gluon/actions/runs/31890472642)
-published all 21 package records to `latest` with provenance and verified the
-train from a clean directory. The immutable GitHub release
-[`v1.9.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.9.0) was
-published on 2026-08-15 from tag commit
-`06dc45457bbf9a109ae67f5048db8be63f0fda39` with 101 reviewed assets. The
+The machine-readable package contract records `publicationState: ready` and
+`scopeControl: verified` for the prepared `1.10.0` candidate. Every official
+manifest is public and lockstep at `1.10.0`. Registry preflight on 2026-08-16
+confirmed that all 21 package records expose `1.9.0` as `latest` and that
+`1.10.0` is absent. The immutable GitHub release `v1.9.0` remains the current
+finalized release until the protected `1.10.0` workflow completes. The
 `v1.0.9` GitHub release remains a historical draft after its public-type
 verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
+
+## v1.10.0 train handoff
+
+Issue [#456](https://github.com/marcmalerei/gluon/issues/456) establishes the
+21-package `1.10.0` train for the complete post-1.9 roadmap tracked by epic
+[#390](https://github.com/marcmalerei/gluon/issues/390). The train uses the
+two-commit release cut: a Quality-Gates-tested candidate followed only by its
+release-cut evidence and compatibility manifest. The immutable `v1.9.0`
+release remains the supported baseline until the protected `v1.10.0` workflow
+completes.
 
 ## v1.9.0 train handoff
 
@@ -234,7 +241,7 @@ that operation with source changes.
 
 ## Owner-controlled prerequisites
 
-Before protected publication of the `1.9.0` release, the repository owner must verify
+Before protected publication of the `1.10.0` release, the repository owner must verify
 all of the following outside the source tree:
 
 1. The GitHub repository is public.
@@ -394,13 +401,13 @@ long-lived publication token may be added to GitHub.
 
 The reviewed release PR makes these changes together:
 
-- set every official manifest to version `1.9.0` and `private: false`;
-- set every official implementation and peer dependency to exact `1.9.0`;
+- set every official manifest to version `1.10.0` and `private: false`;
+- set every official implementation and peer dependency to exact `1.10.0`;
 - update `package-lock.json` from the resulting manifests;
 - change the package contract registry state to `ready` with verified scope
   control;
-- add dated `1.9.0` sections to the root and all package changelogs;
-- copy and review the versioned documentation as `1.9.0`, then make that version
+- add dated `1.10.0` sections to the root and all package changelogs;
+- copy and review the versioned documentation as `1.10.0`, then make that version
   latest and supported;
 - after the prepared commit passes Quality Gates, attach the completed automated
   release-cut evidence and immutable compatibility manifest as the only two
@@ -411,8 +418,8 @@ Validate that commit before creating a tag:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run check
-npm run release:validate -- --candidate 1.9.0
-npm run release:artifacts -- --version 1.9.0
+npm run release:validate -- --candidate 1.10.0
+npm run release:artifacts -- --version 1.10.0
 ```
 
 Release-candidate installs use `--legacy-peer-deps` because the official

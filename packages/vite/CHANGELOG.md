@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
+### Changed
+
+- Advanced the lockstep tooling release for the bundled language-server and
+  editor distribution contracts.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

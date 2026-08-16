@@ -10,7 +10,7 @@ currently supported Chromium browser matrix.
 
 ## Stability notes
 
-The package ships as part of the current `1.9.0` release line. Browser-facing
+The package ships as part of the current `1.10.0` release line. Browser-facing
 helpers and SSR fixtures are stable; direct access to renderer parts, private
 runtime imports, and browser matrices beyond the documented evidence remain
 unsupported.

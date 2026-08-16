@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
+### Changed
+
+- Advanced the lockstep release while retaining the existing Storybook and
+  component-preview integration contract.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

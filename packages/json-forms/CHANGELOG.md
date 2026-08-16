@@ -4,6 +4,8 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 ### Added
 
 - Added a typed custom renderer registry with declarative priority selection,

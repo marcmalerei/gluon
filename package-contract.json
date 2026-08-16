@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-08-15",
+    "checkedAt": "2026-08-16",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "Protected release workflow 31890472642 completed successfully on 2026-08-15: all 21 contracted package records were published to latest at 1.9.0 with provenance and verified from a clean directory. Immutable GitHub release v1.9.0 was published from tag commit 06dc45457bbf9a109ae67f5048db8be63f0fda39 with 101 reviewed assets."
+    "publicationState": "ready",
+    "observation": "Registry preflight on 2026-08-16 confirmed that all 21 contracted package records expose 1.9.0 as latest and that version 1.10.0 is absent. Scope control and trusted publication remain verified by the completed 1.9.0 release contract."
   },
   "packages": [
     {

@@ -219,13 +219,13 @@ for (const required of [
   'npm run build',
   'npm test',
   'npm ls --depth=0 @gluonjs/core',
-  'npm install --save-exact @gluonjs/core@1.9.0',
+  'npm install --save-exact @gluonjs/core@1.10.0',
   'npm install --workspace ./apps/storefront --save-exact',
   'npm pkg get workspaces',
   'git restore package.json package-lock.json',
 ]) if (!upgradeGuide.includes(required)) throw new Error(`upgrade guide commands are missing: ${required}`);
 for (const required of [
-  '/gluon/1.9.0/reference/diagnostics/',
+  '/gluon/1.10.0/reference/diagnostics/',
   'https://www.npmjs.com/org/gluonjs',
 ]) if (!upgradeGuide.includes(required)) throw new Error(`upgrade guide link is missing: ${required}`);
 for (const required of [

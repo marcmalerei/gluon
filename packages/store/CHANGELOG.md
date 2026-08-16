@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
+### Added
+
+- Added versioned persistence migrations and asynchronous persistence hydration
+  with explicit ready, failure, retry, and disposal ownership.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

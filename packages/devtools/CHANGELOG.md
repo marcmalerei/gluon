@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 ### Added
 
 - Exposed the Devtools API handshake through `GluonDevtoolsBridge` so host
