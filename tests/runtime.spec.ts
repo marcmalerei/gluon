@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  createCompiledPrimitiveTextUpdater,
   directive,
   event,
   getCompiledPrimitiveTextBinding,
   html,
   markCompiledPrimitiveTextBinding,
+  releaseRenderStyles,
   render,
   repeat,
+  suspendRender,
   updateCompiledPrimitiveTextBinding,
   type PartController,
 } from '../src/index.js';
@@ -88,6 +91,40 @@ describe('template runtime', () => {
     );
     conflicting('first');
     expect(() => conflicting('second')).toThrow(/different primitive text bindings/i);
+  });
+
+  it('keeps cached compiled primitive updaters bound to an intact active root', () => {
+    const root = document.createElement('div');
+    const view = (value: string | number) => markCompiledPrimitiveTextBinding(
+      html`<output>${value}</output>`,
+      'label',
+      0,
+    );
+
+    render(view('A'), root);
+    const updater = createCompiledPrimitiveTextUpdater(root, 0);
+    expect(updater).toBeDefined();
+    expect(createCompiledPrimitiveTextUpdater(root, 1)).toBeUndefined();
+    expect(createCompiledPrimitiveTextUpdater(null, 0)).toBeUndefined();
+
+    expect(updater?.update(2)).toBe(true);
+    expect(root.textContent).toBe('2');
+    expect(updater?.update({ unsafe: true })).toBe(false);
+
+    releaseRenderStyles(root);
+    expect(updater?.update('released')).toBe(false);
+
+    const suspendedRoot = document.createElement('div');
+    render(view('active'), suspendedRoot);
+    const suspendedUpdater = createCompiledPrimitiveTextUpdater(suspendedRoot, 0);
+    suspendRender(suspendedRoot);
+    expect(suspendedUpdater?.update('suspended')).toBe(false);
+
+    const replacedRoot = document.createElement('div');
+    render(view('owned'), replacedRoot);
+    const replacedUpdater = createCompiledPrimitiveTextUpdater(replacedRoot, 0);
+    replacedRoot.replaceChildren(document.createElement('i'));
+    expect(replacedUpdater?.update('detached')).toBe(false);
   });
 
   it('updates nested templates and arrays without replacing cached elements', () => {

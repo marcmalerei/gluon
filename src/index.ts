@@ -45,10 +45,12 @@ export {
 
 /** @internal Compiler-generated modules use these runtime helpers through the package root. */
 export {
+  createCompiledPrimitiveTextUpdater,
   getCompiledPrimitiveTextBinding,
   markCompiledPrimitiveTextBinding,
   updateCompiledPrimitiveTextBinding,
   type CompiledPrimitiveTextBinding,
+  type CompiledPrimitiveTextUpdater,
 } from './runtime.js';
 
 export {

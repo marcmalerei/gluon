@@ -121,7 +121,7 @@ const evidence = {
     itemsPerComponent: 20,
     samples: options.samples,
     warmupRounds: options.warmupRounds,
-    minimumBatchDurationMs: 8,
+    minimumBatchDurationMs: 40,
     browserTimeoutMs: options.browserTimeoutMs,
     productionBuild: true,
     headless: true,

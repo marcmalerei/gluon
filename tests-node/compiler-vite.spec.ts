@@ -487,16 +487,20 @@ describe('@gluonjs/vite real server contract', () => {
         await count.updateComplete;
         const countText = count.shadowRoot.textContent;
         const countNodeRetained = countButton.firstChild === countNode;
+        countButton.click();
+        await count.updateComplete;
+        const countClickText = count.shadowRoot.textContent;
 
         countPrototype.render = countRender;
         count.shadowRoot.replaceChildren(document.createElement('i'));
-        count.count = 3;
+        count.count = 4;
         await count.updateComplete;
         return {
           compiledText,
           recoveredText: label.shadowRoot.textContent,
           reconnectedText: secondLabel.shadowRoot.textContent,
           countText,
+          countClickText,
           countRecoveredText: count.shadowRoot.textContent,
           countNodeRetained,
         };
@@ -506,7 +510,8 @@ describe('@gluonjs/vite real server contract', () => {
         recoveredText: 'C',
         reconnectedText: 'Disconnected',
         countText: 'Count: 2',
-        countRecoveredText: 'Count: 3',
+        countClickText: 'Count: 3',
+        countRecoveredText: 'Count: 4',
         countNodeRetained: true,
       });
       expect(errors).toEqual([]);

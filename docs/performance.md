@@ -57,12 +57,17 @@ behaviorally covered but is not included in the throughput claim.
 Official production Vite builds also recognize a conservative component-level
 case: one fixed `GluonElement` template with one declared primitive property in
 a text Part and, optionally, one private readonly event handler. Property-only
-updates reuse the resolved Part and a shared microtask queue that preserves
-element update order, sorting only when enqueue order differs. Lifecycle hooks,
-reactive or explicit concurrent updates, hydration, root disturbance,
-non-primitive values, and every unproven template shape use the full effect and
-renderer path. This optimization does not change standalone `html`/`render`
-behavior and is absent from development builds.
+updates reuse a root-bound updater and a shared microtask queue that preserves
+element update order, sorting only when enqueue order differs. The queue drains
+in place in the ordinary case, while its failure and reentrant paths retain
+later work. Simple production declarations skip setter-side contract branches
+they do not declare. Retained event callbacks use one guard while preserving
+the captured application context, component boundary, synchronous error source,
+and asynchronous rejection source. Lifecycle hooks, reactive or explicit
+concurrent updates, hydration, released styles, root disturbance, non-primitive
+values, and every unproven template shape use the full effect and renderer path.
+This optimization does not change standalone `html`/`render` behavior and is
+absent from development builds.
 
 The retained baseline is stored in
 [`benchmarks/results/`](../benchmarks/results/). Its Markdown file summarizes
@@ -249,7 +254,10 @@ One operation covers 50 component boundaries. List and lifecycle components own
 
 Each framework settles through its public completion primitive before another
 operation begins. The shared batch is calibrated until the fastest framework
-takes at least 8 ms, and framework order rotates for warm-ups and measurements.
+takes at least 40 ms, and framework order rotates for warm-ups and measurements.
+This keeps a one-millisecond browser timer step below 2.5% of the measured batch
+before normalization to one operation; it deliberately increases run time to
+reduce quantization and short-batch noise.
 The production runner gives every scenario a fresh browser context so lifecycle
 allocation and collection cannot carry into the property, state, or list
 cells. This isolation removes the cross-framework phase shifts observed when

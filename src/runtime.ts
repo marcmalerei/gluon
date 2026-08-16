@@ -1,6 +1,6 @@
 import {
   getActiveApplicationContext,
-  guardEventListener,
+  guardRetainedEventListener,
   resolveApplicationContext,
   validateTrustedTypesConfig,
   type TrustedTypesConfig,
@@ -32,6 +32,11 @@ const compiledPrimitiveTextBindings = new WeakMap<TemplateStringsArray, Compiled
 export interface CompiledPrimitiveTextBinding {
   readonly property: string;
   readonly index: number;
+}
+
+/** @internal Root-bound updater for one compiler-proven primitive text binding. */
+export interface CompiledPrimitiveTextUpdater {
+  update(value: unknown): boolean;
 }
 
 /** Explicitly renders no child content or removes an attribute value. */
@@ -690,7 +695,7 @@ class NodePart implements Part {
   setExactStablePrimitiveValue(value: string | number | bigint | true): boolean {
     if (!this.textNode || this.textNode.previousSibling !== this.marker) return false;
     if (value !== this.lastPrimitive) {
-      this.textNode.data = String(value);
+      this.textNode.data = value as unknown as string;
       this.lastPrimitive = value;
     }
     return true;
@@ -1675,7 +1680,15 @@ export function updateCompiledPrimitiveTextBinding(
   index: number,
   value: unknown,
 ): boolean {
-  if (!container || !isRenderablePrimitive(value)) return false;
+  return createCompiledPrimitiveTextUpdater(container, index)?.update(value) ?? false;
+}
+
+/** @internal Resolves and validates a compiler-proven binding once for repeated element updates. */
+export function createCompiledPrimitiveTextUpdater(
+  container: Element | DocumentFragment | null,
+  index: number,
+): CompiledPrimitiveTextUpdater | undefined {
+  if (!container) return undefined;
   const current = getRootInstance(container);
   let binding = current?.fastStringBinding?.index === index
     ? current.fastStringBinding
@@ -1699,14 +1712,24 @@ export function updateCompiledPrimitiveTextBinding(
     || !binding
     || !(binding.part instanceof NodePart)
     || binding.directive
-  ) return false;
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint' || value === true) {
-    if (!binding.part.setExactStablePrimitiveValue(value)) {
-      binding.part.setValue(value);
-    }
-  }
-  else binding.part.setValue(value);
-  return true;
+  ) return undefined;
+  const part = binding.part;
+  return {
+    update(value: unknown): boolean {
+      if (
+        !isRenderablePrimitive(value)
+        || getRootInstance(container) !== current
+        || current.suspended
+        || current.hydrated
+        || !current.rootStyleDependenciesEmpty
+        || !current.styles.isActiveAndEmpty
+        || !rootNodesAreInPlace(container, current.nodes)
+        || binding.directive
+      ) return false;
+      if (!part.setExactStablePrimitiveValue(value)) part.setValue(value);
+      return true;
+    },
+  };
 }
 
 export function render(
@@ -2674,12 +2697,7 @@ function retainEvent(event: ResolvedEvent): RetainedEvent {
     listener: undefined as unknown as EventListener,
     options: event.options,
   };
-  const dispatch = function retainedEventListener(this: EventTarget, value: Event): void {
-    const current = retained.current;
-    if (typeof current === 'function') return current.call(this, value);
-    return current.handleEvent(value);
-  };
-  retained.listener = guardEventListener(dispatch) as EventListener;
+  retained.listener = guardRetainedEventListener(retained);
   return retained;
 }
 
