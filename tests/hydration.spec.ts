@@ -22,7 +22,7 @@ import {
   unmount,
 } from '@gluonjs/core';
 import { AspectRatio, Avatar, Button, Checkbox, Input, Progress, Radio, ScrollArea, Select, Separator, Slider, StatusBadge, Switch, Textarea, ToggleButton, aspectRatioStyles, avatarStyles, buttonStyles, checkboxStyles, inputStyles, progressStyles, radioStyles, scrollAreaStyles, selectStyles, separatorStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';
-import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, searchFieldStyles, searchResultsStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
+import { Accordion, ButtonGroup, Card, ChoiceGroup, ControlField, DialogSurface, Disclosure, DropdownMenu, ResponsiveDisclosure, EmptyState, InlineNotice, SearchField, SearchResults, SegmentedControl, TableRegion, Tabs, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, createDialogSurfaceController, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, inlineNoticeStyles, searchFieldStyles, searchResultsStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
 import { ConfirmationDialog, WorkflowTimeline, confirmationDialogStyles, workflowTimelineStyles } from '@gluonjs/organisms';
 import { ProductBadge, productBadgeStyles } from '@gluonjs/example-component-library';
 import {
@@ -383,7 +383,8 @@ describe('SSR hydration', () => {
     expect(hydrated.hydration.retained).toBe(true);
     expect(root.querySelector('#product-title')).toBe(heading);
     expect(hydrated.router.currentRoute.value.fullPath).toBe('/products/orbit-lamp');
-    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).toContain(toolbarStyles);
+    expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).toContain(shopStyles);
 
@@ -398,6 +399,7 @@ describe('SSR hydration', () => {
 
     await fixture.cleanup();
     expect(hydrated.uiOwner.disposed).toBe(true);
+    expect(document.adoptedStyleSheets).not.toContain(toolbarStyles);
     expect(document.adoptedStyleSheets).not.toContain(buttonStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).not.toContain(shopStyles);
@@ -724,6 +726,37 @@ describe('SSR hydration', () => {
     const result = await hydrateTemplate(value, root);
     expect(result.retained).toBe(true);
     expect([...root.querySelectorAll('b, i, u')]).toEqual(elements);
+  });
+
+  it('retains deterministic menu nodes and activates controlled behavior after hydration', async () => {
+    const onOpenChange = vi.fn();
+    const menu = DropdownMenu({
+      id: 'hydrated-actions',
+      label: 'Hydrated actions',
+      trigger: 'Actions',
+      open: false,
+      onOpenChange,
+      items: [{ id: 'details', label: 'Details' }],
+    });
+    const prepared = await prepareForHydration(menu);
+    const manifest = createStyleManifest(createComponentStyleSelection(prepared.value));
+    const styleHost = document.createElement('section');
+    const styleRoot = styleHost.attachShadow({ mode: 'open' });
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    styleRoot.innerHTML = renderStyleCarriers(manifest);
+    styleRoot.append(root);
+    const serverTrigger = root.querySelector('#hydrated-actions-trigger');
+    const serverMenu = root.querySelector('#hydrated-actions-menu');
+    const result = await hydrateTemplate(menu, root, { styles: manifest, styleRoot });
+    expect(result.retained).toBe(true);
+    expect(root.querySelector('#hydrated-actions-trigger')).toBe(serverTrigger);
+    expect(root.querySelector('#hydrated-actions-menu')).toBe(serverMenu);
+    (serverTrigger as HTMLButtonElement).click();
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    expect(onOpenChange.mock.calls[0]?.[0]).toBe(true);
+    expect((serverMenu as HTMLElement).hidden).toBe(true);
+    unmount(root);
   });
 
   it('recovers deterministically when structurally matching HTML lacks required binding markers', async () => {

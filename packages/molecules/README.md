@@ -29,9 +29,13 @@ import {
   NavigationStrip,
   SearchField,
   SearchResults,
+  ContextMenu,
+  DropdownMenu,
+  Menubar,
   SegmentedControl,
   TableRegion,
   Tabs,
+  Toolbar,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -246,8 +250,9 @@ native Radio options. Its catalog filter uses `NavigationStrip` to keep every ca
 discoverable at constrained widths. Browser tests verify implicit labels,
 native constraint validation, overflow interaction, SSR/hydration styles, and
 teardown.
-The site header uses `ButtonGroup` for the search, bag, and mobile-menu action
-cluster without changing the individual actions' semantics.
+The site header uses `Toolbar` for the search, bag, and mobile-menu action
+cluster. Its single Tab stop and arrow navigation do not change the individual
+native buttons or their existing customer actions.
 The catalog uses `SegmentedControl` for a URL-backed Grid/List view choice; the
 shop owns the route update and the corresponding product layout.
 Product details use `Tabs` for URL-backed Story and Details panels while the
@@ -266,3 +271,16 @@ dismissal ownership.
 Checkout uses `TableRegion` around its native captioned order table. The shop
 owns every header, row, price, and total; the molecule adds the region summary
 and narrow-layout overflow affordance without introducing grid interaction.
+
+`DropdownMenu`, `ContextMenu`, and `Menubar` share the bounded `MenuItem` model.
+Every instance requires a caller-owned `id`; `DropdownMenu` and `ContextMenu`
+also require authoritative `open` and `onOpenChange` props. They provide true
+roving focus, buffered typeahead, disabled and separator semantics, explicit
+checkbox/radio groups, nested controlled submenu state, Escape/focus return,
+and RTL movement while preserving native links and buttons. `Menubar` renders
+an APG menubar without a synthetic dropdown trigger. `Toolbar` renders
+caller-described native buttons and links with horizontal/vertical roving
+focus. Styling is exposed through `part`, `data-state`, stable `gluon-*`
+classes, and component-scoped `--gluon-menu-*`/`--gluon-toolbar-*` properties.
+Routing, authorization, persistence, and command execution remain outside
+these compositions.

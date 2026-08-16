@@ -3,7 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -41,7 +41,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.documentElement.dataset.gluonTheme).toBe('light');
     expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).toContain(shopStyles);
-    expect(document.adoptedStyleSheets).toContain(buttonStyles);
+    expect(document.adoptedStyleSheets).toContain(toolbarStyles);
     const editorialSheet = document.adoptedStyleSheets.find((sheet) => (
       getStyleSheetText(sheet).includes('.shop-editorial-link')
     ));
@@ -55,7 +55,7 @@ describe('GLUON GOODS reference shop', () => {
     skipLink.focus();
     expect(document.activeElement).toBe(skipLink);
     expect(skipLink.getAttribute('href')).toBe('#main-content');
-    expect(root.querySelector('.site-header .header-actions')?.getAttribute('role')).toBe('group');
+    expect(root.querySelector('.site-header .header-actions')?.getAttribute('role')).toBe('toolbar');
     expect(root.querySelector('.site-header .header-actions')?.getAttribute('aria-label')).toBe('Store actions');
 
     expect(root.querySelector('h1')?.textContent).toBe('Objects that work the way you do.');
@@ -181,7 +181,15 @@ describe('GLUON GOODS reference shop', () => {
     document.body.append(root);
     app.mount(root);
 
-    root.querySelector<HTMLButtonElement>('[aria-label="Open menu"]')!.click();
+    const headerToolbar = root.querySelector<HTMLElement>('#shop-header-actions[role="toolbar"]')!;
+    const headerActions = headerToolbar.querySelectorAll<HTMLElement>('[data-gluon-toolbar-item]');
+    expect(headerActions).toHaveLength(3);
+    expect(headerToolbar.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+    headerActions[0]!.focus();
+    headerActions[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(document.activeElement).toBe(headerActions[1]);
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Open menu');
+    (document.activeElement as HTMLButtonElement).click();
     await settleShop();
     expect(root.querySelector('.mobile-menu[role="dialog"]')).not.toBeNull();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Close menu');

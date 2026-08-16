@@ -12,9 +12,9 @@ import {
 import { nextTick } from '@gluonjs/reactivity';
 import { Input } from '@gluonjs/atoms';
 import {
-  ButtonGroup,
   DialogSurface,
   EmptyState,
+  Toolbar,
   createDialogSurfaceController,
 } from '@gluonjs/molecules';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
@@ -32,7 +32,6 @@ import {
   ShopIconAction,
   ShopEditorialLink,
   ShopMenuAction,
-  ShopTextAction,
 } from './ui-extensions.js';
 
 type ShopDialog = 'bag' | 'menu' | 'search';
@@ -59,37 +58,41 @@ export function SiteHeader(store: ShopStore): TemplateValue {
         ${compose(RouterLink, { to: '/shop?sort=new' })`New`}
         ${ShopEditorialLink({ href: '#journal', children: 'Journal' })}
       </nav>
-      ${ButtonGroup({
+      ${Toolbar({
+        id: 'shop-header-actions',
         label: 'Store actions',
         attributes: { class: 'header-actions' },
-        children: [
-        ShopTextAction({
-          children: [SearchIcon(), html`<span>Search</span>`],
+        items: [
+        {
+          id: 'search',
+          label: [SearchIcon(), html`<span>Search</span>`],
           attributes: { class: 'search-action' },
-          onClick: (event) => {
+          onActivate: (event) => {
             store.searchOpen = true;
             focusOpenedDialog('search', event.currentTarget as HTMLElement);
           },
-        }),
-        ShopIconAction({
-          children: [html`<span>Menu</span>`, MenuIcon()],
+        },
+        {
+          id: 'menu',
+          label: [html`<span>Menu</span>`, MenuIcon()],
           attributes: { class: 'mobile-menu-button', aria: { label: 'Open menu' } },
-          onClick: (event) => {
+          onActivate: (event) => {
             store.menuOpen = true;
             focusOpenedDialog('menu', event.currentTarget as HTMLElement);
           },
-        }),
-        ShopTextAction({
+        },
+        {
+          id: 'bag',
           label: `Bag ${store.bagCount}`,
           attributes: {
             class: 'bag-action',
             aria: { label: `Open bag with ${store.bagCount} ${store.bagCount === 1 ? 'item' : 'items'}` },
           },
-          onClick: (event) => {
+          onActivate: (event) => {
             store.bagOpen = true;
             focusOpenedDialog('bag', event.currentTarget as HTMLElement);
           },
-        }),
+        },
         ],
       })}
     </header>
