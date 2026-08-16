@@ -8,8 +8,8 @@
     "checkedAt": "2026-08-16",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Registry preflight on 2026-08-16 confirmed that all 21 contracted package records expose 1.9.0 as latest and that version 1.10.0 is absent. Scope control and trusted publication remain verified by the completed 1.9.0 release contract."
+    "publicationState": "released",
+    "observation": "Protected release workflow 31922071023 completed successfully on 2026-08-16: all 21 contracted package records were published to latest at 1.10.0 with provenance and verified from a clean directory. Immutable GitHub release v1.10.0 was published from tag commit d1763ef0646beaa3b5c6753b431f40ddec734ca9 with 115 reviewed assets."
   },
   "packages": [
     {
