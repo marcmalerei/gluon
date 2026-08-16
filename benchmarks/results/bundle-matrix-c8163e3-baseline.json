@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "node": "v24.18.0",
+  "npm": "11.16.0",
+  "vite": "vite/8.1.4 darwin-arm64 node-v24.18.0",
+  "lockfileVersion": 3,
+  "fixtures": {
+    "gluon": {
+      "bytes": {
+        "raw": 41108,
+        "gzip": 12726,
+        "brotli": 11361
+      },
+      "moduleGraph": {
+        "index.html": {
+          "file": "assets/index-CKJac6hq.js",
+          "imports": [],
+          "dynamicImports": [],
+          "css": []
+        }
+      },
+      "parity": {
+        "browser": "149.0.7827.55"
+      }
+    },
+    "lit": {
+      "bytes": {
+        "raw": 7861,
+        "gzip": 3439,
+        "brotli": 3114
+      },
+      "moduleGraph": {
+        "index.html": {
+          "file": "assets/index-w7AxWpVI.js",
+          "imports": [],
+          "dynamicImports": [],
+          "css": []
+        }
+      },
+      "parity": {
+        "browser": "149.0.7827.55"
+      }
+    },
+    "vue": {
+      "bytes": {
+        "raw": 61477,
+        "gzip": 23849,
+        "brotli": 21752
+      },
+      "moduleGraph": {
+        "index.html": {
+          "file": "assets/index-C8UtHmup.js",
+          "imports": [],
+          "dynamicImports": [],
+          "css": []
+        }
+      },
+      "parity": {
+        "browser": "149.0.7827.55"
+      }
+    },
+    "react": {
+      "bytes": {
+        "raw": 190337,
+        "gzip": 59103,
+        "brotli": 51033
+      },
+      "moduleGraph": {
+        "index.html": {
+          "file": "assets/index-DIixXAqA.js",
+          "imports": [],
+          "dynamicImports": [],
+          "css": []
+        }
+      },
+      "parity": {
+        "browser": "149.0.7827.55"
+      }
+    }
+  },
+  "scope": "Equivalent labelled counter fixture; results are per production entry and are not a universal framework ranking."
+}

@@ -5,6 +5,7 @@ import {
   html,
   markCompiledPrimitiveTextBinding,
   setGluonRenderDebugHook,
+  type ComponentErrorInfo,
   type GluonRenderDebugEvent,
   type PropertyDeclarations,
 } from '../src/index.js';
@@ -128,6 +129,287 @@ describe('reactive GluonElement rendering', () => {
 
     await element.refresh();
     expect(element.renders).toBe(5);
+  });
+
+  it('keeps repeated compiled property writes on the same queued DOM root and settles once', async () => {
+    const tagName = `gluon-compiled-queue-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class CompiledQueueElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      renders = 0;
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, CompiledQueueElement);
+    const element = document.createElement(tagName) as CompiledQueueElement;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('A');
+    expect(element.renders).toBe(1);
+
+    element.label = 'B';
+    element.label = 'C';
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('C');
+    expect(element.renders).toBe(2);
+  });
+
+  it('stores declarations with reserved object keys without prototype collisions', async () => {
+    const tagName = `gluon-reserved-properties-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class ReservedPropertyElement extends GluonElement {
+      static override readonly properties = {
+        ['__proto__']: { attribute: false, default: 'prototype' },
+        toString: { attribute: false, default: 'stringifier' },
+      } as unknown as PropertyDeclarations;
+
+      protected override render() {
+        const values = this as unknown as Record<string, string>;
+        return html`<output>${values['__proto__']}:${Reflect.get(values, 'toString')}</output>`;
+      }
+    }
+
+    defineElement(tagName, ReservedPropertyElement);
+    const element = document.createElement(tagName) as ReservedPropertyElement;
+    const values = element as unknown as Record<string, string>;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('prototype:stringifier');
+
+    values['__proto__'] = 'safe';
+    Reflect.set(values, 'toString', 'value');
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('safe:value');
+  });
+
+  it('keeps standalone retained event failures owned by the element boundary', async () => {
+    const childTag = `gluon-event-child-${reactiveElementSequence += 1}` as `${string}-${string}`;
+    const boundaryTag = `gluon-event-boundary-${reactiveElementSequence += 1}` as `${string}-${string}`;
+    const captured: ComponentErrorInfo[] = [];
+
+    class EventChild extends GluonElement {
+      protected override render() {
+        return html`
+          <button id="sync" @click=${() => { throw new Error('standalone sync'); }}>sync</button>
+          <button id="async" @click=${async () => { throw new Error('standalone async'); }}>async</button>
+        `;
+      }
+    }
+
+    class EventBoundary extends GluonElement {
+      constructor() {
+        super();
+        this.onErrorCaptured((info) => {
+          captured.push(info);
+          return true;
+        });
+      }
+
+      protected override render() {
+        return html`<slot></slot>`;
+      }
+    }
+
+    defineElement(childTag, EventChild);
+    defineElement(boundaryTag, EventBoundary);
+    const boundary = document.createElement(boundaryTag) as EventBoundary;
+    const child = document.createElement(childTag) as EventChild;
+    boundary.append(child);
+    document.body.append(boundary);
+    await Promise.all([boundary.updateComplete, child.updateComplete]);
+
+    child.shadowRoot?.querySelector<HTMLButtonElement>('#sync')?.click();
+    child.shadowRoot?.querySelector<HTMLButtonElement>('#async')?.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(captured.map(({ source }) => source)).toEqual(['event', 'async']);
+    expect(captured.every(({ element }) => element === child)).toBe(true);
+  });
+
+  it('drops queued compiled property work on disconnect before flush and resumes after reconnect', async () => {
+    const tagName = `gluon-compiled-disconnect-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class DisconnectElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      renders = 0;
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, DisconnectElement);
+    const element = document.createElement(tagName) as DisconnectElement;
+    document.body.append(element);
+    await element.updateComplete;
+    element.label = 'B';
+    element.remove();
+    await Promise.resolve();
+    expect(element.shadowRoot?.textContent).toBe('A');
+    expect(element.renders).toBe(1);
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('B');
+    expect(element.renders).toBe(2);
+  });
+
+  it('handles reentrant compiled property updates through a full follow-up render', async () => {
+    const tagName = `gluon-compiled-reentrant-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class ReentrantElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+        phase: { type: String, default: 'idle' },
+      };
+
+      declare label: string;
+      declare phase: string;
+      renders = 0;
+
+      constructor() {
+        super();
+        this.onUpdated(() => {
+          if (this.label === 'B' && this.phase === 'idle') {
+            this.phase = 'done';
+          }
+        });
+      }
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}:${this.phase}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, ReentrantElement);
+    const element = document.createElement(tagName) as ReentrantElement;
+    document.body.append(element);
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('A:idle');
+
+    element.label = 'B';
+    await element.updateComplete;
+    expect(element.shadowRoot?.textContent).toBe('B:done');
+    expect(element.renders).toBe(3);
+  });
+
+  it('keeps property updates ordered when mixed with cleanup and reconnect', async () => {
+    const tagName = `gluon-compiled-order-${reactiveElementSequence += 1}` as `${string}-${string}`;
+    const order: string[] = [];
+
+    class OrderedElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+
+      constructor() {
+        super();
+        this.onDisconnected(() => {
+          order.push('disconnect');
+        });
+      }
+
+      protected override render() {
+        order.push(`render:${this.label}`);
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, OrderedElement);
+    const element = document.createElement(tagName) as OrderedElement;
+    document.body.append(element);
+    await element.updateComplete;
+    element.label = 'B';
+    element.label = 'C';
+    await element.updateComplete;
+    element.remove();
+    await Promise.resolve();
+    document.body.append(element);
+    await element.updateComplete;
+    expect(order).toEqual([
+      'render:A',
+      'render:C',
+      'disconnect',
+      'render:C',
+    ]);
+  });
+
+  it('releases unprocessed compiled queue entries after a flush throws', async () => {
+    const tagName = `gluon-compiled-throw-${reactiveElementSequence += 1}` as `${string}-${string}`;
+
+    class ThrowingElement extends GluonElement {
+      static override readonly properties: PropertyDeclarations = {
+        label: { type: String, default: 'A' },
+      };
+
+      declare label: string;
+      renders = 0;
+
+      protected override render() {
+        this.renders += 1;
+        return markCompiledPrimitiveTextBinding(
+          html`<output>${this.label}</output>`,
+          'label',
+          0,
+        );
+      }
+    }
+
+    defineElement(tagName, ThrowingElement);
+    const first = document.createElement(tagName) as ThrowingElement;
+    const firstInternals = first as unknown as {
+      performCompiledPropertyUpdate: () => void;
+    };
+    const second = document.createElement(tagName) as ThrowingElement;
+    document.body.append(first, second);
+    await Promise.all([first.updateComplete, second.updateComplete]);
+    expect(first.shadowRoot?.textContent).toBe('A');
+    expect(second.shadowRoot?.textContent).toBe('A');
+
+    firstInternals.performCompiledPropertyUpdate = () => {
+      throw new Error('compiled flush failure');
+    };
+    first.label = 'B';
+    second.label = 'B';
+    await Promise.resolve();
+    expect(second.shadowRoot?.textContent).toBe('A');
+
+    second.label = 'C';
+    await second.updateComplete;
+    expect(second.shadowRoot?.textContent).toBe('C');
+    expect(second.renders).toBe(2);
   });
 
   it('stops scoped work on disconnect and recreates it while retaining state and DOM', async () => {

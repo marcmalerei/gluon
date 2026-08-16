@@ -63,6 +63,13 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Reduced production Custom Element property and interaction overhead with a
+  reusable compiled primitive-text updater, allocation-free shared queue
+  draining, collision-safe property storage, specialized simple declarations,
+  and one retained event guard that preserves application and error ownership.
+- Increased the component benchmark's calibrated batch floor from 8 ms to
+  40 ms so one-millisecond browser timer steps contribute at most 2.5% to a
+  measured batch before per-operation normalization.
 - Rebased the GLUON GOODS initial JavaScript ceilings to 260,200 bytes raw and
   71,200 bytes gzip after measuring the opt-in Trusted Types runtime paths on
   the supported local and Linux CI build environments; the

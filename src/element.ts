@@ -1,10 +1,11 @@
 import {
+  createCompiledPrimitiveTextUpdater,
   getCompiledPrimitiveTextBinding,
   releaseRenderStyles,
   render,
   suspendRender,
-  updateCompiledPrimitiveTextBinding,
   type CompiledPrimitiveTextBinding,
+  type CompiledPrimitiveTextUpdater,
   type RefTarget,
   type TemplateResult,
   type TemplateValue,
@@ -197,6 +198,7 @@ const serverElementDefinitions = new Map<`${string}-${string}`, GluonElementClas
 const propertyValues = Symbol('gluon.property-values');
 const compiledTextBinding = Symbol('gluon.compiled-text-binding');
 const setProperty = Symbol('gluon.set-property');
+const setSimpleProperty = Symbol('gluon.set-simple-property');
 export const functionalElementPropertyChanged = Symbol('gluon.functional-element-property-changed');
 const publicInstance = Symbol('gluon.public-instance');
 let elementUpdateSequence = 0;
@@ -205,6 +207,10 @@ interface UpdateDeferred {
   readonly promise: Promise<void>;
   readonly resolve: () => void;
   readonly reject: (reason?: unknown) => void;
+}
+
+interface ElementCompiledTextBinding extends CompiledPrimitiveTextBinding {
+  readonly updater: CompiledPrimitiveTextUpdater;
 }
 
 type ComponentErrorReporter = (error: unknown, source: AppErrorSource) => void;
@@ -242,22 +248,42 @@ export abstract class GluonElement<
   Events extends object = Record<string, unknown>,
 > extends HTMLElementBase {
   /* v8 ignore start -- production-only shared compiler queue is covered by the built Vite integration. */
-  private static readonly compiledPropertyUpdates = new Set<GluonElement<any>>();
+  private static readonly compiledPropertyUpdates: GluonElement<any>[] = [];
   private static compiledPropertyUpdatesScheduled = false;
   private static compiledPropertyUpdatesOrdered = true;
   private static compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
   private static readonly flushCompiledPropertyUpdates = (): void => {
     GluonElement.compiledPropertyUpdatesScheduled = false;
-    const elements = [...GluonElement.compiledPropertyUpdates];
-    GluonElement.compiledPropertyUpdates.clear();
+    const elements = GluonElement.compiledPropertyUpdates;
+    const elementCount = elements.length;
     if (!GluonElement.compiledPropertyUpdatesOrdered) {
       elements.sort((left, right) => left.updateId - right.updateId);
     }
     GluonElement.compiledPropertyUpdatesOrdered = true;
     GluonElement.compiledPropertyUpdateLastId = Number.NEGATIVE_INFINITY;
-    for (const element of elements) element.performCompiledPropertyUpdate();
-    if (GluonElement.compiledPropertyUpdates.size > 0) {
-      GluonElement.scheduleCompiledPropertyUpdateFlush();
+    let index = 0;
+    try {
+      while (index < elementCount) {
+        const element = elements[index++]!;
+        if (!element.compiledPropertyUpdateQueued) continue;
+        element.compiledPropertyUpdateQueued = false;
+        element.performCompiledPropertyUpdate();
+      }
+    } catch (error) {
+      for (; index < elementCount; index += 1) {
+        const element = elements[index]!;
+        if (!elements.includes(element, elementCount)) {
+          element.compiledPropertyUpdateQueued = false;
+        }
+      }
+      throw error;
+    } finally {
+      if (elements.length === elementCount) {
+        elements.length = 0;
+      } else {
+        elements.copyWithin(0, elementCount);
+        elements.length -= elementCount;
+      }
     }
   };
 
@@ -268,18 +294,19 @@ export abstract class GluonElement<
   }
 
   private static queueCompiledPropertyUpdate(element: GluonElement<any>): void {
-    if (GluonElement.compiledPropertyUpdates.has(element)) return;
+    if (element.compiledPropertyUpdateQueued) return;
     if (element.updateId < GluonElement.compiledPropertyUpdateLastId) {
       GluonElement.compiledPropertyUpdatesOrdered = false;
     }
     GluonElement.compiledPropertyUpdateLastId = element.updateId;
-    GluonElement.compiledPropertyUpdates.add(element);
+    element.compiledPropertyUpdateQueued = true;
+    GluonElement.compiledPropertyUpdates.push(element);
     GluonElement.scheduleCompiledPropertyUpdateFlush();
   }
   /* v8 ignore stop */
 
   private static cancelCompiledPropertyUpdate(element: GluonElement<any>): void {
-    GluonElement.compiledPropertyUpdates.delete(element);
+    element.compiledPropertyUpdateQueued = false;
   }
 
   /** Declares reactive inputs and their attribute conversion, reflection, and validation rules. */
@@ -295,7 +322,7 @@ export abstract class GluonElement<
 
   /** Shadow root rendered by {@link update}; override {@link createRenderRoot} to customize it. */
   protected readonly renderRoot: ShadowRoot;
-  private readonly [propertyValues] = new Map<string, unknown>();
+  private readonly [propertyValues]: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
   private readonly providedProperties = new Set<string>();
   private readonly updateId = elementUpdateSequence;
   private connected = false;
@@ -305,7 +332,8 @@ export abstract class GluonElement<
   private componentErrorReporter?: ComponentErrorReporter;
   private renderScope?: EffectScope;
   private renderEffect?: ReactiveEffectRunner<void | undefined>;
-  private [compiledTextBinding]?: CompiledPrimitiveTextBinding;
+  private [compiledTextBinding]?: ElementCompiledTextBinding;
+  private compiledPropertyUpdateQueued = false;
   private pendingUpdate?: UpdateDeferred;
   private pendingPropertyUpdate?: string;
   private pendingPropertyValue?: unknown;
@@ -520,7 +548,12 @@ export abstract class GluonElement<
     const result = this.render();
     render(result, this.renderRoot);
     const binding = getCompiledPrimitiveTextBinding(result);
-    this[compiledTextBinding] = binding;
+    const updater = binding
+      ? createCompiledPrimitiveTextUpdater(this.renderRoot, binding.index)
+      : undefined;
+    this[compiledTextBinding] = binding && updater
+      ? { ...binding, updater }
+      : undefined;
   }
 
   /**
@@ -570,12 +603,12 @@ export abstract class GluonElement<
     if (this.connected && declaration.validate) {
       this.validateContractValue('property', name, value, declaration.validate);
     }
-    const oldValue = this[propertyValues].get(name);
+    const oldValue = this[propertyValues][name];
     if (declaration.hasChanged
       ? !declaration.hasChanged(value, oldValue)
       : Object.is(value, oldValue)) return;
 
-    this[propertyValues].set(name, value);
+    this[propertyValues][name] = value;
     const functionalObserver = (this as GluonElement<Events> & {
       [functionalElementPropertyChanged]?: (property: string) => void;
     })[functionalElementPropertyChanged];
@@ -595,6 +628,18 @@ export abstract class GluonElement<
           }
         : undefined,
     );
+  }
+
+  /** @internal Production fast path for declarations without setter-side contracts or reflection. */
+  [setSimpleProperty](name: string, value: unknown): void {
+    const oldValue = this[propertyValues][name];
+    if (Object.is(value, oldValue)) return;
+    this[propertyValues][name] = value;
+    const functionalObserver = (this as GluonElement<Events> & {
+      [functionalElementPropertyChanged]?: (property: string) => void;
+    })[functionalElementPropertyChanged];
+    functionalObserver?.call(this, name);
+    void this.queuePropertyUpdate(name, value);
   }
 
   private createRenderEffect(): void {
@@ -712,7 +757,7 @@ export abstract class GluonElement<
     this.pendingPropertyUpdate = undefined;
     this.pendingPropertyValue = undefined;
     try {
-      if (!updateCompiledPrimitiveTextBinding(this.renderRoot, binding.index, value)) {
+      if (!binding.updater.update(value)) {
         this.pendingUpdate = deferred;
         this.pendingPropertyUpdate = property;
         this.pendingPropertyValue = value;
@@ -895,11 +940,11 @@ export abstract class GluonElement<
           this,
         );
       }
-      if (declaration.validate && this[propertyValues].has(name)) {
+      if (declaration.validate && hasOwnPropertyValue(this[propertyValues], name)) {
         this.validateContractValue(
           'property',
           name,
-          this[propertyValues].get(name),
+          this[propertyValues][name],
           declaration.validate,
         );
       }
@@ -965,13 +1010,13 @@ export abstract class GluonElement<
 
   private applyPropertyDefaults(constructor: GluonElementConstructor): void {
     for (const [name, definition] of Object.entries(getDeclarations(constructor))) {
-      if (this[propertyValues].has(name)) continue;
+      if (hasOwnPropertyValue(this[propertyValues], name)) continue;
       const declaration = normalizeDeclaration(definition);
       if (!('default' in declaration)) continue;
       const defaultValue = typeof declaration.default === 'function'
         ? (declaration.default as () => unknown)()
         : declaration.default;
-      this[propertyValues].set(name, defaultValue);
+      this[propertyValues][name] = defaultValue;
     }
   }
 
@@ -979,8 +1024,8 @@ export abstract class GluonElement<
     const declarations = getDeclarations(this.constructor as GluonElementConstructor);
     for (const [name, definition] of Object.entries(declarations)) {
       const declaration = normalizeDeclaration(definition);
-      if (!declaration.reflect || !this[propertyValues].has(name)) continue;
-      this.reflectProperty(name, this[propertyValues].get(name), declaration);
+      if (!declaration.reflect || !hasOwnPropertyValue(this[propertyValues], name)) continue;
+      this.reflectProperty(name, this[propertyValues][name], declaration);
     }
   }
 
@@ -1403,15 +1448,24 @@ function finalizeProperties(constructor: GluonElementConstructor): void {
     if (Object.getOwnPropertyDescriptor(constructor.prototype, name)
       && !hasOwnDecoratedProperty(constructor, name)) continue;
     const declaration = normalizeDeclaration(definition);
+    const usesSimpleProductionSetter = compiledDevelopment === false
+      && !declaration.required
+      && !declaration.validate
+      && !declaration.hasChanged
+      && !declaration.reflect;
     Object.defineProperty(constructor.prototype, name, {
       configurable: true,
       enumerable: true,
       get(this: GluonElement) {
-        return this[propertyValues].get(name);
+        return this[propertyValues][name];
       },
-      set(this: GluonElement, value: unknown) {
-        this[setProperty](name, value, declaration);
-      },
+      set: usesSimpleProductionSetter
+        ? function setSimpleDeclaredProperty(this: GluonElement, value: unknown): void {
+            this[setSimpleProperty](name, value);
+          }
+        : function setDeclaredProperty(this: GluonElement, value: unknown): void {
+            this[setProperty](name, value, declaration);
+          },
     });
   }
 
@@ -1475,6 +1529,10 @@ function getSlotDeclarations(constructor: GluonElementConstructor): SlotDeclarat
 
 function normalizeDeclaration(definition: PropertyDefinition): PropertyDeclaration {
   return typeof definition === 'function' ? { type: definition } : definition;
+}
+
+function hasOwnPropertyValue(values: Record<string, unknown>, name: string): boolean {
+  return Object.prototype.hasOwnProperty.call(values, name);
 }
 
 function getAttributeName(

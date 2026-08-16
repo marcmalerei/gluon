@@ -447,41 +447,72 @@ describe('@gluonjs/vite real server contract', () => {
       page.on('pageerror', (error) => errors.push(error.message));
       await page.goto(server.resolvedUrls!.local[0]!);
       const result = await page.evaluate(async () => {
-        const elements = [...document.querySelectorAll('compiled-label')] as Array<HTMLElement & {
+        const labels = [...document.querySelectorAll('compiled-label')] as Array<HTMLElement & {
           label: string;
           updateComplete: Promise<void>;
           shadowRoot: ShadowRoot;
         }>;
-        const element = elements[0]!;
-        const second = elements[1]!;
-        const prototype = Object.getPrototypeOf(element) as { render: () => unknown };
-        const render = prototype.render;
-        prototype.render = () => { throw new Error('compiled update rerendered'); };
-        second.label = 'Second B';
-        element.label = 'B';
-        await Promise.all([element.updateComplete, second.updateComplete]);
-        const compiledText = [element.shadowRoot.textContent, second.shadowRoot.textContent];
+        const label = labels[0]!;
+        const secondLabel = labels[1]!;
+        const labelPrototype = Object.getPrototypeOf(label) as { render: () => unknown };
+        const labelRender = labelPrototype.render;
+        labelPrototype.render = () => { throw new Error('compiled label update rerendered'); };
+        secondLabel.label = 'Second B';
+        label.label = 'B';
+        await Promise.all([label.updateComplete, secondLabel.updateComplete]);
+        const compiledText = [label.shadowRoot.textContent, secondLabel.shadowRoot.textContent];
 
-        prototype.render = render;
-        element.shadowRoot.replaceChildren(document.createElement('i'));
-        element.label = 'C';
-        await element.updateComplete;
-        second.label = 'Disconnected';
-        const disconnectedUpdate = second.updateComplete;
-        second.remove();
+        labelPrototype.render = labelRender;
+        label.shadowRoot.replaceChildren(document.createElement('i'));
+        label.label = 'C';
+        await label.updateComplete;
+        secondLabel.label = 'Disconnected';
+        const disconnectedUpdate = secondLabel.updateComplete;
+        secondLabel.remove();
         await disconnectedUpdate;
-        document.body.append(second);
-        await second.updateComplete;
+        document.querySelector('#app')!.append(secondLabel);
+        await secondLabel.updateComplete;
+
+        const count = document.querySelector('compiled-count') as HTMLElement & {
+          count: number;
+          updateComplete: Promise<void>;
+          shadowRoot: ShadowRoot;
+        };
+        const countPrototype = Object.getPrototypeOf(count) as { render: () => unknown };
+        const countRender = countPrototype.render;
+        countPrototype.render = () => { throw new Error('compiled count update rerendered'); };
+        count.count = 2;
+        const countButton = count.shadowRoot.querySelector('[data-role="count"]') as HTMLButtonElement;
+        const countNode = countButton.firstChild;
+        await count.updateComplete;
+        const countText = count.shadowRoot.textContent;
+        const countNodeRetained = countButton.firstChild === countNode;
+        countButton.click();
+        await count.updateComplete;
+        const countClickText = count.shadowRoot.textContent;
+
+        countPrototype.render = countRender;
+        count.shadowRoot.replaceChildren(document.createElement('i'));
+        count.count = 4;
+        await count.updateComplete;
         return {
           compiledText,
-          recoveredText: element.shadowRoot.textContent,
-          reconnectedText: second.shadowRoot.textContent,
+          recoveredText: label.shadowRoot.textContent,
+          reconnectedText: secondLabel.shadowRoot.textContent,
+          countText,
+          countClickText,
+          countRecoveredText: count.shadowRoot.textContent,
+          countNodeRetained,
         };
       });
       expect(result).toEqual({
         compiledText: ['B', 'Second B'],
         recoveredText: 'C',
         reconnectedText: 'Disconnected',
+        countText: 'Count: 2',
+        countClickText: 'Count: 3',
+        countRecoveredText: 'Count: 4',
+        countNodeRetained: true,
       });
       expect(errors).toEqual([]);
     } finally {
@@ -550,7 +581,7 @@ async function createPrimitiveFixture(): Promise<string> {
   temporaryDirectories.push(root);
   await writeFile(
     resolve(root, 'index.html'),
-    '<script type="module" src="/main.ts"></script>',
+    '<main id="app"></main><script type="module" src="/main.ts"></script>',
   );
   await writeFile(resolve(root, 'main.ts'), [
     "import { defineElement, GluonElement, html } from '@gluonjs/core';",
@@ -560,7 +591,14 @@ async function createPrimitiveFixture(): Promise<string> {
     '  protected override render() { return html`<output>${this.label}</output>`; }',
     '}',
     "defineElement('compiled-label', CompiledLabel);",
-    "document.body.append(document.createElement('compiled-label'), document.createElement('compiled-label'));",
+    'class CompiledCount extends GluonElement {',
+    "  static override readonly properties = { count: { type: Number, default: 1 } } as const;",
+    '  declare count: number;',
+    '  private readonly handleClick = () => { this.count += 1; };',
+    "  protected override render() { return html`<article><button type=\"button\" data-role=\"count\" @click=${this.handleClick}>Count: ${this.count}</button></article>`; }",
+    '}',
+    "defineElement('compiled-count', CompiledCount);",
+    "document.querySelector('#app')!.append(document.createElement('compiled-label'), document.createElement('compiled-label'), document.createElement('compiled-count'));",
   ].join('\n'));
   return root;
 }

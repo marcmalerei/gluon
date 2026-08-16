@@ -281,6 +281,41 @@ export function guardEventListener(
   return guarded;
 }
 
+/** @internal Retains one mutable renderer binding while preserving its captured error context. */
+export function guardRetainedEventListener(
+  retained: { current: EventListenerOrEventListenerObject },
+): EventListener {
+  const frame = activeFrame;
+  if (!frame) {
+    return function unownedRetainedEventListener(this: EventTarget, event: Event): void {
+      const current = retained.current;
+      if (typeof current === 'function') current.call(this, event);
+      else current.handleEvent(event);
+    };
+  }
+
+  return function guardedRetainedEventListener(this: EventTarget, event: Event): void {
+    const current = retained.current;
+    try {
+      const previous = activeFrame;
+      activeFrame = frame;
+      let result: unknown;
+      try {
+        result = typeof current === 'function'
+          ? current.call(this, event)
+          : current.handleEvent(event);
+      } finally {
+        activeFrame = previous;
+      }
+      if (result !== undefined && isPromiseLike(result)) {
+        void Promise.resolve(result).catch((error: unknown) => frame.handleError(error, 'async'));
+      }
+    } catch (error) {
+      frame.handleError(error, 'event');
+    }
+  };
+}
+
 export function runActiveGuarded<Result>(
   callback: () => Result | PromiseLike<Result>,
   source: AppErrorSource = 'async',

@@ -75,7 +75,9 @@ const initialBatchSizes: Record<ComponentScenario, number> = {
   state: 2,
   list: 1,
 };
-const minimumBatchDuration = 8;
+// Browser clocks, especially WebKit's, quantize short intervals heavily. A 40 ms
+// floor keeps one-millisecond timer steps below 2.5% of a measured batch.
+const minimumBatchDuration = 40;
 
 export async function runComponentComparison(
   config: ComponentBenchmarkConfig = {},

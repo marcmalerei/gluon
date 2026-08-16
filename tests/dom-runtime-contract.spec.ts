@@ -5,6 +5,7 @@ import {
   defineElement,
   directive,
   event,
+  markCompiledPrimitiveTextBinding,
   html,
   nothing,
   repeat,
@@ -617,6 +618,59 @@ describe('DOM runtime contract', () => {
     render(attributeView(), attributeRoot);
     expect(ownedButton.title).toBe('owned');
     expect(ownedButton.disabled).toBe(true);
+  });
+
+  it('keeps the compiled stable text node identity and recovers from external disturbance', () => {
+    const root = document.createElement('div');
+    const view = (value: string | number | null) => markCompiledPrimitiveTextBinding(
+      html`<p>${value}</p>`,
+      'value',
+      0,
+    );
+
+    render(view('first'), root);
+    const paragraph = root.querySelector('p')!;
+    const text = [...paragraph.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+    expect(text).toBeDefined();
+
+    render(view('second'), root);
+    expect([...paragraph.childNodes].find((node) => node.nodeType === Node.TEXT_NODE)).toBe(text);
+    expect(paragraph.textContent).toBe('second');
+
+    text?.remove();
+    render(view('third'), root);
+    expect(root.querySelector('p')).toBe(paragraph);
+    expect(root.querySelector('p')?.textContent).toBe('third');
+  });
+
+  it('falls back from the compiled stable text path for non-string and directive values', () => {
+    const root = document.createElement('div');
+    const view = (value: string | number | null) => markCompiledPrimitiveTextBinding(
+      html`<p>${value}</p>`,
+      'value',
+      0,
+    );
+    const lifecycle = directive<[string]>({
+      mount(part, [value]) {
+        part.setValue(value);
+      },
+      update(part, [value]) {
+        part.setValue(value);
+      },
+    });
+
+    render(view('first'), root);
+    const paragraph = root.querySelector('p')!;
+    const text = [...paragraph.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+    render(view(2), root);
+    expect(root.querySelector('p')?.textContent).toBe('2');
+    render(view(null), root);
+    expect(root.querySelector('p')?.textContent).toBe('');
+    expect(root.querySelector('p')).toBe(paragraph);
+    expect([...paragraph.childNodes].some((node) => node.nodeType === Node.TEXT_NODE)).toBe(false);
+
+    render(html`<p>${lifecycle('directive')}</p>`, root);
+    expect(root.querySelector('p')?.textContent).toBe('directive');
   });
 
   it('preserves null and undefined as explicit property values', () => {
