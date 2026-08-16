@@ -2,6 +2,15 @@ import type { Meta, StoryObj } from '@gluonjs/gluon-components-vite';
 import { html } from '@gluonjs/core';
 import { OneTimePasswordField } from '@gluonjs/molecules';
 
+type OneTimePasswordFieldStoryArgs = {
+  label: string;
+  length: number;
+  mode: 'numeric' | 'alphanumeric';
+  value: string;
+  helper?: string;
+  error?: string;
+};
+
 const meta = {
   title: 'Molecules/One-time password field',
   render: (args) => html`
@@ -18,10 +27,10 @@ const meta = {
     helper: { control: 'text' },
     error: { control: 'text' },
   },
-} satisfies Meta<{ label: string; length: number; mode: 'numeric' | 'alphanumeric'; value: string; helper?: string; error?: string }>;
+} satisfies Meta<OneTimePasswordFieldStoryArgs>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<OneTimePasswordFieldStoryArgs>;
 export const Default: Story = {};
 export const Alphanumeric: Story = { args: { mode: 'alphanumeric', value: 'A1b', helper: 'Letters and numbers are accepted.' } };
 export const Error: Story = { args: { error: 'Enter the complete code.', helper: undefined } };
