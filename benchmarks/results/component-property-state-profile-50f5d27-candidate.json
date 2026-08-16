@@ -1,0 +1,627 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-16T01:37:26.824Z",
+  "source": {
+    "commit": "50f5d27aac57ca803ebf3b795e83fb5e652eaa97",
+    "branch": "codex/issue-415-lit-performance",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "chromium": "149.0.7827.55",
+    "packages": {
+      "gluon": "1.9.0",
+      "lit": "3.3.3",
+      "playwright": "1.61.1",
+      "vite": "8.2.1"
+    }
+  },
+  "methodology": {
+    "productionBuild": true,
+    "headless": true,
+    "framework": "gluon",
+    "componentCount": 50,
+    "warmupIterations": 1000,
+    "measuredIterations": 20000,
+    "samplingIntervalMicroseconds": 100,
+    "scenarioIsolation": "fresh browser context and CPU profile per scenario"
+  },
+  "runs": [
+    {
+      "scenario": "property",
+      "measurement": {
+        "framework": "gluon",
+        "scenario": "property",
+        "warmupIterations": 1000,
+        "measuredIterations": 20000,
+        "elapsedMs": 221.39999997615814,
+        "snapshot": {
+          "componentCount": 50,
+          "rowCount": 0,
+          "firstLabel": "Component 0 A",
+          "firstCount": null,
+          "firstItemId": null,
+          "firstItemLabel": null,
+          "lastLabel": "Component 49 A",
+          "lastCount": null,
+          "lastItemId": null,
+          "lastItemLabel": null
+        }
+      },
+      "profile": "issue-415-profile-candidate-50f5d27-property.cpuprofile",
+      "profileSummary": [
+        {
+          "functionName": "setExactStablePrimitiveValue",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 5606,
+          "selfSamples": 471,
+          "selfTimeMs": 47.1,
+          "selfPercent": 27.24117987275882
+        },
+        {
+          "functionName": "(program)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 198,
+          "selfTimeMs": 19.8,
+          "selfPercent": 11.451706188548293
+        },
+        {
+          "functionName": "_r",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 48924,
+          "selfSamples": 175,
+          "selfTimeMs": 17.5,
+          "selfPercent": 10.121457489878543
+        },
+        {
+          "functionName": "Yt",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 36488,
+          "selfSamples": 122,
+          "selfTimeMs": 12.2,
+          "selfPercent": 7.056101792943899
+        },
+        {
+          "functionName": "qd",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 4849,
+          "selfSamples": 118,
+          "selfTimeMs": 11.8,
+          "selfPercent": 6.824754193175246
+        },
+        {
+          "functionName": "(garbage collector)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 85,
+          "selfTimeMs": 8.5,
+          "selfPercent": 4.9161364950838635
+        },
+        {
+          "functionName": "performCompiledPropertyUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 50328,
+          "selfSamples": 76,
+          "selfTimeMs": 7.6,
+          "selfPercent": 4.395604395604396
+        },
+        {
+          "functionName": "zd",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 2904,
+          "selfSamples": 75,
+          "selfTimeMs": 7.5,
+          "selfPercent": 4.3377674956622325
+        },
+        {
+          "functionName": "run",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 1846,
+          "selfSamples": 71,
+          "selfTimeMs": 7.1,
+          "selfPercent": 4.1064198958935805
+        },
+        {
+          "functionName": "vr",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 55231,
+          "selfSamples": 68,
+          "selfTimeMs": 6.8,
+          "selfPercent": 3.9329091960670906
+        },
+        {
+          "functionName": "queuePropertyUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 49810,
+          "selfSamples": 31,
+          "selfTimeMs": 3.1,
+          "selfPercent": 1.7929438982070562
+        },
+        {
+          "functionName": "update",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 20021,
+          "selfSamples": 31,
+          "selfTimeMs": 3.1,
+          "selfPercent": 1.7929438982070562
+        },
+        {
+          "functionName": "flushCompiledPropertyUpdates",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 44003,
+          "selfSamples": 31,
+          "selfTimeMs": 3.1,
+          "selfPercent": 1.7929438982070562
+        },
+        {
+          "functionName": "(idle)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 20,
+          "selfTimeMs": 2,
+          "selfPercent": 1.156737998843262
+        },
+        {
+          "functionName": "queueMicrotask",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 19,
+          "selfTimeMs": 1.9,
+          "selfPercent": 1.098901098901099
+        },
+        {
+          "functionName": "ensurePendingUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 51727,
+          "selfSamples": 12,
+          "selfTimeMs": 1.2,
+          "selfPercent": 0.6940427993059572
+        },
+        {
+          "functionName": "queueCompiledPropertyUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 44735,
+          "selfSamples": 10,
+          "selfTimeMs": 1,
+          "selfPercent": 0.578368999421631
+        },
+        {
+          "functionName": "promise",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 55269,
+          "selfSamples": 8,
+          "selfTimeMs": 0.8,
+          "selfPercent": 0.46269519953730476
+        },
+        {
+          "functionName": "get isActiveAndEmpty",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 2483,
+          "selfSamples": 7,
+          "selfTimeMs": 0.7,
+          "selfPercent": 0.4048582995951417
+        },
+        {
+          "functionName": "isURL",
+          "url": "",
+          "lineNumber": 48,
+          "columnNumber": 15,
+          "selfSamples": 7,
+          "selfTimeMs": 0.7,
+          "selfPercent": 0.4048582995951417
+        },
+        {
+          "functionName": "Rd",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 2437,
+          "selfSamples": 6,
+          "selfTimeMs": 0.6,
+          "selfPercent": 0.3470213996529786
+        },
+        {
+          "functionName": "scheduleCompiledPropertyUpdateFlush",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 44575,
+          "selfSamples": 6,
+          "selfTimeMs": 0.6,
+          "selfPercent": 0.3470213996529786
+        },
+        {
+          "functionName": "re",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 1,
+          "columnNumber": 4744,
+          "selfSamples": 4,
+          "selfTimeMs": 0.4,
+          "selfPercent": 0.23134759976865238
+        },
+        {
+          "functionName": "Ke",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 24353,
+          "selfSamples": 4,
+          "selfTimeMs": 0.4,
+          "selfPercent": 0.23134759976865238
+        },
+        {
+          "functionName": "Le",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 19578,
+          "selfSamples": 4,
+          "selfTimeMs": 0.4,
+          "selfPercent": 0.23134759976865238
+        },
+        {
+          "functionName": "(anonymous)",
+          "url": "",
+          "lineNumber": 2,
+          "columnNumber": 8,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.1735106998264893
+        },
+        {
+          "functionName": "UtilityScript",
+          "url": "",
+          "lineNumber": 272,
+          "columnNumber": 14,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.1735106998264893
+        },
+        {
+          "functionName": "(anonymous)",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 24,
+          "columnNumber": 145,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.1735106998264893
+        },
+        {
+          "functionName": "n",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 1,
+          "columnNumber": 701,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.1735106998264893
+        },
+        {
+          "functionName": "update",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 48053,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.1735106998264893
+        }
+      ]
+    },
+    {
+      "scenario": "state",
+      "measurement": {
+        "framework": "gluon",
+        "scenario": "state",
+        "warmupIterations": 1000,
+        "measuredIterations": 20000,
+        "elapsedMs": 1015.3000000119209,
+        "snapshot": {
+          "componentCount": 50,
+          "rowCount": 0,
+          "firstLabel": null,
+          "firstCount": "Count: 21000",
+          "firstItemId": null,
+          "firstItemLabel": null,
+          "lastLabel": null,
+          "lastCount": "Count: 21000",
+          "lastItemId": null,
+          "lastItemLabel": null
+        }
+      },
+      "profile": "issue-415-profile-candidate-50f5d27-state.cpuprofile",
+      "profileSummary": [
+        {
+          "functionName": "click",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 4361,
+          "selfTimeMs": 436.1,
+          "selfPercent": 61.207017543859656
+        },
+        {
+          "functionName": "setExactStablePrimitiveValue",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 5606,
+          "selfSamples": 560,
+          "selfTimeMs": 56,
+          "selfPercent": 7.859649122807018
+        },
+        {
+          "functionName": "querySelector",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 530,
+          "selfTimeMs": 53,
+          "selfPercent": 7.438596491228071
+        },
+        {
+          "functionName": "run",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 1846,
+          "selfSamples": 336,
+          "selfTimeMs": 33.6,
+          "selfPercent": 4.715789473684211
+        },
+        {
+          "functionName": "(garbage collector)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 246,
+          "selfTimeMs": 24.6,
+          "selfPercent": 3.4526315789473685
+        },
+        {
+          "functionName": "(program)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 189,
+          "selfTimeMs": 18.9,
+          "selfPercent": 2.6526315789473682
+        },
+        {
+          "functionName": "Yt",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 36488,
+          "selfSamples": 152,
+          "selfTimeMs": 15.2,
+          "selfPercent": 2.1333333333333333
+        },
+        {
+          "functionName": "(anonymous)",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 1,
+          "columnNumber": 2040,
+          "selfSamples": 113,
+          "selfTimeMs": 11.3,
+          "selfPercent": 1.5859649122807018
+        },
+        {
+          "functionName": "zd",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 2904,
+          "selfSamples": 101,
+          "selfTimeMs": 10.1,
+          "selfPercent": 1.4175438596491228
+        },
+        {
+          "functionName": "vr",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 55231,
+          "selfSamples": 78,
+          "selfTimeMs": 7.8,
+          "selfPercent": 1.094736842105263
+        },
+        {
+          "functionName": "_r",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 48924,
+          "selfSamples": 74,
+          "selfTimeMs": 7.4,
+          "selfPercent": 1.03859649122807
+        },
+        {
+          "functionName": "performCompiledPropertyUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 50328,
+          "selfSamples": 66,
+          "selfTimeMs": 6.6,
+          "selfPercent": 0.9263157894736843
+        },
+        {
+          "functionName": "scheduleCompiledPropertyUpdateFlush",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 44575,
+          "selfSamples": 52,
+          "selfTimeMs": 5.2,
+          "selfPercent": 0.7298245614035087
+        },
+        {
+          "functionName": "queuePropertyUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 49810,
+          "selfSamples": 36,
+          "selfTimeMs": 3.6,
+          "selfPercent": 0.5052631578947369
+        },
+        {
+          "functionName": "qd",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 4849,
+          "selfSamples": 34,
+          "selfTimeMs": 3.4,
+          "selfPercent": 0.4771929824561404
+        },
+        {
+          "functionName": "update",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 20021,
+          "selfSamples": 26,
+          "selfTimeMs": 2.6,
+          "selfPercent": 0.36491228070175435
+        },
+        {
+          "functionName": "flushCompiledPropertyUpdates",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 44003,
+          "selfSamples": 22,
+          "selfTimeMs": 2.2,
+          "selfPercent": 0.3087719298245614
+        },
+        {
+          "functionName": "queueMicrotask",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 18,
+          "selfTimeMs": 1.8,
+          "selfPercent": 0.25263157894736843
+        },
+        {
+          "functionName": "get",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 56231,
+          "selfSamples": 17,
+          "selfTimeMs": 1.7,
+          "selfPercent": 0.2385964912280702
+        },
+        {
+          "functionName": "(idle)",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 15,
+          "selfTimeMs": 1.5,
+          "selfPercent": 0.21052631578947367
+        },
+        {
+          "functionName": "queueCompiledPropertyUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 44735,
+          "selfSamples": 10,
+          "selfTimeMs": 1,
+          "selfPercent": 0.14035087719298245
+        },
+        {
+          "functionName": "handleClick",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 24,
+          "columnNumber": 434,
+          "selfSamples": 9,
+          "selfTimeMs": 0.9,
+          "selfPercent": 0.12631578947368421
+        },
+        {
+          "functionName": "Ke",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 24353,
+          "selfSamples": 5,
+          "selfTimeMs": 0.5,
+          "selfPercent": 0.07017543859649122
+        },
+        {
+          "functionName": "promise",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 55269,
+          "selfSamples": 5,
+          "selfTimeMs": 0.5,
+          "selfPercent": 0.07017543859649122
+        },
+        {
+          "functionName": "get isActiveAndEmpty",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 2483,
+          "selfSamples": 4,
+          "selfTimeMs": 0.4,
+          "selfPercent": 0.05614035087719298
+        },
+        {
+          "functionName": "e",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 45174,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.042105263157894736
+        },
+        {
+          "functionName": "e",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 45683,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.042105263157894736
+        },
+        {
+          "functionName": "removeAttribute",
+          "url": "",
+          "lineNumber": 0,
+          "columnNumber": 0,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.042105263157894736
+        },
+        {
+          "functionName": "zd",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 34,
+          "columnNumber": 2904,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.042105263157894736
+        },
+        {
+          "functionName": "ensurePendingUpdate",
+          "url": "http://127.0.0.1:62651/assets/index-BQYWWaNf.js",
+          "lineNumber": 15,
+          "columnNumber": 51727,
+          "selfSamples": 3,
+          "selfTimeMs": 0.3,
+          "selfPercent": 0.042105263157894736
+        }
+      ]
+    }
+  ]
+}

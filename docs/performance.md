@@ -277,26 +277,30 @@ with issues #172 and #174 supersede that framework-comparison interpretation.
 
 ## Property/state profile evidence
 
-The clean Chromium
-[`component-property-state-profile-b461353.json`](../benchmarks/results/component-property-state-profile-b461353.json)
-profile records 20,000 measured iterations across 50 mounted Gluon components
-after 1,000 warm-ups. Before the shared component queue, property updates spent
-20.98% of sampled self time in the scheduler phase flush and 8.26% in its
-per-element queue path. State updates spent 6.83% and 4.27% in those same
-frames; native button `click` dispatch accounted for 52.93% of state self time.
-The paired property and state `.cpuprofile` files retain the raw Chrome DevTools
-samples. This identified repeated per-element scheduling as the actionable
-Gluon-owned hot path; it does not treat native event dispatch as framework work
-that Gluon can remove.
+The issue #415 Chromium profiles each record 20,000 measured iterations across
+50 mounted Gluon components after 1,000 warm-ups. Clean baseline runtime commit
+`c8163e3` measured 240.3 ms for property and 1,163.4 ms for state. Clean
+candidate commit `50f5d27` measured 221.4 ms and 1,015.3 ms respectively: 7.9%
+and 12.7% lower elapsed time in those run-specific profiles. The
+[baseline](../benchmarks/results/component-property-state-profile-c8163e3-baseline.json)
+and [candidate](../benchmarks/results/component-property-state-profile-50f5d27-candidate.json)
+JSON summaries link their raw property/state `.cpuprofile` files.
+
+The candidate state profile still attributes 61.2% of sampled self time to
+native button `click` dispatch and 7.4% to `querySelector`; those are retained
+as workload costs rather than presented as removable Gluon runtime work. CPU
+sampling and elapsed-time profiles diagnose this recorded environment; they do
+not establish portable per-call costs.
 
 ## Current committed matrix
 
 The current rendering matrix measures clean source commit `4c7bdac`; the
-isolated-scenario component matrix measures clean source commit `6ee04e7`.
+isolated-scenario component candidate measures clean source commit `50f5d27`.
 Both use 40 samples, eight warm-up rounds, and Playwright-managed Chromium 149,
-Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. The paired
-JSON files retain every sample and invariant snapshot; the Markdown files
-expose every median and p95 value.
+Firefox 151, and WebKit 26.5 on the recorded Apple M4 environment. Component
+batches use the 40 ms resolution floor described above. The paired JSON files
+retain every sample and invariant snapshot; the Markdown files expose every
+median and p95 value.
 
 ### Template rendering matrix
 
@@ -316,26 +320,54 @@ recorded workload results, not a general rendering ranking.
 
 ### Component matrix
 
-The complete
-[`component-production-6ee04e7.md`](../benchmarks/results/component-production-6ee04e7.md)
-matrix reports milliseconds per 50 component boundaries. Against Lit, Gluon
-wins seven median cells, ties four, and loses one. Lit median divided by Gluon
-median is 1.22×/0.97×/1.00×/1.56× for Chromium
-lifecycle/property/state/list, 1.00×/1.11×/1.00×/1.27× for Firefox, and
-1.27×/1.14×/1.00×/1.60× for WebKit. Property is faster in Gluon on
-Firefox and WebKit; state is equal in all three engines; lifecycle is faster in
-Chromium and WebKit and equal in Firefox; and keyed list is faster in all three.
+The clean high-resolution baseline uses runtime commit `c8163e3` plus the
+measurement-only calibration commit `2fe4f40`. It wins 10 of 12 Lit median
+cells: Chromium state loses at 0.976× and WebKit state is exactly 1.000×.
+Chromium property is only 1.0048×. This demonstrates that the longer batch floor
+does not itself manufacture the final result. The complete baseline is retained
+as [Markdown](../benchmarks/results/component-production-baseline-c8163e3-high-resolution.md)
+and paired JSON.
 
-The remaining Lit median advantage is the Chromium property cell: 0.0143 ms
-per 50 components versus Gluon's 0.0147 ms, an absolute 0.0004 ms. Its p95 is
-0.0151 ms versus Gluon's 0.0159 ms. The matrix therefore records near parity in
-that cell rather than claiming complete cross-engine superiority.
+Two independent clean candidate runs then pass all 12 Lit median cells and all
+12 Lit p95 cells. Lit median divided by Gluon median is:
 
-Against Vue, Gluon wins all four Chromium cells; wins Firefox property, ties
-list, and loses lifecycle/state; and wins WebKit property/state/list while Vue
-wins lifecycle. Across those 12 cells that is eight Gluon wins, one equal
-median, and three Vue wins. This supports only the recorded component workloads,
-not a universal framework ranking.
+| Engine | Run | Lifecycle | Property | State | List |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Chromium 149 | 1 | 1.322× | 1.061× | 1.045× | 1.554× |
+| Chromium 149 | 2 | 1.521× | 1.084× | 1.030× | 1.528× |
+| Firefox 151 | 1 | 1.141× | 1.371× | 1.527× | 1.372× |
+| Firefox 151 | 2 | 1.027× | 1.404× | 1.533× | 1.385× |
+| WebKit 26.5 | 1 | 1.372× | 1.163× | 1.043× | 2.154× |
+| WebKit 26.5 | 2 | 1.370× | 1.141× | 1.017× | 2.125× |
+
+The full [run 1](../benchmarks/results/component-production-50f5d27-run1.md)
+and [run 2](../benchmarks/results/component-production-50f5d27-run2.md)
+retain exact medians, p95 values, calibrated batches, snapshots, and every raw
+sample. The narrowest repeated median result is WebKit state at 1.017× in run
+2, so the claim remains specific to these recorded workloads and environment.
+
+Against Vue, candidate Gluon wins 10 of 12 median cells in both runs. Vue wins
+Firefox and WebKit lifecycle. This supports only the recorded component
+workloads, not a universal framework ranking.
+
+The companion allocation run improved template-result creation by 58.2%, text
+updates by 18.6%, and spread updates by 0.9% versus the clean baseline. Array
+updates were 0.7% slower, so they are explicitly recorded as unchanged within
+run noise rather than claimed as an improvement. Retaining 100,000 reachable
+TemplateResults used 5,890,444 bytes, 1,504 bytes below the baseline run. See
+the [baseline](../benchmarks/results/renderer-allocations-c8163e3-baseline.md)
+and [candidate](../benchmarks/results/renderer-allocations-50f5d27-candidate.md).
+
+The equivalent labelled-counter bundle decreased from 41,108/12,726/11,361
+raw/gzip/Brotli bytes to 40,896/12,643/11,275 bytes. The paired
+[baseline](../benchmarks/results/bundle-matrix-c8163e3-baseline.json) and
+[candidate](../benchmarks/results/bundle-matrix-50f5d27-candidate.json) reports
+also retain browser parity and the Lit/Vue/React controls. The full candidate
+[runtime scorecard](../benchmarks/results/runtime-scorecard-50f5d27-candidate.md)
+passes every SSR, hydration, route, loader, style, teardown, interaction, and
+retention criterion in all supported engines; the
+[baseline](../benchmarks/results/runtime-scorecard-c8163e3-baseline.md) is
+retained alongside it.
 
 Neither matrix measures an Apple M1. Hardware model, operating system, browser,
 thermal state, and other load are part of the evidence boundary; an M1 result
