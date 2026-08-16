@@ -105,8 +105,16 @@ describe('PasswordToggleField', () => {
   });
 
   it('matches the responsive password field visual baseline', async () => {
-    adoptStyles(document, passwordToggleFieldStyles);
-    render(html`<main><div data-testid="password-visual" style="box-sizing:border-box;inline-size:320px;max-inline-size:100%;padding:16px">${PasswordToggleField({ id: 'visual-password', label: 'Password', value: 'example-password', showLabel: 'Show password', hideLabel: 'Hide password', helper: 'Use a password manager when available.' })}</div></main>`, document.body);
+    const field = PasswordToggleField({ id: 'visual-password', label: 'Password', value: 'example-password', showLabel: 'Show password', hideLabel: 'Hide password', helper: 'Use a password manager when available.' });
+    const styleSelection = createComponentStyleSelection(field);
+    expect(styleSelection.entries.map(({ id }) => id)).toEqual(expect.arrayContaining([
+      'gluon-atom-button',
+      'gluon-atom-input',
+      'gluon-atom-toggle-button',
+      'gluon-molecule-password-toggle-field',
+    ]));
+    for (const { sheet } of styleSelection.entries) adoptStyles(document, sheet);
+    render(html`<main><div data-testid="password-visual" style="box-sizing:border-box;inline-size:320px;max-inline-size:100%;padding:16px;font-family:Arial,sans-serif">${field}</div></main>`, document.body);
     await expect.element(page.getByTestId('password-visual')).toMatchScreenshot('password-toggle-field-states', {
       comparatorName: 'pixelmatch',
       comparatorOptions: { allowedMismatchedPixelRatio: 0.05, threshold: 0.15 },
