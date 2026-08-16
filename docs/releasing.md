@@ -9,12 +9,15 @@ For day-to-day version upgrades, start with the
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the prepared `1.10.0` candidate. Every official
-manifest is public and lockstep at `1.10.0`. Registry preflight on 2026-08-16
-confirmed that all 21 package records expose `1.9.0` as `latest` and that
-`1.10.0` is absent. The immutable GitHub release `v1.9.0` remains the current
-finalized release until the protected `1.10.0` workflow completes. The
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.10.0`. Every official manifest is public and
+lockstep at `1.10.0`. Protected release workflow
+[31922071023](https://github.com/marcmalerei/gluon/actions/runs/31922071023)
+published all 21 package records to `latest` with provenance and verified the
+train from a clean directory. The immutable GitHub release
+[`v1.10.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.10.0) was
+published on 2026-08-16 from tag commit
+`d1763ef0646beaa3b5c6753b431f40ddec734ca9` with 115 reviewed assets. The
 `v1.0.9` GitHub release remains a historical draft after its public-type
 verification failure. This is enforced locally by:
 
@@ -24,13 +27,14 @@ npm run check:release-contract
 
 ## v1.10.0 train handoff
 
-Issue [#456](https://github.com/marcmalerei/gluon/issues/456) establishes the
+Issue [#456](https://github.com/marcmalerei/gluon/issues/456) established the
 21-package `1.10.0` train for the complete post-1.9 roadmap tracked by epic
-[#390](https://github.com/marcmalerei/gluon/issues/390). The train uses the
-two-commit release cut: a Quality-Gates-tested candidate followed only by its
-release-cut evidence and compatibility manifest. The immutable `v1.9.0`
-release remains the supported baseline until the protected `v1.10.0` workflow
-completes.
+[#390](https://github.com/marcmalerei/gluon/issues/390). PR
+[#457](https://github.com/marcmalerei/gluon/pull/457) merged the tested
+candidate and its release-cut evidence as a preserved merge commit. The
+protected tag workflow completed candidate, reproducibility, browser-engine,
+Node-runtime, performance, fixture, registry, provenance, and publication
+checks. `v1.10.0` is now the supported `latest` baseline.
 
 ## v1.9.0 train handoff
 

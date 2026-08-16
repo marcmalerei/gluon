@@ -1,10 +1,10 @@
 # Release readiness
 
-The `1.10.0` documentation describes the prepared lockstep candidate. All 21
-official manifests are at `1.10.0`; registry preflight found the target version
-absent while `1.9.0` remains the supported `latest` package train. Issue
-[#456](https://github.com/marcmalerei/gluon/issues/456) owns the release of the
-post-1.9 documentation, package, UI, tooling, security, persistence, forms, and
+The `1.10.0` documentation describes the completed lockstep release. All 21
+official manifests are at `1.10.0`, and the protected release workflow published
+`1.10.0` as the latest package train with npm provenance. Issue
+[#456](https://github.com/marcmalerei/gluon/issues/456) released the post-1.9
+documentation, package, UI, tooling, security, persistence, forms, and
 performance work tracked by epic
 [#390](https://github.com/marcmalerei/gluon/issues/390). The release cut retains
 a Quality-Gates-tested candidate followed only by its release-cut evidence and
@@ -14,10 +14,11 @@ Release-state wording in this documentation follows the repository policy:
 stable describes shipped public contracts, experimental describes explicitly
 labeled opt-in surfaces, and unsupported marks boundaries the contract refuses.
 
-The immutable [`v1.9.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.9.0)
-release remains supported until the protected `v1.10.0` tag workflow completes
-browser, Node, performance, reproducibility, clean-room registry, provenance,
-and publication verification for all 21 packages.
+The immutable GitHub release is [`v1.10.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.10.0),
+published from `d1763ef0646beaa3b5c6753b431f40ddec734ca9`. Protected workflow
+run [31922071023](https://github.com/marcmalerei/gluon/actions/runs/31922071023)
+passed browser, Node, performance, reproducibility, clean-room registry,
+provenance, and publication verification for all 21 packages.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
