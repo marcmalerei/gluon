@@ -314,7 +314,8 @@ describe('reactive GluonElement rendering', () => {
     }
 
     defineElement(tagName, ThrowingElement);
-    const first = document.createElement(tagName) as ThrowingElement & {
+    const first = document.createElement(tagName) as ThrowingElement;
+    const firstInternals = first as unknown as {
       performCompiledPropertyUpdate: () => void;
     };
     const second = document.createElement(tagName) as ThrowingElement;
@@ -323,7 +324,7 @@ describe('reactive GluonElement rendering', () => {
     expect(first.shadowRoot?.textContent).toBe('A');
     expect(second.shadowRoot?.textContent).toBe('A');
 
-    first.performCompiledPropertyUpdate = () => {
+    firstInternals.performCompiledPropertyUpdate = () => {
       throw new Error('compiled flush failure');
     };
     first.label = 'B';
