@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 ### Changed
 
 - Documented the six stable `GLUON_RESPONSIVE_DISCLOSURE_*` runtime diagnostics

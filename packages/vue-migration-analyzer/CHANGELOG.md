@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
+### Changed
+
+- Updated analyzer reports and migration links to the immutable `1.10.0`
+  documentation line.
+
 ## [1.9.0] - 2026-08-15
 
 ### Changed

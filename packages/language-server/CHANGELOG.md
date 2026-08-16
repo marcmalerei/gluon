@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 - Added compiler-parsed `.gluon` diagnostics plus completion, hover,
   definition, references, rename, and semantic tokens across static template,
   script, relative import, component, and CSS-class boundaries.

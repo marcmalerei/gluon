@@ -9,7 +9,7 @@
 </p>
 
 > [!IMPORTANT]
-> This source tree and package describe Gluon `1.9.0` across all 21 official
+> This source tree and package describe Gluon `1.10.0` across all 21 official
 > packages. npm publication occurs only from an immutable release tag through
 > the protected release workflow; later repository commits cannot replace
 > published package contents.
@@ -35,8 +35,8 @@
 - optional `@gluonjs/i18n` locale-aware messages with lazy namespace loading
 - a form-associated `@gluonjs/json-forms` Custom Element for the documented JSON Schema subset
 - request-free, DOM-independent form orchestration through `createFormController()` beside the native UI compositions
-- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.9.0/migration/vue-to-gluon-cutover/index.md)
-- a versioned [Gluon upgrade guide](docs-site/content/1.9.0/migration/upgrade/index.md)
+- a tested, reversible [Vue-to-Gluon cutover playbook](docs-site/content/1.10.0/migration/vue-to-gluon-cutover/index.md)
+- a versioned [Gluon upgrade guide](docs-site/content/1.10.0/migration/upgrade/index.md)
 - nested templates, index-based arrays, and keyed `repeat()` reconciliation
 - standalone DOM-free reactivity with refs, proxies, effects, and computed values
 - reactive Custom Elements through `GluonElement`
@@ -381,9 +381,9 @@ See the [Storybook guide](docs/storybook.md) and the runnable
 [`examples/component-library`](examples/component-library/README.md) catalog.
 
 For a first project, use the versioned
-[step-by-step learning path](docs-site/content/1.9.0/guides/learning-path/index.md).
+[step-by-step learning path](docs-site/content/1.10.0/guides/learning-path/index.md).
 Before extracting shop UI, use the
-[component decision guide](docs-site/content/1.9.0/guides/component-decisions/index.md):
+[component decision guide](docs-site/content/1.10.0/guides/component-decisions/index.md):
 official packages require a cross-application semantic and accessibility
 contract; branded GLUON GOODS compositions remain application-local.
 
@@ -551,7 +551,7 @@ change-detection, required, and validation options as `static properties`.
 `@state()` is reactive internal state with attribute transport disabled.
 Typed events continue to use `static events` and `emit()`; template
 `@event-name` bindings are listeners, not TypeScript decorators. The
-[component guide](docs-site/content/1.9.0/guides/components/index.md) shows the
+[component guide](docs-site/content/1.10.0/guides/components/index.md) shows the
 decorator and plain TypeScript forms side by side.
 
 `defineGluonElement()` is the concise path for the same autonomous boundary. It
@@ -804,7 +804,7 @@ The following points describe architectural advantages and design goals. Outcome
 - [Report-only Vue migration analyzer RFC](docs/rfcs/0003-report-only-vue-migration-analyzer.md)
 - [Bounded Vue codemod no-go decision](docs/vue-codemod-decision.md)
 - [Browser, runtime, and style transport ADR](docs/adrs/0001-browser-runtime-and-style-transport.md)
-- [Gluon upgrade guide](docs-site/content/1.9.0/migration/upgrade/index.md)
+- [Gluon upgrade guide](docs-site/content/1.10.0/migration/upgrade/index.md)
 - [Accessibility and compatibility support matrix](docs/support-matrix.md)
 - [Package, release, and supply-chain governance ADR](docs/adrs/0002-package-release-and-supply-chain-governance.md)
 - [Release operations and protected publication runbook](docs/releasing.md)
@@ -881,7 +881,7 @@ an unsupported superiority claim or an unmeasured hardware claim.
 
 ## Stability policy
 
-Gluon 1.9.0 ships three documentation states:
+Gluon 1.10.0 ships three documentation states:
 
 - stable: the public package surfaces, application runtime, component packages,
   tooling, and release guidance described in the versioned docs and package READMEs;

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 ### Added
 
 - Added a native, filter-aware keyboard node list beside the canvas so graph

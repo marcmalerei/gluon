@@ -4,7 +4,7 @@ This matrix states what Gluon verifies and what it deliberately does not claim.
 It is a compatibility boundary, not a promise that every package exercises
 every platform feature in every environment.
 
-The current lockstep package line is **1.9.0**. Package membership and version
+The current lockstep package line is **1.10.0**. Package membership and version
 ownership come from [`package-contract.json`](../package-contract.json); this
 page names every current official package so omissions fail the repository
 support-matrix check.

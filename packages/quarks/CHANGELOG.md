@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-16
+
 ### Added
 
 - Added separate Tooltip and HoverCard anchored-overlay contracts with typed
