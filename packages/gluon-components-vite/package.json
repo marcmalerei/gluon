@@ -47,7 +47,7 @@
     "provenance": true
   },
   "dependencies": {
-    "@storybook/builder-vite": "10.5.3"
+    "@storybook/builder-vite": "10.5.8"
   },
   "peerDependencies": {
     "@gluonjs/core": "1.10.0",
