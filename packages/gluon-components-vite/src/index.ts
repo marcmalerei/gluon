@@ -53,6 +53,19 @@ export interface FrameworkOptions {
   builder?: BuilderOptions;
 }
 
+/** Per-story controls for Gluon's SSR hydration verification renderer. */
+export interface GluonSsrHydrationParameters {
+  /** Serializes the story as SSR markup, then requires retained browser hydration. */
+  readonly enabled: boolean;
+}
+
+/** Storybook parameters recognized by the Gluon renderer. */
+export interface GluonStoryParameters {
+  readonly gluon?: {
+    readonly ssrHydration?: boolean | GluonSsrHydrationParameters;
+  };
+}
+
 type FrameworkName = CompatibleString<'@gluonjs/gluon-components-vite'>;
 type BuilderName = CompatibleString<'@storybook/builder-vite'>;
 type StorybookConfigFramework = {

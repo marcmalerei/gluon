@@ -1,16 +1,22 @@
 import {
+  createComponentStyleSelection,
   isTemplateResult,
   render as renderGluon,
   unmount,
   type TemplateResult,
 } from '@gluonjs/core';
+import {
+  createStyleManifest,
+  prepareForHydration,
+} from '@gluonjs/ssr';
+import { hydrateTemplate } from '@gluonjs/ssr/hydration';
 import { simulatePageLoad } from 'storybook/preview-api';
 import type {
   Args,
   RenderContext,
   StoryContext,
 } from 'storybook/internal/types';
-import type { GluonRenderer } from './index.js';
+import type { GluonRenderer, GluonStoryParameters } from './index.js';
 
 /** @internal Identifies this preview as Gluon's native renderer. */
 export const parameters = {
@@ -42,7 +48,7 @@ export function render(
  *
  * @internal
  */
-export function renderToCanvas(
+export async function renderToCanvas(
   {
     storyFn,
     showMain,
@@ -50,9 +56,10 @@ export function renderToCanvas(
     forceRemount,
     kind,
     name,
+    storyContext,
   }: RenderContext<GluonRenderer>,
   canvasElement: HTMLElement,
-): () => void {
+): Promise<() => void> {
   if (forceRemount) unmount(canvasElement);
   const result = storyFn();
   showMain();
@@ -66,7 +73,108 @@ export function renderToCanvas(
     return () => unmount(canvasElement);
   }
 
+  if (usesSsrHydration(storyContext.parameters)) {
+    return queueSsrHydration(async () => renderSsrHydrationStory(result, canvasElement, { kind, name, showError }));
+  }
+
   renderGluon(result, canvasElement);
   simulatePageLoad(canvasElement);
   return () => unmount(canvasElement);
+}
+
+let ssrHydrationQueue = Promise.resolve();
+
+function queueSsrHydration<Task>(task: () => Promise<Task>): Promise<Task> {
+  const next = ssrHydrationQueue.then(task, task);
+  ssrHydrationQueue = next.then(() => undefined, () => undefined);
+  return next;
+}
+
+async function renderSsrHydrationStory(
+  result: TemplateResult,
+  canvasElement: HTMLElement,
+  context: Pick<RenderContext<GluonRenderer>, 'kind' | 'name' | 'showError'>,
+): Promise<() => void> {
+  const document = canvasElement.ownerDocument;
+  const carriers: HTMLStyleElement[] = [];
+  const mismatches: string[] = [];
+  try {
+    unmount(canvasElement);
+    const prepared = await prepareForHydration(result);
+    /* c8 ignore next 3 -- prepareForHydration preserves an accepted template root. */
+    if (!isTemplateResult(prepared.value)) {
+      throw new TypeError('A Gluon SSR story must resolve to an html`...` or svg`...` template.');
+    }
+    const styles = createStyleManifest(createComponentStyleSelection(prepared.value));
+    carriers.push(...appendStyleCarriers(document, styles));
+    // `innerHTML` does not materialize Declarative Shadow DOM and Chromium
+    // warns about the transport attribute. Keep it inert until the portable
+    // materialization step below handles every nested root.
+    canvasElement.innerHTML = prepared.html.replaceAll('<template shadowrootmode=', '<template data-gluon-shadowrootmode=');
+    materializeDeclarativeShadowRoots(canvasElement);
+    const hydration = await hydrateTemplate(prepared.value, canvasElement, {
+      hydrateElements: true,
+      onMismatch: (mismatch) => mismatches.push(`${mismatch.category} at ${mismatch.path}`),
+      recovery: 'throw',
+      styles,
+      styleRoot: document,
+    });
+    /* v8 ignore next -- recovery: 'throw' rejects instead of returning recovered hydration. */
+    if (!hydration.retained) {
+      throw new Error(`Gluon SSR story hydration must retain the server-rendered DOM${mismatches.length ? ` (${mismatches.join(', ')})` : ''}.`);
+    }
+    canvasElement.dataset.gluonSsrHydration = 'retained';
+    simulatePageLoad(canvasElement);
+    return () => {
+      delete canvasElement.dataset.gluonSsrHydration;
+      unmount(canvasElement);
+      for (const carrier of carriers) carrier.remove();
+    };
+  } catch (error) {
+    delete canvasElement.dataset.gluonSsrHydration;
+    unmount(canvasElement);
+    for (const carrier of carriers) carrier.remove();
+    context.showError({
+      title: `SSR hydration failed for "${context.name}" of "${context.kind}".`,
+      description: [error, ...mismatches].map(String).join(', '),
+    });
+    return () => unmount(canvasElement);
+  }
+}
+
+function usesSsrHydration(parameters: unknown): boolean {
+  const gluon = (parameters as GluonStoryParameters | undefined)?.gluon;
+  if (!gluon) return false;
+  const configured = gluon.ssrHydration;
+  return configured === true || (typeof configured === 'object' && configured?.enabled === true);
+}
+
+function appendStyleCarriers(
+  document: Document,
+  manifest: ReturnType<typeof createStyleManifest>,
+): HTMLStyleElement[] {
+  const carriers = manifest.entries.map((entry) => {
+    const carrier = document.createElement('style');
+    carrier.dataset.gluonStyle = entry.id;
+    carrier.dataset.gluonDigest = entry.digest;
+    /* c8 ignore next 2 -- component-style selection always supplies its public fallback scope. */
+    if (entry.scope) carrier.dataset.gluonStyleScope = entry.scope;
+    carrier.textContent = entry.cssText;
+    return carrier;
+  });
+  document.head.append(...carriers);
+  return carriers;
+}
+
+function materializeDeclarativeShadowRoots(root: ParentNode): void {
+  for (const template of [...root.querySelectorAll<HTMLTemplateElement>('template[data-gluon-shadowrootmode]')]) {
+    const host = template.parentElement;
+    /* c8 ignore next 2 -- every query-selected template has a parent element. */
+    if (!host) continue;
+    /* c8 ignore next -- renderElement roots are registered Gluon Elements with an open shadow root. */
+    const shadow = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+    shadow.replaceChildren(template.content.cloneNode(true));
+    template.remove();
+    materializeDeclarativeShadowRoots(shadow);
+  }
 }

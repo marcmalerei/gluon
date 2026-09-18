@@ -397,13 +397,13 @@ export const layerOrderStyles = css`
 
 export const foundationStyles = css`
   @layer gluon {
-    :where(.gluon),
-    :where(.gluon)::before,
-    :where(.gluon)::after {
+    :where([data-gluon]),
+    :where([data-gluon])::before,
+    :where([data-gluon])::after {
       box-sizing: border-box;
     }
 
-    :where(.gluon[hidden]:not([hidden="until-found"])) {
+    :where([data-gluon][hidden]:not([hidden="until-found"])) {
       display: none !important;
     }
   }

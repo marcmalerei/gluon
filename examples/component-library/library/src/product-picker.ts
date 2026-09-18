@@ -4,6 +4,8 @@ import {
   elementEvent,
   elementProperty,
   html,
+  type GluonElement,
+  type GluonElementClass,
 } from '@gluonjs/core';
 
 export const productPickerStyles = css`
@@ -12,10 +14,10 @@ export const productPickerStyles = css`
 `;
 
 export interface ProductPickerChange { readonly quantity: number; }
-export interface ProductPickerElement extends HTMLElement { value: number; }
+export interface ProductPickerElement extends GluonElement { value: number; }
 
 /** A stateful library boundary with an explicit public element tag. */
-export const ProductPicker: CustomElementConstructor & { new(): ProductPickerElement; } = defineGluonElement({
+export const ProductPicker: GluonElementClass<ProductPickerElement> = defineGluonElement({
   tagName: 'example-product-picker',
   properties: { value: elementProperty<number>({ type: Number, reflect: true, default: 1 }) },
   events: { change: elementEvent<ProductPickerChange>() },
@@ -32,4 +34,4 @@ export const ProductPicker: CustomElementConstructor & { new(): ProductPickerEle
       <button type="button" aria-label="Increase quantity" @click=${() => change(context.props.value + 1)}>+</button>
     ` };
   },
-}) as CustomElementConstructor & { new(): ProductPickerElement; };
+});

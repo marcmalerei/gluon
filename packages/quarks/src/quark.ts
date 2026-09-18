@@ -281,14 +281,16 @@ export function quark<TagName extends string>(
   const isTextarea = tagName === 'textarea';
   const strings = createQuarkStrings(tagName, isVoid, isTextarea);
   const factory = ((props: QuarkProps<Element> = {}) => {
-    const { children, ...attributes } = props;
+    const { children, data, ...attributes } = props;
     if (isVoid && children != null && children !== false && children !== nothing) {
       throw new TypeError(`Void quark <${tagName}> cannot receive children.`);
     }
 
     const merged = mergeProps(
       {
-        class: { gluon: true, quark: true },
+        // Keep the Foundation reset scoped to framework-rendered nodes without
+        // exposing generic styling classes on every Quark.
+        data: { gluon: true, ...data },
         ...(isTextarea && hasQuarkChildren(children)
           ? { '.defaultValue': textareaDefaultValue(children) }
           : {}),

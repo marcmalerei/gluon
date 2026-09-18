@@ -22,6 +22,10 @@ Direct template child interpolation inside raw-text and RCDATA elements
 (`textarea`, `title`, `script`, and `style`) is rejected with a runtime error
 that points to the supported complete binding form.
 
+Quark factories do not add generic `gluon` or `quark` classes. Supply a
+component-specific class when styling a native element; headless primitives
+retain only their documented component classes such as `gluon-overlay`.
+
 `QuarkProps<ElementType>` has no general string index signature. It derives
 native scalar values and explicit property/boolean bindings from the target DOM
 interface and types ARIA, data, class, style, event, and ref bindings. Use

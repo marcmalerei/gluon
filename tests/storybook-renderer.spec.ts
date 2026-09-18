@@ -1,10 +1,13 @@
 import {
   createComponentStyleDependency,
   css,
+  defineElement,
   event,
+  GluonElement,
   html,
   type TemplateResult,
 } from '@gluonjs/core';
+import { renderElement } from '@gluonjs/ssr';
 import {
   type GluonRenderer,
 } from '@gluonjs/gluon-components-vite';
@@ -40,7 +43,7 @@ describe('@gluonjs/gluon-components-vite', () => {
     )).toThrow('requires a Gluon component function or an explicit render function');
   });
 
-  it('renders, updates, and exactly tears down templates and styles', () => {
+  it('renders, updates, and exactly tears down templates and styles', async () => {
     const canvas = document.createElement('div');
     document.body.append(canvas);
     const sheet = css`button { color: rgb(1 2 3); }`;
@@ -57,7 +60,7 @@ describe('@gluonjs/gluon-components-vite', () => {
     `.withStyleDependencies([styles]);
     const first = context(storyFn);
 
-    const cleanup = renderToCanvas(first.value, canvas);
+    const cleanup = await renderToCanvas(first.value, canvas);
     expect(first.showMain).toHaveBeenCalledOnce();
     expect(first.showError).not.toHaveBeenCalled();
     expect(canvas.querySelector('button')?.textContent).toBe('First');
@@ -66,7 +69,7 @@ describe('@gluonjs/gluon-components-vite', () => {
     expect(click).toHaveBeenCalledOnce();
 
     label = 'Second';
-    renderToCanvas(context(storyFn).value, canvas);
+    await renderToCanvas(context(storyFn).value, canvas);
     expect(canvas.querySelector('button')?.textContent).toBe('Second');
 
     cleanup();
@@ -75,24 +78,24 @@ describe('@gluonjs/gluon-components-vite', () => {
     canvas.remove();
   });
 
-  it('clears a previous root on forced remount', () => {
+  it('clears a previous root on forced remount', async () => {
     const canvas = document.createElement('div');
     const firstButton = html`<button>First</button>`;
-    renderToCanvas(context(() => firstButton).value, canvas);
+    await renderToCanvas(context(() => firstButton).value, canvas);
     const previous = canvas.querySelector('button');
 
-    renderToCanvas(context(() => html`<button>Second</button>`, true).value, canvas);
+    await renderToCanvas(context(() => html`<button>Second</button>`, true).value, canvas);
 
     expect(canvas.querySelector('button')?.textContent).toBe('Second');
     expect(canvas.querySelector('button')).not.toBe(previous);
   });
 
-  it('reports non-Gluon story values and leaves the canvas empty', () => {
+  it('reports non-Gluon story values and leaves the canvas empty', async () => {
     const canvas = document.createElement('div');
     canvas.append(document.createElement('span'));
     const invalid = context(() => 'not a Gluon template' as unknown as TemplateResult);
 
-    const cleanup = renderToCanvas(invalid.value, canvas);
+    const cleanup = await renderToCanvas(invalid.value, canvas);
 
     expect(invalid.showMain).toHaveBeenCalledOnce();
     expect(invalid.showError).toHaveBeenCalledWith({
@@ -102,11 +105,148 @@ describe('@gluonjs/gluon-components-vite', () => {
     expect(canvas.childNodes).toHaveLength(0);
     cleanup();
   });
+
+  it('strictly retains, hydrates, and tears down a styled SSR template story', async () => {
+    const canvas = document.createElement('div');
+    document.body.append(canvas);
+    const sheet = css`button { color: rgb(1 2 3); }`;
+    const styles = createComponentStyleDependency({
+      id: 'storybook-ssr-template-test',
+      sheet,
+      layer: 'atom',
+      order: 0,
+    });
+    const click = vi.fn();
+    const story = context(
+      () => html`<button @click=${event(click)}>Hydrated</button>`.withStyleDependencies([styles]),
+      false,
+      true,
+    );
+
+    const cleanup = await renderToCanvas(story.value, canvas);
+
+    expect(story.showError).not.toHaveBeenCalled();
+    expect(canvas.dataset.gluonSsrHydration).toBe('retained');
+    expect(canvas.querySelector('button')?.textContent).toBe('Hydrated');
+    expect(document.adoptedStyleSheets).toContain(sheet);
+    expect(document.head.querySelector('[data-gluon-style]')).toBeNull();
+    canvas.querySelector('button')?.click();
+    expect(click).toHaveBeenCalledOnce();
+
+    cleanup();
+    expect(canvas.childNodes).toHaveLength(0);
+    expect(canvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(document.adoptedStyleSheets).not.toContain(sheet);
+    canvas.remove();
+  });
+
+  it('hydrates nested server-rendered Gluon elements in a story canvas', async () => {
+    const canvas = document.createElement('div');
+    document.body.append(canvas);
+    const story = context(
+      () => html`<section>${renderElement(StorybookHydratedElement, { properties: { count: 0 } })}</section>`,
+      false,
+      true,
+    );
+
+    const cleanup = await renderToCanvas(story.value, canvas);
+    const host = canvas.querySelector<StorybookHydratedElement>('storybook-hydrated-element');
+    const button = host?.shadowRoot?.querySelector<HTMLButtonElement>('button');
+    const output = host?.shadowRoot?.querySelector('output');
+
+    expect(story.showError).not.toHaveBeenCalled();
+    expect(host?.hasAttribute('data-gluon-hydration')).toBe(false);
+    expect(output?.textContent).toBe('0');
+    button?.click();
+    await host?.updateComplete;
+    expect(output?.textContent).toBe('1');
+
+    cleanup();
+    canvas.remove();
+  });
+
+  it('reports strict SSR hydration failures and continues with the next queued story', async () => {
+    const failedCanvas = document.createElement('div');
+    const retainedCanvas = document.createElement('div');
+    document.body.append(failedCanvas, retainedCanvas);
+    const failed = context(
+      () => html`${renderElement(StorybookTamperedElement)}`,
+      false,
+      { enabled: true },
+    );
+    const retained = context(
+      () => html`<p>Queued retained story</p>`,
+      false,
+      true,
+    );
+
+    const [failedCleanup, retainedCleanup] = await Promise.all([
+      renderToCanvas(failed.value, failedCanvas),
+      renderToCanvas(retained.value, retainedCanvas),
+    ]);
+
+    expect(failed.showError).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'SSR hydration failed for "Example" of "Components".',
+    }));
+    expect(failedCanvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(failedCanvas.childNodes).toHaveLength(0);
+    expect(retained.showError).not.toHaveBeenCalled();
+    expect(retainedCanvas.dataset.gluonSsrHydration).toBe('retained');
+
+    failedCleanup();
+    retainedCleanup();
+    failedCanvas.remove();
+    retainedCanvas.remove();
+  });
+
+
+  it('keeps object-form disabled and omitted SSR options on the normal renderer path', async () => {
+    const disabledCanvas = document.createElement('div');
+    const omittedCanvas = document.createElement('div');
+    const disabled = context(() => html`<p>Disabled SSR option</p>`, false, { enabled: false });
+    const omitted = context(() => html`<p>Omitted SSR option</p>`, false, {});
+
+    await renderToCanvas(disabled.value, disabledCanvas);
+    await renderToCanvas(omitted.value, omittedCanvas);
+
+    expect(disabledCanvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(omittedCanvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(disabledCanvas.textContent).toBe('Disabled SSR option');
+    expect(omittedCanvas.textContent).toBe('Omitted SSR option');
+  });
 });
+
+class StorybookHydratedElement extends GluonElement {
+  static override readonly properties = {
+    count: { type: Number, default: 0, reflect: true },
+  };
+
+  declare count: number;
+
+  protected override render(): TemplateResult {
+    return html`<button type="button" @click=${() => { this.count += 1; }}>Increase</button><output>${this.count}</output>`;
+  }
+}
+
+defineElement('storybook-hydrated-element', StorybookHydratedElement);
+
+class StorybookTamperedElement extends GluonElement {
+  constructor() {
+    super();
+    queueMicrotask(() => this.shadowRoot?.replaceChildren(document.createTextNode('tampered')));
+  }
+
+  protected override render(): TemplateResult {
+    return html`<p>Expected server content</p>`;
+  }
+}
+
+defineElement('storybook-tampered-element', StorybookTamperedElement);
 
 function context(
   storyFn: () => TemplateResult,
   forceRemount = false,
+  ssrHydration: boolean | { readonly enabled?: boolean } = false,
 ): {
   value: RenderContext<GluonRenderer>;
   showMain: ReturnType<typeof vi.fn>;
@@ -122,6 +262,9 @@ function context(
       forceRemount,
       kind: 'Components',
       name: 'Example',
+      storyContext: {
+        parameters: ssrHydration ? { gluon: { ssrHydration } } : {},
+      },
     } as unknown as RenderContext<GluonRenderer>,
     showMain,
     showError,

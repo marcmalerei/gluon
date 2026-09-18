@@ -105,7 +105,7 @@ export interface OverlayProps {
 export function Overlay({ children, onDismiss, attributes = {} }: OverlayProps): TemplateResult {
   const { onPointerDown: attributePointerDown, ...nativeAttributes } = attributes;
   const merged = mergeProps({
-    class: { gluon: true, quark: true, 'gluon-overlay': true },
+    class: { 'gluon-overlay': true },
     data: { gluonOverlay: true },
     children,
   }, nativeAttributes);
@@ -602,7 +602,7 @@ export interface FieldProps {
 
 export function Field({ label, children, helper, error, attributes = {} }: FieldProps): TemplateResult {
   return q.label(mergeProps({
-    class: { gluon: true, quark: true, 'gluon-field': true },
+    class: { 'gluon-field': true },
     children: [
       q.span({ data: { fieldLabel: true }, children: label }),
       children,

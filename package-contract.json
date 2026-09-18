@@ -90,6 +90,7 @@
       "state": "current",
       "environment": "browser",
       "exports": [".", "./entry-preview", "./preset", "./renderer-preset"],
+      "currentDependencies": ["@gluonjs/core", "@gluonjs/ssr"],
       "dependencies": ["@gluonjs/core"]
     },
     {

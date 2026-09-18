@@ -58,9 +58,49 @@ Storybook's Vite builder, controls, decorators, loaders, play functions, and
 addons remain available. The framework package selects the Vite builder and
 registers Gluon's preview annotation automatically.
 
+## Verify SSR hydration
+
+Enable strict SSR-to-browser hydration verification on an individual story:
+
+```ts
+import type {
+  GluonStoryParameters,
+  Meta,
+  StoryObj,
+} from '@gluonjs/gluon-components-vite';
+import { html } from '@gluonjs/core';
+
+const meta = {
+  title: 'Shop/SSR stock label',
+  render: ({ label }) => html`<strong>${label}</strong>`,
+} satisfies Meta<{ label: string }>;
+
+export default meta;
+type Story = StoryObj<{ label: string }>;
+
+export const Retained: Story = {
+  args: { label: 'In stock' },
+  parameters: {
+    gluon: { ssrHydration: true },
+  } satisfies GluonStoryParameters,
+};
+```
+
+The renderer serializes the template, carries its exact component styles,
+materializes Declarative Shadow DOM, and hydrates with `recovery: 'throw'`.
+Mismatch recovery is therefore never hidden by a client-side replacement.
+
+For Custom Elements, add `@gluonjs/ssr` to the component-library project and
+return an `html` template that interpolates
+`renderElement(Component, { properties })`, with all reflected initial
+properties explicit. `renderElement()` is required because a literal
+custom-element tag does not contain enough information to serialize its
+Declarative Shadow DOM. This verifies Gluon's SSR/hydration contract in the
+Storybook browser preview; it is not a separate Node-server execution.
+
 ## Cleanup contract
 
-`renderToCanvas()` returns a teardown that calls Gluon's public `unmount()`.
+`renderToCanvas()` asynchronously returns a teardown that calls Gluon's public `unmount()`.
 Story switches therefore release event bindings and exact component stylesheet
 claims. A forced remount clears the prior Gluon root before rendering.
 

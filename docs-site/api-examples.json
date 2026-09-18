@@ -2101,7 +2101,7 @@
         "const prepared = await prepareForHydration(standalone);",
         "const templateRoot = document.createElement('div');",
         "templateRoot.innerHTML = prepared.html;",
-        "await hydrateTemplate(standalone, templateRoot);",
+        "await hydrateTemplate(standalone, templateRoot, { hydrateElements: true });",
         "",
         "class HydratedBadge extends GluonElement {",
         "  protected render() { return html`<strong>Ready</strong>`; }",
@@ -3240,7 +3240,9 @@
         "  Decorator,",
         "  FrameworkOptions,",
         "  GluonRenderer,",
+        "  GluonSsrHydrationParameters,",
         "  GluonStoryComponent,",
+        "  GluonStoryParameters,",
         "  Loader,",
         "  Meta,",
         "  Preview,",
@@ -3267,8 +3269,10 @@
         "const decorator: Decorator = (Story) => Story();",
         "const loader: Loader = async () => ({ stock: 'available' });",
         "const preview: Preview = { decorators: [decorator], loaders: [loader] };",
+        "const ssrHydration: GluonSsrHydrationParameters = { enabled: true };",
+        "const parameters: GluonStoryParameters = { gluon: { ssrHydration } };",
         "const storyFn: StoryFn<{ label: string }> = ({ label }) => html`<strong>${label}</strong>`;",
-        "console.log(config.framework, story.args?.label, options, rendererResult, preview, storyFn);"
+        "console.log(config.framework, story.args?.label, options, rendererResult, preview, parameters, storyFn);"
       ]
     },
     "reactivity-errors": {
@@ -3523,6 +3527,14 @@
     "packages/gluon-components-vite/src/interfaces/GluonRenderer.md": {
       "recipe": "storybook-gluon",
       "description": "Describe Storybook canvas and story results as native Gluon templates:"
+    },
+    "packages/gluon-components-vite/src/interfaces/GluonSsrHydrationParameters.md": {
+      "recipe": "storybook-gluon",
+      "description": "Enable strict SSR rendering and retained hydration for one Gluon Storybook story:"
+    },
+    "packages/gluon-components-vite/src/interfaces/GluonStoryParameters.md": {
+      "recipe": "storybook-gluon",
+      "description": "Type Gluon-specific Storybook parameters, including per-story SSR hydration validation:"
     },
     "packages/gluon-components-vite/src/type-aliases/Decorator.md": {
       "recipe": "storybook-gluon",

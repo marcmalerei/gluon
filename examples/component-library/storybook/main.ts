@@ -13,6 +13,8 @@ const config: StorybookConfig = {
         '@gluonjs/core': resolve(import.meta.dirname, '../../../src/index.ts'),
         '@gluonjs/quarks': resolve(import.meta.dirname, '../../../packages/quarks/src/index.ts'),
         '@gluonjs/reactivity': resolve(import.meta.dirname, '../../../packages/reactivity/src/index.ts'),
+        '@gluonjs/ssr/hydration': resolve(import.meta.dirname, '../../../packages/ssr/src/hydration.ts'),
+        '@gluonjs/ssr': resolve(import.meta.dirname, '../../../packages/ssr/src/index.ts'),
         '@gluonjs/atoms': resolve(import.meta.dirname, '../../../packages/atoms/src/index.ts'),
         '@gluonjs/molecules': resolve(import.meta.dirname, '../../../packages/molecules/src/index.ts'),
         '@gluonjs/example-component-library/manifest': resolve(import.meta.dirname, '../library/src/manifest.ts'),

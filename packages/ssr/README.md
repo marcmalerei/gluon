@@ -82,7 +82,10 @@ server DOM before binding events, refs, application context, and reactive
 updates. Diagnostics distinguish text, attribute, structure, state, and style
 mismatches. The default recovery replaces the root once; `recovery: 'throw'`
 aborts without mutation. Suppressed categories remain recorded but do not call
-the diagnostic callback.
+the diagnostic callback. When a standalone template contains `renderElement()`
+roots, pass `hydrateElements: true` to `hydrateTemplate()` so its nested
+Declarative Shadow DOM roots are validated and hydrated as part of the same
+retained handoff.
 
 `@gluonjs/ssr/streaming` exposes ordered chunks, byte `ReadableStream`s, and
 progressive rendering. Shell and boundary records include newly required exact
