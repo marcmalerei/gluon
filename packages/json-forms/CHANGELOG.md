@@ -4,6 +4,12 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+## [1.11.2] - 2026-09-18
+
+### Fixed
+
+- Released with the lockstep patch that refreshes VSIX clean-install integrity after the immutable v1.11.1 candidate stopped before publication.
+
 ## [1.11.1] - 2026-09-18
 
 ### Fixed

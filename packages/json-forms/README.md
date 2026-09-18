@@ -11,7 +11,7 @@ an optional package: schema rendering and AJV validation do not enter
 
 ## Stability notes
 
-The package ships as part of the current `1.11.1` release line. Its documented
+The package ships as part of the current `1.11.2` release line. Its documented
 schema and UI schema subset, host-owned lifecycle, and renderer-registry
 boundary are stable; broader JSON Schema features remain unsupported unless a
 later contract adds them.

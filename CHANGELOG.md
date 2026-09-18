@@ -7,6 +7,13 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.11.2] - 2026-09-18
+
+### Fixed
+
+- Refreshed the VSIX clean-install lock integrity for the current npm registry
+  artifact of `@azure/core-client@1.11.1`.
+
 ## [1.11.1] - 2026-09-18
 
 ### Fixed

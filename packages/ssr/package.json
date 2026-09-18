@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/ssr",
-  "version": "1.11.1",
+  "version": "1.11.2",
   "description": "DOM-independent server rendering and request isolation for Gluon.",
   "private": false,
   "type": "module",
@@ -51,12 +51,12 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/reactivity": "1.11.1",
-    "@gluonjs/router": "1.11.1",
-    "@gluonjs/store": "1.11.1"
+    "@gluonjs/reactivity": "1.11.2",
+    "@gluonjs/router": "1.11.2",
+    "@gluonjs/store": "1.11.2"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.11.1"
+    "@gluonjs/core": "1.11.2"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {
