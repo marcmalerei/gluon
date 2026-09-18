@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.11.4] - 2026-09-18
+
+### Fixed
+
+- Released with lockstep hardening that tolerates normal npm registry propagation before release finalization.
+
 ## [1.11.3] - 2026-09-18
 
 ### Fixed

@@ -7,6 +7,14 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.11.4] - 2026-09-18
+
+### Fixed
+
+- Made the post-publish npm visibility and dist-tag checks cache-safe and
+  bounded-retry tolerant, so normal registry propagation cannot falsely block
+  release finalization after all immutable packages were published.
+
 ## [1.11.3] - 2026-09-18
 
 ### Fixed

@@ -590,6 +590,11 @@ the immutable GitHub release. A partial npm publication leaves the GitHub
 release as a draft. Rerunning the failed job verifies and skips matching
 immutable versions before continuing with the unpublished packages.
 
+The direct post-publish probes use npm's online-preferred reads and a bounded,
+increasing retry window. This accommodates normal registry propagation without
+accepting a stale cache or waiting indefinitely; integrity, provenance, and the
+`latest` tag must still match the reviewed candidate before finalization.
+
 A second fresh runner runs the complete root `npm run build` for the same source
 commit and compares every canonical unpacked package-file digest with the
 candidate job. Release-contract validation rejects a workflow that replaces

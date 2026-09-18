@@ -620,7 +620,7 @@ function validateWorkflow() {
   if (!/gh release create[\s\S]*release:publish[\s\S]*release:verify-registry[\s\S]*release:finalize-assets[\s\S]*gh release edit/.test(publishJob)) {
     throw new Error('Release publish must create a draft before direct publication, then verify the registry before finalizing the GitHub release.');
   }
-  for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', distTag", "'--registry', registry", 'releaseContract.publication.registry', 'releaseContract.publication.distTag', 'requireExistingPackage', 'waitForDistTag']) {
+  for (const required of ["'publish'", "'--provenance'", "'--access', 'public'", "'--tag', distTag", "'--registry', registry", "'--prefer-online'", 'releaseContract.publication.registry', 'releaseContract.publication.distTag', 'registryRetryDelaysMs', 'waitForRegistryRetry', 'requireExistingPackage', 'waitForDistTag']) {
     if (!publishScript.includes(required)) throw new Error(`Release publisher is missing ${required}.`);
   }
   if (publishScript.includes('stagingDistTagPrefix') || publishScript.includes("'dist-tag'")) {
