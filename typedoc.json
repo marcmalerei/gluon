@@ -24,6 +24,7 @@
     "packages/ssr/src/static.ts",
     "packages/ssr/src/streaming.ts",
     "packages/vite/src/index.ts",
+    "packages/vite/src/tailwind.ts",
     "packages/gluon-components-vite/src/index.ts",
     "packages/gluon-components-vite/src/entry-preview.ts",
     "packages/gluon-components-vite/src/preset.ts",

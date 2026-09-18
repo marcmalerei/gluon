@@ -1910,6 +1910,17 @@
         "console.log(plugin.name, plugin.enforce); // gluon, pre"
       ]
     },
+    "vite-tailwind": {
+      "module": "@gluonjs/vite/tailwind",
+      "code": [
+        "import { gluonTailwind } from '@gluonjs/vite/tailwind';",
+        "",
+        "const plugins = gluonTailwind({",
+        "  universal: { manifestFile: 'gluon-assets.json', shadowStyles: true },",
+        "});",
+        "console.log(plugins.map((plugin) => plugin.name));"
+      ]
+    },
     "vue-migration-report": {
       "module": "@gluonjs/vue-migration-analyzer",
       "code": [
@@ -4116,6 +4127,10 @@
     "packages/vite/src/functions/default.md": {
       "recipe": "vite-plugin",
       "description": "Install Gluon's pre-transform, compiler diagnostics, HMR virtual runtime, and optional universal asset-manifest generation in Vite:"
+    },
+    "packages/vite/src/tailwind/functions/gluonTailwind.md": {
+      "recipe": "vite-tailwind",
+      "description": "Compose Tailwind's official Vite integration with Gluon's compact, deduplicated Shadow DOM stylesheet manifest:"
     },
     "packages/vite/src/interfaces/GluonVitePluginOptions.md": {
       "recipe": "vite-plugin",

@@ -186,7 +186,8 @@
       "useCases": [
         "Template source maps, development diagnostics, and HMR.",
         "Build-time integration for Gluon applications.",
-        "Tooling support for browser-oriented packages."
+        "Tooling support for browser-oriented packages.",
+        "Optional Tailwind composition with deduplicated Shadow DOM SSR stylesheet assets."
       ],
       "limits": [
         "Does not own application runtime state or rendering semantics.",
@@ -198,7 +199,7 @@
       ],
       "integrationNotes": [
         "Depends on `@gluonjs/compiler` and peers on `@gluonjs/core` plus `vite`.",
-        "Public export surface is `.`."
+        "Public export surface is `.` plus the optional `./tailwind` composition entry."
       ]
     },
     {
