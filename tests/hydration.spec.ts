@@ -525,6 +525,24 @@ describe('SSR hydration', () => {
         code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT',
       });
       expect(root.querySelector('[data-gluon-shadow-style]')).not.toBeNull();
+
+      const missing = document.createElement('tailwind-shadow-card') as TailwindShadowCard;
+      missing.shadowRoot!.innerHTML = '<p class="text-cobalt">Tailwind utility</p>';
+      await expect(hydrateElement(missing, { shadowStyles, recovery: 'throw' })).rejects.toMatchObject({
+        code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT',
+      });
+
+      const corruptStyles = [{
+        id: 'gluon-shadow-corrupt', href: '/assets/corrupt.css', digest: getStyleTextDigest(cssText),
+      }] as const;
+      const corrupt = document.createElement('tailwind-shadow-card') as TailwindShadowCard;
+      const corruptRoot = corrupt.shadowRoot!;
+      corruptRoot.innerHTML = `<link rel="stylesheet" href="/assets/corrupt.css" data-gluon-shadow-style="gluon-shadow-corrupt" data-gluon-digest="${getStyleTextDigest(cssText)}"><p class="text-cobalt">Tailwind utility</p>`;
+      fetch.mockResolvedValueOnce(new Response('.text-cobalt { color: red; }'));
+      await expect(hydrateElement(corrupt, { shadowStyles: corruptStyles, recovery: 'throw' })).rejects.toMatchObject({
+        code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT',
+      });
+      expect(corruptRoot.querySelector('[data-gluon-shadow-style]')).not.toBeNull();
     } finally {
       fetch.mockRestore();
       container.remove();
