@@ -5,6 +5,7 @@ import {
   hydrate,
   GluonElement,
   getStyleSheetText,
+  getStyleTextDigest,
   renderGluonApplicationForServer,
   TemplateResult,
   unmount,
@@ -22,7 +23,7 @@ import {
   prepareForHydration,
   SSR_HYDRATION_MARKER_ATTRIBUTE,
 } from './index.js';
-import type { SsrHydrationMarkerTransport, StyleManifest } from './index.js';
+import type { ShadowStyleAsset, SsrHydrationMarkerTransport, StyleManifest } from './index.js';
 
 export interface HydrateTemplateOptions {
   readonly recovery?: 'replace' | 'throw';
@@ -33,6 +34,8 @@ export interface HydrateTemplateOptions {
   /** Exact application sheets combined with component styles discovered from the hydrated tree. */
   readonly styleSelection?: StyleSheetSelection;
   readonly styleRoot?: Document | ShadowRoot;
+  /** Immutable CSS assets emitted inside every Declarative Shadow DOM root. */
+  readonly shadowStyles?: readonly ShadowStyleAsset[];
   /** @internal Set by hydrateElement() after validating the host transport attribute. */
   readonly markerTransport?: SsrHydrationMarkerTransport;
   /** @internal Nested roots reuse renderer-owned styles without consuming document carriers. */
@@ -133,6 +136,9 @@ export async function hydrateTemplate(
   const handoff = manifest
     ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, manifest, selection)
     : undefined;
+  const shadowHandoff = options.shadowStyles && container.getRootNode() instanceof ShadowRoot
+    ? await prepareShadowStyleHandoff(container.getRootNode() as ShadowRoot, options.shadowStyles)
+    : undefined;
   try {
     const result = hydrate(prepared.value, container, {
       expectedMarkup: prepared.html,
@@ -149,9 +155,11 @@ export async function hydrateTemplate(
       throw new SsrTransportError('DOM hydration recovery is incompatible with an active style handoff.');
     }
     handoff?.commit();
+    shadowHandoff?.commit();
     return result;
   } catch (error) {
     handoff?.rollback();
+    shadowHandoff?.rollback();
     throw error;
   }
 }
@@ -344,6 +352,85 @@ function prepareStyleHandoff(
     },
     dispose() { explicitOwner.dispose(); },
   };
+}
+
+const shadowStyleSheets = new WeakMap<Document, Map<string, Promise<CSSStyleSheet>>>();
+
+async function prepareShadowStyleHandoff(root: ShadowRoot, styles: readonly ShadowStyleAsset[]) {
+  const links = [...root.children].filter((node): node is HTMLLinkElement => (
+    node instanceof HTMLLinkElement && node.dataset.gluonShadowStyle !== undefined
+  ));
+  if (links.length !== styles.length) {
+    throw new SsrTransportError('The hydration target does not contain the expected number of SSR Shadow DOM stylesheet links.');
+  }
+  const ids = new Set<string>();
+  const owner = createStyleSheetOwner(root);
+  try {
+    for (let index = 0; index < styles.length; index += 1) {
+      const expected = styles[index]!;
+      const actual = links[index]!;
+      if (ids.has(expected.id) || actual.dataset.gluonShadowStyle !== expected.id
+        || actual.getAttribute('href') !== expected.href
+        || actual.dataset.gluonDigest !== expected.digest) {
+        throw new SsrTransportError(`SSR Shadow DOM stylesheet transport is invalid for ${expected.id}.`);
+      }
+      ids.add(expected.id);
+      owner.retain(await loadShadowStyleSheet(root.ownerDocument, expected));
+    }
+  } catch (error) {
+    owner.dispose();
+    throw error;
+  }
+  const positions = links.map((link) => ({ link, next: link.nextSibling }));
+  for (const { link } of positions) link.remove();
+  let complete = false;
+  return {
+    commit() {
+      if (complete) return;
+      complete = true;
+      for (const link of links) link.remove();
+    },
+    rollback() {
+      if (complete) return;
+      complete = true;
+      owner.dispose();
+      for (const { link, next } of positions) root.insertBefore(link, next);
+    },
+    dispose() { owner.dispose(); },
+  };
+}
+
+function loadShadowStyleSheet(document: Document, asset: ShadowStyleAsset): Promise<CSSStyleSheet> {
+  let byId = shadowStyleSheets.get(document);
+  if (!byId) {
+    byId = new Map();
+    shadowStyleSheets.set(document, byId);
+  }
+  const existing = byId.get(asset.id);
+  if (existing) return existing;
+  const pending = fetchShadowStyleSheet(document, asset).catch((error: unknown) => {
+    byId!.delete(asset.id);
+    throw error;
+  });
+  byId.set(asset.id, pending);
+  return pending;
+}
+
+async function fetchShadowStyleSheet(document: Document, asset: ShadowStyleAsset): Promise<CSSStyleSheet> {
+  const fetchStyle = document.defaultView?.fetch.bind(document.defaultView) ?? globalThis.fetch;
+  if (!fetchStyle) throw new SsrTransportError('The browser cannot load SSR Shadow DOM stylesheet assets.');
+  const response = await fetchStyle(asset.href);
+  if (!response.ok) throw new SsrTransportError(`Unable to load SSR Shadow DOM stylesheet ${asset.href}.`);
+  const css = await response.text();
+  if (getStyleTextDigest(css) !== asset.digest) {
+    throw new SsrTransportError(`SSR Shadow DOM stylesheet ${asset.id} has a mismatched digest.`);
+  }
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(css);
+  if (getStyleSheetText(sheet).length === 0 && css.length > 0) {
+    throw new SsrTransportError(`SSR Shadow DOM stylesheet ${asset.id} could not be constructed.`);
+  }
+  return sheet;
 }
 
 function hydrationStyleError(

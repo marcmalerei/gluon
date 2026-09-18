@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-09-18
+
+### Added
+
+- Added compact, content-addressed external stylesheet transport for
+  Declarative Shadow DOM SSR. Hydration deduplicates fetched assets and shares
+  one constructed stylesheet per document and style ID across ShadowRoots.
+
 ## [1.10.0] - 2026-08-16
 
 ### Added

@@ -152,6 +152,7 @@ export async function* renderToChunks(
   yield* serializeValue(value, {
     marker: options.markerOffset ?? 0,
     assets: options.assets,
+    shadowStyles: options.shadowStyles ?? options.assets?.shadowStyles,
     signal: options.signal,
     omitServerElementShadowRoots: options.omitServerElementShadowRoots,
     elementScopes: [],
@@ -160,6 +161,8 @@ export async function* renderToChunks(
 
 export interface RenderSerializationOptions {
   readonly assets?: AssetManifest;
+  /** Compact stylesheet references emitted into each Declarative Shadow DOM root. */
+  readonly shadowStyles?: readonly ShadowStyleAsset[];
   readonly signal?: AbortSignal;
   /** @internal Used by the official nested DSD hydration handoff. */
   readonly markerOffset?: number;
@@ -173,6 +176,8 @@ export type ProgressiveRenderChunk =
 
 export interface ProgressiveRenderOptions {
   readonly signal?: AbortSignal;
+  /** Compact stylesheet references emitted into each Declarative Shadow DOM root. */
+  readonly shadowStyles?: readonly ShadowStyleAsset[];
 }
 
 /** Emits fallbacks in the shell and resolved async boundaries as ordered patch records. */
@@ -192,6 +197,7 @@ export async function* renderProgressively(
     progressive,
     componentStyles,
     signal: options.signal,
+    shadowStyles: options.shadowStyles,
     elementScopes: [],
   };
   let shell = '';
@@ -364,11 +370,22 @@ export interface StyleManifest {
   readonly entries: readonly StyleManifestEntry[];
 }
 
+/** A compact, content-addressed stylesheet reference installed in every SSR ShadowRoot. */
+export interface ShadowStyleAsset {
+  readonly id: string;
+  /** Root-relative immutable asset URL emitted by the client build. */
+  readonly href: string;
+  /** Stable FNV-1a digest of the exact asset CSS. */
+  readonly digest: string;
+}
+
 export interface AssetManifest {
   readonly entry: string;
   readonly imports?: readonly string[];
   readonly styles?: readonly string[];
   readonly assets?: readonly string[];
+  /** Optional CSS assets that must also cross Declarative Shadow DOM boundaries. */
+  readonly shadowStyles?: readonly ShadowStyleAsset[];
 }
 
 export type StyleManifestSource = readonly CSSStyleSheet[] | StyleSheetSelection;
@@ -432,6 +449,7 @@ interface SerializationContext {
   readonly omitServerElementShadowRoots?: boolean;
   readonly progressive?: ProgressiveCoordinator;
   readonly assets?: AssetManifest;
+  readonly shadowStyles?: readonly ShadowStyleAsset[];
   readonly componentStyles?: Map<string, ComponentStyleDependency>;
   readonly signal?: AbortSignal;
 }
@@ -499,6 +517,7 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
       yield serverElement.scopedRegistry
         ? '<template shadowrootmode="open" shadowrootcustomelementregistry>'
         : '<template shadowrootmode="open">';
+      yield renderShadowStyleLinks(context.shadowStyles);
       yield shadow;
       yield '</template>';
     }
@@ -567,6 +586,19 @@ async function* serializeValue(value: unknown, context: SerializationContext): A
     'GLUON_SSR_INVALID_VALUE',
     `Cannot server-render ${Object.prototype.toString.call(value)}.`,
   );
+}
+
+/** Renders the compact DSD transport nodes for immutable external Shadow DOM styles. */
+export function renderShadowStyleLinks(styles: readonly ShadowStyleAsset[] | undefined): string {
+  if (!styles || styles.length === 0) return '';
+  const seen = new Set<string>();
+  return styles.map((style) => {
+    if (!style.id || !style.href.startsWith('/') || !style.digest || seen.has(style.id)) {
+      throw new TypeError('SSR Shadow DOM styles require unique IDs, digests, and root-relative asset URLs.');
+    }
+    seen.add(style.id);
+    return `<link rel="stylesheet" href="${escapeAttribute(style.href)}" data-gluon-shadow-style="${escapeAttribute(style.id)}" data-gluon-digest="${escapeAttribute(style.digest)}">`;
+  }).join('');
 }
 
 async function* serializeTemplate(

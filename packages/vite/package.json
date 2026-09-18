@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/vite",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Official Vite integration and state-preserving HMR for Gluon.",
   "private": false,
   "type": "module",
@@ -22,6 +22,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./tailwind": {
+      "types": "./dist/tailwind.d.ts",
+      "import": "./dist/tailwind.js"
     }
   },
   "files": [
@@ -36,14 +40,18 @@
     "provenance": true
   },
   "dependencies": {
-    "@gluonjs/compiler": "1.10.0"
+    "@gluonjs/compiler": "1.11.0"
   },
   "peerDependencies": {
-    "@gluonjs/core": "1.10.0",
+    "@gluonjs/core": "1.11.0",
+    "@tailwindcss/vite": "^4.3.3",
     "vite": "^8.0.0"
   },
   "peerDependenciesMeta": {
     "@gluonjs/core": {
+      "optional": true
+    },
+    "@tailwindcss/vite": {
       "optional": true
     }
   },

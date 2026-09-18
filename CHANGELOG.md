@@ -7,6 +7,16 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-09-18
+
+### Added
+
+- Added the optional `@gluonjs/vite/tailwind` integration, built on Tailwind's
+  official Vite plugin, with a content-addressed Shadow DOM SSR asset manifest.
+- Added compact external stylesheet transport for Declarative Shadow DOM SSR.
+  Tailwind CSS is linked rather than copied per template, then loaded once per
+  document and shared as one constructed stylesheet across hydrated roots.
+
 ## [1.10.0] - 2026-08-16
 
 ### Added

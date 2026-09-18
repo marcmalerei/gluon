@@ -6,6 +6,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/compiler': resolve(import.meta.dirname, 'packages/compiler/src/index.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
+      '@gluonjs/vite/tailwind': resolve(import.meta.dirname, 'packages/vite/src/tailwind.ts'),
       '@gluonjs/vite': resolve(import.meta.dirname, 'packages/vite/src/index.ts'),
     },
   },
