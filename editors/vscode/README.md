@@ -24,7 +24,7 @@ Build and install the self-contained VSIX from a clean repository checkout:
 ```sh
 npm ci --ignore-scripts --legacy-peer-deps
 npm run release:vscode
-code --install-extension .tmp/release/vscode/gluon-vscode-1.11.1.vsix
+code --install-extension .tmp/release/vscode/gluon-vscode-1.11.2.vsix
 ```
 
 The generated `.vsix` is a release artifact and is not committed. The release

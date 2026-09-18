@@ -12,11 +12,11 @@ Install the lockstep packages together and import application state from the
 public Reactivity entry point:
 
 ```sh
-npm install @gluonjs/core@1.11.1 @gluonjs/reactivity@1.11.1
+npm install @gluonjs/core@1.11.2 @gluonjs/reactivity@1.11.2
 npm ls @gluonjs/reactivity
 ```
 
-The second command should report one deduped `@gluonjs/reactivity@1.11.1` path.
+The second command should report one deduped `@gluonjs/reactivity@1.11.2` path.
 The repository's packed-consumer gate installs Core and direct application
 Reactivity from separate archives, rejects a nested Core copy, and verifies
 that Node resolves both imports to the same module file. This is a package
