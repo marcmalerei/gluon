@@ -2,11 +2,19 @@
 
 ## [Unreleased]
 
+## [1.11.3] - 2026-09-18
+
+### Fixed
+
+- Advanced the lockstep package train after re-resolving the VSIX Azure graph
+  from the current registry and making its fresh-install smoke test a required
+  pre-tag Quality Gates check.
+
 ## [1.11.2] - 2026-09-18
 
 ### Fixed
 
-- Released with the lockstep patch that refreshes VSIX clean-install integrity
+- Released with the lockstep patch that refreshed VSIX clean-install integrity
   after the immutable `v1.11.1` candidate stopped before publication.
 
 ## [1.11.1] - 2026-09-18

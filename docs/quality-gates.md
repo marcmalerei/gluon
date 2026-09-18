@@ -29,7 +29,7 @@ bounded expensive steps:
 | ------------------------- | --------------------------: | ----------------------------------------------------------------------------------------- |
 | `repository`              |                  25 minutes | install 10, repository check 18 minutes                                                    |
 | `create-gluon-fixtures`   |                  25 minutes | install/build 10 each, fixture matrix 15 minutes                                           |
-| `release-artifacts`       |                  25 minutes | install/build 10 each, release-artifact check 12 minutes                                   |
+| `release-artifacts`       |                  25 minutes | install/build 10 each, release artifacts plus fresh VSIX package/LSP smoke check 12 minutes |
 | `browser-engines`         |       30 minutes per engine | install 10, browser matrix 15, individual evidence commands 10–15 minutes                 |
 | `node-runtime`            | 25 minutes per Node version | install 10, build 10, SSR suite 10 minutes                                                |
 | `budgets`                 |                  20 minutes | install 10; each build/budget command 5 minutes                                           |
@@ -60,7 +60,10 @@ step logs with the run, including an explicit step-timeout message.
 
 `npm run check` remains the complete local gate. It composes
 `check:repository`, `check:create-gluon-fixtures`, and
-`check:release-artifacts` in that order. The CI workflow runs those same
+`check:release-artifacts` in that order. The release-artifact boundary builds
+the VSIX through a fresh isolated npm cache and smoke-tests its bundled language
+server, so stale or withdrawn VSIX lockfile tarballs fail before a release tag.
+The CI workflow runs those same
 boundaries in parallel jobs; `check:repository` alone is not complete release
 evidence.
 
@@ -254,7 +257,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.11.2/examples/ui.html` with the other versioned documentation examples.
+`/1.11.3/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 16 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
