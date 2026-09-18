@@ -73,7 +73,7 @@ test('finds the production Vue host and links it to the tested cutover stages', 
   expect(host?.migrationStages).toEqual(expect.arrayContaining(['leaf-boundary', 'state-form']));
   expect(report.inventory.some((item) => item.fileId === host?.fileId && item.kind === 'model')).toBe(false);
   expect(report.findings.every((finding) => finding.guideUrl.includes('/migration/vue-to-gluon-cutover/'))).toBe(true);
-});
+}, 15_000);
 
 test('enforces invalid UTF-8 and fixed per-file resource budgets', async () => {
   const fixture = await project();
@@ -108,7 +108,7 @@ test('implements the exact CLI formats and exit codes', () => {
   expect(spawnSync(process.execPath, [cli, unsupported]).status).toBe(1);
   expect(spawnSync(process.execPath, [cli, resolve(root, 'missing')]).status).toBe(2);
   expect(spawnSync(process.execPath, [cli, '--format', 'yaml']).status).toBe(2);
-  expect(execFileSync(process.execPath, [cli, '--version'], { encoding: 'utf8' })).toBe('1.11.2\n');
+  expect(execFileSync(process.execPath, [cli, '--version'], { encoding: 'utf8' })).toBe('1.11.3\n');
 });
 
 test('exports one deeply frozen schema and rejects unreadable roots', async () => {

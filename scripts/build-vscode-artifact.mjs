@@ -1,7 +1,8 @@
-import { access, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { access, cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
-import { resolve } from 'node:path';
+import { resolve, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { promisify } from 'node:util';
 import process from 'node:process';
 import { resolveVscodeReleaseOptions } from './vscode-release-options.mjs';
@@ -28,7 +29,14 @@ for (const [name, actual] of [['VS Code extension', extensionManifest.version], 
 await run(process.execPath, ['scripts/validate-vscode-client.mjs'], { cwd: root });
 await run('npm', ['run', 'build:compiler'], { cwd: root });
 await run('npm', ['run', 'build:language-server'], { cwd: root });
-await run('npm', ['ci', '--ignore-scripts'], { cwd: extension });
+const npmCache = await mkdtemp(join(tmpdir(), 'gluon-vscode-npm-cache-'));
+try {
+  // Resolve from the registry rather than a warm cache so withdrawn tarballs and
+  // changed integrity records fail in Quality Gates before a tag is created.
+  await run('npm', ['ci', '--ignore-scripts', '--cache', npmCache, '--prefer-online'], { cwd: extension });
+} finally {
+  await rm(npmCache, { recursive: true, force: true });
+}
 await mkdir(output, { recursive: true });
 const stagedServer = resolve(extension, 'server');
 

@@ -7,6 +7,17 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.11.3] - 2026-09-18
+
+### Fixed
+
+- Re-resolved the VSIX Azure dependency graph against the current npm registry
+  after the immutable, unpublished `v1.11.2` candidate stopped on a withdrawn
+  `@azure/core-auth` tarball.
+- Made the exact VSIX clean install, packaging, and bundled language-server
+  smoke check a required Quality Gates pre-tag condition, using an isolated npm
+  cache to expose stale registry lock entries.
+
 ## [1.11.2] - 2026-09-18
 
 ### Fixed

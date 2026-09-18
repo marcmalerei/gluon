@@ -1,6 +1,6 @@
 {
   "name": "@gluonjs/core",
-  "version": "1.11.2",
+  "version": "1.11.3",
   "description": "A native-first UI system built on Custom Elements, HTML template literals, and adopted stylesheets.",
   "private": false,
   "workspaces": [
@@ -51,7 +51,7 @@
     "provenance": true
   },
   "peerDependencies": {
-    "@gluonjs/reactivity": "1.11.2"
+    "@gluonjs/reactivity": "1.11.3"
   },
   "scripts": {
     "build": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:i18n && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:graph && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
@@ -238,7 +238,7 @@
     "release:verify-registry": "node scripts/verify-registry-release.mjs",
     "check:release-bootstrap": "node scripts/build-npm-bootstrap-artifacts.mjs --check",
     "check:release-contract": "node scripts/validate-release-contract.mjs",
-    "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state",
+    "check:release-artifacts": "node scripts/build-release-artifacts.mjs --check-state && npm run release:vscode && npm run check:release-vscode",
     "check": "npm run check:repository && npm run check:create-gluon-fixtures && npm run check:release-artifacts",
     "check:repository": "npm run typecheck && npm run build && npm run check:shop-boundaries && npm run check:shop-static && npm run check:eleventy-clean-install && npm run check:example-previews && npm run check:component-library-clean-install && npm run check:storybook:component-library && npm run test:coverage && npm run test:playground && npm run test:property-fuzz && npm run test:i18n:node && npm run check:quality-budgets && npm run check:benchmark-builds && npm run check:security && npm run check:dependency-security-policy && npm run test:dependency-security && npm run check:ui-contract && npm run typecheck:core-api && npm run typecheck:json-forms-api && npm run typecheck:ui-api && npm run typecheck:reactivity-api && npm run typecheck:router-api && npm run typecheck:store-api && npm run typecheck:i18n-api && npm run typecheck:test-utils-api && npm run typecheck:tooling-api && npm run typecheck:ssr-api && npm run typecheck:devtools-api-contract && npm run typecheck:language-server-api && npm run typecheck:vue-analyzer-api && npm run typecheck:create-gluon-api && npm run check:router-lazy && npm run check:packages && npm run check:reactivity-singleton && npm run check:release-sbom-closure && npm run check:vscode-client && npm run check:language-server-cli && npm run check:project-analysis && npm run check:project-analysis-clean-install && npm run check:diagnostics && npm run check:template-composition && npm run check:stateful-control-comparison && npm run check:vue-analyzer-fixtures && npm run check:vue-analyzer-clean-install && npm run check:vue-codemod-decision && npm run check:dx-scorecard && npm run check:docs && npm run check:release-bootstrap && npm run check:release-contract",
     "build:i18n": "npm run build --workspace @gluonjs/i18n",

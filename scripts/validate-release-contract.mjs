@@ -574,6 +574,9 @@ function validateWorkflow() {
   if (!qualityWorkflow.includes('- uses: actions/checkout@v7\n        with:\n          fetch-depth: 0')) {
     throw new Error('Quality Gates repository validation must fetch full history for tested-commit ancestry checks.');
   }
+  if (rootManifest.scripts?.['check:release-artifacts'] !== 'node scripts/build-release-artifacts.mjs --check-state && npm run release:vscode && npm run check:release-vscode') {
+    throw new Error('Release-artifact Quality Gates must run the fresh VSIX build and bundled language-server smoke validation.');
+  }
   for (const required of [
     'environment: npm',
     'id-token: write',
@@ -781,7 +784,7 @@ function validateVscodeDistributionWorkflow(publishJob) {
   for (const required of ['createHash', 'VSIX-SHA256SUMS', 'expectedManifestKeys', 'extractVsix', 'Unsafe VSIX entry path', 'activateBundledExtension', 'initializeBundledServer', "response.result?.serverInfo?.version !== version", "extensionSource.includes(\"module: bundledServer\")"]) {
     if (!vscodeValidationScript.includes(required)) throw new Error(`VSIX validation is missing enforced contract ${required}.`);
   }
-  for (const required of ["cp(resolve(server, 'package.json')", "dependency === '@gluonjs/compiler'", 'stageRuntimePackage', 'manifest.dependencies', 'finally']) {
+  for (const required of ["cp(resolve(server, 'package.json')", "dependency === '@gluonjs/compiler'", 'stageRuntimePackage', 'manifest.dependencies', 'finally', 'mkdtemp', '--cache', '--prefer-online']) {
     if (!vscodeBuildScript.includes(required)) throw new Error(`VSIX builder is missing self-contained runtime contract ${required}.`);
   }
 
