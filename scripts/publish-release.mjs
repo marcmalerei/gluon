@@ -31,6 +31,9 @@ if (!dryRun && recovery) {
 const evidence = JSON.parse(await readFile(resolve(directory, 'release-evidence.json'), 'utf8'));
 const releaseContract = JSON.parse(await readFile(resolve(root, 'release/release-contract.json'), 'utf8'));
 const registry = releaseContract.publication.registry;
+// npm's globally distributed read path can lag a successful trusted publish.
+// Keep the release bounded, but allow enough cache-safe time for propagation.
+const registryRetryDelaysMs = [2_000, 4_000, 8_000, 16_000, 30_000, 30_000, 30_000];
 if (evidence.version !== version || evidence.tag !== canonicalTag || evidence.blockedDevelopmentBuild) {
   throw new Error(`Release evidence is not a publishable ${version} candidate.`);
 }
@@ -84,7 +87,7 @@ async function requireExistingPackage(name) {
 
 async function registryMetadata(name, packageVersion) {
   try {
-    const { stdout } = await execFile('npm', ['view', `${name}@${packageVersion}`, '--json', '--registry', registry], {
+    const { stdout } = await execFile('npm', ['view', `${name}@${packageVersion}`, '--json', '--prefer-online', '--registry', registry], {
       cwd: root,
       encoding: 'utf8',
       maxBuffer: 5 * 1024 * 1024,
@@ -97,31 +100,36 @@ async function registryMetadata(name, packageVersion) {
 }
 
 async function waitForRegistry(name, packageVersion) {
-  for (let attempt = 0; attempt < 6; attempt += 1) {
+  for (let attempt = 0; attempt <= registryRetryDelaysMs.length; attempt += 1) {
     const metadata = await registryMetadata(name, packageVersion);
     if (metadata) return metadata;
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 2_000));
+    await waitForRegistryRetry(attempt);
   }
   throw new Error(`${name}@${packageVersion} was not visible on the public registry after publication.`);
 }
 
 async function waitForDistTag(name, tag, expectedVersion) {
   let observed = null;
-  for (let attempt = 0; attempt < 6; attempt += 1) {
+  for (let attempt = 0; attempt <= registryRetryDelaysMs.length; attempt += 1) {
     observed = await registryDistTag(name, tag);
     if (observed === expectedVersion) return observed;
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 2_000));
+    await waitForRegistryRetry(attempt);
   }
   return observed;
 }
 
 async function registryDistTag(name, tag) {
-  const { stdout } = await execFile('npm', ['view', name, `dist-tags.${tag}`, '--registry', registry], {
+  const { stdout } = await execFile('npm', ['view', name, `dist-tags.${tag}`, '--prefer-online', '--registry', registry], {
     cwd: root,
     encoding: 'utf8',
     maxBuffer: 5 * 1024 * 1024,
   });
   return stdout.trim();
+}
+
+async function waitForRegistryRetry(attempt) {
+  const delay = registryRetryDelaysMs[attempt];
+  if (delay !== undefined) await new Promise((resolveDelay) => setTimeout(resolveDelay, delay));
 }
 
 function verifyPublishedMetadata(entry, metadata) {
