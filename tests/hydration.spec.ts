@@ -8,6 +8,7 @@ import {
   defineElement,
   defineGluonElement,
   css,
+  getStyleTextDigest,
   elementRef,
   GluonElement,
   html,
@@ -486,6 +487,48 @@ describe('SSR hydration', () => {
     expect(upgraded.shadowRoot).toBe(shadow);
     expect(upgraded.shadowRoot?.querySelector('p')).toBe(paragraph);
     upgraded.remove();
+  });
+
+  it('hydrates deduplicated external Shadow DOM stylesheet assets without retaining transport links', async () => {
+    class TailwindShadowCard extends GluonElement {
+      protected override render() { return html`<p class="text-cobalt">Tailwind utility</p>`; }
+    }
+    defineElement('tailwind-shadow-card', TailwindShadowCard);
+    const cssText = '.text-cobalt { color: rgb(0 71 171); }';
+    const shadowStyles = [{
+      id: 'gluon-shadow-tailwind', href: '/assets/tailwind.css', digest: getStyleTextDigest(cssText),
+    }] as const;
+    const markup = await renderToString(html`${renderElement(TailwindShadowCard)}${renderElement(TailwindShadowCard)}`, {
+      shadowStyles,
+    });
+    expect(markup.match(/text-cobalt/g)).toHaveLength(2);
+    expect(markup.match(/data-gluon-shadow-style/g)).toHaveLength(2);
+    expect(markup).not.toContain(cssText);
+
+    const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(cssText));
+    const container = document.createElement('div');
+    materializeServerElements(container, markup);
+    document.body.append(container);
+    const [first, second] = [...container.querySelectorAll('tailwind-shadow-card')] as TailwindShadowCard[];
+    try {
+      await hydrateElement(first!, { shadowStyles });
+      await hydrateElement(second!, { shadowStyles });
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(first!.shadowRoot?.querySelector('[data-gluon-shadow-style]')).toBeNull();
+      expect(second!.shadowRoot?.querySelector('[data-gluon-shadow-style]')).toBeNull();
+      expect(first!.shadowRoot?.adoptedStyleSheets[0]).toBe(second!.shadowRoot?.adoptedStyleSheets[0]);
+
+      const invalid = document.createElement('tailwind-shadow-card') as TailwindShadowCard;
+      const root = invalid.shadowRoot!;
+      root.innerHTML = `<link rel="stylesheet" href="/assets/tailwind.css" data-gluon-shadow-style="gluon-shadow-tailwind" data-gluon-digest="invalid"><p class="text-cobalt">Tailwind utility</p>`;
+      await expect(hydrateElement(invalid, { shadowStyles, recovery: 'throw' })).rejects.toMatchObject({
+        code: 'GLUON_UNSUPPORTED_SSR_TRANSPORT',
+      });
+      expect(root.querySelector('[data-gluon-shadow-style]')).not.toBeNull();
+    } finally {
+      fetch.mockRestore();
+      container.remove();
+    }
   });
 
   it('retains deterministic JSON Forms custom renderer output and binds host-owned commits', async () => {

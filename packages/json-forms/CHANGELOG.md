@@ -4,6 +4,12 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-09-18
+
+### Changed
+
+- Advanced the lockstep release with the Tailwind-aware Vite integration and deduplicated Shadow DOM SSR stylesheet transport while retaining this package's public contract.
+
 ## [1.10.0] - 2026-08-16
 
 ### Added

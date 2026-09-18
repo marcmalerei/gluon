@@ -112,6 +112,16 @@ in the carrier, so `@gluonjs/atoms` can serialize
 `createUiStyleSelection(theme)` and validate the exact selection during browser
 installation without a second hand-maintained manifest.
 
+For generated global CSS that must also style Shadow DOM (such as Tailwind),
+the Vite universal manifest may contain `shadowStyles`. `renderToString()`,
+`prepareForHydration()`, and `renderRequest()` emit one compact stylesheet link
+per Declarative Shadow DOM root instead of copying CSS into every template.
+Pass the same `shadowStyles` array to `hydrateElement()` or
+`hydrateApplication()`: the browser verifies the ID, URL, and digest, loads an
+asset once per document, adopts one constructed stylesheet identity into every
+root, and removes the links only after retained hydration. Failed validation or
+loading leaves the original links untouched.
+
 `@gluonjs/ssr/static` prerenders explicit route URLs and records dynamic
 fallbacks without rewriting components. `renderRequest()` can receive the Vite
 asset manifest, document styles, and a request nonce; its `head` contains

@@ -16,6 +16,7 @@ import {
   transpileGluonDecorators,
 } from '@gluonjs/compiler';
 import gluon from '@gluonjs/vite';
+import { gluonTailwind } from '@gluonjs/vite/tailwind';
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryDirectories: string[] = [];
@@ -552,6 +553,33 @@ describe('@gluonjs/vite real server contract', () => {
       .flatMap((entry) => (entry as Rollup.RollupOutput).output)
       .some((entry) => entry.type === 'asset' && entry.fileName === 'custom-assets.json')).toBe(true);
   });
+
+  it('composes Tailwind and exports its immutable CSS asset for Shadow DOM SSR', async () => {
+    const root = await createFixture('tailwind', 1, 'rgb(1, 2, 3)');
+    const main = resolve(root, 'main.ts');
+    await writeFile(main, `${await readFile(main, 'utf8')}\nimport './tailwind.css';\nvoid '<p class="text-red-500 font-bold">Tailwind</p>';\n`);
+    await writeFile(resolve(root, 'tailwind.css'), '@import "tailwindcss";');
+    const output = await build({
+      ...viteConfig(root),
+      plugins: gluonTailwind(),
+      build: { write: false },
+    });
+    const entries = (Array.isArray(output) ? output : [output])
+      .flatMap((entry) => (entry as Rollup.RollupOutput).output);
+    const manifest = JSON.parse(String(entries.find((entry): entry is Rollup.OutputAsset => (
+      entry.type === 'asset' && entry.fileName === 'gluon-assets.json'
+    ))?.source));
+    expect(manifest.shadowStyles).toHaveLength(1);
+    expect(manifest.shadowStyles[0]).toEqual(expect.objectContaining({
+      id: expect.stringMatching(/^gluon-shadow-[a-f0-9]{8}$/),
+      href: expect.stringMatching(/^\/assets\/.*\.css$/),
+      digest: expect.stringMatching(/^[a-f0-9]{8}$/),
+    }));
+    const css = entries.find((entry): entry is Rollup.OutputAsset => (
+      entry.type === 'asset' && `/${entry.fileName}` === manifest.shadowStyles[0].href
+    ));
+    expect(String(css?.source)).toContain('.text-red-500');
+  }, 30_000);
 });
 
 async function createFixture(version: string, increment: number, color: string): Promise<string> {

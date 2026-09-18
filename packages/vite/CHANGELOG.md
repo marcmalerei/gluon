@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-09-18
+
+### Added
+
+- Added `gluonTailwind()` to compose the official Tailwind Vite plugin with a
+  content-addressed `shadowStyles` universal manifest for Shadow DOM SSR.
+
 ## [1.10.0] - 2026-08-16
 
 ### Changed

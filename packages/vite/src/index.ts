@@ -16,7 +16,11 @@ export interface GluonVitePluginOptions {
   readonly decorators?: GluonDecoratorMode;
   readonly diagnostics?: boolean;
   readonly include?: RegExp | ((id: string) => boolean);
-  readonly universal?: boolean | { readonly manifestFile?: string };
+  readonly universal?: boolean | {
+    readonly manifestFile?: string;
+    /** Make emitted CSS assets available to SSR Shadow DOM roots by stable asset reference. */
+    readonly shadowStyles?: boolean;
+  };
 }
 
 export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
@@ -89,6 +93,15 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
         .filter((asset) => asset.type === 'asset' && asset.fileName.endsWith('.css'))
         .map((asset) => `/${asset.fileName}`)
         .sort();
+      const shadowStyles = universalShadowStyles(options.universal)
+        ? Object.values(bundle).flatMap((asset) => {
+          if (asset.type !== 'asset' || !asset.fileName.endsWith('.css')) return [];
+            const css = typeof asset.source === 'string' ? asset.source : Buffer.from(asset.source).toString('utf8');
+            const digest = styleDigest(css);
+            return [{ id: `gluon-shadow-${digest}`, href: `/${asset.fileName}`, digest }];
+          })
+          .sort((left, right) => left.href.localeCompare(right.href))
+        : [];
       const assets = Object.values(bundle)
         .filter((asset) => asset.type === 'asset' && !asset.fileName.endsWith('.css'))
         .map((asset) => `/${asset.fileName}`)
@@ -98,6 +111,7 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
         entry: `/${entry.fileName}`,
         imports: entry.imports.map((file) => `/${file}`).sort(),
         styles,
+        ...(shadowStyles.length > 0 ? { shadowStyles } : {}),
         assets,
       };
       this.emitFile({
@@ -109,6 +123,19 @@ export default function gluon(options: GluonVitePluginOptions = {}): Plugin {
       });
     },
   };
+}
+
+function universalShadowStyles(options: GluonVitePluginOptions['universal']): boolean {
+  return typeof options === 'object' && options.shadowStyles === true;
+}
+
+function styleDigest(value: string): string {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
 function shouldTransform(

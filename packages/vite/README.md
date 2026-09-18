@@ -76,6 +76,35 @@ referenced assets consumed by `@gluonjs/ssr` and static generation. Pass
 Build the server entry separately with Vite SSR; the canonical shop commands
 are documented in [Static and server deployment](../../docs/deployment.md).
 
+## Tailwind and Shadow DOM SSR
+
+Use `gluonTailwind()` when the application imports Tailwind's CSS entry. It
+composes Tailwind's official Vite plugin and enables the universal Shadow DOM
+stylesheet manifest. `@tailwindcss/vite` is an optional peer dependency, so
+projects that do not use Tailwind do not load it.
+
+```ts
+import { defineConfig } from 'vite';
+import { gluonTailwind } from '@gluonjs/vite/tailwind';
+
+export default defineConfig({ plugins: gluonTailwind() });
+```
+
+Import Tailwind once from the application entry (for example,
+`import './tailwind.css'` where the file contains `@import "tailwindcss";`).
+The generated `gluon-assets.json` then contains `shadowStyles`: immutable CSS
+asset references with stable IDs and content digests. Pass that manifest to
+`renderRequest()` and pass `assets.shadowStyles` to `hydrateApplication()` or
+`hydrateElement()`.
+
+For each Declarative Shadow DOM root, SSR writes only a compact `<link>` to the
+same hashed CSS asset—never a second copy of Tailwind's generated CSS.
+Hydration loads and validates each asset once per document, shares the resulting
+constructed sheet among all participating roots, and removes the temporary
+links only after retained hydration succeeds. A failed handoff leaves the links
+in place. Configure `gluon({ universal: { shadowStyles: true } })` directly
+when using another CSS generator that produces a single Shadow-safe CSS entry.
+
 The default transform boundary is the Vite project root and excludes
 `node_modules`. `include` accepts a regular expression or predicate when a
 monorepo keeps application modules outside that root. Set `diagnostics: false`

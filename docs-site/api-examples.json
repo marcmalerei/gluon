@@ -2250,11 +2250,13 @@
         "import {",
         "  createStyleManifest,",
         "  renderResourceHints,",
+        "  renderShadowStyleLinks,",
         "  renderStyleCarriers,",
         "  serializeSsrState,",
         "  type AssetManifest,",
         "  type StyleManifest,",
         "  type StyleManifestEntry,",
+        "  type ShadowStyleAsset,",
         "} from '@gluonjs/ssr';",
         "",
         "const assets = {",
@@ -2262,11 +2264,13 @@
         "  imports: ['/assets/vendor.js'],",
         "  styles: ['/assets/app.css'],",
         "  assets: ['/assets/orbit-lamp.webp'],",
+        "  shadowStyles: [{ id: 'tailwind', href: '/assets/tailwind.css', digest: '4a1f9d2b' }],",
         "} satisfies AssetManifest;",
+        "const shadow: ShadowStyleAsset = assets.shadowStyles[0]!;",
         "const sheet = css`:host { display: block; }`;",
         "const styles: StyleManifest = createStyleManifest([sheet]);",
         "const first: StyleManifestEntry | undefined = styles.entries[0];",
-        "const head = renderResourceHints(assets) + renderStyleCarriers(styles, { nonce: 'request-nonce' });",
+        "const head = renderResourceHints(assets) + renderStyleCarriers(styles, { nonce: 'request-nonce' }) + renderShadowStyleLinks([shadow]);",
         "const state = serializeSsrState({ product: 'Orbit <Lamp>', quantity: 1 });",
         "console.log(first?.digest, head, state);"
       ]
@@ -6424,6 +6428,10 @@
       "recipe": "ssr-assets",
       "description": "Render ordered digest-labelled style carriers, optionally with a request nonce, for verified client stylesheet adoption:"
     },
+    "packages/ssr/src/functions/renderShadowStyleLinks.md": {
+      "recipe": "ssr-assets",
+      "description": "Emit compact, digest-labelled external stylesheet links inside Declarative Shadow DOM roots instead of duplicating generated CSS:"
+    },
     "packages/ssr/src/functions/renderToChunks.md": {
       "recipe": "ssr-serialization",
       "description": "Iterate ordered hydration-marked HTML strings without first buffering the complete rendered document:"
@@ -6475,6 +6483,10 @@
     "packages/ssr/src/interfaces/SsrRequestResult.md": {
       "recipe": "ssr-request",
       "description": "Consume the rendered body, safe state carrier, head resources, style manifest, and Router/Store snapshots produced before request cleanup:"
+    },
+    "packages/ssr/src/interfaces/ShadowStyleAsset.md": {
+      "recipe": "ssr-assets",
+      "description": "Name one immutable CSS asset used by SSR Shadow DOM transport with its exact URL and digest:"
     },
     "packages/ssr/src/interfaces/StyleManifest.md": {
       "recipe": "ssr-assets",
