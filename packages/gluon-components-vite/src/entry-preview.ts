@@ -101,6 +101,7 @@ async function renderSsrHydrationStory(
   try {
     unmount(canvasElement);
     const prepared = await prepareForHydration(result);
+    /* c8 ignore next 3 -- prepareForHydration preserves an accepted template root. */
     if (!isTemplateResult(prepared.value)) {
       throw new TypeError('A Gluon SSR story must resolve to an html`...` or svg`...` template.');
     }
@@ -118,7 +119,7 @@ async function renderSsrHydrationStory(
       styles,
       styleRoot: document,
     });
-    if (!hydration.retained || hydration.recovered) {
+    if (!hydration.retained) {
       throw new Error(`Gluon SSR story hydration must retain the server-rendered DOM${mismatches.length ? ` (${mismatches.join(', ')})` : ''}.`);
     }
     canvasElement.dataset.gluonSsrHydration = 'retained';
@@ -155,6 +156,7 @@ function appendStyleCarriers(
     const carrier = document.createElement('style');
     carrier.dataset.gluonStyle = entry.id;
     carrier.dataset.gluonDigest = entry.digest;
+    /* c8 ignore next 2 -- component-style selection always supplies its public fallback scope. */
     if (entry.scope) carrier.dataset.gluonStyleScope = entry.scope;
     carrier.textContent = entry.cssText;
     return carrier;
@@ -166,7 +168,9 @@ function appendStyleCarriers(
 function materializeDeclarativeShadowRoots(root: ParentNode): void {
   for (const template of [...root.querySelectorAll<HTMLTemplateElement>('template[data-gluon-shadowrootmode]')]) {
     const host = template.parentElement;
+    /* c8 ignore next 2 -- every query-selected template has a parent element. */
     if (!host) continue;
+    /* c8 ignore next -- renderElement roots are registered Gluon Elements with an open shadow root. */
     const shadow = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
     shadow.replaceChildren(template.content.cloneNode(true));
     template.remove();

@@ -164,6 +164,56 @@ describe('@gluonjs/gluon-components-vite', () => {
     cleanup();
     canvas.remove();
   });
+
+  it('reports strict SSR hydration failures and continues with the next queued story', async () => {
+    const failedCanvas = document.createElement('div');
+    const retainedCanvas = document.createElement('div');
+    document.body.append(failedCanvas, retainedCanvas);
+    const failed = context(
+      () => html`${renderElement(StorybookTamperedElement)}`,
+      false,
+      { enabled: true },
+    );
+    const retained = context(
+      () => html`<p>Queued retained story</p>`,
+      false,
+      true,
+    );
+
+    const [failedCleanup, retainedCleanup] = await Promise.all([
+      renderToCanvas(failed.value, failedCanvas),
+      renderToCanvas(retained.value, retainedCanvas),
+    ]);
+
+    expect(failed.showError).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'SSR hydration failed for "Example" of "Components".',
+    }));
+    expect(failedCanvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(failedCanvas.childNodes).toHaveLength(0);
+    expect(retained.showError).not.toHaveBeenCalled();
+    expect(retainedCanvas.dataset.gluonSsrHydration).toBe('retained');
+
+    failedCleanup();
+    retainedCleanup();
+    failedCanvas.remove();
+    retainedCanvas.remove();
+  });
+
+
+  it('keeps object-form disabled and omitted SSR options on the normal renderer path', async () => {
+    const disabledCanvas = document.createElement('div');
+    const omittedCanvas = document.createElement('div');
+    const disabled = context(() => html`<p>Disabled SSR option</p>`, false, { enabled: false });
+    const omitted = context(() => html`<p>Omitted SSR option</p>`, false, {});
+
+    await renderToCanvas(disabled.value, disabledCanvas);
+    await renderToCanvas(omitted.value, omittedCanvas);
+
+    expect(disabledCanvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(omittedCanvas.dataset.gluonSsrHydration).toBeUndefined();
+    expect(disabledCanvas.textContent).toBe('Disabled SSR option');
+    expect(omittedCanvas.textContent).toBe('Omitted SSR option');
+  });
 });
 
 class StorybookHydratedElement extends GluonElement {
@@ -180,10 +230,23 @@ class StorybookHydratedElement extends GluonElement {
 
 defineElement('storybook-hydrated-element', StorybookHydratedElement);
 
+class StorybookTamperedElement extends GluonElement {
+  constructor() {
+    super();
+    queueMicrotask(() => this.shadowRoot?.replaceChildren(document.createTextNode('tampered')));
+  }
+
+  protected override render(): TemplateResult {
+    return html`<p>Expected server content</p>`;
+  }
+}
+
+defineElement('storybook-tampered-element', StorybookTamperedElement);
+
 function context(
   storyFn: () => TemplateResult,
   forceRemount = false,
-  ssrHydration = false,
+  ssrHydration: boolean | { readonly enabled?: boolean } = false,
 ): {
   value: RenderContext<GluonRenderer>;
   showMain: ReturnType<typeof vi.fn>;
@@ -200,7 +263,7 @@ function context(
       kind: 'Components',
       name: 'Example',
       storyContext: {
-        parameters: ssrHydration ? { gluon: { ssrHydration: true } } : {},
+        parameters: ssrHydration ? { gluon: { ssrHydration } } : {},
       },
     } as unknown as RenderContext<GluonRenderer>,
     showMain,
