@@ -629,7 +629,7 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
 
   it('server-renders the packed component-library public exports', async () => {
     const atom = withoutHydrationMarkers(await renderToString(ProductBadge('In stock')));
-    expect(atom).toBe('<span class="gluon quark example-product-badge">In stock</span>');
+    expect(atom).toBe('<span data-gluon="true" class="example-product-badge">In stock</span>');
 
     const element = withoutHydrationMarkers(await renderToString(renderElement(
       ProductPicker as import('@gluonjs/core').GluonElementClass,

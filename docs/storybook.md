@@ -94,13 +94,81 @@ addons. The renderer owns only the canvas result. A play function queries the
 normal `canvasElement`; Shadow DOM queries are needed only when the component
 itself intentionally owns a ShadowRoot.
 
+## Verify SSR hydration per story
+
+Set `parameters.gluon.ssrHydration` to `true` for the stories whose server
+markup and retained browser hydration you want to check. The renderer resolves
+the template with Gluon's SSR contract, installs the exact temporary stylesheet
+carriers, materializes Declarative Shadow DOM, and then hydrates with
+`recovery: 'throw'`. A mismatch fails the Storybook story instead of replacing
+the server DOM.
+
+```ts
+import type {
+  GluonStoryParameters,
+  Meta,
+  StoryObj,
+} from '@gluonjs/gluon-components-vite';
+import { html } from '@gluonjs/core';
+
+const meta = {
+  title: 'Catalog/SSR stock label',
+  render: ({ label }) => html`<strong>${label}</strong>`,
+} satisfies Meta<{ label: string }>;
+
+export default meta;
+type Story = StoryObj<{ label: string }>;
+
+export const Retained: Story = {
+  args: { label: 'In stock' },
+  parameters: {
+    gluon: { ssrHydration: true },
+  } satisfies GluonStoryParameters,
+};
+```
+
+For a Gluon Custom Element, install `@gluonjs/ssr` in the component-library
+project and use its public `renderElement()` helper. A literal custom-element
+tag does not give the SSR renderer the constructor and properties it needs to
+serialize the element's Declarative Shadow DOM.
+
+```ts
+import type { Meta } from '@gluonjs/gluon-components-vite';
+import { html } from '@gluonjs/core';
+import { renderElement } from '@gluonjs/ssr';
+import { ProductPicker } from './product-picker.js';
+
+const meta = {
+  title: 'Catalog/SSR product picker',
+  render: () => html`
+    ${renderElement(ProductPicker, {
+      properties: { value: 1 },
+    })}
+  `,
+} satisfies Meta;
+
+export default meta;
+
+export const Retained = {
+  parameters: { gluon: { ssrHydration: true } },
+};
+```
+
+Pass every reflected initial property explicitly, as in `value: 1`, so the
+server attribute and the upgraded element agree before hydration. This mode
+checks Gluon's SSR-to-browser contract in the Storybook preview; it does not
+execute the story in a separate Node server process. Keep SSR stories
+deterministic: do not derive their initial markup from browser-only globals,
+current time, or random values.
+
 ## Lifecycle contract
 
 For each canvas render the framework:
 
 1. evaluates the story;
 2. verifies that it returned a Gluon template;
-3. calls Gluon's public `render()` on Storybook's canvas;
+3. calls Gluon's public `render()` on Storybook's canvas, or the opt-in SSR
+   serializer plus strict `hydrateTemplate()` handoff;
 4. reports page-load completion to Storybook;
 5. returns a teardown that calls Gluon's public `unmount()`.
 

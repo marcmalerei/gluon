@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the `hydrateElements` option to `hydrateTemplate()` for retaining and
+  hydrating nested server-rendered Gluon element roots.
+
 ## [1.11.4] - 2026-09-18
 
 ### Fixed

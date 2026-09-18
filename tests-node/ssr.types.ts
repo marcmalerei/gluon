@@ -31,6 +31,7 @@ void prepareForHydration(html`<p>Hydrate</p>`);
 const hydrationRoot = document.createElement('div');
 const hydrationValue = html`<p>Hydrate</p>`;
 void hydrateTemplate(hydrationValue, hydrationRoot, {
+  hydrateElements: true,
   recovery: 'throw',
   styleSelection: createComponentStyleSelection(hydrationValue),
 });

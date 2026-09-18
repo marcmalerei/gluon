@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added per-story `parameters.gluon.ssrHydration` verification, which strictly
+  serializes, retains, and hydrates Gluon templates and nested server-rendered
+  elements in the Storybook canvas.
+
 ## [1.11.4] - 2026-09-18
 
 ### Fixed

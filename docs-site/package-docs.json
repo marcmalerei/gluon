@@ -212,10 +212,12 @@
       "useCases": [
         "Storybook rendering for Gluon component libraries.",
         "Renderer-owned DOM and stylesheet cleanup when stories change.",
+        "Opt-in strict SSR serialization and retained hydration checks per story.",
         "Preview, preset, and renderer-preset integration."
       ],
       "limits": [
         "Does not replace the component library or application runtime.",
+        "SSR hydration checks run in the Storybook browser preview, not a separate Node server process.",
         "Requires Storybook and Vite in the host project."
       ],
       "relatedGuides": [
@@ -223,7 +225,7 @@
         { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" }
       ],
       "integrationNotes": [
-        "Depends on `@gluonjs/core` and peers on Storybook plus Vite.",
+        "Depends on `@gluonjs/core` and `@gluonjs/ssr`, and peers on Storybook plus Vite.",
         "Exports `.` plus `./entry-preview`, `./preset`, and `./renderer-preset`."
       ]
     },

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Removed automatic generic `gluon` and `quark` classes from Quark output;
+  component-specific classes remain intact.
+
 ## [1.11.4] - 2026-09-18
 
 ### Fixed

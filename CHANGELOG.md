@@ -7,6 +7,17 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added opt-in strict SSR serialization and retained hydration validation for
+  individual Gluon Storybook stories, including component styles and
+  Declarative Shadow DOM elements (#482).
+
+### Changed
+
+- Removed automatic generic `gluon` and `quark` classes from Quark output;
+  component-specific classes remain intact (#483).
+
 ## [1.11.4] - 2026-09-18
 
 ### Fixed

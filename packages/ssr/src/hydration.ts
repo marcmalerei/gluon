@@ -29,6 +29,8 @@ export interface HydrateTemplateOptions {
   readonly recovery?: 'replace' | 'throw';
   readonly suppress?: boolean | readonly HydrationMismatchCategory[];
   readonly onMismatch?: Parameters<typeof hydrate>[2]['onMismatch'];
+  /** Hydrates server-rendered Gluon element roots nested inside this template. */
+  readonly hydrateElements?: boolean;
   readonly state?: { readonly server: unknown; readonly client: unknown };
   readonly styles?: StyleManifest;
   /** Exact application sheets combined with component styles discovered from the hydrated tree. */
@@ -79,6 +81,7 @@ export async function hydrateElement(
   try {
     const result = await hydrateTemplate(element.renderForServer(), root, {
       ...options,
+      hydrateElements: false,
       ...(transport ? {
         markerTransport: transport,
         // A marker-range failure is transport corruption, never a recovery
@@ -117,9 +120,12 @@ export async function hydrateTemplate(
   container: AppContainer,
   options: HydrateTemplateOptions = {},
 ): Promise<HydrationResult> {
-  const prepared = await prepareForHydration(result, options.markerTransport
+  const nested = options.hydrateElements ? collectNestedGluonElements(container as ParentNode) : [];
+  const hydratedElements = options.hydratedElements ?? new Set<GluonElement>();
+  for (const child of nested) child.beginHydration();
+  const prepared = await prepareForHydration(result, options.markerTransport || options.hydrateElements
     ? {
-        markerOffset: options.markerTransport.start,
+        ...(options.markerTransport ? { markerOffset: options.markerTransport.start } : {}),
         omitServerElementShadowRoots: true,
       }
     : {});
@@ -139,8 +145,9 @@ export async function hydrateTemplate(
   const shadowHandoff = options.shadowStyles && container.getRootNode() instanceof ShadowRoot
     ? await prepareShadowStyleHandoff(container.getRootNode() as ShadowRoot, options.shadowStyles)
     : undefined;
+  let completed = false;
   try {
-    const result = hydrate(prepared.value, container, {
+    const hydration = hydrate(prepared.value, container, {
       expectedMarkup: prepared.html,
       ...(options.markerTransport ? {
         markerOffset: options.markerTransport.start,
@@ -150,17 +157,34 @@ export async function hydrateTemplate(
       onMismatch: options.onMismatch,
       state: options.state,
     });
-    if (!result.retained && handoff) {
+    if (!hydration.retained && handoff) {
       unmount(container);
       throw new SsrTransportError('DOM hydration recovery is incompatible with an active style handoff.');
     }
+    for (const child of nested) {
+      if (hydratedElements.has(child)) continue;
+      await hydrateElement(child, {
+        ...options,
+        hydrateElements: false,
+        styles: undefined,
+        styleRoot: undefined,
+        skipStyleHandoff: true,
+        requireMarkerTransport: true,
+        hydratedElements,
+      });
+    }
     handoff?.commit();
     shadowHandoff?.commit();
-    return result;
+    completed = true;
+    return hydration;
   } catch (error) {
     handoff?.rollback();
     shadowHandoff?.rollback();
     throw error;
+  } finally {
+    if (completed) {
+      for (const child of nested) child.endHydration();
+    }
   }
 }
 

@@ -4,7 +4,9 @@
     "noEmit": true,
     "paths": {
       "@gluonjs/core": ["src/index.ts"],
-      "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"]
+      "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
+      "@gluonjs/ssr": ["packages/ssr/src/index.ts"],
+      "@gluonjs/ssr/hydration": ["packages/ssr/src/hydration.ts"]
     }
   },
   "include": ["src/**/*.ts"]

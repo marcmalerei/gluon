@@ -33,8 +33,9 @@ describe('quarks', () => {
     const button = root.querySelector('button') as HTMLButtonElement;
     button.click();
 
-    expect(button.classList.contains('gluon')).toBe(true);
-    expect(button.classList.contains('quark')).toBe(true);
+    expect(button.classList.contains('gluon')).toBe(false);
+    expect(button.classList.contains('quark')).toBe(false);
+    expect(button.hasAttribute('data-gluon')).toBe(true);
     expect(button.classList.contains('action')).toBe(true);
     expect(button.dataset.testId).toBe('save');
     expect(button.getAttribute('aria-label')).toBe('Save changes');
