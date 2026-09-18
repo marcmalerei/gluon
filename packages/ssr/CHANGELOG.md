@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-18
+
 ### Added
 
 - Added the `hydrateElements` option to `hydrateTemplate()` for retaining and

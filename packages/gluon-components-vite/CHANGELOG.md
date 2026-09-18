@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-18
+
 ### Added
 
 - Added per-story `parameters.gluon.ssrHydration` verification, which strictly

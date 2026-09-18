@@ -8,7 +8,7 @@ The official Gluon store provides typed, application-scoped state without a
 DOM dependency. Store definitions infer state, computed getter values, action
 arguments, and action results from one definition.
 
-The package ships as part of the current `1.11.4` release line.
+The package ships as part of the current `1.12.0` release line.
 
 ## Stability notes
 

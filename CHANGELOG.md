@@ -7,6 +7,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-18
+
 ### Added
 
 - Added opt-in strict SSR serialization and retained hydration validation for
