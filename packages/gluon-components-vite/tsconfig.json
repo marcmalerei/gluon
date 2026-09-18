@@ -5,8 +5,10 @@
     "paths": {
       "@gluonjs/core": ["src/index.ts"],
       "@gluonjs/reactivity": ["packages/reactivity/src/index.ts"],
+      "@gluonjs/router/memory": ["packages/router/src/memory.ts"],
       "@gluonjs/ssr": ["packages/ssr/src/index.ts"],
-      "@gluonjs/ssr/hydration": ["packages/ssr/src/hydration.ts"]
+      "@gluonjs/ssr/hydration": ["packages/ssr/src/hydration.ts"],
+      "@gluonjs/store": ["packages/store/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts"]
