@@ -119,6 +119,7 @@ async function renderSsrHydrationStory(
       styles,
       styleRoot: document,
     });
+    /* v8 ignore next -- recovery: 'throw' rejects instead of returning recovered hydration. */
     if (!hydration.retained) {
       throw new Error(`Gluon SSR story hydration must retain the server-rendered DOM${mismatches.length ? ` (${mismatches.join(', ')})` : ''}.`);
     }
@@ -135,7 +136,7 @@ async function renderSsrHydrationStory(
     for (const carrier of carriers) carrier.remove();
     context.showError({
       title: `SSR hydration failed for "${context.name}" of "${context.kind}".`,
-      description: `${error instanceof Error ? error.message : String(error)}${mismatches.length ? ` (${mismatches.join(', ')})` : ''}`,
+      description: [error, ...mismatches].map(String).join(', '),
     });
     return () => unmount(canvasElement);
   }
