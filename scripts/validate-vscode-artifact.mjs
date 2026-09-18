@@ -98,7 +98,7 @@ try {
     || !Array.isArray(resultFor(4)?.result) || !resultFor(5)?.result?.changes
     || !Array.isArray(resultFor(6)?.result?.data) || !Array.isArray(resultFor(7)?.result)
     || !extensionSource.includes("language: 'gluon'")) {
-    throw new Error('Bundled VSIX language server returned invalid LSP evidence.');
+    throw new Error(`Bundled VSIX language server returned invalid LSP evidence: ${JSON.stringify(responses)}.`);
   }
 } finally {
   await rm(extractionRoot, { recursive: true, force: true });

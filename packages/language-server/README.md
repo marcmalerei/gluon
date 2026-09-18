@@ -40,7 +40,8 @@ gluon-project-analyze src > project-analysis.json
 gluon-language-server --stdio
 ```
 
-The LSP uses standard `Content-Length` framing and supports full-document sync,
+The LSP uses standard `Content-Length` framing, reports the lockstep package
+version through `initialize.serverInfo`, and supports full-document sync,
 diagnostics, completion, hover, go-to-definition, references, rename, and
 semantic tokens. `.gluon` documents use the compiler's typed SFC block parser;
 template and script ranges remain in the original file and malformed documents
