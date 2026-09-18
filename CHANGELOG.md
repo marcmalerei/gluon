@@ -7,6 +7,13 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-09-18
+
+### Fixed
+
+- Corrected the packed VSIX language-server handshake so
+  `initialize.serverInfo.version` reports the lockstep `1.11.1` package train.
+
 ## [1.11.0] - 2026-09-18
 
 ### Added

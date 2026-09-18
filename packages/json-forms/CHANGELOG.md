@@ -4,6 +4,12 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-09-18
+
+### Fixed
+
+- Released in the lockstep 1.11.1 patch train, which repairs the VSIX language-server version handshake.
+
 ## [1.11.0] - 2026-09-18
 
 ### Changed

@@ -475,7 +475,10 @@ describe('Gluon LSP protocol', () => {
   test('exposes capabilities and publishes the same diagnostics as project analysis', () => {
     const server = new GluonProtocolServer();
     const initialized = server.handle({ jsonrpc: '2.0', id: 1, method: 'initialize' });
-    expect(initialized[0]?.result).toMatchObject({ capabilities: { renameProvider: { prepareProvider: false } } });
+    expect(initialized[0]?.result).toMatchObject({
+      serverInfo: { name: '@gluonjs/language-server', version: '1.11.1' },
+      capabilities: { renameProvider: { prepareProvider: false } },
+    });
     const opened = server.handle({
       jsonrpc: '2.0',
       method: 'textDocument/didOpen',

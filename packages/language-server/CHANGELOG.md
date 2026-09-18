@@ -2,11 +2,19 @@
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-09-18
+
+### Fixed
+
+- Corrected the LSP `initialize.serverInfo` version so the packed VSIX reports the
+  lockstep package train.
+
 ## [1.11.0] - 2026-09-18
 
 ### Changed
 
 - Advanced the lockstep release with the Tailwind-aware Vite integration and deduplicated Shadow DOM SSR stylesheet transport while retaining this package's public contract.
+- Corrected the LSP `initialize.serverInfo` version so the packed VSIX reports the lockstep package train.
 
 ## [1.10.0] - 2026-08-16
 
