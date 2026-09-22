@@ -1390,10 +1390,10 @@ class SpreadPart implements Part {
   private committedValues: SpreadValueSnapshot[] = [];
   private keyOrder: string[] = [];
   private keysOverlap = false;
-  private readonly events = new Map<string, RetainedEvent & { readonly eventName: string }>();
-  private readonly dataAttributes = new Set<string>();
-  private readonly ariaAttributes = new Set<string>();
-  private readonly styleProperties = new Set<string>();
+  private events?: Map<string, RetainedEvent & { readonly eventName: string }>;
+  private dataAttributes?: Set<string>;
+  private ariaAttributes?: Set<string>;
+  private styleProperties?: Set<string>;
   private styleMode: 'none' | 'string' | 'object' = 'none';
   private ref?: RefTarget;
 
@@ -1406,8 +1406,7 @@ class SpreadPart implements Part {
   setValue(value: TemplateValue): void {
     const props = isObjectRecord(value) ? value : undefined;
     const entries = props ? Object.entries(props) : [];
-    const nextKeys = entries.map(([key]) => key);
-    const structureChanged = !sameStringArray(this.keyOrder, nextKeys);
+    const structureChanged = !sameSpreadKeys(this.keyOrder, entries);
 
     for (const key of this.keys) {
       if (!props || !(key in props)) {
@@ -1424,6 +1423,7 @@ class SpreadPart implements Part {
     }
 
     if (structureChanged) {
+      const nextKeys = entries.map(([key]) => key);
       this.keysOverlap = spreadKeySetHasOverlap(nextKeys);
       const committedValues: SpreadValueSnapshot[] = [];
       for (const [key, nextValue] of entries) {
@@ -1471,10 +1471,12 @@ class SpreadPart implements Part {
   }
 
   suspend(): void {
-    for (const { eventName, listener, options } of this.events.values()) {
-      this.element.removeEventListener(eventName, listener, options);
+    if (this.events) {
+      for (const { eventName, listener, options } of this.events.values()) {
+        this.element.removeEventListener(eventName, listener, options);
+      }
+      this.events.clear();
     }
-    this.events.clear();
     this.setRef(undefined);
     this.committedValues = [];
   }
@@ -1515,12 +1517,12 @@ class SpreadPart implements Part {
     }
 
     if (key === 'data' || key === 'dataset') {
-      this.setAttributeMap('data-', value, this.dataAttributes, spreadMapEntries(snapshot));
+      this.dataAttributes = this.setAttributeMap('data-', value, this.dataAttributes, spreadMapEntries(snapshot));
       return;
     }
 
     if (key === 'aria') {
-      this.setAttributeMap('aria-', value, this.ariaAttributes, spreadMapEntries(snapshot));
+      this.ariaAttributes = this.setAttributeMap('aria-', value, this.ariaAttributes, spreadMapEntries(snapshot));
       return;
     }
 
@@ -1593,7 +1595,7 @@ class SpreadPart implements Part {
     const eventName = key.startsWith('@')
       ? key.slice(1)
       : key.slice(2).toLowerCase();
-    const previous = this.events.get(key);
+    const previous = this.events?.get(key);
 
     if (previous && event && previous.options === event.options) {
       previous.current = event.listener;
@@ -1606,9 +1608,9 @@ class SpreadPart implements Part {
     if (event) {
       const retained = Object.assign(retainEvent(event), { eventName });
       this.element.addEventListener(eventName, retained.listener, retained.options);
-      this.events.set(key, retained);
+      (this.events ??= new Map()).set(key, retained);
     } else {
-      this.events.delete(key);
+      this.events?.delete(key);
     }
   }
 
@@ -1647,31 +1649,32 @@ class SpreadPart implements Part {
       setStyleProperty(style, property, propertyValue);
     }
 
-    for (const property of this.styleProperties) {
-      if (!nextProperties.has(property)) removeStyleProperty(style, property);
+    if (this.styleProperties) {
+      for (const property of this.styleProperties) {
+        if (!nextProperties.has(property)) removeStyleProperty(style, property);
+      }
     }
 
-    this.styleProperties.clear();
-    for (const property of nextProperties) this.styleProperties.add(property);
+    this.styleProperties = nextProperties;
     this.styleMode = 'object';
   }
 
   private clearStyle(): void {
     const style = getStyleDeclaration(this.element);
     if (this.styleMode === 'string') this.element.removeAttribute('style');
-    if (style) {
+    if (style && this.styleProperties) {
       for (const property of this.styleProperties) removeStyleProperty(style, property);
     }
-    this.styleProperties.clear();
+    this.styleProperties = undefined;
     this.styleMode = 'none';
   }
 
   private setAttributeMap(
     prefix: 'data-' | 'aria-',
     value: unknown,
-    previousAttributes: Set<string>,
+    previousAttributes: Set<string> | undefined,
     entries?: readonly (readonly [string, unknown])[],
-  ): void {
+  ): Set<string> {
     const nextAttributes = new Set<string>();
 
     if (isObjectRecord(value)) {
@@ -1686,15 +1689,17 @@ class SpreadPart implements Part {
       }
     }
 
-    for (const attribute of previousAttributes) {
-      if (!nextAttributes.has(attribute)) this.element.removeAttribute(attribute);
+    if (previousAttributes) {
+      for (const attribute of previousAttributes) {
+        if (!nextAttributes.has(attribute)) this.element.removeAttribute(attribute);
+      }
     }
 
-    previousAttributes.clear();
-    for (const attribute of nextAttributes) previousAttributes.add(attribute);
+    return nextAttributes;
   }
 
-  private clearAttributes(attributes: Set<string>): void {
+  private clearAttributes(attributes: Set<string> | undefined): void {
+    if (!attributes) return;
     for (const attribute of attributes) this.element.removeAttribute(attribute);
     attributes.clear();
   }
@@ -1736,6 +1741,7 @@ function snapshotSpreadValue(key: string, value: unknown): SpreadValueSnapshot {
 }
 
 function sameSpreadValue(left: SpreadValueSnapshot, right: SpreadValueSnapshot): boolean {
+  if (Object.is(left, right)) return true;
   if (isSpreadMapSnapshot(left) && isSpreadMapSnapshot(right)) {
     if (left.entries.length !== right.entries.length) return false;
     for (let index = 0; index < left.entries.length; index += 1) {
@@ -1745,16 +1751,11 @@ function sameSpreadValue(left: SpreadValueSnapshot, right: SpreadValueSnapshot):
     }
     return true;
   }
-  if (isSpreadOpaqueSnapshot(left) || isSpreadOpaqueSnapshot(right)) return false;
-  return Object.is(left, right);
+  return false;
 }
 
 function isSpreadMapSnapshot(value: unknown): value is SpreadMapSnapshot {
   return Boolean(value && typeof value === 'object' && value[spreadSnapshotKind as keyof typeof value] === 'map');
-}
-
-function isSpreadOpaqueSnapshot(value: unknown): value is SpreadOpaqueSnapshot {
-  return Boolean(value && typeof value === 'object' && value[spreadSnapshotKind as keyof typeof value] === 'opaque');
 }
 
 function spreadMapEntries(
@@ -1774,10 +1775,10 @@ function sameSpreadLeaf(left: unknown, right: unknown): boolean {
   return left === null || (typeof left !== 'object' && typeof left !== 'function');
 }
 
-function sameStringArray(left: readonly string[], right: readonly string[]): boolean {
+function sameSpreadKeys(left: readonly string[], right: readonly (readonly [string, unknown])[]): boolean {
   if (left.length !== right.length) return false;
   for (let index = 0; index < left.length; index += 1) {
-    if (left[index] !== right[index]) return false;
+    if (left[index] !== right[index]![0]) return false;
   }
   return true;
 }

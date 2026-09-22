@@ -171,6 +171,10 @@ dynamic binding guard.
 
 ## Spread update semantics
 
+Spread bookkeeping is allocated on demand for events and attribute/style maps.
+Stable key order reuses the retained key list. Input entries are still captured
+before applying bindings, so getter evaluation and setter ordering remain intact.
+
 `...=${props}` retains committed values per rendered Part. A rerender with the
 same key order skips a key whose effective value has not changed. Primitive,
 property, event, and ref values use identity-aware comparison. Class arrays and

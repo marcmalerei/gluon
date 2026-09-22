@@ -185,6 +185,25 @@ describe('template runtime edge cases', () => {
     expect(removeAttribute).not.toHaveBeenCalled();
   });
 
+  it('preserves spread getter evaluation before setters and observes deleted keys', () => {
+    const root = document.createElement('div');
+    const view = (props: Record<string, unknown>) => html`<button ...=${props}>Save</button>`;
+    render(view({}), root);
+    const button = root.querySelector('button')!;
+    const calls: string[] = [];
+    Object.defineProperty(button, 'tracked', { set: () => calls.push('set') });
+    const props: Record<string, unknown> = {
+      get '.tracked'() { calls.push('get-property'); return 1; },
+      get title() { calls.push('get-title'); delete props.obsolete; return 'Ready'; },
+      obsolete: 'removed by getter',
+    };
+    render(view(props), root);
+    expect(calls).toEqual(['get-property', 'get-title', 'set']);
+    expect(button.title).toBe('Ready');
+    expect(button.hasAttribute('obsolete')).toBe(false);
+    unmount(root);
+  });
+
   it('detects in-place class, style, data, and ARIA map mutations', () => {
     const root = document.createElement('div');
     const classState = { active: true, quiet: false };
