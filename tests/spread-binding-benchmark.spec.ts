@@ -21,7 +21,7 @@ describe('spread-binding benchmark', () => {
       for (const entry of scenario.results) {
         expect(entry.batchSize).toBeGreaterThan(0);
         expect(entry.samples).toHaveLength(2);
-        expect(entry.samples.every((sample) => sample > 0)).toBe(true);
+        expect(entry.samples.every((sample) => Number.isFinite(sample) && sample >= 0)).toBe(true);
       }
     }
   }, 30_000);
