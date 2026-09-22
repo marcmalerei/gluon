@@ -8,8 +8,8 @@
     "checkedAt": "2026-09-22",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "Protected release workflow 35388473398 completed successfully on 2026-09-18: all 21 contracted package records were published to latest at 1.12.0 with provenance and verified from a clean directory. Immutable GitHub release v1.12.0 was published from tag commit ae56ac9d813d0b7185552af0709e2d90dfeb3a7d with 115 reviewed assets; registry state was reverified on 2026-09-22."
+    "publicationState": "ready",
+    "observation": "Registry preflight on 2026-09-22 verified all 21 contracted package records at latest 1.12.0 and confirmed 1.12.1 absent. Candidate publication requires exact-commit Quality Gates, release-cut evidence, and compatibility-manifest validation before the protected v1.12.1 tag may be created."
   },
   "packages": [
     {

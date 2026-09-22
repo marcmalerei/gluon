@@ -15,11 +15,11 @@ equivalence.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/vue-migration-analyzer at a glance
 
-**Runtime:** node · **Release:** 1.12.0
+**Runtime:** node · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/vue-migration-analyzer/) · [npm](https://www.npmjs.com/package/@gluonjs/vue-migration-analyzer) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/vue-migration-analyzer/README.md)
 
-**Public API:** [`@gluonjs/vue-migration-analyzer`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/vue-migration-analyzer/src/) · [`@gluonjs/vue-migration-analyzer/schema`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/vue-migration-analyzer/src/schema/)
+**Public API:** [`@gluonjs/vue-migration-analyzer`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/vue-migration-analyzer/src/) · [`@gluonjs/vue-migration-analyzer/schema`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/vue-migration-analyzer/src/schema/)
 
 ### Install
 

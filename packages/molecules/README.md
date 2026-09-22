@@ -19,11 +19,11 @@ device-specific inset behavior.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/molecules at a glance
 
-**Runtime:** browser · **Release:** 1.12.0
+**Runtime:** browser · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/molecules/) · [npm](https://www.npmjs.com/package/@gluonjs/molecules) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/molecules/README.md)
 
-**Public API:** [`@gluonjs/molecules`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/molecules/src/)
+**Public API:** [`@gluonjs/molecules`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/molecules/src/)
 
 ### Install
 

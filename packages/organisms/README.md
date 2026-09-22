@@ -12,11 +12,11 @@ downward on Core, Quarks, Atoms, and Molecules.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/organisms at a glance
 
-**Runtime:** browser · **Release:** 1.12.0
+**Runtime:** browser · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/organisms/) · [npm](https://www.npmjs.com/package/@gluonjs/organisms) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/organisms/README.md)
 
-**Public API:** [`@gluonjs/organisms`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/organisms/src/)
+**Public API:** [`@gluonjs/organisms`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/organisms/src/)
 
 ### Install
 
