@@ -47,7 +47,10 @@ toolchain and browser versions, and the parity invariants. This workload is
 specifically an 80-card stable-props update measurement. It does not establish
 general framework superiority, and changes must also pass the canonical
 rendering, component, allocation, bundle, cleanup, security, SSR, and hydration
-gates.
+gates. The issue #487 baseline, candidate, trade-offs, and raw evidence are
+retained in the
+[`spread-bindings-issue-487-comparison.md`](../benchmarks/results/spread-bindings-issue-487-comparison.md)
+report.
 
 ## Renderer-owned node-array reuse
 
