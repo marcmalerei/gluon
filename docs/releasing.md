@@ -9,28 +9,32 @@ For day-to-day version upgrades, start with the
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the `1.12.1` candidate. Every official manifest is
-public and lockstep at `1.12.1`. Registry preflight on 2026-09-22 confirmed all
-21 package records at `latest` `1.12.0` and confirmed that `1.12.1` is absent.
-The protected `v1.12.1` tag must not be created until the exact candidate commit
-passes Quality Gates and the release-cut evidence and compatibility manifest
-are committed and validated. This is enforced locally by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.12.1`. Every official manifest is public and
+lockstep at `1.12.1`. Protected release workflow
+[35730530965](https://github.com/marcmalerei/gluon/actions/runs/35730530965)
+published all 21 package records to `latest` with provenance and verified the
+train from a clean directory. The immutable GitHub release
+[`v1.12.1`](https://github.com/marcmalerei/gluon/releases/tag/v1.12.1) was
+published on 2026-09-22 from tag commit
+`15b1eefe0d7cbcb75fa3a3e551882f208b0f5542` with 117 reviewed assets. This is
+enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.12.1 candidate handoff
+## v1.12.1 train handoff
 
-Issue [#489](https://github.com/marcmalerei/gluon/issues/489) tracks the
+Issue [#489](https://github.com/marcmalerei/gluon/issues/489) established the
 21-package patch train for the value-aware Core spread update, the measured
 allocation follow-up, and the VitePress documentation/adoption work merged in
-PR [#488](https://github.com/marcmalerei/gluon/pull/488). The retained benchmark
-claims are fixture- and host-specific; they do not claim general superiority
-over Lit. The immutable `v1.12.0` release remains the supported baseline until
-the protected `v1.12.1` workflow completes publication and independent registry
-verification.
+PR [#488](https://github.com/marcmalerei/gluon/pull/488). The protected workflow
+completed candidate, reproducibility, browser-engine, Node-runtime, performance,
+fixture, clean-room registry, provenance, and publication checks. Independent
+registry verification confirmed all 21 package records at `latest` `1.12.1`.
+The retained benchmark claims remain fixture- and host-specific; they do not
+claim general superiority over Lit.
 
 ## v1.12.0 train handoff
 
