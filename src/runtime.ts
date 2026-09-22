@@ -352,33 +352,35 @@ export function createComponentStyleSelection(value: TemplateValue): StyleSheetS
 }
 
 function collectComponentStyleDependencies(value: TemplateValue): readonly ComponentStyleDependency[] {
-  const dependencies = new Map<string, ComponentStyleDependency>();
-  collectComponentStyles(value, dependencies);
-  return [...dependencies.values()];
+  const dependencies = collectComponentStyles(value);
+  return dependencies ? [...dependencies.values()] : emptyComponentStyles;
 }
 
 function collectComponentStyles(
   value: unknown,
-  dependencies: Map<string, ComponentStyleDependency>,
-): void {
+  dependencies?: Map<string, ComponentStyleDependency>,
+): Map<string, ComponentStyleDependency> | undefined {
+  if (value === null || typeof value !== 'object') return dependencies;
   if (Array.isArray(value)) {
-    for (const child of value) collectComponentStyles(child, dependencies);
-    return;
+    for (const child of value) dependencies = collectComponentStyles(child, dependencies);
+    return dependencies;
   }
   if (isTemplateResult(value)) {
     for (const dependency of value.styleDependencies) {
+      dependencies ??= new Map();
       const current = dependencies.get(dependency.id);
       if (current && current.sheet !== dependency.sheet) {
         throw new Error(`Component stylesheet id ${dependency.id} maps to multiple sheet identities.`);
       }
       dependencies.set(dependency.id, dependency);
     }
-    for (const child of value.values) collectComponentStyles(child, dependencies);
-    return;
+    for (const child of value.values) dependencies = collectComponentStyles(child, dependencies);
+    return dependencies;
   }
   if (isRepeatResult(value)) {
-    for (const child of value[repeatValues]) collectComponentStyles(child, dependencies);
+    for (const child of value[repeatValues]) dependencies = collectComponentStyles(child, dependencies);
   }
+  return dependencies;
 }
 
 export function directive<Args extends readonly unknown[]>(

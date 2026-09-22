@@ -175,6 +175,11 @@ Spread bookkeeping is allocated on demand for events and attribute/style maps.
 Stable key order reuses the retained key list. Input entries are still captured
 before applying bindings, so getter evaluation and setter ordering remain intact.
 
+The component-style preflight allocates its dependency map only when it finds a
+stylesheet. Unstyled trees share an empty dependency list. Every render still
+checks the current child tree (including mutated arrays) and rejects conflicting
+sheet identities before committing DOM updates.
+
 `...=${props}` retains committed values per rendered Part. A rerender with the
 same key order skips a key whose effective value has not changed. Primitive,
 property, event, and ref values use identity-aware comparison. Class arrays and
