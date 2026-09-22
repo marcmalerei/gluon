@@ -4,6 +4,12 @@ All notable changes to `@gluonjs/router` are recorded here.
 
 ## [Unreleased]
 
+## [1.12.1] - 2026-09-22
+
+### Changed
+
+- Released in the lockstep 1.12.1 patch train; no package-specific public API change was introduced here.
+
 ## [1.12.0] - 2026-09-18
 
 ### Changed

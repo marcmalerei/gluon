@@ -39,11 +39,11 @@ diagnostic catalog shared with the Playground and Devtools reference.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/language-server at a glance
 
-**Runtime:** node · **Release:** 1.12.0
+**Runtime:** node · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/language-server/) · [npm](https://www.npmjs.com/package/@gluonjs/language-server) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/language-server/README.md)
 
-**Public API:** [`@gluonjs/language-server`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/language-server/src/)
+**Public API:** [`@gluonjs/language-server`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/language-server/src/)
 
 ### Install
 

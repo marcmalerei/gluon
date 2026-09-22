@@ -7,6 +7,8 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.12.1] - 2026-09-22
+
 ### Changed
 
 - Made Core spread-binding updates value-aware, so stable native props no

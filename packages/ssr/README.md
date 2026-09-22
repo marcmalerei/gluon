@@ -20,11 +20,11 @@ normal element hydrator.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/ssr at a glance
 
-**Runtime:** node · **Release:** 1.12.0
+**Runtime:** node · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/ssr/) · [npm](https://www.npmjs.com/package/@gluonjs/ssr) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/ssr/README.md)
 
-**Public API:** [`@gluonjs/ssr`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/) · [`@gluonjs/ssr/eleventy`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/eleventy/) · [`@gluonjs/ssr/hydration`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/hydration/) · [`@gluonjs/ssr/static`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/static/) · [`@gluonjs/ssr/streaming`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/streaming/)
+**Public API:** [`@gluonjs/ssr`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/ssr/src/) · [`@gluonjs/ssr/eleventy`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/ssr/src/eleventy/) · [`@gluonjs/ssr/hydration`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/ssr/src/hydration/) · [`@gluonjs/ssr/static`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/ssr/src/static/) · [`@gluonjs/ssr/streaming`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/ssr/src/streaming/)
 
 ### Install
 

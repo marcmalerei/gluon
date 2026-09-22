@@ -90,7 +90,7 @@ export default defineConfig({
   lastUpdated: false,
   ignoreDeadLinks: [
     /^\/latest(?:\/|$)/,
-    /^\/1\.12\.0\/examples(?:\/|$)/,
+    /^\/1\.12\.1\/examples(?:\/|$)/,
     /^\/playground(?:\/|$)/,
   ],
   transformPageData(pageData) {

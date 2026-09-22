@@ -48,11 +48,11 @@ stylesheets and `adoptedStyleSheets` only.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/compiler at a glance
 
-**Runtime:** universal · **Release:** 1.12.0
+**Runtime:** universal · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/compiler/) · [npm](https://www.npmjs.com/package/@gluonjs/compiler) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/compiler/README.md)
 
-**Public API:** [`@gluonjs/compiler`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/compiler/src/) · [`@gluonjs/compiler/diagnostics`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/compiler/src/diagnostics/)
+**Public API:** [`@gluonjs/compiler`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/compiler/src/) · [`@gluonjs/compiler/diagnostics`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/compiler/src/diagnostics/)
 
 ### Install
 

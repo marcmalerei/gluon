@@ -19,11 +19,11 @@ message.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/i18n at a glance
 
-**Runtime:** browser · **Release:** 1.12.0
+**Runtime:** browser · **Release:** 1.12.1
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/i18n/) · [npm](https://www.npmjs.com/package/@gluonjs/i18n) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/i18n/README.md)
 
-**Public API:** [`@gluonjs/i18n`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/i18n/src/)
+**Public API:** [`@gluonjs/i18n`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/i18n/src/)
 
 ### Install
 

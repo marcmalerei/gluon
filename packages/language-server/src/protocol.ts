@@ -73,7 +73,7 @@ export class GluonProtocolServer {
 }
 
 const initializeResult = Object.freeze({
-  serverInfo: { name: '@gluonjs/language-server', version: '1.12.0' },
+  serverInfo: { name: '@gluonjs/language-server', version: '1.12.1' },
   capabilities: {
     textDocumentSync: 1,
     completionProvider: { triggerCharacters: ['<', ' ', '.', '@', '"', "'"] },
