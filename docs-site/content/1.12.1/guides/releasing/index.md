@@ -1,12 +1,15 @@
 # Release readiness
 
-The `1.12.1` documentation describes the lockstep release candidate. All 21
-official manifests resolve to `1.12.1`; npm registry preflight on 2026-09-22
-confirmed `latest` remains `1.12.0` and `1.12.1` is absent for every contracted
-package. Issue [#489](https://github.com/marcmalerei/gluon/issues/489) tracks the
-candidate, which contains the value-aware Core spread optimization, its measured
-allocation follow-up, and the VitePress documentation/adoption work merged in
-PR [#488](https://github.com/marcmalerei/gluon/pull/488).
+The `1.12.1` documentation describes the published lockstep release. All 21
+official manifests and npm `latest` tags resolve to `1.12.1`. Protected release
+workflow
+[35730530965](https://github.com/marcmalerei/gluon/actions/runs/35730530965)
+completed candidate, reproducibility, browser-engine, Node-runtime, performance,
+fixture, clean-room registry, provenance, and publication checks. Issue
+[#489](https://github.com/marcmalerei/gluon/issues/489) tracks the train, which
+contains the value-aware Core spread optimization, its measured allocation
+follow-up, and the VitePress documentation/adoption work merged in PR
+[#488](https://github.com/marcmalerei/gluon/pull/488).
 
 The release cut retains a Quality-Gates-tested candidate followed only by its
 release-cut evidence and compatibility manifest. The protected tag is created
@@ -16,10 +19,11 @@ Release-state wording in this documentation follows the repository policy:
 stable describes shipped public contracts, experimental describes explicitly
 labeled opt-in surfaces, and unsupported marks boundaries the contract refuses.
 
-No `v1.12.1` tag or GitHub release exists at candidate preparation time. The
-immutable [`v1.12.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.12.0)
-release remains the supported baseline until the protected workflow publishes
-and independently verifies the complete `1.12.1` train.
+The protected `v1.12.1` tag resolves to
+`15b1eefe0d7cbcb75fa3a3e551882f208b0f5542`. Its immutable
+[GitHub release](https://github.com/marcmalerei/gluon/releases/tag/v1.12.1)
+contains 117 reviewed assets. Independent registry verification on 2026-09-22
+confirmed all 21 package records at `latest` `1.12.1`.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
