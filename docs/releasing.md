@@ -10,20 +10,28 @@ For day-to-day version upgrades, start with the
 ## Current publication state
 
 The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for `1.10.0`. Every official manifest is public and
-lockstep at `1.10.0`. Protected release workflow
-[31922071023](https://github.com/marcmalerei/gluon/actions/runs/31922071023)
+`scopeControl: verified` for `1.12.0`. Every official manifest is public and
+lockstep at `1.12.0`. Protected release workflow
+[35388473398](https://github.com/marcmalerei/gluon/actions/runs/35388473398)
 published all 21 package records to `latest` with provenance and verified the
 train from a clean directory. The immutable GitHub release
-[`v1.10.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.10.0) was
-published on 2026-08-16 from tag commit
-`d1763ef0646beaa3b5c6753b431f40ddec734ca9` with 115 reviewed assets. The
+[`v1.12.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.12.0) was
+published on 2026-09-18 from tag commit
+`ae56ac9d813d0b7185552af0709e2d90dfeb3a7d` with 115 reviewed assets. The
 `v1.0.9` GitHub release remains a historical draft after its public-type
 verification failure. This is enforced locally by:
 
 ```sh
 npm run check:release-contract
 ```
+
+## v1.12.0 train handoff
+
+The protected `v1.12.0` workflow completed candidate, reproducibility,
+browser-engine, Node-runtime, performance, fixture, clean-room registry,
+provenance, and publication checks. Registry verification on 2026-09-22
+confirmed all 21 contracted package records at `latest` `1.12.0`; the immutable
+release remains the supported baseline until a later release completes.
 
 ## v1.10.0 train handoff
 

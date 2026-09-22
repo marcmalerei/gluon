@@ -1,9 +1,11 @@
 # Release readiness
 
-The `1.12.0` documentation describes the prepared lockstep release candidate.
-All 21 official manifests are at `1.12.0`; it is not a published package train
-until the protected release workflow completes the candidate, provenance,
-registry, and immutable-release checks. Issue
+The `1.12.0` documentation describes the published lockstep release. All 21
+official manifests and npm `latest` tags resolve to `1.12.0`. Protected release
+workflow
+[35388473398](https://github.com/marcmalerei/gluon/actions/runs/35388473398)
+completed the candidate, provenance, clean-room registry, and immutable-release
+checks. Issue
 [#465](https://github.com/marcmalerei/gluon/issues/465) delivers the optional
 Tailwind Vite integration and deduplicated Shadow DOM SSR stylesheet transport.
 Issues [#468](https://github.com/marcmalerei/gluon/issues/468) and
@@ -30,10 +32,11 @@ Release-state wording in this documentation follows the repository policy:
 stable describes shipped public contracts, experimental describes explicitly
 labeled opt-in surfaces, and unsupported marks boundaries the contract refuses.
 
-No `v1.12.0` tag or immutable GitHub release exists while this candidate is
-under review. The protected workflow must produce fresh browser, Node,
-performance, reproducibility, clean-room registry, provenance, and publication
-evidence for all 21 packages before this wording is changed to a release claim.
+The protected `v1.12.0` tag resolves to
+`ae56ac9d813d0b7185552af0709e2d90dfeb3a7d`. Its immutable
+[GitHub release](https://github.com/marcmalerei/gluon/releases/tag/v1.12.0)
+contains 115 reviewed assets. Registry verification on 2026-09-22 confirmed
+all 21 package records at `latest` `1.12.0`.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
