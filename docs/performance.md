@@ -26,6 +26,11 @@ mixed, or multi-node rows continue through generic keyed reconciliation.
 
 ## Spread-binding update benchmark
 
+The [incremental allocation follow-up](../benchmarks/results/spread-followup-issue-487-comparison.md)
+compares the value-aware spread implementation with lazy bookkeeping and a
+style preflight that avoids empty dependency maps. It retains independent repeats, the
+three-engine rendering matrix, component results, size changes, and limitations.
+
 `npm run benchmark:spread-bindings` measures 80 equivalent product-card
 templates in a production Chromium build. The Gluon fixture forwards a fresh
 native-props object through `...=${props}` on every card render; the Lit fixture

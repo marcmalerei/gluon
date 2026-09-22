@@ -13,6 +13,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   longer repeat DOM, property, event, class, style, data, ARIA, ref, or URL
   work while mutable maps, removals, alias ordering, suspension, and permanent
   cleanup retain their existing behavior (#487).
+- Reduced spread bookkeeping and empty component-style preflight allocations,
+  preserving getter ordering, mutable style-tree discovery, and pre-commit
+  stylesheet validation; retained repeated performance evidence (#487).
 
 ### Documentation
 
