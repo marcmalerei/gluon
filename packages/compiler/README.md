@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/compiler
+
 `@gluonjs/compiler` is Gluon's shared source-location and module-transform
 foundation. It records `html` and `css` tagged-template boundaries and
 interpolation locations, produces high-resolution source maps, and supplies the
@@ -42,6 +44,63 @@ reference, compact production codes, and generated JSON documentation.
 Inline `<style>` elements in `html` templates produce
 `GLUON_TEMPLATE_STYLE_ELEMENT`; Gluon browser styling uses constructable
 stylesheets and `adoptedStyleSheets` only.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/compiler at a glance
+
+**Runtime:** universal · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/compiler/) · [npm](https://www.npmjs.com/package/@gluonjs/compiler) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/compiler/README.md)
+
+**Public API:** [`@gluonjs/compiler`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/compiler/src/) · [`@gluonjs/compiler/diagnostics`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/compiler/src/diagnostics/)
+
+### Install
+
+```sh
+npm install @gluonjs/compiler
+```
+
+### Quick start
+
+```ts
+import {
+  transformGluonModule,
+  type GluonTransformResult,
+} from '@gluonjs/compiler';
+
+const source = `
+  import { html } from '@gluonjs/core';
+  export const ProductName = (name: string) => html\`<h1>\${name}</h1>\`;
+`;
+
+const result: GluonTransformResult = transformGluonModule(
+  source,
+  '/src/product-name.ts',
+  { development: true },
+);
+
+console.log(result.templates[0]?.tag); // "html"
+console.log(result.diagnostics); // source-located compiler diagnostics
+```
+
+### Choose this package when
+
+- Track `html`, `svg`, `css`, and aliased `compose()` tagged templates.
+- Produce source maps and decorator transforms for tooling.
+- Support downstream Vite and language tooling packages.
+
+**Choose another boundary when:**
+
+- Does not render templates or own runtime application state.
+- Does not replace the public component model with a private renderer format.
+
+### Related documentation
+
+- [Presentational SFCs](https://marcmalerei.github.io/gluon/latest/guides/sfc-authoring/)
+- [Tooling](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+- [Diagnostics](https://marcmalerei.github.io/gluon/latest/reference/diagnostics/)
+
+<!-- gluon-package-overview:end -->
 
 ## Transform a module
 
@@ -85,7 +144,7 @@ The compiler supports typed script, one annotated template, identifier
 interpolation, a default slot, a prop-driven conditional native root, and one
 owned constructable stylesheet. It rejects stateful or ambiguous forms instead
 of adding a second runtime. See
-[the task-oriented SFC guide](../../docs/sfc-authoring.md).
+[the task-oriented SFC guide](https://marcmalerei.github.io/gluon/latest/guides/sfc-authoring/).
 
 ## License
 

@@ -4,10 +4,53 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/graph
+
 `@gluonjs/graph` is an optional, canvas-backed network graph for Gluon. It has
 no layout dependency: node positions are deterministic from `seed`, node input,
 and links. The element owns pan, zoom, drawing, and selection; the host owns
 domain labels, filtering controls, and persistence.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/graph at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/graph/) · [npm](https://www.npmjs.com/package/@gluonjs/graph) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/graph/README.md)
+
+**Public API:** [`@gluonjs/graph`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/graph/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/graph
+```
+
+### Quick start
+
+```ts
+import '@gluonjs/graph';
+
+const graph = document.querySelector('gluon-graph');
+```
+
+### Choose this package when
+
+- Canvas-backed graph visualization with deterministic layouts.
+- Pan, zoom, selection, and link rendering owned by the element.
+- Optional knowledge-map and dependency-map views.
+
+**Choose another boundary when:**
+
+- Does not own graph data modeling or filtering controls.
+- Consumers must provide their own labels and persistence.
+
+### Related documentation
+
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+- [Application](https://marcmalerei.github.io/gluon/latest/guides/application/)
+
+<!-- gluon-package-overview:end -->
 
 ## Render a knowledge map
 

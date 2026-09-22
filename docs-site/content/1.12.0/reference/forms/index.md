@@ -9,7 +9,7 @@ subscriptions, and `snapshot()`/`hydrate()` transport.
 
 It deliberately does not render labels or controls, read `FormData`, perform
 constraint validation, send requests, or walk JSON Schema. Keep those concerns
-with the native form/application or use [`@gluonjs/json-forms`](../../api/generated/packages/json-forms/src/).
+with the native form/application or use [`@gluonjs/json-forms`](/gluon/1.12.0/api/generated/packages/json-forms/src/).
 
-See the [request-free form guide](../../../../forms/) for the full contract and
+See the [request-free form guide](/gluon/1.12.0/reference/forms/) for the full contract and
 SSR/browser example.

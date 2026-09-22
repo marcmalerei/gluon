@@ -4,11 +4,53 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/vue-migration-analyzer
+
 This Node-only package statically inventories the Vue 3.5 project surface
 accepted by [RFC 0003](../../docs/rfcs/0003-report-only-vue-migration-analyzer.md).
 It emits migration evidence; it does not execute project code, compile an
 application, generate Gluon source, modify files, or establish behavioral
 equivalence.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/vue-migration-analyzer at a glance
+
+**Runtime:** node · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/vue-migration-analyzer/) · [npm](https://www.npmjs.com/package/@gluonjs/vue-migration-analyzer) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/vue-migration-analyzer/README.md)
+
+**Public API:** [`@gluonjs/vue-migration-analyzer`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/vue-migration-analyzer/src/) · [`@gluonjs/vue-migration-analyzer/schema`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/vue-migration-analyzer/src/schema/)
+
+### Install
+
+```sh
+npm install @gluonjs/vue-migration-analyzer
+```
+
+### Quick start
+
+```sh
+gluon-vue-analyze .
+gluon-vue-analyze . --format json
+```
+
+### Choose this package when
+
+- Inventory Vue source surfaces without executing project code.
+- Report-only migration evidence for the Gluon Vue cutover path.
+- Schema-backed CLI analysis for repository reviews.
+
+**Choose another boundary when:**
+
+- Does not generate Gluon source or modify files.
+- Does not establish behavioral equivalence.
+
+### Related documentation
+
+- [Vue migration analyzer](https://marcmalerei.github.io/gluon/latest/migration/vue-analyzer/)
+- [Vue cutover](https://marcmalerei.github.io/gluon/latest/migration/vue-to-gluon-cutover/)
+
+<!-- gluon-package-overview:end -->
 
 ```sh
 gluon-vue-analyze .

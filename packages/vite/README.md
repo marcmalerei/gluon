@@ -4,8 +4,54 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/vite
+
 The official Vite plugin adds Gluon template source maps, development
 diagnostics, and compatible state-preserving HMR.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/vite at a glance
+
+**Runtime:** node · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/vite/) · [npm](https://www.npmjs.com/package/@gluonjs/vite) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/vite/README.md)
+
+**Public API:** [`@gluonjs/vite`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/vite/src/) · [`@gluonjs/vite/tailwind`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/vite/src/tailwind/)
+
+### Install
+
+```sh
+npm install @gluonjs/vite
+```
+
+### Quick start
+
+```ts
+import { defineConfig } from 'vite';
+import gluon from '@gluonjs/vite';
+
+export default defineConfig({ plugins: [gluon()] });
+```
+
+### Choose this package when
+
+- Template source maps, development diagnostics, and HMR.
+- Build-time integration for Gluon applications.
+- Tooling support for browser-oriented packages.
+- Optional Tailwind composition with deduplicated Shadow DOM SSR stylesheet assets.
+
+**Choose another boundary when:**
+
+- Does not own application runtime state or rendering semantics.
+- Requires Vite and the public Core package.
+
+### Related documentation
+
+- [Presentational SFCs](https://marcmalerei.github.io/gluon/latest/guides/sfc-authoring/)
+- [Tooling](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+- [Deployment](https://marcmalerei.github.io/gluon/latest/guides/deployment/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import { defineConfig } from 'vite';
@@ -21,7 +67,7 @@ ordinary module analysis; no second plugin is required. SFC script blocks are
 transpiled with the configured TypeScript decorator mode, while generated code
 uses ordinary public Gluon component, Quark, template, and stylesheet
 contracts. See
-[Presentational Single-File Components](../../docs/sfc-authoring.md).
+[Presentational Single-File Components](https://marcmalerei.github.io/gluon/latest/guides/sfc-authoring/).
 
 The plugin also transpiles standard TypeScript decorators imported from
 `@gluonjs/core/decorators`; no `experimentalDecorators` setting is required.

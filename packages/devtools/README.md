@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/devtools
+
 Gluon Devtools is explicitly opt-in. `createDevtoolsBridge()` defaults to
 `enabled: false`, installs no render hook, and exposes no global. Development
 entry points enable it deliberately and register each application root with an
@@ -13,6 +15,47 @@ production paths and excerpts are never surfaced. Pass `navigateToSource` to
 `mountGluonDevtools()` when the application has an editor integration. Gluon
 never constructs an editor URI, opens a remote connection, or navigates without
 that callback.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/devtools at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/devtools/) · [npm](https://www.npmjs.com/package/@gluonjs/devtools) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/devtools/README.md)
+
+**Public API:** [`@gluonjs/devtools`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/devtools/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/devtools
+```
+
+### Quick start
+
+```ts
+import { createDevtoolsBridge, mountGluonDevtools } from '@gluonjs/devtools';
+
+const bridge = createDevtoolsBridge({ enabled: true });
+```
+
+### Choose this package when
+
+- Development-only inspection of application, component, render, Router, and Store state.
+- Explicit opt-in bridges and app-root registration.
+- Browser inspector integration with optional Vite support.
+
+**Choose another boundary when:**
+
+- Disabled by default and never exposes a global automatically.
+- Development tooling only; not part of production app behavior.
+
+### Related documentation
+
+- [Tooling](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+- [Quality](https://marcmalerei.github.io/gluon/latest/guides/quality/)
+
+<!-- gluon-package-overview:end -->
 
 ## Inspect an application
 

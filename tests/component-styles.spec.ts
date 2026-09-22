@@ -179,6 +179,32 @@ describe('usage-driven component styles', () => {
     expect(document.adoptedStyleSheets).toContain(second.sheet);
   });
 
+  it('discovers styles added to a mutable child array and rejects conflicts before committing', () => {
+    const first = createComponentStyleDependency({
+      id: 'mutable-child-style', sheet: css`p { color: red; }`, layer: 'atom', order: 0,
+    });
+    const conflicting = createComponentStyleDependency({
+      id: first.id, sheet: css`p { color: blue; }`, layer: 'atom', order: 0,
+    });
+    const styled = (dependency: typeof first) => html`<p>Styled</p>`.withStyleDependencies([dependency]);
+    const children = [html`<span>Unstyled</span>`];
+    const view = () => html`<section>${children}</section>`;
+    render(view(), document.body);
+    expect(document.adoptedStyleSheets).not.toContain(first.sheet);
+    children.push(styled(first));
+    render(view(), document.body);
+    expect(document.adoptedStyleSheets).toContain(first.sheet);
+    const before = document.body.innerHTML;
+    children.push(styled(conflicting));
+    expect(() => render(view(), document.body)).toThrow('multiple sheet identities');
+    expect(document.body.innerHTML).toBe(before);
+    expect(document.adoptedStyleSheets).not.toContain(conflicting.sheet);
+    children.splice(1);
+    render(view(), document.body);
+    expect(document.adoptedStyleSheets).not.toContain(first.sheet);
+    expect(createComponentStyleSelection(view()).entries).toEqual([]);
+  });
+
   it('rejects deprecated aggregate coexistence instead of double-styling silently', () => {
     adoptStyles(document, atomStyles);
     expect(() => render(Button({ label: 'Conflicting path' }), document.body)).toThrowError(

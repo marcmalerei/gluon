@@ -3,7 +3,8 @@ import { basename, dirname, extname, relative, resolve, sep } from 'node:path';
 import ts from 'typescript';
 
 const root = resolve(import.meta.dirname, '..');
-const apiRoot = resolve(root, '.tmp/docs-api');
+const versions = await readJson('docs-site/versions.json');
+const apiRoot = resolve(root, 'docs-site', 'content', versions.latest, 'api', 'generated');
 const corpusRoot = resolve(root, '.tmp/api-examples');
 const catalog = await readJson('docs-site/api-examples.json');
 const packageContract = await readJson('package-contract.json');

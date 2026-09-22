@@ -24,6 +24,39 @@ The exact-reverse fast path reuses the direct element for each still-safe
 primitive row, avoiding per-row node-array materialization. Structural,
 mixed, or multi-node rows continue through generic keyed reconciliation.
 
+## Spread-binding update benchmark
+
+The [incremental allocation follow-up](../benchmarks/results/spread-followup-issue-487-comparison.md)
+compares the value-aware spread implementation with lazy bookkeeping and a
+style preflight that avoids empty dependency maps. It retains independent repeats, the
+three-engine rendering matrix, component results, size changes, and limitations.
+
+`npm run benchmark:spread-bindings` measures 80 equivalent product-card
+templates in a production Chromium build. The Gluon fixture forwards a fresh
+native-props object through `...=${props}` on every card render; the Lit fixture
+uses explicit bindings and produces the same observable DOM. Separate lanes
+measure cold commit, stable text-only update commit, their end-to-end forms,
+and renderer cleanup. The runner rejects changed element identity, text or
+attribute differences, inline-style differences, incomplete cleanup, and
+browser console warnings before writing evidence.
+
+```bash
+npm run benchmark:spread-bindings -- \
+  --samples=25 \
+  --warmup=6 \
+  --output=.tmp/spread-binding-results.json
+```
+
+The paired JSON retains every sample, calibrated batch sizes, source state,
+toolchain and browser versions, and the parity invariants. This workload is
+specifically an 80-card stable-props update measurement. It does not establish
+general framework superiority, and changes must also pass the canonical
+rendering, component, allocation, bundle, cleanup, security, SSR, and hydration
+gates. The issue #487 baseline, candidate, trade-offs, and raw evidence are
+retained in the
+[`spread-bindings-issue-487-comparison.md`](../benchmarks/results/spread-bindings-issue-487-comparison.md)
+report.
+
 ## Renderer-owned node-array reuse
 
 Issue #295 removed two redundant array copies before private DOM
@@ -141,6 +174,7 @@ production comparison:
 ```bash
 npx playwright install chromium firefox webkit
 npm run benchmark:rendering
+npm run benchmark:spread-bindings
 npm run benchmark:components
 npm run benchmark:runtime
 npm run profile:component-property-state

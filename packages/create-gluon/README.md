@@ -4,11 +4,52 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# create-gluon
+
 `create-gluon` scaffolds supported TypeScript applications that consume only
 public Gluon package entry points.
 
 It also adds verified app-local UI boundaries to an existing generated or
 compatible strict-TypeScript project:
+
+<!-- gluon-package-overview:start -->
+## create-gluon at a glance
+
+**Runtime:** node · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/create-gluon/) · [npm](https://www.npmjs.com/package/create-gluon) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/create-gluon/README.md)
+
+**Public API:** [`create-gluon`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/create-gluon/src/)
+
+### Install
+
+```sh
+npm create gluon@latest my-app
+```
+
+### Quick start
+
+```sh
+npm create gluon@latest my-app
+```
+
+### Choose this package when
+
+- Project scaffolding with public Gluon package entry points.
+- Adding verified app-local component boundaries to an existing project.
+- CLI-driven local project setup.
+
+**Choose another boundary when:**
+
+- Does not provide a runtime package or browser component API.
+- Scaffolded projects must still follow the public-boundary rules.
+
+### Related documentation
+
+- [Getting started](https://marcmalerei.github.io/gluon/latest/guides/getting-started/)
+- [Tooling](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+
+<!-- gluon-package-overview:end -->
 
 ```sh
 create-gluon add-component PurchaseAction --kind molecule --yes

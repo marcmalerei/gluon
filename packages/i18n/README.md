@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/i18n
+
 `@gluonjs/i18n` is the optional Gluon internationalization package. It depends
 on `@gluonjs/core` for application injection and on `@gluonjs/reactivity` for the
 reactive locale and ready counters, so applications that do not need translated
@@ -13,6 +15,47 @@ The package also exports `validateI18nCatalog()` for build-time and test-time
 catalog checks. The validator is DOM-free and returns typed diagnostics that
 include the locale, source key, machine-readable code, and human-readable
 message.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/i18n at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/i18n/) · [npm](https://www.npmjs.com/package/@gluonjs/i18n) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/i18n/README.md)
+
+**Public API:** [`@gluonjs/i18n`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/i18n/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/i18n
+```
+
+### Quick start
+
+```ts
+import { createI18n, useI18n } from '@gluonjs/i18n';
+
+const i18n = createI18n({ locale: 'en', fallbackLocale: 'en' });
+```
+
+### Choose this package when
+
+- Translated messages for application UI.
+- Lazy-loaded locale namespaces and ready-state tracking.
+- Reactive language switching in browser apps.
+
+**Choose another boundary when:**
+
+- Does not own routing, storage, or component rendering.
+- Applications without translated strings do not need this package.
+
+### Related documentation
+
+- [Application runtime](https://marcmalerei.github.io/gluon/latest/guides/application/)
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import { validateI18nCatalog } from '@gluonjs/i18n';

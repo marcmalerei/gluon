@@ -43,6 +43,7 @@ npm run check:component-library-loader-build
 npm run check:storybook:component-library
 npm run benchmark:bundle
 npm run benchmark:components
+npm run benchmark:spread-bindings
 npm run benchmark:runtime
 ```
 

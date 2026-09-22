@@ -4,9 +4,52 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/test-utils
+
 The official Gluon test utilities mount public components and applications in a
 real browser without private runtime imports. The package targets Gluon's
 currently supported Chromium browser matrix.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/test-utils at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/test-utils/) · [npm](https://www.npmjs.com/package/@gluonjs/test-utils) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/test-utils/README.md)
+
+**Public API:** [`@gluonjs/test-utils`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/test-utils/src/) · [`@gluonjs/test-utils/ssr`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/test-utils/src/ssr/)
+
+### Install
+
+```sh
+npm install @gluonjs/test-utils
+```
+
+### Quick start
+
+```ts
+import { afterEach, expect, it } from 'vitest';
+import { html } from '@gluonjs/core';
+import { cleanupFixtures, mountComponent } from '@gluonjs/test-utils';
+```
+
+### Choose this package when
+
+- Browser-based mounting of public components and applications.
+- Test cleanup helpers and SSR-specific test helpers.
+- User-facing behavior checks without private runtime imports.
+
+**Choose another boundary when:**
+
+- Targets the supported browser matrix rather than Node-only unit tests.
+- Does not expose private framework internals.
+
+### Related documentation
+
+- [Quality](https://marcmalerei.github.io/gluon/latest/guides/quality/)
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+
+<!-- gluon-package-overview:end -->
 
 ## Stability notes
 

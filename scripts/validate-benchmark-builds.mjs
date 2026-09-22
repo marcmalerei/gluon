@@ -4,6 +4,7 @@ import { loadConfigFromFile } from 'vite';
 const root = resolve(import.meta.dirname, '..');
 const configs = [
   'benchmarks/rendering/vite.config.ts',
+  'benchmarks/spread-bindings/vite.config.ts',
   'benchmarks/components/vite.config.ts',
   'benchmarks/allocations/vite.config.ts',
 ];

@@ -99,6 +99,9 @@ jobs:
           GLUON_BROWSER: ${{ matrix.browser }}
       - run: npm run benchmark:rendering -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/rendering-${{ matrix.browser }}.json
         timeout-minutes: 10
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run benchmark:spread-bindings -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/spread-bindings-chromium.json
+        timeout-minutes: 10
       - run: npm run benchmark:components -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/components-${{ matrix.browser }}.json
         timeout-minutes: 10
       - run: npm run benchmark:runtime -- --browsers=${{ matrix.browser }} --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard-${{ matrix.browser }}.json

@@ -53,5 +53,5 @@ for the evidence boundary shared by the package portal and release line.
 - [`@gluonjs/organisms`](generated/packages/organisms/src/)
 
 Each package exports a machine-readable stable-contract manifest. The compiled
-[interactive UI example](../examples/ui.html) exercises themes, controls,
+[interactive UI example](/gluon/1.12.0/examples/ui.html) exercises themes, controls,
 compositions, and headless listbox keyboard behavior.

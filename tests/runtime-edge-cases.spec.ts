@@ -4,7 +4,9 @@ import {
   isTemplateResult,
   nothing,
   render,
+  suspendRender,
   svg,
+  unmount,
   type TemplateResult,
   type TemplateValue,
 } from '../src/index.js';
@@ -148,6 +150,164 @@ describe('template runtime edge cases', () => {
     expect(button.hasAttribute('data-track-id')).toBe(false);
     expect(button.hasAttribute('aria-expanded')).toBe(false);
     expect(button.value).toBe('undefined');
+  });
+
+  it('skips stable spread writes and applies an isolated scalar change once', () => {
+    const root = document.createElement('div');
+    const click = vi.fn();
+    const ref = { value: undefined as Element | undefined };
+    const view = (title: string, label: string) => html`<button ...=${{
+      class: ['action', { active: true }],
+      style: { color: 'red', '--accent': 'blue' },
+      data: { trackId: 'stable' },
+      aria: { label: 'Stable action' },
+      title,
+      draggable: undefined,
+      '?disabled': false,
+      '.tabIndex': 0,
+      onClick: click,
+      ref,
+    }}>${label}</button>`;
+
+    render(view('Stable', 'First'), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    const setAttribute = vi.spyOn(button, 'setAttribute');
+    const removeAttribute = vi.spyOn(button, 'removeAttribute');
+
+    render(view('Stable', 'Second'), root);
+    expect(button.textContent).toBe('Second');
+    expect(setAttribute).not.toHaveBeenCalled();
+    expect(removeAttribute).not.toHaveBeenCalled();
+
+    render(view('Changed', 'Third'), root);
+    expect(setAttribute).toHaveBeenCalledOnce();
+    expect(setAttribute).toHaveBeenLastCalledWith('title', 'Changed');
+    expect(removeAttribute).not.toHaveBeenCalled();
+  });
+
+  it('preserves spread getter evaluation before setters and observes deleted keys', () => {
+    const root = document.createElement('div');
+    const view = (props: Record<string, unknown>) => html`<button ...=${props}>Save</button>`;
+    render(view({}), root);
+    const button = root.querySelector('button')!;
+    const calls: string[] = [];
+    Object.defineProperty(button, 'tracked', { set: () => calls.push('set') });
+    const props: Record<string, unknown> = {
+      get '.tracked'() { calls.push('get-property'); return 1; },
+      get title() { calls.push('get-title'); delete props.obsolete; return 'Ready'; },
+      obsolete: 'removed by getter',
+    };
+    render(view(props), root);
+    expect(calls).toEqual(['get-property', 'get-title', 'set']);
+    expect(button.title).toBe('Ready');
+    expect(button.hasAttribute('obsolete')).toBe(false);
+    unmount(root);
+  });
+
+  it('detects in-place class, style, data, and ARIA map mutations', () => {
+    const root = document.createElement('div');
+    const classState = { active: true, quiet: false };
+    const classNames = ['action', classState];
+    const styles: Record<string, unknown> = { color: 'red', padding: '4px' };
+    const data: Record<string, unknown> = { trackId: 'alpha', removeMe: 'yes' };
+    const aria: Record<string, unknown> = { label: 'Initial', expanded: false };
+    const props = { class: classNames, style: styles, data, aria };
+    const view = () => html`<button ...=${props}>Save</button>`;
+
+    render(view(), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    classState.active = false;
+    classState.quiet = true;
+    styles.color = 'blue';
+    delete styles.padding;
+    data.trackId = 'beta';
+    delete data.removeMe;
+    aria.label = 'Changed';
+    delete aria.expanded;
+    render(view(), root);
+
+    expect(button.className).toBe('action quiet');
+    expect(button.style.color).toBe('blue');
+    expect(button.style.padding).toBe('');
+    expect(button.dataset.trackId).toBe('beta');
+    expect(button.dataset.removeMe).toBeUndefined();
+    expect(button.getAttribute('aria-label')).toBe('Changed');
+    expect(button.hasAttribute('aria-expanded')).toBe(false);
+  });
+
+  it('preserves last-write ordering for overlapping spread aliases', () => {
+    const root = document.createElement('div');
+    const view = (className: string, dataValue: string) => html`<button ...=${{
+      class: className,
+      className: 'last-class',
+      data: { track: dataValue },
+      'data-track': 'last-data',
+      '?disabled': true,
+      disabled: false,
+    }}>Save</button>`;
+
+    render(view('first-class', 'first-data'), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    render(view('changed-class', 'changed-data'), root);
+
+    expect(button.className).toBe('last-class');
+    expect(button.dataset.track).toBe('last-data');
+    expect(button.hasAttribute('disabled')).toBe(false);
+  });
+
+  it('restores controlled properties and native booleans when spread values stay stable', () => {
+    const root = document.createElement('div');
+    const props = {
+      hidden: false,
+      '.tabIndex': 0,
+    };
+    const view = () => html`<button ...=${props}>Save</button>`;
+
+    render(view(), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    button.hidden = true;
+    button.tabIndex = 3;
+    render(view(), root);
+
+    expect(button.hidden).toBe(false);
+    expect(button.tabIndex).toBe(0);
+  });
+
+  it('updates spread event listeners in place and releases cached values on suspend and disconnect', () => {
+    const root = document.createElement('div');
+    const first = vi.fn();
+    const second = vi.fn();
+    const ref = { value: undefined as Element | undefined };
+    const view = (listener: EventListener) => html`<button ...=${{
+      title: 'Stable',
+      onClick: listener,
+      ref,
+    }}>Save</button>`;
+
+    render(view(first), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    const addEventListener = vi.spyOn(button, 'addEventListener');
+    const removeEventListener = vi.spyOn(button, 'removeEventListener');
+    render(view(second), root);
+    button.click();
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledOnce();
+    expect(addEventListener).not.toHaveBeenCalled();
+    expect(removeEventListener).not.toHaveBeenCalled();
+
+    suspendRender(root);
+    expect(ref.value).toBeUndefined();
+    expect(removeEventListener).toHaveBeenCalledOnce();
+    render(view(second), root);
+    expect(ref.value).toBe(button);
+    expect(addEventListener).toHaveBeenCalledOnce();
+
+    unmount(root);
+    button.click();
+    expect(second).toHaveBeenCalledOnce();
+    expect(ref.value).toBeUndefined();
+    expect(removeEventListener).toHaveBeenCalledTimes(2);
   });
 
   it('rejects raw-text and RCDATA child expressions with targeted diagnostics', () => {

@@ -352,33 +352,35 @@ export function createComponentStyleSelection(value: TemplateValue): StyleSheetS
 }
 
 function collectComponentStyleDependencies(value: TemplateValue): readonly ComponentStyleDependency[] {
-  const dependencies = new Map<string, ComponentStyleDependency>();
-  collectComponentStyles(value, dependencies);
-  return [...dependencies.values()];
+  const dependencies = collectComponentStyles(value);
+  return dependencies ? [...dependencies.values()] : emptyComponentStyles;
 }
 
 function collectComponentStyles(
   value: unknown,
-  dependencies: Map<string, ComponentStyleDependency>,
-): void {
+  dependencies?: Map<string, ComponentStyleDependency>,
+): Map<string, ComponentStyleDependency> | undefined {
+  if (value === null || typeof value !== 'object') return dependencies;
   if (Array.isArray(value)) {
-    for (const child of value) collectComponentStyles(child, dependencies);
-    return;
+    for (const child of value) dependencies = collectComponentStyles(child, dependencies);
+    return dependencies;
   }
   if (isTemplateResult(value)) {
     for (const dependency of value.styleDependencies) {
+      dependencies ??= new Map();
       const current = dependencies.get(dependency.id);
       if (current && current.sheet !== dependency.sheet) {
         throw new Error(`Component stylesheet id ${dependency.id} maps to multiple sheet identities.`);
       }
       dependencies.set(dependency.id, dependency);
     }
-    for (const child of value.values) collectComponentStyles(child, dependencies);
-    return;
+    for (const child of value.values) dependencies = collectComponentStyles(child, dependencies);
+    return dependencies;
   }
   if (isRepeatResult(value)) {
-    for (const child of value[repeatValues]) collectComponentStyles(child, dependencies);
+    for (const child of value[repeatValues]) dependencies = collectComponentStyles(child, dependencies);
   }
+  return dependencies;
 }
 
 export function directive<Args extends readonly unknown[]>(
@@ -1387,10 +1389,13 @@ export function elementRef<ElementType extends Element = Element>(): {
 
 class SpreadPart implements Part {
   private readonly keys = new Set<string>();
-  private readonly events = new Map<string, RetainedEvent & { readonly eventName: string }>();
-  private readonly dataAttributes = new Set<string>();
-  private readonly ariaAttributes = new Set<string>();
-  private readonly styleProperties = new Set<string>();
+  private committedValues: SpreadValueSnapshot[] = [];
+  private keyOrder: string[] = [];
+  private keysOverlap = false;
+  private events?: Map<string, RetainedEvent & { readonly eventName: string }>;
+  private dataAttributes?: Set<string>;
+  private ariaAttributes?: Set<string>;
+  private styleProperties?: Set<string>;
   private styleMode: 'none' | 'string' | 'object' = 'none';
   private ref?: RefTarget;
 
@@ -1402,6 +1407,8 @@ class SpreadPart implements Part {
 
   setValue(value: TemplateValue): void {
     const props = isObjectRecord(value) ? value : undefined;
+    const entries = props ? Object.entries(props) : [];
+    const structureChanged = !sameSpreadKeys(this.keyOrder, entries);
 
     for (const key of this.keys) {
       if (!props || !(key in props)) {
@@ -1410,28 +1417,73 @@ class SpreadPart implements Part {
       }
     }
 
-    if (!props) return;
+    if (!props) {
+      this.committedValues = [];
+      this.keyOrder = [];
+      this.keysOverlap = false;
+      return;
+    }
 
-    for (const [key, nextValue] of Object.entries(props)) {
-      this.applyKey(key, nextValue);
-      this.keys.add(key);
+    if (structureChanged) {
+      const nextKeys = entries.map(([key]) => key);
+      this.keysOverlap = spreadKeySetHasOverlap(nextKeys);
+      const committedValues: SpreadValueSnapshot[] = [];
+      for (const [key, nextValue] of entries) {
+        const snapshot = snapshotSpreadValue(key, nextValue);
+        this.applyKey(key, nextValue, snapshot);
+        this.keys.add(key);
+        committedValues.push(snapshot);
+      }
+      this.committedValues = committedValues;
+      this.keyOrder = nextKeys;
+      return;
+    }
+
+    if (!this.keysOverlap) {
+      for (let index = 0; index < entries.length; index += 1) {
+        const [key, nextValue] = entries[index]!;
+        const snapshot = snapshotSpreadValue(key, nextValue);
+        if (index < this.committedValues.length
+          && sameSpreadValue(this.committedValues[index], snapshot)
+          && this.canSkipStableKey(key, nextValue)) continue;
+        this.applyKey(key, nextValue, snapshot);
+        this.committedValues[index] = snapshot;
+      }
+      return;
+    }
+
+    const snapshots = entries.map(([key, nextValue]) => snapshotSpreadValue(key, nextValue));
+    if (entries.every(([key, nextValue], index) => index < this.committedValues.length
+      && sameSpreadValue(this.committedValues[index], snapshots[index]!)
+      && this.canSkipStableKey(key, nextValue))) return;
+    for (let index = 0; index < entries.length; index += 1) {
+      const [key, nextValue] = entries[index]!;
+      const snapshot = snapshots[index]!;
+      this.applyKey(key, nextValue, snapshot);
+      this.committedValues[index] = snapshot;
     }
   }
 
   disconnect(): void {
     for (const key of this.keys) this.clearKey(key);
     this.keys.clear();
+    this.committedValues = [];
+    this.keyOrder = [];
+    this.keysOverlap = false;
   }
 
   suspend(): void {
-    for (const { eventName, listener, options } of this.events.values()) {
-      this.element.removeEventListener(eventName, listener, options);
+    if (this.events) {
+      for (const { eventName, listener, options } of this.events.values()) {
+        this.element.removeEventListener(eventName, listener, options);
+      }
+      this.events.clear();
     }
-    this.events.clear();
     this.setRef(undefined);
+    this.committedValues = [];
   }
 
-  private applyKey(key: string, value: unknown): void {
+  private applyKey(key: string, value: unknown, snapshot?: SpreadValueSnapshot): void {
     if (key === 'ref') {
       this.setRef(isRefTarget(value) ? value : undefined);
       return;
@@ -1455,24 +1507,24 @@ class SpreadPart implements Part {
     }
 
     if (key === 'class' || key === 'className') {
-      const className = normalizeClass(value);
+      const className = typeof snapshot === 'string' ? snapshot : normalizeClass(value);
       if (className) this.element.setAttribute('class', className);
       else this.element.removeAttribute('class');
       return;
     }
 
     if (key === 'style') {
-      this.setStyle(value);
+      this.setStyle(value, spreadMapEntries(snapshot));
       return;
     }
 
     if (key === 'data' || key === 'dataset') {
-      this.setAttributeMap('data-', value, this.dataAttributes);
+      this.dataAttributes = this.setAttributeMap('data-', value, this.dataAttributes, spreadMapEntries(snapshot));
       return;
     }
 
     if (key === 'aria') {
-      this.setAttributeMap('aria-', value, this.ariaAttributes);
+      this.ariaAttributes = this.setAttributeMap('aria-', value, this.ariaAttributes, spreadMapEntries(snapshot));
       return;
     }
 
@@ -1481,6 +1533,17 @@ class SpreadPart implements Part {
     } else {
       setOwnedAttribute(this.element, key, serializeAttributeValue(key, value));
     }
+  }
+
+  private canSkipStableKey(key: string, value: unknown): boolean {
+    if (key.startsWith('.') && key.length > 1) {
+      return Object.is((this.element as unknown as Record<string, unknown>)[key.slice(1)], value);
+    }
+    if (key.startsWith('?') && key.length > 1) {
+      return this.element.hasAttribute(key.slice(1)) === (!isEmptyValue(value) && Boolean(value));
+    }
+    if (typeof value === 'boolean') return this.element.hasAttribute(key) === value;
+    return true;
   }
 
   private clearKey(key: string): void {
@@ -1534,7 +1597,7 @@ class SpreadPart implements Part {
     const eventName = key.startsWith('@')
       ? key.slice(1)
       : key.slice(2).toLowerCase();
-    const previous = this.events.get(key);
+    const previous = this.events?.get(key);
 
     if (previous && event && previous.options === event.options) {
       previous.current = event.listener;
@@ -1547,9 +1610,9 @@ class SpreadPart implements Part {
     if (event) {
       const retained = Object.assign(retainEvent(event), { eventName });
       this.element.addEventListener(eventName, retained.listener, retained.options);
-      this.events.set(key, retained);
+      (this.events ??= new Map()).set(key, retained);
     } else {
-      this.events.delete(key);
+      this.events?.delete(key);
     }
   }
 
@@ -1564,7 +1627,7 @@ class SpreadPart implements Part {
     else if (ref) ref.value = this.element;
   }
 
-  private setStyle(value: unknown): void {
+  private setStyle(value: unknown, entries?: readonly (readonly [string, unknown])[]): void {
     const style = getStyleDeclaration(this.element);
     if (!style) return;
 
@@ -1583,39 +1646,41 @@ class SpreadPart implements Part {
     if (this.styleMode === 'string') this.element.removeAttribute('style');
     const nextProperties = new Set<string>();
 
-    for (const [property, propertyValue] of Object.entries(value)) {
+    for (const [property, propertyValue] of entries ?? Object.entries(value)) {
       nextProperties.add(property);
       setStyleProperty(style, property, propertyValue);
     }
 
-    for (const property of this.styleProperties) {
-      if (!nextProperties.has(property)) removeStyleProperty(style, property);
+    if (this.styleProperties) {
+      for (const property of this.styleProperties) {
+        if (!nextProperties.has(property)) removeStyleProperty(style, property);
+      }
     }
 
-    this.styleProperties.clear();
-    for (const property of nextProperties) this.styleProperties.add(property);
+    this.styleProperties = nextProperties;
     this.styleMode = 'object';
   }
 
   private clearStyle(): void {
     const style = getStyleDeclaration(this.element);
     if (this.styleMode === 'string') this.element.removeAttribute('style');
-    if (style) {
+    if (style && this.styleProperties) {
       for (const property of this.styleProperties) removeStyleProperty(style, property);
     }
-    this.styleProperties.clear();
+    this.styleProperties = undefined;
     this.styleMode = 'none';
   }
 
   private setAttributeMap(
     prefix: 'data-' | 'aria-',
     value: unknown,
-    previousAttributes: Set<string>,
-  ): void {
+    previousAttributes: Set<string> | undefined,
+    entries?: readonly (readonly [string, unknown])[],
+  ): Set<string> {
     const nextAttributes = new Set<string>();
 
     if (isObjectRecord(value)) {
-      for (const [name, attributeValue] of Object.entries(value)) {
+      for (const [name, attributeValue] of entries ?? Object.entries(value)) {
         const attribute = `${prefix}${toKebabCase(name)}`;
         if (attributeValue == null) {
           this.element.removeAttribute(attribute);
@@ -1626,18 +1691,138 @@ class SpreadPart implements Part {
       }
     }
 
-    for (const attribute of previousAttributes) {
-      if (!nextAttributes.has(attribute)) this.element.removeAttribute(attribute);
+    if (previousAttributes) {
+      for (const attribute of previousAttributes) {
+        if (!nextAttributes.has(attribute)) this.element.removeAttribute(attribute);
+      }
     }
 
-    previousAttributes.clear();
-    for (const attribute of nextAttributes) previousAttributes.add(attribute);
+    return nextAttributes;
   }
 
-  private clearAttributes(attributes: Set<string>): void {
+  private clearAttributes(attributes: Set<string> | undefined): void {
+    if (!attributes) return;
     for (const attribute of attributes) this.element.removeAttribute(attribute);
     attributes.clear();
   }
+}
+
+const spreadSnapshotKind = Symbol('gluon.spreadSnapshot');
+
+type SpreadValueSnapshot = unknown;
+
+interface SpreadMapSnapshot {
+  readonly [spreadSnapshotKind]: 'map';
+  readonly entries: readonly (readonly [string, unknown])[];
+}
+
+interface SpreadOpaqueSnapshot {
+  readonly [spreadSnapshotKind]: 'opaque';
+}
+
+function snapshotSpreadValue(key: string, value: unknown): SpreadValueSnapshot {
+  if (key === 'class' || key === 'className') {
+    return normalizeClass(value);
+  }
+  if (key === 'style' || key === 'data' || key === 'dataset' || key === 'aria') {
+    return isObjectRecord(value)
+      ? { [spreadSnapshotKind]: 'map', entries: Object.entries(value) }
+      : value;
+  }
+  if (key.startsWith('?') && key.length > 1) {
+    return !isEmptyValue(value) && Boolean(value);
+  }
+  if (
+    value !== null
+    && (typeof value === 'object' || typeof value === 'function')
+    && !isSpreadIdentityBinding(key)
+  ) {
+    return { [spreadSnapshotKind]: 'opaque' };
+  }
+  return value;
+}
+
+function sameSpreadValue(left: SpreadValueSnapshot, right: SpreadValueSnapshot): boolean {
+  if (Object.is(left, right)) return true;
+  if (isSpreadMapSnapshot(left) && isSpreadMapSnapshot(right)) {
+    if (left.entries.length !== right.entries.length) return false;
+    for (let index = 0; index < left.entries.length; index += 1) {
+      const leftEntry = left.entries[index]!;
+      const rightEntry = right.entries[index]!;
+      if (leftEntry[0] !== rightEntry[0] || !sameSpreadLeaf(leftEntry[1], rightEntry[1])) return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+function isSpreadMapSnapshot(value: unknown): value is SpreadMapSnapshot {
+  return Boolean(value && typeof value === 'object' && value[spreadSnapshotKind as keyof typeof value] === 'map');
+}
+
+function spreadMapEntries(
+  snapshot: SpreadValueSnapshot,
+): readonly (readonly [string, unknown])[] | undefined {
+  return isSpreadMapSnapshot(snapshot) ? snapshot.entries : undefined;
+}
+
+function isSpreadIdentityBinding(key: string): boolean {
+  if (key === 'ref' || key.startsWith('@') || /^on[A-Z]|^on[a-z]/.test(key)) return true;
+  if (!key.startsWith('.') || key.length <= 1) return false;
+  return !urlAttributes.has(key.slice(1).toLowerCase());
+}
+
+function sameSpreadLeaf(left: unknown, right: unknown): boolean {
+  if (!Object.is(left, right)) return false;
+  return left === null || (typeof left !== 'object' && typeof left !== 'function');
+}
+
+function sameSpreadKeys(left: readonly string[], right: readonly (readonly [string, unknown])[]): boolean {
+  if (left.length !== right.length) return false;
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]![0]) return false;
+  }
+  return true;
+}
+
+function spreadKeySetHasOverlap(keys: readonly string[]): boolean {
+  const targets = new Set<string>();
+  let dataMap = false;
+  let ariaMap = false;
+  let dataAttribute = false;
+  let ariaAttribute = false;
+  for (const key of keys) {
+    if (key === 'data' || key === 'dataset') {
+      if (dataMap || dataAttribute) return true;
+      dataMap = true;
+      continue;
+    }
+    if (key === 'aria') {
+      if (ariaMap || ariaAttribute) return true;
+      ariaMap = true;
+      continue;
+    }
+    const target = spreadKeyTarget(key);
+    if (targets.has(target)) return true;
+    targets.add(target);
+    if (target.startsWith('attribute:')) {
+      const attribute = target.slice('attribute:'.length);
+      if ((dataMap && attribute.startsWith('data-')) || (ariaMap && attribute.startsWith('aria-'))) return true;
+      if (attribute.startsWith('data-')) dataAttribute = true;
+      if (attribute.startsWith('aria-')) ariaAttribute = true;
+    }
+  }
+  return false;
+}
+
+function spreadKeyTarget(key: string): string {
+  if (key === 'ref') return 'ref';
+  if (key.startsWith('@')) return `event:${key.slice(1).toLowerCase()}`;
+  if (/^on[A-Z]|^on[a-z]/.test(key)) return `event:${key.slice(2).toLowerCase()}`;
+  if (key.startsWith('.') && key.length > 1) return `property:${key.slice(1)}`;
+  if (key.startsWith('?') && key.length > 1) return `attribute:${key.slice(1).toLowerCase()}`;
+  if (key === 'class' || key === 'className') return 'attribute:class';
+  return `attribute:${key.toLowerCase()}`;
 }
 
 interface RootInstance {

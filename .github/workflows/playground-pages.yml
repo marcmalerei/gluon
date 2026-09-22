@@ -7,11 +7,18 @@ on:
       - "examples/playground/**"
       - "docs-site/**"
       - "docs/**"
+      - "README.md"
       - "package-contract.json"
       - "typedoc.json"
       - "tsconfig.typedoc.json"
-      - "scripts/build-docs.mjs"
+      - "scripts/build-docs-api.mjs"
+      - "scripts/generate-api-examples.mjs"
+      - "scripts/generate-package-doc-pages.mjs"
+      - "scripts/generate-package-readmes.mjs"
+      - "scripts/mirror-latest-docs.mjs"
       - "scripts/validate-docs.mjs"
+      - "scripts/validate-docs-search-browser.mjs"
+      - "scripts/docs-consistency.mjs"
       - "package.json"
       - "package-lock.json"
       - "packages/**"
@@ -45,9 +52,7 @@ jobs:
       - run: npm run build:compiler
       - run: npm run build:vite
       - run: npm run build:playground
-      - run: npm run build:docs
-      - run: npm run typecheck:docs
-      - run: node scripts/validate-docs.mjs
+      - run: npm run check:docs
       - run: mkdir -p .pages/playground && cp -R docs-site/dist/. .pages/ && cp -R examples/playground/dist/. .pages/playground/
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5

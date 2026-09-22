@@ -4,9 +4,50 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/quarks
+
 Typed native-element factories and headless interaction primitives. The package
 depends on Core but Core never imports it, so applications that only need the
 renderer do not install or bundle UI code.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/quarks at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/quarks/) · [npm](https://www.npmjs.com/package/@gluonjs/quarks) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/quarks/README.md)
+
+**Public API:** [`@gluonjs/quarks`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/quarks/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/quarks
+```
+
+### Quick start
+
+```ts
+import { Dialog, Listbox, createFocusScope, q } from '@gluonjs/quarks';
+```
+
+### Choose this package when
+
+- Factory helpers for native elements and headless behavior primitives.
+- Semantic building blocks without inventing roles or names.
+- Low-level interaction helpers for higher UI packages.
+
+**Choose another boundary when:**
+
+- Does not create accessibility semantics on behalf of callers.
+- Callers remain responsible for roles, names, and labels.
+
+### Related documentation
+
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+- [Accessibility](https://marcmalerei.github.io/gluon/latest/reference/support-matrix/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import { Dialog, Listbox, createFocusScope, q } from '@gluonjs/quarks';

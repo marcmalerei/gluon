@@ -24,6 +24,7 @@ whether to update the property.
 
 | Need | Use | Why |
 | --- | --- | --- |
+| Keep typed props, one native template root, a slot, and owned CSS together | [A `.gluon` presentational SFC](../sfc-authoring/) | The official Vite plugin compiles the file to ordinary public Gluon component calls; it adds no SFC runtime or component instance. |
 | A stateful Custom Element with concise setup-owned state and cleanup | `defineGluonElement()` | It infers declared property and event types and creates the same native element contract without a handwritten subclass. |
 | Inheritance or protected hooks such as `createRenderRoot()`, `setupConnection()`, `teardownConnection()`, or `update()` | subclass `GluonElement` | The class API exposes those extension points and a stable host identity. |
 | Stateless template composition with no independent host or connection lifecycle | a functional component | It is a render function, not a Custom Element instance. |
@@ -32,6 +33,9 @@ Use `defineGluonElement()` for a new stateful component unless the component
 needs one of the class extension points in the second row. Use
 `elementProperty<Value>()` and `elementEvent<Detail>()` when a setup-based
 definition needs structured generic types that a constructor cannot infer.
+Choose `.gluon` only for the intentionally small presentational subset; the
+[SFC authoring guide](../sfc-authoring/) lists supported syntax and rejected
+Vue-style features.
 
 ## Package and load a component library
 

@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/atoms
+
 Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
@@ -11,6 +13,52 @@ Foundation atoms include `AspectRatio`, `Avatar`, `ScrollArea`, and `Separator`.
 Each owns a separately tree-shakable stylesheet and exposes only component-scoped
 `--gluon-*` properties. They do not fetch data, load account records, upload
 images, virtualize content, or own product state.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/atoms at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/atoms/) · [npm](https://www.npmjs.com/package/@gluonjs/atoms) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/atoms/README.md)
+
+**Public API:** [`@gluonjs/atoms`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/atoms/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/atoms
+```
+
+### Quick start
+
+```ts
+import { AspectRatio, Avatar, ScrollArea, Separator, installUi } from '@gluonjs/atoms';
+
+const ui = installUi(document, { theme: 'light' });
+const media = AspectRatio({ ratio: 4 / 3, children: 'Product media' });
+const avatar = Avatar({ alt: 'Ada Lovelace', fallback: 'AL', status: 'error' });
+const history = ScrollArea({ label: 'Order history', children: 'Order rows' });
+const rule = Separator({ decorative: true });
+console.log(media, avatar, history, rule, ui.theme);
+```
+
+### Choose this package when
+
+- Focused UI primitives and shared theming boundaries.
+- Accessible form controls, image/fallback presentation, bounded native scrolling, separators, and theme installation.
+- Shared styles for browser-facing Gluon interfaces.
+
+**Choose another boundary when:**
+
+- Does not own larger compositions or app shell layout.
+- Depends on Quarks for native primitives and Core for runtime ownership.
+
+### Related documentation
+
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+- [Accessibility](https://marcmalerei.github.io/gluon/latest/reference/support-matrix/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import {

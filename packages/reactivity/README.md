@@ -4,8 +4,57 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/reactivity
+
 DOM-free reactive state primitives for Gluon. The package ships as part of the
 current `1.12.0` release line.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/reactivity at a glance
+
+**Runtime:** universal · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/reactivity/) · [npm](https://www.npmjs.com/package/@gluonjs/reactivity) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/reactivity/README.md)
+
+**Public API:** [`@gluonjs/reactivity`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/reactivity/src/) · [`@gluonjs/reactivity/signals`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/reactivity/src/signals/) · [`@gluonjs/reactivity/preact-signals`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/reactivity/src/preact-signals/)
+
+### Install
+
+```sh
+npm install @gluonjs/reactivity
+```
+
+### Quick start
+
+```ts
+import { computed, effect, reactive, ref } from '@gluonjs/reactivity';
+
+const count = ref(1);
+const state = reactive({ multiplier: 2 });
+const total = computed(() => count.value * state.multiplier);
+
+effect(() => {
+  console.log(total.value);
+});
+```
+
+### Choose this package when
+
+- Shared reactive state in browser, Node, and SSR code.
+- Signals-style derived state and side effects.
+- Core runtime ownership for packages that depend on reactive state.
+
+**Choose another boundary when:**
+
+- Does not provide DOM, component, router, or store APIs.
+- Applications that need object lifetime, templating, or elements must use the owning package.
+
+### Related documentation
+
+- [API reference](https://marcmalerei.github.io/gluon/latest/api/)
+- [Application runtime](https://marcmalerei.github.io/gluon/latest/guides/application/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import { computed, effect, nextTick, reactive, ref } from '@gluonjs/reactivity';
