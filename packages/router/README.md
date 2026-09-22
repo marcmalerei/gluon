@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/router
+
 The official Gluon router provides deterministic route matching, browser/hash/
 memory histories, typed named routes, guards, failures, lazy route components,
 scroll restoration, and Gluon application bindings.
@@ -11,6 +13,51 @@ scroll restoration, and Gluon application bindings.
 The package ships as part of the current `1.12.0` release line. Core and
 Reactivity are peers so an application has one shared application context and
 reactive identity.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/router at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/router/) · [npm](https://www.npmjs.com/package/@gluonjs/router) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/router/README.md)
+
+**Public API:** [`@gluonjs/router`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/router/src/) · [`@gluonjs/router/memory`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/router/src/memory/)
+
+### Install
+
+```sh
+npm install @gluonjs/router
+```
+
+### Quick start
+
+```ts
+import { html } from '@gluonjs/core';
+import { createRouter, createWebHistory } from '@gluonjs/router';
+
+const router = createRouter({
+  history: createWebHistory('/app'),
+  routes: [{ path: '/', component: () => html`<main>Home</main>` }],
+});
+```
+
+### Choose this package when
+
+- Named routes, guards, lazy routes, and scroll restoration.
+- Browser, hash, and memory history strategies.
+- Application bindings that share the Gluon runtime context.
+
+**Choose another boundary when:**
+
+- Does not own component rendering or application state storage.
+- History selection and guards live at the router boundary.
+
+### Related documentation
+
+- [Application runtime](https://marcmalerei.github.io/gluon/latest/guides/application/)
+- [Universal rendering](https://marcmalerei.github.io/gluon/latest/guides/universal-rendering/)
+
+<!-- gluon-package-overview:end -->
 
 ## Stability notes
 

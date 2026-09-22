@@ -7,6 +7,19 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Made Core spread-binding updates value-aware, so stable native props no
+  longer repeat DOM, property, event, class, style, data, ARIA, ref, or URL
+  work while mutable maps, removals, alias ordering, suspension, and permanent
+  cleanup retain their existing behavior (#487).
+
+### Documentation
+
+- Rebuilt the documentation site around VitePress with versioned package
+  guides, generated API navigation, runnable discovery paths, and clearer
+  adoption entry points (#486).
+
 ## [1.12.0] - 2026-09-18
 
 ### Added

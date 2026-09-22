@@ -1387,6 +1387,9 @@ export function elementRef<ElementType extends Element = Element>(): {
 
 class SpreadPart implements Part {
   private readonly keys = new Set<string>();
+  private committedValues: SpreadValueSnapshot[] = [];
+  private keyOrder: string[] = [];
+  private keysOverlap = false;
   private readonly events = new Map<string, RetainedEvent & { readonly eventName: string }>();
   private readonly dataAttributes = new Set<string>();
   private readonly ariaAttributes = new Set<string>();
@@ -1402,6 +1405,9 @@ class SpreadPart implements Part {
 
   setValue(value: TemplateValue): void {
     const props = isObjectRecord(value) ? value : undefined;
+    const entries = props ? Object.entries(props) : [];
+    const nextKeys = entries.map(([key]) => key);
+    const structureChanged = !sameStringArray(this.keyOrder, nextKeys);
 
     for (const key of this.keys) {
       if (!props || !(key in props)) {
@@ -1410,17 +1416,58 @@ class SpreadPart implements Part {
       }
     }
 
-    if (!props) return;
+    if (!props) {
+      this.committedValues = [];
+      this.keyOrder = [];
+      this.keysOverlap = false;
+      return;
+    }
 
-    for (const [key, nextValue] of Object.entries(props)) {
-      this.applyKey(key, nextValue);
-      this.keys.add(key);
+    if (structureChanged) {
+      this.keysOverlap = spreadKeySetHasOverlap(nextKeys);
+      const committedValues: SpreadValueSnapshot[] = [];
+      for (const [key, nextValue] of entries) {
+        const snapshot = snapshotSpreadValue(key, nextValue);
+        this.applyKey(key, nextValue, snapshot);
+        this.keys.add(key);
+        committedValues.push(snapshot);
+      }
+      this.committedValues = committedValues;
+      this.keyOrder = nextKeys;
+      return;
+    }
+
+    if (!this.keysOverlap) {
+      for (let index = 0; index < entries.length; index += 1) {
+        const [key, nextValue] = entries[index]!;
+        const snapshot = snapshotSpreadValue(key, nextValue);
+        if (index < this.committedValues.length
+          && sameSpreadValue(this.committedValues[index], snapshot)
+          && this.canSkipStableKey(key, nextValue)) continue;
+        this.applyKey(key, nextValue, snapshot);
+        this.committedValues[index] = snapshot;
+      }
+      return;
+    }
+
+    const snapshots = entries.map(([key, nextValue]) => snapshotSpreadValue(key, nextValue));
+    if (entries.every(([key, nextValue], index) => index < this.committedValues.length
+      && sameSpreadValue(this.committedValues[index], snapshots[index]!)
+      && this.canSkipStableKey(key, nextValue))) return;
+    for (let index = 0; index < entries.length; index += 1) {
+      const [key, nextValue] = entries[index]!;
+      const snapshot = snapshots[index]!;
+      this.applyKey(key, nextValue, snapshot);
+      this.committedValues[index] = snapshot;
     }
   }
 
   disconnect(): void {
     for (const key of this.keys) this.clearKey(key);
     this.keys.clear();
+    this.committedValues = [];
+    this.keyOrder = [];
+    this.keysOverlap = false;
   }
 
   suspend(): void {
@@ -1429,9 +1476,10 @@ class SpreadPart implements Part {
     }
     this.events.clear();
     this.setRef(undefined);
+    this.committedValues = [];
   }
 
-  private applyKey(key: string, value: unknown): void {
+  private applyKey(key: string, value: unknown, snapshot?: SpreadValueSnapshot): void {
     if (key === 'ref') {
       this.setRef(isRefTarget(value) ? value : undefined);
       return;
@@ -1455,24 +1503,24 @@ class SpreadPart implements Part {
     }
 
     if (key === 'class' || key === 'className') {
-      const className = normalizeClass(value);
+      const className = typeof snapshot === 'string' ? snapshot : normalizeClass(value);
       if (className) this.element.setAttribute('class', className);
       else this.element.removeAttribute('class');
       return;
     }
 
     if (key === 'style') {
-      this.setStyle(value);
+      this.setStyle(value, spreadMapEntries(snapshot));
       return;
     }
 
     if (key === 'data' || key === 'dataset') {
-      this.setAttributeMap('data-', value, this.dataAttributes);
+      this.setAttributeMap('data-', value, this.dataAttributes, spreadMapEntries(snapshot));
       return;
     }
 
     if (key === 'aria') {
-      this.setAttributeMap('aria-', value, this.ariaAttributes);
+      this.setAttributeMap('aria-', value, this.ariaAttributes, spreadMapEntries(snapshot));
       return;
     }
 
@@ -1481,6 +1529,17 @@ class SpreadPart implements Part {
     } else {
       setOwnedAttribute(this.element, key, serializeAttributeValue(key, value));
     }
+  }
+
+  private canSkipStableKey(key: string, value: unknown): boolean {
+    if (key.startsWith('.') && key.length > 1) {
+      return Object.is((this.element as unknown as Record<string, unknown>)[key.slice(1)], value);
+    }
+    if (key.startsWith('?') && key.length > 1) {
+      return this.element.hasAttribute(key.slice(1)) === (!isEmptyValue(value) && Boolean(value));
+    }
+    if (typeof value === 'boolean') return this.element.hasAttribute(key) === value;
+    return true;
   }
 
   private clearKey(key: string): void {
@@ -1564,7 +1623,7 @@ class SpreadPart implements Part {
     else if (ref) ref.value = this.element;
   }
 
-  private setStyle(value: unknown): void {
+  private setStyle(value: unknown, entries?: readonly (readonly [string, unknown])[]): void {
     const style = getStyleDeclaration(this.element);
     if (!style) return;
 
@@ -1583,7 +1642,7 @@ class SpreadPart implements Part {
     if (this.styleMode === 'string') this.element.removeAttribute('style');
     const nextProperties = new Set<string>();
 
-    for (const [property, propertyValue] of Object.entries(value)) {
+    for (const [property, propertyValue] of entries ?? Object.entries(value)) {
       nextProperties.add(property);
       setStyleProperty(style, property, propertyValue);
     }
@@ -1611,11 +1670,12 @@ class SpreadPart implements Part {
     prefix: 'data-' | 'aria-',
     value: unknown,
     previousAttributes: Set<string>,
+    entries?: readonly (readonly [string, unknown])[],
   ): void {
     const nextAttributes = new Set<string>();
 
     if (isObjectRecord(value)) {
-      for (const [name, attributeValue] of Object.entries(value)) {
+      for (const [name, attributeValue] of entries ?? Object.entries(value)) {
         const attribute = `${prefix}${toKebabCase(name)}`;
         if (attributeValue == null) {
           this.element.removeAttribute(attribute);
@@ -1638,6 +1698,128 @@ class SpreadPart implements Part {
     for (const attribute of attributes) this.element.removeAttribute(attribute);
     attributes.clear();
   }
+}
+
+const spreadSnapshotKind = Symbol('gluon.spreadSnapshot');
+
+type SpreadValueSnapshot = unknown;
+
+interface SpreadMapSnapshot {
+  readonly [spreadSnapshotKind]: 'map';
+  readonly entries: readonly (readonly [string, unknown])[];
+}
+
+interface SpreadOpaqueSnapshot {
+  readonly [spreadSnapshotKind]: 'opaque';
+}
+
+function snapshotSpreadValue(key: string, value: unknown): SpreadValueSnapshot {
+  if (key === 'class' || key === 'className') {
+    return normalizeClass(value);
+  }
+  if (key === 'style' || key === 'data' || key === 'dataset' || key === 'aria') {
+    return isObjectRecord(value)
+      ? { [spreadSnapshotKind]: 'map', entries: Object.entries(value) }
+      : value;
+  }
+  if (key.startsWith('?') && key.length > 1) {
+    return !isEmptyValue(value) && Boolean(value);
+  }
+  if (
+    value !== null
+    && (typeof value === 'object' || typeof value === 'function')
+    && !isSpreadIdentityBinding(key)
+  ) {
+    return { [spreadSnapshotKind]: 'opaque' };
+  }
+  return value;
+}
+
+function sameSpreadValue(left: SpreadValueSnapshot, right: SpreadValueSnapshot): boolean {
+  if (isSpreadMapSnapshot(left) && isSpreadMapSnapshot(right)) {
+    if (left.entries.length !== right.entries.length) return false;
+    for (let index = 0; index < left.entries.length; index += 1) {
+      const leftEntry = left.entries[index]!;
+      const rightEntry = right.entries[index]!;
+      if (leftEntry[0] !== rightEntry[0] || !sameSpreadLeaf(leftEntry[1], rightEntry[1])) return false;
+    }
+    return true;
+  }
+  if (isSpreadOpaqueSnapshot(left) || isSpreadOpaqueSnapshot(right)) return false;
+  return Object.is(left, right);
+}
+
+function isSpreadMapSnapshot(value: unknown): value is SpreadMapSnapshot {
+  return Boolean(value && typeof value === 'object' && value[spreadSnapshotKind as keyof typeof value] === 'map');
+}
+
+function isSpreadOpaqueSnapshot(value: unknown): value is SpreadOpaqueSnapshot {
+  return Boolean(value && typeof value === 'object' && value[spreadSnapshotKind as keyof typeof value] === 'opaque');
+}
+
+function spreadMapEntries(
+  snapshot: SpreadValueSnapshot,
+): readonly (readonly [string, unknown])[] | undefined {
+  return isSpreadMapSnapshot(snapshot) ? snapshot.entries : undefined;
+}
+
+function isSpreadIdentityBinding(key: string): boolean {
+  if (key === 'ref' || key.startsWith('@') || /^on[A-Z]|^on[a-z]/.test(key)) return true;
+  if (!key.startsWith('.') || key.length <= 1) return false;
+  return !urlAttributes.has(key.slice(1).toLowerCase());
+}
+
+function sameSpreadLeaf(left: unknown, right: unknown): boolean {
+  if (!Object.is(left, right)) return false;
+  return left === null || (typeof left !== 'object' && typeof left !== 'function');
+}
+
+function sameStringArray(left: readonly string[], right: readonly string[]): boolean {
+  if (left.length !== right.length) return false;
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]) return false;
+  }
+  return true;
+}
+
+function spreadKeySetHasOverlap(keys: readonly string[]): boolean {
+  const targets = new Set<string>();
+  let dataMap = false;
+  let ariaMap = false;
+  let dataAttribute = false;
+  let ariaAttribute = false;
+  for (const key of keys) {
+    if (key === 'data' || key === 'dataset') {
+      if (dataMap || dataAttribute) return true;
+      dataMap = true;
+      continue;
+    }
+    if (key === 'aria') {
+      if (ariaMap || ariaAttribute) return true;
+      ariaMap = true;
+      continue;
+    }
+    const target = spreadKeyTarget(key);
+    if (targets.has(target)) return true;
+    targets.add(target);
+    if (target.startsWith('attribute:')) {
+      const attribute = target.slice('attribute:'.length);
+      if ((dataMap && attribute.startsWith('data-')) || (ariaMap && attribute.startsWith('aria-'))) return true;
+      if (attribute.startsWith('data-')) dataAttribute = true;
+      if (attribute.startsWith('aria-')) ariaAttribute = true;
+    }
+  }
+  return false;
+}
+
+function spreadKeyTarget(key: string): string {
+  if (key === 'ref') return 'ref';
+  if (key.startsWith('@')) return `event:${key.slice(1).toLowerCase()}`;
+  if (/^on[A-Z]|^on[a-z]/.test(key)) return `event:${key.slice(2).toLowerCase()}`;
+  if (key.startsWith('.') && key.length > 1) return `property:${key.slice(1)}`;
+  if (key.startsWith('?') && key.length > 1) return `attribute:${key.slice(1).toLowerCase()}`;
+  if (key === 'class' || key === 'className') return 'attribute:class';
+  return `attribute:${key.toLowerCase()}`;
 }
 
 interface RootInstance {

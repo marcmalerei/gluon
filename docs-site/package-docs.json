@@ -43,6 +43,7 @@
         "Does not replace the public component model with a private renderer format."
       ],
       "relatedGuides": [
+        { "label": "Presentational SFCs", "href": "/gluon/latest/guides/sfc-authoring/" },
         { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" },
         { "label": "Diagnostics", "href": "/gluon/latest/reference/diagnostics/" }
       ],
@@ -81,7 +82,7 @@
       "purpose": "Official Gluon router with browser, hash, and memory histories.",
       "starter": {
         "language": "ts",
-        "code": "import { createRouter } from '@gluonjs/router';\n\nconst router = createRouter({\n  routes: [{ path: '/', component: () => import('./home.js') }],\n});"
+        "code": "import { html } from '@gluonjs/core';\nimport { createRouter, createWebHistory } from '@gluonjs/router';\n\nconst router = createRouter({\n  history: createWebHistory('/app'),\n  routes: [{ path: '/', component: () => html`<main>Home</main>` }],\n});"
       },
       "useCases": [
         "Named routes, guards, lazy routes, and scroll restoration.",
@@ -106,7 +107,7 @@
       "purpose": "Typed, application-scoped state management without a DOM dependency.",
       "starter": {
         "language": "ts",
-        "code": "import { createStoreManager, defineStore } from '@gluonjs/store';\n\nconst counter = defineStore('counter', () => ({ count: 0 }), {\n  increment(state) { state.count += 1; },\n});"
+        "code": "import { createStoreManager, defineStore } from '@gluonjs/store';\n\nconst counterDefinition = defineStore('counter', () => ({ count: 0 }), {\n  actions: (store) => ({\n    increment() { store.count += 1; },\n  }),\n});\n\nconst manager = createStoreManager();\nconst counter = counterDefinition.use(manager);\ncounter.increment();\nmanager.dispose();"
       },
       "useCases": [
         "Shared state, getters, and actions for browser or server code.",
@@ -194,6 +195,7 @@
         "Requires Vite and the public Core package."
       ],
       "relatedGuides": [
+        { "label": "Presentational SFCs", "href": "/gluon/latest/guides/sfc-authoring/" },
         { "label": "Tooling", "href": "/gluon/latest/guides/tooling/" },
         { "label": "Deployment", "href": "/gluon/latest/guides/deployment/" }
       ],

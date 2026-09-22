@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/language-server
+
 The Gluon language server analyzes imported `html`, `svg`, `css`, and aliased
 `compose(Component, props)` tagged templates without evaluating application
 code. The public service and the
@@ -33,6 +35,47 @@ Unknown literal named light-DOM assignments receive
 declarations and exposes their fields, events, and slots to the same analyzer.
 Every emitted code is required to exist in the public `@gluonjs/compiler`
 diagnostic catalog shared with the Playground and Devtools reference.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/language-server at a glance
+
+**Runtime:** node · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/language-server/) · [npm](https://www.npmjs.com/package/@gluonjs/language-server) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/language-server/README.md)
+
+**Public API:** [`@gluonjs/language-server`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/language-server/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/language-server
+```
+
+### Quick start
+
+```sh
+gluon-language-server
+# or
+ gluon-project-analyze .
+```
+
+### Choose this package when
+
+- Static analysis for imported templates and alias-aware tagged templates.
+- Language server, project analyzer, and CI template checks.
+- Diagnostics without evaluating application code.
+
+**Choose another boundary when:**
+
+- Does not execute project code or modify source files.
+- Reports evidence records rather than browser behavior.
+
+### Related documentation
+
+- [Tooling](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+- [Quality](https://marcmalerei.github.io/gluon/latest/guides/quality/)
+
+<!-- gluon-package-overview:end -->
 
 ```sh
 gluon-template-check src

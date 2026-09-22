@@ -169,6 +169,30 @@ sanitizer, URL allowlist, navigation policy, or Content Security Policy.
 Static literal markup is author-controlled source and is not passed through the
 dynamic binding guard.
 
+## Spread update semantics
+
+`...=${props}` retains committed values per rendered Part. A rerender with the
+same key order skips a key whose effective value has not changed. Primitive,
+property, event, and ref values use identity-aware comparison. Class arrays and
+maps compare their normalized class string; style, `data`/`dataset`, and ARIA
+maps retain shallow entry snapshots so an in-place mutation or removed entry is
+still committed. Controlled property keys and native boolean props also compare
+the requested value with the live DOM before skipping, so browser or
+application mutations are restored on the next render.
+
+When two spread keys can write the same target, such as `class` plus
+`className`, `data` plus a direct `data-*` attribute, or `?disabled` plus
+`disabled`, Gluon reapplies the ordered group after a change. This preserves
+the existing last-write behavior. Added, removed, or reordered keys also take
+the full reconciliation path. Changed values continue through the same
+property, event, ref, style, map, and URL validation functions as an initial
+commit.
+
+The committed-value cache belongs to one `SpreadPart`. Suspension and permanent
+disconnect both clear it; listeners and refs are released at the same time.
+The next connected render therefore reinstalls current resources instead of
+mistaking them for active stable values.
+
 ## Ownership, suspension, and external DOM
 
 `render(result, container)` owns the complete contents of its container.

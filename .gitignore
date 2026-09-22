@@ -8,6 +8,8 @@ coverage/
 playwright-report/
 test-results/
 .tmp/
+docs-site/content/*/api/generated/
+docs-site/content/latest/
 tests/__screenshots__/
 .vitest-attachments/
 .DS_Store

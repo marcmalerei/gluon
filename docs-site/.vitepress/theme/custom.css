@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+  --vp-c-brand-1: #1549f5;
+  --vp-c-brand-2: #103ed8;
+  --vp-c-brand-3: #0b32b8;
+  --vp-c-brand-soft: rgb(21 73 245 / 9%);
+  --vp-c-bg: #fff;
+  --vp-c-bg-alt: #f7f8f8;
+  --vp-c-bg-elv: #fff;
+  --vp-c-text-1: #111;
+  --vp-c-text-2: #4d4d49;
+  --vp-c-text-3: #6b6b65;
+  --vp-c-divider: #deded9;
+  --vp-c-gutter: #deded9;
+  --vp-font-family-base: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --vp-font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --vp-home-hero-name-color: #111;
+  --vp-home-hero-name-background: transparent;
+  --vp-button-brand-bg: #c8ff00;
+  --vp-button-brand-hover-bg: #b7ed00;
+  --vp-button-brand-active-bg: #a8d900;
+  --vp-button-brand-text: #111;
+  --vp-button-brand-hover-text: #111;
+  --vp-button-brand-active-text: #111;
+  font-synthesis: none;
+}
+
+html { scroll-behavior: smooth; }
+
+.VPNavBar {
+  border-top: 1px solid var(--vp-c-text-1);
+  background: rgb(255 255 255 / 97%) !important;
+}
+
+.VPNavBarTitle .title { font-weight: 760; letter-spacing: -.045em; }
+.VPNavBarMenuLink { font-size: 14px; }
+.VPButton { border-radius: 0; font-weight: 650; }
+.VPButton.brand { border-color: #c8ff00; }
+.VPButton.alt { border-radius: 0; }
+.VPSidebar { background: #fff !important; }
+.VPSidebarItem.level-0 > .item > .text { font-weight: 650; }
+.VPDoc .content-container { max-width: 850px; }
+.vp-doc h1 { letter-spacing: -.055em; }
+.vp-doc h2 { letter-spacing: -.035em; }
+.vp-doc a { text-underline-offset: 3px; }
+.vp-doc :not(pre) > code { color: #103ed8; }
+.vp-doc div[class*='language-'] { border: 1px solid #deded9; border-radius: 0; }
+.vp-doc table { width: 100%; }
+.VPHome .VPHero .name,
+.VPHome .VPHero .text { letter-spacing: -.055em; }
+.VPHome .VPHero .tagline { max-width: 680px; }
+.VPHome .VPFeature { border-radius: 0; }
+.VPHome .VPFeature .title { letter-spacing: -.025em; }
+.VPFooter { border-top: 1px solid #111; }
+
+@media (max-width: 720px) {
+  .VPNavBar { border-top: 0; }
+  .VPHome .VPHero { padding-top: 88px; }
+  .VPHome .VPHero .name { font-size: clamp(42px, 13vw, 60px); }
+  .VPDoc .content-container { padding-inline: 6px; }
+  .vp-doc table { display: block; overflow-x: auto; }
+}

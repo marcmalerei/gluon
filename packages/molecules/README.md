@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/molecules
+
 Reusable compositions built only from Core, Quarks, and Atoms.
 
 `ResponsiveActionBar` composes one caller-owned primary action with optional
@@ -13,6 +15,45 @@ inline wide layouts, short-viewport static fallback, forced-colors and
 reduced-motion handling, and a 44px minimum action target. Safe-area behavior
 uses the platform environment variables; applications remain responsible for
 device-specific inset behavior.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/molecules at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/molecules/) · [npm](https://www.npmjs.com/package/@gluonjs/molecules) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/molecules/README.md)
+
+**Public API:** [`@gluonjs/molecules`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/molecules/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/molecules
+```
+
+### Quick start
+
+```ts
+import { Accordion, ButtonGroup, Card, ChoiceGroup } from '@gluonjs/molecules';
+```
+
+### Choose this package when
+
+- Reusable mid-level compositions built from Core, Quarks, and Atoms.
+- Form fields, control groups, notice surfaces, and dialog patterns.
+- Composition helpers that preserve native ownership.
+
+**Choose another boundary when:**
+
+- Does not replace application-specific structure or business logic.
+- Some components rely on caller-provided heading and labeling hierarchy.
+
+### Related documentation
+
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+- [Component decisions](https://marcmalerei.github.io/gluon/latest/guides/component-decisions/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import {

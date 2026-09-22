@@ -4,10 +4,53 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/json-forms
+
 `@gluonjs/json-forms` turns a deliberately documented subset of JSON Schema and
 JSON Forms UI schema into one accessible, form-associated Web Component. It is
 an optional package: schema rendering and AJV validation do not enter
 `@gluonjs/core`.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/json-forms at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/json-forms/) · [npm](https://www.npmjs.com/package/@gluonjs/json-forms) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/json-forms/README.md)
+
+**Public API:** [`@gluonjs/json-forms`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/json-forms/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/json-forms
+```
+
+### Quick start
+
+```ts
+import { registerJsonForms } from '@gluonjs/json-forms';
+
+registerJsonForms();
+```
+
+### Choose this package when
+
+- Accessible form rendering from a documented JSON Schema subset.
+- AJV-backed validation and form-associated custom elements.
+- Optional schema-driven UI inside browser applications.
+
+**Choose another boundary when:**
+
+- Does not enter the core package runtime.
+- Schema rendering is intentionally limited to the documented subset.
+
+### Related documentation
+
+- [Forms](https://marcmalerei.github.io/gluon/latest/reference/forms/)
+- [Application](https://marcmalerei.github.io/gluon/latest/guides/application/)
+
+<!-- gluon-package-overview:end -->
 
 ## Stability notes
 

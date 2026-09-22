@@ -8,6 +8,7 @@ const outputRoot = resolve(siteRoot, 'dist');
 const versions = JSON.parse(await readFile(resolve(siteRoot, 'versions.json'), 'utf8'));
 const packageContract = JSON.parse(await readFile(resolve(root, 'package-contract.json'), 'utf8'));
 const packageDocs = JSON.parse(await readFile(resolve(siteRoot, 'package-docs.json'), 'utf8'));
+const apiRoot = resolve(siteRoot, 'content', versions.latest, 'api', 'generated');
 const base = '/gluon/';
 validatePackageDocs(packageDocs, packageContract);
 await validateSourceDocs();
@@ -16,174 +17,94 @@ if (!versions.supported.includes(versions.latest)) {
   throw new Error(`documentation latest ${versions.latest} is not a supported version`);
 }
 
+const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
+const requiredPages = [
+  'index.html', 'guides/index.html', 'guides/getting-started/index.html',
+  'guides/learning-path/index.html', 'guides/components/index.html',
+  'guides/sfc-authoring/index.html',
+  'guides/application/index.html', 'guides/universal-rendering/index.html',
+  'guides/quality/index.html', 'api/index.html', 'packages/index.html',
+  'cookbook/index.html', 'migration/index.html', 'migration/upgrade/index.html',
+  'migration/vue-to-gluon-cutover/index.html', 'migration/vue-analyzer/index.html',
+  'migration/vue-codemod-decision/index.html', 'reference/forms/index.html',
+  'reference/diagnostics/index.html', 'examples/plain.html', 'examples/ui.html',
+  'examples/vue.html', 'examples/json-forms.html',
+];
 for (const version of versions.supported) {
-  for (const page of [
-    'index.html',
-    'guides/index.html',
-    'guides/getting-started/index.html',
-    'guides/components/index.html',
-    'guides/quality/index.html',
-    'api/index.html',
-    'cookbook/index.html',
-    'migration/index.html',
-    'migration/upgrade/index.html',
-    'migration/vue-to-gluon-cutover/index.html',
-    'migration/vue-analyzer/index.html',
-    'migration/vue-codemod-decision/index.html',
-    'examples/plain.html',
-    'examples/ui.html',
-    'examples/vue.html',
-  ]) await access(resolve(outputRoot, version, page));
+  for (const page of requiredPages) await access(resolve(outputRoot, version, page));
+  for (const entry of currentPackages) {
+    await access(resolve(outputRoot, version, 'packages', packageSlug(entry.name), 'index.html'));
+  }
 }
+await access(resolve(outputRoot, 'index.html'));
 await access(resolve(outputRoot, 'archive/index.html'));
 await access(resolve(outputRoot, 'latest/index.html'));
-await access(resolve(outputRoot, versions.latest, 'packages/index.html'));
-await access(resolve(outputRoot, 'latest', 'packages', 'index.html'));
+await access(resolve(outputRoot, 'latest/packages/index.html'));
 
-const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
-const packageIndexHtml = await readFile(resolve(outputRoot, versions.latest, 'packages/index.html'), 'utf8');
-if ((packageIndexHtml.match(/data-package-card/g) ?? []).length !== currentPackages.length) {
-  throw new Error(`package portal lists ${(packageIndexHtml.match(/data-package-card/g) ?? []).length} packages; contract requires ${currentPackages.length}`);
-}
-if (!packageIndexHtml.includes('public entry points')) {
-  throw new Error('package portal index must name the displayed metric as public entry points.');
-}
-if (!packageIndexHtml.includes(`href="/gluon/${versions.latest}/migration/upgrade/"`)) {
-  throw new Error('package portal index must link to the versioned upgrade guide.');
-}
+const packageIndex = await readFile(resolve(siteRoot, 'content', versions.latest, 'packages/index.md'), 'utf8');
 for (const entry of currentPackages) {
-  const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
-  const packageHtml = await readFile(resolve(outputRoot, versions.latest, 'packages', packageSlug, 'index.html'), 'utf8');
-  const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
-  const docsEntry = packageDocs.packages.find((candidate) => candidate.name === entry.name);
-  for (const required of [
-    `<title>${entry.name} · Gluon ${versions.latest}</title>`,
-    `<meta name="description" content="${escapeHtml(packageJson.description)}">`,
-    'Install and start',
-    'Purpose',
-    'Use cases',
-    'Public entry points',
-    'Dependencies and peers',
-    'Scope and limits',
-    'Related guides',
-    'Verified integration notes',
-  ]) if (!packageHtml.includes(required)) throw new Error(`${entry.name} package portal is missing: ${required}`);
-  if (!docsEntry) throw new Error(`package docs are missing for ${entry.name}`);
-  if (!packageHtml.includes(escapeHtml(docsEntry.starter.code))) {
-    throw new Error(`${entry.name} package portal does not render the documented starter code.`);
+  if (!packageIndex.includes(`| [${entry.name}](/${versions.latest}/packages/${packageSlug(entry.name)}/) |`)) {
+    throw new Error(`package index is missing ${entry.name}`);
   }
-  if (!packageHtml.includes(`>${escapeHtml(docsEntry.starter.language)}<`)) {
-    throw new Error(`${entry.name} package portal does not render the documented starter language.`);
+  const pagePath = resolve(siteRoot, 'content', versions.latest, 'packages', packageSlug(entry.name), 'index.md');
+  const pageSource = await readFile(pagePath, 'utf8');
+  const readmePath = resolve(root, entry.directory, 'README.md');
+  const readme = await readFile(readmePath, 'utf8');
+  if (!readme.includes('<!-- gluon-package-overview:start -->')
+    || !readme.includes('<!-- gluon-package-overview:end -->')) {
+    throw new Error(`${entry.name} README has no generated package overview`);
   }
-  if (!packageHtml.includes(escapeHtml(docsEntry.purpose))) {
-    throw new Error(`${entry.name} package portal does not render the documented purpose.`);
+  if (!pageSource.includes(entry.directory === '.' ? 'README.md{1,}' : `${entry.directory}/README.md{7,}`)) {
+    throw new Error(`${entry.name} docs page is not sourced from its maintained README`);
   }
-  for (const item of docsEntry.useCases) {
-    if (!packageHtml.includes(`<li>${escapeHtml(item)}</li>`)) {
-      throw new Error(`${entry.name} package portal does not render use case ${item}.`);
-    }
+  const output = await readFile(resolve(outputRoot, versions.latest, 'packages', packageSlug(entry.name), 'index.html'), 'utf8');
+  const manifest = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
+  if (!output.includes(`<title>${escapeHtml(entry.name)} | Gluon</title>`)) {
+    throw new Error(`${entry.name} package page has an inconsistent title`);
   }
-  for (const item of docsEntry.limits) {
-    if (!packageHtml.includes(`<li>${escapeHtml(item)}</li>`)) {
-      throw new Error(`${entry.name} package portal does not render scope limit ${item}.`);
-    }
+  if (!output.includes(escapeHtml(manifest.description))) {
+    throw new Error(`${entry.name} package page is missing its package description`);
   }
-  for (const item of docsEntry.integrationNotes) {
-    if (!packageHtml.includes(`<li>${escapeHtml(item)}</li>`)) {
-      throw new Error(`${entry.name} package portal does not render integration note ${item}.`);
-    }
-  }
-  for (const guide of docsEntry.relatedGuides) {
-    if (!packageHtml.includes(`href="${guide.href}"`) || !packageHtml.includes(`>${escapeHtml(guide.label)}<`)) {
-      throw new Error(`${entry.name} package portal does not render related guide ${guide.label} -> ${guide.href}.`);
-    }
+  for (const required of [' at a glance', 'Quick start', 'Choose this package when', 'Related documentation']) {
+    if (!output.includes(required)) throw new Error(`${entry.name} package page is missing ${required}`);
   }
 }
 
 for (const entry of currentPackages) {
-  const packageJson = JSON.parse(await readFile(resolve(root, entry.directory, 'package.json'), 'utf8'));
   const sourceRoot = entry.directory === '.' ? 'src' : `${entry.directory}/src`;
-  const html = await readFile(resolve(outputRoot, versions.latest, 'api/generated', sourceRoot, 'index.html'), 'utf8');
-  if (!html.includes(`<title>${escapeHtml(entry.name)} · Gluon ${versions.latest}</title>`)) {
-    throw new Error(`${entry.name} API landing page has no package-specific title`);
-  }
-  if (!html.includes(`<meta name="description" content="${escapeHtml(packageJson.description)}">`)) {
-    throw new Error(`${entry.name} API landing page has no package-specific description`);
-  }
-  if (!html.includes(`>${escapeHtml(entry.name)}</a>`)) {
-    throw new Error(`${entry.name} API landing page has no package-specific breadcrumb`);
-  }
-}
-for (const entry of currentPackages) {
-  const packageSlug = entry.name === '@gluonjs/core' ? 'core' : entry.name.replace(/^@gluonjs\//, '');
-  const latestPackageHtml = await readFile(resolve(outputRoot, 'latest', 'packages', packageSlug, 'index.html'), 'utf8');
-  if (!latestPackageHtml.includes(`<link rel="canonical" href="https://marcmalerei.github.io/gluon/${versions.latest}/packages/${packageSlug}/">`)) {
-    throw new Error(`${entry.name} package portal latest alias does not preserve the versioned canonical URL`);
-  }
+  await access(resolve(outputRoot, versions.latest, 'api/generated', sourceRoot, 'index.html'));
 }
 for (const page of [
-  ['latest', 'index.html'],
-  ['latest', 'guides', 'components', 'index.html'],
-  ['latest', 'api', 'index.html'],
-  ['latest', 'migration', 'index.html'],
-  ['latest', 'migration', 'vue-to-gluon-cutover', 'index.html'],
+  ['latest', 'index.html'], ['latest', 'guides/components/index.html'],
+  ['latest', 'api/index.html'], ['latest', 'migration/index.html'],
+  ['latest', 'migration/vue-to-gluon-cutover/index.html'],
 ]) {
   const html = await readFile(resolve(outputRoot, ...page), 'utf8');
   if (!html.includes(`<link rel="canonical" href="https://marcmalerei.github.io/gluon/${versions.latest}/`)) {
     throw new Error(`latest alias page is missing versioned canonical metadata: ${page.join('/')}`);
   }
 }
-await access(resolve(outputRoot, 'assets/docs.css'));
-await access(resolve(outputRoot, 'assets/docs.js'));
-await access(resolve(outputRoot, 'assets/search-index.json'));
-const docsStyles = await readFile(resolve(outputRoot, 'assets/docs.css'), 'utf8');
-if (!docsStyles.includes('.content h1 { overflow-wrap: anywhere;')) {
-  throw new Error('documentation CSS must wrap long generated API titles on mobile');
-}
-if (!docsStyles.includes('.search-panel { position: fixed; inset: 0;')) {
-  throw new Error('documentation CSS must include the global search overlay styles.');
-}
-
-const searchIndex = JSON.parse(await readFile(resolve(outputRoot, 'assets/search-index.json'), 'utf8'));
-if (!Array.isArray(searchIndex) || searchIndex.length === 0) {
-  throw new Error('search index must contain at least one entry.');
-}
-const searchTargets = new Set();
-let previousSearchUrl = '';
-for (const entry of searchIndex) {
-  for (const field of ['title', 'description', 'contentType', 'context', 'url', 'version', 'terms']) {
-    if (!isTrimmedNonEmptyString(entry?.[field])) throw new Error(`search index entry is missing ${field}.`);
-  }
-  if (!entry.url.startsWith('/gluon/')) throw new Error(`search index entry must use a versioned Gluon URL: ${entry.url}`);
-  if (searchTargets.has(entry.url)) throw new Error(`search index contains duplicate URL ${entry.url}`);
-  if (previousSearchUrl && entry.url < previousSearchUrl) throw new Error(`search index is not deterministically ordered: ${entry.url}`);
-  searchTargets.add(entry.url);
-  previousSearchUrl = entry.url;
-}
-const expectedSearchEntries = (await filesWithExtension(resolve(siteRoot, 'content'), '.md')).length
-  + (await filesWithExtension(resolve(root, '.tmp/docs-api'), '.md')).length
-  + versions.supported.length * (currentPackages.length + 1);
-if (searchIndex.length !== expectedSearchEntries) {
-  throw new Error(`search index contains ${searchIndex.length} pages; docs sources and package contract require ${expectedSearchEntries}`);
-}
-for (const entry of searchIndex) {
-  const file = resolve(outputRoot, searchUrlToRelativePath(entry.url));
-  await access(file);
+const cssFiles = await filesWithExtension(resolve(outputRoot, 'assets'), '.css');
+const jsFiles = await filesWithExtension(resolve(outputRoot, 'assets'), '.js');
+if (cssFiles.length === 0 || jsFiles.length === 0) throw new Error('VitePress did not emit its site styles and client bundle.');
+const bundledCss = (await Promise.all(cssFiles.map((file) => readFile(file, 'utf8')))).join('\n');
+if (!bundledCss.includes('--vp-c-brand-1') && !bundledCss.includes('#1549f5')) {
+  throw new Error('VitePress output does not include the Gluon documentation theme.');
 }
 
 const expectedEntryPoints = packageContract.packages
   .filter((entry) => entry.state === 'current')
   .reduce((total, entry) => total + entry.exports.length, 0);
-const apiIndex = await readFile(resolve(root, '.tmp/docs-api/README.md'), 'utf8');
-const documentedEntryPoints = (apiIndex.match(/^- \[[^\]]+\]\([^\)]+README\.md\)$/gm) ?? []).length;
+const apiIndex = await readFile(resolve(apiRoot, 'index.md'), 'utf8');
+const documentedEntryPoints = (apiIndex.match(/^- \[[^\]]+\]\([^\)]+index\.md\)$/gm) ?? []).length;
 if (documentedEntryPoints !== expectedEntryPoints) {
   throw new Error(`API reference documents ${documentedEntryPoints} entry points; package contract requires ${expectedEntryPoints}`);
 }
 
 const apiExampleManifest = JSON.parse(await readFile(resolve(root, '.tmp/api-examples/manifest.json'), 'utf8'));
 const apiSymbolPattern = /\/(?:functions|classes|interfaces|type-aliases|variables)\/[^/]+\.md$/;
-const apiSymbolFiles = (await filesWithExtension(resolve(root, '.tmp/docs-api'), '.md'))
-  .map((file) => slash(relative(resolve(root, '.tmp/docs-api'), file)))
+const apiSymbolFiles = (await filesWithExtension(apiRoot, '.md'))
+  .map((file) => slash(relative(apiRoot, file)))
   .filter((file) => apiSymbolPattern.test(`/${file}`))
   .sort();
 
@@ -269,8 +190,8 @@ for (const required of [
 ]) if (!componentExample.includes(required)) throw new Error(`compiled component authoring example is missing: ${required}`);
 
 const gluonElementReference = await readFile(resolve(
-  root,
-  '.tmp/docs-api/src/classes/GluonElement.md',
+  apiRoot,
+  'src/classes/GluonElement.md',
 ), 'utf8');
 for (const required of [
   'Base class for a stateful Gluon Custom Element',
@@ -287,8 +208,8 @@ for (const inheritedPlatformMember of ['### accessKey', '### ariaLabel', '### on
 }
 
 const propertyDeclarationReference = await readFile(resolve(
-  root,
-  '.tmp/docs-api/src/interfaces/PropertyDeclaration.md',
+  apiRoot,
+  'src/interfaces/PropertyDeclaration.md',
 ), 'utf8');
 for (const required of [
   'built-in String, Number, Boolean, Object, or Array',
@@ -300,8 +221,8 @@ for (const required of [
 ]) if (!propertyDeclarationReference.includes(required)) throw new Error(`PropertyDeclaration reference is missing: ${required}`);
 
 const eventDeclarationReference = await readFile(resolve(
-  root,
-  '.tmp/docs-api/src/interfaces/EventDeclaration.md',
+  apiRoot,
+  'src/interfaces/EventDeclaration.md',
 ), 'utf8');
 for (const required of [
   'travels through ancestor elements',
@@ -324,7 +245,7 @@ if (JSON.stringify(examplePaths) !== JSON.stringify(apiSymbolFiles)) {
   throw new Error('API example manifest paths do not match the generated symbol pages');
 }
 for (const entry of apiExampleManifest.entries) {
-  const markdown = await readFile(resolve(root, '.tmp/docs-api', entry.path), 'utf8');
+  const markdown = await readFile(resolve(apiRoot, entry.path), 'utf8');
   if (!markdown.includes('\n## Example\n') || !markdown.includes(`from '${entry.module}'`)) {
     throw new Error(`Generated API example is missing or uses the wrong public module: ${entry.path}`);
   }
@@ -337,13 +258,13 @@ for (const entry of apiExampleManifest.entries) {
     'without recreating framework-owned runtime state',
   ]) if (markdown.includes(genericCopy)) throw new Error(`Generated API example contains generic purpose copy: ${entry.path}`);
   const html = await readFile(resolve(outputRoot, versions.latest, 'api/generated', entry.htmlPath), 'utf8');
-  if (!html.includes('id="example"') || !html.includes('class="language-ts"')) {
+  if (!html.includes('id="example"') || !html.includes('class="language-ts ')) {
     throw new Error(`Rendered API example is missing from ${entry.htmlPath}`);
   }
 }
 const memoryHistoryExample = await readFile(resolve(
-  root,
-  '.tmp/docs-api/packages/router/src/functions/createMemoryHistory.md',
+  apiRoot,
+  'packages/router/src/functions/createMemoryHistory.md',
 ), 'utf8');
 for (const required of [
   'tests, server requests',
@@ -358,8 +279,8 @@ for (const required of [
 ]) if (!memoryHistoryExample.includes(required)) throw new Error(`createMemoryHistory API example is missing: ${required}`);
 
 const routerOptionsExample = await readFile(resolve(
-  root,
-  '.tmp/docs-api/packages/router/src/interfaces/RouterOptions.md',
+  apiRoot,
+  'packages/router/src/interfaces/RouterOptions.md',
 ), 'utf8');
 for (const required of [
   "from '@gluonjs/router/memory'",
@@ -372,16 +293,16 @@ for (const required of [
 ]) if (!routerOptionsExample.includes(required)) throw new Error(`RouterOptions API example is missing: ${required}`);
 
 const buttonPropsExample = await readFile(resolve(
-  root,
-  '.tmp/docs-api/packages/atoms/src/interfaces/ButtonProps.md',
+  apiRoot,
+  'packages/atoms/src/interfaces/ButtonProps.md',
 ), 'utf8');
 for (const required of ["label: 'Add to bag'", "variant: ButtonVariant = 'primary'", "size: ButtonSize = 'large'", 'onClick: (event: MouseEvent)', 'Button(button)']) {
   if (!buttonPropsExample.includes(required)) throw new Error(`ButtonProps API example is missing: ${required}`);
 }
 
 const defineStoreExample = await readFile(resolve(
-  root,
-  '.tmp/docs-api/packages/store/src/functions/defineStore.md',
+  apiRoot,
+  'packages/store/src/functions/defineStore.md',
 ), 'utf8');
 for (const required of ["id: 'counter'", 'state: () => ({ count: 0 })', 'store.$patch', 'manager.dispose()']) {
   if (!defineStoreExample.includes(required)) throw new Error(`defineStore API example is missing: ${required}`);
@@ -407,6 +328,24 @@ for (const required of [
   'does not write',
   'GVA9002',
 ]) if (!vueAnalyzer.includes(required)) throw new Error(`Vue analyzer guide is missing: ${required}`);
+
+const sfcGuide = await readFile(resolve(
+  outputRoot,
+  versions.latest,
+  'guides/sfc-authoring/index.html',
+), 'utf8');
+const visibleSfcGuide = sfcGuide
+  .replace(/<[^>]+>/g, ' ')
+  .replaceAll('&amp;', '&')
+  .replace(/\s+/g, ' ');
+for (const required of [
+  'Presentational Single-File Components',
+  'npm install --save-dev vite @gluonjs/vite',
+  'Register the plugin in vite.config.ts',
+  'script setup',
+  'ShopEditorialLink.gluon',
+  'Core and Quark contracts',
+]) if (!visibleSfcGuide.includes(required)) throw new Error(`SFC authoring guide is missing: ${required}`);
 
 const vueCodemodDecision = await readFile(resolve(
   siteRoot,
@@ -448,25 +387,25 @@ for (const required of [
 const htmlFiles = await filesWithExtension(outputRoot, '.html');
 const missingLinks = [];
 const invalidExternalLinks = [];
+const docsOrigin = 'https://marcmalerei.github.io';
 for (const file of htmlFiles) {
   const html = await readFile(file, 'utf8');
   for (const match of html.matchAll(/\shref="([^"]+)"/g)) {
     const href = match[1];
-    if (/^(?:https?:|mailto:)/.test(href)) {
-      const external = href.startsWith('http') ? new URL(href) : undefined;
-      if (external?.hostname === 'github.com'
-        && external.pathname.startsWith('/marcmalerei/gluon/blob/')
-        && external.pathname.endsWith('.html')) {
-        invalidExternalLinks.push(`${slash(relative(outputRoot, file))} -> ${href}`);
-      }
+    if (href.startsWith('#')) continue;
+    const external = /^(?:https?:|mailto:)/.test(href) ? new URL(href) : undefined;
+    if (external?.hostname === 'github.com'
+      && external.pathname.startsWith('/marcmalerei/gluon/blob/')
+      && external.pathname.endsWith('.html')) {
+      invalidExternalLinks.push(`${slash(relative(outputRoot, file))} -> ${href}`);
       continue;
     }
-    if (href.startsWith('#')) continue;
+    if (external && external.origin !== docsOrigin) continue;
     const currentRelative = slash(relative(outputRoot, file));
     const currentPath = currentRelative.endsWith('/index.html')
       ? `${base}${currentRelative.slice(0, -'index.html'.length)}`
       : `${base}${currentRelative}`;
-    const target = new URL(href, `https://docs.invalid${currentPath}`);
+    const target = new URL(href, external?.origin ?? `https://docs.invalid${currentPath}`);
     if (!target.pathname.startsWith(base)) continue;
     if (target.pathname === `${base}playground/`) continue;
     let targetRelative = decodeURIComponent(target.pathname.slice(base.length));
@@ -479,12 +418,6 @@ for (const file of htmlFiles) {
 if (missingLinks.length > 0) throw new Error(`documentation has broken internal links:\n- ${missingLinks.join('\n- ')}`);
 if (invalidExternalLinks.length > 0) {
   throw new Error(`documentation rewrote curated GitHub links to generated HTML:\n- ${invalidExternalLinks.join('\n- ')}`);
-}
-
-for (const entry of searchIndex) {
-  if (!htmlFiles.some((file) => slash(relative(outputRoot, file)) === searchUrlToRelativePath(entry.url))) {
-    throw new Error(`search index references missing output: ${entry.url}`);
-  }
 }
 
 const exampleSources = (await filesWithExtension(resolve(siteRoot, 'examples'), '.ts'))
@@ -504,12 +437,8 @@ async function filesWithExtension(directory, extension) {
 }
 
 function slash(value) { return value.split(sep).join('/'); }
+function packageSlug(name) { return name.startsWith('@gluonjs/') ? name.slice('@gluonjs/'.length) : name; }
 function escapeHtml(value) { return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
-function searchUrlToRelativePath(url) {
-  const relativeUrl = url.slice('/gluon/'.length);
-  return relativeUrl.endsWith('/') ? `${relativeUrl}index.html` : relativeUrl;
-}
-
 async function validateSourceDocs() {
   const rootPackage = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
   const currentVersion = rootPackage.version;

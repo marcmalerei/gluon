@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/devtools-api
+
 Environment-neutral protocol version 1 for independent Gluon Devtools clients.
 `DevtoolsProtocol` owns application selection and one globally ordered timeline
 of application, component, render, Router, Store, scheduler, event, and error
@@ -18,6 +20,48 @@ snapshots, source locations, the ordered timeline, and application/render/
 Router/Store/scheduler/event/error records.
 
 The package has no browser or framework dependency.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/devtools-api at a glance
+
+**Runtime:** universal · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/devtools-api/) · [npm](https://www.npmjs.com/package/@gluonjs/devtools-api) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/devtools-api/README.md)
+
+**Public API:** [`@gluonjs/devtools-api`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/devtools-api/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/devtools-api
+```
+
+### Quick start
+
+```ts
+import { DevtoolsProtocol } from '@gluonjs/devtools-api';
+
+const protocol = new DevtoolsProtocol();
+protocol.handshake();
+```
+
+### Choose this package when
+
+- Inspector, overlay, and editor integrations that exchange structured records.
+- Protocol handshakes and capability gating across environments.
+- Independent application timelines and snapshots.
+
+**Choose another boundary when:**
+
+- Does not render UI or own a browser bridge by itself.
+- Protocol consumers must validate capability compatibility.
+
+### Related documentation
+
+- [Devtools](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+- [Diagnostics](https://marcmalerei.github.io/gluon/latest/reference/diagnostics/)
+
+<!-- gluon-package-overview:end -->
 
 ## Record an application timeline
 

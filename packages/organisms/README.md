@@ -4,8 +4,50 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/organisms
+
 Larger Gluon interface structures. The package is optional and depends only
 downward on Core, Quarks, Atoms, and Molecules.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/organisms at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/organisms/) · [npm](https://www.npmjs.com/package/@gluonjs/organisms) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/organisms/README.md)
+
+**Public API:** [`@gluonjs/organisms`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/organisms/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/organisms
+```
+
+### Quick start
+
+```ts
+import { AppShell } from '@gluonjs/organisms';
+```
+
+### Choose this package when
+
+- App shell and larger layout structures built from lower-level packages.
+- Landmarks, navigation, and responsive composition.
+- Structured interface regions for browser apps.
+- Bounded multi-stage workflows with explicit status and evidence.
+
+**Choose another boundary when:**
+
+- Does not generate content that the caller has not supplied.
+- Layout remains dependent on consumer-owned content and semantics.
+
+### Related documentation
+
+- [Application](https://marcmalerei.github.io/gluon/latest/guides/application/)
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import { AppShell } from "@gluonjs/organisms";

@@ -4,11 +4,63 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/store
+
 The official Gluon store provides typed, application-scoped state without a
 DOM dependency. Store definitions infer state, computed getter values, action
 arguments, and action results from one definition.
 
 The package ships as part of the current `1.12.0` release line.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/store at a glance
+
+**Runtime:** universal · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/store/) · [npm](https://www.npmjs.com/package/@gluonjs/store) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/store/README.md)
+
+**Public API:** [`@gluonjs/store`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/store/src/)
+
+### Install
+
+```sh
+npm install @gluonjs/store
+```
+
+### Quick start
+
+```ts
+import { createStoreManager, defineStore } from '@gluonjs/store';
+
+const counterDefinition = defineStore('counter', () => ({ count: 0 }), {
+  actions: (store) => ({
+    increment() { store.count += 1; },
+  }),
+});
+
+const manager = createStoreManager();
+const counter = counterDefinition.use(manager);
+counter.increment();
+manager.dispose();
+```
+
+### Choose this package when
+
+- Shared state, getters, and actions for browser or server code.
+- Application-scoped store instances with typed inference.
+- Structured state ownership in larger Gluon apps.
+
+**Choose another boundary when:**
+
+- Does not provide DOM access or component templating.
+- Applications needing reactive presentation still depend on Core and Reactivity.
+
+### Related documentation
+
+- [Application](https://marcmalerei.github.io/gluon/latest/guides/application/)
+- [Store](https://marcmalerei.github.io/gluon/latest/reference/support-matrix/)
+
+<!-- gluon-package-overview:end -->
 
 ## Stability notes
 

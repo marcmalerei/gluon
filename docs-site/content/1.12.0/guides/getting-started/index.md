@@ -10,6 +10,24 @@ npm install
 npm run dev
 ```
 
+Want to try the programming model first? Open the [shareable browser
+Playground](/playground/). It provides starter code, diagnostics, and a stable
+reproduction URL without requiring a local checkout. When the first experiment
+is useful, move it into the generated application above.
+
+## What to try first
+
+The smallest useful path is deliberately short:
+
+1. Render one `html` template with `@gluonjs/core`.
+2. Add a reactive value with `@gluonjs/reactivity`.
+3. Add Router, Store, UI, or SSR only when the application needs that boundary.
+
+The [GLUON GOODS shop](https://github.com/marcmalerei/gluon/tree/main/examples/shop)
+shows the same public packages joined into a complete customer flow. Use it to
+understand how the individual guides compose, not as a prerequisite for a first
+application.
+
 New to frontend frameworks? Follow the
 [step-by-step learning path](../learning-path/) next. It explains the generated
 files, templates, bindings, reactivity, keyed lists, styles, cleanup, tests, and
@@ -51,10 +69,15 @@ maintained starter, and builds this documentation site.
 | Use optional reusable UI | `@gluonjs/atoms`, `@gluonjs/molecules`, `@gluonjs/organisms` |
 | Add URLs | `@gluonjs/router` |
 | Add shared application state | `@gluonjs/store` |
-| Build with Vite and `.gluon` files | `@gluonjs/vite` |
+| Build with Vite and `.gluon` files | [`@gluonjs/vite`](../sfc-authoring/) |
 | Build a Storybook catalog | `@gluonjs/gluon-components-vite` |
 | Test public browser behavior | `@gluonjs/test-utils` |
 | Render on a server or generate static HTML | `@gluonjs/ssr` |
 
 Install a package when the feature enters the application. A minimal browser
 app does not need Router, Store, SSR, or the optional UI packages.
+
+If the first run does not behave as expected, [open a small issue with a
+Playground link](https://github.com/marcmalerei/gluon/issues/new/choose). This
+keeps feedback attached to a reproducible example and helps improve the starter
+path for the next user.

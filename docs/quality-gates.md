@@ -497,6 +497,11 @@ aggregator validates and uploads the complete commit-named artifact for 30
 days. These CI samples are regression and review evidence; the larger committed
 baseline remains the evidence used for comparative prose.
 
+The focused `benchmark:spread-bindings` runner uses the same production-build
+guard and records 80-card cold, stable-update, end-to-end, and cleanup lanes in
+Chromium. It is review evidence for spread-binding changes, not a replacement
+for the cross-engine rendering, runtime scorecard, or shop budget gates.
+
 ## Release-cut evidence boundary
 
 Gluon 1.0 records the exact Playwright-managed Chromium, Firefox, and WebKit

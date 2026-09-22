@@ -4,6 +4,8 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/ssr
+
 The official DOM-independent Gluon server renderer consumes the same public
 `html`, functional component, application, Store, Router, async built-in, and
 registered `GluonElement` definitions used by the browser.
@@ -14,6 +16,48 @@ ShadowRoot template, and stops the scope without browser connection lifecycle.
 Streaming and SSG consume that template unchanged; hydration reruns setup under
 the browser connection owner and binds the declarative ShadowRoot through the
 normal element hydrator.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/ssr at a glance
+
+**Runtime:** node · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/ssr/) · [npm](https://www.npmjs.com/package/@gluonjs/ssr) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/ssr/README.md)
+
+**Public API:** [`@gluonjs/ssr`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/) · [`@gluonjs/ssr/eleventy`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/eleventy/) · [`@gluonjs/ssr/hydration`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/hydration/) · [`@gluonjs/ssr/static`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/static/) · [`@gluonjs/ssr/streaming`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/ssr/src/streaming/)
+
+### Install
+
+```sh
+npm install @gluonjs/ssr
+```
+
+### Quick start
+
+```ts
+import { renderToString } from '@gluonjs/ssr';
+import { html } from '@gluonjs/core';
+
+const markup = await renderToString(html`<main>Hello</main>`);
+```
+
+### Choose this package when
+
+- Server rendering, streaming, static generation, and hydration handoff.
+- Request-local effect scopes and declarative ShadowRoot output.
+- Shared public component definitions between browser and server.
+
+**Choose another boundary when:**
+
+- Does not replace browser ownership or client hydration logic.
+- Rendered output still depends on public component definitions.
+
+### Related documentation
+
+- [Universal rendering](https://marcmalerei.github.io/gluon/latest/guides/universal-rendering/)
+- [Hydration](https://marcmalerei.github.io/gluon/latest/reference/hydration/)
+
+<!-- gluon-package-overview:end -->
 
 ```ts
 import { createApp, html } from '@gluonjs/core';

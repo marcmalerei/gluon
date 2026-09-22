@@ -36,6 +36,18 @@ for (const fixture of ['gluon', 'lit', 'vue', 'react']) {
   }
 }
 
+const spreadBindings = await readJson('spread-bindings-chromium.json');
+validateSource(spreadBindings, 'Chromium spread bindings');
+if (spreadBindings.environment?.browser?.name !== 'chromium'
+  || typeof spreadBindings.environment.browser.version !== 'string') {
+  throw new Error('Spread-binding evidence must retain its Chromium version.');
+}
+if (spreadBindings.benchmark?.cardCount !== 80
+  || !Object.values(spreadBindings.benchmark?.invariants ?? {}).every(Boolean)) {
+  throw new Error('Spread-binding evidence must retain the 80-card fixture and passing invariants.');
+}
+await requireText('spread-bindings-chromium.md');
+
 const loader = await readJson('component-library-loader.json');
 validateChromiumReport(loader, 'component-library loader');
 await requireText('component-library-loader.png');
@@ -60,7 +72,7 @@ if (shop.passed !== true || shop.failures?.length !== 0) {
 await requireText('shop-flow.md');
 
 console.log(JSON.stringify(summary, null, 2));
-console.log(`performance evidence complete: ${browsers.length} engines plus Chromium bundle, loader, Storybook, and shop gates`);
+console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, loader, Storybook, and shop gates`);
 
 function option(name) {
   const argument = process.argv.find((value) => value.startsWith(`${name}=`));

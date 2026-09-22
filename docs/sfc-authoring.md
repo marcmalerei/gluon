@@ -5,6 +5,33 @@ presentational Atoms, Molecules, and Organisms. A `.gluon` file keeps its typed
 props, native markup, and owned CSS together while the official Vite plugin
 compiles it to the same public contracts used by handwritten components.
 
+## Enable `.gluon` in a Vite application
+
+Install the runtime and the official build integration:
+
+```sh
+npm install @gluonjs/core
+npm install --save-dev vite @gluonjs/vite
+```
+
+Register the plugin in `vite.config.ts`. It discovers and compiles `.gluon`
+imports as part of the ordinary Vite pipeline; no second SFC plugin is needed:
+
+```ts
+import { defineConfig } from 'vite';
+import gluon from '@gluonjs/vite';
+
+export default defineConfig({
+  plugins: [gluon()],
+});
+```
+
+The authoring format is intentionally not Vue SFC compatibility. The Vue SFC
+parser is a build-time block parser only; emitted browser code uses public Gluon
+Core and Quark contracts and has no Vue runtime dependency. See the
+[`@gluonjs/vite` guide](https://marcmalerei.github.io/gluon/latest/packages/vite/)
+for TypeScript, HMR, diagnostics, and other Vite integration details.
+
 ## First component
 
 Create `TextLink.gluon`:
@@ -104,3 +131,8 @@ GLUON GOODS demonstrates the boundary in production:
   Organism compositions because they coordinate multiple child components.
 - the product configurator and bag quantity control remain Custom Elements
   because they own form or stateful lifecycle behavior.
+
+Inspect the [actual `ShopEditorialLink.gluon` source](../examples/shop/src/shop-editorial-link.gluon),
+its [application integration](../examples/shop/src/ui-extensions.ts), and the
+[shop feature evidence](../examples/shop/FEATURES.md). These show the real
+boundary between a small `.gluon` Atom and the Core/Vite-owned application flow.

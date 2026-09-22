@@ -9,6 +9,7 @@ contracts exercised by GLUON GOODS.
 - [Learn Gluon step by step](learning-path/): a junior-friendly path through templates, reactivity, lists, styles, cleanup, and tests.
 - [Choose a component level](component-decisions/): decide between native markup, Quark, Atom, Molecule, Organism, Custom Element, and app-local code.
 - [Components: properties, events, and lifecycle](components/): choose an authoring model and build typed component boundaries.
+- [Presentational Single-File Components](sfc-authoring/): enable the `.gluon` format, author typed markup and styles, and understand its supported boundaries.
 - [Application architecture](application/): application ownership, Router, Store, and cleanup.
 - [Universal rendering](universal-rendering/): SSR, hydration, streaming, and SSG boundaries.
 - [Tooling workflow](tooling/): Vite, diagnostics, Devtools, testing, and Playground.

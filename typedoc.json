@@ -42,8 +42,17 @@
   "entryPointStrategy": "resolve",
   "tsconfig": "tsconfig.typedoc.json",
   "plugin": [
-    "typedoc-plugin-markdown"
+    "typedoc-plugin-markdown",
+    "typedoc-vitepress-theme"
   ],
+  "entryFileName": "index.md",
+  "docsRoot": "docs-site/content",
+  "sidebar": {
+    "autoConfiguration": true,
+    "format": "vitepress",
+    "pretty": true,
+    "collapsed": true
+  },
   "out": ".tmp/docs-api",
   "json": ".tmp/docs-api-reflections.json",
   "readme": "none",

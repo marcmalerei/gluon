@@ -485,6 +485,14 @@ describe('DOM runtime contract', () => {
     render(link(unsafeURL('data:text/plain,reviewed')), root);
     expect(root.querySelector('a')?.getAttribute('href')).toBe('data:text/plain,reviewed');
 
+    const spreadLink = (href: string | ReturnType<typeof unsafeURL>) => html`<a ...=${{ href }}>Spread link</a>`;
+    const spreadRoot = document.createElement('div');
+    render(spreadLink('/safe'), spreadRoot);
+    expect(() => render(spreadLink('javascript:alert(1)'), spreadRoot)).toThrow(/blocked unsafe url protocol/i);
+    expect(spreadRoot.querySelector('a')?.getAttribute('href')).toBe('/safe');
+    render(spreadLink(unsafeURL('data:text/plain,reviewed')), spreadRoot);
+    expect(spreadRoot.querySelector('a')?.getAttribute('href')).toBe('data:text/plain,reviewed');
+
     expect(() => render(html`<a .href=${'javascript:alert(1)'}>Blocked</a>`, propertyRoot)).toThrow(
       /blocked unsafe url protocol/i,
     );

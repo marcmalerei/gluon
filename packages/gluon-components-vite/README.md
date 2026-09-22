@@ -4,9 +4,59 @@
 </p>
 <!-- gluon-package-header:end -->
 
+# @gluonjs/gluon-components-vite
+
 The official Storybook renderer for Gluon accepts native `TemplateResult`
 stories, renders them with `@gluonjs/core`, and releases renderer-owned DOM,
 bindings, and constructable stylesheets when Storybook replaces a story.
+
+<!-- gluon-package-overview:start -->
+## @gluonjs/gluon-components-vite at a glance
+
+**Runtime:** browser · **Release:** 1.12.0
+
+[Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/gluon-components-vite/) · [npm](https://www.npmjs.com/package/@gluonjs/gluon-components-vite) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/gluon-components-vite/README.md)
+
+**Public API:** [`@gluonjs/gluon-components-vite`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/gluon-components-vite/src/) · [`@gluonjs/gluon-components-vite/entry-preview`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/gluon-components-vite/src/entry-preview/) · [`@gluonjs/gluon-components-vite/preset`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/gluon-components-vite/src/preset/) · [`@gluonjs/gluon-components-vite/renderer-preset`](https://marcmalerei.github.io/gluon/1.12.0/api/generated/packages/gluon-components-vite/src/renderer-preset/)
+
+### Install
+
+```sh
+npm install @gluonjs/gluon-components-vite
+```
+
+### Quick start
+
+```ts
+import type { StorybookConfig } from '@gluonjs/gluon-components-vite';
+
+const config = {
+  stories: ['../src/**/*.stories.ts'],
+  framework: '@gluonjs/gluon-components-vite',
+} satisfies StorybookConfig;
+
+export default config;
+```
+
+### Choose this package when
+
+- Storybook rendering for Gluon component libraries.
+- Renderer-owned DOM and stylesheet cleanup when stories change.
+- Opt-in strict SSR serialization and retained hydration checks per story.
+- Preview, preset, and renderer-preset integration.
+
+**Choose another boundary when:**
+
+- Does not replace the component library or application runtime.
+- SSR hydration checks run in the Storybook browser preview, not a separate Node server process.
+- Requires Storybook and Vite in the host project.
+
+### Related documentation
+
+- [Components](https://marcmalerei.github.io/gluon/latest/guides/components/)
+- [Tooling](https://marcmalerei.github.io/gluon/latest/guides/tooling/)
+
+<!-- gluon-package-overview:end -->
 
 ## Install
 
