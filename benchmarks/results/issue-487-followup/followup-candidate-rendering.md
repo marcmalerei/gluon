@@ -32,4 +32,3 @@ Method: production build, batches calibrated to at least 8 ms for the fastest re
 | reverse | vanilla | 70 | 0.1143 | 0.1271 | 0.81× |
 
 Every individual measured sample is preserved in the accompanying JSON file.
-

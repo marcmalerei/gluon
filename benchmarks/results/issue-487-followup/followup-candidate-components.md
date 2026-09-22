@@ -28,4 +28,3 @@ Method: production build; 50 autonomous Custom Elements with open Shadow DOM per
 | list | vue | 232 | 0.3599 | 0.3720 | 1.49× |
 
 Every individual measured sample and validated output snapshot is preserved in the accompanying JSON file.
-
