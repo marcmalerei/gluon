@@ -7,7 +7,7 @@ import {
 import { html as litHtml, nothing as litNothing, render as litRender } from 'lit-html';
 
 export const SPREAD_CARD_COUNT = 80;
-export const spreadBenchmarkFrameworks = ['gluon', 'lit'] as const;
+export const spreadBenchmarkFrameworks = ['gluon-spread', 'gluon-explicit', 'lit'] as const;
 export const spreadBenchmarkScenarios = [
   'initial-commit',
   'stable-update-commit',
@@ -43,7 +43,7 @@ interface Snapshot {
 }
 
 export interface SpreadBindingBenchmarkResult {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly cardCount: number;
   readonly samples: number;
   readonly warmupRounds: number;
@@ -62,7 +62,8 @@ export interface SpreadBindingBenchmarkResult {
       readonly batchSize: number;
       readonly samples: readonly number[];
       readonly statistics: ReturnType<typeof statistics>;
-      readonly relativeToGluonMedian: number;
+      readonly relativeToGluonSpreadMedian: number;
+      readonly relativeToGluonExplicitMedian: number;
     }[];
   }[];
 }
@@ -113,7 +114,8 @@ export async function runSpreadBindingBenchmark(
         }
         await nextFrame();
       }
-      const gluonMedian = statistics(raw.get('gluon')!).median;
+      const gluonSpreadMedian = statistics(raw.get('gluon-spread')!).median;
+      const gluonExplicitMedian = statistics(raw.get('gluon-explicit')!).median;
       scenarios.push({
         scenario,
         unit: 'milliseconds per operation',
@@ -125,7 +127,8 @@ export async function runSpreadBindingBenchmark(
             batchSize,
             samples: frameworkSamples,
             statistics: frameworkStatistics,
-            relativeToGluonMedian: frameworkStatistics.median / gluonMedian,
+            relativeToGluonSpreadMedian: frameworkStatistics.median / gluonSpreadMedian,
+            relativeToGluonExplicitMedian: frameworkStatistics.median / gluonExplicitMedian,
           };
         }),
       });
@@ -135,7 +138,7 @@ export async function runSpreadBindingBenchmark(
   }
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     cardCount: SPREAD_CARD_COUNT,
     samples,
     warmupRounds,
@@ -214,13 +217,16 @@ function createHarness(framework: Framework, scenario: Scenario): Harness {
 }
 
 function createView(framework: Framework, alternate: boolean): Renderable {
-  if (framework === 'gluon') {
-    return gluonHtml`<main>${cards.map((card) => gluonCard(card, alternate))}</main>`;
+  if (framework === 'gluon-spread') {
+    return gluonHtml`<main>${cards.map((card) => gluonSpreadCard(card, alternate))}</main>`;
+  }
+  if (framework === 'gluon-explicit') {
+    return gluonHtml`<main>${cards.map((card) => gluonExplicitCard(card, alternate))}</main>`;
   }
   return litHtml`<main>${cards.map((card) => litCard(card, alternate))}</main>`;
 }
 
-function gluonCard(card: Card, alternate: boolean): TemplateResult {
+function gluonSpreadCard(card: Card, alternate: boolean): TemplateResult {
   const props = {
     class: ['card', { featured: card.id % 8 === 0 }],
     title: `Product ${card.id}`,
@@ -231,6 +237,21 @@ function gluonCard(card: Card, alternate: boolean): TemplateResult {
     '.tabIndex': 0,
   };
   return gluonHtml`<article ...=${props}><h2>${alternate ? card.labelB : card.labelA}</h2></article>`;
+}
+
+function gluonExplicitCard(card: Card, alternate: boolean): TemplateResult {
+  const className = card.id % 8 === 0 ? 'card featured' : 'card';
+  const color = card.id % 2 === 0 ? 'navy' : 'black';
+  return gluonHtml`<article
+    class=${className}
+    title=${`Product ${card.id}`}
+    data-card-id=${String(card.id)}
+    data-track="benchmark"
+    aria-label=${`Product card ${card.id}`}
+    style=${`--card-index: ${card.id}; color: ${color};`}
+    ?hidden=${false}
+    .tabIndex=${0}
+  ><h2>${alternate ? card.labelB : card.labelA}</h2></article>`;
 }
 
 function litCard(card: Card, alternate: boolean): ReturnType<typeof litHtml> {
@@ -249,26 +270,24 @@ function litCard(card: Card, alternate: boolean): ReturnType<typeof litHtml> {
 }
 
 function commit(framework: Framework, value: Renderable, root: HTMLElement): void {
-  if (framework === 'gluon') gluonRender(value as TemplateResult, root);
+  if (framework === 'gluon-spread' || framework === 'gluon-explicit') gluonRender(value as TemplateResult, root);
   else litRender(value as ReturnType<typeof litHtml>, root);
 }
 
 function dispose(framework: Framework, root: HTMLElement): void {
-  if (framework === 'gluon') gluonUnmount(root);
+  if (framework === 'gluon-spread' || framework === 'gluon-explicit') gluonUnmount(root);
   else litRender(litNothing, root);
   root.replaceChildren();
 }
 
 function validateInvariants(): SpreadBindingBenchmarkResult['invariants'] {
   const roots = spreadBenchmarkFrameworks.map(() => document.createElement('div'));
-  commit('gluon', createView('gluon', false), roots[0]!);
-  commit('lit', createView('lit', false), roots[1]!);
+  spreadBenchmarkFrameworks.forEach((framework, index) => commit(framework, createView(framework, false), roots[index]!));
   const initialElements = roots.map((root) => root.querySelector('article'));
-  commit('gluon', createView('gluon', true), roots[0]!);
-  commit('lit', createView('lit', true), roots[1]!);
+  spreadBenchmarkFrameworks.forEach((framework, index) => commit(framework, createView(framework, true), roots[index]!));
   const snapshots = roots.map(snapshot);
-  if (JSON.stringify(snapshots[0]) !== JSON.stringify(snapshots[1])) {
-    throw new Error(`Gluon and Lit produced different card snapshots: ${JSON.stringify(snapshots)}`);
+  if (snapshots.some((value) => JSON.stringify(value) !== JSON.stringify(snapshots[0]))) {
+    throw new Error(`Binding lanes produced different card snapshots: ${JSON.stringify(snapshots)}`);
   }
   if (roots.some((root, index) => root.querySelector('article') !== initialElements[index])) {
     throw new Error('A renderer replaced card DOM during a stable update.');

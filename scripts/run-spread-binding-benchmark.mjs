@@ -42,7 +42,7 @@ try {
 }
 
 const evidence = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: new Date().toISOString(),
   source: {
     commit: git('rev-parse', 'HEAD'),
@@ -66,7 +66,9 @@ const evidence = {
     browser: { name: 'chromium', version: browser.version() },
   },
   methodology: {
-    fixture: '80 equivalent product cards; Gluon forwards fresh native props through a spread and Lit uses explicit bindings',
+    fixture: '80 equivalent product cards; Gluon spread, Gluon explicit, and Lit explicit bindings produce the same observable DOM',
+    primaryBaseline: 'gluon-explicit',
+    spreadIsolation: 'gluon-spread versus gluon-explicit on the same Gluon renderer and workload',
     samples: options.samples,
     warmupRounds: options.warmupRounds,
     minimumBatchDurationMs: 12,
@@ -122,17 +124,19 @@ function renderMarkdown(evidence) {
     '',
     `Method: production build, ${evidence.benchmark.cardCount} cards, ${evidence.methodology.warmupRounds} warm-up rounds, and ${evidence.methodology.samples} interleaved samples. Lower latency is faster.`,
     '',
-    '| Scenario | Renderer | Batch | Median ms/op | p95 ms/op | vs Gluon |',
-    '| --- | --- | ---: | ---: | ---: | ---: |',
+    '| Scenario | Renderer | Batch | Median ms/op | p95 ms/op | vs Gluon spread | vs Gluon explicit |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
   ];
   for (const scenario of evidence.benchmark.scenarios) {
     for (const result of scenario.results) {
-      lines.push(`| ${scenario.scenario} | ${result.framework} | ${result.batchSize} | ${formatMilliseconds(result.statistics.median)} | ${formatMilliseconds(result.statistics.p95)} | ${result.relativeToGluonMedian.toFixed(2)}× |`);
+      lines.push(`| ${scenario.scenario} | ${result.framework} | ${result.batchSize} | ${formatMilliseconds(result.statistics.median)} | ${formatMilliseconds(result.statistics.p95)} | ${result.relativeToGluonSpreadMedian.toFixed(2)}× | ${result.relativeToGluonExplicitMedian.toFixed(2)}× |`);
     }
   }
   lines.push(
     '',
     `Invariants: equivalent DOM ${evidence.benchmark.invariants.equivalentDom ? 'passed' : 'failed'}; stable element identity ${evidence.benchmark.invariants.stableElementIdentity ? 'passed' : 'failed'}; style parity ${evidence.benchmark.invariants.styleParity ? 'passed' : 'failed'}; cleanup ${evidence.benchmark.invariants.cleanupEmptiesRoots ? 'passed' : 'failed'}.`,
+    '',
+    'The explicit Gluon lane is the no-spread baseline. Values above 1.00× in the `vs Gluon explicit` column indicate the measured spread/framework overhead for that renderer and scenario.',
     '',
     'Every measured sample is preserved in the accompanying JSON file.',
     '',
