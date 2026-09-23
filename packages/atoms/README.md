@@ -17,11 +17,11 @@ images, virtualize content, or own product state.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/atoms at a glance
 
-**Runtime:** browser · **Release:** 1.12.1
+**Runtime:** browser · **Release:** 1.12.2
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/atoms/) · [npm](https://www.npmjs.com/package/@gluonjs/atoms) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/atoms/README.md)
 
-**Public API:** [`@gluonjs/atoms`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/atoms/src/)
+**Public API:** [`@gluonjs/atoms`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/atoms/src/)
 
 ### Install
 

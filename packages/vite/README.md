@@ -12,11 +12,11 @@ diagnostics, and compatible state-preserving HMR.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/vite at a glance
 
-**Runtime:** node · **Release:** 1.12.1
+**Runtime:** node · **Release:** 1.12.2
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/vite/) · [npm](https://www.npmjs.com/package/@gluonjs/vite) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/vite/README.md)
 
-**Public API:** [`@gluonjs/vite`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/vite/src/) · [`@gluonjs/vite/tailwind`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/vite/src/tailwind/)
+**Public API:** [`@gluonjs/vite`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/vite/src/) · [`@gluonjs/vite/tailwind`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/vite/src/tailwind/)
 
 ### Install
 

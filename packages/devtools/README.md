@@ -19,11 +19,11 @@ that callback.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/devtools at a glance
 
-**Runtime:** browser · **Release:** 1.12.1
+**Runtime:** browser · **Release:** 1.12.2
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/devtools/) · [npm](https://www.npmjs.com/package/@gluonjs/devtools) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/devtools/README.md)
 
-**Public API:** [`@gluonjs/devtools`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/devtools/src/)
+**Public API:** [`@gluonjs/devtools`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/devtools/src/)
 
 ### Install
 

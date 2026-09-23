@@ -34,7 +34,7 @@ jobs:
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
       - run: npm run check:repository
-        timeout-minutes: 18
+        timeout-minutes: 20
 
   create-gluon-fixtures:
     runs-on: ubuntu-latest

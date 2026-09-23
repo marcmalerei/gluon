@@ -4,11 +4,11 @@ All notable changes to this package are documented in the root [Gluon changelog]
 
 ## [Unreleased]
 
-## [1.12.1] - 2026-09-22
+## [1.12.2] - 2026-09-23
 
 ### Changed
 
-- Released in the lockstep 1.12.1 patch train; no package-specific public API change was introduced here.
+- Released in the lockstep 1.12.2 patch train; no package-specific public API change was introduced here.
 
 ## [1.12.0] - 2026-09-18
 
