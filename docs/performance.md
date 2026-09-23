@@ -391,13 +391,12 @@ production benchmark build:
 | Gluon lane | Hydration median / p95 | Interaction median / p95 |
 | --- | ---: | ---: |
 | Main baseline `2565964` | 2.6 / 3.6 ms | 0.1 / 0.1 ms |
-| Candidate | 2.2 / 5.3 ms | 0.1 / 0.2 ms |
+| Candidate `44d090b` | 2.2 / 3.2 ms | 0.1 / 0.2 ms |
 
-The candidate median is approximately 15% lower in this paired run. The p95
-is not claimed as an improvement because isolated 5–8 ms browser samples remain
-visible. This is evidence for a successful-path hydration median on this
-workload, not a universal Lit/Vue performance ranking. The complete raw samples
-and environment metadata are retained in the
+The candidate median is approximately 15% lower and p95 approximately 11% lower
+in this paired run. This is evidence for a successful-path hydration improvement
+on this workload, not a universal Lit/Vue performance ranking. The complete raw
+samples and environment metadata are retained in the
 [`#502 baseline`](../benchmarks/results/hydration-comparison-502-baseline.json)
 and
 [`#502 candidate`](../benchmarks/results/hydration-comparison-502-candidate.json)
