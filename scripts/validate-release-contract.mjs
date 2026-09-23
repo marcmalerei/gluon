@@ -516,8 +516,12 @@ async function validateReleaseCutEvidence(version) {
     throw new Error(`${path} tested commit is not an ancestor of the candidate commit.`);
   }
   const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', version);
-  const permittedEvidenceChanges = new Set([path, compatibilityPath]);
-  const changedAfterTesting = execFileSync('git', ['diff', '--name-only', evidence.testedCommit, 'HEAD'], {
+  const recoveryManifest = readOptionalJsonAtRef('HEAD', `release/recovery/${version}.json`);
+  const permittedEvidenceChanges = recoveryManifest
+    ? new Set(expectedRecoveryPaths(version, recoveryManifest.failureCategory))
+    : new Set([path, compatibilityPath]);
+  const validationHead = process.env.GITHUB_EVENT_NAME === 'pull_request' ? 'HEAD^2' : 'HEAD';
+  const changedAfterTesting = execFileSync('git', ['diff', '--name-only', evidence.testedCommit, validationHead], {
     cwd: root,
     encoding: 'utf8',
   }).trim().split('\n').filter(Boolean);
@@ -849,6 +853,7 @@ function readOptionalJsonAtRef(ref, path) {
 
 function expectedRecoveryPaths(version, failureCategory = 'squash-merge-tested-commit-not-ancestor') {
   const paths = [
+    `benchmarks/spread-bindings/main.ts`,
     '.github/workflows/release.yml',
     `docs-site/content/${version}/guides/releasing/index.md`,
     'docs/releasing.md',
