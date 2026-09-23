@@ -1,0 +1,27 @@
+{
+  "$schema": "../recovery-manifest.schema.json",
+  "schemaVersion": 1,
+  "releaseVersion": "1.12.2",
+  "canonicalTag": "v1.12.2",
+  "canonicalTagCommit": "8e3a90041ace8d67ea933abb5fda33eae83c9679",
+  "canonicalTagTree": "3c655084e9b5e9192f70a8b55c42ad1125c6d5dd",
+  "failedTestedCommit": "d42ab8c05c6a10c15cd866dd30ae9e49826259bd",
+  "failedEvidenceCommit": "8e3a90041ace8d67ea933abb5fda33eae83c9679",
+  "failedRunUrl": "https://github.com/marcmalerei/gluon/actions/runs/35836323001",
+  "failureCategory": "release-performance-evidence-contract",
+  "recoveryTag": "v1.12.2-recovery.1",
+  "allowedCanonicalDeltaPaths": [
+    ".github/workflows/release.yml",
+    "docs-site/content/1.12.2/guides/releasing/index.md",
+    "docs/releasing.md",
+    "release/compatibility/1.12.2.json",
+    "release/evidence/1.12.2.json",
+    "release/recovery-manifest.schema.json",
+    "release/recovery/1.12.2.json",
+    "scripts/publish-release.mjs",
+    "scripts/validate-release-contract.mjs",
+    "scripts/validate-release-recovery.mjs",
+    "scripts/verify-registry-release.mjs",
+    "scripts/verify-release-hosting.mjs"
+  ]
+}

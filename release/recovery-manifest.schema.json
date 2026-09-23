@@ -48,6 +48,7 @@
         "squash-merge-tested-commit-not-ancestor",
         "missing-bootstrap-record",
         "release-tag-version-resolution-shell",
+        "release-performance-evidence-contract",
         "published-registry-type-verification-storybook"
       ]
     },
