@@ -1,0 +1,542 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-23T06:00:43.180Z",
+  "source": {
+    "commit": "665a09ade1a0c627c5eb301715b7b7c08bbe1a22",
+    "branch": "codex/492-app-benchmark-evidence",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "packages": {
+      "gluon": "1.12.1",
+      "lit": "3.3.3",
+      "vue": "3.5.39",
+      "playwright": "1.61.1",
+      "vite": "8.2.1"
+    }
+  },
+  "methodology": {
+    "workloads": {
+      "lifecycle": "create, connect, render, disconnect, and clean up 50 autonomous Custom Elements",
+      "property": "update one public string property across 50 mounted Custom Elements",
+      "state": "dispatch one internal button interaction across 50 mounted Custom Elements",
+      "list": "reverse and restore 20 keyed rows inside each of 50 mounted Custom Elements"
+    },
+    "componentCount": 50,
+    "itemsPerComponent": 20,
+    "samples": 10,
+    "warmupRounds": 4,
+    "minimumBatchDurationMs": 40,
+    "browserTimeoutMs": 300000,
+    "productionBuild": true,
+    "headless": true,
+    "scenarioIsolation": "fresh browser context per scenario",
+    "componentBoundary": "autonomous Custom Elements with open Shadow DOM for Gluon, Lit, and Vue",
+    "scenarioSurfaceIsolation": "property renders label only; state renders button only; list renders keyed rows only; lifecycle renders all three",
+    "frameworkOrder": "rotated for every warm-up and measured sample",
+    "unit": "milliseconds per 50 components; lower is faster"
+  },
+  "runs": [
+    {
+      "browser": "chromium",
+      "browserVersion": "149.0.7827.55",
+      "result": {
+        "schemaVersion": 1,
+        "componentCount": 50,
+        "itemsPerComponent": 20,
+        "samples": 10,
+        "warmupRounds": 4,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+        "scenarios": [
+          {
+            "scenario": "lifecycle",
+            "unit": "milliseconds per 50 components",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 64,
+                "samples": [
+                  1.042187500745058,
+                  0.90625,
+                  1.015625,
+                  1.0640624985098839,
+                  0.970312500372529,
+                  0.9875000007450581,
+                  1.001562500372529,
+                  0.912499999627471,
+                  0.931250000372529,
+                  0.9812500011175871
+                ],
+                "statistics": {
+                  "min": 0.90625,
+                  "max": 1.0640624985098839,
+                  "mean": 0.9812500001862645,
+                  "median": 0.9812500011175871,
+                  "p75": 1.015625,
+                  "p95": 1.0640624985098839,
+                  "p99": 1.0640624985098839
+                },
+                "relativeToGluonMedian": 1,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 1000,
+                  "firstLabel": "Component 0 A",
+                  "firstCount": "Count: 0",
+                  "firstItemId": "0",
+                  "firstItemLabel": "Item 0 A",
+                  "lastLabel": "Component 49 A",
+                  "lastCount": "Count: 0",
+                  "lastItemId": "0",
+                  "lastItemLabel": "Item 0 A"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 64,
+                "samples": [
+                  1.271874999627471,
+                  1.260937500745058,
+                  1.232812499627471,
+                  1.2640625014901161,
+                  1.3125,
+                  1.260937498882413,
+                  1.259375000372529,
+                  1.270312501117587,
+                  1.260937500745058,
+                  1.265625
+                ],
+                "statistics": {
+                  "min": 1.232812499627471,
+                  "max": 1.3125,
+                  "mean": 1.2659375002607702,
+                  "median": 1.260937500745058,
+                  "p75": 1.270312501117587,
+                  "p95": 1.3125,
+                  "p99": 1.3125
+                },
+                "relativeToGluonMedian": 1.2850318464294757,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 1000,
+                  "firstLabel": "Component 0 A",
+                  "firstCount": "Count: 0",
+                  "firstItemId": "0",
+                  "firstItemLabel": "Item 0 A",
+                  "lastLabel": "Component 49 A",
+                  "lastCount": "Count: 0",
+                  "lastItemId": "0",
+                  "lastItemLabel": "Item 0 A"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 64,
+                "samples": [
+                  1.029687499627471,
+                  1.028124999254942,
+                  0.9656250011175871,
+                  1.0390625,
+                  1.076562499627471,
+                  1.046875,
+                  1.0249999985098839,
+                  0.9968749992549419,
+                  1.03125,
+                  1.046875
+                ],
+                "statistics": {
+                  "min": 0.9656250011175871,
+                  "max": 1.076562499627471,
+                  "mean": 1.0285937497392297,
+                  "median": 1.029687499627471,
+                  "p75": 1.046875,
+                  "p95": 1.076562499627471,
+                  "p99": 1.076562499627471
+                },
+                "relativeToGluonMedian": 1.0493630557500295,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 1000,
+                  "firstLabel": "Component 0 A",
+                  "firstCount": "Count: 0",
+                  "firstItemId": "0",
+                  "firstItemLabel": "Item 0 A",
+                  "lastLabel": "Component 49 A",
+                  "lastCount": "Count: 0",
+                  "lastItemId": "0",
+                  "lastItemLabel": "Item 0 A"
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "property",
+            "unit": "milliseconds per 50 components",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 8000,
+                "samples": [
+                  0.009724999994039536,
+                  0.009587499991059303,
+                  0.011924999997019767,
+                  0.011912500008940697,
+                  0.0121875,
+                  0.012,
+                  0.011662499994039536,
+                  0.011887500002980233,
+                  0.0116875,
+                  0.011512500002980233
+                ],
+                "statistics": {
+                  "min": 0.009587499991059303,
+                  "max": 0.0121875,
+                  "mean": 0.011408749999105931,
+                  "median": 0.0116875,
+                  "p75": 0.011924999997019767,
+                  "p95": 0.0121875,
+                  "p99": 0.0121875
+                },
+                "relativeToGluonMedian": 1,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 0,
+                  "firstLabel": "Component 0 A",
+                  "firstCount": null,
+                  "firstItemId": null,
+                  "firstItemLabel": null,
+                  "lastLabel": "Component 49 A",
+                  "lastCount": null,
+                  "lastItemId": null,
+                  "lastItemLabel": null
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 8000,
+                "samples": [
+                  0.010212500005960464,
+                  0.010200000002980231,
+                  0.012925000011920929,
+                  0.012574999988079072,
+                  0.012649999991059303,
+                  0.0130625,
+                  0.0125625,
+                  0.012649999991059303,
+                  0.012849999994039536,
+                  0.012924999997019768
+                ],
+                "statistics": {
+                  "min": 0.010200000002980231,
+                  "max": 0.0130625,
+                  "mean": 0.01226124999821186,
+                  "median": 0.012649999991059303,
+                  "p75": 0.012924999997019768,
+                  "p95": 0.0130625,
+                  "p99": 0.0130625
+                },
+                "relativeToGluonMedian": 1.082352940411491,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 0,
+                  "firstLabel": "Component 0 A",
+                  "firstCount": null,
+                  "firstItemId": null,
+                  "firstItemLabel": null,
+                  "lastLabel": "Component 49 A",
+                  "lastCount": null,
+                  "lastItemId": null,
+                  "lastItemLabel": null
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 8000,
+                "samples": [
+                  0.06973749999701977,
+                  0.07076250000298023,
+                  0.07177499999105931,
+                  0.07171250000596047,
+                  0.07083750000596047,
+                  0.07116249999403954,
+                  0.07130000001192092,
+                  0.07125,
+                  0.0715625,
+                  0.071375
+                ],
+                "statistics": {
+                  "min": 0.06973749999701977,
+                  "max": 0.07177499999105931,
+                  "mean": 0.07114750000089407,
+                  "median": 0.07125,
+                  "p75": 0.0715625,
+                  "p95": 0.07177499999105931,
+                  "p99": 0.07177499999105931
+                },
+                "relativeToGluonMedian": 6.096256684491978,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 0,
+                  "firstLabel": "Component 0 A",
+                  "firstCount": null,
+                  "firstItemId": null,
+                  "firstItemLabel": null,
+                  "lastLabel": "Component 49 A",
+                  "lastCount": null,
+                  "lastItemId": null,
+                  "lastItemLabel": null
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "state",
+            "unit": "milliseconds per 50 components",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 1608,
+                "samples": [
+                  0.04539800995024876,
+                  0.04347014923890432,
+                  0.04682835817930117,
+                  0.04595771142795904,
+                  0.046019900497512436,
+                  0.0476990049306433,
+                  0.04552238808935555,
+                  0.04800995027841027,
+                  0.04595771142795904,
+                  0.046019900497512436
+                ],
+                "statistics": {
+                  "min": 0.04347014923890432,
+                  "max": 0.04800995027841027,
+                  "mean": 0.04608830845178062,
+                  "median": 0.04595771142795904,
+                  "p75": 0.04682835817930117,
+                  "p95": 0.04800995027841027,
+                  "p99": 0.04800995027841027
+                },
+                "relativeToGluonMedian": 1,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 0,
+                  "firstLabel": null,
+                  "firstCount": "Count: 25328",
+                  "firstItemId": null,
+                  "firstItemLabel": null,
+                  "lastLabel": null,
+                  "lastCount": "Count: 25328",
+                  "lastItemId": null,
+                  "lastItemLabel": null
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 1608,
+                "samples": [
+                  0.04546019901980215,
+                  0.04589552235840565,
+                  0.0488805970297524,
+                  0.04869402989522734,
+                  0.04863184075153882,
+                  0.048507462686567165,
+                  0.048942786025170666,
+                  0.049378109512044424,
+                  0.04788557213930348,
+                  0.04875621889064561
+                ],
+                "statistics": {
+                  "min": 0.04546019901980215,
+                  "max": 0.049378109512044424,
+                  "mean": 0.04810323383084577,
+                  "median": 0.04863184075153882,
+                  "p75": 0.0488805970297524,
+                  "p95": 0.049378109512044424,
+                  "p99": 0.049378109512044424
+                },
+                "relativeToGluonMedian": 1.0581867382097911,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 0,
+                  "firstLabel": null,
+                  "firstCount": "Count: 25328",
+                  "firstItemId": null,
+                  "firstItemLabel": null,
+                  "lastLabel": null,
+                  "lastCount": "Count: 25328",
+                  "lastItemId": null,
+                  "lastItemLabel": null
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 1608,
+                "samples": [
+                  0.061691542244076136,
+                  0.05995024881552701,
+                  0.06218905472636816,
+                  0.05895522385094296,
+                  0.06026119401502372,
+                  0.05920398012915654,
+                  0.060820895566869135,
+                  0.06038557207999538,
+                  0.06013681587591693,
+                  0.06069651742776235
+                ],
+                "statistics": {
+                  "min": 0.05895522385094296,
+                  "max": 0.06218905472636816,
+                  "mean": 0.06042910447316383,
+                  "median": 0.06026119401502372,
+                  "p75": 0.060820895566869135,
+                  "p95": 0.06218905472636816,
+                  "p99": 0.06218905472636816
+                },
+                "relativeToGluonMedian": 1.3112313938757827,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 0,
+                  "firstLabel": null,
+                  "firstCount": "Count: 25328",
+                  "firstItemId": null,
+                  "firstItemLabel": null,
+                  "lastLabel": null,
+                  "lastCount": "Count: 25328",
+                  "lastItemId": null,
+                  "lastItemLabel": null
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "list",
+            "unit": "milliseconds per 50 components",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 186,
+                "samples": [
+                  0.20913978481805454,
+                  0.20698924731182797,
+                  0.23010752662535636,
+                  0.24086021479739939,
+                  0.23978494636474118,
+                  0.23064516116214054,
+                  0.2403225802606152,
+                  0.23494623681550386,
+                  0.23548387135228804,
+                  0.23387096774193547
+                ],
+                "statistics": {
+                  "min": 0.20698924731182797,
+                  "max": 0.24086021479739939,
+                  "mean": 0.23021505372498624,
+                  "median": 0.23387096774193547,
+                  "p75": 0.23978494636474118,
+                  "p95": 0.24086021479739939,
+                  "p99": 0.24086021479739939
+                },
+                "relativeToGluonMedian": 1,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 1000,
+                  "firstLabel": null,
+                  "firstCount": null,
+                  "firstItemId": "19",
+                  "firstItemLabel": "Item 19 A",
+                  "lastLabel": null,
+                  "lastCount": null,
+                  "lastItemId": "19",
+                  "lastItemLabel": "Item 19 A"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 186,
+                "samples": [
+                  0.3473118280851713,
+                  0.33602150537634407,
+                  0.3698924728619155,
+                  0.374731183052063,
+                  0.3973118278288072,
+                  0.375268816947937,
+                  0.38387096761375344,
+                  0.3602150537634409,
+                  0.3806451610339585,
+                  0.3682795698924731
+                ],
+                "statistics": {
+                  "min": 0.33602150537634407,
+                  "max": 0.3973118278288072,
+                  "mean": 0.3693548386455864,
+                  "median": 0.3698924728619155,
+                  "p75": 0.3806451610339585,
+                  "p95": 0.3973118278288072,
+                  "p99": 0.3973118278288072
+                },
+                "relativeToGluonMedian": 1.5816091943061217,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 1000,
+                  "firstLabel": null,
+                  "firstCount": null,
+                  "firstItemId": "19",
+                  "firstItemLabel": "Item 19 A",
+                  "lastLabel": null,
+                  "lastCount": null,
+                  "lastItemId": "19",
+                  "lastItemLabel": "Item 19 A"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 186,
+                "samples": [
+                  0.3247311826675169,
+                  0.3247311826675169,
+                  0.34408602150537637,
+                  0.35698924718364594,
+                  0.40645161303140787,
+                  0.3693548389660415,
+                  0.35000000012818205,
+                  0.35107526856084026,
+                  0.36236559126966744,
+                  0.3543010751406352
+                ],
+                "statistics": {
+                  "min": 0.3247311826675169,
+                  "max": 0.40645161303140787,
+                  "mean": 0.354408602112083,
+                  "median": 0.35107526856084026,
+                  "p75": 0.36236559126966744,
+                  "p95": 0.40645161303140787,
+                  "p99": 0.40645161303140787
+                },
+                "relativeToGluonMedian": 1.5011494241911791,
+                "snapshot": {
+                  "componentCount": 50,
+                  "rowCount": 1000,
+                  "firstLabel": null,
+                  "firstCount": null,
+                  "firstItemId": "19",
+                  "firstItemLabel": "Item 19 A",
+                  "lastLabel": null,
+                  "lastCount": null,
+                  "lastItemId": "19",
+                  "lastItemLabel": "Item 19 A"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -177,6 +177,7 @@ npm run benchmark:rendering
 npm run benchmark:spread-bindings
 npm run benchmark:components
 npm run benchmark:application
+npm run benchmark:ssr
 npm run benchmark:runtime
 npm run profile:component-property-state
 ```
@@ -271,6 +272,27 @@ The raw JSON preserves every sample, source state, dependency/browser/runtime
 versions, hardware, and final correctness snapshot. Results are specific to
 the recorded workload and environment. They must not be summarized as a
 universal Gluon/Lit/Vue ranking.
+
+## SSR comparison workload
+
+`npm run benchmark:ssr` compares complete Node string rendering for Gluon,
+Lit with `@lit-labs/ssr`, and Vue with `@vue/server-renderer` over the same
+120-row catalog tree. It rotates framework order, validates row count and
+boundaries, and retains raw samples, markup bytes, versions, hardware, and
+source state.
+
+```bash
+npm run benchmark:ssr -- \
+  --samples=20 \
+  --warmup=5 \
+  --output=.tmp/ssr-comparison.json
+```
+
+This is a complete string-render lane. It does not measure streaming
+throughput, concurrent request capacity, memory/GC behavior, or browser
+hydration; those require separate workload contracts. Lit hydration support is
+available through `@lit-labs/ssr-client`, but it is not silently folded into
+this Node-only comparison.
 
 ## Template workloads
 

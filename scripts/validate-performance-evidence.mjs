@@ -41,6 +41,16 @@ for (const fixture of ['gluon', 'lit', 'vue', 'react']) {
   }
 }
 
+const ssr = await readJson('ssr-comparison.json');
+validateSource(ssr, 'SSR comparison');
+if (ssr.benchmark?.schemaVersion !== 1 || ssr.benchmark.results?.length !== 3
+  || ssr.benchmark.results.some((result) => !['gluon', 'lit', 'vue'].includes(result.framework)
+    || !Array.isArray(result.samples) || result.samples.length === 0
+    || !result.snapshot && !ssr.benchmark.correctness?.[result.framework])) {
+  throw new Error('SSR comparison evidence must retain passing Gluon, Lit, and Vue string-render results.');
+}
+await requireText('ssr-comparison.md');
+
 const spreadBindings = await readJson('spread-bindings-chromium.json');
 validateSource(spreadBindings, 'Chromium spread bindings');
 if (spreadBindings.environment?.browser?.name !== 'chromium'
@@ -77,7 +87,7 @@ if (shop.passed !== true || shop.failures?.length !== 0) {
 await requireText('shop-flow.md');
 
 console.log(JSON.stringify(summary, null, 2));
-console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, loader, Storybook, and shop gates`);
+console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, SSR, loader, Storybook, and shop gates`);
 
 function option(name) {
   const argument = process.argv.find((value) => value.startsWith(`${name}=`));
