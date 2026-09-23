@@ -1277,6 +1277,11 @@ class NodePart implements Part {
 
   private cacheKeyedChild(child: KeyedChild): void {
     if (isLazyPrimitiveKeyedChild(child)) return;
+    if (child.part.hasStyleDependencies()) {
+      if (child.binding) disconnectBinding(child.binding);
+      else child.part.disconnect();
+      return;
+    }
     if (child.binding) suspendBindings([child.binding]);
     else child.part.suspend();
     const cache = this.keyedChildCache ??= new Map();
@@ -1291,6 +1296,15 @@ class NodePart implements Part {
         else oldest.part.disconnect();
       }
     }
+  }
+
+  private hasStyleDependencies(): boolean {
+    if (this.styleDependencies.length > 0) return true;
+    if (this.child?.bindings.some((binding) => (
+      binding.part instanceof NodePart && binding.part.hasStyleDependencies()
+    ))) return true;
+    if (this.arrayChildren.some((child) => child?.part.hasStyleDependencies())) return true;
+    return this.keyedChildren.some((child) => child.part?.hasStyleDependencies() ?? false);
   }
 
   clearStyleClaim(): void {
