@@ -6,7 +6,7 @@ Source: `877fc02807464ff3059b5569a1ca15721d00e018` on `codex/492-app-benchmark-e
 
 Environment: Apple M4, 10 logical CPUs, 16.0 GiB memory, darwin 25.3.0, Node v24.18.0
 
-Packages: Gluon 1.12.1, Lit 3.3.3 with @lit-labs/ssr 4.1.0, Vue 3.5.39 with @vue/server-renderer 3.5.39
+Packages: Gluon 1.12.2, Lit 3.3.3 with @lit-labs/ssr 4.1.0, Vue 3.5.39 with @vue/server-renderer 3.5.39
 
 Method: 20 interleaved samples after 5 warm-ups, rotating framework order. The workload renders 120 keyed product rows in one catalog main/section/list tree. Lower milliseconds per complete string render is faster.
 

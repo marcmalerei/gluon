@@ -13,11 +13,11 @@ renderer do not install or bundle UI code.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/quarks at a glance
 
-**Runtime:** browser · **Release:** 1.12.1
+**Runtime:** browser · **Release:** 1.12.2
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/quarks/) · [npm](https://www.npmjs.com/package/@gluonjs/quarks) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/quarks/README.md)
 
-**Public API:** [`@gluonjs/quarks`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/quarks/src/)
+**Public API:** [`@gluonjs/quarks`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/quarks/src/)
 
 ### Install
 

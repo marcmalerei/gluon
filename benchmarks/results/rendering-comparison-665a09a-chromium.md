@@ -6,7 +6,7 @@ Source: `665a09ade1a0c627c5eb301715b7b7c08bbe1a22` on `codex/492-app-benchmark-e
 
 Environment: Apple M4, 10 logical CPUs, 16.0 GiB memory, darwin 25.3.0
 
-Packages: Gluon 1.12.1, Lit 3.3.3 / lit-html 3.3.3, Vue 3.5.39, Playwright 1.61.1, Vite 8.2.1
+Packages: Gluon 1.12.2, Lit 3.3.3 / lit-html 3.3.3, Vue 3.5.39, Playwright 1.61.1, Vite 8.2.1
 
 Method: production build, batches calibrated to at least 8 ms for the fastest renderer, 4 warm-up rounds, and 10 interleaved samples per renderer and scenario. The text scenario updates one binding; create, update, and reverse operate on 1,000 keyed rows. Lower latency is faster. Ratios are renderer median ÷ Gluon median; values above 1 mean Gluon was faster in that browser/scenario.
 

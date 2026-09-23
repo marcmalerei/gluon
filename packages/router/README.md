@@ -10,18 +10,18 @@ The official Gluon router provides deterministic route matching, browser/hash/
 memory histories, typed named routes, guards, failures, lazy route components,
 scroll restoration, and Gluon application bindings.
 
-The package ships as part of the current `1.12.1` release line. Core and
+The package ships as part of the current `1.12.2` release line. Core and
 Reactivity are peers so an application has one shared application context and
 reactive identity.
 
 <!-- gluon-package-overview:start -->
 ## @gluonjs/router at a glance
 
-**Runtime:** browser · **Release:** 1.12.1
+**Runtime:** browser · **Release:** 1.12.2
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/router/) · [npm](https://www.npmjs.com/package/@gluonjs/router) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/router/README.md)
 
-**Public API:** [`@gluonjs/router`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/router/src/) · [`@gluonjs/router/memory`](https://marcmalerei.github.io/gluon/1.12.1/api/generated/packages/router/src/memory/)
+**Public API:** [`@gluonjs/router`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/router/src/) · [`@gluonjs/router/memory`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/router/src/memory/)
 
 ### Install
 
