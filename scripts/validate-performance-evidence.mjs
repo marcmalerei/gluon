@@ -16,6 +16,9 @@ for (const browser of browsers) {
   const application = await readJson(`application-${browser}.json`);
   validateBrowserRuns(application, 'runs', browser, 'application');
   validateApplicationRun(application, browser);
+  const hydration = await readJson(`hydration-${browser}.json`);
+  validateBrowserRuns(hydration, 'runs', browser, 'hydration');
+  validateHydrationRun(hydration, browser);
   const runtime = await readJson(`runtime-scorecard-${browser}.json`);
   validateBrowserRuns(runtime, 'browsers', browser, 'runtime scorecard');
   if (runtime.passed !== true || runtime.failures?.length !== 0) {
@@ -24,11 +27,13 @@ for (const browser of browsers) {
   await requireText(`rendering-${browser}.md`);
   await requireText(`components-${browser}.md`);
   await requireText(`application-${browser}.md`);
+  await requireText(`hydration-${browser}.md`);
   await requireText(`runtime-scorecard-${browser}.md`);
   summary.browsers[browser] = {
     rendering: rendering.runs[0].browserVersion,
     components: components.runs[0].browserVersion,
     application: application.runs[0].browserVersion,
+    hydration: hydration.runs[0].browserVersion,
     runtime: runtime.browsers[0].browserVersion,
   };
 }
@@ -87,7 +92,7 @@ if (shop.passed !== true || shop.failures?.length !== 0) {
 await requireText('shop-flow.md');
 
 console.log(JSON.stringify(summary, null, 2));
-console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, SSR, loader, Storybook, and shop gates`);
+console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, SSR, hydration, loader, Storybook, and shop gates`);
 
 function option(name) {
   const argument = process.argv.find((value) => value.startsWith(`${name}=`));
@@ -146,6 +151,27 @@ function validateApplicationRun(evidence, browser) {
       if (!Array.isArray(result.samples) || result.samples.length === 0 || !result.snapshot) {
         throw new Error(`${browser} application ${scenario.scenario}/${result.framework} is missing samples or correctness.`);
       }
+    }
+  }
+}
+
+function validateHydrationRun(evidence, browser) {
+  const run = evidence.runs[0];
+  if (run.browserVersion === undefined || run.result?.schemaVersion !== 1 || run.result.sampleCount <= 0) {
+    throw new Error(`${browser} hydration evidence has an invalid result contract.`);
+  }
+  const results = run.result.results;
+  if (!Array.isArray(results) || results.length !== 3) {
+    throw new Error(`${browser} hydration evidence must contain Gluon, Lit, and Vue.`);
+  }
+  for (const result of results) {
+    if (!['gluon', 'lit', 'vue'].includes(result.framework)
+      || !Array.isArray(result.samples) || result.samples.length !== run.result.sampleCount
+      || result.samples.some((sample) => sample.retainedMain !== true
+        || sample.interactionReady !== true
+        || sample.cleanupEmpty !== true
+        || typeof sample.markupBytes !== 'number')) {
+      throw new Error(`${browser} hydration ${result.framework ?? 'unknown'} evidence is missing samples or correctness.`);
     }
   }
 }

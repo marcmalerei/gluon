@@ -7,6 +7,7 @@ const configs = [
   'benchmarks/spread-bindings/vite.config.ts',
   'benchmarks/components/vite.config.ts',
   'benchmarks/application/vite.config.ts',
+  'benchmarks/hydration-comparison/vite.config.ts',
   'benchmarks/allocations/vite.config.ts',
 ];
 
