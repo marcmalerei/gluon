@@ -13,6 +13,9 @@ for (const browser of browsers) {
   validateBrowserRuns(rendering, 'runs', browser, 'rendering');
   const components = await readJson(`components-${browser}.json`);
   validateBrowserRuns(components, 'runs', browser, 'components');
+  const application = await readJson(`application-${browser}.json`);
+  validateBrowserRuns(application, 'runs', browser, 'application');
+  validateApplicationRun(application, browser);
   const runtime = await readJson(`runtime-scorecard-${browser}.json`);
   validateBrowserRuns(runtime, 'browsers', browser, 'runtime scorecard');
   if (runtime.passed !== true || runtime.failures?.length !== 0) {
@@ -20,10 +23,12 @@ for (const browser of browsers) {
   }
   await requireText(`rendering-${browser}.md`);
   await requireText(`components-${browser}.md`);
+  await requireText(`application-${browser}.md`);
   await requireText(`runtime-scorecard-${browser}.md`);
   summary.browsers[browser] = {
     rendering: rendering.runs[0].browserVersion,
     components: components.runs[0].browserVersion,
+    application: application.runs[0].browserVersion,
     runtime: runtime.browsers[0].browserVersion,
   };
 }
@@ -110,6 +115,28 @@ function validateBrowserRuns(evidence, key, browser, label) {
   const runs = evidence[key];
   if (!Array.isArray(runs) || runs.length !== 1 || runs[0]?.browser !== browser) {
     throw new Error(`${browser} ${label} evidence must contain exactly its own engine run.`);
+  }
+}
+
+function validateApplicationRun(evidence, browser) {
+  const run = evidence.runs[0];
+  if (run.browserVersion === undefined || run.result?.schemaVersion !== 1 || run.result.productCount !== 120) {
+    throw new Error(`${browser} application evidence has an invalid result contract.`);
+  }
+  const expected = ['mount', 'filter', 'sort', 'configure', 'bag', 'teardown'];
+  const scenarios = run.result.scenarios;
+  if (!Array.isArray(scenarios) || scenarios.length !== expected.length || scenarios.some((scenario, index) => scenario.scenario !== expected[index])) {
+    throw new Error(`${browser} application evidence must retain the six ordered scenarios.`);
+  }
+  for (const scenario of scenarios) {
+    if (!Array.isArray(scenario.results) || scenario.results.length !== 3) {
+      throw new Error(`${browser} application ${scenario.scenario} evidence must contain Gluon, Lit, and Vue.`);
+    }
+    for (const result of scenario.results) {
+      if (!Array.isArray(result.samples) || result.samples.length === 0 || !result.snapshot) {
+        throw new Error(`${browser} application ${scenario.scenario}/${result.framework} is missing samples or correctness.`);
+      }
+    }
   }
 }
 

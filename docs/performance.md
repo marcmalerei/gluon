@@ -176,6 +176,7 @@ npx playwright install chromium firefox webkit
 npm run benchmark:rendering
 npm run benchmark:spread-bindings
 npm run benchmark:components
+npm run benchmark:application
 npm run benchmark:runtime
 npm run profile:component-property-state
 ```
@@ -234,11 +235,42 @@ For an interactive demonstration in a browser:
 ```bash
 npm run dev:benchmark
 npm run dev:benchmark:components
+npm run dev:benchmark:application
 ```
 
 The template development server listens on `0.0.0.0:4174`; the component page
 uses port 4175. Interactive results are useful for exploration but are not
 retained evidence; use the production CLI commands for reviewable results.
+
+## Application-shaped workload
+
+`npm run benchmark:application` measures the same catalog flow in
+Gluon, Lit, and Vue through their public client APIs. The fixture contains 120
+keyed product records, primary navigation landmarks, filtering, sorting,
+conditional product detail, configuration events, bag state, and teardown.
+Every scenario validates the rendered product boundaries and state before its
+sample is retained. Update scenarios measure a three-action batch and report
+milliseconds per action; mount and teardown are measured as one operation.
+
+The app-shaped fixture is deliberately smaller than GLUON GOODS and is not a
+claim that the frameworks are interchangeable applications. It complements
+the shop's Gluon-only customer-flow budget with an equivalent three-framework
+surface. Gluon and Vue render into light DOM; Lit uses its public open Shadow
+DOM root. The semantic output and action sequence remain equivalent, while
+Shadow DOM behavior is also covered by the component matrix above.
+
+```bash
+npm run benchmark:application -- \
+  --browsers=chromium,firefox \
+  --samples=12 \
+  --warmup=4 \
+  --output=.tmp/application-benchmark.json
+```
+
+The raw JSON preserves every sample, source state, dependency/browser/runtime
+versions, hardware, and final correctness snapshot. Results are specific to
+the recorded workload and environment. They must not be summarized as a
+universal Gluon/Lit/Vue ranking.
 
 ## Template workloads
 

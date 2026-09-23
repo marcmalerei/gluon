@@ -104,6 +104,8 @@ jobs:
         timeout-minutes: 10
       - run: npm run benchmark:components -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/components-${{ matrix.browser }}.json
         timeout-minutes: 10
+      - run: npm run benchmark:application -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/application-${{ matrix.browser }}.json
+        timeout-minutes: 12
       - run: npm run benchmark:runtime -- --browsers=${{ matrix.browser }} --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard-${{ matrix.browser }}.json
         timeout-minutes: 12
       - if: ${{ matrix.browser == 'chromium' }}
