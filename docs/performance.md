@@ -328,6 +328,41 @@ versions, hardware, and final correctness snapshot. Results are specific to
 the recorded workload and environment. They must not be summarized as a
 universal Gluon/Lit/Vue ranking.
 
+### App-shaped update follow-up (#496)
+
+The application harness uses explicit attribute and event bindings for all
+three frameworks. It does not use an attribute spread in the Gluon path; the
+separate spread-binding workload remains isolated in
+`benchmarks/spread-bindings`.
+
+CPU profiling of the filter scenario showed that the dominant Gluon cost was
+recreating and garbage-collecting keyed product rows when a filter removed and
+then reintroduced them. Gluon now keeps a bounded, per-`NodePart` cache of up
+to 64 recently removed keyed children. Cached children are suspended so their
+listeners and directives are inactive, reused by key when they return, and
+fully disconnected when evicted or when the parent is torn down. This is an
+internal optimization and does not change the public API.
+
+The diagnostic profile can be reproduced with:
+
+```bash
+npm run profile:application-update -- \
+  --scenario=filter \
+  --warmup=200 \
+  --iterations=1000 \
+  --output=.tmp/application-update-profile.json
+```
+
+In the paired Chromium run recorded in
+`benchmarks/results/application-comparison-496-baseline.json` and
+`benchmarks/results/application-comparison-496-candidate.json`, Gluon's
+filter median decreased from `0.2333` to `0.1333 ms/action` (about 43%),
+with p95 decreasing from `0.3000` to `0.1667 ms/action`. That puts this
+workload at the same median as Lit and Vue, with a lower p95 than both in the
+candidate run. Mount and teardown
+medians did not materially change, so this result is evidence for the keyed
+update path only, not a universal framework ranking.
+
 ## SSR comparison workload
 
 `npm run benchmark:ssr` compares complete Node string rendering for Gluon,

@@ -493,6 +493,7 @@ interface LazyPrimitivePlan {
 
 const emptyPartChildren: Array<PartChild | undefined> = [];
 const emptyKeyedChildren: KeyedChild[] = [];
+const MAX_KEYED_CHILD_CACHE_SIZE = 64;
 
 class RenderStyleTracker {
   readonly target: StyleTarget;
@@ -597,6 +598,7 @@ class NodePart implements Part {
   private child?: ChildInstance;
   private arrayChildren: Array<PartChild | undefined> = emptyPartChildren;
   private keyedChildren: KeyedChild[] = emptyKeyedChildren;
+  private keyedChildCache?: Map<Key, PartKeyedChild>;
   private detachedKeyMarker?: Comment;
   private unsafeMarkup?: string;
   private styleDependencies: readonly ComponentStyleDependency[] = emptyComponentStyles;
@@ -865,7 +867,7 @@ class NodePart implements Part {
 
     for (let index = 0; index < this.arrayChildren.length; index += 1) {
       const previous = this.arrayChildren[index];
-      if (previous && previous !== nextChildren[index]) disconnectBindings([previous.binding]);
+      if (previous && previous !== nextChildren[index]) disconnectBinding(previous.binding);
     }
 
     this.arrayChildren = nextChildren;
@@ -991,8 +993,7 @@ class NodePart implements Part {
     for (let index = start; index < nextEnd; index += 1) nextMiddleKeys.add(keys[index]!);
     for (const [key, { child: removed }] of previousByKey) {
       if (nextMiddleKeys.has(key)) continue;
-      if (removed.binding) disconnectBindings([removed.binding]);
-      else if (removed.part) removed.part.disconnect();
+      this.cacheKeyedChild(removed);
       previousByKey.delete(key);
     }
 
@@ -1131,6 +1132,12 @@ class NodePart implements Part {
     value: TemplateValue,
     lazyPlan?: LazyPrimitivePlan,
   ): KeyedChild {
+    const cached = this.keyedChildCache?.get(key);
+    if (cached) {
+      this.keyedChildCache!.delete(key);
+      this.updateKeyedChild(cached, value, true);
+      return cached;
+    }
     if (
       lazyPlan
       && value instanceof TemplateResult
@@ -1256,12 +1263,48 @@ class NodePart implements Part {
   }
 
   private disconnectKeyedChildren(): void {
-    if (this.keyedChildren.length === 0) return;
     for (const child of this.keyedChildren) {
       if (child.binding) disconnectBindings([child.binding]);
       else if (child.part) child.part.disconnect();
     }
     this.keyedChildren = emptyKeyedChildren;
+    for (const child of this.keyedChildCache?.values() ?? []) {
+      if (child.binding) disconnectBinding(child.binding);
+      else child.part.disconnect();
+    }
+    this.keyedChildCache?.clear();
+  }
+
+  private cacheKeyedChild(child: KeyedChild): void {
+    if (isLazyPrimitiveKeyedChild(child)) return;
+    if (child.part.hasStyleDependencies()) {
+      if (child.binding) disconnectBinding(child.binding);
+      else child.part.disconnect();
+      return;
+    }
+    if (child.binding) suspendBindings([child.binding]);
+    else child.part.suspend();
+    const cache = this.keyedChildCache ??= new Map();
+    cache.set(child.key, child);
+    while (cache.size > MAX_KEYED_CHILD_CACHE_SIZE) {
+      const oldestKey = cache.keys().next().value;
+      if (oldestKey === undefined) break;
+      const oldest = cache.get(oldestKey);
+      cache.delete(oldestKey);
+      if (oldest) {
+        if (oldest.binding) disconnectBinding(oldest.binding);
+        else oldest.part.disconnect();
+      }
+    }
+  }
+
+  private hasStyleDependencies(): boolean {
+    if (this.styleDependencies.length > 0) return true;
+    if (this.child?.bindings.some((binding) => (
+      binding.part instanceof NodePart && binding.part.hasStyleDependencies()
+    ))) return true;
+    if (this.arrayChildren.some((child) => child?.part.hasStyleDependencies())) return true;
+    return this.keyedChildren.some((child) => child.part?.hasStyleDependencies() ?? false);
   }
 
   clearStyleClaim(): void {
@@ -2851,20 +2894,22 @@ function applyBinding(binding: Binding, value: TemplateValue, assumeInPlace = fa
 }
 
 function disconnectBindings(bindings: readonly Binding[]): void {
-  runBindingCleanup(bindings, (binding) => {
-    let error: unknown;
-    try {
-      deactivateDirective(binding);
-    } catch (cause) {
-      error = cause;
-    }
-    try {
-      binding.part.disconnect();
-    } catch (cause) {
-      error ??= cause;
-    }
-    if (error) throw error;
-  });
+  runBindingCleanup(bindings, disconnectBinding);
+}
+
+function disconnectBinding(binding: Binding): void {
+  let error: unknown;
+  try {
+    deactivateDirective(binding);
+  } catch (cause) {
+    error = cause;
+  }
+  try {
+    binding.part.disconnect();
+  } catch (cause) {
+    error ??= cause;
+  }
+  if (error) throw error;
 }
 
 function suspendBindings(bindings: readonly Binding[]): void {
