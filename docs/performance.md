@@ -404,6 +404,37 @@ hydration; those require separate workload contracts. Lit hydration support is
 available through `@lit-labs/ssr-client`, but it is not silently folded into
 this Node-only comparison.
 
+### Synchronous complete-string fastpath
+
+Issue [#497](https://github.com/marcmalerei/gluon/issues/497) adds an internal
+synchronous serializer for complete trees that contain no unresolved async
+boundary. `renderToString()` uses it for ordinary primitives, templates,
+arrays, repeats, server elements, attributes, and trusted/unsafe markup. If a
+Suspense boundary or another async value is encountered, it discards the
+partial local context and uses the existing async-generator serializer. The
+public `@gluonjs/ssr` exports, hydration markers, escaping, streaming path, and
+request semantics remain unchanged.
+
+The clean before/after runs used Apple M4, Node 24.18.0, the same 120-row
+catalog workload, 8 warm-ups, 32 rotated samples, and identical package
+versions. Lower is faster:
+
+| Framework/lane | Baseline median | Candidate median | Change |
+| --- | ---: | ---: | ---: |
+| Gluon complete string | 0.8491 ms | 0.1250 ms | **−85.3%** |
+| Gluon p95 | 1.1794 ms | 0.1516 ms | **−87.1%** |
+| Gluon markup | 23,615 B | 23,615 B | unchanged |
+
+In the same candidate run Lit measured 0.1200 ms and Vue 0.0703 ms. That means
+the optimization closes almost all of the previous Gluon/Lit gap for this
+workload, but does not justify claiming that Gluon is universally faster than
+Vue or Lit. Every raw sample and correctness snapshot is retained in the
+paired
+[`ssr-comparison-497-baseline-d42f024.json`](../benchmarks/results/ssr-comparison-497-baseline-d42f024.json)
+and
+[`ssr-comparison-497-candidate-6015e4f.json`](../benchmarks/results/ssr-comparison-497-candidate-6015e4f.json)
+files.
+
 ## Cross-framework hydration workload
 
 `npm run benchmark:hydration` takes equivalent 120-row server-rendered catalog
