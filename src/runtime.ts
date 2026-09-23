@@ -2062,17 +2062,39 @@ export function render(
   if (!isTemplateResult(result)) {
     throw new TypeError('render() expects a TemplateResult created by html or svg.');
   }
-  const styleDependencies = collectComponentStyleDependencies(result);
 
+  // Keep the common one-string update out of the recursive style walk. The
+  // template identity and the primitive value prove that this result cannot
+  // introduce nested component styles, while the remaining checks preserve
+  // the same DOM-ownership and renderer-state contract as the general path.
   let current = getRootInstance(container);
-  const currentTemplateMatches = current?.template.strings === result.strings
-    && current.template.type === result.type;
-  const currentNodesInPlace = Boolean(current && currentTemplateMatches
-    && rootNodesAreInPlace(container, current.nodes));
   const fastStringBinding = current?.fastStringBinding;
   const fastStringValue = fastStringBinding && fastStringBinding.index < result.values.length
     ? result.values[fastStringBinding.index]
     : undefined;
+  if (
+    current
+    && current.template.strings === result.strings
+    && current.template.type === result.type
+    && current.rootStyleDependenciesEmpty
+    && current.styles.isActiveAndEmpty
+    && result.styleDependencies.length === 0
+    && fastStringBinding
+    && typeof fastStringValue === 'string'
+    && !fastStringBinding.directive
+    && rootNodesAreInPlace(container, current.nodes)
+  ) {
+    fastStringBinding.part.setStableStringValue(fastStringValue);
+    current.suspended = false;
+    return;
+  }
+
+  const styleDependencies = collectComponentStyleDependencies(result);
+
+  const currentTemplateMatches = current?.template.strings === result.strings
+    && current.template.type === result.type;
+  const currentNodesInPlace = Boolean(current && currentTemplateMatches
+    && rootNodesAreInPlace(container, current.nodes));
   if (
     current
     && currentNodesInPlace
