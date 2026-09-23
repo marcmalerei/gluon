@@ -1,13 +1,17 @@
 # Release readiness
 
-The `1.12.2` documentation describes the release candidate and its protected
+The `1.12.2` documentation describes the shipped release and its protected
 recovery path. The first protected workflow
 [35836323001](https://github.com/marcmalerei/gluon/actions/runs/35836323001)
 stopped before publication because its release performance lane omitted the
 application evidence required by the shared validator. The immutable
-`v1.12.2` tag is not moved; the supported baseline remains `v1.12.1` until
-`v1.12.2-recovery.1` completes publication and registry verification. Issue
-[#509](https://github.com/marcmalerei/gluon/issues/509) tracks the workflow fix.
+`v1.12.2` tag was not moved; protected execution tag
+`v1.12.2-recovery.1` completed the recovery publication. Run
+[35840742192](https://github.com/marcmalerei/gluon/actions/runs/35840742192)
+(attempt 2) verified all 21 packages at `latest` `1.12.2`, and the immutable
+[GitHub release](https://github.com/marcmalerei/gluon/releases/tag/v1.12.2)
+contains 130 reviewed assets. Issue [#509](https://github.com/marcmalerei/gluon/issues/509)
+tracks the workflow fix.
 The spread-binding evidence lane now permits up to 1,000,000 calibrated
 operations so fast CI hosts produce evidence instead of failing at the former
 10,000-operation ceiling.
@@ -21,9 +25,11 @@ stable describes shipped public contracts, experimental describes explicitly
 labeled opt-in surfaces, and unsupported marks boundaries the contract refuses.
 
 The protected `v1.12.2` tag resolves to
-`8e3a90041ace8d67ea933abb5fda33eae83c9679` and remains immutable while the
-recovery path is prepared. No npm `1.12.2` publication or immutable GitHub
-release is claimed yet.
+`8e3a90041ace8d67ea933abb5fda33eae83c9679` and remains immutable. The
+recovery execution tag resolves to
+`e7bc92307c28cc5e433cb46c033f82246ea919ac`. The `1.12.2` package train is
+published under `latest`; the retained performance claims remain fixture- and
+host-specific and do not claim general superiority over Lit.
 
 Gluon's release group contains 21 lockstep packages. The repository validates
 their common version, exact official dependencies, package contents,
