@@ -13,6 +13,7 @@ describe('spread-binding benchmark', () => {
       minimumBatchDurationMs: 1,
     });
 
+    expect(result.schemaVersion).toBe(2);
     expect(result.cardCount).toBe(80);
     expect(result.scenarios.map(({ scenario }) => scenario)).toEqual(spreadBenchmarkScenarios);
     expect(Object.values(result.invariants).every(Boolean)).toBe(true);
@@ -22,6 +23,8 @@ describe('spread-binding benchmark', () => {
         expect(entry.batchSize).toBeGreaterThan(0);
         expect(entry.samples).toHaveLength(2);
         expect(entry.samples.every((sample) => Number.isFinite(sample) && sample >= 0)).toBe(true);
+        expect(Number.isFinite(entry.relativeToGluonSpreadMedian)).toBe(true);
+        expect(Number.isFinite(entry.relativeToGluonExplicitMedian)).toBe(true);
       }
     }
   }, 30_000);
