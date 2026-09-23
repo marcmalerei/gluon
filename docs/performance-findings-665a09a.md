@@ -79,11 +79,25 @@ The raw report is [`bundle-matrix-665a09a.json`](../benchmarks/results/bundle-ma
 
 ## SSR and hydration boundary
 
-The current Gluon runtime scorecard passed its own Node SSR and browser
+The first equivalent SSR string-render lane is now available. It renders the
+same 120 keyed product rows through Gluon, Lit with `@lit-labs/ssr`, and Vue
+with `@vue/server-renderer`, using 20 interleaved samples after five warm-ups
+on the same Apple M4/Node 24.18.0 environment:
+
+| Scenario | Gluon median | Lit median | Vue median | Finding |
+| --- | ---: | ---: | ---: | --- |
+| complete Node string render | 0.8264 ms | 0.1252 ms | 0.0727 ms | Gluon is slower in this workload |
+
+The rendered output also differs in size: Gluon 23,615 bytes, Lit 22,886
+bytes, and Vue 8,051 bytes. This is evidence for an optimization target, not
+proof of a universal SSR ranking. The raw samples and correctness snapshots
+are in [`ssr-comparison-877fc02.md`](../benchmarks/results/ssr-comparison-877fc02.md).
+
+The Gluon-only runtime scorecard still passes its Node SSR and browser
 hydration correctness/latency criteria, including a 0.625 ms median Node SSR
-lane and 0.200 ms Chromium hydration median. It does not yet compare the same
-SSR/hydration workload against Lit and Vue. No cross-framework SSR advantage is
-claimed here.
+lane and 0.200 ms Chromium hydration median. Cross-framework hydration,
+streaming throughput, concurrent request capacity, and memory/GC behavior
+remain unmeasured and are not claimed here.
 
 ## Interpretation
 
@@ -94,6 +108,19 @@ The evidence supports two simultaneous conclusions:
 2. Gluon still has measurable adoption costs in minimal payload and in the
    app-shaped mount/filter/teardown path.
 
-The improvement issues derived from this report must preserve public exports,
-DOM/event/hydration contracts, and the existing correctness gates. Any change
-should be validated against this benchmark set and the full repository suite.
+The improvement issues derived from this report are:
+
+- [#493](https://github.com/marcmalerei/gluon/issues/493): reduce the focused
+  primitive text-update gap without changing public APIs.
+- [#494](https://github.com/marcmalerei/gluon/issues/494): reduce minimal Gluon
+  client payload without changing public exports.
+- [#495](https://github.com/marcmalerei/gluon/issues/495): optimize conditional
+  interaction and teardown overhead.
+- [#496](https://github.com/marcmalerei/gluon/issues/496): optimize app-shaped
+  catalog mount and filter updates.
+- [#497](https://github.com/marcmalerei/gluon/issues/497): optimize SSR string
+  rendering for large keyed trees without changing public APIs.
+
+Every issue requires preserving public exports, DOM/event/hydration contracts,
+and the existing correctness gates. Any change should be validated against
+this benchmark set and the full repository suite.

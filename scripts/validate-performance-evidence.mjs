@@ -46,7 +46,7 @@ validateSource(ssr, 'SSR comparison');
 if (ssr.benchmark?.schemaVersion !== 1 || ssr.benchmark.results?.length !== 3
   || ssr.benchmark.results.some((result) => !['gluon', 'lit', 'vue'].includes(result.framework)
     || !Array.isArray(result.samples) || result.samples.length === 0
-    || !result.snapshot && !ssr.benchmark.correctness?.[result.framework])) {
+    || !ssr.benchmark.correctness?.[result.framework])) {
   throw new Error('SSR comparison evidence must retain passing Gluon, Lit, and Vue string-render results.');
 }
 await requireText('ssr-comparison.md');
