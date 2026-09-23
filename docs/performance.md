@@ -421,18 +421,18 @@ versions. Lower is faster:
 
 | Framework/lane | Baseline median | Candidate median | Change |
 | --- | ---: | ---: | ---: |
-| Gluon complete string | 0.8491 ms | 0.1250 ms | **−85.3%** |
-| Gluon p95 | 1.1794 ms | 0.1516 ms | **−87.1%** |
+| Gluon complete string | 0.8491 ms | 0.1177 ms | **−86.1%** |
+| Gluon p95 | 1.1794 ms | 0.1442 ms | **−87.8%** |
 | Gluon markup | 23,615 B | 23,615 B | unchanged |
 
-In the same candidate run Lit measured 0.1200 ms and Vue 0.0703 ms. That means
+In the same candidate run Lit measured 0.1175 ms and Vue 0.0625 ms. That means
 the optimization closes almost all of the previous Gluon/Lit gap for this
 workload, but does not justify claiming that Gluon is universally faster than
 Vue or Lit. Every raw sample and correctness snapshot is retained in the
 paired
 [`ssr-comparison-497-baseline-d42f024.json`](../benchmarks/results/ssr-comparison-497-baseline-d42f024.json)
 and
-[`ssr-comparison-497-candidate-6015e4f.json`](../benchmarks/results/ssr-comparison-497-candidate-6015e4f.json)
+[`ssr-comparison-497-candidate-d9bd60a.json`](../benchmarks/results/ssr-comparison-497-candidate-d9bd60a.json)
 files.
 
 ## Cross-framework hydration workload
