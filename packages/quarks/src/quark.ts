@@ -262,6 +262,12 @@ const voidTags = new Set<string>([
   'source', 'track', 'wbr',
 ]);
 const quarkCache = new Map<string, QuarkFactory<string, Element>>();
+const maxCompiledQuarkShapes = 64;
+
+interface CompiledQuarkShape {
+  readonly strings: TemplateStringsArray;
+  readonly bindingKeys: readonly string[];
+}
 
 type ElementFor<TagName extends string> = TagName extends keyof HTMLElementTagNameMap
   ? HTMLElementTagNameMap[TagName]
@@ -279,7 +285,8 @@ export function quark<TagName extends string>(
 
   const isVoid = voidTags.has(tagName);
   const isTextarea = tagName === 'textarea';
-  const strings = createQuarkStrings(tagName, isVoid, isTextarea);
+  const genericStrings = createQuarkStrings(tagName, isVoid, isTextarea);
+  const shapeCache = new Map<string, CompiledQuarkShape>();
   const factory = ((props: QuarkProps<Element> = {}) => {
     const { children, data, ...attributes } = props;
     if (isVoid && children != null && children !== false && children !== nothing) {
@@ -297,9 +304,28 @@ export function quark<TagName extends string>(
       },
       attributes,
     );
+    const shape = getCompiledQuarkShape(
+      tagName,
+      isVoid,
+      isTextarea,
+      merged,
+      shapeCache,
+    );
+    if (!shape) {
+      return new TemplateResult(
+        genericStrings,
+        isVoid || isTextarea ? [merged] : [merged, children ?? nothing],
+      );
+    }
+    const compiledValues = merged as unknown as Readonly<Record<string, TemplateValue>>;
     return new TemplateResult(
-      strings,
-      isVoid || isTextarea ? [merged] : [merged, children ?? nothing],
+      shape.strings,
+      isVoid || isTextarea
+        ? shape.bindingKeys.map((key) => compiledValues[key]!)
+        : [
+          ...shape.bindingKeys.map((key) => compiledValues[key]!),
+          children ?? nothing,
+        ],
     );
   }) as QuarkFactory<string, Element>;
 
@@ -309,6 +335,53 @@ export function quark<TagName extends string>(
   });
   quarkCache.set(tagName, factory);
   return factory as unknown as QuarkFactory<TagName, ElementFor<TagName>>;
+}
+
+function getCompiledQuarkShape(
+  tagName: string,
+  isVoid: boolean,
+  isTextarea: boolean,
+  props: Readonly<Record<string, unknown>>,
+  cache: Map<string, CompiledQuarkShape>,
+): CompiledQuarkShape | undefined {
+  const bindingKeys = Object.keys(props);
+  if (bindingKeys.some((key) => !isSafeQuarkBindingKey(key))) return undefined;
+
+  const shapeKey = bindingKeys.map((key) => `${key}:${quarkBindingName(key)}`).join('|');
+  const cached = cache.get(shapeKey);
+  if (cached) return cached;
+  if (cache.size >= maxCompiledQuarkShapes) return undefined;
+
+  const firstKey = bindingKeys[0];
+  const strings: string[] = [
+    `<${tagName}${firstKey === undefined ? '' : ` ${quarkBindingName(firstKey)}=`}`,
+  ];
+  for (const key of bindingKeys.slice(1)) {
+    strings.push(` ${quarkBindingName(key)}=`);
+  }
+  strings.push('>', `</${tagName}>`);
+  const templateStrings = isVoid
+    ? strings.slice(0, -1)
+    : isTextarea
+      ? [...strings.slice(0, -2), `></${tagName}>`]
+      : strings;
+  const compiled: CompiledQuarkShape = Object.freeze({
+    strings: createTemplateStrings(templateStrings),
+    bindingKeys: Object.freeze(bindingKeys.slice()),
+  });
+  cache.set(shapeKey, compiled);
+  return compiled;
+}
+
+function isSafeQuarkBindingKey(key: string): boolean {
+  if (key === 'children') return false;
+  const binding = quarkBindingName(key);
+  return /^[A-Za-z_:?@.][A-Za-z0-9_.:?@-]*$/.test(binding);
+}
+
+function quarkBindingName(key: string): string {
+  if (/^on[A-Z]|^on[a-z]/.test(key)) return `@${key.slice(2).toLowerCase()}`;
+  return key;
 }
 
 export const q = new Proxy(Object.create(null) as QuarkMap, {

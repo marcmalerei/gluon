@@ -1284,6 +1284,12 @@ class NodePart implements Part {
 class AttributePart implements Part {
   private lastValue: unknown;
   private event?: RetainedEvent;
+  private ref?: RefTarget;
+  private classValue?: string;
+  private dataAttributes?: Set<string>;
+  private ariaAttributes?: Set<string>;
+  private styleProperties?: Set<string>;
+  private styleMode: 'none' | 'string' | 'object' = 'none';
 
   constructor(
     private readonly element: Element,
@@ -1298,6 +1304,37 @@ class AttributePart implements Part {
   }
 
   setValue(value: TemplateValue, assumeInPlace = false): void {
+    if (this.name === 'ref') {
+      this.setRef(isRefTarget(value) ? value : undefined);
+      this.lastValue = value;
+      return;
+    }
+
+    if (this.name === 'class' || this.name === 'className') {
+      this.setClass(value);
+      return;
+    }
+
+    if (this.name === 'style') {
+      this.setStyle(value, spreadMapEntries(snapshotSpreadValue('style', value)));
+      this.lastValue = value;
+      return;
+    }
+
+    if (this.name === 'data' || this.name === 'dataset') {
+      const snapshot = snapshotSpreadValue(this.name, value);
+      this.dataAttributes = this.setAttributeMap('data-', value, this.dataAttributes, spreadMapEntries(snapshot));
+      this.lastValue = snapshot;
+      return;
+    }
+
+    if (this.name === 'aria') {
+      const snapshot = snapshotSpreadValue('aria', value);
+      this.ariaAttributes = this.setAttributeMap('aria-', value, this.ariaAttributes, spreadMapEntries(snapshot));
+      this.lastValue = snapshot;
+      return;
+    }
+
     if (assumeInPlace && value === this.lastValue) return;
 
     if (this.name.startsWith('.')) {
@@ -1338,19 +1375,119 @@ class AttributePart implements Part {
   }
 
   disconnect(): void {
+    if (this.name === 'ref') this.setRef(undefined);
+    if (this.name === 'class' || this.name === 'className') removeOwnedAttribute(this.element, 'class');
+    if (this.name === 'style') this.clearStyle();
+    if (this.name === 'data' || this.name === 'dataset') this.clearAttributes(this.dataAttributes);
+    if (this.name === 'aria') this.clearAttributes(this.ariaAttributes);
     this.suspend();
     this.lastValue = unsetValue;
   }
 
   suspend(): void {
-    if (!this.event || !this.name.startsWith('@')) return;
-    this.element.removeEventListener(
-      this.name.slice(1),
-      this.event.listener,
-      this.event.options,
-    );
-    this.event = undefined;
+    if (this.event && this.name.startsWith('@')) {
+      this.element.removeEventListener(
+        this.name.slice(1),
+        this.event.listener,
+        this.event.options,
+      );
+      this.event = undefined;
+    }
+    if (this.name === 'ref') this.setRef(undefined);
+    this.classValue = undefined;
     this.lastValue = unsetValue;
+  }
+
+  private setClass(value: unknown): void {
+    const className = normalizeClass(value);
+    if (className === this.classValue) return;
+    if (className) setOwnedAttribute(this.element, 'class', className);
+    else removeOwnedAttribute(this.element, 'class');
+    this.classValue = className;
+    this.lastValue = unsetValue;
+  }
+
+  private setRef(ref: RefTarget | undefined): void {
+    if (ref === this.ref) return;
+    if (typeof this.ref === 'function') this.ref(undefined);
+    else if (this.ref) this.ref.value = undefined;
+    this.ref = ref;
+    if (typeof ref === 'function') ref(this.element);
+    else if (ref) ref.value = this.element;
+  }
+
+  private setStyle(value: unknown, entries?: readonly (readonly [string, unknown])[]): void {
+    const style = getStyleDeclaration(this.element);
+    if (!style) return;
+
+    if (typeof value === 'string') {
+      if (this.styleMode === 'string' && this.lastValue === value) return;
+      this.clearStyle();
+      this.element.setAttribute('style', value);
+      this.styleMode = 'string';
+      return;
+    }
+
+    if (!isObjectRecord(value)) {
+      this.clearStyle();
+      return;
+    }
+
+    const nextProperties = new Set<string>();
+    for (const [property, propertyValue] of entries ?? Object.entries(value)) {
+      nextProperties.add(property);
+      setStyleProperty(style, property, propertyValue);
+    }
+    if (this.styleProperties) {
+      for (const property of this.styleProperties) {
+        if (!nextProperties.has(property)) removeStyleProperty(style, property);
+      }
+    }
+    if (this.styleMode === 'string') this.element.removeAttribute('style');
+    this.styleProperties = nextProperties;
+    this.styleMode = 'object';
+  }
+
+  private clearStyle(): void {
+    const style = getStyleDeclaration(this.element);
+    if (this.styleMode === 'string') this.element.removeAttribute('style');
+    if (style && this.styleProperties) {
+      for (const property of this.styleProperties) removeStyleProperty(style, property);
+    }
+    this.styleProperties = undefined;
+    this.styleMode = 'none';
+  }
+
+  private setAttributeMap(
+    prefix: 'data-' | 'aria-',
+    value: unknown,
+    previousAttributes: Set<string> | undefined,
+    entries?: readonly (readonly [string, unknown])[],
+  ): Set<string> {
+    const nextAttributes = new Set<string>();
+    if (isObjectRecord(value)) {
+      for (const [name, attributeValue] of entries ?? Object.entries(value)) {
+        const attribute = `${prefix}${toKebabCase(name)}`;
+        if (attributeValue == null) {
+          removeOwnedAttribute(this.element, attribute);
+          continue;
+        }
+        setOwnedAttribute(this.element, attribute, String(attributeValue));
+        nextAttributes.add(attribute);
+      }
+    }
+    if (previousAttributes) {
+      for (const attribute of previousAttributes) {
+        if (!nextAttributes.has(attribute)) removeOwnedAttribute(this.element, attribute);
+      }
+    }
+    return nextAttributes;
+  }
+
+  private clearAttributes(attributes: Set<string> | undefined): void {
+    if (!attributes) return;
+    for (const attribute of attributes) removeOwnedAttribute(this.element, attribute);
+    attributes.clear();
   }
 
   private setEvent(value: TemplateValue): void {

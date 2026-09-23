@@ -26,6 +26,15 @@ mixed, or multi-node rows continue through generic keyed reconciliation.
 
 ## Spread-binding update benchmark
 
+Issue [#499](https://github.com/marcmalerei/gluon/issues/499) adds a separate
+Quark-side shape-compilation lane to this optimization area. A stable safe
+`q.<tag>()` option-key shape is cached per factory and emitted as dedicated
+Core bindings; open or unsupported key shapes continue to use `SpreadPart`.
+The implementation is intended to reduce classification work at DOM commit,
+but no speed claim is recorded until the frozen 80-card and canonical atom
+measurements are rerun with production builds. Shape transitions are measured
+separately because a changed template identity is not a stable update.
+
 The [incremental allocation follow-up](../benchmarks/results/spread-followup-issue-487-comparison.md)
 compares the value-aware spread implementation with lazy bookkeeping and a
 style preflight that avoids empty dependency maps. It retains independent repeats, the

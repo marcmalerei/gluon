@@ -63,6 +63,14 @@ Direct template child interpolation inside raw-text and RCDATA elements
 (`textarea`, `title`, `script`, and `style`) is rejected with a runtime error
 that points to the supported complete binding form.
 
+For stable, safe option-key shapes, a Quark factory caches a bounded explicit
+binding template per factory and sends class, style, data, ARIA, property,
+boolean, event, ref, URL, and child values to their dedicated Core Parts. This
+avoids repeating generic spread-key classification during commit while keeping
+open or unsupported prop bags on the generic spread path. Shape transitions
+remain correct but are not treated as stable template updates, so callers that
+need identity across changing key sets should keep the option-key set stable.
+
 Quark factories do not add generic `gluon` or `quark` classes. Supply a
 component-specific class when styling a native element; headless primitives
 retain only their documented component classes such as `gluon-overlay`.

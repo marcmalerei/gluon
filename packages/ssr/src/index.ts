@@ -700,6 +700,22 @@ async function resolveHydrationValue(value: TemplateValue, signal?: AbortSignal)
 function serializeBinding(name: string, value: unknown, assets?: AssetManifest): string {
   if (name === '...') return serializeSpread(value, assets);
   if (name.startsWith('@')) return '';
+  if (name === 'ref') return '';
+  if (name === 'data' || name === 'dataset' || name === 'aria') {
+    if (!isRecord(value)) return '';
+    const prefix = name === 'aria' ? 'aria-' : 'data-';
+    return Object.entries(value)
+      .map(([key, entry]) => serializeBinding(`${prefix}${toKebabCase(key)}`, entry, assets))
+      .join('');
+  }
+  if (name === 'class' || name === 'className') {
+    if (value == null || value === false || value === nothing || typeof value === 'function') return '';
+    return ` class="${escapeAttribute(normalizeClass(value))}"`;
+  }
+  if (name === 'style') {
+    if (value == null || value === false || value === nothing || typeof value === 'function') return '';
+    return ` style="${escapeAttribute(normalizeStyle(value))}"`;
+  }
   if (name.startsWith('?')) return value ? ` ${safeAttributeName(name.slice(1))}` : '';
   const attribute = name.startsWith('.') ? name.slice(1) : name;
   if (value == null || value === false || value === nothing || typeof value === 'function') return '';

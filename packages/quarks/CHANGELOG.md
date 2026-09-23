@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Performance
+
+- Cache bounded safe Quark prop shapes and emit explicit Core bindings for
+  stable option objects; open or unsupported prop bags retain the generic
+  spread fallback and its existing validation semantics.
+
 ## [1.12.1] - 2026-09-22
 
 ### Changed

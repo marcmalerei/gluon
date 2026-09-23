@@ -42,6 +42,59 @@ describe('quarks', () => {
     expect(click).toHaveBeenCalledOnce();
   });
 
+  it('caches explicit binding shapes and keeps stable quark updates in place', () => {
+    const root = document.createElement('div');
+    const ref: { value?: HTMLDivElement } = {};
+    const props = {
+      class: { card: true, featured: false },
+      style: { color: 'red' },
+      data: { testId: 'card' },
+      aria: { label: 'Card' },
+      ref,
+      children: 'First',
+    };
+    const first = q.div(props);
+    const second = q.div({ ...props, children: 'Second' });
+
+    expect(first.strings[0]).not.toContain('...=');
+    expect(first.strings).toBe(second.strings);
+    render(first, root);
+    const element = root.querySelector('div > div') as HTMLDivElement;
+    expect(element.textContent).toBe('First');
+    expect(ref.value).toBe(element);
+
+    render(second, root);
+    expect(root.querySelector('div > div')).toBe(element);
+    expect(element.textContent).toBe('Second');
+    expect(element.className).toBe('card');
+    expect(element.style.color).toBe('red');
+    expect(element.dataset.testId).toBe('card');
+    expect(element.getAttribute('aria-label')).toBe('Card');
+  });
+
+  it('retains the generic path for unsupported open prop keys', () => {
+    const result = q.div({ 'x$y': 'preserved' } as never);
+    expect(result.strings[0]).toContain('...=');
+
+    const root = document.createElement('div');
+    render(result, root);
+    expect(root.querySelector('div > div')?.getAttribute('x$y')).toBe('preserved');
+  });
+
+  it('compiles image attributes as dedicated URL and boolean bindings', () => {
+    const result = q.img({ class: 'product', loading: 'lazy', alt: 'Lamp', src: '/lamp.webp' });
+    expect(result.strings[0]).not.toContain('...=');
+
+    const root = document.createElement('div');
+    render(result, root);
+    const image = root.querySelector('div > img') as HTMLImageElement;
+    expect(image.className).toBe('product');
+    expect(image.loading).toBe('lazy');
+    expect(image.alt).toBe('Lamp');
+    expect(image.getAttribute('src')).toBe('/lamp.webp');
+    expect(() => render(q.img({ src: 'javascript:alert(1)' }), root)).toThrow(/blocked unsafe url protocol/i);
+  });
+
   it('keeps Tooltip and HoverCard semantics distinct and supports focus/Escape lifecycle', async () => {
     const root = document.createElement('div');
     render(fragment([
