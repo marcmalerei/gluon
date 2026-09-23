@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-23T17:10:11.513Z",
+  "generatedAt": "2026-09-23T17:15:46.503Z",
   "source": {
-    "commit": "4e18bb35e917e6a089299e729d448d4f2ce8dc01",
+    "commit": "855a453e6cfba5aa1e4e7f22125a31511719b375",
     "branch": "codex/496-application-update-path",
     "workingTreeDirty": false
   },
@@ -32,367 +32,367 @@
       "bagQuantity": "0"
     }
   },
-  "profile": "application-update-profile-496-filter-final.cpuprofile",
+  "profile": "application-update-profile-496-filter-final2.cpuprofile",
   "profileSummary": [
     {
       "functionName": "setKeyed",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
       "lineNumber": 15,
       "columnNumber": 8169,
-      "selfSamples": 176,
-      "selfTimeMs": 17.6,
-      "selfPercent": 11.428571428571429
-    },
-    {
-      "functionName": "(garbage collector)",
-      "url": "",
-      "lineNumber": 0,
-      "columnNumber": 0,
-      "selfSamples": 125,
-      "selfTimeMs": 12.5,
-      "selfPercent": 8.116883116883116
+      "selfSamples": 171,
+      "selfTimeMs": 17.1,
+      "selfPercent": 12.518301610541727
     },
     {
       "functionName": "at",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
       "lineNumber": 15,
-      "columnNumber": 30704,
-      "selfSamples": 120,
-      "selfTimeMs": 12,
-      "selfPercent": 7.792207792207792
-    },
-    {
-      "functionName": "cloneNode",
-      "url": "",
-      "lineNumber": 0,
-      "columnNumber": 0,
-      "selfSamples": 112,
-      "selfTimeMs": 11.2,
-      "selfPercent": 7.2727272727272725
+      "columnNumber": 31059,
+      "selfSamples": 110,
+      "selfTimeMs": 11,
+      "selfPercent": 8.052708638360176
     },
     {
       "functionName": "insertBefore",
       "url": "",
       "lineNumber": 0,
       "columnNumber": 0,
-      "selfSamples": 97,
-      "selfTimeMs": 9.7,
-      "selfPercent": 6.298701298701298
+      "selfSamples": 109,
+      "selfTimeMs": 10.9,
+      "selfPercent": 7.979502196193265
     },
     {
       "functionName": "removeChild",
       "url": "",
       "lineNumber": 0,
       "columnNumber": 0,
-      "selfSamples": 80,
-      "selfTimeMs": 8,
-      "selfPercent": 5.194805194805195
+      "selfSamples": 91,
+      "selfTimeMs": 9.1,
+      "selfPercent": 6.661786237188873
+    },
+    {
+      "functionName": "cloneNode",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 86,
+      "selfTimeMs": 8.6,
+      "selfPercent": 6.295754026354319
+    },
+    {
+      "functionName": "(garbage collector)",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 85,
+      "selfTimeMs": 8.5,
+      "selfPercent": 6.222547584187408
     },
     {
       "functionName": "ut",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
       "lineNumber": 15,
-      "columnNumber": 31780,
-      "selfSamples": 62,
-      "selfTimeMs": 6.2,
-      "selfPercent": 4.025974025974026
+      "columnNumber": 32135,
+      "selfSamples": 45,
+      "selfTimeMs": 4.5,
+      "selfPercent": 3.294289897510981
+    },
+    {
+      "functionName": "tn",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 41148,
+      "selfSamples": 32,
+      "selfTimeMs": 3.2,
+      "selfPercent": 2.342606149341142
     },
     {
       "functionName": "(program)",
       "url": "",
       "lineNumber": 0,
       "columnNumber": 0,
-      "selfSamples": 55,
-      "selfTimeMs": 5.5,
-      "selfPercent": 3.571428571428571
-    },
-    {
-      "functionName": "setAttribute",
-      "url": "",
-      "lineNumber": 0,
-      "columnNumber": 0,
-      "selfSamples": 40,
-      "selfTimeMs": 4,
-      "selfPercent": 2.5974025974025974
-    },
-    {
-      "functionName": "tn",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 40793,
-      "selfSamples": 34,
-      "selfTimeMs": 3.4,
-      "selfPercent": 2.207792207792208
-    },
-    {
-      "functionName": "addEventListener",
-      "url": "",
-      "lineNumber": 0,
-      "columnNumber": 0,
-      "selfSamples": 23,
-      "selfTimeMs": 2.3,
-      "selfPercent": 1.4935064935064934
-    },
-    {
-      "functionName": "setAttribute",
-      "url": "",
-      "lineNumber": 0,
-      "columnNumber": 0,
-      "selfSamples": 22,
-      "selfTimeMs": 2.2,
-      "selfPercent": 1.4285714285714286
+      "selfSamples": 30,
+      "selfTimeMs": 3,
+      "selfPercent": 2.1961932650073206
     },
     {
       "functionName": "removeEventListener",
       "url": "",
       "lineNumber": 0,
       "columnNumber": 0,
-      "selfSamples": 20,
-      "selfTimeMs": 2,
-      "selfPercent": 1.2987012987012987
+      "selfSamples": 30,
+      "selfTimeMs": 3,
+      "selfPercent": 2.1961932650073206
     },
     {
-      "functionName": "(idle)",
+      "functionName": "setAttribute",
       "url": "",
       "lineNumber": 0,
       "columnNumber": 0,
-      "selfSamples": 18,
-      "selfTimeMs": 1.8,
-      "selfPercent": 1.1688311688311688
-    },
-    {
-      "functionName": "cacheKeyedChild",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 14287,
-      "selfSamples": 18,
-      "selfTimeMs": 1.8,
-      "selfPercent": 1.1688311688311688
-    },
-    {
-      "functionName": "Id",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 16,
-      "columnNumber": 70288,
-      "selfSamples": 17,
-      "selfTimeMs": 1.7,
-      "selfPercent": 1.103896103896104
-    },
-    {
-      "functionName": "setRepeatResult",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 11844,
-      "selfSamples": 17,
-      "selfTimeMs": 1.7,
-      "selfPercent": 1.103896103896104
-    },
-    {
-      "functionName": "setValue",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 15045,
-      "selfSamples": 16,
-      "selfTimeMs": 1.6,
-      "selfPercent": 1.0389610389610389
-    },
-    {
-      "functionName": "it",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 30264,
-      "selfSamples": 16,
-      "selfTimeMs": 1.6,
-      "selfPercent": 1.0389610389610389
-    },
-    {
-      "functionName": "suspend",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 16600,
-      "selfSamples": 16,
-      "selfTimeMs": 1.6,
-      "selfPercent": 1.0389610389610389
-    },
-    {
-      "functionName": "click",
-      "url": "",
-      "lineNumber": 0,
-      "columnNumber": 0,
-      "selfSamples": 15,
-      "selfTimeMs": 1.5,
-      "selfPercent": 0.974025974025974
-    },
-    {
-      "functionName": "we",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 1546,
-      "selfSamples": 15,
-      "selfTimeMs": 1.5,
-      "selfPercent": 0.974025974025974
-    },
-    {
-      "functionName": "sn",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 41415,
-      "selfSamples": 15,
-      "selfTimeMs": 1.5,
-      "selfPercent": 0.974025974025974
-    },
-    {
-      "functionName": "tt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 27126,
-      "selfSamples": 14,
-      "selfTimeMs": 1.4,
-      "selfPercent": 0.9090909090909091
-    },
-    {
-      "functionName": "vt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 33373,
-      "selfSamples": 14,
-      "selfTimeMs": 1.4,
-      "selfPercent": 0.9090909090909091
-    },
-    {
-      "functionName": "isURL",
-      "url": "",
-      "lineNumber": 48,
-      "columnNumber": 15,
-      "selfSamples": 13,
-      "selfTimeMs": 1.3,
-      "selfPercent": 0.8441558441558441
-    },
-    {
-      "functionName": "(anonymous)",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 16,
-      "columnNumber": 70328,
-      "selfSamples": 12,
-      "selfTimeMs": 1.2,
-      "selfPercent": 0.7792207792207793
-    },
-    {
-      "functionName": "rt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 29514,
-      "selfSamples": 11,
-      "selfTimeMs": 1.1,
-      "selfPercent": 0.7142857142857143
+      "selfSamples": 28,
+      "selfTimeMs": 2.8,
+      "selfPercent": 2.049780380673499
     },
     {
       "functionName": "addEventListener",
       "url": "",
       "lineNumber": 0,
       "columnNumber": 0,
-      "selfSamples": 11,
-      "selfTimeMs": 1.1,
-      "selfPercent": 0.7142857142857143
+      "selfSamples": 24,
+      "selfTimeMs": 2.4,
+      "selfPercent": 1.7569546120058566
+    },
+    {
+      "functionName": "setAttribute",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 24,
+      "selfTimeMs": 2.4,
+      "selfPercent": 1.7569546120058566
     },
     {
       "functionName": "yt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
       "lineNumber": 15,
-      "columnNumber": 34089,
-      "selfSamples": 11,
-      "selfTimeMs": 1.1,
-      "selfPercent": 0.7142857142857143
-    },
-    {
-      "functionName": "xe",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 961,
-      "selfSamples": 10,
-      "selfTimeMs": 1,
-      "selfPercent": 0.6493506493506493
-    },
-    {
-      "functionName": "Dt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 35345,
-      "selfSamples": 8,
-      "selfTimeMs": 0.8,
-      "selfPercent": 0.5194805194805194
-    },
-    {
-      "functionName": "yt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 34089,
-      "selfSamples": 8,
-      "selfTimeMs": 0.8,
-      "selfPercent": 0.5194805194805194
-    },
-    {
-      "functionName": "vt",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 33373,
-      "selfSamples": 8,
-      "selfTimeMs": 0.8,
-      "selfPercent": 0.5194805194805194
-    },
-    {
-      "functionName": "createKeyedChild",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 11906,
-      "selfSamples": 8,
-      "selfTimeMs": 0.8,
-      "selfPercent": 0.5194805194805194
-    },
-    {
-      "functionName": "we",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 1546,
-      "selfSamples": 6,
-      "selfTimeMs": 0.6,
-      "selfPercent": 0.38961038961038963
-    },
-    {
-      "functionName": "(anonymous)",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 34531,
-      "selfSamples": 6,
-      "selfTimeMs": 0.6,
-      "selfPercent": 0.38961038961038963
-    },
-    {
-      "functionName": "suspend",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
-      "lineNumber": 15,
-      "columnNumber": 6652,
-      "selfSamples": 6,
-      "selfTimeMs": 0.6,
-      "selfPercent": 0.38961038961038963
+      "columnNumber": 34444,
+      "selfSamples": 17,
+      "selfTimeMs": 1.7,
+      "selfPercent": 1.2445095168374818
     },
     {
       "functionName": "setValue",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
       "lineNumber": 15,
-      "columnNumber": 15045,
-      "selfSamples": 6,
-      "selfTimeMs": 0.6,
-      "selfPercent": 0.38961038961038963
+      "columnNumber": 15400,
+      "selfSamples": 16,
+      "selfTimeMs": 1.6,
+      "selfPercent": 1.171303074670571
+    },
+    {
+      "functionName": "we",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 1546,
+      "selfSamples": 15,
+      "selfTimeMs": 1.5,
+      "selfPercent": 1.0980966325036603
+    },
+    {
+      "functionName": "nn",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 41260,
+      "selfSamples": 15,
+      "selfTimeMs": 1.5,
+      "selfPercent": 1.0980966325036603
+    },
+    {
+      "functionName": "it",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 30619,
+      "selfSamples": 15,
+      "selfTimeMs": 1.5,
+      "selfPercent": 1.0980966325036603
+    },
+    {
+      "functionName": "createKeyedChild",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 11906,
+      "selfSamples": 15,
+      "selfTimeMs": 1.5,
+      "selfPercent": 1.0980966325036603
+    },
+    {
+      "functionName": "(idle)",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 13,
+      "selfTimeMs": 1.3,
+      "selfPercent": 0.951683748169839
+    },
+    {
+      "functionName": "cacheKeyedChild",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 14287,
+      "selfSamples": 13,
+      "selfTimeMs": 1.3,
+      "selfPercent": 0.951683748169839
+    },
+    {
+      "functionName": "setValue",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 15400,
+      "selfSamples": 13,
+      "selfTimeMs": 1.3,
+      "selfPercent": 0.951683748169839
+    },
+    {
+      "functionName": "sn",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 41770,
+      "selfSamples": 13,
+      "selfTimeMs": 1.3,
+      "selfPercent": 0.951683748169839
+    },
+    {
+      "functionName": "Id",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 16,
+      "columnNumber": 70288,
+      "selfSamples": 12,
+      "selfTimeMs": 1.2,
+      "selfPercent": 0.8784773060029283
+    },
+    {
+      "functionName": "(anonymous)",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 16,
+      "columnNumber": 70328,
+      "selfSamples": 12,
+      "selfTimeMs": 1.2,
+      "selfPercent": 0.8784773060029283
+    },
+    {
+      "functionName": "xe",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 961,
+      "selfSamples": 12,
+      "selfTimeMs": 1.2,
+      "selfPercent": 0.8784773060029283
+    },
+    {
+      "functionName": "Rd",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 16,
+      "columnNumber": 70468,
+      "selfSamples": 10,
+      "selfTimeMs": 1,
+      "selfPercent": 0.7320644216691069
+    },
+    {
+      "functionName": "setRepeatResult",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 11844,
+      "selfSamples": 9,
+      "selfTimeMs": 0.9,
+      "selfPercent": 0.6588579795021963
+    },
+    {
+      "functionName": "addEventListener",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 9,
+      "selfTimeMs": 0.9,
+      "selfPercent": 0.6588579795021963
     },
     {
       "functionName": "setStringValue",
-      "url": "http://127.0.0.1:53598/assets/index-B_E8RrI9.js",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
       "lineNumber": 15,
       "columnNumber": 5054,
+      "selfSamples": 9,
+      "selfTimeMs": 0.9,
+      "selfPercent": 0.6588579795021963
+    },
+    {
+      "functionName": "setValue",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 5552,
+      "selfSamples": 9,
+      "selfTimeMs": 0.9,
+      "selfPercent": 0.6588579795021963
+    },
+    {
+      "functionName": "click",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 8,
+      "selfTimeMs": 0.8,
+      "selfPercent": 0.5856515373352855
+    },
+    {
+      "functionName": "hasStyleDependencies",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 14648,
+      "selfSamples": 7,
+      "selfTimeMs": 0.7,
+      "selfPercent": 0.5124450951683748
+    },
+    {
+      "functionName": "setValue",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 15400,
+      "selfSamples": 7,
+      "selfTimeMs": 0.7,
+      "selfPercent": 0.5124450951683748
+    },
+    {
+      "functionName": "vt",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 33728,
+      "selfSamples": 7,
+      "selfTimeMs": 0.7,
+      "selfPercent": 0.5124450951683748
+    },
+    {
+      "functionName": "yt",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 34444,
+      "selfSamples": 7,
+      "selfTimeMs": 0.7,
+      "selfPercent": 0.5124450951683748
+    },
+    {
+      "functionName": "Kt",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 39168,
+      "selfSamples": 7,
+      "selfTimeMs": 0.7,
+      "selfPercent": 0.5124450951683748
+    },
+    {
+      "functionName": "fr",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 48067,
       "selfSamples": 6,
       "selfTimeMs": 0.6,
-      "selfPercent": 0.38961038961038963
+      "selfPercent": 0.43923865300146414
+    },
+    {
+      "functionName": "yt",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 34444,
+      "selfSamples": 6,
+      "selfTimeMs": 0.6,
+      "selfPercent": 0.43923865300146414
+    },
+    {
+      "functionName": "setEvent",
+      "url": "http://127.0.0.1:55984/assets/index-DSPRVmAR.js",
+      "lineNumber": 15,
+      "columnNumber": 18551,
+      "selfSamples": 6,
+      "selfTimeMs": 0.6,
+      "selfPercent": 0.43923865300146414
     }
   ]
 }

@@ -1,8 +1,8 @@
 # Application benchmark evidence
 
-Generated: 2026-09-23T17:09:28.426Z
+Generated: 2026-09-23T17:15:39.123Z
 
-Source: `41df6e73324f5cbafe9859897d5ebfd1c4961e2e` on `codex/496-application-update-path` (working tree clean)
+Source: `855a453e6cfba5aa1e4e7f22125a31511719b375` on `codex/496-application-update-path` (working tree clean)
 
 Environment: Apple M4, 10 logical CPUs, 16.0 GiB memory, darwin 25.3.0
 
@@ -14,18 +14,18 @@ Method: production build, 10 warm-up rounds, 100 samples, three-action update ba
 
 | Scenario | Framework | Batch | Median ms/action | p95 ms/action | vs Gluon |
 | --- | --- | ---: | ---: | ---: | ---: |
-| mount | gluon | 1 | 0.6000 | 0.8000 | 1.00× |
-| mount | lit | 1 | 0.4000 | 0.6000 | 0.67× |
-| mount | vue | 1 | 0.4000 | 0.5000 | 0.67× |
+| mount | gluon | 1 | 0.6000 | 1.9000 | 1.00× |
+| mount | lit | 1 | 0.4000 | 0.7000 | 0.67× |
+| mount | vue | 1 | 0.3000 | 0.6000 | 0.50× |
 | filter | gluon | 3 | 0.1333 | 0.1667 | 1.00× |
-| filter | lit | 3 | 0.1333 | 0.2000 | 1.00× |
+| filter | lit | 3 | 0.1667 | 0.2333 | 1.25× |
 | filter | vue | 3 | 0.1333 | 0.2000 | 1.00× |
-| sort | gluon | 3 | 0.1000 | 0.1000 | 1.00× |
+| sort | gluon | 3 | 0.1000 | 0.1333 | 1.00× |
 | sort | lit | 3 | 0.1000 | 0.1333 | 1.00× |
-| sort | vue | 3 | 0.1333 | 0.1667 | 1.33× |
+| sort | vue | 3 | 0.1000 | 0.1333 | 1.00× |
 | configure | gluon | 3 | 0.0333 | 0.0667 | 1.00× |
 | configure | lit | 3 | 0.0333 | 0.0667 | 1.00× |
-| configure | vue | 3 | 0.0667 | 0.1333 | 2.00× |
+| configure | vue | 3 | 0.0667 | 0.1000 | 2.00× |
 | bag | gluon | 3 | 0.0333 | 0.0667 | 1.00× |
 | bag | lit | 3 | 0.0333 | 0.0667 | 1.00× |
 | bag | vue | 3 | 0.0667 | 0.1000 | 2.00× |
