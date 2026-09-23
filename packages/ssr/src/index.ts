@@ -598,7 +598,7 @@ function serializeTemplateSynchronously(
   let skipQuote = '';
   let html = '';
   for (let index = 0; index < result.strings.length; index += 1) {
-    const originalChunk = result.strings[index] ?? '';
+    const originalChunk = result.strings[index]!;
     updateMarkupState(state, originalChunk);
     const chunk = skipQuote && originalChunk.startsWith(skipQuote)
       ? originalChunk.slice(1)
@@ -626,10 +626,10 @@ function serializeTemplateSynchronously(
     const nameOffset = chunk.lastIndexOf(name);
     const prefix = chunk.slice(0, nameOffset);
     const marker = allocateMarker(context);
-    html += /\s$/.test(prefix) ? prefix.slice(0, -1) : prefix;
+    html += prefix.slice(0, -1);
     html += serializeBinding(name, result.values[index], context.assets);
     html += ` data-gluon-h-${marker}=""`;
-    skipQuote = match[2] ?? '';
+    skipQuote = match[2] || '';
   }
   return html;
 }

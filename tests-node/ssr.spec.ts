@@ -428,6 +428,46 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(asynchronous).toBe(asynchronousChunks.join(''));
   });
 
+  it('covers synchronous serializer contracts before falling back to async rendering', async () => {
+    expect(await renderToString([
+      html`<p>before</p>`,
+      Suspense({ source: Promise.resolve('ready'), fallback: 'loading', children: (value) => value }),
+    ])).toContain('<p>before</p>');
+    expect(withoutHydrationMarkers(await renderToString(KeepAlive({
+      cacheKey: 'sync-keep-alive',
+      children: html`<p>kept</p>`,
+    })))).toBe('<p>kept</p>');
+    expect(withoutHydrationMarkers(await renderToString(repeat(
+      [1, 2],
+      (item) => item,
+      (item) => html`<b>${item}</b>`,
+    )))).toContain('<b>1</b>');
+    expect(await renderToString(repeat(
+      [1],
+      (item) => item,
+      () => Suspense({ source: Promise.resolve('ready'), fallback: 'loading', children: (value) => value }),
+    ))).toContain('ready');
+    expect(withoutHydrationMarkers(await renderToString(html`<div data-value=${'unquoted'}></div>`)))
+      .toBe('<div data-value="unquoted"></div>');
+
+    class SyncBoundaryElement extends GluonElement {
+      protected override render() {
+        return html`<span>shadow</span>`;
+      }
+    }
+    defineElement('ssr-sync-boundary', SyncBoundaryElement);
+    const syncElement = renderElement(SyncBoundaryElement, {
+      children: html`<span>light</span>`,
+    });
+    expect(withoutHydrationMarkers(await renderToString(syncElement)))
+      .toContain('<template shadowrootmode="open"><span>shadow</span></template>');
+    expect(await renderToString(renderElement(SyncBoundaryElement, {
+      children: Suspense({ source: Promise.resolve('ready'), fallback: 'loading', children: (value) => value }),
+    }))).toContain('ready');
+    expect(await renderToString(syncElement, { omitServerElementShadowRoots: true }))
+      .not.toContain('shadowrootmode');
+  });
+
   it('loads the public Core and renderer without browser DOM globals', () => {
     expect(globalThis).not.toHaveProperty('document');
     expect(globalThis).not.toHaveProperty('HTMLElement');
