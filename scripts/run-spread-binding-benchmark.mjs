@@ -42,7 +42,7 @@ try {
 }
 
 const evidence = {
-  schemaVersion: 2,
+  schemaVersion: 1,
   generatedAt: new Date().toISOString(),
   source: {
     commit: git('rev-parse', 'HEAD'),
