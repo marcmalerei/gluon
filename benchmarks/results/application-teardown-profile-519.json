@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-23T19:29:16.541Z",
+  "source": {
+    "commit": "3ca0213fb75f05d354acaceb9dc3fbd029439a06",
+    "branch": "codex/519-mount-teardown-performance",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "chromium": "149.0.7827.55",
+    "node": "v24.18.0"
+  },
+  "methodology": {
+    "productionBuild": true,
+    "framework": "gluon",
+    "scenario": "teardown",
+    "warmupIterations": 30,
+    "measuredIterations": 100,
+    "samplingIntervalMicroseconds": 100
+  },
+  "measurement": {
+    "productCount": 0,
+    "firstProductId": null,
+    "lastProductId": null,
+    "selectedProductId": null,
+    "finish": null,
+    "bagQuantity": "0"
+  },
+  "profile": "application-teardown-profile-519.cpuprofile",
+  "profileSummary": [
+    {
+      "functionName": "replaceChildren",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 92,
+      "selfTimeMs": 9.2,
+      "selfPercent": 48.67724867724868
+    },
+    {
+      "functionName": "(program)",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 37,
+      "selfTimeMs": 3.7,
+      "selfPercent": 19.576719576719576
+    },
+    {
+      "functionName": "(garbage collector)",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 20,
+      "selfTimeMs": 2,
+      "selfPercent": 10.582010582010582
+    },
+    {
+      "functionName": "removeEventListener",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 10,
+      "selfTimeMs": 1,
+      "selfPercent": 5.291005291005291
+    },
+    {
+      "functionName": "disconnect",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 16618,
+      "selfSamples": 3,
+      "selfTimeMs": 0.3,
+      "selfPercent": 1.5873015873015872
+    },
+    {
+      "functionName": "bt",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 34628,
+      "selfSamples": 3,
+      "selfTimeMs": 0.3,
+      "selfPercent": 1.5873015873015872
+    },
+    {
+      "functionName": "disconnectKeyedChildren",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 14043,
+      "selfSamples": 3,
+      "selfTimeMs": 0.3,
+      "selfPercent": 1.5873015873015872
+    },
+    {
+      "functionName": "replaceChildren",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 2,
+      "selfTimeMs": 0.2,
+      "selfPercent": 1.0582010582010581
+    },
+    {
+      "functionName": "suspend",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 16960,
+      "selfSamples": 2,
+      "selfTimeMs": 0.2,
+      "selfPercent": 1.0582010582010581
+    },
+    {
+      "functionName": "suspend",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 16960,
+      "selfSamples": 2,
+      "selfTimeMs": 0.2,
+      "selfPercent": 1.0582010582010581
+    },
+    {
+      "functionName": "Et",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 35496,
+      "selfSamples": 2,
+      "selfTimeMs": 0.2,
+      "selfPercent": 1.0582010582010581
+    },
+    {
+      "functionName": "evaluate",
+      "url": "",
+      "lineNumber": 297,
+      "columnNumber": 11,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "removeEventListener",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "removeEventListener",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "suspend",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 16960,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "suspend",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 16960,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "disconnect",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 6515,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "disconnect",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 16618,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "$e",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 25474,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "xt",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 34652,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "remove",
+      "url": "",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "claim",
+      "url": "http://127.0.0.1:60553/assets/index-7-RPaIvY.js",
+      "lineNumber": 15,
+      "columnNumber": 2322,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "serialize",
+      "url": "",
+      "lineNumber": 169,
+      "columnNumber": 19,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    },
+    {
+      "functionName": "isURL",
+      "url": "",
+      "lineNumber": 48,
+      "columnNumber": 15,
+      "selfSamples": 1,
+      "selfTimeMs": 0.1,
+      "selfPercent": 0.5291005291005291
+    }
+  ]
+}
