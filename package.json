@@ -188,6 +188,7 @@
     "benchmark:spread-bindings": "node scripts/run-spread-binding-benchmark.mjs",
     "benchmark:components": "npm run build:compiler && node scripts/run-component-benchmark.mjs",
     "benchmark:application": "npm run build:compiler && node scripts/run-application-benchmark.mjs",
+    "benchmark:hydration": "node scripts/run-hydration-comparison-benchmark.mjs",
     "profile:component-property-state": "npm run build:compiler && node scripts/profile-component-property-state.mjs",
     "benchmark:runtime": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && node scripts/run-runtime-scorecard.mjs",
     "benchmark:ssr": "npm run build:core && npm run build:ssr && node scripts/run-ssr-comparison-benchmark.mjs",

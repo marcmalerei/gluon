@@ -186,6 +186,7 @@ npm run benchmark:rendering
 npm run benchmark:spread-bindings
 npm run benchmark:components
 npm run benchmark:application
+npm run benchmark:hydration
 npm run benchmark:ssr
 npm run benchmark:runtime
 npm run profile:component-property-state
@@ -302,6 +303,31 @@ throughput, concurrent request capacity, memory/GC behavior, or browser
 hydration; those require separate workload contracts. Lit hydration support is
 available through `@lit-labs/ssr-client`, but it is not silently folded into
 this Node-only comparison.
+
+## Cross-framework hydration workload
+
+`npm run benchmark:hydration` takes equivalent 120-row server-rendered catalog
+fixtures through Gluon's `hydrateApplication()`, Lit's
+`@lit-labs/ssr-client` `hydrate()`, and Vue's `createSSRApp().mount()`
+hydration path. It measures hydration execution, a row-119 interaction after
+hydration, and teardown separately. The harness verifies retained server-main
+identity, all 120 rows, successful interaction, and removal of element/text
+content after teardown. Framework-specific comment markers may remain as
+renderer ownership anchors and are not treated as leaked element content.
+
+```bash
+npm run benchmark:hydration -- \
+  --browsers=chromium \
+  --samples=20 \
+  --warmup=5 \
+  --output=.tmp/hydration-comparison.json
+```
+
+The server markup is parsed before timing, so the hydration number measures
+the framework handoff rather than HTML parsing. Markup transport is recorded
+per framework because Lit SSR markers, Gluon hydration markers, and Vue's SSR
+output are not byte-identical. This lane does not claim streaming,
+concurrent-request, or memory/GC results.
 
 ## Template workloads
 

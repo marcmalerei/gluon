@@ -1,0 +1,1926 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-23T06:45:13.383Z",
+  "source": {
+    "commit": "f305c76684786dd5e20c1f32614415b34d8fc810",
+    "branch": "codex/501-hydration-evidence",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "packages": {
+      "gluon": "1.12.1",
+      "lit": "3.3.3",
+      "litSsr": "4.1.0",
+      "litSsrClient": "1.1.8",
+      "vue": "3.5.39",
+      "vueServerRenderer": "3.5.39",
+      "playwright": "1.61.1",
+      "vite": "8.2.1"
+    }
+  },
+  "methodology": {
+    "workload": "server-rendered 120-row catalog with one interactive button per row",
+    "samples": 20,
+    "warmupRounds": 5,
+    "frameworkOrder": "rotated for every warm-up and measured sample",
+    "unit": "milliseconds; lower is faster",
+    "hydration": "parse server markup before timing; measure framework hydration only",
+    "interaction": "click row 119 after hydration and await framework update completion",
+    "teardown": "unmount hydrated application and require an empty benchmark root",
+    "boundary": "equivalent behavior with framework-native SSR and hydration APIs; markup transport remains framework-specific"
+  },
+  "fixtures": {
+    "markupBytes": {
+      "gluon": 28225,
+      "lit": 27233,
+      "vue": 10207
+    }
+  },
+  "runs": [
+    {
+      "browser": "chromium",
+      "browserVersion": "149.0.7827.55",
+      "result": {
+        "schemaVersion": 1,
+        "sampleCount": 20,
+        "warmupRounds": 5,
+        "results": [
+          {
+            "framework": "gluon",
+            "samples": [
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3.1999999284744263,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.8000000715255737,
+                "interactionMs": 0.19999992847442627,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.799999952316284,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.6999999284744263,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.600000023841858,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.5,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.700000047683716,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3.600000023841858,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.399999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3.5,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.5,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.5,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.5,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 2.399999976158142,
+                "median": 2.8000000715255737,
+                "p95": 3.600000023841858,
+                "max": 3.899999976158142
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0.09999990463256836,
+                "p95": 0.19999992847442627,
+                "max": 0.20000004768371582
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0.10000002384185791,
+                "max": 0.10000002384185791
+              }
+            }
+          },
+          {
+            "framework": "lit",
+            "samples": [
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.2999999523162842,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0.10000002384185791,
+                "median": 0.19999992847442627,
+                "p95": 0.20000004768371582,
+                "max": 0.2999999523162842
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0.09999990463256836
+              }
+            }
+          },
+          {
+            "framework": "vue",
+            "samples": [
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.09999990463256836,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.5,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.09999990463256836,
+                "interactionMs": 0.3999999761581421,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.19999992847442627,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0,
+                "median": 0.10000002384185791,
+                "p95": 0.20000004768371582,
+                "max": 0.5
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0.10000002384185791,
+                "p95": 0.20000004768371582,
+                "max": 0.3999999761581421
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0.09999990463256836
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "browser": "firefox",
+      "browserVersion": "151.0",
+      "result": {
+        "schemaVersion": 1,
+        "sampleCount": 20,
+        "warmupRounds": 5,
+        "results": [
+          {
+            "framework": "gluon",
+            "samples": [
+              {
+                "hydrationMs": 26,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 28,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 27,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 27,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 28,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 27,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 28,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 31,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 48,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 35,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 37,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 36,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 35,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 35,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 35,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 37,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 35,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 44,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 31,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 27,
+                "interactionMs": 0,
+                "teardownMs": 1,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 26,
+                "median": 31,
+                "p95": 44,
+                "max": 48
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 1
+              }
+            }
+          },
+          {
+            "framework": "lit",
+            "samples": [
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 4,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 4
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          {
+            "framework": "vue",
+            "samples": [
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 17,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 17
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "browser": "webkit",
+      "browserVersion": "26.5",
+      "result": {
+        "schemaVersion": 1,
+        "sampleCount": 20,
+        "warmupRounds": 5,
+        "results": [
+          {
+            "framework": "gluon",
+            "samples": [
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 6,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 2,
+                "median": 3,
+                "p95": 3,
+                "max": 6
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          {
+            "framework": "lit",
+            "samples": [
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          },
+          {
+            "framework": "vue",
+            "samples": [
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 1,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 1,
+                "max": 1
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0,
+                "max": 0
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
