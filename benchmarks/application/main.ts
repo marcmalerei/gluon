@@ -33,6 +33,20 @@ export interface ApplicationBenchmarkResult {
   readonly scenarios: readonly ApplicationScenarioResult[];
 }
 
+export interface GluonApplicationProfileConfig {
+  readonly scenario?: Exclude<ApplicationScenario, 'mount' | 'teardown'>;
+  readonly warmupIterations?: number;
+  readonly measuredIterations?: number;
+}
+
+export interface GluonApplicationProfileResult {
+  readonly framework: 'gluon';
+  readonly scenario: Exclude<ApplicationScenario, 'mount' | 'teardown'>;
+  readonly warmupIterations: number;
+  readonly measuredIterations: number;
+  readonly snapshot: ApplicationSnapshot;
+}
+
 export async function runApplicationComparison(config: ApplicationBenchmarkConfig = {}): Promise<ApplicationBenchmarkResult> {
   const samples = positiveInteger(config.samples ?? 12, 'samples');
   const warmupRounds = nonNegativeInteger(config.warmupRounds ?? 4, 'warmupRounds');
@@ -44,6 +58,26 @@ export async function runApplicationComparison(config: ApplicationBenchmarkConfi
     });
   }
   return { schemaVersion: 1, productCount: APP_PRODUCT_COUNT, scenarios };
+}
+
+/** @internal Diagnostic-only single-framework workload used by the CPU profiler. */
+export async function runGluonApplicationProfile(
+  config: GluonApplicationProfileConfig = {},
+): Promise<GluonApplicationProfileResult> {
+  const scenario = config.scenario ?? 'filter';
+  const warmupIterations = positiveInteger(config.warmupIterations ?? 200, 'warmupIterations');
+  const measuredIterations = positiveInteger(config.measuredIterations ?? 1_000, 'measuredIterations');
+  const harness = createApplicationHarness('gluon');
+  await harness.mount();
+  try {
+    for (let index = 0; index < warmupIterations; index += 1) await harness.action(scenario);
+    for (let index = 0; index < measuredIterations; index += 1) await harness.action(scenario);
+    const snapshot = harness.snapshot();
+    validateSnapshot(snapshot, scenario);
+    return { framework: 'gluon', scenario, warmupIterations, measuredIterations, snapshot };
+  } finally {
+    await harness.dispose();
+  }
 }
 
 async function runApplicationScenario(
@@ -217,7 +251,9 @@ function renderResult(result: ApplicationBenchmarkResult): HTMLElement {
 declare global {
   interface Window {
     runApplicationComparison: typeof runApplicationComparison;
+    runGluonApplicationProfile: typeof runGluonApplicationProfile;
   }
 }
 
 window.runApplicationComparison = runApplicationComparison;
+window.runGluonApplicationProfile = runGluonApplicationProfile;

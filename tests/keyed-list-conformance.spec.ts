@@ -111,6 +111,27 @@ describe('keyed list renderer conformance', () => {
     expect(moved.textContent?.trim()).toBe('Bee');
   });
 
+  it('reuses a recently removed keyed child after suspending its listeners', () => {
+    const root = document.createElement('div');
+    const clicks: string[] = [];
+    const view = (ids: readonly string[]) => html`<section>${repeat(
+      ids,
+      (id) => id,
+      (id) => html`<button data-id=${id} @click=${() => clicks.push(id)}>${id}</button>`,
+    )}</section>`;
+
+    render(view(['a', 'b']), root);
+    const removed = root.querySelector<HTMLButtonElement>('[data-id="b"]')!;
+    render(view(['a']), root);
+    removed.click();
+    expect(clicks).toEqual([]);
+
+    render(view(['a', 'b']), root);
+    expect(root.querySelector('[data-id="b"]')).toBe(removed);
+    removed.click();
+    expect(clicks).toEqual(['b']);
+  });
+
   it('reinstalls externally detached lazy rows without replacing their DOM identities', () => {
     const root = document.createElement('div');
     const rows = [row('a'), row('b'), row('c')];
