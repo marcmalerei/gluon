@@ -26,9 +26,24 @@ try {
     const session = await context.newCDPSession(page);
     await session.send('Profiler.enable');
     await session.send('Profiler.setSamplingInterval', { interval: options.interval });
+    const lifecycleProfile = options.scenario === 'mount' || options.scenario === 'teardown';
+    if (lifecycleProfile) {
+      await page.evaluate(
+        (iterations) => window.warmupGluonApplicationLifecycle(iterations),
+        options.warmup,
+      );
+      if (options.scenario === 'teardown') {
+        await page.evaluate(
+          ({ scenario, iterations }) => window.prepareGluonApplicationLifecycle(scenario, iterations),
+          { scenario: options.scenario, iterations: options.iterations },
+        );
+      }
+    }
     await session.send('Profiler.start');
     const measurement = await page.evaluate(
-      (config) => window.runGluonApplicationProfile(config),
+      (config) => config.scenario === 'mount' || config.scenario === 'teardown'
+        ? window.measureGluonApplicationLifecycle(config.scenario, config.measuredIterations)
+        : window.runGluonApplicationProfile(config),
       {
         scenario: options.scenario,
         warmupIterations: options.warmup,
@@ -37,6 +52,7 @@ try {
     );
     const { profile } = await session.send('Profiler.stop');
     await session.send('Profiler.disable');
+    if (options.scenario === 'mount') await page.evaluate(() => window.cleanupGluonApplicationLifecycle());
     const profilePath = outputPath.replace(/\.json$/u, '.cpuprofile');
     await mkdir(dirname(outputPath), { recursive: true });
     await writeFile(profilePath, `${JSON.stringify(profile)}\n`, 'utf8');

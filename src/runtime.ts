@@ -2544,12 +2544,16 @@ function instantiateBindings(
 ): Binding[] {
   if (descriptors.length === 0) return [];
   const bindings = new Array<Binding>(descriptors.length);
-  let node = includeRoot ? root : nextBindingNode(root, root);
+  const walker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
+  );
+  let node: Node | null = includeRoot ? root : walker.nextNode();
   let traversalIndex = 0;
 
   for (const descriptor of descriptors) {
     while (node && traversalIndex < descriptor.traversalIndex) {
-      node = nextBindingNode(root, node);
+      node = walker.nextNode();
       traversalIndex += 1;
     }
     if (!node || traversalIndex !== descriptor.traversalIndex) {
@@ -2571,20 +2575,6 @@ function instantiateBindings(
     bindings[descriptor.index] = { index: descriptor.index, part, priority: part.commitPriority ?? 0 };
   }
   return bindings;
-}
-
-function nextBindingNode(root: Node, current: Node): Node | null {
-  let node = current;
-  while (true) {
-    if (node.firstChild) {
-      node = node.firstChild;
-    } else {
-      while (node !== root && !node.nextSibling) node = node.parentNode!;
-      if (node === root) return null;
-      node = node.nextSibling!;
-    }
-    if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.COMMENT_NODE) return node;
-  }
 }
 
 function cloneTemplateContent(template: CompiledTemplate): DocumentFragment {

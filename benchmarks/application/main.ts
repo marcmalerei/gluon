@@ -4,6 +4,7 @@ import {
   applicationFrameworks,
   applicationScenarios,
   createApplicationHarness,
+  type ApplicationHarness,
   type ApplicationFramework,
   type ApplicationScenario,
   type ApplicationSnapshot,
@@ -34,14 +35,14 @@ export interface ApplicationBenchmarkResult {
 }
 
 export interface GluonApplicationProfileConfig {
-  readonly scenario?: Exclude<ApplicationScenario, 'mount' | 'teardown'>;
+  readonly scenario?: ApplicationScenario;
   readonly warmupIterations?: number;
   readonly measuredIterations?: number;
 }
 
 export interface GluonApplicationProfileResult {
   readonly framework: 'gluon';
-  readonly scenario: Exclude<ApplicationScenario, 'mount' | 'teardown'>;
+  readonly scenario: ApplicationScenario;
   readonly warmupIterations: number;
   readonly measuredIterations: number;
   readonly snapshot: ApplicationSnapshot;
@@ -65,6 +66,9 @@ export async function runGluonApplicationProfile(
   config: GluonApplicationProfileConfig = {},
 ): Promise<GluonApplicationProfileResult> {
   const scenario = config.scenario ?? 'filter';
+  if (scenario === 'mount' || scenario === 'teardown') {
+    throw new Error('Use the lifecycle profiling helpers for mount and teardown.');
+  }
   const warmupIterations = positiveInteger(config.warmupIterations ?? 200, 'warmupIterations');
   const measuredIterations = positiveInteger(config.measuredIterations ?? 1_000, 'measuredIterations');
   const harness = createApplicationHarness('gluon');
@@ -80,12 +84,67 @@ export async function runGluonApplicationProfile(
   }
 }
 
+let preparedLifecycleHarnesses: ApplicationHarness[] = [];
+
+/** @internal Diagnostic-only lifecycle setup used by the CPU profiler. */
+export async function warmupGluonApplicationLifecycle(
+  iterations: number,
+): Promise<void> {
+  for (let index = 0; index < iterations; index += 1) {
+    const harness = createApplicationHarness('gluon');
+    await harness.mount();
+    await harness.dispose();
+  }
+}
+
+/** @internal Prepares teardown roots or clears the mount profile workspace. */
+export async function prepareGluonApplicationLifecycle(
+  scenario: 'mount' | 'teardown',
+  iterations: number,
+): Promise<void> {
+  preparedLifecycleHarnesses = [];
+  if (scenario !== 'teardown') return;
+  for (let index = 0; index < iterations; index += 1) {
+    const harness = createApplicationHarness('gluon');
+    await harness.mount();
+    preparedLifecycleHarnesses.push(harness);
+  }
+}
+
+/** @internal Measures only the requested lifecycle phase while profiling. */
+export async function measureGluonApplicationLifecycle(
+  scenario: 'mount' | 'teardown',
+  iterations: number,
+): Promise<ApplicationSnapshot> {
+  if (scenario === 'mount') {
+    preparedLifecycleHarnesses = [];
+    for (let index = 0; index < iterations; index += 1) {
+      const harness = createApplicationHarness('gluon');
+      await harness.mount();
+      preparedLifecycleHarnesses.push(harness);
+    }
+    return preparedLifecycleHarnesses.at(-1)?.snapshot() ?? emptyApplicationSnapshot();
+  }
+
+  if (preparedLifecycleHarnesses.length !== iterations) {
+    throw new Error(`Expected ${iterations} prepared teardown harnesses.`);
+  }
+  for (const harness of preparedLifecycleHarnesses) await harness.dispose();
+  return preparedLifecycleHarnesses.at(-1)?.snapshot() ?? emptyApplicationSnapshot();
+}
+
+/** @internal Releases roots retained by a mount CPU profile. */
+export async function cleanupGluonApplicationLifecycle(): Promise<void> {
+  for (const harness of preparedLifecycleHarnesses) await harness.dispose();
+  preparedLifecycleHarnesses = [];
+}
+
 async function runApplicationScenario(
   scenario: ApplicationScenario,
   samples: number,
   warmupRounds: number,
 ): Promise<readonly ApplicationFrameworkResult[]> {
-  const batchSize = scenario === 'mount' || scenario === 'teardown' ? 1 : 3;
+  const batchSize = scenario === 'mount' ? 1 : scenario === 'teardown' ? 20 : 3;
   const durations = new Map<ApplicationFramework, number[]>();
   const snapshots = new Map<ApplicationFramework, ApplicationSnapshot>();
   for (const framework of applicationFrameworks) durations.set(framework, []);
@@ -93,13 +152,24 @@ async function runApplicationScenario(
   if (scenario === 'mount' || scenario === 'teardown') {
     for (let round = 0; round < warmupRounds + samples; round += 1) {
       for (const framework of rotatedFrameworks(round)) {
-        const harness = createApplicationHarness(framework);
-        const started = performance.now();
-        await harness.mount();
-        const beforeDispose = harness.snapshot();
-        await harness.dispose();
-        if (round >= warmupRounds) durations.get(framework)!.push(performance.now() - started);
-        snapshots.set(framework, scenario === 'mount' ? beforeDispose : harness.snapshot());
+        if (scenario === 'mount') {
+          const harness = createApplicationHarness(framework);
+          const mountStarted = performance.now();
+          await harness.mount();
+          const mountDuration = performance.now() - mountStarted;
+          snapshots.set(framework, harness.snapshot());
+          if (round >= warmupRounds) durations.get(framework)!.push(mountDuration);
+          await harness.dispose();
+          continue;
+        }
+
+        const harnesses = Array.from({ length: batchSize }, () => createApplicationHarness(framework));
+        for (const harness of harnesses) await harness.mount();
+        const teardownStarted = performance.now();
+        for (const harness of harnesses) await harness.dispose();
+        const teardownDuration = (performance.now() - teardownStarted) / batchSize;
+        if (round >= warmupRounds) durations.get(framework)!.push(teardownDuration);
+        snapshots.set(framework, harnesses.at(-1)!.snapshot());
       }
     }
   } else {
@@ -180,6 +250,17 @@ function validateSnapshot(snapshot: ApplicationSnapshot, scenario: ApplicationSc
   }
 }
 
+function emptyApplicationSnapshot(): ApplicationSnapshot {
+  return {
+    productCount: 0,
+    firstProductId: null,
+    lastProductId: null,
+    selectedProductId: null,
+    finish: null,
+    bagQuantity: '0',
+  };
+}
+
 function summarize(values: readonly number[]) {
   const sorted = [...values].sort((left, right) => left - right);
   return {
@@ -249,11 +330,19 @@ function renderResult(result: ApplicationBenchmarkResult): HTMLElement {
 }
 
 declare global {
-  interface Window {
-    runApplicationComparison: typeof runApplicationComparison;
-    runGluonApplicationProfile: typeof runGluonApplicationProfile;
-  }
+interface Window {
+  runApplicationComparison: typeof runApplicationComparison;
+  runGluonApplicationProfile: typeof runGluonApplicationProfile;
+  warmupGluonApplicationLifecycle: typeof warmupGluonApplicationLifecycle;
+  prepareGluonApplicationLifecycle: typeof prepareGluonApplicationLifecycle;
+  measureGluonApplicationLifecycle: typeof measureGluonApplicationLifecycle;
+  cleanupGluonApplicationLifecycle: typeof cleanupGluonApplicationLifecycle;
+}
 }
 
 window.runApplicationComparison = runApplicationComparison;
 window.runGluonApplicationProfile = runGluonApplicationProfile;
+window.warmupGluonApplicationLifecycle = warmupGluonApplicationLifecycle;
+window.prepareGluonApplicationLifecycle = prepareGluonApplicationLifecycle;
+window.measureGluonApplicationLifecycle = measureGluonApplicationLifecycle;
+window.cleanupGluonApplicationLifecycle = cleanupGluonApplicationLifecycle;
