@@ -24,6 +24,49 @@ The exact-reverse fast path reuses the direct element for each still-safe
 primitive row, avoiding per-row node-array materialization. Structural,
 mixed, or multi-node rows continue through generic keyed reconciliation.
 
+## Stable primitive text update hotpath
+
+Issue [#493](https://github.com/marcmalerei/gluon/issues/493) closes the small
+single-binding gap identified in the cross-framework matrix. When an existing
+root has the same template identity, an unstyled single NodePart, an in-place
+DOM, and a string value, `render()` now reaches the existing safe text updater
+before walking the complete value tree for component-style dependencies. The
+general renderer remains the fallback for nested values, styles, directives,
+hydration, disturbed DOM, and every other unproven shape. No public export or
+rendering contract changed.
+
+The paired production Chromium runs used the same Apple M4 host, Chromium
+149.0.7827.55, 10 warm-ups, 64 interleaved samples, and the existing 1,000-row
+rendering matrix. The baseline is clean commit `d42ab8c`; the candidate is
+clean commit `7c1151f`. Lower is faster:
+
+| Scenario | Baseline median | Candidate median | Change |
+| --- | ---: | ---: | ---: |
+| Single text update | 0.0000578 ms/op | 0.0000467 ms/op | **−19.1%** |
+| 1,000-row create | 0.3028 ms/op | 0.3048 ms/op | +0.7% |
+| 1,000-row update | 0.0763 ms/op | 0.0769 ms/op | +0.9% |
+| 1,000-row reverse | 0.1386 ms/op | 0.1467 ms/op | +5.9% |
+
+The text p95 changed from 0.0000597 to 0.0000496 ms/op (−16.9%). The larger
+scenarios are retained as regression evidence, not as claimed improvements;
+their small differences are within the run-to-run variance of this local
+microbenchmark. Every measured sample and correctness snapshot is retained in
+the paired
+[`rendering-comparison-493-baseline-d42ab8c.json`](../benchmarks/results/rendering-comparison-493-baseline-d42ab8c.json)
+and
+[`rendering-comparison-493-candidate-7c1151f.json`](../benchmarks/results/rendering-comparison-493-candidate-7c1151f.json)
+files, with Markdown summaries alongside them.
+
+Reproduce the candidate lane with:
+
+```bash
+npm run benchmark:rendering -- \
+  --browsers=chromium \
+  --samples=64 \
+  --warmup=10 \
+  --output=.tmp/issue-493-candidate.json
+```
+
 ## Spread-binding update benchmark
 
 Issue [#499](https://github.com/marcmalerei/gluon/issues/499) adds a separate
