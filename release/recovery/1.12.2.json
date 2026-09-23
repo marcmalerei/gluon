@@ -11,6 +11,7 @@
   "failureCategory": "release-performance-evidence-contract",
   "recoveryTag": "v1.12.2-recovery.1",
   "allowedCanonicalDeltaPaths": [
+    "benchmarks/spread-bindings/main.ts",
     ".github/workflows/release.yml",
     "docs-site/content/1.12.2/guides/releasing/index.md",
     "docs/releasing.md",

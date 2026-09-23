@@ -22,7 +22,9 @@ generate the application evidence required by the shared validator. The
 canonical tag remains immutable; recovery is tracked by issue
 [#509](https://github.com/marcmalerei/gluon/issues/509) and uses the protected
 `v1.12.2-recovery.1` execution tag after the workflow fix passes renewed
-Quality Gates. This is enforced by:
+Quality Gates. The spread-binding benchmark calibration also permits up to
+1,000,000 operations so very fast CI hosts do not fail before producing valid
+evidence. This is enforced by:
 
 ```sh
 npm run check:release-contract

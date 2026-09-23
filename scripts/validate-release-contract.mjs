@@ -853,6 +853,7 @@ function readOptionalJsonAtRef(ref, path) {
 
 function expectedRecoveryPaths(version, failureCategory = 'squash-merge-tested-commit-not-ancestor') {
   const paths = [
+    `benchmarks/spread-bindings/main.ts`,
     '.github/workflows/release.yml',
     `docs-site/content/${version}/guides/releasing/index.md`,
     'docs/releasing.md',

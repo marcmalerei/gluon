@@ -8,6 +8,9 @@ application evidence required by the shared validator. The immutable
 `v1.12.2` tag is not moved; the supported baseline remains `v1.12.1` until
 `v1.12.2-recovery.1` completes publication and registry verification. Issue
 [#509](https://github.com/marcmalerei/gluon/issues/509) tracks the workflow fix.
+The spread-binding evidence lane now permits up to 1,000,000 calibrated
+operations so fast CI hosts produce evidence instead of failing at the former
+10,000-operation ceiling.
 
 The release cut retains a Quality-Gates-tested candidate followed only by its
 release-cut evidence and compatibility manifest. The protected tag is created
