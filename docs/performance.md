@@ -374,6 +374,34 @@ per framework because Lit SSR markers, Gluon hydration markers, and Vue's SSR
 output are not byte-identical. This lane does not claim streaming,
 concurrent-request, or memory/GC results.
 
+### Hydration hot-path follow-up (#502)
+
+The successful Gluon hydration path now collects adoption markers while the
+existing structural comparison walks the actual DOM. It no longer performs a
+second full `TreeWalker` pass over the same tree. The comparison also checks
+expected and client-only attributes with direct loops instead of creating a
+per-element union `Set` and temporary attribute arrays. Mismatch categories,
+ordering, recovery, marker ranges, and retained DOM identity remain covered by
+`tests/hydration.spec.ts`; no public API or marker format changed.
+
+On the recorded Apple M4 / Chromium 149.0.7827.55 setup, both runs used 50
+interleaved samples after 8 warm-ups, the 120-row catalog fixture, and the
+production benchmark build:
+
+| Gluon lane | Hydration median / p95 | Interaction median / p95 |
+| --- | ---: | ---: |
+| Main baseline `2565964` | 2.6 / 3.6 ms | 0.1 / 0.1 ms |
+| Candidate `44d090b` | 2.2 / 3.2 ms | 0.1 / 0.2 ms |
+
+The candidate median is approximately 15% lower and p95 approximately 11% lower
+in this paired run. This is evidence for a successful-path hydration improvement
+on this workload, not a universal Lit/Vue performance ranking. The complete raw
+samples and environment metadata are retained in the
+[`#502 baseline`](../benchmarks/results/hydration-comparison-502-baseline.json)
+and
+[`#502 candidate`](../benchmarks/results/hydration-comparison-502-candidate.json)
+JSON files, with Markdown summaries alongside them.
+
 ## Template workloads
 
 All implementations produce the same `<main>` and `<p data-id>` output. Browser

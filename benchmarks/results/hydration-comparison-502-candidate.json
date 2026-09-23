@@ -1,0 +1,1484 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-23T13:42:35.511Z",
+  "source": {
+    "commit": "44d090bc7cf1d7c8ec6abef2253d687511966874",
+    "branch": "codex/502-hydration-update-path",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "packages": {
+      "gluon": "1.12.2",
+      "lit": "3.3.3",
+      "litSsr": "4.1.0",
+      "litSsrClient": "1.1.8",
+      "vue": "3.5.39",
+      "vueServerRenderer": "3.5.39",
+      "playwright": "1.61.1",
+      "vite": "8.2.1"
+    }
+  },
+  "methodology": {
+    "workload": "server-rendered 120-row catalog with one interactive button per row",
+    "samples": 50,
+    "warmupRounds": 8,
+    "frameworkOrder": "rotated for every warm-up and measured sample",
+    "unit": "milliseconds; lower is faster",
+    "hydration": "parse server markup before timing; measure framework hydration only",
+    "interaction": "click row 119 after hydration and await framework update completion",
+    "teardown": "unmount hydrated application and require an empty benchmark root",
+    "boundary": "equivalent behavior with framework-native SSR and hydration APIs; markup transport remains framework-specific"
+  },
+  "fixtures": {
+    "markupBytes": {
+      "gluon": 28225,
+      "lit": 27233,
+      "vue": 10207
+    }
+  },
+  "runs": [
+    {
+      "browser": "chromium",
+      "browserVersion": "149.0.7827.55",
+      "result": {
+        "schemaVersion": 1,
+        "sampleCount": 50,
+        "warmupRounds": 8,
+        "results": [
+          {
+            "framework": "gluon",
+            "samples": [
+              {
+                "hydrationMs": 2.4000000953674316,
+                "interactionMs": 0.19999992847442627,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.600000023841858,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.799999952316284,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.399999976158142,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.6999999284744263,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3.299999952316284,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 4.100000023841858,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.3000000715255737,
+                "interactionMs": 0,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.399999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3.1999999284744263,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.1999999284744263,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.200000047683716,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.8000000715255737,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.4000000953674316,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.0999999046325684,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.3000000715255737,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.600000023841858,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.5,
+                "interactionMs": 0,
+                "teardownMs": 0.20000004768371582,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.100000023841858,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0.19999992847442627,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.100000023841858,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.8000000715255737,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.100000023841858,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.200000047683716,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.1999999284744263,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.6999999284744263,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.7999999523162842,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 3,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.7999999523162842,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.7999999523162842,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.30000007152557373,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.299999952316284,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.0999999046325684,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 1.899999976158142,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              },
+              {
+                "hydrationMs": 2.100000023841858,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 28225
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 1.7999999523162842,
+                "median": 2.200000047683716,
+                "p95": 3.1999999284744263,
+                "max": 4.100000023841858
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0.10000002384185791,
+                "p95": 0.19999992847442627,
+                "max": 0.20000004768371582
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0.10000002384185791,
+                "max": 0.30000007152557373
+              }
+            }
+          },
+          {
+            "framework": "lit",
+            "samples": [
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.09999990463256836,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.30000007152557373,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.2999999523162842,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.3999999761581421,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.30000007152557373,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 27233
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0.09999990463256836,
+                "median": 0.19999992847442627,
+                "p95": 0.30000007152557373,
+                "max": 0.3999999761581421
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0.09999990463256836,
+                "max": 0.10000002384185791
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0.09999990463256836,
+                "max": 0.10000002384185791
+              }
+            }
+          },
+          {
+            "framework": "vue",
+            "samples": [
+              {
+                "hydrationMs": 0.30000007152557373,
+                "interactionMs": 0.3999999761581421,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.09999990463256836,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.09999990463256836,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0.19999992847442627,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.5,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1.100000023841858,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.09999990463256836,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0,
+                "interactionMs": 0.20000004768371582,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0.10000002384185791,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 1.2000000476837158,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 0,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.20000004768371582,
+                "interactionMs": 1.2000000476837158,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0.09999990463256836,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.19999992847442627,
+                "interactionMs": 0,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 0.10000002384185791,
+                "interactionMs": 0.10000002384185791,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              },
+              {
+                "hydrationMs": 1,
+                "interactionMs": 0.09999990463256836,
+                "teardownMs": 0,
+                "retainedMain": true,
+                "interactionReady": true,
+                "cleanupEmpty": true,
+                "markupBytes": 10207
+              }
+            ],
+            "statistics": {
+              "hydrationMs": {
+                "min": 0,
+                "median": 0.10000002384185791,
+                "p95": 0.5,
+                "max": 1.100000023841858
+              },
+              "interactionMs": {
+                "min": 0,
+                "median": 0.10000002384185791,
+                "p95": 0.3999999761581421,
+                "max": 1.2000000476837158
+              },
+              "teardownMs": {
+                "min": 0,
+                "median": 0,
+                "p95": 0.10000002384185791,
+                "max": 0.10000002384185791
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
