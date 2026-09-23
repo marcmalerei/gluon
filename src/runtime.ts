@@ -2244,12 +2244,14 @@ export function hydrate(
   const expectedTemplate = document.createElement('template');
   assignTemplateHTML(expectedTemplate, options.expectedMarkup, 'hydration expected markup', trustedTypes);
   const mismatches: HydrationMismatch[] = [];
+  const adoption = createHydrationAdoptionCollector();
   compareHydrationNodes(
-    [...expectedTemplate.content.childNodes],
-    [...container.childNodes],
+    expectedTemplate.content.childNodes,
+    container.childNodes,
     'root',
     options,
     mismatches,
+    adoption,
   );
   if (options.state && stableHydrationValue(options.state.server) !== stableHydrationValue(options.state.client)) {
     recordHydrationMismatch('state', 'state', options.state.server, options.state.client, options, mismatches);
@@ -2264,7 +2266,7 @@ export function hydrate(
   const styleClaim = {};
   styles.claim(styleClaim, styleDependencies);
   try {
-    const context = createHydrationAdoptionContext(container, styles, options.markerOffset ?? 0);
+    const context = adoption.createContext(styles, options.markerOffset ?? 0);
     const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
     setRootInstance(container, {
       template: compiled,
@@ -2558,34 +2560,47 @@ interface HydrationAdoptionContext {
   readonly styles: RenderStyleTracker;
 }
 
-function createHydrationAdoptionContext(
-  root: Element | DocumentFragment,
-  styles: RenderStyleTracker,
-  markerOffset: number,
-): HydrationAdoptionContext {
+interface HydrationAdoptionCollector {
+  readonly ranges: Map<string, HydrationRange>;
+  readonly starts: Map<string, Comment>;
+  readonly attributes: Map<number, Element>;
+  visit(node: Node): void;
+  createContext(styles: RenderStyleTracker, markerOffset: number): HydrationAdoptionContext;
+}
+
+function createHydrationAdoptionCollector(): HydrationAdoptionCollector {
   const ranges = new Map<string, HydrationRange>();
   const starts = new Map<string, Comment>();
   const attributes = new Map<number, Element>();
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT);
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    if (node instanceof Comment) {
-      const start = node.data.match(/^gluon:([hik]):(\d+)$/);
-      if (start?.[1] && start[2]) starts.set(`${start[1]}:${start[2]}`, node);
-      const end = node.data.match(/^gluon:\/([hik]):(\d+)$/);
-      if (end?.[1] && end[2]) {
-        const key = `${end[1]}:${end[2]}`;
-        const opening = starts.get(key);
-        if (opening) ranges.set(key, { start: opening, end: node });
+  return {
+    ranges,
+    starts,
+    attributes,
+    visit(node: Node): void {
+      if (node.nodeType === Node.COMMENT_NODE) {
+        const comment = node as Comment;
+        const start = comment.data.match(/^gluon:([hik]):(\d+)$/);
+        if (start?.[1] && start[2]) starts.set(`${start[1]}:${start[2]}`, comment);
+        const end = comment.data.match(/^gluon:\/([hik]):(\d+)$/);
+        if (end?.[1] && end[2]) {
+          const key = `${end[1]}:${end[2]}`;
+          const opening = starts.get(key);
+          if (opening) ranges.set(key, { start: opening, end: comment });
+        }
+        return;
       }
-      continue;
-    }
-    for (const attribute of [...(node as Element).attributes]) {
-      const match = attribute.name.match(/^data-gluon-h-(\d+)$/);
-      if (match?.[1]) attributes.set(Number(match[1]), node as Element);
-    }
-  }
-  return { marker: markerOffset, ranges, attributes, styles };
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      const element = node as Element;
+      for (let index = 0; index < element.attributes.length; index += 1) {
+        const attribute = element.attributes[index]!;
+        const match = attribute.name.match(/^data-gluon-h-(\d+)$/);
+        if (match?.[1]) attributes.set(Number(match[1]), element);
+      }
+    },
+    createContext(styles: RenderStyleTracker, markerOffset: number): HydrationAdoptionContext {
+      return { marker: markerOffset, ranges, attributes, styles };
+    },
+  };
 }
 
 function instantiateHydratedBindings(
@@ -3463,11 +3478,12 @@ function rootNodesAreInPlace(
 }
 
 function compareHydrationNodes(
-  expected: readonly Node[],
-  actual: readonly Node[],
+  expected: NodeListOf<ChildNode>,
+  actual: NodeListOf<ChildNode>,
   path: string,
   options: HydrationOptions,
   mismatches: HydrationMismatch[],
+  adoption?: HydrationAdoptionCollector,
 ): void {
   if (expected.length !== actual.length) {
     recordHydrationMismatch('structure', path, `${expected.length} nodes`, `${actual.length} nodes`, options, mismatches);
@@ -3476,6 +3492,7 @@ function compareHydrationNodes(
   for (let index = 0; index < expected.length; index += 1) {
     const expectedNode = expected[index]!;
     const actualNode = actual[index]!;
+    adoption?.visit(actualNode);
     const nodePath = `${path}/${index}`;
     if (expectedNode.nodeType !== actualNode.nodeType) {
       recordHydrationMismatch('structure', nodePath, describeNode(expectedNode), describeNode(actualNode), options, mismatches);
@@ -3500,11 +3517,12 @@ function compareHydrationNodes(
       }
       compareHydrationAttributes(expectedNode, actualNode, nodePath, options, mismatches);
       compareHydrationNodes(
-        [...expectedNode.childNodes],
-        [...actualNode.childNodes],
+        expectedNode.childNodes,
+        actualNode.childNodes,
         nodePath,
         options,
         mismatches,
+        adoption,
       );
     }
   }
@@ -3517,24 +3535,37 @@ function compareHydrationAttributes(
   options: HydrationOptions,
   mismatches: HydrationMismatch[],
 ): void {
-  const names = new Set([
-    ...[...expected.attributes].map((attribute) => attribute.name),
-    ...[...actual.attributes].map((attribute) => attribute.name),
-  ]);
-  for (const name of names) {
+  for (let index = 0; index < expected.attributes.length; index += 1) {
+    const name = expected.attributes[index]!.name;
     if (name === 'data-gluon-hydration') continue;
-    const expectedValue = expected.getAttribute(name);
-    const actualValue = actual.getAttribute(name);
-    if (expectedValue === actualValue || equivalentHydrationAttribute(name, expectedValue, actualValue, actual.ownerDocument.baseURI)) continue;
-    recordHydrationMismatch(
-      name === 'style' ? 'style' : 'attribute',
-      `${path}@${name}`,
-      expectedValue,
-      actualValue,
-      options,
-      mismatches,
-    );
+    compareHydrationAttribute(name, expected, actual, path, options, mismatches);
   }
+  for (let index = 0; index < actual.attributes.length; index += 1) {
+    const name = actual.attributes[index]!.name;
+    if (name === 'data-gluon-hydration' || expected.hasAttribute(name)) continue;
+    compareHydrationAttribute(name, expected, actual, path, options, mismatches);
+  }
+}
+
+function compareHydrationAttribute(
+  name: string,
+  expected: Element,
+  actual: Element,
+  path: string,
+  options: HydrationOptions,
+  mismatches: HydrationMismatch[],
+): void {
+  const expectedValue = expected.getAttribute(name);
+  const actualValue = actual.getAttribute(name);
+  if (expectedValue === actualValue || equivalentHydrationAttribute(name, expectedValue, actualValue, actual.ownerDocument.baseURI)) return;
+  recordHydrationMismatch(
+    name === 'style' ? 'style' : 'attribute',
+    `${path}@${name}`,
+    expectedValue,
+    actualValue,
+    options,
+    mismatches,
+  );
 }
 
 function equivalentHydrationAttribute(

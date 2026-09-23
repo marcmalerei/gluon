@@ -393,6 +393,24 @@ describe('SSR hydration', () => {
     expect(root.firstChild).toBe(original);
   });
 
+  it('retains missing and extra attribute diagnostics while comparing without attribute snapshots', async () => {
+    const result = html`<p title=${'expected'}>${'text'}</p>`;
+    const prepared = await prepareForHydration(result);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const paragraph = root.querySelector('p')!;
+    paragraph.removeAttribute('title');
+    paragraph.setAttribute('data-extra', 'client-only');
+
+    const hydrated = await hydrateTemplate(result, root);
+
+    expect(hydrated.recovered).toBe(true);
+    expect(hydrated.mismatches.map((mismatch) => mismatch.path)).toEqual([
+      'root/0@title',
+      'root/0@data-extra',
+    ]);
+  });
+
   it('hydrates GLUON GOODS route and Store snapshots into an interactive product flow', async () => {
     history.replaceState({}, '', '/products/orbit-lamp');
     const server = await renderSsrFixture(
