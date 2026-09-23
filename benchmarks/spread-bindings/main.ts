@@ -79,6 +79,7 @@ const cards: readonly Card[] = Array.from({ length: SPREAD_CARD_COUNT }, (_, id)
   labelB: `Card ${id} B`,
 }));
 const minimumBatchDuration = 12;
+const maximumBatchOperations = 1_000_000;
 
 export async function runSpreadBindingBenchmark(
   config: SpreadBindingBenchmarkConfig = {},
@@ -307,7 +308,7 @@ function calibrate(
   minimumDuration: number,
 ): number {
   let size = initialSize;
-  while (size <= 10_000) {
+  while (size <= maximumBatchOperations) {
     let shortest = Number.POSITIVE_INFINITY;
     for (const framework of spreadBenchmarkFrameworks) {
       shortest = Math.min(shortest, harnesses.get(framework)!.measureBatch(size));
@@ -315,7 +316,7 @@ function calibrate(
     if (shortest >= minimumDuration) return size;
     size *= shortest === 0 ? 10 : Math.max(2, Math.ceil(minimumDuration / shortest));
   }
-  throw new Error('Could not calibrate the spread-binding benchmark below 10,000 operations.');
+  throw new Error(`Could not calibrate the spread-binding benchmark below ${maximumBatchOperations.toLocaleString()} operations.`);
 }
 
 function rotatedFrameworks(offset: number): readonly Framework[] {

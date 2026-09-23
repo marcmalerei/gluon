@@ -260,11 +260,27 @@ jobs:
       - if: ${{ matrix.browser == 'chromium' }}
         run: npm run benchmark:spread-bindings -- --samples=10 --warmup=4 --output=.tmp/quality-evidence/spread-bindings-chromium.json
       - run: npm run benchmark:components -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/components-${{ matrix.browser }}.json
+      - run: npm run benchmark:application -- --browsers=${{ matrix.browser }} --samples=10 --warmup=4 --output=.tmp/quality-evidence/application-${{ matrix.browser }}.json
+        timeout-minutes: 12
+      - run: npm run benchmark:hydration -- --browsers=${{ matrix.browser }} --samples=10 --warmup=3 --output=.tmp/quality-evidence/hydration-${{ matrix.browser }}.json
+        timeout-minutes: 12
       - run: npm run benchmark:runtime -- --browsers=${{ matrix.browser }} --samples=10 --warmup=3 --output=.tmp/quality-evidence/runtime-scorecard-${{ matrix.browser }}.json
       - if: ${{ matrix.browser == 'chromium' }}
         run: npm run benchmark:bundle
       - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run benchmark:ssr -- --samples=10 --warmup=3 --output=.tmp/quality-evidence/ssr-comparison.json
+        timeout-minutes: 12
+      - if: ${{ matrix.browser == 'chromium' }}
         run: cp .tmp/bundle-matrix/report.json .tmp/quality-evidence/bundle-matrix.json
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:component-library-loader-build
+        timeout-minutes: 10
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:storybook:component-library
+        timeout-minutes: 15
+      - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run check:shop-performance
+        timeout-minutes: 10
       - if: ${{ matrix.browser == 'chromium' }}
         run: npm run check:component-library-loader-build
       - if: ${{ matrix.browser == 'chromium' }}

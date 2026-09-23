@@ -13,23 +13,34 @@ The machine-readable package contract records `publicationState: ready` and
 `scopeControl: verified` for the `1.12.2` candidate. Every official manifest is
 public and lockstep at `1.12.2`. Registry preflight on 2026-09-23 confirmed all
 21 package records at `latest` `1.12.1` and confirmed that `1.12.2` is absent.
-The protected `v1.12.2` tag must not be created until the exact candidate commit
-passes Quality Gates and the release-cut evidence and compatibility manifest
-are committed and validated. This is enforced by:
+The protected `v1.12.2` tag was created only after the exact candidate commit
+passed Quality Gates and the release-cut evidence and compatibility manifest
+were committed and validated. Its first protected workflow
+[#35836323001](https://github.com/marcmalerei/gluon/actions/runs/35836323001)
+stopped before publication because the release performance lane did not
+generate the application evidence required by the shared validator. The
+canonical tag remains immutable; recovery is tracked by issue
+[#509](https://github.com/marcmalerei/gluon/issues/509) and uses the protected
+`v1.12.2-recovery.1` execution tag after the workflow fix passes renewed
+Quality Gates. The spread-binding benchmark calibration also permits up to
+1,000,000 operations so very fast CI hosts do not fail before producing valid
+evidence. This is enforced by:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.12.2 candidate handoff
+## v1.12.2 recovery handoff
 
 Issue [#504](https://github.com/marcmalerei/gluon/issues/504) tracks the
 21-package patch train for the cached Quark prop-shape compilation merged in
-PR [#500](https://github.com/marcmalerei/gluon/pull/500). The immutable
-`v1.12.1` release remains the supported baseline until the protected `v1.12.2`
-workflow completes publication and independent registry verification.
-The retained benchmark claims remain fixture- and host-specific; they do not
-claim general superiority over Lit.
+PR [#500](https://github.com/marcmalerei/gluon/pull/500). The candidate and
+release-cut evidence are merged in PR [#505](https://github.com/marcmalerei/gluon/pull/505)
+and [#507](https://github.com/marcmalerei/gluon/pull/507). The immutable
+`v1.12.1` release remains the supported baseline until recovery completes
+publication and independent registry verification. The retained benchmark
+claims remain fixture- and host-specific; they do not claim general superiority
+over Lit.
 
 ## v1.12.0 train handoff
 

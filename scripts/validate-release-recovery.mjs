@@ -24,6 +24,7 @@ if (!await fileExists(manifestPath)) {
 }
 
 const manifest = await readJson(manifestPath);
+const validationHead = process.env.GITHUB_EVENT_NAME === 'pull_request' ? 'HEAD^2' : 'HEAD';
 const schema = await readJson('release/recovery-manifest.schema.json');
 const validator = new Ajv2020({ allErrors: true, strict: false });
 addFormats(validator);
@@ -35,6 +36,7 @@ if (!validate(manifest)) {
 
 const canonicalTag = `v${version}`;
 const expectedPaths = [
+  `benchmarks/spread-bindings/main.ts`,
   '.github/workflows/release.yml',
   `docs-site/content/${version}/guides/releasing/index.md`,
   'docs/releasing.md',
@@ -90,7 +92,7 @@ if (manifest.previousRecoveryTag) {
 requireAncestor(manifest.failedTestedCommit, manifest.failedEvidenceCommit,
   'The failed evidence commit does not descend from its recorded tested commit.');
 
-const changed = git('diff', '--name-only', canonicalTag, 'HEAD').split('\n').filter(Boolean);
+const changed = git('diff', '--name-only', canonicalTag, validationHead).split('\n').filter(Boolean);
 const allowed = new Set(expectedPaths);
 const forbidden = changed.filter((path) => !allowed.has(path));
 if (forbidden.length > 0) {
