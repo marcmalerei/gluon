@@ -2,14 +2,14 @@
   "$schema": "../release-cut-evidence.schema.json",
   "schemaVersion": 1,
   "releaseVersion": "1.12.2",
-  "testedCommit": "d42ab8c05c6a10c15cd866dd30ae9e49826259bd",
-  "cutAt": "2026-09-23T07:58:00Z",
-  "automatedQualityRun": { "url": "https://github.com/marcmalerei/gluon/actions/runs/35832715799", "conclusion": "success" },
+  "testedCommit": "6513293b11bbb397d213829189350827518c4c31",
+  "cutAt": "2026-09-23T09:02:47Z",
+  "automatedQualityRun": { "url": "https://github.com/marcmalerei/gluon/actions/runs/35838637204", "conclusion": "success" },
   "hostingPreflight": {
-    "immutableReleases": { "enabled": true, "enforcedByOwner": false, "checkedBy": "marcmalerei", "checkedAt": "2026-09-23T07:58:00Z" },
-    "releaseTagRulesets": { "creationRulesetId": 18869893, "immutabilityRulesetId": 18869897, "creationBypass": { "actorId": 25964605, "actorType": "User", "bypassMode": "always" }, "immutabilityBypassActorCount": 0, "checkedBy": "marcmalerei", "checkedAt": "2026-09-23T07:58:00Z" }
+    "immutableReleases": { "enabled": true, "enforcedByOwner": false, "checkedBy": "marcmalerei", "checkedAt": "2026-09-23T09:02:47Z" },
+    "releaseTagRulesets": { "creationRulesetId": 18869893, "immutabilityRulesetId": 18869897, "creationBypass": { "actorId": 25964605, "actorType": "User", "bypassMode": "always" }, "immutabilityBypassActorCount": 0, "checkedBy": "marcmalerei", "checkedAt": "2026-09-23T09:02:47Z" }
   },
   "supportBoundary": { "model": "automated-engine-evidence-only", "brandedBrowserSupportClaimed": false, "operatingSystemSupportClaimed": false, "deviceSupportClaimed": false, "assistiveTechnologySupportClaimed": false, "manualBrowserDeviceEvidenceRequired": false, "manualAssistiveTechnologyEvidenceRequired": false, "singleOperatorRiskAccepted": true },
   "acceptedBy": "marcmalerei",
-  "acceptedAt": "2026-09-23T07:58:00Z"
+  "acceptedAt": "2026-09-23T09:02:47Z"
 }
