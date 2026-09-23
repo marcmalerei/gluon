@@ -95,9 +95,26 @@ are in [`ssr-comparison-877fc02.md`](../benchmarks/results/ssr-comparison-877fc0
 
 The Gluon-only runtime scorecard still passes its Node SSR and browser
 hydration correctness/latency criteria, including a 0.625 ms median Node SSR
-lane and 0.200 ms Chromium hydration median. Cross-framework hydration,
-streaming throughput, concurrent request capacity, and memory/GC behavior
-remain unmeasured and are not claimed here.
+lane and 0.200 ms Chromium hydration median. Streaming throughput, concurrent
+request capacity, and memory/GC behavior remain unmeasured and are not claimed
+here.
+
+The cross-framework hydration lane is now measured separately. It installs
+framework-native server markup before timing and hydrates the same 120-row
+catalog through Gluon's `hydrateApplication()`, Lit's
+`@lit-labs/ssr-client` `hydrate()`, and Vue's `createSSRApp().mount()`:
+
+| Framework | Markup bytes | Hydration median | Hydration p95 |
+| --- | ---: | ---: | ---: |
+| Gluon | 28,225 | 2.8000 ms | 3.6000 ms |
+| Lit | 27,233 | 0.2000 ms | 0.2000 ms |
+| Vue | 10,207 | 0.1000 ms | 0.2000 ms |
+
+This Chromium result shows a material Gluon hydration cost in this workload.
+Firefox and WebKit completed the retained-DOM, interaction, and cleanup gates,
+but their sub-millisecond Lit/Vue samples are timer-quantized and are not used
+for ranking. Raw evidence is in
+[`hydration-comparison-f305c76.md`](../benchmarks/results/hydration-comparison-f305c76.md).
 
 ## Interpretation
 
@@ -120,6 +137,10 @@ The improvement issues derived from this report are:
   catalog mount and filter updates.
 - [#497](https://github.com/marcmalerei/gluon/issues/497): optimize SSR string
   rendering for large keyed trees without changing public APIs.
+- [#501](https://github.com/marcmalerei/gluon/issues/501): retain a
+  cross-framework hydration evidence lane.
+- [#502](https://github.com/marcmalerei/gluon/issues/502): reduce Gluon
+  hydration overhead for large keyed trees without changing public APIs.
 
 Every issue requires preserving public exports, DOM/event/hydration contracts,
 and the existing correctness gates. Any change should be validated against
