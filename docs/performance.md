@@ -357,8 +357,9 @@ In the paired Chromium run recorded in
 `benchmarks/results/application-comparison-496-baseline.json` and
 `benchmarks/results/application-comparison-496-candidate.json`, Gluon's
 filter median decreased from `0.2333` to `0.1333 ms/action` (about 43%),
-with p95 decreasing from `0.3000` to `0.2000 ms/action`. That puts this
-workload at the same median and p95 as Vue and below Lit. Mount and teardown
+with p95 decreasing from `0.3000` to `0.1667 ms/action`. That puts this
+workload at the same median as Lit and Vue, with a lower p95 than both in the
+candidate run. Mount and teardown
 medians did not materially change, so this result is evidence for the keyed
 update path only, not a universal framework ranking.
 
