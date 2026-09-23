@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-23T06:01:22.300Z",
+  "source": {
+    "commit": "665a09ade1a0c627c5eb301715b7b7c08bbe1a22",
+    "branch": "codex/492-app-benchmark-evidence",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "packages": {
+      "gluon": "1.12.1",
+      "playwright": "1.61.1",
+      "vite": "8.2.1"
+    }
+  },
+  "methodology": {
+    "productionBuild": true,
+    "headless": true,
+    "samples": 10,
+    "warmupRounds": 3,
+    "teardownCycles": 30,
+    "browserTimeoutMs": 300000,
+    "lanes": {
+      "ssr": "Node renderToString of one 100-row Gluon template",
+      "hydration": "retain marker-bearing server DOM in place",
+      "routing": "await one public memory-router transition",
+      "loader": "load one cached dynamic module through a fresh manifest-driven loader",
+      "styles": "retain and release one constructable stylesheet through 100 owners; milliseconds per owner",
+      "memory": "mount, interact with, unmount, and probe detached listeners for 30 application roots",
+      "interaction": "dispatch one application-owned button interaction and await the reactive update",
+      "longTasks": "record PerformanceObserver longtask entries only in engines that expose that entry type"
+    },
+    "correctnessGate": "every warm-up and measured operation validates its observable output before evidence is accepted",
+    "isolation": "one fresh browser context per engine; engine results are never averaged together",
+    "unit": "milliseconds; lower is faster"
+  },
+  "criteria": {
+    "schemaVersion": 1,
+    "samples": 20,
+    "warmupRounds": 5,
+    "teardownCycles": 30,
+    "metrics": {
+      "ssrRenderMs": {
+        "maxP95": 50
+      },
+      "hydrationMs": {
+        "maxP95": 100
+      },
+      "routeTransitionMs": {
+        "maxP95": 100
+      },
+      "loaderCachedModuleLoadMs": {
+        "maxP95": 100
+      },
+      "styleOwnershipMs": {
+        "maxP95": 10
+      },
+      "teardownThirtyCyclesMs": {
+        "maxP95": 250
+      },
+      "interactionMs": {
+        "maxP95": 100
+      }
+    },
+    "invariants": {
+      "hydrationRetainsServerDom": true,
+      "routeMatchesRequestedLocation": true,
+      "loaderReusesCachedModule": true,
+      "stylesReleasedAfterOwnershipEnds": true,
+      "retainedDomNodesAfterTeardown": 0,
+      "detachedListenersAfterTeardown": 0,
+      "longTasksWhenObservable": 0
+    }
+  },
+  "ssr": {
+    "metric": "ssrRenderMs",
+    "samples": [
+      0.7434999999998126,
+      0.7192090000000917,
+      0.6657909999998992,
+      0.6811250000000655,
+      0.6245420000000195,
+      1.6329579999999169,
+      0.4650409999999283,
+      0.46241699999995944,
+      0.4861660000001393,
+      0.48220900000001166
+    ],
+    "correctness": {
+      "rowCount": 100,
+      "markupBytes": 12608
+    },
+    "statistics": {
+      "min": 0.46241699999995944,
+      "median": 0.6245420000000195,
+      "p95": 1.6329579999999169,
+      "max": 1.6329579999999169
+    }
+  },
+  "browsers": [
+    {
+      "browser": "chromium",
+      "browserVersion": "149.0.7827.55",
+      "result": {
+        "schemaVersion": 1,
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+        "samples": 10,
+        "warmupRounds": 3,
+        "teardownCycles": 30,
+        "metrics": {
+          "hydrationMs": [
+            0.09999990463256836,
+            0.19999992847442627,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.19999992847442627,
+            0.19999992847442627,
+            0.19999992847442627,
+            0.2999999523162842
+          ],
+          "routeTransitionMs": [
+            0.10000002384185791,
+            0,
+            0,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.19999992847442627,
+            0.10000002384185791,
+            0,
+            0,
+            0.10000002384185791
+          ],
+          "loaderCachedModuleLoadMs": [
+            0.10000002384185791,
+            0.10000002384185791,
+            0.20000004768371582,
+            0.10000002384185791,
+            0.10000002384185791,
+            0.20000004768371582,
+            0.19999992847442627,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.10000002384185791
+          ],
+          "styleOwnershipMs": [
+            0.0019999992847442626,
+            0.0020000004768371583,
+            0.0029999995231628418,
+            0.0030000007152557375,
+            0.0029999995231628418,
+            0.0029999995231628418,
+            0.005,
+            0.003999999761581421,
+            0.003999999761581421,
+            0.0029999995231628418
+          ],
+          "teardownThirtyCyclesMs": [
+            0.7000000476837158,
+            0.5999999046325684,
+            1,
+            1,
+            0.7000000476837158,
+            1.100000023841858,
+            1.100000023841858,
+            1.100000023841858,
+            1.3000000715255737,
+            1.2999999523162842
+          ],
+          "interactionMs": [
+            0.10000002384185791,
+            0,
+            0,
+            0,
+            0.09999990463256836,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "correctness": {
+          "hydrationRetainsServerDom": true,
+          "routeMatchesRequestedLocation": true,
+          "loaderReusesCachedModule": true,
+          "stylesReleasedAfterOwnershipEnds": true,
+          "retainedDomNodesAfterTeardown": 0,
+          "detachedListenersAfterTeardown": 0
+        },
+        "longTasks": {
+          "supported": true,
+          "count": 0,
+          "durationsMs": []
+        }
+      },
+      "statistics": {
+        "hydrationMs": {
+          "min": 0.09999990463256836,
+          "median": 0.19999992847442627,
+          "p95": 0.2999999523162842,
+          "max": 0.2999999523162842
+        },
+        "routeTransitionMs": {
+          "min": 0,
+          "median": 0.10000002384185791,
+          "p95": 0.19999992847442627,
+          "max": 0.19999992847442627
+        },
+        "loaderCachedModuleLoadMs": {
+          "min": 0.10000002384185791,
+          "median": 0.10000002384185791,
+          "p95": 0.20000004768371582,
+          "max": 0.20000004768371582
+        },
+        "styleOwnershipMs": {
+          "min": 0.0019999992847442626,
+          "median": 0.0029999995231628418,
+          "p95": 0.005,
+          "max": 0.005
+        },
+        "teardownThirtyCyclesMs": {
+          "min": 0.5999999046325684,
+          "median": 1,
+          "p95": 1.3000000715255737,
+          "max": 1.3000000715255737
+        },
+        "interactionMs": {
+          "min": 0,
+          "median": 0,
+          "p95": 0.10000002384185791,
+          "max": 0.10000002384185791
+        }
+      }
+    }
+  ],
+  "passed": true,
+  "failures": []
+}

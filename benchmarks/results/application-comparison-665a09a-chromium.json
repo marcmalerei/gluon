@@ -1,0 +1,654 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-23T05:59:57.539Z",
+  "source": {
+    "commit": "665a09ade1a0c627c5eb301715b7b7c08bbe1a22",
+    "branch": "codex/492-app-benchmark-evidence",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "25.3.0",
+    "cpu": "Apple M4",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 17179869184,
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "packages": {
+      "gluon": "1.12.1",
+      "lit": "3.3.3",
+      "vue": "3.5.39",
+      "playwright": "1.61.1",
+      "vite": "8.2.1"
+    }
+  },
+  "methodology": {
+    "workload": "120 keyed product records with navigation landmarks, filtering, sorting, conditional product detail, configuration events, bag state, and teardown",
+    "samples": 12,
+    "warmupRounds": 4,
+    "updateBatchSize": 3,
+    "productionBuild": true,
+    "headless": true,
+    "frameworkOrder": "rotated for every warm-up and measured sample within each scenario",
+    "unit": "milliseconds per action; lower is faster",
+    "boundary": "public Gluon and Vue light-DOM APIs plus the public LitElement open Shadow DOM API"
+  },
+  "runs": [
+    {
+      "browser": "chromium",
+      "browserVersion": "149.0.7827.55",
+      "result": {
+        "schemaVersion": 1,
+        "productCount": 120,
+        "scenarios": [
+          {
+            "scenario": "mount",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 1,
+                "samples": [
+                  0.8999999761581421,
+                  0.8999999761581421,
+                  1.4000000953674316,
+                  0.6999999284744263,
+                  1.2000000476837158,
+                  0.7999999523162842,
+                  0.6999999284744263,
+                  0.8000000715255737,
+                  0.7999999523162842,
+                  0.5999999046325684,
+                  0.7000000476837158,
+                  0.6000000238418579
+                ],
+                "statistics": {
+                  "min": 0.5999999046325684,
+                  "median": 0.7999999523162842,
+                  "p95": 1.4000000953674316,
+                  "max": 1.4000000953674316
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 1,
+                "samples": [
+                  1.6999999284744263,
+                  0.5,
+                  0.5,
+                  0.5,
+                  0.6000000238418579,
+                  0.5,
+                  0.5,
+                  0.3999999761581421,
+                  0.5,
+                  0.5,
+                  0.6000000238418579,
+                  0.5
+                ],
+                "statistics": {
+                  "min": 0.3999999761581421,
+                  "median": 0.5,
+                  "p95": 1.6999999284744263,
+                  "max": 1.6999999284744263
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 1,
+                "samples": [
+                  0.6000000238418579,
+                  0.6000000238418579,
+                  0.5,
+                  0.40000009536743164,
+                  0.3999999761581421,
+                  0.7000000476837158,
+                  0.5,
+                  0.3999999761581421,
+                  0.30000007152557373,
+                  1.100000023841858,
+                  0.5,
+                  0.3999999761581421
+                ],
+                "statistics": {
+                  "min": 0.30000007152557373,
+                  "median": 0.5,
+                  "p95": 1.100000023841858,
+                  "max": 1.100000023841858
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "filter",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 3,
+                "samples": [
+                  0.2666666905085246,
+                  0.36666667461395264,
+                  0.20000000794728598,
+                  0.36666667461395264,
+                  0.23333330949147543,
+                  0.29999999205271405,
+                  0.7333333492279053,
+                  0.3333333333333333,
+                  0.23333330949147543,
+                  0.3333333333333333,
+                  0.23333330949147543,
+                  0.2666666507720947
+                ],
+                "statistics": {
+                  "min": 0.20000000794728598,
+                  "median": 0.2666666905085246,
+                  "p95": 0.7333333492279053,
+                  "max": 0.7333333492279053
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 3,
+                "samples": [
+                  0.13333332538604736,
+                  0.20000000794728598,
+                  0.16666666666666666,
+                  0.1999999682108561,
+                  0.13333332538604736,
+                  0.23333334922790527,
+                  0.16666666666666666,
+                  0.20000000794728598,
+                  0.1333333651224772,
+                  0.1999999682108561,
+                  0.1333333651224772,
+                  0.23333334922790527
+                ],
+                "statistics": {
+                  "min": 0.13333332538604736,
+                  "median": 0.16666666666666666,
+                  "p95": 0.23333334922790527,
+                  "max": 0.23333334922790527
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 3,
+                "samples": [
+                  0.16666666666666666,
+                  0.3999999761581421,
+                  0.16666666666666666,
+                  0.20000000794728598,
+                  0.1333333651224772,
+                  0.16666666666666666,
+                  0.13333332538604736,
+                  0.16666666666666666,
+                  0.13333332538604736,
+                  0.16666666666666666,
+                  0.13333332538604736,
+                  0.23333334922790527
+                ],
+                "statistics": {
+                  "min": 0.13333332538604736,
+                  "median": 0.16666666666666666,
+                  "p95": 0.3999999761581421,
+                  "max": 0.3999999761581421
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "sort",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 3,
+                "samples": [
+                  0.16666666666666666,
+                  0.13333332538604736,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.10000002384185791,
+                  0.09999998410542806,
+                  0.09999998410542806,
+                  0.13333332538604736,
+                  0.10000002384185791,
+                  0.13333332538604736,
+                  0.09999998410542806
+                ],
+                "statistics": {
+                  "min": 0.0666666825612386,
+                  "median": 0.09999998410542806,
+                  "p95": 0.16666666666666666,
+                  "max": 0.16666666666666666
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 3,
+                "samples": [
+                  0.09999998410542806,
+                  0.10000002384185791,
+                  0.13333332538604736,
+                  0.13333332538604736,
+                  0.13333332538604736,
+                  0.09999998410542806,
+                  0.10000002384185791,
+                  0.09999998410542806,
+                  0.09999998410542806,
+                  0.09999998410542806,
+                  0.1333333651224772,
+                  0.13333332538604736
+                ],
+                "statistics": {
+                  "min": 0.09999998410542806,
+                  "median": 0.10000002384185791,
+                  "p95": 0.1333333651224772,
+                  "max": 0.1333333651224772
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 3,
+                "samples": [
+                  0.13333332538604736,
+                  0.13333332538604736,
+                  0.13333332538604736,
+                  0.3333333333333333,
+                  0.13333332538604736,
+                  0.13333332538604736,
+                  0.13333332538604736,
+                  0.1333333651224772,
+                  0.0666666825612386,
+                  0.09999998410542806,
+                  0.09999998410542806,
+                  0.10000002384185791
+                ],
+                "statistics": {
+                  "min": 0.0666666825612386,
+                  "median": 0.13333332538604736,
+                  "p95": 0.3333333333333333,
+                  "max": 0.3333333333333333
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "configure",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 3,
+                "samples": [
+                  0.03333330154418945,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.23333330949147543,
+                  0.0333333412806193,
+                  0.06666664282480876,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0
+                ],
+                "statistics": {
+                  "min": 0,
+                  "median": 0.06666664282480876,
+                  "p95": 0.23333330949147543,
+                  "max": 0.23333330949147543
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": "0",
+                  "finish": "Finish: Cobalt",
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 3,
+                "samples": [
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0,
+                  0.06666664282480876,
+                  0.0333333412806193,
+                  0,
+                  0.0666666825612386,
+                  0.0333333412806193,
+                  0,
+                  0.0333333412806193,
+                  0.0333333412806193
+                ],
+                "statistics": {
+                  "min": 0,
+                  "median": 0.0333333412806193,
+                  "p95": 0.0666666825612386,
+                  "max": 0.0666666825612386
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": "0",
+                  "finish": "Finish: Cobalt",
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 3,
+                "samples": [
+                  0.0666666825612386,
+                  0.09999998410542806,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.03333330154418945,
+                  0.0666666825612386,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.13333332538604736
+                ],
+                "statistics": {
+                  "min": 0.03333330154418945,
+                  "median": 0.0666666825612386,
+                  "p95": 0.13333332538604736,
+                  "max": 0.13333332538604736
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": "0",
+                  "finish": "Finish: Cobalt",
+                  "bagQuantity": "0"
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "bag",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 3,
+                "samples": [
+                  0.06666664282480876,
+                  0.06666664282480876,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.06666664282480876,
+                  0.0333333412806193,
+                  0.06666664282480876,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.0333333412806193
+                ],
+                "statistics": {
+                  "min": 0.0333333412806193,
+                  "median": 0.06666664282480876,
+                  "p95": 0.0666666825612386,
+                  "max": 0.0666666825612386
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": "0",
+                  "finish": "Finish: Black",
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 3,
+                "samples": [
+                  0.0333333412806193,
+                  0.03333330154418945,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193,
+                  0.0333333412806193
+                ],
+                "statistics": {
+                  "min": 0.03333330154418945,
+                  "median": 0.0333333412806193,
+                  "p95": 0.0666666825612386,
+                  "max": 0.0666666825612386
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": "0",
+                  "finish": "Finish: Black",
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 3,
+                "samples": [
+                  0.0666666825612386,
+                  0.10000002384185791,
+                  0.10000002384185791,
+                  0.06666664282480876,
+                  0.09999998410542806,
+                  0.10000002384185791,
+                  0.06666664282480876,
+                  0.0666666825612386,
+                  0.0666666825612386,
+                  0.06666664282480876,
+                  0.09999998410542806,
+                  0.09999998410542806
+                ],
+                "statistics": {
+                  "min": 0.06666664282480876,
+                  "median": 0.0666666825612386,
+                  "p95": 0.10000002384185791,
+                  "max": 0.10000002384185791
+                },
+                "snapshot": {
+                  "productCount": 120,
+                  "firstProductId": "0",
+                  "lastProductId": "119",
+                  "selectedProductId": "0",
+                  "finish": "Finish: Black",
+                  "bagQuantity": "0"
+                }
+              }
+            ]
+          },
+          {
+            "scenario": "teardown",
+            "results": [
+              {
+                "framework": "gluon",
+                "batchSize": 1,
+                "samples": [
+                  0.3999999761581421,
+                  0.5,
+                  0.5,
+                  0.5,
+                  0.6000000238418579,
+                  0.5,
+                  0.5,
+                  0.6000000238418579,
+                  0.5,
+                  0.6000000238418579,
+                  0.5,
+                  0.6000000238418579
+                ],
+                "statistics": {
+                  "min": 0.3999999761581421,
+                  "median": 0.5,
+                  "p95": 0.6000000238418579,
+                  "max": 0.6000000238418579
+                },
+                "snapshot": {
+                  "productCount": 0,
+                  "firstProductId": null,
+                  "lastProductId": null,
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "lit",
+                "batchSize": 1,
+                "samples": [
+                  0.2999999523162842,
+                  0.5,
+                  0.30000007152557373,
+                  0.3999999761581421,
+                  0.5,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.3999999761581421
+                ],
+                "statistics": {
+                  "min": 0.2999999523162842,
+                  "median": 0.3999999761581421,
+                  "p95": 0.5,
+                  "max": 0.5
+                },
+                "snapshot": {
+                  "productCount": 0,
+                  "firstProductId": null,
+                  "lastProductId": null,
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              },
+              {
+                "framework": "vue",
+                "batchSize": 1,
+                "samples": [
+                  0.5,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.2999999523162842,
+                  0.30000007152557373,
+                  0.2999999523162842,
+                  0.40000009536743164,
+                  0.3999999761581421,
+                  0.3999999761581421,
+                  0.30000007152557373,
+                  0.3999999761581421,
+                  0.2999999523162842
+                ],
+                "statistics": {
+                  "min": 0.2999999523162842,
+                  "median": 0.3999999761581421,
+                  "p95": 0.5,
+                  "max": 0.5
+                },
+                "snapshot": {
+                  "productCount": 0,
+                  "firstProductId": null,
+                  "lastProductId": null,
+                  "selectedProductId": null,
+                  "finish": null,
+                  "bagQuantity": "0"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+:root { color: #102030; background: #fff; font: 16px/1.5 ui-sans-serif, system-ui, sans-serif; }
+body { margin: 0; }
+main { max-width: 920px; margin: 0 auto; padding: 48px 24px 80px; }
+.eyebrow { color: #315d72; font-size: 12px; letter-spacing: .12em; font-weight: 700; }
+h1 { font-size: clamp(2.4rem, 7vw, 5rem); line-height: .95; letter-spacing: -.06em; max-width: 720px; }
+.intro { max-width: 680px; color: #4c5b64; font-size: 1.1rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 32px 0 12px; }
+label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; }
+input, button { min-height: 44px; border: 1px solid #102030; border-radius: 4px; background: #fff; padding: 0 14px; font: inherit; }
+button { cursor: pointer; background: #d7f24b; }
+button:focus-visible { outline: 3px solid #315d72; outline-offset: 2px; }
+#benchmark-status { min-height: 24px; }
+.results { display: grid; gap: 12px; }
+.result-card { border-top: 1px solid #b7c0c5; padding-top: 12px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 6px 4px; text-align: right; border-bottom: 1px solid #e5e9eb; }
+th:first-child, td:first-child { text-align: left; }
+aside { margin-top: 32px; padding-top: 16px; border-top: 1px solid #b7c0c5; color: #4c5b64; }
