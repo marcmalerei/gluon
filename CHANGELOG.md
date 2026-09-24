@@ -7,6 +7,24 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.12.3] - 2026-09-24
+
+### Added
+
+- Added provider-independent semantic analytics with consent, inherited
+  context, deduplication, SSR-safe delivery, and a GA4 adapter (#521).
+- Added request-scoped tenant resolution and deterministic SSR/hydration
+  tenant context under `@gluonjs/ssr/tenant` (#522).
+- Added the versioned API manifest, structured `gluon check --json`, and the
+  read-only MCP/JSON-RPC agent tooling (#523).
+- Added opt-in persistent stores with browser adapters, migrations,
+  hydration status, recovery, and loop-safe cross-tab synchronization (#524).
+
+### Changed
+
+- Updated the complete 21-package lockstep train to 1.12.3. All additions are
+  public-boundary compatible with the existing 1.12.2 APIs.
+
 ## [1.12.2] - 2026-09-23
 
 ### Changed

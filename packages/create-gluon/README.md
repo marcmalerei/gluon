@@ -15,11 +15,11 @@ compatible strict-TypeScript project:
 <!-- gluon-package-overview:start -->
 ## create-gluon at a glance
 
-**Runtime:** node · **Release:** 1.12.2
+**Runtime:** node · **Release:** 1.12.3
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/create-gluon/) · [npm](https://www.npmjs.com/package/create-gluon) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/create-gluon/README.md)
 
-**Public API:** [`create-gluon`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/create-gluon/src/)
+**Public API:** [`create-gluon`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/create-gluon/src/)
 
 ### Install
 

@@ -10,16 +10,16 @@ The official Gluon store provides typed, application-scoped state without a
 DOM dependency. Store definitions infer state, computed getter values, action
 arguments, and action results from one definition.
 
-The package ships as part of the current `1.12.2` release line.
+The package ships as part of the current `1.12.3` release line.
 
 <!-- gluon-package-overview:start -->
 ## @gluonjs/store at a glance
 
-**Runtime:** universal · **Release:** 1.12.2
+**Runtime:** universal · **Release:** 1.12.3
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/store/) · [npm](https://www.npmjs.com/package/@gluonjs/store) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/store/README.md)
 
-**Public API:** [`@gluonjs/store`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/store/src/)
+**Public API:** [`@gluonjs/store`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/store/src/)
 
 ### Install
 

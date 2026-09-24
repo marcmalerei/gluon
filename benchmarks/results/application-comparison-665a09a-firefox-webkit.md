@@ -6,7 +6,7 @@ Source: `665a09ade1a0c627c5eb301715b7b7c08bbe1a22` on `codex/492-app-benchmark-e
 
 Environment: Apple M4, 10 logical CPUs, 16.0 GiB memory, darwin 25.3.0
 
-Packages: Gluon 1.12.2, Lit 3.3.3, Vue 3.5.39, Playwright 1.61.1, Vite 8.2.1
+Packages: Gluon 1.12.3, Lit 3.3.3, Vue 3.5.39, Playwright 1.61.1, Vite 8.2.1
 
 Method: production build, 3 warm-up rounds, 8 samples, three-action update batches, and correctness checks over 120 keyed product records with navigation landmarks, filtering, sorting, conditional product detail, configuration events, bag state, and teardown. Lower milliseconds per action is faster. Ratios are framework median ÷ Gluon median; values above 1 mean Gluon was faster.
 

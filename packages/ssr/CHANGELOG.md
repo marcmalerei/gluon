@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.12.3] - 2026-09-24
+
+### Added
+
+- Added request-scoped tenant resolution and deterministic tenant
+  serialization/hydration helpers under `@gluonjs/ssr/tenant` (#522).
+
 ## [1.12.2] - 2026-09-23
 
 ### Changed

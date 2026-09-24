@@ -477,7 +477,7 @@ describe('Gluon LSP protocol', () => {
     const server = new GluonProtocolServer();
     const initialized = server.handle({ jsonrpc: '2.0', id: 1, method: 'initialize' });
     expect(initialized[0]?.result).toMatchObject({
-      serverInfo: { name: '@gluonjs/language-server', version: '1.12.2' },
+      serverInfo: { name: '@gluonjs/language-server', version: '1.12.3' },
       capabilities: { renameProvider: { prepareProvider: false } },
     });
     const opened = server.handle({
