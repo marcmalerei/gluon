@@ -564,6 +564,16 @@
       "source": "tooling"
     },
     {
+      "id": 1409,
+      "code": "GLUON_API_MANIFEST",
+      "compactCode": "G1409",
+      "title": "API manifest contract failed",
+      "summary": "The public API manifest is missing, malformed, or inconsistent with the shipped package surface.",
+      "why": "Machine-readable tooling cannot safely validate or consume the public API contract.",
+      "remediation": "Regenerate the manifest and run the package, type, and manifest checks before publishing.",
+      "source": "tooling"
+    },
+    {
       "id": 1501,
       "code": "GLUON_DEVTOOLS_APPLICATION_ID_EMPTY",
       "compactCode": "G1501",
