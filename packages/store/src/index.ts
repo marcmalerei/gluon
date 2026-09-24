@@ -59,7 +59,20 @@ export interface PersistOptions<State extends StateTree> {
   readonly version?: number;
   readonly migrations?: readonly PersistMigrationStep[];
   readonly legacy?: PersistLegacyMigration;
+  /** Defines how persisted client data combines with request/SSR state. */
+  readonly merge?: PersistMergePolicy<State>;
+  /** Optional JSON-compatible codec for applications that need richer values. */
+  readonly serialize?: (envelope: PersistedStateEnvelope) => string;
+  readonly deserialize?: (raw: string) => unknown;
+  /** Opt into BroadcastChannel synchronization for this store. */
+  readonly sync?: boolean;
 }
+
+export type PersistMergePolicy<State extends StateTree> =
+  | 'server-wins'
+  | 'persisted-wins'
+  | 'merge'
+  | ((server: PersistedStateRecord, persisted: PersistedStateRecord) => PersistedStateRecord);
 
 /**
  * The object shape exposed to migration callbacks.
@@ -94,6 +107,15 @@ export interface PersistedStateRecovery {
   reset(): void;
   remove(): void;
   quarantine(): void;
+}
+
+export type PersistenceStatus = 'idle' | 'hydrating' | 'ready' | 'failed';
+
+export interface PersistenceLifecycle {
+  readonly status: PersistenceStatus;
+  readonly error: unknown;
+  readonly ready: Promise<void>;
+  dispose(): void;
 }
 
 export interface PersistedStateErrorContext {
@@ -214,6 +236,7 @@ interface StoreRuntime {
 }
 
 const unsafeKeys = new Set(['__proto__', 'constructor', 'prototype']);
+let persistenceSourceSequence = 0;
 
 export function defineStore<
   const Id extends string,
@@ -665,6 +688,157 @@ export interface StorageLike {
   removeItem?(key: string): void;
 }
 
+export interface PersistenceChannel {
+  postMessage(message: unknown): void;
+  addEventListener(listener: (message: unknown) => void): void;
+  removeEventListener(listener: (message: unknown) => void): void;
+  close?(): void;
+}
+
+export interface PersistenceChannelFactory {
+  create(name: string): PersistenceChannel;
+}
+
+export function createMemoryStorage(initial: Readonly<Record<string, string>> = {}): StorageLike {
+  const values = new Map(Object.entries(initial));
+  return {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => { values.set(key, value); },
+    removeItem: (key) => { values.delete(key); },
+  };
+}
+
+export function createWebStorageAdapter(kind: 'local' | 'session', storage?: StorageLike): StorageLike {
+  if (storage) return storage;
+  const candidate = (globalThis as unknown as Record<string, unknown>)[`${kind}Storage`];
+  if (!candidate || typeof candidate !== 'object') {
+    throw new Error(`The ${kind}Storage API is unavailable in this environment.`);
+  }
+  return candidate as StorageLike;
+}
+
+export function createLocalStorageAdapter(storage?: StorageLike): StorageLike {
+  return createWebStorageAdapter('local', storage);
+}
+
+export function createSessionStorageAdapter(storage?: StorageLike): StorageLike {
+  return createWebStorageAdapter('session', storage);
+}
+
+export function createBroadcastChannelFactory(
+  constructor?: new (name: string) => {
+    postMessage(message: unknown): void;
+    addEventListener(type: 'message', listener: (event: { readonly data: unknown }) => void): void;
+    removeEventListener(type: 'message', listener: (event: { readonly data: unknown }) => void): void;
+    close?(): void;
+  },
+): PersistenceChannelFactory {
+  const Channel = constructor ?? (globalThis as unknown as { BroadcastChannel?: new (name: string) => {
+    postMessage(message: unknown): void;
+    addEventListener(type: 'message', listener: (event: { readonly data: unknown }) => void): void;
+    removeEventListener(type: 'message', listener: (event: { readonly data: unknown }) => void): void;
+    close?(): void;
+  } }).BroadcastChannel;
+  if (!Channel) throw new Error('The BroadcastChannel API is unavailable in this environment.');
+  return {
+    create(name) {
+      const native = new Channel(name);
+      const listeners = new Map<(message: unknown) => void, (event: { readonly data: unknown }) => void>();
+      return {
+        postMessage: (message) => native.postMessage(message),
+        addEventListener(listener) {
+          const wrapped = (event: { readonly data: unknown }) => listener(event.data);
+          listeners.set(listener, wrapped);
+          native.addEventListener('message', wrapped);
+        },
+        removeEventListener(listener) {
+          const wrapped = listeners.get(listener);
+          if (wrapped) native.removeEventListener('message', wrapped);
+          listeners.delete(listener);
+        },
+        close: () => native.close?.(),
+      };
+    },
+  };
+}
+
+export interface IndexedDbStorageOptions {
+  readonly database?: string;
+  readonly store?: string;
+  readonly factory?: IndexedDbFactory;
+}
+
+export interface IndexedDbFactory {
+  open(name: string, version?: number): IndexedDbOpenRequest;
+}
+
+interface IndexedDbOpenRequest {
+  result: IndexedDbDatabase;
+  error?: unknown;
+  onsuccess: (() => void) | null;
+  onerror: (() => void) | null;
+  onupgradeneeded: (() => void) | null;
+}
+
+interface IndexedDbDatabase {
+  objectStoreNames: { contains(name: string): boolean };
+  createObjectStore(name: string): void;
+  transaction(name: string, mode: 'readonly' | 'readwrite'): IndexedDbTransaction;
+  close(): void;
+}
+
+interface IndexedDbTransaction {
+  objectStore(name: string): IndexedDbObjectStore;
+  oncomplete: (() => void) | null;
+  onerror: (() => void) | null;
+  onabort: (() => void) | null;
+}
+
+interface IndexedDbObjectStore {
+  get(key: string): IndexedDbRequest;
+  put(value: string, key: string): IndexedDbRequest;
+  delete(key: string): IndexedDbRequest;
+}
+
+interface IndexedDbRequest {
+  result: unknown;
+  error?: unknown;
+  onsuccess: (() => void) | null;
+  onerror: (() => void) | null;
+}
+
+/** Browser IndexedDB adapter kept behind the async persistence contract. */
+export function createIndexedDbStorage(options: IndexedDbStorageOptions = {}): AsyncStorageLike {
+  const factory = options.factory
+    ?? (globalThis as unknown as { indexedDB?: IndexedDbFactory }).indexedDB;
+  if (!factory) throw new Error('The IndexedDB API is unavailable in this environment.');
+  const database = options.database ?? 'gluon';
+  const store = options.store ?? 'persistence';
+  let connection: Promise<IndexedDbDatabase> | undefined;
+  const open = (): Promise<IndexedDbDatabase> => connection ??= new Promise((resolve, reject) => {
+    const request = factory.open(database, 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(store)) request.result.createObjectStore(store);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error ?? new Error('IndexedDB open failed.'));
+  });
+  const run = (mode: 'readonly' | 'readwrite', action: (objectStore: IndexedDbObjectStore) => IndexedDbRequest): Promise<unknown> =>
+    open().then((db) => new Promise((resolve, reject) => {
+      const transaction = db.transaction(store, mode);
+      const request = action(transaction.objectStore(store));
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error ?? new Error('IndexedDB request failed.'));
+      transaction.onerror = () => reject(new Error('IndexedDB transaction failed.'));
+      transaction.onabort = () => reject(new Error('IndexedDB transaction aborted.'));
+    }));
+  return {
+    getItem: (key) => run('readonly', (objectStore) => objectStore.get(key)).then((value) => typeof value === 'string' ? value : null),
+    setItem: (key, value) => run('readwrite', (objectStore) => objectStore.put(value, key)).then(() => undefined),
+    removeItem: (key) => run('readwrite', (objectStore) => objectStore.delete(key)).then(() => undefined),
+  };
+}
+
 /** Promise-based persistence adapter. The synchronous StorageLike contract is intentionally unchanged. */
 export interface AsyncStorageLike {
   getItem(key: string, signal?: StoreAbortSignal): Promise<string | null>;
@@ -702,6 +876,7 @@ export interface AsyncPersistencePlugin extends StorePlugin {
 export interface PersistencePluginOptions {
   readonly storage: StorageLike;
   readonly namespace?: string;
+  readonly channel?: PersistenceChannelFactory;
   readonly onError?: (error: unknown, storeId: string, recovery?: PersistedStateErrorContext) => void;
 }
 
@@ -712,6 +887,23 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
     const config = persist === true ? {} : persist;
     const key = config.key ?? `${options.namespace ?? 'gluon'}:${definition.id}`;
     const plan = normalizePersistencePlan(config);
+    let status: PersistenceStatus = 'hydrating';
+    let failure: unknown;
+    let resolveReady!: () => void;
+    const ready = new Promise<void>((resolve) => { resolveReady = resolve; });
+    const lifecycle: PersistenceLifecycle = {
+      get status() { return status; },
+      get error() { return failure; },
+      ready,
+      dispose() {
+        if (status === 'hydrating') {
+          status = 'failed';
+          failure ??= new Error('Synchronous store persistence was disposed before hydration completed.');
+          resolveReady();
+        }
+      },
+    };
+    (store.$extensions as Record<string, unknown>).persistence = lifecycle;
     const select = () => {
       const state = store.$state;
       if (!config.paths) return snapshotState(state);
@@ -723,29 +915,68 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
     };
     let lastRaw: string | null = null;
     let recoveryState: 'ready' | 'blocked' = 'ready';
+    let applyingRemote = false;
+    const source = `gluon-persistence-${++persistenceSourceSequence}`;
+    let channel: PersistenceChannel | undefined;
+    const channelMessage = (message: unknown): void => {
+      if (applyingRemote || !message || typeof message !== 'object') return;
+      const candidate = message as { readonly source?: unknown; readonly raw?: unknown };
+      if (candidate.source === source || typeof candidate.raw !== 'string') return;
+      try {
+        const loaded = loadPersistedState(candidate.raw, plan, definition.id, config);
+        if (!loaded.state) return;
+        applyingRemote = true;
+        store.$patch(resolvePersistedState(snapshotState(store.$state), loaded.state, 'persisted-wins'), {
+          source: 'persistence-sync',
+        });
+      } catch (error) {
+        options.onError?.(error, definition.id);
+      } finally {
+        applyingRemote = false;
+      }
+    };
+    if (config.sync) {
+      try {
+        const hasNativeChannel = Boolean((globalThis as unknown as { BroadcastChannel?: unknown }).BroadcastChannel);
+        if (options.channel || hasNativeChannel) {
+          channel = (options.channel ?? createBroadcastChannelFactory()).create(key);
+          channel.addEventListener(channelMessage);
+        }
+      } catch (error) {
+        failure = error;
+        status = 'failed';
+        options.onError?.(error, definition.id);
+      }
+    }
     const recovery = createRecovery({
       key,
       storage: options.storage,
       store,
       select,
       version: plan.version,
+      serialize: config.serialize,
       getRaw: () => lastRaw,
       setRaw: (raw) => {
         lastRaw = raw;
       },
       onRecover: () => {
         recoveryState = 'ready';
+        failure = undefined;
+        status = 'ready';
       },
     });
 
     try {
       lastRaw = options.storage.getItem(key);
-      const loaded = loadPersistedState(lastRaw, plan, definition.id);
+      const loaded = loadPersistedState(lastRaw, plan, definition.id, config);
       if (loaded.state) {
-        store.$patch(loaded.state, { source: 'persistence' });
+        store.$patch(resolvePersistedState(snapshotState(store.$state), loaded.state, config.merge), { source: 'persistence' });
       }
+      if (status !== 'failed') status = 'ready';
     } catch (error) {
       recoveryState = 'blocked';
+      failure = error;
+      status = 'failed';
       options.onError?.(error, definition.id, createRecoveryContext(error, {
         key,
         raw: lastRaw,
@@ -753,15 +984,20 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
         recovery,
       }, 'storage-read'));
     }
+    resolveReady();
 
-    return store.$subscribe(() => {
-      if (recoveryState === 'blocked') return;
+    const unsubscribe = store.$subscribe(() => {
+      if (recoveryState === 'blocked' || applyingRemote || status === 'failed') return;
       try {
-        const raw = JSON.stringify({ version: plan.version, state: select() });
+        const envelope = { version: plan.version, state: select() } satisfies PersistedStateEnvelope;
+        const raw = config.serialize?.(envelope) ?? JSON.stringify(envelope);
         options.storage.setItem(key, raw);
         lastRaw = raw;
+        channel?.postMessage({ source, raw });
       } catch (error) {
         recoveryState = 'blocked';
+        failure = error;
+        status = 'failed';
         options.onError?.(error, definition.id, createRecoveryContext(error, {
           key,
           raw: lastRaw,
@@ -770,6 +1006,12 @@ export function createPersistencePlugin(options: PersistencePluginOptions): Stor
         }, 'storage-write'));
       }
     });
+    return () => {
+      unsubscribe();
+      channel?.removeEventListener(channelMessage);
+      channel?.close?.();
+      lifecycle.dispose();
+    };
   };
 }
 
@@ -842,6 +1084,7 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
     if (!persist || disposed || aborted || status === 'failed') return;
     if (pending === 0) beginCycle();
     const config = persist === true ? {} : persist;
+    (store.$extensions as Record<string, unknown>).persistence = lifecycle;
     const key = config.key ?? `${options.namespace ?? 'gluon'}:${definition.id}`;
     const plan = normalizePersistencePlan(config);
     let revision = 0;
@@ -858,7 +1101,8 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
     const unsubscribe = store.$subscribe(() => {
       revision += 1;
       if (!hydrated || disposed || disposedStore || status === 'failed') return;
-      const raw = JSON.stringify({ version: plan.version, state: selectPersistedState(store, config.paths) });
+      const envelope = { version: plan.version, state: selectPersistedState(store, config.paths) } satisfies PersistedStateEnvelope;
+      const raw = config.serialize?.(envelope) ?? JSON.stringify(envelope);
       writeQueue = writeQueue.then(() => {
         if (disposed || disposedStore || status === 'failed') return;
         return options.storage.setItem(key, raw, controller);
@@ -867,12 +1111,15 @@ export function createAsyncPersistencePlugin(options: AsyncPersistencePluginOpti
     const readRevision = revision;
     const task = options.storage.getItem(key, controller).then((raw) => {
       if (disposed || disposedStore) return;
-      const loaded = loadPersistedState(raw, plan, definition.id);
+      const loaded = loadPersistedState(raw, plan, definition.id, config);
       const stale = readRevision !== revision;
-      if (!stale && loaded.state) store.$patch(loaded.state, { source: 'async-persistence' });
+      if (!stale && loaded.state) {
+        store.$patch(resolvePersistedState(snapshotState(store.$state), loaded.state, config.merge), { source: 'async-persistence' });
+      }
       hydrated = true;
       if (stale && !disposed && status !== 'failed') {
-        const current = JSON.stringify({ version: plan.version, state: selectPersistedState(store, config.paths) });
+        const envelope = { version: plan.version, state: selectPersistedState(store, config.paths) } satisfies PersistedStateEnvelope;
+        const current = config.serialize?.(envelope) ?? JSON.stringify(envelope);
         writeQueue = writeQueue.then(() => {
           if (disposed || disposedStore || status === 'failed') return;
           return options.storage.setItem(key, current, controller);
@@ -895,6 +1142,18 @@ function selectPersistedState(store: StorePluginStore, paths?: readonly string[]
   const selected: Record<string, JsonValue> = Object.create(null);
   for (const path of paths) if (path in store.$state) selected[path] = toJsonValue(store.$state[path], new WeakSet());
   return selected;
+}
+
+function resolvePersistedState(
+  serverState: PersistedStateRecord,
+  persistedState: PersistedStateRecord,
+  policy: PersistMergePolicy<StateTree> | undefined,
+): PersistedStateRecord {
+  if (typeof policy === 'function') return policy(serverState, persistedState);
+  if (policy === 'server-wins') return { ...persistedState, ...serverState };
+  if (policy === 'merge') return { ...serverState, ...persistedState };
+  // Preserve the historical persistence behavior when no policy is supplied.
+  return { ...serverState, ...persistedState };
 }
 
 function normalizePersistencePlan<State extends StateTree>(config: PersistOptions<State>): PersistencePlan {
@@ -938,11 +1197,12 @@ function loadPersistedState(
   saved: string | null,
   plan: PersistencePlan,
   storeId: string,
+  config: { readonly deserialize?: (raw: string) => unknown } = {},
 ): { readonly state: PersistedJsonStateRecord | null; readonly version?: number } {
   if (saved === null) return { state: null };
   let parsed: unknown;
   try {
-    parsed = JSON.parse(saved);
+    parsed = config.deserialize?.(saved) ?? JSON.parse(saved);
   } catch (error) {
     throw new PersistenceFailure('corrupt-json', saved, plan.version, storeId, error);
   }
@@ -1005,6 +1265,7 @@ function createRecovery(options: {
   readonly store: StorePluginStore;
   readonly select: () => Readonly<Record<string, JsonValue>>;
   readonly version: number;
+  readonly serialize?: (envelope: PersistedStateEnvelope) => string;
   readonly getRaw: () => string | null;
   readonly setRaw: (raw: string | null) => void;
   readonly onRecover: () => void;
@@ -1020,10 +1281,11 @@ function createRecovery(options: {
     key: options.key,
     reset() {
       options.store.$reset({ source: 'persistence-recovery', recovery: 'reset' });
-      const raw = JSON.stringify({
+      const envelope = {
         version: options.version,
         state: options.select(),
-      });
+      } satisfies PersistedStateEnvelope;
+      const raw = options.serialize?.(envelope) ?? JSON.stringify(envelope);
       options.storage.setItem(options.key, raw);
       options.setRaw(raw);
       options.onRecover();

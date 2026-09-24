@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gluonjs.dev/schemas/api-manifest-v1.json",
+  "type": "object",
+  "required": ["schemaVersion", "framework", "packageContract", "concepts", "diagnostics", "validation", "packages"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "framework": { "const": "gluon" },
+    "packageContract": { "type": "string" },
+    "concepts": { "type": "array", "items": { "type": "string" } },
+    "diagnostics": { "type": "object", "required": ["catalog", "stableCodes"] },
+    "validation": { "type": "object", "required": ["projectAnalysis", "templateCheck", "json"] },
+    "packages": { "type": "array", "items": { "type": "object", "required": ["name", "environment", "exports"] } }
+  },
+  "additionalProperties": false
+}

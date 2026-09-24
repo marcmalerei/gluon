@@ -142,6 +142,32 @@ Migration callbacks accept ordinary typed object records; application DTOs do
 not need a string index signature. Gluon normalizes and validates every result
 as JSON-safe state before applying or storing it.
 
+Browser adapters are explicit and can be replaced in tests:
+
+```ts
+import {
+  createIndexedDbStorage,
+  createLocalStorageAdapter,
+  createPersistencePlugin,
+} from '@gluonjs/store';
+
+const persistence = createPersistencePlugin({
+  storage: createLocalStorageAdapter(),
+});
+const asyncPersistence = createAsyncPersistencePlugin({
+  storage: createIndexedDbStorage({ database: 'shop', store: 'state' }),
+});
+```
+
+`persist.merge` is deterministic: `persisted-wins` is the compatible default,
+`server-wins` preserves request/SSR values, `merge` shallowly combines both,
+and a function can define an application-specific result. `persist.sync: true`
+uses an explicit `PersistenceChannelFactory` (or the browser
+`BroadcastChannel`) and suppresses rebroadcast while applying remote state.
+The selected state is the only state written; persistence is not secure storage
+and must not contain secrets. `store.$extensions.persistence` exposes the
+per-store `PersistenceLifecycle` (`status`, `error`, `ready`, and `dispose`).
+
 ```ts
 const profile = defineStore({
   id: 'profile',

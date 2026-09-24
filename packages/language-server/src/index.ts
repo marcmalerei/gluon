@@ -1,6 +1,9 @@
 import ts from 'typescript';
 import { compileGluonSfc, getGluonDiagnostic, parseGluonSfc, transformGluonModule, type GluonSfcBlock } from '@gluonjs/compiler';
 
+export { GLUON_API_MANIFEST, getGluonApiManifest, type GluonApiManifest, type GluonApiManifestPackage } from './api-manifest.js';
+export { GluonMcpServer, type McpRequest, type McpResponse } from './mcp.js';
+
 export {
   PROJECT_ANALYSIS_SCHEMA,
   analyzeStaticGluonProject,

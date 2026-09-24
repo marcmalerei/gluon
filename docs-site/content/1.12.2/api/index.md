@@ -20,6 +20,7 @@ for the evidence boundary shared by the package portal and release line.
 
 - [`@gluonjs/core`](generated/src/)
 - [`@gluonjs/core/styles`](generated/src/styles/)
+- [`@gluonjs/core/analytics`](generated/src/analytics/)
 - [`@gluonjs/reactivity`](generated/packages/reactivity/src/)
 - [`@gluonjs/router`](generated/packages/router/src/)
 - [`@gluonjs/router/memory`](generated/packages/router/src/memory/)
@@ -32,6 +33,7 @@ for the evidence boundary shared by the package portal and release line.
 - [`@gluonjs/ssr/hydration`](generated/packages/ssr/src/hydration/)
 - [`@gluonjs/ssr/static`](generated/packages/ssr/src/static/)
 - [`@gluonjs/ssr/streaming`](generated/packages/ssr/src/streaming/)
+- [`@gluonjs/ssr/tenant`](generated/packages/ssr/src/tenant/)
 
 ## Tooling
 

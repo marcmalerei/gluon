@@ -226,6 +226,7 @@ they are not alternative component bases.
 
 | Class | Use it for |
 | --- | --- |
+| [`Analytics`](/gluon/1.12.2/api/generated/src/analytics/classes/Analytics.html) | Own provider-independent semantic events, consent, enrichment, and SSR-safe analytics delivery for one application. |
 | [`GluonElement`](/gluon/1.12.2/api/generated/src/classes/GluonElement.html) | Subclass it for a stateful Custom Element that needs protected class extension points. |
 | [`TemplateResult`](/gluon/1.12.2/api/generated/src/classes/TemplateResult.html) | This is the immutable result returned by `html`; return it from render code rather than constructing it directly. |
 | [`EffectScope`](/gluon/1.12.2/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
@@ -248,6 +249,7 @@ they are not alternative component bases.
 | [`GluonDevtoolsBridge`](/gluon/1.12.2/api/generated/packages/devtools/src/classes/GluonDevtoolsBridge.html) | Connect application, Router, Store, render, event, and error signals to `DevtoolsProtocol`; dispose it with its owner. |
 | [`GluonLanguageService`](/gluon/1.12.2/api/generated/packages/language-server/src/classes/GluonLanguageService.html) | Analyze open TypeScript documents for Gluon diagnostics, completion, hover, definitions, rename edits, and semantic tokens. |
 | [`GluonProtocolServer`](/gluon/1.12.2/api/generated/packages/language-server/src/classes/GluonProtocolServer.html) | Adapt `GluonLanguageService` to the repository's JSON-RPC/LSP message contract. |
+| [`GluonMcpServer`](/gluon/1.12.2/api/generated/packages/language-server/src/classes/GluonMcpServer.html) | Serve the read-only API manifest, diagnostics, and validation tools through the stable MCP request contract. |
 
 ### Error classes
 

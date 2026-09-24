@@ -12,6 +12,7 @@ const entry = {
   decorators: resolve(import.meta.dirname, 'src/decorators.ts'),
   index: resolve(import.meta.dirname, 'src/index.ts'),
   styles: resolve(import.meta.dirname, 'src/styles/index.ts'),
+  analytics: resolve(import.meta.dirname, 'src/analytics.ts'),
 };
 
 export default defineConfig({
@@ -49,6 +50,7 @@ export default defineConfig({
     conditions: ['browser'],
     alias: {
       '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
+      '@gluonjs/core/analytics': resolve(import.meta.dirname, 'src/analytics.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/i18n': resolve(import.meta.dirname, 'packages/i18n/src/index.ts'),
       '@gluonjs/json-forms': resolve(import.meta.dirname, 'packages/json-forms/src/index.ts'),
@@ -71,6 +73,7 @@ export default defineConfig({
       '@gluonjs/ssr/hydration': resolve(import.meta.dirname, 'packages/ssr/src/hydration.ts'),
       '@gluonjs/ssr/eleventy': resolve(import.meta.dirname, 'packages/ssr/src/eleventy.ts'),
       '@gluonjs/ssr/streaming': resolve(import.meta.dirname, 'packages/ssr/src/streaming.ts'),
+      '@gluonjs/ssr/tenant': resolve(import.meta.dirname, 'packages/ssr/src/tenant.ts'),
       '@gluonjs/ssr': resolve(import.meta.dirname, 'packages/ssr/src/index.ts'),
       '@gluonjs/store': resolve(import.meta.dirname, 'packages/store/src/index.ts'),
       '@gluonjs/test-utils/ssr': resolve(import.meta.dirname, 'packages/test-utils/src/ssr.ts'),
@@ -143,6 +146,7 @@ export default defineConfig({
         'packages/ssr/src/eleventy.ts',
         'packages/ssr/src/static.ts',
         'packages/ssr/src/streaming.ts',
+        'packages/ssr/src/tenant.ts',
         'packages/store/**',
         'packages/test-utils/**',
         'packages/vite/**',
