@@ -8,8 +8,8 @@
     "checkedAt": "2026-09-24",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Registry preflight on 2026-09-24 verified all 21 contracted package records at latest 1.12.2 and confirmed 1.12.3 absent. Candidate publication requires exact-commit Quality Gates, release-cut evidence, and compatibility-manifest validation before the protected v1.12.3 tag may be created."
+    "publicationState": "released",
+    "observation": "Independent post-publication verification on 2026-09-24 confirmed protected tag v1.12.3 resolves to merge commit 3185e48a3dcc1b3138eaa6bf19f1e51893d7e8f1, release workflow 35985803820 succeeded, the GitHub release contains 131 assets, and all 21 contracted packages are published at version and latest 1.12.3 with provenance metadata."
   },
   "packages": [
     {

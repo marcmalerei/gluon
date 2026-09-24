@@ -9,26 +9,27 @@ For day-to-day version upgrades, start with the
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: ready` and
-`scopeControl: verified` for the `1.12.3` candidate. Every official manifest is
-public and lockstep at `1.12.3`. Registry preflight on 2026-09-24 confirmed all
-21 package records at `latest` `1.12.2` and confirmed that `1.12.3` is absent.
-The protected `v1.12.3` tag must not be created until the exact candidate commit
-passes Quality Gates and the release-cut evidence and compatibility manifest
-are committed and validated. This is enforced by:
+The machine-readable package contract records `publicationState: released` and
+`scopeControl: verified` for `1.12.3`. The protected tag `v1.12.3` resolves to
+merge commit `3185e48a3dcc1b3138eaa6bf19f1e51893d7e8f1`. Release workflow
+[`35985803820`](https://github.com/marcmalerei/gluon/actions/runs/35985803820)
+completed successfully, the GitHub release contains 131 assets, and independent
+registry verification confirmed all 21 package records at version and `latest`
+`1.12.3` with provenance metadata. Validate the recorded state with:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.12.3 candidate handoff
+## v1.12.3 publication
 
 Issue [#526](https://github.com/marcmalerei/gluon/issues/526) tracks the
 21-package patch train for the additive analytics, tenant, agent-tooling, and
-persistence APIs delivered by issues #521-#524. The candidate PR must pass the
-full repository Quality Gates before its release-cut evidence is recorded.
-The package train and immutable `v1.12.3` release remain unpublished until
-the protected tag workflow and independent registry verification complete.
+persistence APIs delivered by issues #521-#524. Candidate PR
+[#527](https://github.com/marcmalerei/gluon/pull/527) preserved the tested
+candidate and release-cut evidence as a merge commit. The protected tag
+workflow and independent registry verification completed successfully; issue
+#526 is closed and `1.12.3` is the supported `latest` baseline.
 
 ## v1.12.0 train handoff
 
