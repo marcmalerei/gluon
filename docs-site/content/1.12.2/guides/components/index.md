@@ -248,6 +248,7 @@ they are not alternative component bases.
 | [`GluonDevtoolsBridge`](/gluon/1.12.2/api/generated/packages/devtools/src/classes/GluonDevtoolsBridge.html) | Connect application, Router, Store, render, event, and error signals to `DevtoolsProtocol`; dispose it with its owner. |
 | [`GluonLanguageService`](/gluon/1.12.2/api/generated/packages/language-server/src/classes/GluonLanguageService.html) | Analyze open TypeScript documents for Gluon diagnostics, completion, hover, definitions, rename edits, and semantic tokens. |
 | [`GluonProtocolServer`](/gluon/1.12.2/api/generated/packages/language-server/src/classes/GluonProtocolServer.html) | Adapt `GluonLanguageService` to the repository's JSON-RPC/LSP message contract. |
+| [`GluonMcpServer`](/gluon/1.12.2/api/generated/packages/language-server/src/classes/GluonMcpServer.html) | Serve the read-only API manifest, diagnostics, and validation tools through the stable MCP request contract. |
 
 ### Error classes
 
