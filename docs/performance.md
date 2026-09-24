@@ -306,7 +306,9 @@ keyed product records, primary navigation landmarks, filtering, sorting,
 conditional product detail, configuration events, bag state, and teardown.
 Every scenario validates the rendered product boundaries and state before its
 sample is retained. Update scenarios measure a three-action batch and report
-milliseconds per action; mount and teardown are measured as one operation.
+milliseconds per action; mount and teardown measure their own phase separately
+around the same fresh application lifecycle. Teardown uses a 20-instance batch
+and reports the per-instance cost to stay above coarse browser timer resolution.
 
 The app-shaped fixture is deliberately smaller than GLUON GOODS and is not a
 claim that the frameworks are interchangeable applications. It complements
@@ -362,6 +364,24 @@ workload at the same median as Lit and Vue, with a lower p95 than both in the
 candidate run. Mount and teardown
 medians did not materially change, so this result is evidence for the keyed
 update path only, not a universal framework ranking.
+
+### Lifecycle measurement follow-up (#519)
+
+The lifecycle benchmark now records mount and teardown independently. Earlier
+results measured the full mount-plus-dispose span for both labels, with only
+the correctness snapshot placed on either side of disposal. Those values were
+not suitable for attributing a remaining lifecycle gap to one phase. New
+results use 200 samples, 20 warm-up rounds, and a 20-instance teardown batch.
+
+The paired Chromium run isolated one useful mount improvement. Replacing the
+repeated `nextBindingNode()` walk during binding instantiation with one native
+`TreeWalker` pass reduced Gluon's mount median from `0.5000` to `0.4000 ms`
+and p95 from `0.6000` to `0.5000 ms`. The candidate mount median now matches
+Lit in this run; Vue remains faster at `0.3000 ms`. Teardown did not improve:
+Gluon remains at `0.0550 ms/instance`, compared with `0.0150` for Lit and
+`0.0200` for Vue. Its CPU profile is dominated by native `replaceChildren`,
+so further teardown work requires a separate DOM-removal experiment rather
+than more binding-loop changes.
 
 ## SSR comparison workload
 

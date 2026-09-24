@@ -151,6 +151,10 @@ function validateApplicationRun(evidence, browser) {
       if (!Array.isArray(result.samples) || result.samples.length === 0 || !result.snapshot) {
         throw new Error(`${browser} application ${scenario.scenario}/${result.framework} is missing samples or correctness.`);
       }
+      const expectedBatchSize = scenario.scenario === 'mount' ? 1 : scenario.scenario === 'teardown' ? 20 : 3;
+      if (result.batchSize !== expectedBatchSize) {
+        throw new Error(`${browser} application ${scenario.scenario}/${result.framework} must use batch size ${expectedBatchSize}.`);
+      }
     }
   }
 }
