@@ -53,6 +53,7 @@ import {
 } from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
 import { gluonEleventyPlugin, renderEleventyPage } from '@gluonjs/ssr/eleventy';
+import { deserializeTenantContext, serializeTenantContext } from '@gluonjs/ssr/tenant';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 import { renderSsrFixture } from '../packages/test-utils/src/ssr.js';
 import { ClassQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-class.js';
@@ -1209,6 +1210,26 @@ describe('@gluonjs/ssr static output and style transport', () => {
     } finally {
       await rm(output, { recursive: true, force: true });
     }
+  });
+});
+
+describe('tenant request isolation and handoff', () => {
+  it('resolves tenant data per request and serializes it explicitly', async () => {
+    let seenTenant: unknown;
+    const response = await renderRequest({
+      url: 'https://acme.example/products',
+      resolveTenant: ({ hostname }) => ({ id: hostname, theme: 'cobalt' }),
+      createApp: ({ tenant }) => {
+        seenTenant = tenant;
+        return createApp(() => html`<main>${tenant?.tenant.theme}</main>`);
+      },
+    });
+    expect(response.tenant?.id).toBe('acme.example');
+    expect(seenTenant).toEqual(response.tenant);
+    expect(response.html).toContain('cobalt');
+    const serialized = serializeTenantContext(response.tenant!);
+    expect(deserializeTenantContext(serialized)).toEqual(response.tenant);
+    expect(JSON.parse(response.state).tenant).toEqual(response.tenant);
   });
 });
 

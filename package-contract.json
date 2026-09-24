@@ -33,7 +33,7 @@
       "directory": ".",
       "state": "current",
       "environment": "browser",
-      "exports": [".", "./decorators", "./styles"],
+      "exports": [".", "./decorators", "./styles", "./analytics"],
       "bins": ["gluon-skill"],
       "currentDependencies": ["@gluonjs/reactivity"],
       "dependencies": ["@gluonjs/reactivity"]
@@ -67,7 +67,7 @@
       "directory": "packages/ssr",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./eleventy", "./hydration", "./static", "./streaming"],
+      "exports": [".", "./eleventy", "./hydration", "./static", "./streaming", "./tenant"],
       "dependencies": [
         "@gluonjs/core",
         "@gluonjs/reactivity",
@@ -140,7 +140,9 @@
       "bins": [
         "gluon-language-server",
         "gluon-project-analyze",
-        "gluon-template-check"
+        "gluon-template-check",
+        "gluon-check",
+        "gluon-mcp"
       ],
       "dependencies": ["@gluonjs/compiler"]
     },

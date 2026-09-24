@@ -38,6 +38,10 @@
     "./static": {
       "types": "./dist/static.d.ts",
       "import": "./dist/static.js"
+    },
+    "./tenant": {
+      "types": "./dist/tenant.d.ts",
+      "import": "./dist/tenant.js"
     }
   },
   "files": [

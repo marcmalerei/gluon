@@ -3335,9 +3335,122 @@
         "console.log(fieldName, errors, context.signal.aborted, result.ok);",
         "controller.dispose();"
       ]
+    },
+    "analytics-contract": {
+      "module": "@gluonjs/core/analytics",
+      "code": [
+        "import { Analytics, createAnalytics, createGa4Adapter, createServerAnalytics, semanticAnalyticsEvents, trackEvent, trackImpression, type AnalyticsAdapter, type AnalyticsEvent, type AnalyticsEventName, type AnalyticsEventOptions, type AnalyticsOptions, type AnalyticsScope, type AnalyticsDirectiveOptions, type SemanticAnalyticsEvent } from '@gluonjs/core/analytics';",
+        "const adapter: AnalyticsAdapter = createGa4Adapter((event) => console.log(event));",
+        "const options: AnalyticsOptions = { adapters: [adapter], consent: () => 'granted' };",
+        "const analytics: Analytics = createAnalytics(options);",
+        "const scope: AnalyticsScope = analytics.scope({ locale: 'en-GB' });",
+        "const eventName: AnalyticsEventName = semanticAnalyticsEvents[0];",
+        "const semanticEvent: SemanticAnalyticsEvent = 'view_item';",
+        "const eventOptions: AnalyticsEventOptions = { context: { currency: 'EUR' } };",
+        "const event: AnalyticsEvent = scope.track(eventName, { item_id: 'lamp' }, eventOptions)!;",
+        "const directiveOptions: AnalyticsDirectiveOptions = { emitOnUpdate: true };",
+        "const server = createServerAnalytics();",
+        "console.log(event, semanticEvent, directiveOptions, server, trackEvent, trackImpression);"
+      ]
+    },
+    "agent-manifest-contract": {
+      "module": "@gluonjs/language-server",
+      "code": [
+        "import { GLUON_API_MANIFEST, getGluonApiManifest, type GluonApiManifest, type GluonApiManifestPackage } from '@gluonjs/language-server';",
+        "const manifest: GluonApiManifest = getGluonApiManifest();",
+        "const packageEntry: GluonApiManifestPackage | undefined = manifest.packages.find((entry) => entry.name === '@gluonjs/core');",
+        "console.log(GLUON_API_MANIFEST.framework, manifest.concepts, packageEntry?.exports);"
+      ]
+    },
+    "mcp-contract": {
+      "module": "@gluonjs/language-server",
+      "code": [
+        "import { GluonMcpServer, type McpRequest, type McpResponse } from '@gluonjs/language-server';",
+        "const request: McpRequest = { jsonrpc: '2.0', id: 1, method: 'tools/list' };",
+        "const response: McpResponse = new GluonMcpServer().handle(request);",
+        "console.log(response.jsonrpc, response.result);"
+      ]
+    },
+    "tenant-contract": {
+      "module": "@gluonjs/ssr/tenant",
+      "code": [
+        "import { createTenantContext, deserializeTenantContext, installTenant, resolveTenant, serializeTenantContext, tenantInjectionKey, type TenantContext, type TenantJsonValue, type TenantResolutionRequest, type TenantResolver } from '@gluonjs/ssr/tenant';",
+        "const request: TenantResolutionRequest = { url: 'https://acme.example/', hostname: 'acme.example', headers: {} };",
+        "const resolver: TenantResolver = (input) => ({ id: input.hostname, locale: 'en-GB' });",
+        "const context: TenantContext = await resolveTenant(request, resolver);",
+        "const explicit = createTenantContext({ id: 'acme' } satisfies TenantJsonValue, { hostname: request.hostname });",
+        "const serialized = serializeTenantContext(context);",
+        "const restored = deserializeTenantContext(serialized);",
+        "console.log(installTenant, tenantInjectionKey, explicit, restored);"
+      ]
+    },
+    "store-persistence-adapters": {
+      "module": "@gluonjs/store",
+      "code": [
+        "import { createBroadcastChannelFactory, createIndexedDbStorage, createLocalStorageAdapter, createMemoryStorage, createSessionStorageAdapter, createWebStorageAdapter, type IndexedDbFactory, type IndexedDbStorageOptions, type PersistenceChannel, type PersistenceChannelFactory, type PersistenceLifecycle, type PersistenceStatus, type PersistMergePolicy } from '@gluonjs/store';",
+        "const memory = createMemoryStorage({ draft: '{\\\"version\\\":1,\\\"state\\\":{}}' });",
+        "const local = createLocalStorageAdapter(memory);",
+        "const session = createSessionStorageAdapter(memory);",
+        "const web = createWebStorageAdapter('local', memory);",
+        "const channel: PersistenceChannel = { postMessage() {}, addEventListener() {}, removeEventListener() {} };",
+        "const channels: PersistenceChannelFactory = { create: () => channel };",
+        "const status: PersistenceStatus = 'ready';",
+        "const lifecycle: PersistenceLifecycle | undefined = undefined;",
+        "const merge: PersistMergePolicy<{ value: number }> = 'server-wins';",
+        "const factory: IndexedDbFactory | undefined = undefined;",
+        "const indexedDbOptions: IndexedDbStorageOptions = { database: 'shop', store: 'state', factory };",
+        "const indexed = factory ? createIndexedDbStorage(indexedDbOptions) : undefined;",
+        "const browserChannels = typeof BroadcastChannel === 'undefined' ? channels : createBroadcastChannelFactory();",
+        "console.log(local, session, web, indexed, browserChannels, status, lifecycle, merge);"
+      ]
     }
   },
   "overrides": {
+    "src/analytics/classes/Analytics.md": { "recipe": "analytics-contract", "description": "Own provider-independent event delivery and consent policy:" },
+    "src/analytics/functions/createAnalytics.md": { "recipe": "analytics-contract", "description": "Create an application-local analytics pipeline:" },
+    "src/analytics/functions/createGa4Adapter.md": { "recipe": "analytics-contract", "description": "Adapt semantic events to a GA4-shaped application sink:" },
+    "src/analytics/functions/createServerAnalytics.md": { "recipe": "analytics-contract", "description": "Create an SSR-safe analytics scope that never delivers events:" },
+    "src/analytics/interfaces/AnalyticsAdapter.md": { "recipe": "analytics-contract", "description": "Implement a provider adapter at the delivery boundary:" },
+    "src/analytics/interfaces/AnalyticsDirectiveOptions.md": { "recipe": "analytics-contract", "description": "Control repeated template lifecycle event delivery:" },
+    "src/analytics/interfaces/AnalyticsEvent.md": { "recipe": "analytics-contract", "description": "Read the immutable semantic event envelope:" },
+    "src/analytics/interfaces/AnalyticsEventOptions.md": { "recipe": "analytics-contract", "description": "Add local context and deduplication policy to one event:" },
+    "src/analytics/interfaces/AnalyticsOptions.md": { "recipe": "analytics-contract", "description": "Configure adapters, consent, enrichment, and environment ownership:" },
+    "src/analytics/interfaces/AnalyticsScope.md": { "recipe": "analytics-contract", "description": "Inherit analytics context through nested reusable components:" },
+    "src/analytics/type-aliases/AnalyticsEventName.md": { "recipe": "analytics-contract", "description": "Use a typed semantic or application-defined event name:" },
+    "src/analytics/type-aliases/SemanticAnalyticsEvent.md": { "recipe": "analytics-contract", "description": "Choose a standard commerce event name:" },
+    "src/analytics/variables/semanticAnalyticsEvents.md": { "recipe": "analytics-contract", "description": "Discover the built-in semantic commerce event registry:" },
+    "src/analytics/variables/trackEvent.md": { "recipe": "analytics-contract", "description": "Emit a semantic analytics event from a template lifecycle:" },
+    "src/analytics/variables/trackImpression.md": { "recipe": "analytics-contract", "description": "Emit a lifecycle-safe, deduplicated template impression:" },
+    "packages/language-server/src/functions/getGluonApiManifest.md": { "recipe": "agent-manifest-contract", "description": "Read the stable machine-facing framework map used by validation tooling:" },
+    "packages/language-server/src/classes/GluonMcpServer.md": { "recipe": "mcp-contract", "description": "Serve read-only API, diagnostics, and validation tools over MCP:" },
+    "packages/language-server/src/interfaces/McpRequest.md": { "recipe": "mcp-contract", "description": "Construct one JSON-RPC request for the read-only MCP surface:" },
+    "packages/language-server/src/interfaces/McpResponse.md": { "recipe": "mcp-contract", "description": "Handle a structured MCP JSON-RPC response:" },
+    "packages/language-server/src/interfaces/GluonApiManifest.md": { "recipe": "agent-manifest-contract", "description": "Type a machine-readable Gluon API manifest returned by the language tooling:" },
+    "packages/language-server/src/interfaces/GluonApiManifestPackage.md": { "recipe": "agent-manifest-contract", "description": "Describe one public package and its supported entry points:" },
+    "packages/language-server/src/variables/GLUON_API_MANIFEST.md": { "recipe": "agent-manifest-contract", "description": "Use the immutable built-in API manifest in an agent-facing check:" },
+    "packages/ssr/src/tenant/functions/createTenantContext.md": { "recipe": "tenant-contract", "description": "Create a request-local tenant context from resolved configuration:" },
+    "packages/ssr/src/tenant/functions/deserializeTenantContext.md": { "recipe": "tenant-contract", "description": "Restore a validated tenant context from the explicit client handoff:" },
+    "packages/ssr/src/tenant/functions/installTenant.md": { "recipe": "tenant-contract", "description": "Install a resolved tenant context into a Gluon application:" },
+    "packages/ssr/src/tenant/functions/resolveTenant.md": { "recipe": "tenant-contract", "description": "Resolve tenant configuration from the request hostname without global state:" },
+    "packages/ssr/src/tenant/functions/serializeTenantContext.md": { "recipe": "tenant-contract", "description": "Serialize only JSON-compatible tenant data for hydration:" },
+    "packages/ssr/src/tenant/interfaces/TenantContext.md": { "recipe": "tenant-contract", "description": "Carry tenant identity and configuration through one request:" },
+    "packages/ssr/src/tenant/interfaces/TenantResolutionRequest.md": { "recipe": "tenant-contract", "description": "Provide hostname and headers to an application-owned tenant resolver:" },
+    "packages/ssr/src/tenant/type-aliases/TenantJsonValue.md": { "recipe": "tenant-contract", "description": "Constrain tenant configuration to safe handoff values:" },
+    "packages/ssr/src/tenant/type-aliases/TenantResolver.md": { "recipe": "tenant-contract", "description": "Define synchronous or asynchronous hostname-based tenant resolution:" },
+    "packages/ssr/src/tenant/variables/tenantInjectionKey.md": { "recipe": "tenant-contract", "description": "Use the public injection key when a component consumes tenant context:" },
+    "packages/store/src/functions/createBroadcastChannelFactory.md": { "recipe": "store-persistence-adapters", "description": "Provide the browser channel implementation for opt-in synchronized persistence:" },
+    "packages/store/src/functions/createIndexedDbStorage.md": { "recipe": "store-persistence-adapters", "description": "Create an asynchronous IndexedDB adapter behind the persistence contract:" },
+    "packages/store/src/functions/createLocalStorageAdapter.md": { "recipe": "store-persistence-adapters", "description": "Select localStorage explicitly while retaining an injectable test adapter:" },
+    "packages/store/src/functions/createMemoryStorage.md": { "recipe": "store-persistence-adapters", "description": "Use an isolated in-memory adapter for tests and non-browser execution:" },
+    "packages/store/src/functions/createSessionStorageAdapter.md": { "recipe": "store-persistence-adapters", "description": "Select sessionStorage explicitly for short-lived client state:" },
+    "packages/store/src/functions/createWebStorageAdapter.md": { "recipe": "store-persistence-adapters", "description": "Select a browser Web Storage kind through one injectable adapter contract:" },
+    "packages/store/src/interfaces/IndexedDbFactory.md": { "recipe": "store-persistence-adapters", "description": "Inject a DOM-free IndexedDB factory for deterministic adapter tests:" },
+    "packages/store/src/interfaces/IndexedDbStorageOptions.md": { "recipe": "store-persistence-adapters", "description": "Configure database and object-store ownership for IndexedDB persistence:" },
+    "packages/store/src/interfaces/PersistenceChannel.md": { "recipe": "store-persistence-adapters", "description": "Connect cross-tab messages to the persistence synchronization boundary:" },
+    "packages/store/src/interfaces/PersistenceChannelFactory.md": { "recipe": "store-persistence-adapters", "description": "Create named synchronization channels per persisted store key:" },
+    "packages/store/src/interfaces/PersistenceLifecycle.md": { "recipe": "store-persistence-adapters", "description": "Observe per-store readiness and failure ownership through the extension metadata:" },
+    "packages/store/src/type-aliases/PersistenceStatus.md": { "recipe": "store-persistence-adapters", "description": "Represent the explicit persistence hydration lifecycle:" },
+    "packages/store/src/type-aliases/PersistMergePolicy.md": { "recipe": "store-persistence-adapters", "description": "Choose deterministic server-versus-persisted state conflict semantics:" },
     "packages/molecules/src/variables/Toolbar.md": {
       "description": "Render a named toolbar from the public molecule entry point while keeping native actions and routing caller-owned:",
       "code": [

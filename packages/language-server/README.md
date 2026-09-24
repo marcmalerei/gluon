@@ -36,6 +36,11 @@ declarations and exposes their fields, events, and slots to the same analyzer.
 Every emitted code is required to exist in the public `@gluonjs/compiler`
 diagnostic catalog shared with the Playground and Devtools reference.
 
+Agent-facing contracts are available through `getGluonApiManifest()` and the
+generated [`docs/api-manifest.json`](../../docs/api-manifest.json). The
+`gluon-check` alias accepts `--json` and emits a versioned result containing
+the public API manifest, checked files, stable diagnostics, and an `ok` flag:
+
 <!-- gluon-package-overview:start -->
 ## @gluonjs/language-server at a glance
 
@@ -78,6 +83,16 @@ gluon-language-server
 <!-- gluon-package-overview:end -->
 
 ```sh
+gluon-check --json src > gluon-check.json
+node scripts/build-api-manifest.mjs --check
+```
+
+The JSON path is additive; `gluon-template-check` keeps its existing human
+output and exit codes.
+
+
+
+```sh
 gluon-template-check src
 gluon-project-analyze src > project-analysis.json
 gluon-language-server --stdio
@@ -100,6 +115,10 @@ dynamic imports, and filesystem rename remain outside the contract.
 Protocol behavior is tested through `GluonProtocolServer` without VS Code. The
 maintained VS Code client is in `editors/vscode` and starts the lockstep server
 from the workspace or extension configuration.
+
+`gluon-mcp` is a read-only MCP stdio server backed by the same API manifest and
+diagnostic catalog. It exposes `get_api_manifest`, `explain_error`, and
+`validate_code` tools; it does not execute project code or modify files.
 
 ## License
 

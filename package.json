@@ -34,6 +34,10 @@
     "./styles": {
       "types": "./dist/types/styles/index.d.ts",
       "import": "./dist/styles.js"
+    },
+    "./analytics": {
+      "types": "./dist/types/analytics.d.ts",
+      "import": "./dist/analytics.js"
     }
   },
   "files": [
@@ -204,6 +208,7 @@
     "check:example-previews": "npm run build:shop && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:component-library && node scripts/validate-example-previews.mjs && npm run check:json-forms-example-browser",
     "check:json-forms-example-browser": "node scripts/validate-json-forms-example-browser.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
+    "check:api-manifest": "node scripts/build-api-manifest.mjs --check",
     "check:reactivity-singleton": "node scripts/validate-reactivity-singleton.mjs",
     "check:release-sbom-closure": "node scripts/validate-release-sbom-closure.mjs",
     "check:create-gluon-fixtures": "node scripts/validate-create-gluon-fixtures.mjs",

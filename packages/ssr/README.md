@@ -24,7 +24,7 @@ normal element hydrator.
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/ssr/) · [npm](https://www.npmjs.com/package/@gluonjs/ssr) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/ssr/README.md)
 
-**Public API:** [`@gluonjs/ssr`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/) · [`@gluonjs/ssr/eleventy`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/eleventy/) · [`@gluonjs/ssr/hydration`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/hydration/) · [`@gluonjs/ssr/static`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/static/) · [`@gluonjs/ssr/streaming`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/streaming/)
+**Public API:** [`@gluonjs/ssr`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/) · [`@gluonjs/ssr/eleventy`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/eleventy/) · [`@gluonjs/ssr/hydration`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/hydration/) · [`@gluonjs/ssr/static`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/static/) · [`@gluonjs/ssr/streaming`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/streaming/) · [`@gluonjs/ssr/tenant`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/ssr/src/tenant/)
 
 ### Install
 
@@ -104,6 +104,13 @@ without the attribute remain compatible.
 tree and merges them between shared UI and application-owned sheets. Style
 manifests use deterministic IDs and ordered CSS text for initial carriers and
 browser handoff.
+
+Tenant resolution is request-scoped and optional. Pass `resolveTenant()` (or an
+already resolved `tenant` context) to `renderRequest()`; the result is exposed
+to `load()` and `createApp()`, serialized in the state handoff, and returned as
+`result.tenant`. `@gluonjs/ssr/tenant` provides JSON-checked
+`serializeTenantContext()`/`deserializeTenantContext()` and `installTenant()`.
+No tenant data is stored in a process-wide singleton.
 
 Nested component composition participates in the same traversal. A public
 `defineMolecule()` wrapper that calls a public Atom such as `Radio()` still

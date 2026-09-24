@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createPersistencePlugin,
   createAsyncPersistencePlugin,
+  createMemoryStorage,
   createStoreManager,
   createTestingStoreManager,
   defineStore,
@@ -35,6 +36,39 @@ const counterDefinition = defineStore({
       throw new Error('action failed');
     },
   }),
+});
+
+describe('@gluonjs/store persistence adapters and synchronization', () => {
+  it('supports explicit merge policy and cross-tab synchronization without feedback loops', () => {
+    const storage = createMemoryStorage({ 'gluon:merge': '{"version":1,"state":{"value":9}}' });
+    const definition = defineStore({
+      id: 'merge',
+      state: () => ({ value: 1 }),
+      persist: { merge: 'server-wins', sync: true },
+    });
+    const listeners = new Set<(message: unknown) => void>();
+    const channel = {
+      create() {
+        return {
+          postMessage(message: unknown) { for (const callback of [...listeners]) callback(message); },
+          addEventListener(callback: (message: unknown) => void) { listeners.add(callback); },
+          removeEventListener(callback: (message: unknown) => void) { listeners.delete(callback); },
+        };
+      },
+    };
+    const first = createStoreManager({ plugins: [createPersistencePlugin({ storage, channel })] });
+    const second = createStoreManager({ plugins: [createPersistencePlugin({ storage, channel })] });
+    const firstStore = first.use(definition);
+    const secondStore = second.use(definition);
+    expect(firstStore.value).toBe(1);
+    expect(secondStore.value).toBe(1);
+
+    firstStore.$patch({ value: 3 });
+    expect(secondStore.value).toBe(3);
+    expect(firstStore.$extensions.persistence).toMatchObject({ status: 'ready' });
+    first.dispose();
+    second.dispose();
+  });
 });
 
 describe('@gluonjs/store definitions and transactions', () => {

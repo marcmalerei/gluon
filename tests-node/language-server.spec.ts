@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { describe, expect, test } from 'vitest';
 import {
   GluonLanguageService,
+  GluonMcpServer,
   GluonProtocolServer,
   analyzeGluonDocument,
   analyzeGluonProject,
@@ -522,6 +523,23 @@ describe('Gluon LSP protocol', () => {
     expect(server.handle({ jsonrpc: '2.0', id: 5, method: 'textDocument/semanticTokens/full', params })[0]?.result).toBeDefined();
     const closed = server.handle({ jsonrpc: '2.0', method: 'textDocument/didClose', params: { textDocument: { uri: 'file:///use.ts' } } });
     expect((closed[0]?.params as any).diagnostics).toEqual([]);
+  });
+});
+
+describe('Gluon MCP server', () => {
+  test('exposes the public manifest, diagnostic explanation, and read-only validation tool', () => {
+    const server = new GluonMcpServer();
+    expect(server.handle({ jsonrpc: '2.0', id: 1, method: 'tools/list' }).result).toMatchObject({ tools: expect.arrayContaining([
+      expect.objectContaining({ name: 'get_api_manifest' }),
+      expect.objectContaining({ name: 'explain_error' }),
+      expect.objectContaining({ name: 'validate_code' }),
+    ]) });
+    const manifest = server.handle({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'get_api_manifest' } });
+    expect(manifest.result).toMatchObject({ content: [{ type: 'text' }] });
+    const diagnostic = server.handle({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'explain_error', arguments: { code: 'GLUON_TEMPLATE_VOID_CHILDREN' } } });
+    expect(JSON.parse((diagnostic.result as any).content[0].text).code).toBe('GLUON_TEMPLATE_VOID_CHILDREN');
+    const validation = server.handle({ jsonrpc: '2.0', id: 4, method: 'tools/call', params: { name: 'validate_code', arguments: { uri: 'inline.ts', text: "import { html } from '@gluonjs/core'; html`<main>ok</main>`;" } } });
+    expect(JSON.parse((validation.result as any).content[0].text).diagnostics).toEqual([]);
   });
 });
 

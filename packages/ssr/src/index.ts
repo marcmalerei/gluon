@@ -33,6 +33,15 @@ import {
   type StoreManager,
   type StoreSnapshot,
 } from '@gluonjs/store';
+import {
+  resolveTenant,
+  type TenantContext,
+  type TenantJsonValue,
+  type TenantResolutionRequest,
+  type TenantResolver,
+} from './tenant.js';
+
+export * from './tenant.js';
 
 export const SSR_HYDRATION_MARKER_ATTRIBUTE = 'data-gluon-hydration' as const;
 const SSR_HYDRATION_MARKER_VERSION = 1 as const;
@@ -247,14 +256,19 @@ export interface SsrRequestContext<Data = undefined> {
   readonly scope: EffectScope;
   readonly signal: AbortSignal;
   readonly data: Data;
+  /** Request-local tenant data; never shared between renderRequest() calls. */
+  readonly tenant?: TenantContext;
 }
 
 export interface SsrRequestOptions<Data = undefined> {
   readonly url: string;
   readonly signal?: AbortSignal;
+  readonly headers?: Readonly<Record<string, string | undefined>>;
   readonly routes?: readonly RouteRecordRaw[] | ((store: StoreManager) => readonly RouteRecordRaw[]);
   readonly load?: (context: Omit<SsrRequestContext<Data>, 'data'>) => Promise<Data> | Data;
   readonly createApp: (context: SsrRequestContext<Data>) => GluonApp;
+  readonly tenant?: TenantContext;
+  readonly resolveTenant?: TenantResolver<TenantJsonValue>;
   readonly state?: Readonly<Record<string, unknown>>;
   readonly styles?: StyleManifestSource;
   readonly nonce?: string;
@@ -269,6 +283,7 @@ export interface SsrRequestResult {
   readonly styles: StyleManifest;
   readonly router: RouterSnapshot;
   readonly store: StoreSnapshot;
+  readonly tenant?: TenantContext;
 }
 
 /** Creates and disposes one application, Router, Store, and effect scope per call. */
@@ -291,7 +306,13 @@ export async function renderRequest<Data = undefined>(
       routes,
     });
     await abortable(router.isReady(), signal);
-    const baseContext = { url: options.url, router, store, scope, signal };
+    const tenant = options.resolveTenant
+      ? await abortable(
+          resolveTenant(createTenantResolutionRequest(options.url, options.headers), options.resolveTenant),
+          signal,
+        )
+      : options.tenant;
+    const baseContext = { url: options.url, router, store, scope, signal, ...(tenant ? { tenant } : {}) };
     const data = options.load
       ? await abortable(
           options.load(baseContext as Omit<SsrRequestContext<Data>, 'data'>),
@@ -318,6 +339,7 @@ export async function renderRequest<Data = undefined>(
       router: routerSnapshot,
       store: storeSnapshot,
       data,
+      ...(tenant ? { tenant } : {}),
     });
     throwIfAborted(signal);
     const componentStyles = createComponentStyleSelection(prepared.value);
@@ -330,6 +352,7 @@ export async function renderRequest<Data = undefined>(
       styles,
       router: routerSnapshot,
       store: storeSnapshot,
+      ...(tenant ? { tenant } : {}),
     });
   } finally {
     let cleanupError: unknown;
@@ -938,6 +961,18 @@ function throwIfAborted(signal: AbortSignal | undefined): void {
     return;
   }
   if (signal.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
+}
+
+function createTenantResolutionRequest(
+  url: string,
+  headers: Readonly<Record<string, string | undefined>> | undefined,
+): TenantResolutionRequest {
+  const resolved = new URL(url, 'http://localhost');
+  return Object.freeze({
+    url,
+    hostname: resolved.hostname,
+    headers: Object.freeze({ ...(headers ?? {}) }),
+  });
 }
 
 function abortable<Value>(value: PromiseLike<Value> | Value, signal: AbortSignal): Promise<Value> {
