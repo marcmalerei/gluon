@@ -52,19 +52,19 @@ describe('@gluonjs/core/analytics', () => {
     });
     const scope = analytics.scope({ page: 'catalog' });
 
-    render(html`<div>${trackEvent(scope, 'select_item', { item_id: 'lamp' })}</div>`, root);
-    render(html`<div>${trackEvent(scope, 'select_item', { item_id: 'lamp' })}</div>`, root);
+    render(html`<div>${trackEvent(scope, 'select_item', { item_id: 'lamp' }, undefined, undefined)}</div>`, root);
+    render(html`<div>${trackEvent(scope, 'select_item', { item_id: 'lamp' }, undefined, undefined)}</div>`, root);
     render(html`<div>${trackEvent(scope, 'select_item', { item_id: 'lamp' }, undefined, { emitOnUpdate: true })}</div>`, root);
-    render(html`<div>${trackEvent(scope.child({ section: 'featured' }), 'select_item', { item_id: 'lamp' })}</div>`, root);
-    const initialDirective = trackEvent(scope, 'select_item', { item_id: 'lamp' });
-    const changedDirective = trackEvent(scope.child({ section: 'featured' }), 'select_item', { item_id: 'lamp' });
+    render(html`<div>${trackEvent(scope.child({ section: 'featured' }), 'select_item', { item_id: 'lamp' }, undefined, undefined)}</div>`, root);
+    const initialDirective = trackEvent(scope, 'select_item', { item_id: 'lamp' }, undefined, undefined);
+    const changedDirective = trackEvent(scope.child({ section: 'featured' }), 'select_item', { item_id: 'lamp' }, undefined, undefined);
     const directiveDefinition = Reflect.get(initialDirective, Object.getOwnPropertySymbols(initialDirective)[0]!) as {
       update(part: unknown, args: readonly unknown[], previousArgs: readonly unknown[]): void;
     };
     directiveDefinition.update({}, initialDirective.args, initialDirective.args);
     directiveDefinition.update({}, changedDirective.args, initialDirective.args);
-    render(html`<div>${trackImpression(scope, 'lamp', 'view_item', 3)}</div>`, root);
-    render(html`<div>${trackImpression(scope, 'lamp', 'view_item', 3)}</div>`, root);
+    render(html`<div>${trackImpression(scope, 'lamp', 'view_item', 3, undefined)}</div>`, root);
+    render(html`<div>${trackImpression(scope, 'lamp', 'view_item', 3, undefined)}</div>`, root);
 
     analytics.withContext({ route: '/catalog' }, (nested) => {
       nested.track('custom', 3, { context: { source: 'test' }, dedupeKey: 'custom-once' });
