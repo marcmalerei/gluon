@@ -13,11 +13,11 @@ currently supported Chromium browser matrix.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/test-utils at a glance
 
-**Runtime:** browser · **Release:** 1.12.2
+**Runtime:** browser · **Release:** 1.12.3
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/test-utils/) · [npm](https://www.npmjs.com/package/@gluonjs/test-utils) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/test-utils/README.md)
 
-**Public API:** [`@gluonjs/test-utils`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/test-utils/src/) · [`@gluonjs/test-utils/ssr`](https://marcmalerei.github.io/gluon/1.12.2/api/generated/packages/test-utils/src/ssr/)
+**Public API:** [`@gluonjs/test-utils`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/test-utils/src/) · [`@gluonjs/test-utils/ssr`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/test-utils/src/ssr/)
 
 ### Install
 
@@ -53,7 +53,7 @@ import { cleanupFixtures, mountComponent } from '@gluonjs/test-utils';
 
 ## Stability notes
 
-The package ships as part of the current `1.12.2` release line. Browser-facing
+The package ships as part of the current `1.12.3` release line. Browser-facing
 helpers and SSR fixtures are stable; direct access to renderer parts, private
 runtime imports, and browser matrices beyond the documented evidence remain
 unsupported.
