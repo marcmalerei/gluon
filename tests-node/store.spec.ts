@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createPersistencePlugin,
   createAsyncPersistencePlugin,
+  createBroadcastChannelFactory,
+  createIndexedDbStorage,
+  createLocalStorageAdapter,
   createMemoryStorage,
+  createSessionStorageAdapter,
   createStoreManager,
   createTestingStoreManager,
   defineStore,
@@ -68,6 +72,163 @@ describe('@gluonjs/store persistence adapters and synchronization', () => {
     expect(firstStore.$extensions.persistence).toMatchObject({ status: 'ready' });
     first.dispose();
     second.dispose();
+  });
+
+  it('covers browser adapter contracts without requiring browser globals', async () => {
+    const supplied: StorageLike = {
+      getItem: () => null,
+      setItem: () => undefined,
+    };
+    expect(createLocalStorageAdapter(supplied)).toBe(supplied);
+    expect(createSessionStorageAdapter(supplied)).toBe(supplied);
+    expect(() => createLocalStorageAdapter()).toThrow(/localStorage/);
+    expect(() => createSessionStorageAdapter()).toThrow(/sessionStorage/);
+    const globalStorage = createMemoryStorage({ key: 'value' });
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: globalStorage });
+    Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: globalStorage });
+    expect(createLocalStorageAdapter()).toBe(globalStorage);
+    expect(createSessionStorageAdapter()).toBe(globalStorage);
+    expect(globalStorage.getItem('key')).toBe('value');
+    globalStorage.removeItem?.('key');
+    expect(globalStorage.getItem('key')).toBeNull();
+    delete (globalThis as Record<string, unknown>).localStorage;
+    delete (globalThis as Record<string, unknown>).sessionStorage;
+
+    class FakeBroadcastChannel {
+      static readonly instances: FakeBroadcastChannel[] = [];
+      readonly listeners = new Set<(event: { readonly data: unknown }) => void>();
+      readonly messages: unknown[] = [];
+      constructor(readonly name: string) { FakeBroadcastChannel.instances.push(this); }
+      postMessage(message: unknown) { this.messages.push(message); }
+      addEventListener(_type: 'message', listener: (event: { readonly data: unknown }) => void) { this.listeners.add(listener); }
+      removeEventListener(_type: 'message', listener: (event: { readonly data: unknown }) => void) { this.listeners.delete(listener); }
+      close() { this.listeners.clear(); }
+      emit(data: unknown) { for (const listener of this.listeners) listener({ data }); }
+    }
+    const channel = createBroadcastChannelFactory(FakeBroadcastChannel).create('cart');
+    const received: unknown[] = [];
+    const listener = (message: unknown) => { received.push(message); };
+    channel.addEventListener(listener);
+    const native = FakeBroadcastChannel.instances[0]!;
+    native.emit({ value: 1 });
+    channel.postMessage({ value: 2 });
+    channel.removeEventListener(listener);
+    native.emit({ value: 3 });
+    channel.close?.();
+    expect(native.name).toBe('cart');
+    expect(received).toEqual([{ value: 1 }]);
+    expect(native.messages).toEqual([{ value: 2 }]);
+    const nativeBroadcast = (globalThis as Record<string, unknown>).BroadcastChannel;
+    delete (globalThis as Record<string, unknown>).BroadcastChannel;
+    expect(() => createBroadcastChannelFactory()).toThrow(/BroadcastChannel/);
+    if (nativeBroadcast) Object.defineProperty(globalThis, 'BroadcastChannel', { configurable: true, value: nativeBroadcast });
+
+    const values = new Map<string, string>();
+    const database = {
+      objectStoreNames: { contains: () => true },
+      createObjectStore: vi.fn(),
+      close: vi.fn(),
+      transaction: () => ({
+        oncomplete: null,
+        onerror: null,
+        onabort: null,
+        objectStore: () => ({
+          get(key: string) {
+            const request = { result: values.get(key), error: undefined, onsuccess: null as (() => void) | null, onerror: null };
+            queueMicrotask(() => request.onsuccess?.());
+            return request;
+          },
+          put(value: string, key: string) {
+            values.set(key, value);
+            const request = { result: undefined, error: undefined, onsuccess: null as (() => void) | null, onerror: null };
+            queueMicrotask(() => request.onsuccess?.());
+            return request;
+          },
+          delete(key: string) {
+            values.delete(key);
+            const request = { result: undefined, error: undefined, onsuccess: null as (() => void) | null, onerror: null };
+            queueMicrotask(() => request.onsuccess?.());
+            return request;
+          },
+        }),
+      }),
+    };
+    const indexed = createIndexedDbStorage({
+      database: 'tests',
+      store: 'values',
+      factory: { open: () => {
+        const request = { result: database, error: undefined, onsuccess: null as (() => void) | null, onerror: null, onupgradeneeded: null as (() => void) | null };
+        queueMicrotask(() => { request.onupgradeneeded?.(); request.onsuccess?.(); });
+        return request;
+      } },
+    });
+    await indexed.setItem('key', 'value');
+    await expect(indexed.getItem('key')).resolves.toBe('value');
+    await indexed.removeItem?.('key');
+    await expect(indexed.getItem('key')).resolves.toBeNull();
+    expect(() => createIndexedDbStorage({ factory: undefined })).toThrow(/IndexedDB/);
+
+    const upgradeDatabase = { ...database, objectStoreNames: { contains: () => false } };
+    const upgrade = createIndexedDbStorage({ factory: { open: () => {
+      const request = { result: upgradeDatabase, error: undefined, onsuccess: null as (() => void) | null, onerror: null, onupgradeneeded: null as (() => void) | null };
+      queueMicrotask(() => { request.onupgradeneeded?.(); request.onsuccess?.(); });
+      return request;
+    } } });
+    await upgrade.setItem('key', 'value');
+    expect(upgradeDatabase.createObjectStore).toHaveBeenCalledWith('persistence');
+
+    const openFailure = createIndexedDbStorage({ factory: { open: () => {
+      const request = { result: database, error: new Error('open failed'), onsuccess: null, onerror: null as (() => void) | null, onupgradeneeded: null };
+      queueMicrotask(() => request.onerror?.());
+      return request;
+    } } });
+    await expect(openFailure.getItem('key')).rejects.toThrow('open failed');
+  });
+
+  it('reports synchronization setup failures and initially aborted async persistence', async () => {
+    const errors = vi.fn();
+    const definition = defineStore({ id: 'sync-failure', state: () => ({ value: 0 }), persist: { sync: true } });
+    const manager = createStoreManager({
+      plugins: [createPersistencePlugin({
+        storage: createMemoryStorage(),
+        channel: { create: () => { throw new Error('channel unavailable'); } },
+        onError: errors,
+      })],
+    });
+    const store = manager.use(definition);
+    expect(store.$extensions.persistence).toMatchObject({ status: 'failed' });
+    expect((store.$extensions.persistence as { readonly error: unknown }).error).toBeInstanceOf(Error);
+    expect(errors).toHaveBeenCalledWith(expect.objectContaining({ message: 'channel unavailable' }), 'sync-failure');
+    manager.dispose();
+
+    const plugin = createAsyncPersistencePlugin({
+      signal: { aborted: true, reason: 'cancelled' },
+      storage: { getItem: async () => null, setItem: async () => undefined },
+    });
+    await plugin.lifecycle.ready;
+    expect(plugin.lifecycle.status).toBe('failed');
+    expect(plugin.lifecycle.error).toMatchObject({ name: 'AbortError' });
+
+    const inspected = createAsyncPersistencePlugin({
+      signal: { aborted: false, reason: 'reason' },
+      storage: {
+        getItem: async (_key, signal) => {
+          expect(signal?.aborted).toBe(false);
+          expect(signal?.reason).toBe('reason');
+          signal?.addEventListener?.('abort', () => undefined);
+          return null;
+        },
+        setItem: async () => undefined,
+      },
+    });
+    createStoreManager({ plugins: [inspected] }).use(defineStore({ id: 'inspected', state: () => ({ value: 1 }), persist: true }));
+    await inspected.lifecycle.ready;
+
+    const idle = createAsyncPersistencePlugin({
+      storage: { getItem: async () => null, setItem: async () => undefined },
+    });
+    createStoreManager({ plugins: [idle] }).use(defineStore({ id: 'not-persistent', state: () => ({ value: 1 }) }));
+    await idle.lifecycle.ready;
   });
 });
 
