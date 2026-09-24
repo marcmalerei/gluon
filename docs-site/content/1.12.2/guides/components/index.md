@@ -226,6 +226,7 @@ they are not alternative component bases.
 
 | Class | Use it for |
 | --- | --- |
+| [`Analytics`](/gluon/1.12.2/api/generated/src/analytics/classes/Analytics.html) | Own provider-independent semantic events, consent, enrichment, and SSR-safe analytics delivery for one application. |
 | [`GluonElement`](/gluon/1.12.2/api/generated/src/classes/GluonElement.html) | Subclass it for a stateful Custom Element that needs protected class extension points. |
 | [`TemplateResult`](/gluon/1.12.2/api/generated/src/classes/TemplateResult.html) | This is the immutable result returned by `html`; return it from render code rather than constructing it directly. |
 | [`EffectScope`](/gluon/1.12.2/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
