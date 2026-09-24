@@ -53,7 +53,13 @@ import {
 } from '@gluonjs/ssr/streaming';
 import { generateStaticSite } from '@gluonjs/ssr/static';
 import { gluonEleventyPlugin, renderEleventyPage } from '@gluonjs/ssr/eleventy';
-import { deserializeTenantContext, serializeTenantContext } from '@gluonjs/ssr/tenant';
+import {
+  createTenantContext,
+  deserializeTenantContext,
+  installTenant,
+  resolveTenant,
+  serializeTenantContext,
+} from '@gluonjs/ssr/tenant';
 import { renderShopRequest } from '../examples/shop/src/server.js';
 import { renderSsrFixture } from '../packages/test-utils/src/ssr.js';
 import { ClassQuantityControl } from '../benchmarks/dx/stateful-form-control/gluon-class.js';
@@ -1230,6 +1236,35 @@ describe('tenant request isolation and handoff', () => {
     const serialized = serializeTenantContext(response.tenant!);
     expect(deserializeTenantContext(serialized)).toEqual(response.tenant);
     expect(JSON.parse(response.state).tenant).toEqual(response.tenant);
+  });
+
+  it('validates tenant handoff data and derives stable ids', async () => {
+    const byId = createTenantContext({ id: 'tenant-id' }, { hostname: 'id.example' });
+    const bySlug = createTenantContext({ slug: 'tenant-slug' }, { hostname: 'slug.example' });
+    const byHost = createTenantContext({ region: 'eu' }, { hostname: 'HOST.example' });
+    const primitive = createTenantContext('tenant', { hostname: 'primitive.example' });
+    expect([byId.id, bySlug.id, byHost.id, primitive.id]).toEqual([
+      'tenant-id', 'tenant-slug', 'host.example', 'primitive.example',
+    ]);
+    expect(() => createTenantContext({}, { hostname: '', id: 'valid-id' })).toThrow(/hostname/);
+    expect(() => createTenantContext({}, { hostname: 'valid.example', id: ' ' })).toThrow(/id/);
+
+    const request = {
+      url: 'https://acme.example/catalog',
+      hostname: 'acme.example',
+      headers: { 'x-tenant': 'acme' },
+    } as const;
+    await expect(resolveTenant(request, (input) => ({ id: input.headers['x-tenant'] ?? 'unknown' })))
+      .resolves.toMatchObject({ id: 'acme', hostname: 'acme.example' });
+
+    const app = createApp(() => html``);
+    expect(installTenant(app, byId)).toBeTypeOf('function');
+    expect(() => deserializeTenantContext('{')).toThrow(/Invalid serialized/);
+    expect(() => deserializeTenantContext('{"id":"x"}')).toThrow(/valid tenant context/);
+    expect(() => deserializeTenantContext('{"id":"x","hostname":"x.example","resolvedAt":1,"tenant":{"value":null}}'))
+      .not.toThrow();
+    expect(() => deserializeTenantContext('{"id":"x","hostname":"x.example","resolvedAt":1,"tenant":{"value":null},"extra":true}'))
+      .not.toThrow();
   });
 });
 

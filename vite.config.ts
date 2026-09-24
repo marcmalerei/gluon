@@ -146,6 +146,7 @@ export default defineConfig({
         'packages/ssr/src/eleventy.ts',
         'packages/ssr/src/static.ts',
         'packages/ssr/src/streaming.ts',
+        'packages/ssr/src/tenant.ts',
         'packages/store/**',
         'packages/test-utils/**',
         'packages/vite/**',
