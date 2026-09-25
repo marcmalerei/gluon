@@ -211,7 +211,7 @@
     "check:shop-boundaries": "node scripts/validate-shop-boundaries.mjs",
     "check:shop-static": "npm run build:shop && npm run build:shop:server && npm run build:shop:static && node scripts/validate-shop-static-output.mjs",
     "check:eleventy-clean-install": "npm run build:ssr && node scripts/validate-eleventy-clean-install.mjs",
-    "check:example-previews": "npm run build:shop && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:component-library && node scripts/validate-example-previews.mjs && npm run check:json-forms-example-browser",
+    "check:example-previews": "npm run build:shop && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:component-library && node scripts/validate-example-previews.mjs && node scripts/validate-graph-example-browser.mjs && npm run check:json-forms-example-browser",
     "check:json-forms-example-browser": "node scripts/validate-json-forms-example-browser.mjs",
     "check:packages": "node scripts/validate-package-contract.mjs",
     "check:api-manifest": "node scripts/build-api-manifest.mjs --check",

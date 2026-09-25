@@ -13,6 +13,13 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   deduplication, SSR prefetch/reuse, cancellation, timeout, JSON hydration
   handoff, and a provider-independent Contentful reference fetcher (#531).
 
+### Fixed
+
+- Preserved `@gluonjs/graph` custom-element registration in production bundles
+  and added a paint-level regression for the runnable knowledge-graph example
+  (#533). The maintained example also keeps its mobile controls at a 44px
+  touch target.
+
 ## [1.12.3] - 2026-09-24
 
 ### Added

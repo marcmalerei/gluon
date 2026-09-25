@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve the public custom-element registration import in production bundles
+  so `<gluon-graph>` upgrades and paints when consumers import the package entry.
+
 ## [1.12.3] - 2026-09-24
 
 ### Changed
