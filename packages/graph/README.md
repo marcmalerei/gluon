@@ -11,6 +11,10 @@ no layout dependency: node positions are deterministic from `seed`, node input,
 and links. The element owns pan, zoom, drawing, and selection; the host owns
 domain labels, filtering controls, and persistence.
 
+The package entry is intentionally a side-effectful registration import. Import
+`@gluonjs/graph` once before querying `<gluon-graph>`; type-only imports do not
+register the custom element.
+
 <!-- gluon-package-overview:start -->
 ## @gluonjs/graph at a glance
 
