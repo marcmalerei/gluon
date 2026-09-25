@@ -47,11 +47,13 @@ function documentationSidebar(version: string): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Getting started', link: `/${version}/guides/getting-started/` },
         { text: 'Learning path', link: `/${version}/guides/learning-path/` },
+        { text: 'Build one stateful component', link: `/${version}/guides/first-component/` },
         { text: 'Application architecture', link: `/${version}/guides/application/` },
         { text: 'Components', link: `/${version}/guides/components/` },
         { text: 'Presentational SFCs', link: `/${version}/guides/sfc-authoring/` },
         { text: 'Choose a component level', link: `/${version}/guides/component-decisions/` },
         { text: 'Universal rendering', link: `/${version}/guides/universal-rendering/` },
+        { text: 'Async data and SSR', link: `/${version}/guides/async-ssr/` },
         { text: 'Tooling', link: `/${version}/guides/tooling/` },
         { text: 'Quality and security', link: `/${version}/guides/quality/` },
         { text: 'Deployment', link: `/${version}/guides/deployment/` },
@@ -67,6 +69,7 @@ function documentationSidebar(version: string): DefaultTheme.SidebarItem[] {
         { text: 'Upgrade between releases', link: `/${version}/migration/upgrade/` },
         { text: 'Vue migration analyzer', link: `/${version}/migration/vue-analyzer/` },
         { text: 'Vue cutover playbook', link: `/${version}/migration/vue-to-gluon-cutover/` },
+        { text: 'Lit and Web Components', link: `/${version}/migration/lit-to-gluon/` },
       ],
     },
   ];

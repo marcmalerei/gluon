@@ -21,12 +21,14 @@ const currentPackages = packageContract.packages.filter((entry) => entry.state =
 const requiredPages = [
   'index.html', 'guides/index.html', 'guides/getting-started/index.html',
   'guides/learning-path/index.html', 'guides/components/index.html',
+  'guides/first-component/index.html', 'guides/async-ssr/index.html',
   'guides/sfc-authoring/index.html',
   'guides/application/index.html', 'guides/universal-rendering/index.html',
   'guides/quality/index.html', 'api/index.html', 'packages/index.html',
   'cookbook/index.html', 'migration/index.html', 'migration/upgrade/index.html',
   'migration/vue-to-gluon-cutover/index.html', 'migration/vue-analyzer/index.html',
   'migration/vue-codemod-decision/index.html', 'reference/forms/index.html',
+  'migration/lit-to-gluon/index.html',
   'reference/diagnostics/index.html', 'examples/plain.html', 'examples/ui.html',
   'examples/vue.html', 'examples/json-forms.html',
 ];

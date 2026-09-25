@@ -4,6 +4,10 @@ Gluon is an alternative application platform, not a Vue compatibility layer.
 There is no automatic Vue-to-Gluon source converter, production SFC compiler,
 compatibility runtime, or migration codemod in version `1.12.3`.
 
+Developers coming from Lit or browser Custom Elements can start with the
+[Lit and Web Components to Gluon concept map](./lit-to-gluon/). It calls out
+semantic differences before any compatibility bridge is used.
+
 ## Automation boundary
 
 Supported automation starts after Gluon source exists:

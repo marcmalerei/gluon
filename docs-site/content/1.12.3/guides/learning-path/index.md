@@ -129,6 +129,11 @@ assert renderer comments, private fields, or implementation classes.
 
 ## Step 7: choose the next guide
 
+Before the advanced authoring comparison, complete [Build one stateful
+component](../first-component/). It connects a public input, local state,
+native output, render, lifecycle, cleanup, parent usage, and a testable browser
+boundary in one small example.
+
 - Need a reusable visual part? Continue with
   [choosing a component level](../component-decisions/).
 - Need a stateful Custom Element? Continue with
@@ -137,6 +142,8 @@ assert renderer comments, private fields, or implementation classes.
   [application architecture](../application/).
 - Need server HTML? Continue with
   [universal rendering](../universal-rendering/).
+- Need a component-owned async request during SSR? Continue with
+  [async component data and SSR](../async-ssr/).
 - Something failed? Read the error message and code, then open the
   [diagnostic reference](../../reference/diagnostics/).
 

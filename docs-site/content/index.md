@@ -61,9 +61,11 @@ compose without turning each capability into a private framework convention.
 | --- | --- |
 | Create a working project | [Getting started](/latest/guides/getting-started/) |
 | Understand the model step by step | [Learning path](/latest/guides/learning-path/) |
+| Build one stateful component | [First component](/latest/guides/first-component/) |
 | Pick a package | [Package guide](/latest/packages/) |
 | Combine Router and Store | [Application architecture](/latest/guides/application/) |
 | Render and hydrate on the server | [Universal rendering](/latest/guides/universal-rendering/) |
+| Load component data during SSR | [Async data and SSR](/latest/guides/async-ssr/) |
 | Find an API contract | [API reference](/latest/api/) |
 | Move from Vue | [Migration guides](/latest/migration/) |
 
