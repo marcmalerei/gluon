@@ -4,6 +4,7 @@ import gluon from '@gluonjs/vite';
 import { defineConfig } from 'vite';
 
 const repositoryRoot = resolve(import.meta.dirname, '../..');
+const docsVersion = process.env.GLUON_DOCS_VERSION ?? '1.13.0';
 
 export default defineConfig({
   plugins: [gluon(), vue({
@@ -14,7 +15,7 @@ export default defineConfig({
     },
   })],
   root: import.meta.dirname,
-  base: '/gluon/1.12.3/examples/',
+  base: `/gluon/${docsVersion}/examples/`,
   resolve: {
     alias: {
       '@gluonjs/core/decorators': resolve(repositoryRoot, 'src/decorators.ts'),
@@ -30,7 +31,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist/1.12.3/examples',
+    outDir: `../dist/${docsVersion}/examples`,
     emptyOutDir: false,
     rollupOptions: {
       input: {

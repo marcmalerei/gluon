@@ -1,6 +1,6 @@
 # Release operations
 
-Gluon uses one lockstep release for the 21 packages in
+Gluon uses one lockstep release for the 22 packages in
 [`package-contract.json`](../package-contract.json). The executable release
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
@@ -20,6 +20,15 @@ registry verification confirmed all 21 package records at version and `latest`
 ```sh
 npm run check:release-contract
 ```
+
+## v1.13.0 candidate
+
+Issue [#539](https://github.com/marcmalerei/gluon/issues/539) tracks the
+22-package release candidate for the Lit lifecycle compatibility, GraphQL data
+connector, SSR load evidence, runnable graph fix, and progressive learning-path
+work delivered by issues #530-#533 and #506. The candidate remains unpublished
+until the protected release workflow, registry verification, and release-cut
+evidence establish the immutable `v1.13.0` artifacts.
 
 ## v1.12.3 publication
 

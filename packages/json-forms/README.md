@@ -14,11 +14,11 @@ an optional package: schema rendering and AJV validation do not enter
 <!-- gluon-package-overview:start -->
 ## @gluonjs/json-forms at a glance
 
-**Runtime:** browser · **Release:** 1.12.3
+**Runtime:** browser · **Release:** 1.13.0
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/json-forms/) · [npm](https://www.npmjs.com/package/@gluonjs/json-forms) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/json-forms/README.md)
 
-**Public API:** [`@gluonjs/json-forms`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/json-forms/src/)
+**Public API:** [`@gluonjs/json-forms`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/json-forms/src/)
 
 ### Install
 
@@ -54,7 +54,7 @@ registerJsonForms();
 
 ## Stability notes
 
-The package ships as part of the current `1.12.3` release line. Its documented
+The package ships as part of the current `1.13.0` release line. Its documented
 schema and UI schema subset, host-owned lifecycle, and renderer-registry
 boundary are stable; broader JSON Schema features remain unsupported unless a
 later contract adds them.

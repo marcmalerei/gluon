@@ -11,16 +11,16 @@ It keeps resource state in an explicit request context so SSR prefetching,
 component-owned loading, mixed rendering, and browser hydration can share one
 deduplicated result without adding GraphQL or Contentful runtime code to Core.
 
-The package ships as part of the current `1.12.3` release line.
+The package ships as part of the current `1.13.0` release line.
 
 <!-- gluon-package-overview:start -->
 ## @gluonjs/graphql at a glance
 
-**Runtime:** universal · **Release:** 1.12.3
+**Runtime:** universal · **Release:** 1.13.0
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/graphql/) · [npm](https://www.npmjs.com/package/@gluonjs/graphql) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/graphql/README.md)
 
-**Public API:** [`@gluonjs/graphql`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/graphql/src/)
+**Public API:** [`@gluonjs/graphql`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/graphql/src/)
 
 ### Install
 

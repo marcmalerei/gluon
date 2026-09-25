@@ -24,11 +24,11 @@ The package has no browser or framework dependency.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/devtools-api at a glance
 
-**Runtime:** universal · **Release:** 1.12.3
+**Runtime:** universal · **Release:** 1.13.0
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/devtools-api/) · [npm](https://www.npmjs.com/package/@gluonjs/devtools-api) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/devtools-api/README.md)
 
-**Public API:** [`@gluonjs/devtools-api`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/devtools-api/src/)
+**Public API:** [`@gluonjs/devtools-api`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/devtools-api/src/)
 
 ### Install
 
