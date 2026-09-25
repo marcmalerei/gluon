@@ -117,6 +117,9 @@ jobs:
         run: npm run benchmark:ssr -- --samples=10 --warmup=3 --output=.tmp/quality-evidence/ssr-comparison.json
         timeout-minutes: 12
       - if: ${{ matrix.browser == 'chromium' }}
+        run: npm run benchmark:ssr:load -- --concurrency=4 --requests=16 --batches=2 --warmup=1 --output=.tmp/quality-evidence/ssr-load.json
+        timeout-minutes: 12
+      - if: ${{ matrix.browser == 'chromium' }}
         run: cp .tmp/bundle-matrix/report.json .tmp/quality-evidence/bundle-matrix.json
       - if: ${{ matrix.browser == 'chromium' }}
         run: npm run check:component-library-loader-build
