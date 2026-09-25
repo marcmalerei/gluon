@@ -20,6 +20,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
   (#533). The maintained example also keeps its mobile controls at a 44px
   touch target.
 
+### Documentation
+
+- Added a progressive first-component path with lifecycle and SSR troubleshooting,
+  explicit async SSR choices, server/browser ownership labels, and a Lit/Web
+  Components concept map (#532).
+
 ## [1.12.3] - 2026-09-24
 
 ### Added

@@ -20,6 +20,19 @@ Props are inputs and events are outputs. Do not mutate an object owned by the
 parent and call that an event. Emit the requested change and let the owner decide
 whether to update the property.
 
+## Build one stateful component first
+
+Before comparing all authoring models, build the complete common path once:
+
+<<< ../../../../examples/stateful-component.ts
+
+This example answers the practical questions in order: a requirement becomes a
+Custom Element; `label` is a public property; `context.state()` is local state;
+`change` is a native output; `render()` owns the DOM; `styles` owns component
+CSS; lifecycle hooks attach and observe work; and `onCleanup()` releases the
+imperative listener. The [step-by-step component guide](../first-component/)
+explains the same flow with a symptom-first troubleshooting table.
+
 ## Choose an authoring model
 
 | Need | Use | Why |
@@ -37,7 +50,11 @@ Choose `.gluon` only for the intentionally small presentational subset; the
 [SFC authoring guide](../sfc-authoring/) lists supported syntax and rejected
 Vue-style features.
 
-## Package and load a component library
+## Advanced: package and load a component library
+
+Read this section after the first component works. Most applications should not
+start with manifests, loaders, or Storybook infrastructure; those are extension
+points for separately published component libraries.
 
 A separately published library exposes ordinary public ESM exports plus a
 serializable `ComponentLibraryManifest` from `@gluonjs/quarks`. Each manifest
@@ -215,6 +232,39 @@ For setup-based components, register the equivalent work with
 `context.onConnected()`, `context.onUpdated()`, `context.onDisconnected()`, and
 `context.onCleanup()`. Setup executes once per connected lifetime; explicitly
 keyed `state()` and `reactiveState()` values survive a reconnect.
+
+### Task-oriented lifecycle recipes
+
+- Start a fetch or subscription in `onConnected()` and keep its controller in
+  the connection scope.
+- Attach an imperative listener with an `AbortSignal`, then abort it from
+  `onCleanup()`.
+- Initialize a DOM-dependent library in `onConnected()` when it needs the first
+  committed node, or in `onUpdated()` when it must follow later DOM changes.
+- Use `onUpdated()` for measurement/reporting after a render, not to mirror a
+  reactive value back into the template.
+- Put cancellation, subscription release, timer cleanup, and third-party
+  disposal in `onCleanup()`; it runs when that connection scope ends.
+
+The platform may disconnect and reconnect the same element. Render-owned
+bindings are restored automatically; connection-owned work must be registered
+again. See the [lifecycle timeline](../first-component/) before using a hook.
+
+### Component troubleshooting workflow
+
+Start with the visible symptom, then inspect the public boundary and run the
+smallest check:
+
+| Symptom | Likely cause | Diagnostic/check | Minimal fix |
+| --- | --- | --- | --- |
+| Property is text instead of an object | Attribute binding used | Inspect the rendered attribute and property | Use `.value=${object}`. |
+| Update never happens | Render did not read reactive state | Check the dependency in the template and run `updateComplete` | Read `.value` during render or declare the property. |
+| Hook runs twice | Element reconnected or work was put in `onUpdated()` | Log connect/update/disconnect with the Devtools timeline | Scope first-connection work to `onConnected()`. |
+| Listener leaks | Imperative listener has no owner cleanup | Remove and reinsert the element in a browser test | Use `context.onCleanup()` or `event(..., { signal })`. |
+| Shadow DOM style is missing | Document CSS cannot cross the root | Inspect `adoptedStyleSheets` and style ownership | Use `static styles` or a retained constructable sheet. |
+
+For SSR, hydration, and async symptoms use the [universal rendering guide](../universal-rendering/)
+and its troubleshooting workflow.
 
 ## Public class map
 

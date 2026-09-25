@@ -11,6 +11,9 @@ First framework project? Use the
 [junior learning path](/gluon/1.12.3/guides/learning-path/) for a progressive
 feature and plain-language glossary.
 
+Then build [one stateful component](/gluon/1.12.3/guides/first-component/)
+before opening the advanced component and SSR references.
+
 <<< ../../examples/basic-app.ts
 
 ## Guides

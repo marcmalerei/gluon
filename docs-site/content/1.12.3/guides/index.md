@@ -7,11 +7,13 @@ contracts exercised by GLUON GOODS.
 
 - [Getting started](getting-started/): install, author, check, and build a browser application.
 - [Learn Gluon step by step](learning-path/): a junior-friendly path through templates, reactivity, lists, styles, cleanup, and tests.
+- [Build one stateful component](first-component/): follow requirement → state → event → render → lifecycle → cleanup → parent usage.
 - [Choose a component level](component-decisions/): decide between native markup, Quark, Atom, Molecule, Organism, Custom Element, and app-local code.
 - [Components: properties, events, and lifecycle](components/): choose an authoring model and build typed component boundaries.
 - [Presentational Single-File Components](sfc-authoring/): enable the `.gluon` format, author typed markup and styles, and understand its supported boundaries.
 - [Application architecture](application/): application ownership, Router, Store, and cleanup.
 - [Universal rendering](universal-rendering/): SSR, hydration, streaming, and SSG boundaries.
+- [Async component data and SSR](async-ssr/): choose browser-only, blocking, progressive, prefetch, or component-owned async work.
 - [Tooling workflow](tooling/): Vite, diagnostics, Devtools, testing, and Playground.
 - [Quality and security](quality/): accessibility, CSP, dependency, and browser gates.
 - [Deployment](deployment/): static and server output from the reference shop.
