@@ -56,6 +56,35 @@ if (ssr.benchmark?.schemaVersion !== 1 || ssr.benchmark.results?.length !== 3
 }
 await requireText('ssr-comparison.md');
 
+const ssrLoad = await readJson('ssr-load.json');
+validateSource(ssrLoad, 'SSR load');
+if (ssrLoad.schemaVersion !== 1
+  || ssrLoad.methodology?.concurrency !== 4
+  || ssrLoad.methodology?.requestsPerMeasuredBatch !== 16
+  || ssrLoad.methodology?.measuredBatchesPerFramework !== 2
+  || ssrLoad.methodology?.warmupBatchesPerFramework !== 1) {
+  throw new Error('SSR load evidence does not retain the declared CI workload contract.');
+}
+for (const mode of ['string', 'stream']) {
+  const results = ssrLoad.results?.[mode];
+  if (!Array.isArray(results) || results.length !== 6) {
+    throw new Error(`SSR load evidence must retain two batches for each framework in ${mode} mode.`);
+  }
+  for (const result of results) {
+    if (!['gluon', 'lit', 'vue'].includes(result.framework)
+      || result.errors !== 0
+      || result.samples?.length !== 16
+      || result.output?.bytes <= 0
+      || typeof result.output?.sha256 !== 'string'
+      || result.statistics?.p95 < result.statistics?.median
+      || result.statistics?.p99 < result.statistics?.p95
+      || result.memory?.forcedGc !== true) {
+      throw new Error(`SSR load ${mode} evidence has an invalid ${result.framework} batch.`);
+    }
+  }
+}
+await requireText('ssr-load.md');
+
 const spreadBindings = await readJson('spread-bindings-chromium.json');
 validateSource(spreadBindings, 'Chromium spread bindings');
 if (spreadBindings.environment?.browser?.name !== 'chromium'
@@ -92,7 +121,7 @@ if (shop.passed !== true || shop.failures?.length !== 0) {
 await requireText('shop-flow.md');
 
 console.log(JSON.stringify(summary, null, 2));
-console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, SSR, hydration, loader, Storybook, and shop gates`);
+console.log(`performance evidence complete: ${browsers.length} engines plus Chromium spread, bundle, SSR, SSR load, hydration, loader, Storybook, and shop gates`);
 
 function option(name) {
   const argument = process.argv.find((value) => value.startsWith(`${name}=`));

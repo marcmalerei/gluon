@@ -203,6 +203,7 @@
     "profile:component-property-state": "npm run build:compiler && node scripts/profile-component-property-state.mjs",
     "benchmark:runtime": "npm run build:core && npm run build:router && npm run build:store && npm run build:ssr && node scripts/run-runtime-scorecard.mjs",
     "benchmark:ssr": "npm run build:core && npm run build:ssr && node scripts/run-ssr-comparison-benchmark.mjs",
+    "benchmark:ssr:load": "node --expose-gc scripts/run-ssr-load-benchmark.mjs",
     "check:performance-evidence": "node scripts/validate-performance-evidence.mjs",
     "benchmark:allocations": "node scripts/run-renderer-allocation-benchmark.mjs",
     "benchmark:dx": "node scripts/run-dx-automation.mjs",

@@ -435,6 +435,39 @@ and
 [`ssr-comparison-497-candidate-d9bd60a.json`](../benchmarks/results/ssr-comparison-497-candidate-d9bd60a.json)
 files.
 
+## SSR load and memory evidence (#506)
+
+`npm run benchmark:ssr:load` is a separate load contract from the serial SSR
+comparison. It renders the same 120-row catalog with Gluon, Lit, and Vue at a
+declared concurrency, repeats bounded request batches, rotates framework order,
+and retains every request duration. It also runs a separate stream mode: the
+measurement ends only after the complete Gluon web stream, Lit Node stream, or
+Vue Node stream has been consumed. The stream result must have the same bytes
+and SHA-256 as the corresponding complete-string output.
+
+The runner records request throughput, errors, median/p95/p99, raw samples,
+output identity, RSS/heap/external/ArrayBuffer observations before and after
+each batch, `process.execArgv`, package/runtime metadata, source commit, and
+working-tree state. The default npm command uses `--expose-gc`; the JSON marks
+forced collection explicitly rather than implying that an observation is a
+post-GC measurement when the flag is absent.
+
+```bash
+npm run benchmark:ssr:load -- \
+  --concurrency=4 \
+  --requests=32 \
+  --batches=3 \
+  --warmup=1 \
+  --output=.tmp/ssr-load.json
+```
+
+This lane reports observations for the declared workload only. It does not
+rank frameworks, claim a universal capacity limit, or install CI regression
+thresholds; runner variance must be measured separately before thresholds are
+appropriate. The stream implementations are comparable at the contract level
+(complete output consumed), but their native transport types remain explicit in
+the source and report.
+
 ## Cross-framework hydration workload
 
 `npm run benchmark:hydration` takes equivalent 120-row server-rendered catalog
