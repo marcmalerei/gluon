@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-09-25
+
+### Changed
+
+- Prepared the 22-package lockstep release with the GraphQL connector, progressive learning documentation, production graph fix, and SSR load evidence.
+
+
 ## [1.12.3] - 2026-09-24
 
 ### Changed

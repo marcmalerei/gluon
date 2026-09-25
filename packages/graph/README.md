@@ -18,11 +18,11 @@ register the custom element.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/graph at a glance
 
-**Runtime:** browser · **Release:** 1.12.3
+**Runtime:** browser · **Release:** 1.13.0
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/graph/) · [npm](https://www.npmjs.com/package/@gluonjs/graph) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/graph/README.md)
 
-**Public API:** [`@gluonjs/graph`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/packages/graph/src/)
+**Public API:** [`@gluonjs/graph`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/graph/src/)
 
 ### Install
 

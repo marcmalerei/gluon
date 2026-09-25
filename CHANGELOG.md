@@ -7,28 +7,28 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-09-25
+
 ### Added
 
-- Added optional `@gluonjs/graphql` request-scoped resources with concurrent
-  deduplication, SSR prefetch/reuse, cancellation, timeout, JSON hydration
-  handoff, and a provider-independent Contentful reference fetcher (#531).
-- Added a reproducible SSR load and memory evidence lane for bounded concurrency,
-  sustained batches, complete-string and fully-consumed stream timing, raw
-  request samples, p95/p99, errors, RSS/heap observations, and runtime metadata
-  without introducing performance thresholds (#506).
+- Added opt-in Lit lifecycle compatibility helpers for existing Gluon element
+  definitions without changing the default lifecycle path (#530).
+- Added the provider-independent `@gluonjs/graphql` request-scoped data
+  connector with SSR prefetch/reuse, cancellation, timeout, JSON hydration,
+  and a Contentful fetcher reference (#531).
+- Added bounded SSR load and memory evidence for complete-string and consumed
+  stream lanes across Gluon, Lit, and Vue, with raw samples and p95/p99
+  observations (#506).
 
 ### Fixed
 
-- Preserved `@gluonjs/graph` custom-element registration in production bundles
-  and added a paint-level regression for the runnable knowledge-graph example
-  (#533). The maintained example also keeps its mobile controls at a 44px
-  touch target.
+- Preserved production registration for the runnable graph example and added
+  paint-level and mobile-control regression evidence (#533).
 
 ### Documentation
 
-- Added a progressive first-component path with lifecycle and SSR troubleshooting,
-  explicit async SSR choices, server/browser ownership labels, and a Lit/Web
-  Components concept map (#532).
+- Added the progressive first-component, async SSR, and Lit migration learning
+  path with lifecycle, ownership, and troubleshooting guidance (#532).
 
 ## [1.12.3] - 2026-09-24
 

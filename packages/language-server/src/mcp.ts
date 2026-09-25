@@ -43,7 +43,7 @@ export class GluonMcpServer {
       if (request.method === 'initialize') {
         return { jsonrpc: '2.0', id: request.id, result: {
           protocolVersion: '2024-11-05',
-          serverInfo: { name: '@gluonjs/language-server', version: '1.12.3' },
+          serverInfo: { name: '@gluonjs/language-server', version: '1.13.0' },
           capabilities: { tools: {} },
         } };
       }

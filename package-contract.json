@@ -8,8 +8,8 @@
     "checkedAt": "2026-09-24",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "released",
-    "observation": "Independent post-publication verification on 2026-09-24 confirmed protected tag v1.12.3 resolves to merge commit 3185e48a3dcc1b3138eaa6bf19f1e51893d7e8f1, release workflow 35985803820 succeeded, the GitHub release contains 131 assets, and all 21 contracted packages are published at version and latest 1.12.3 with provenance metadata."
+    "publicationState": "ready",
+    "observation": "Release candidate 1.13.0 contains the current 22-package lockstep contract, including @gluonjs/graphql delivered after the 1.12.3 publication. Registry publication and immutable-release verification remain pending for the protected v1.13.0 workflow."
   },
   "packages": [
     {
