@@ -45,6 +45,7 @@ export * from './tenant.js';
 
 export const SSR_HYDRATION_MARKER_ATTRIBUTE = 'data-gluon-hydration' as const;
 const SSR_HYDRATION_MARKER_VERSION = 1 as const;
+const synchronousSerializationUnavailable = Symbol('gluon.synchronous-serialization-unavailable');
 const urlAttributes = new Set([
   'action', 'cite', 'data', 'formaction', 'href', 'manifest', 'ping',
   'poster', 'src', 'srcdoc', 'srcset', 'xlink:href',
@@ -148,8 +149,11 @@ export async function renderToString(
   value: TemplateValue,
   options: RenderSerializationOptions = {},
 ): Promise<string> {
+  const synchronous = serializeValueSynchronously(value, createSerializationContext(options));
+  if (synchronous !== synchronousSerializationUnavailable) return synchronous;
+
   let html = '';
-  for await (const chunk of renderToChunks(value, options)) html += chunk;
+  for await (const chunk of serializeValue(value, createSerializationContext(options))) html += chunk;
   return html;
 }
 
@@ -158,14 +162,18 @@ export async function* renderToChunks(
   value: TemplateValue,
   options: RenderSerializationOptions = {},
 ): AsyncGenerator<string> {
-  yield* serializeValue(value, {
+  yield* serializeValue(value, createSerializationContext(options));
+}
+
+function createSerializationContext(options: RenderSerializationOptions): SerializationContext {
+  return {
     marker: options.markerOffset ?? 0,
     assets: options.assets,
     shadowStyles: options.shadowStyles ?? options.assets?.shadowStyles,
     signal: options.signal,
     omitServerElementShadowRoots: options.omitServerElementShadowRoots,
     elementScopes: [],
-  });
+  };
 }
 
 export interface RenderSerializationOptions {
@@ -495,6 +503,135 @@ interface ProgressiveTask {
     readonly value?: TemplateValue;
     readonly error?: unknown;
   }>;
+}
+
+type SynchronousSerializationResult = string | typeof synchronousSerializationUnavailable;
+
+/** Serializes complete synchronous trees without paying async-generator overhead. */
+function serializeValueSynchronously(
+  value: unknown,
+  context: SerializationContext,
+): SynchronousSerializationResult {
+  throwIfAborted(context.signal);
+  if (value == null || value === false || value === nothing) return '';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'bigint' || value === true) {
+    return escapeText(String(value));
+  }
+  if (value instanceof URL) return escapeText(String(value));
+  if (Array.isArray(value)) {
+    let html = '';
+    for (const child of value) {
+      const marker = allocateMarker(context);
+      const serialized = serializeValueSynchronously(child, context);
+      if (serialized === synchronousSerializationUnavailable) return serialized;
+      html += `<!--gluon:i:${marker}-->${serialized}<!--gluon:/i:${marker}-->`;
+    }
+    return html;
+  }
+
+  const serverElement = getServerElementValue(value);
+  if (serverElement) {
+    const propertyMarker = allocateMarker(context);
+    const childrenMarker = allocateMarker(context);
+    const scope: ElementMarkerScope = { start: context.marker, end: context.marker };
+    context.elementScopes.push(scope);
+    let shadow: SynchronousSerializationResult;
+    try {
+      shadow = serializeTemplateSynchronously(serverElement.shadow, context);
+    } finally {
+      context.elementScopes.pop();
+    }
+    if (shadow === synchronousSerializationUnavailable) return shadow;
+    const children = serializeValueSynchronously(serverElement.children, context);
+    if (children === synchronousSerializationUnavailable) return children;
+    const marker = encodeMarkerTransport({
+      version: SSR_HYDRATION_MARKER_VERSION,
+      start: scope.start,
+      end: scope.end,
+    });
+    const shadowRoot = serverElement.scopedRegistry
+      ? '<template shadowrootmode="open" shadowrootcustomelementregistry>'
+      : '<template shadowrootmode="open">';
+    return `<${serverElement.tagName}${serializeSpread(serverElement.properties)} ${SSR_HYDRATION_MARKER_ATTRIBUTE}="${marker}" data-gluon-h-${propertyMarker}="">`
+      + (context.omitServerElementShadowRoots ? '' : `${shadowRoot}${renderShadowStyleLinks(context.shadowStyles)}${shadow}</template>`)
+      + `<!--gluon:h:${childrenMarker}-->${children}<!--gluon:/h:${childrenMarker}--></${serverElement.tagName}>`;
+  }
+
+  if (isTemplateResult(value)) return serializeTemplateSynchronously(value, context);
+
+  const builtin = getBuiltinServerContract(value);
+  if (builtin) {
+    if (builtin.kind === 'suspense') return synchronousSerializationUnavailable;
+    return serializeValueSynchronously(builtin.content, context);
+  }
+  const contract = getTemplateValueServerContract(value);
+  if (contract?.kind === 'repeat') {
+    let html = '';
+    for (const item of contract.items) {
+      const marker = allocateMarker(context);
+      const serialized = serializeValueSynchronously(item.value, context);
+      if (serialized === synchronousSerializationUnavailable) return serialized;
+      html += `<!--gluon:k:${marker}-->${serialized}<!--gluon:/k:${marker}-->`;
+    }
+    return html;
+  }
+  if (contract?.kind === 'unsafe-html' || contract?.kind === 'trusted-html') return contract.markup;
+  if (contract?.kind === 'unsafe-url') return escapeText(contract.value);
+  if (contract?.kind === 'event') return '';
+  if (contract?.kind === 'directive') {
+    throw new SsrRenderError(
+      'GLUON_SSR_UNSUPPORTED_DIRECTIVE',
+      'A browser-only directive has no server contract.',
+    );
+  }
+  throw new SsrRenderError(
+    'GLUON_SSR_INVALID_VALUE',
+    `Cannot server-render ${Object.prototype.toString.call(value)}.`,
+  );
+}
+
+function serializeTemplateSynchronously(
+  result: TemplateResult,
+  context: SerializationContext,
+): SynchronousSerializationResult {
+  const state = { inTag: false, quote: '' };
+  let skipQuote = '';
+  let html = '';
+  for (let index = 0; index < result.strings.length; index += 1) {
+    const originalChunk = result.strings[index]!;
+    updateMarkupState(state, originalChunk);
+    const chunk = skipQuote && originalChunk.startsWith(skipQuote)
+      ? originalChunk.slice(1)
+      : originalChunk;
+    skipQuote = '';
+    if (index >= result.values.length) {
+      html += chunk;
+      continue;
+    }
+    if (!state.inTag) {
+      const marker = allocateMarker(context);
+      const serialized = serializeValueSynchronously(result.values[index], context);
+      if (serialized === synchronousSerializationUnavailable) return serialized;
+      html += `${chunk}<!--gluon:h:${marker}-->${serialized}<!--gluon:/h:${marker}-->`;
+      continue;
+    }
+    const match = originalChunk.match(/(?:^|[\s<])([^\s"'<>/=]+)=\s*(["']?)$/);
+    if (!match?.[1]) {
+      throw new SsrRenderError(
+        'GLUON_SSR_INVALID_VALUE',
+        `Unsupported server expression ${index} inside a tag.`,
+      );
+    }
+    const name = match[1];
+    const nameOffset = chunk.lastIndexOf(name);
+    const prefix = chunk.slice(0, nameOffset);
+    const marker = allocateMarker(context);
+    html += prefix.slice(0, -1);
+    html += serializeBinding(name, result.values[index], context.assets);
+    html += ` data-gluon-h-${marker}=""`;
+    skipQuote = match[2] || '';
+  }
+  return html;
 }
 
 async function* serializeValue(value: unknown, context: SerializationContext): AsyncGenerator<string> {

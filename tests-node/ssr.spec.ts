@@ -408,6 +408,66 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(withoutHydrationMarkers(progressive[0]!.html)).toBe(rendered);
   });
 
+  it('keeps synchronous string rendering byte-identical and falls back for async boundaries', async () => {
+    const synchronousValue = html`<main data-mode=${'catalog'}><ul>${Array.from({ length: 8 }, (_, index) => html`
+      <li data-row=${index}><span>Object ${index}</span></li>
+    `)}</ul></main>`;
+    const synchronous = await renderToString(synchronousValue);
+    const synchronousChunks: string[] = [];
+    for await (const chunk of renderToChunks(synchronousValue)) synchronousChunks.push(chunk);
+    expect(synchronous).toBe(synchronousChunks.join(''));
+
+    const asynchronousValue = html`<section>${Suspense({
+      source: Promise.resolve('ready'),
+      fallback: html`<p>loading</p>`,
+      children: (result) => html`<p>${result}</p>`,
+    })}</section>`;
+    const asynchronous = await renderToString(asynchronousValue);
+    const asynchronousChunks: string[] = [];
+    for await (const chunk of renderToChunks(asynchronousValue)) asynchronousChunks.push(chunk);
+    expect(asynchronous).toBe(asynchronousChunks.join(''));
+  });
+
+  it('covers synchronous serializer contracts before falling back to async rendering', async () => {
+    expect(await renderToString([
+      html`<p>before</p>`,
+      Suspense({ source: Promise.resolve('ready'), fallback: 'loading', children: (value) => value }),
+    ])).toContain('<p>before</p>');
+    expect(withoutHydrationMarkers(await renderToString(KeepAlive({
+      cacheKey: 'sync-keep-alive',
+      children: html`<p>kept</p>`,
+    })))).toBe('<p>kept</p>');
+    expect(withoutHydrationMarkers(await renderToString(repeat(
+      [1, 2],
+      (item) => item,
+      (item) => html`<b>${item}</b>`,
+    )))).toContain('<b>1</b>');
+    expect(await renderToString(repeat(
+      [1],
+      (item) => item,
+      () => Suspense({ source: Promise.resolve('ready'), fallback: 'loading', children: (value) => value }),
+    ))).toContain('ready');
+    expect(withoutHydrationMarkers(await renderToString(html`<div data-value=${'unquoted'}></div>`)))
+      .toBe('<div data-value="unquoted"></div>');
+
+    class SyncBoundaryElement extends GluonElement {
+      protected override render() {
+        return html`<span>shadow</span>`;
+      }
+    }
+    defineElement('ssr-sync-boundary', SyncBoundaryElement);
+    const syncElement = renderElement(SyncBoundaryElement, {
+      children: html`<span>light</span>`,
+    });
+    expect(withoutHydrationMarkers(await renderToString(syncElement)))
+      .toContain('<template shadowrootmode="open"><span>shadow</span></template>');
+    expect(await renderToString(renderElement(SyncBoundaryElement, {
+      children: Suspense({ source: Promise.resolve('ready'), fallback: 'loading', children: (value) => value }),
+    }))).toContain('ready');
+    expect(await renderToString(syncElement, { omitServerElementShadowRoots: true }))
+      .not.toContain('shadowrootmode');
+  });
+
   it('loads the public Core and renderer without browser DOM globals', () => {
     expect(globalThis).not.toHaveProperty('document');
     expect(globalThis).not.toHaveProperty('HTMLElement');
