@@ -338,6 +338,8 @@ export abstract class GluonElement<
   private pendingPropertyUpdate?: string;
   private pendingPropertyValue?: unknown;
   private pendingFullUpdate = false;
+  private readonly pendingChangedProperties = new Map<PropertyKey, unknown>();
+  private activeChangedProperties: ReadonlyMap<PropertyKey, unknown> = new Map();
   private connectionRendered = false;
   private hydrationPending = false;
   private readonly connectedHooks: ComponentLifecycleCallback[] = [];
@@ -460,6 +462,17 @@ export abstract class GluonElement<
   /** Resolves after the currently scheduled render and its update hooks finish. */
   get updateComplete(): Promise<void> {
     return this.updatePromise;
+  }
+
+  /**
+   * Returns the old values collected for the current update pass.
+   *
+   * This is primarily a protected integration point for compatibility layers;
+   * native Gluon components should continue to use the lifecycle callbacks and
+   * reactive state directly.
+   */
+  protected get changedProperties(): ReadonlyMap<PropertyKey, unknown> {
+    return this.activeChangedProperties;
   }
 
   /** Creates the component render root. Override only when the default open ShadowRoot is unsuitable. */
@@ -609,6 +622,9 @@ export abstract class GluonElement<
       : Object.is(value, oldValue)) return;
 
     this[propertyValues][name] = value;
+    if (!this.pendingChangedProperties.has(name)) {
+      this.pendingChangedProperties.set(name, oldValue);
+    }
     const functionalObserver = (this as GluonElement<Events> & {
       [functionalElementPropertyChanged]?: (property: string) => void;
     })[functionalElementPropertyChanged];
@@ -635,6 +651,9 @@ export abstract class GluonElement<
     const oldValue = this[propertyValues][name];
     if (Object.is(value, oldValue)) return;
     this[propertyValues][name] = value;
+    if (!this.pendingChangedProperties.has(name)) {
+      this.pendingChangedProperties.set(name, oldValue);
+    }
     const functionalObserver = (this as GluonElement<Events> & {
       [functionalElementPropertyChanged]?: (property: string) => void;
     })[functionalElementPropertyChanged];
@@ -756,6 +775,8 @@ export abstract class GluonElement<
     this.pendingUpdate = undefined;
     this.pendingPropertyUpdate = undefined;
     this.pendingPropertyValue = undefined;
+    this.activeChangedProperties = new Map(this.pendingChangedProperties);
+    this.pendingChangedProperties.clear();
     try {
       if (!binding.updater.update(value)) {
         this.pendingUpdate = deferred;
@@ -793,6 +814,8 @@ export abstract class GluonElement<
         deferred.resolve();
         return;
       }
+      this.activeChangedProperties = new Map(this.pendingChangedProperties);
+      this.pendingChangedProperties.clear();
       if (this.connectionRendered) this.invokeLifecycle(this.beforeUpdateHooks);
       this.releaseCompiledPrimitiveTextBinding();
       this.runOwned(() => this.update());

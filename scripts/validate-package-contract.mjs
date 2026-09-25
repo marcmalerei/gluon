@@ -34,7 +34,7 @@ if (selectedName && !byName.has(selectedName)) {
 }
 
 const validPackageName = /^(?:@gluonjs\/[a-z0-9]+(?:-[a-z0-9]+)*|create-gluon)$/;
-const validExport = /^\.$|^\.\/[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const validExport = /^\.$|^\.\/[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/;
 
 for (const entry of packages) {
   if (!validPackageName.test(entry.name)) {

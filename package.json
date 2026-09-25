@@ -38,6 +38,10 @@
     "./analytics": {
       "types": "./dist/types/analytics.d.ts",
       "import": "./dist/analytics.js"
+    },
+    "./compat/lit": {
+      "types": "./dist/types/compat/lit.d.ts",
+      "import": "./dist/compat/lit.js"
     }
   },
   "files": [

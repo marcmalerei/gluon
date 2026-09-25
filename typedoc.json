@@ -5,6 +5,7 @@
     "src/decorators.ts",
     "src/styles/index.ts",
     "src/analytics.ts",
+    "src/compat/lit.ts",
     "packages/json-forms/src/index.ts",
     "packages/quarks/src/index.ts",
     "packages/atoms/src/index.ts",

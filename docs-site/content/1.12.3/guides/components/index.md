@@ -228,6 +228,7 @@ they are not alternative component bases.
 | --- | --- |
 | [`Analytics`](/gluon/1.12.3/api/generated/src/analytics/classes/Analytics.html) | Own provider-independent semantic events, consent, enrichment, and SSR-safe analytics delivery for one application. |
 | [`GluonElement`](/gluon/1.12.3/api/generated/src/classes/GluonElement.html) | Subclass it for a stateful Custom Element that needs protected class extension points. |
+| [`LitCompatElement`](/gluon/1.12.3/api/generated/src/compat/lit/classes/LitCompatElement.html) | Use only while migrating Lit lifecycle methods; new Gluon components should use `GluonElement` and native lifecycle hooks. |
 | [`TemplateResult`](/gluon/1.12.3/api/generated/src/classes/TemplateResult.html) | This is the immutable result returned by `html`; return it from render code rather than constructing it directly. |
 | [`EffectScope`](/gluon/1.12.3/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
 | [`StoreManager`](/gluon/1.12.3/api/generated/packages/store/src/classes/StoreManager.html) | Own Store definitions and live Store instances for one application, request, or test; create it with `createStoreManager()` and call `dispose()`. |
@@ -274,4 +275,5 @@ they are not alternative component bases.
 - [Application architecture](../application/) for application, Router, and Store ownership.
 - [Component contracts](https://github.com/marcmalerei/gluon/blob/main/docs/component-contracts.md) for the normative property, event, slot, model, and ref behavior.
 - [Reactive Custom Elements](https://github.com/marcmalerei/gluon/blob/main/docs/reactive-elements.md) for scheduler and reconnection semantics.
+- [Lit lifecycle compatibility](https://github.com/marcmalerei/gluon/blob/main/docs/lit-compat.md) for opt-in Lit-to-Gluon migration names and semantic boundaries.
 - [API reference](/gluon/1.12.3/api/) for exact signatures and one compiled example per public symbol.

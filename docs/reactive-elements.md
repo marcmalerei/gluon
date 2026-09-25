@@ -94,6 +94,8 @@ The complete timing, stop order, error, context, form, universal-rendering,
 HMR, and standalone behavior is specified by
 [RFC 0005](rfcs/0005-functional-custom-element-authoring.md).
 
+For Lit migrations, see the [Lit lifecycle compatibility guide](lit-compat.md).
+
 Only reactive properties and collection operations read during the current
 `update()`/`render()` execution become dependencies. Dependencies are rebuilt
 on every run, so a value that is no longer read after a conditional branch
