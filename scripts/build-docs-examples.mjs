@@ -1,15 +1,11 @@
-import { readdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 
 const root = resolve(import.meta.dirname, '..');
 const siteRoot = resolve(root, 'docs-site');
 const versions = JSON.parse(await readFile(resolve(siteRoot, 'versions.json'), 'utf8'));
-const contentEntries = await readdir(resolve(siteRoot, 'content'), { withFileTypes: true });
-const versionDirectories = contentEntries
-  .filter((entry) => entry.isDirectory() && /^\d+\.\d+\.\d+$/.test(entry.name))
-  .map((entry) => entry.name)
-  .sort();
+const versionDirectories = [...versions.supported].sort();
 
 if (!versionDirectories.includes(versions.latest)) {
   throw new Error(`latest docs version ${versions.latest} has no content directory`);

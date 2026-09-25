@@ -1,4 +1,5 @@
 import { defineConfig, type DefaultTheme } from 'vitepress';
+import { readdirSync } from 'node:fs';
 import contract from '../../package-contract.json';
 import versions from '../versions.json';
 
@@ -7,6 +8,10 @@ const packages = contract.packages
   .filter((entry) => entry.state === 'current')
   .sort((left, right) => left.name.localeCompare(right.name));
 const latest = versions.latest;
+const archivedVersions = readdirSync(new URL('../content/', import.meta.url), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((version) => /^\d+\.\d+\.\d+$/.test(version) && !versions.supported.includes(version));
 
 function packageSlug(name: string): string {
   return name.startsWith('@gluonjs/') ? name.slice('@gluonjs/'.length) : name;
@@ -90,11 +95,11 @@ export default defineConfig({
   cleanUrls: false,
   appearance: false,
   buildConcurrency: 8,
+  srcExclude: archivedVersions.map((version) => `${version}/**`),
   lastUpdated: false,
   ignoreDeadLinks: [
     /^\/latest(?:\/|$)/,
     /^\/1\.13\.0\/examples(?:\/|$)/,
-    /^\/1\.12\.3\/examples(?:\/|$)/,
     /^\/playground(?:\/|$)/,
   ],
   transformPageData(pageData) {

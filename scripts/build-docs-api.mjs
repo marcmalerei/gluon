@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, readdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
@@ -22,9 +22,3 @@ const examples = spawnSync(process.execPath, [resolve(root, 'scripts/generate-ap
   stdio: 'inherit',
 });
 if (examples.status !== 0) process.exit(examples.status ?? 1);
-
-const contentEntries = await readdir(docsRoot, { withFileTypes: true });
-for (const entry of contentEntries) {
-  if (!entry.isDirectory() || !/^\d+\.\d+\.\d+$/.test(entry.name) || entry.name === versions.latest) continue;
-  await cp(output, resolve(docsRoot, entry.name, 'api', 'generated'), { recursive: true, force: true });
-}
