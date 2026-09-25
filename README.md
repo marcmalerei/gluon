@@ -27,7 +27,7 @@ models.
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/core/) · [npm](https://www.npmjs.com/package/@gluonjs/core) · [Source](https://github.com/marcmalerei/gluon/blob/main/README.md)
 
-**Public API:** [`@gluonjs/core`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/) · [`@gluonjs/core/decorators`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/decorators/) · [`@gluonjs/core/styles`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/styles/) · [`@gluonjs/core/analytics`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/analytics/)
+**Public API:** [`@gluonjs/core`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/) · [`@gluonjs/core/decorators`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/decorators/) · [`@gluonjs/core/styles`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/styles/) · [`@gluonjs/core/analytics`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/analytics/) · [`@gluonjs/core/compat/lit`](https://marcmalerei.github.io/gluon/1.12.3/api/generated/src/compat/lit/)
 
 ### Install
 

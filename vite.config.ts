@@ -13,6 +13,7 @@ const entry = {
   index: resolve(import.meta.dirname, 'src/index.ts'),
   styles: resolve(import.meta.dirname, 'src/styles/index.ts'),
   analytics: resolve(import.meta.dirname, 'src/analytics.ts'),
+  'compat/lit': resolve(import.meta.dirname, 'src/compat/lit.ts'),
 };
 
 export default defineConfig({
@@ -51,6 +52,7 @@ export default defineConfig({
     alias: {
       '@gluonjs/core/decorators': resolve(import.meta.dirname, 'src/decorators.ts'),
       '@gluonjs/core/analytics': resolve(import.meta.dirname, 'src/analytics.ts'),
+      '@gluonjs/core/compat/lit': resolve(import.meta.dirname, 'src/compat/lit.ts'),
       '@gluonjs/core': resolve(import.meta.dirname, 'src/index.ts'),
       '@gluonjs/i18n': resolve(import.meta.dirname, 'packages/i18n/src/index.ts'),
       '@gluonjs/json-forms': resolve(import.meta.dirname, 'packages/json-forms/src/index.ts'),

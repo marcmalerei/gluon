@@ -3406,6 +3406,32 @@
     }
   },
   "overrides": {
+    "src/compat/lit/classes/LitCompatElement.md": {
+      "description": "Extend the opt-in lifecycle bridge while leaving rendering and scheduling with Gluon:",
+      "module": "@gluonjs/core/compat/lit",
+      "code": [
+        "import { LitCompatElement } from '@gluonjs/core/compat/lit';",
+        "import { html } from '@gluonjs/core';",
+        "",
+        "class ProductCard extends LitCompatElement {",
+        "  protected override render() {",
+        "    return html`<article>Product</article>`;",
+        "  }",
+        "}",
+        "",
+        "console.log(ProductCard);"
+      ]
+    },
+    "src/compat/lit/type-aliases/LitChangedProperties.md": {
+      "description": "Inspect the old values exposed to compatibility lifecycle methods:",
+      "module": "@gluonjs/core/compat/lit",
+      "code": [
+        "import type { LitChangedProperties } from '@gluonjs/core/compat/lit';",
+        "",
+        "const changed: LitChangedProperties = new Map([['productId', undefined]]);",
+        "console.log(changed.get('productId'));"
+      ]
+    },
     "src/analytics/classes/Analytics.md": { "recipe": "analytics-contract", "description": "Own provider-independent event delivery and consent policy:" },
     "src/analytics/functions/createAnalytics.md": { "recipe": "analytics-contract", "description": "Create an application-local analytics pipeline:" },
     "src/analytics/functions/createGa4Adapter.md": { "recipe": "analytics-contract", "description": "Adapt semantic events to a GA4-shaped application sink:" },

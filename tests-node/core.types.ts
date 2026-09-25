@@ -55,6 +55,10 @@ import {
   type TrustedTypesConfig,
   type VirtualizerHandle,
 } from '@gluonjs/core';
+import {
+  LitCompatElement,
+  type LitChangedProperties,
+} from '@gluonjs/core/compat/lit';
 
 const intersection = createIntersectionObserver<HTMLDivElement>({ threshold: [0, 1] }, (entries) => {
   entries[0]?.intersectionRatio.toFixed(2);
@@ -118,6 +122,19 @@ defineGluonElement({
   tagName: 'typed-functional-scoped-element',
   setup: () => ({ render: () => html`Functional scoped` }),
 }, { registry: typedScopedRegistry, shadowRootRegistry: typedScopedRegistry });
+
+class TypedLitCompatElement extends LitCompatElement<{ changed: { value: string } }> {
+  protected override willUpdate(changed: LitChangedProperties): void {
+    changed.get('value');
+  }
+
+  protected override render() {
+    return html`<span>compat</span>`;
+  }
+}
+
+const typedLitCompat = new TypedLitCompatElement();
+typedLitCompat.requestUpdate('value', undefined) satisfies Promise<void>;
 // @ts-expect-error registry options require a CustomElementRegistry-compatible target
 defineElement('typed-invalid-registry', TypedScopedElement, { registry: {} });
 
