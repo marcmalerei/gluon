@@ -89,7 +89,7 @@ export default defineConfig({
   outDir: 'dist',
   cleanUrls: false,
   appearance: false,
-  buildConcurrency: 4,
+  buildConcurrency: 8,
   lastUpdated: false,
   ignoreDeadLinks: [
     /^\/latest(?:\/|$)/,
