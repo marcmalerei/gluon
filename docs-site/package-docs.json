@@ -178,6 +178,32 @@
       ]
     },
     {
+      "name": "@gluonjs/graphql",
+      "purpose": "Optional request-scoped GraphQL resources for SSR, hydration, and component-owned data loading.",
+      "starter": {
+        "language": "ts",
+        "code": "import { createGraphQLResource, createGraphQLResourceContext } from '@gluonjs/graphql';\n\nconst context = createGraphQLResourceContext();\nconst resource = createGraphQLResource<{ id: string }, { id: string }>({\n  key: ({ id }) => `product:${id}`,\n  query: 'query Product($id: ID!) { product(id: $id) { id } }',\n  variables: ({ id }) => ({ id }),\n  fetcher: async () => ({ id: '4711' }),\n});\n\nawait resource.prefetch({ id: '4711' }, { context });"
+      },
+      "useCases": [
+        "Component-owned GraphQL resource reads with loading and error boundaries.",
+        "SSR/page prefetch and request-local deduplication.",
+        "Safe JSON state handoff for browser hydration.",
+        "Contentful Delivery and Preview endpoint configuration without an SDK."
+      ],
+      "limits": [
+        "Does not bundle a GraphQL client, schema generator, Contentful SDK, or renderer-specific Suspense wrapper.",
+        "Callers must create one explicit context per SSR request and keep credentials server-side."
+      ],
+      "relatedGuides": [
+        { "label": "GraphQL data connectors", "href": "/gluon/latest/guides/graphql-data-connectors/" },
+        { "label": "Universal rendering", "href": "/gluon/latest/guides/universal-rendering/" }
+      ],
+      "integrationNotes": [
+        "Has no official runtime dependencies and is outside `@gluonjs/core`.",
+        "Consumes generated GraphQL documents and result types from the host application's existing toolchain."
+      ]
+    },
+    {
       "name": "@gluonjs/vite",
       "purpose": "Official Vite integration and state-preserving HMR for Gluon.",
       "starter": {

@@ -1,0 +1,41 @@
+{
+  "name": "@gluonjs/graphql",
+  "version": "1.12.3",
+  "description": "Optional request-scoped GraphQL resources for Gluon applications.",
+  "private": false,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcmalerei/gluon.git",
+    "directory": "packages/graphql"
+  },
+  "homepage": "https://marcmalerei.github.io/gluon/latest/packages/graphql/",
+  "bugs": {
+    "url": "https://github.com/marcmalerei/gluon/issues"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

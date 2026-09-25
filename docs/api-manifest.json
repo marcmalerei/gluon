@@ -51,7 +51,8 @@
         ".",
         "./decorators",
         "./styles",
-        "./analytics"
+        "./analytics",
+        "./compat/lit"
       ]
     },
     {
@@ -86,6 +87,13 @@
         "./static",
         "./streaming",
         "./tenant"
+      ]
+    },
+    {
+      "name": "@gluonjs/graphql",
+      "environment": "universal",
+      "exports": [
+        "."
       ]
     },
     {
