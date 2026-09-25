@@ -76,6 +76,14 @@
       ]
     },
     {
+      "name": "@gluonjs/graphql",
+      "directory": "packages/graphql",
+      "state": "current",
+      "environment": "universal",
+      "exports": ["."],
+      "dependencies": []
+    },
+    {
       "name": "@gluonjs/vite",
       "directory": "packages/vite",
       "state": "current",

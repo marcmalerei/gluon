@@ -7,6 +7,12 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added optional `@gluonjs/graphql` request-scoped resources with concurrent
+  deduplication, SSR prefetch/reuse, cancellation, timeout, JSON hydration
+  handoff, and a provider-independent Contentful reference fetcher (#531).
+
 ## [1.12.3] - 2026-09-24
 
 ### Added

@@ -141,6 +141,7 @@ export default defineConfig({
         'packages/create-gluon/**',
         'packages/devtools/**',
         'packages/devtools-api/**',
+        'packages/graphql/**',
         'packages/language-server/**',
         'packages/reactivity/**',
         'packages/router/**',

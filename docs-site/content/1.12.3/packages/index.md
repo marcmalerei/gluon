@@ -16,6 +16,7 @@ Gluon packages are intentionally composable. Begin with the smallest capability 
 | [@gluonjs/devtools-api](/1.12.3/packages/devtools-api/) | universal | Versioned, environment-neutral Gluon Devtools protocol. |
 | [@gluonjs/gluon-components-vite](/1.12.3/packages/gluon-components-vite/) | browser | Official Storybook renderer and Vite framework for Gluon components. |
 | [@gluonjs/graph](/1.12.3/packages/graph/) | browser | Interactive, dependency-free network graph Custom Element for Gluon. |
+| [@gluonjs/graphql](/1.12.3/packages/graphql/) | universal | Optional request-scoped GraphQL resources for SSR, hydration, and component-owned data loading. |
 | [@gluonjs/i18n](/1.12.3/packages/i18n/) | browser | Locale-aware messages and lazy namespace loading for Gluon applications. |
 | [@gluonjs/json-forms](/1.12.3/packages/json-forms/) | browser | Schema-driven, form-associated Custom Elements for Gluon. |
 | [@gluonjs/language-server](/1.12.3/packages/language-server/) | node | Gluon template language service, LSP server, and CI checker. |

@@ -62,7 +62,7 @@
     "@gluonjs/reactivity": "1.12.3"
   },
   "scripts": {
-    "build": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:i18n && npm run build:ssr && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:graph && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
+    "build": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:i18n && npm run build:ssr && npm run build:graphql && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:graph && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon && npm run build:shop && npm run build:shop:server && npm run build:shop:static && npm run build:shop:eleventy && npm run build:playground && npm run build:virtualizer-example && npm run build:signals-example && npm run build:docs",
     "build:core": "npm run build:reactivity && vite build && tsc -p tsconfig.build.json",
     "build:json-forms": "npm run build --workspace @gluonjs/json-forms",
     "build:ui": "npm run build:quarks && npm run build:atoms && npm run build:molecules && npm run build:organisms",
@@ -74,6 +74,7 @@
     "build:router": "npm run build --workspace @gluonjs/router",
     "build:store": "npm run build --workspace @gluonjs/store",
     "build:ssr": "npm run build --workspace @gluonjs/ssr",
+    "build:graphql": "npm run build --workspace @gluonjs/graphql",
     "build:compiler": "npm run build --workspace @gluonjs/compiler",
     "build:vite": "npm run build --workspace @gluonjs/vite",
     "build:gluon-components-vite": "npm run build --workspace @gluonjs/gluon-components-vite",
@@ -120,7 +121,7 @@
     "dev:benchmark:application": "vite --config benchmarks/application/vite.config.ts",
     "measure:shop": "npm run build:shop && node scripts/measure-shop-build.mjs",
     "benchmark:bundle": "node scripts/run-bundle-matrix.mjs",
-    "typecheck": "npm run typecheck:core && npm run typecheck:decorators-legacy && npm run typecheck:json-forms && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:i18n && npm run typecheck:ssr && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:gluon-components-vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:graph && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
+    "typecheck": "npm run typecheck:core && npm run typecheck:decorators-legacy && npm run typecheck:json-forms && npm run typecheck:ui && npm run typecheck:reactivity && npm run typecheck:router && npm run typecheck:store && npm run typecheck:i18n && npm run typecheck:ssr && npm run typecheck:graphql && npm run typecheck:compiler && npm run typecheck:vite && npm run typecheck:gluon-components-vite && npm run typecheck:test-utils && npm run typecheck:devtools-api && npm run typecheck:devtools && npm run typecheck:graph && npm run typecheck:language-server && npm run typecheck:vue-analyzer && npm run typecheck:create-gluon && npm run typecheck:docs",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:decorators-legacy": "tsc -p tests-node/tsconfig.decorators-legacy.json",
     "typecheck:json-forms": "npm run typecheck --workspace @gluonjs/json-forms",
@@ -129,6 +130,7 @@
     "typecheck:router": "npm run typecheck --workspace @gluonjs/router",
     "typecheck:store": "npm run typecheck --workspace @gluonjs/store",
     "typecheck:ssr": "npm run typecheck --workspace @gluonjs/ssr",
+    "typecheck:graphql": "npm run typecheck --workspace @gluonjs/graphql",
     "typecheck:compiler": "npm run typecheck --workspace @gluonjs/compiler",
     "typecheck:vite": "npm run typecheck --workspace @gluonjs/vite",
     "typecheck:gluon-components-vite": "npm run typecheck --workspace @gluonjs/gluon-components-vite",

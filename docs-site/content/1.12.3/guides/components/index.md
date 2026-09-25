@@ -229,6 +229,8 @@ they are not alternative component bases.
 | [`Analytics`](/gluon/1.12.3/api/generated/src/analytics/classes/Analytics.html) | Own provider-independent semantic events, consent, enrichment, and SSR-safe analytics delivery for one application. |
 | [`GluonElement`](/gluon/1.12.3/api/generated/src/classes/GluonElement.html) | Subclass it for a stateful Custom Element that needs protected class extension points. |
 | [`LitCompatElement`](/gluon/1.12.3/api/generated/src/compat/lit/classes/LitCompatElement.html) | Use only while migrating Lit lifecycle methods; new Gluon components should use `GluonElement` and native lifecycle hooks. |
+| [`GraphQLRequestError`](/gluon/1.12.3/api/generated/packages/graphql/src/classes/GraphQLRequestError.html) | Handle provider HTTP or GraphQL response failures at an application data boundary; it is not a component base class. |
+| [`GraphQLTimeoutError`](/gluon/1.12.3/api/generated/packages/graphql/src/classes/GraphQLTimeoutError.html) | Handle a request timeout at the owning data boundary; it is not a component lifecycle API. |
 | [`TemplateResult`](/gluon/1.12.3/api/generated/src/classes/TemplateResult.html) | This is the immutable result returned by `html`; return it from render code rather than constructing it directly. |
 | [`EffectScope`](/gluon/1.12.3/api/generated/packages/reactivity/src/classes/EffectScope.html) | Group reactive effects and cleanup under one `stop()` boundary; `effectScope()` is the public factory. |
 | [`StoreManager`](/gluon/1.12.3/api/generated/packages/store/src/classes/StoreManager.html) | Own Store definitions and live Store instances for one application, request, or test; create it with `createStoreManager()` and call `dispose()`. |
