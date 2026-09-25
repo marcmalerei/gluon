@@ -18,4 +18,3 @@ Method: 32 interleaved samples after 8 warm-ups, rotating framework order. The w
 
 This lane compares complete Node string rendering only. It does not claim streaming throughput, request concurrency, memory/GC behavior, or browser hydration equivalence.
 Every measured sample and correctness snapshot is preserved in the accompanying JSON file.
-
