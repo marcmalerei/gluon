@@ -26,9 +26,12 @@ npm run check:release-contract
 Issue [#539](https://github.com/marcmalerei/gluon/issues/539) tracks the
 22-package release candidate for the Lit lifecycle compatibility, GraphQL data
 connector, SSR load evidence, runnable graph fix, and progressive learning-path
-work delivered by issues #530-#533 and #506. The candidate remains unpublished
-until the protected release workflow, registry verification, and release-cut
-evidence establish the immutable `v1.13.0` artifacts.
+work delivered by issues #530-#533 and #506. The canonical `v1.13.0` tag is
+immutable. Its first workflow run `36340425449` stopped before publication
+because the release browser lane did not retain the required Chromium
+`ssr-load.json` evidence. Issue [#543](https://github.com/marcmalerei/gluon/issues/543)
+records the allowlisted workflow repair and one-time recovery through
+`v1.13.0-recovery.1`; the package and application tree remain unchanged.
 
 ## v1.12.3 publication
 

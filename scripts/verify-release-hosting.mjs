@@ -124,6 +124,15 @@ const changedAfterTesting = (await execFile('git', ['diff', '--name-only', relea
 })).stdout.trim().split('\n').filter(Boolean);
 const compatibilityPath = releaseContract.compatibilityManifestPath.replace('{version}', releaseVersion);
 const permittedEvidenceChanges = new Set([evidencePath, compatibilityPath]);
+const recoveryManifestPath = `release/recovery/${releaseVersion}.json`;
+try {
+  const recoveryManifest = JSON.parse(await readFile(resolve(root, recoveryManifestPath), 'utf8'));
+  if (recoveryManifest.recoveryTag === process.env.GITHUB_REF_NAME) {
+    for (const path of recoveryManifest.allowedCanonicalDeltaPaths) permittedEvidenceChanges.add(path);
+  }
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
 if (changedAfterTesting.some((path) => !permittedEvidenceChanges.has(path))) {
   throw new Error(`Acceptance-relevant files changed after the automated Quality Gates run: ${changedAfterTesting.filter((path) => !permittedEvidenceChanges.has(path)).join(', ')}.`);
 }
