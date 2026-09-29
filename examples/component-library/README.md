@@ -1,5 +1,7 @@
 # Component-library consumer
 
+## Purpose
+
 This is a deliberately separate component-library and consumer example. It is
 not a GLUON GOODS route or a replacement for the shop acceptance application.
 
@@ -12,12 +14,16 @@ rendering reads that property directly, button interactions update it, and its
 `reflect: true` declaration keeps the `value` attribute synchronized for HTML
 and DOM consumers without a second local quantity state.
 
+## Run
+
 Run `npm run build:component-library` to build the consumer. It imports only
 the serializable manifest initially, requests the badge and picker through
 `createComponentLibraryLoader()`, displays observable loader state, and keeps
 the two public component modules in distinct dynamic chunks. The badge sheet
 is owned by the explicit document target; the picker's internal sheet remains
 owned by its ShadowRoot.
+
+## Verify
 
 `npm run check:component-library-loader-build` verifies the production Vite
 manifest and browser requests from a clean checkout by building the required
@@ -57,6 +63,8 @@ The validator is part of `check:storybook:component-library`, so the three-engin
 geometry evidence runs in the repository quality gate.
 See the [Storybook with Gluon guide](../../docs/storybook.md) for a minimal
 configuration, typed story, style ownership, and lifecycle explanation.
+
+## Boundaries
 
 `library/` is the separately buildable `@gluonjs/example-component-library`
 package boundary. Its implementation imports only the public Core and Quarks

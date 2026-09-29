@@ -2,6 +2,9 @@
 
 Documentation is retained by supported release line. The version selector and
 this archive resolve to immutable version paths rather than a floating page.
+Only versions listed in `docs-site/versions.json` are built into the current
+site; older lines may remain as repository history or as explicitly retained
+archive trees.
 
 ## Supported
 
@@ -9,7 +12,6 @@ this archive resolve to immutable version paths rather than a floating page.
 
 ## Archived
 
-- Gluon 1.12.0 — previous supported release line, retained in repository history.
 - Gluon 1.12.3 — previous supported release line, retained in repository history.
 - Gluon 1.9.0 — previous supported release line, retained in repository history.
 - Gluon 1.10.0 — previous supported release line, retained in repository history.

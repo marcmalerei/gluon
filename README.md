@@ -152,6 +152,13 @@ and the full static-site checks with `npm run check:docs`. See
 [`docs-site/README.md`](docs-site/README.md) for the source layout, Pages build,
 versioning, and validation pipeline.
 
+The documentation information architecture, stale-document audit, and README
+rules are recorded in
+[`docs/documentation-architecture.md`](docs/documentation-architecture.md),
+[`docs/documentation-audit.md`](docs/documentation-audit.md), and
+[`docs/readme-contract.md`](docs/readme-contract.md). `npm run check:readmes`
+checks the scope-specific structure before documentation work is reviewed.
+
 ## Performance evidence
 
 Reproducible browser matrices, raw samples, and their interpretation limits are

@@ -1,5 +1,7 @@
 # GLUON GOODS reference shop
 
+## Purpose
+
 GLUON GOODS is the living application acceptance surface for Gluon. It is a
 coherent mobile-first shop frontend, not an example index. Each applicable
 framework feature must improve a real customer flow here as defined by the
@@ -234,7 +236,7 @@ The latest verified renders are:
 - [scoped-registry product flow on desktop](../../output/playwright/issue-195-scoped-registries/product-desktop.png)
 - [scoped-registry product flow at 390px](../../output/playwright/issue-195-scoped-registries/product-390.png)
 
-## Verification contract
+## Verify
 
 The shop must build during `npm run check`. Browser tests cover the current
 customer flow, and visual changes require desktop, 390px, and 320px screenshots

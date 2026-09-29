@@ -47,7 +47,7 @@ function documentationSidebar(version: string): DefaultTheme.SidebarItem[] {
   return [
     { text: 'Start here', link: `/${version}/` },
     {
-      text: 'Learn and build',
+      text: 'Learn',
       collapsed: false,
       items: [
         { text: 'Getting started', link: `/${version}/guides/getting-started/` },
@@ -62,13 +62,22 @@ function documentationSidebar(version: string): DefaultTheme.SidebarItem[] {
         { text: 'Tooling', link: `/${version}/guides/tooling/` },
         { text: 'Quality and security', link: `/${version}/guides/quality/` },
         { text: 'Deployment', link: `/${version}/guides/deployment/` },
+        { text: 'Release readiness', link: `/${version}/guides/releasing/` },
       ],
     },
-    { text: 'Packages', link: `/${version}/packages/`, items: packageLinks(version) },
+    {
+      text: 'Reference',
+      collapsed: true,
+      items: [
+        { text: 'Reference overview', link: `/${version}/reference/` },
+        { text: 'Packages', link: `/${version}/packages/`, items: packageLinks(version) },
+        { text: 'API reference', link: `/${version}/api/`, items: apiLinks(version) },
+      ],
+    },
     { text: 'Recipes', link: `/${version}/cookbook/` },
-    { text: 'API reference', link: `/${version}/api/`, items: apiLinks(version) },
     {
       text: 'Migration',
+      collapsed: true,
       link: `/${version}/migration/`,
       items: [
         { text: 'Upgrade between releases', link: `/${version}/migration/upgrade/` },
@@ -135,10 +144,16 @@ export default defineConfig({
   themeConfig: {
     siteTitle: 'GLUON / DOCS',
     nav: [
-      { text: 'Guides', link: `/${latest}/guides/` },
-      { text: 'Packages', link: `/${latest}/packages/` },
+      { text: 'Learn', link: `/${latest}/guides/` },
+      {
+        text: 'Reference',
+        items: [
+          { text: 'Overview', link: `/${latest}/reference/` },
+          { text: 'Packages', link: `/${latest}/packages/` },
+          { text: 'API', link: `/${latest}/api/` },
+        ],
+      },
       { text: 'Recipes', link: `/${latest}/cookbook/` },
-      { text: 'API', link: `/${latest}/api/` },
       { text: 'Migration', link: `/${latest}/migration/` },
       {
         text: `Gluon ${latest}`,
