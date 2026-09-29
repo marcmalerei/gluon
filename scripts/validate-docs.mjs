@@ -28,6 +28,7 @@ const requiredPages = [
   'cookbook/index.html', 'migration/index.html', 'migration/upgrade/index.html',
   'migration/vue-to-gluon-cutover/index.html', 'migration/vue-analyzer/index.html',
   'migration/vue-codemod-decision/index.html', 'reference/forms/index.html',
+  'reference/index.html',
   'migration/lit-to-gluon/index.html',
   'reference/diagnostics/index.html', 'examples/plain.html', 'examples/ui.html',
   'examples/vue.html', 'examples/json-forms.html',
@@ -42,6 +43,17 @@ await access(resolve(outputRoot, 'index.html'));
 await access(resolve(outputRoot, 'archive/index.html'));
 await access(resolve(outputRoot, 'latest/index.html'));
 await access(resolve(outputRoot, 'latest/packages/index.html'));
+
+const contentRoot = resolve(siteRoot, 'content');
+const archiveIndex = await readFile(resolve(contentRoot, 'archive/index.md'), 'utf8');
+const versionDirectories = (await readdir(contentRoot, { withFileTypes: true }))
+  .filter((entry) => entry.isDirectory() && /^\d+\.\d+\.\d+$/.test(entry.name))
+  .map((entry) => entry.name);
+for (const version of versionDirectories) {
+  if (!versions.supported.includes(version) && !archiveIndex.includes(`Gluon ${version}`)) {
+    throw new Error(`archived documentation ${version} is not named in content/archive/index.md`);
+  }
+}
 
 const packageIndex = await readFile(resolve(siteRoot, 'content', versions.latest, 'packages/index.md'), 'utf8');
 for (const entry of currentPackages) {
@@ -458,6 +470,7 @@ async function validateSourceDocs() {
   const releasingPath = `docs-site/content/${versions.latest}/guides/releasing/index.md`;
   const sourceEntries = await Promise.all([
     'README.md',
+    'docs/releasing.md',
     'docs/roadmap.md',
     ...packagePaths,
     upgradePath,
@@ -476,6 +489,11 @@ async function validateSourceDocs() {
         '- experimental: RFC-backed or opt-in surfaces',
         '- unsupported: behaviors that the contract documents reject',
         'Historical RFC decisions remain preserved',
+      ],
+      'docs/releasing.md': [
+        `The current lockstep line is \`${currentVersion}\`.`,
+        'artifacts are published.',
+        'The release handoffs below are historical evidence.',
       ],
       'docs/roadmap.md': [
         'provides language tooling, Devtools, and a public',

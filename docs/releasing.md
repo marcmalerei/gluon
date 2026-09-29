@@ -5,25 +5,23 @@ Gluon uses one lockstep release for the 22 packages in
 contract is [`release/release-contract.json`](../release/release-contract.json),
 and `.github/workflows/release.yml` is the only supported publication path.
 For day-to-day version upgrades, start with the
-[Gluon upgrade guide](/gluon/1.10.0/migration/upgrade/).
+[Gluon upgrade guide](/gluon/1.13.0/migration/upgrade/).
 
 ## Current publication state
 
-The machine-readable package contract records `publicationState: released` and
-`scopeControl: verified` for `1.12.3`. The protected tag `v1.12.3` resolves to
-merge commit `3185e48a3dcc1b3138eaa6bf19f1e51893d7e8f1`. Release workflow
-[`35985803820`](https://github.com/marcmalerei/gluon/actions/runs/35985803820)
-completed successfully, the GitHub release contains 131 assets, and independent
-registry verification confirmed all 21 package records at version and `latest`
-`1.12.3` with provenance metadata. Validate the recorded state with:
+The current lockstep line is `1.13.0`. The protected tag `v1.13.0` resolves to
+the published GitHub release
+[`v1.13.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.13.0), and npm
+reports `1.13.0` as the `latest` dist-tag for `@gluonjs/core`. The release is
+the 22-package current line; validate the local release contract with:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.13.0 candidate
+## v1.13.0 publication
 
-Issue [#539](https://github.com/marcmalerei/gluon/issues/539) tracks the
+Issue [#539](https://github.com/marcmalerei/gluon/issues/539) tracked the
 22-package release candidate for the Lit lifecycle compatibility, GraphQL data
 connector, SSR load evidence, runnable graph fix, and progressive learning-path
 work delivered by issues #530-#533 and #506. The canonical `v1.13.0` tag is
@@ -32,6 +30,11 @@ because the release browser lane did not retain the required Chromium
 `ssr-load.json` evidence. Issue [#543](https://github.com/marcmalerei/gluon/issues/543)
 records the allowlisted workflow repair and one-time recovery through
 `v1.13.0-recovery.1`; the package and application tree remain unchanged.
+The recovery completed publication and registry verification; the `1.13.0`
+artifacts are published.
+
+The release handoffs below are historical evidence. Their version numbers and
+recorded workflow outcomes must not be read as the current publication state.
 
 ## v1.12.3 publication
 

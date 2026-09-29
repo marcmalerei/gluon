@@ -1,9 +1,13 @@
 # Gluon Playground
 
+## Purpose
+
 The Playground is the maintained browser reproduction surface. It imports the
 same public Core, Reactivity, Compiler diagnostic catalog, Language Server, and
 Vite package entry points used by local starters. Application source never
 imports repository internals; monorepo aliases live only in Vite/test config.
+
+## Run
 
 ```sh
 npm run dev:playground
@@ -13,6 +17,8 @@ npm run preview:playground
 
 `preview:playground` serves the production build at
 `http://127.0.0.1:4174/gluon/playground/`.
+
+## Verify
 
 The default reproduction defines and renders a stateful Custom Element with the
 public `defineGluonElement` and `elementEvent` APIs. Re-running edited source
@@ -33,6 +39,8 @@ configuration, aligned `1.13.0` Gluon dependencies, and the template checker.
 The default project also exercises `compose(Component, props)\`body\`` so the
 browser analyzer and downloaded project retain template-native functional
 composition at original TypeScript locations.
+
+## Boundaries
 
 The Playground intentionally has no visual UI-package application for
 component-owned sheets: its host chrome uses native controls styled by the

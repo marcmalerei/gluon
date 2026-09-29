@@ -1,5 +1,7 @@
 # Bundle-size matrix
 
+## Purpose
+
 `npm run benchmark:bundle` builds the same labelled counter interaction with
 Gluon, Lit, Vue, and React in production mode. Every fixture renders a heading,
 a native labelled button, and a polite live output; all use one entry and no
@@ -11,6 +13,16 @@ module graph, and writes the raw, gzip level 9, and Brotli quality 11 byte total
 `.tmp/bundle-matrix/report.json`. The Vite manifests remain beside each build
 for chunk inspection. Quality Gates run this gate and retain its report to
 prevent fixture or toolchain drift from silently changing the comparison.
+## Run
+
+Run the matrix from the repository root:
+
+```sh
+npm run benchmark:bundle
+```
+
+## Interpret results
+
 Results are a bounded import-and-render scenario, not a
 general framework-size ranking.
 

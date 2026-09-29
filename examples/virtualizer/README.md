@@ -1,5 +1,7 @@
 # Gluon virtualizer example
 
+## Purpose
+
 This runnable acceptance application exercises `createVirtualizer()` against a
 500-item typed inventory. It is deliberately separate from GLUON GOODS: the
 canonical shop has only four products, so windowing that customer route would
@@ -19,6 +21,8 @@ The example demonstrates:
 - list/grid semantics and logical collection position metadata;
 - callback-ref observer/listener ownership and application cleanup.
 
+## Run
+
 Run it from the repository root:
 
 ```sh
@@ -26,6 +30,8 @@ npm run dev:virtualizer-example
 npm run build:virtualizer-example
 npm run preview:virtualizer-example
 ```
+
+## Verify
 
 The production preview is available at
 `http://127.0.0.1:4175/gluon/examples/virtualizer/`.

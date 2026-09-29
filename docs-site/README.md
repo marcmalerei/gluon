@@ -28,7 +28,8 @@ mobile widths.
 ## Information architecture
 
 - `content/index.md` is the cross-version landing page.
-- `content/<version>/guides/` teaches complete workflows in a recommended order.
+- `content/<version>/guides/` teaches complete workflows in a recommended order
+  grouped as Essentials, Build an application, and Render and ship.
 - `guides/sfc-authoring/` publishes the maintained `docs/sfc-authoring.md`
   tutorial inside each versioned site, with links from component, compiler, and
   Vite entry points.
@@ -36,6 +37,9 @@ mobile widths.
   README, so GitHub, npm, and the site share one package guide and examples.
 - `content/<version>/cookbook/` composes multiple public packages into real
   application tasks.
+- `content/<version>/reference/` is the gateway to operational contracts and
+  documentation governance; package comparison and generated API remain their
+  own reference routes.
 - `content/<version>/api/` contains the maintained API introduction and
   generated TypeDoc pages for every public entry point and symbol.
 - `content/<version>/migration/` and `reference/` hold migration playbooks and
@@ -43,6 +47,12 @@ mobile widths.
 - `examples/` contains the TypeScript/Vue source compiled by the docs checks and
   linked from Markdown; examples are not copied into prose by hand.
 - `.vitepress/` owns routes, version navigation, search, theme, and layout.
+
+The repository-level rationale, stale-document audit, and README contract live
+in [`docs/documentation-architecture.md`](../docs/documentation-architecture.md),
+[`docs/documentation-audit.md`](../docs/documentation-audit.md), and
+[`docs/readme-contract.md`](../docs/readme-contract.md). They are contributor
+references rather than a second public navigation tree.
 
 `versions.json` declares supported lines and the latest line. New release lines
 must be added deliberately; historical content is retained according to the
