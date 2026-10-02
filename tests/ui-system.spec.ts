@@ -2560,7 +2560,9 @@ describe('advanced data and workflow molecules', () => {
     await userEvent.click(input);
     await userEvent.keyboard('{ArrowDown}');
     expect(active).toEqual(['orbit-cable']);
-    await userEvent.click(listbox.querySelectorAll<HTMLElement>('[role="option"]')[1]);
+    const expressOption = listbox.querySelectorAll<HTMLElement>('[role="option"]')[1];
+    if (!expressOption) throw new Error('Combobox test fixture did not render the express option.');
+    await userEvent.click(expressOption);
     expect(selected).toEqual(['orbit-cable']);
     expect(openStates).toEqual([true, false]);
     expect(getStyleSheetText(comboboxFieldStyles)).toContain('--gluon-combobox-field');
