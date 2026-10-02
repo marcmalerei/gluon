@@ -85,6 +85,7 @@ import {
   FilterBar,
   DataList,
   ListboxField,
+  ComboboxField,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -151,7 +152,9 @@ controls, counts, summaries, and reset actions. `DataList` renders native
 small screens. `ListboxField` composes a visible label and helper/error
 relationships around the public Quarks listbox, preserving controlled values,
 disabled options, Arrow/Home/End navigation, and caller-owned change effects.
-All five components expose `--gluon-*` presentation hooks and
+`ComboboxField` adds a controlled native input with a stable listbox
+relationship, keyboard selection, disabled options, loading/empty feedback,
+active-option reporting, and caller-owned filtering and open state. All six components expose `--gluon-*` presentation hooks and
 keep data, routing, fetching, persistence, and mutations in the application.
 `Disclosure` renders native `details` and `summary`, preserving browser
 keyboard toggling, find-in-page expansion, semantics, and form behavior. Use

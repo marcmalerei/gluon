@@ -37,6 +37,8 @@ export { DataList, type DataListAttributes, type DataListItem, type DataListProp
 export { dataListStyles } from './data-list-styles.js';
 export { ListboxField, type ListboxFieldAttributes, type ListboxFieldListboxAttributes, type ListboxFieldProps } from './listbox-field.js';
 export { listboxFieldStyles } from './listbox-field-styles.js';
+export { ComboboxField, type ComboboxFieldAttributes, type ComboboxFieldInputAttributes, type ComboboxFieldListboxAttributes, type ComboboxFieldProps } from './combobox-field.js';
+export { comboboxFieldStyles } from './combobox-field-styles.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';

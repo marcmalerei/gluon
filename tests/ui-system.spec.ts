@@ -79,6 +79,8 @@ import {
   FilterBar,
   DataList,
   ListboxField,
+  ComboboxField,
+  comboboxFieldStyles,
   listboxFieldStyles,
   tooltipStyles,
   SegmentedControl,
@@ -2524,6 +2526,50 @@ describe('advanced data and workflow molecules', () => {
     const invalid = document.querySelector<HTMLElement>('#invalid-delivery')!;
     expect(invalid.querySelector('[role="listbox"]')?.getAttribute('aria-invalid')).toBe('true');
     expect(invalid.querySelector('[role="alert"]')?.textContent).toContain('Choose');
+  });
+
+  it('composes a controlled ComboboxField with stable relationships and keyboard selection', async () => {
+    const selected: string[] = [];
+    const active: string[] = [];
+    const openStates: boolean[] = [];
+    render(ComboboxField({
+      id: 'product-search',
+      label: 'Product search',
+      value: 'orbit-lamp',
+      inputValue: 'Orbit',
+      activeValue: 'orbit-lamp',
+      open: true,
+      options: [
+        { value: 'orbit-lamp', label: 'Orbit lamp' },
+        { value: 'orbit-cable', label: 'Orbit cable' },
+        { value: 'orbit-shade', label: 'Orbit shade', disabled: true },
+      ],
+      helper: 'Search the current catalog.',
+      onSelect: (value) => selected.push(value),
+      onActiveChange: (value) => active.push(value),
+      onOpenChange: (open) => openStates.push(open),
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#product-search')!;
+    const input = root.querySelector<HTMLInputElement>('[role="combobox"]')!;
+    const listbox = root.querySelector<HTMLElement>('[role="listbox"]')!;
+    expect(input.getAttribute('aria-controls')).toBe('product-search-listbox');
+    expect(input.getAttribute('aria-expanded')).toBe('true');
+    expect(input.getAttribute('aria-describedby')).toBe('product-search-description');
+    expect(listbox.querySelectorAll('[role="option"]')).toHaveLength(3);
+    expect(listbox.querySelector('[aria-selected="true"]')?.textContent).toBe('Orbit lamp');
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowDown}');
+    expect(active).toEqual(['orbit-cable']);
+    await userEvent.click(listbox.querySelectorAll<HTMLElement>('[role="option"]')[1]);
+    expect(selected).toEqual(['orbit-cable']);
+    expect(openStates).toEqual([true, false]);
+    expect(getStyleSheetText(comboboxFieldStyles)).toContain('--gluon-combobox-field');
+
+    render(ComboboxField({ id: 'empty-search', label: 'Search', open: true, loading: true, options: [] }), document.body);
+    expect(document.querySelector('#empty-search [role="status"]')?.textContent).toContain('Loading');
+    render(ComboboxField({ id: 'invalid-search', label: 'Search', error: 'Choose a product.', options: [] }), document.body);
+    expect(document.querySelector('#invalid-search [role="combobox"]')?.getAttribute('aria-invalid')).toBe('true');
+    expect(document.querySelector('#invalid-search [role="alert"]')?.textContent).toContain('Choose');
   });
 
   it('covers optional states and rejects invalid molecule identifiers', () => {

@@ -975,6 +975,37 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "ComboboxField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-combobox-field"
+      ],
+      "variants": [
+        "suggestions",
+        "loading",
+        "empty"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "combobox-field",
+      "accessibility": "Composes a visible label, native combobox input, stable listbox relationship, keyboard selection, disabled options, loading and empty feedback, helper text, and an announced error.",
+      "extension": "Options, filtering, value, input value, open state, selection effects, fetching, localization, persistence, authorization, and tenant-specific CSS variables remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ComboboxField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "ContextMenu",
       "kind": "component",
       "status": "stable",
