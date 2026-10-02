@@ -896,10 +896,10 @@ describe('@gluonjs/ssr request ownership and state', () => {
       'gluon-ui-tokens',
       'gluon-ui-theme',
       'gluon-atom-status-badge',
-      'gluon-molecule-navigation-menu',
       'gluon-molecule-tabs',
       'gluon-molecule-toolbar',
       'gluon-molecule-toast',
+      'gluon-organism-mega-menu',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
@@ -1230,19 +1230,19 @@ describe('@gluonjs/ssr static output and style transport', () => {
       'gluon-ui-tokens',
       'gluon-ui-theme',
       'gluon-atom-status-badge',
-      'gluon-molecule-navigation-menu',
       'gluon-molecule-tabs',
       'gluon-molecule-toolbar',
       'gluon-molecule-toast',
+      'gluon-organism-mega-menu',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
     expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(response.styles.entries[4]?.cssText).toContain('.gluon-status-badge');
-    expect(response.styles.entries[5]?.cssText).toContain('.gluon-navigation-menu');
-    expect(response.styles.entries[6]?.cssText).toContain('.gluon-tabs');
-    expect(response.styles.entries[7]?.cssText).toContain('.gluon-toolbar');
-    expect(response.styles.entries[8]?.cssText).toContain('.gluon-toast');
+    expect(response.styles.entries[5]?.cssText).toContain('.gluon-tabs');
+    expect(response.styles.entries[6]?.cssText).toContain('.gluon-toolbar');
+    expect(response.styles.entries[7]?.cssText).toContain('.gluon-toast');
+    expect(response.styles.entries[8]?.cssText).toContain('.gluon-mega-menu');
     expect(response.styles.entries[9]?.cssText).toContain('--gluon-color-action: #c8ff00');
     expect(response.styles.entries[10]?.cssText).toContain('.checkout-page');
     expect(response.styles.entries.some((entry) => entry.id === 'gluon-atoms-components')).toBe(false);
