@@ -163,6 +163,13 @@ html { scroll-behavior: smooth; }
 .ui-sample-shell .is-header, .ui-sample-shell .is-footer { grid-column: 2; }
 .ui-sample-shell .is-content { grid-column: 2; min-height: 34px; }
 .ui-sample-shell .is-footer { background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
+.ui-sample-mega-menu { display: grid; gap: 6px; width: 94%; text-align: start; font-size: .72rem; }
+.ui-sample-mega-menu > button { justify-self: start; min-block-size: 32px; padding: 5px 9px; border: 0; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); font: inherit; }
+.ui-sample-mega-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); box-shadow: 0 8px 18px rgb(0 0 0 / 8%); }
+.ui-sample-mega-panel section { display: grid; gap: 4px; }
+.ui-sample-mega-panel strong { color: var(--vp-c-text-2); font-size: .66rem; text-transform: uppercase; }
+.ui-sample-mega-panel a { min-block-size: 28px; padding: 5px; color: inherit; text-decoration: none; }
+.ui-sample-mega-panel a:hover { background: color-mix(in srgb, var(--ui-catalog-accent) 16%, var(--vp-c-bg)); color: var(--ui-catalog-accent); }
 .ui-sample-component { border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 8px 12px; font-weight: 650; }
 .ui-sample-variant { color: var(--vp-c-text-2); font-size: .78rem; }
 .ui-sample-separator { display: block; width: 80%; height: 1px; background: var(--vp-c-divider); }

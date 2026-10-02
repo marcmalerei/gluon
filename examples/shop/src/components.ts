@@ -15,9 +15,9 @@ import {
   DialogSurface,
   EmptyState,
   Toolbar,
-  NavigationMenu,
   createDialogSurfaceController,
 } from '@gluonjs/molecules';
+import { MegaMenu } from '@gluonjs/organisms';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink, useRoute } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -55,25 +55,28 @@ export function SiteHeader(store: ShopStore): TemplateValue {
         to: '/',
         attributes: { class: 'wordmark', 'aria-label': 'GLUON GOODS home' },
       })`GLUON GOODS`}
-      ${NavigationMenu({
+      ${MegaMenu({
         id: 'desktop-primary-navigation',
         label: 'Primary navigation',
-        open: store.navigationOpen,
-        onOpenChange: (open) => { store.navigationOpen = [...open]; },
+        trigger: 'Shop',
+        open: store.navigationOpen.includes('shop-navigation'),
+        onOpenChange: (open) => { store.navigationOpen = open ? ['shop-navigation'] : []; },
         attributes: { class: 'desktop-nav' },
-        items: [
+        triggerAttributes: { aria: { label: 'Open Shop navigation' } },
+        groups: [
           {
-            id: 'shop-navigation',
+            id: 'shop-links',
             label: 'Shop',
-            accessibleLabel: 'Open Shop navigation',
-            href: '/shop',
-            active: route.path === '/shop' || route.path.startsWith('/products/'),
-            children: [
+            links: [
               { id: 'shop-all', label: 'All objects', href: '/shop', active: route.path === '/shop' && route.query.category === undefined },
               { id: 'shop-new', label: 'New arrivals', href: '/shop?sort=new', active: route.path === '/shop' && route.query.sort === 'new' },
             ],
           },
-          { id: 'journal-navigation', label: 'Journal', href: '#journal', linkAttributes: { class: 'shop-editorial-link' } },
+          {
+            id: 'editorial-links',
+            label: 'Journal',
+            links: [{ id: 'journal-navigation', label: 'Journal', href: '#journal', attributes: { class: 'shop-editorial-link' } }],
+          },
         ],
       })}
       ${Toolbar({

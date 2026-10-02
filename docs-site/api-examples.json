@@ -1498,7 +1498,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, AsyncState, ConfirmationDialog, ProductCard, ProductGrid, WorkflowTimeline, createConfirmationDialogController, asyncStateStyles, confirmationDialogStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, WorkflowTimeline, createConfirmationDialogController, asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1526,7 +1526,14 @@
         "const workflowAttributes: WorkflowTimelineAttributes = { 'aria-label': 'Order workflow' };",
         "const workflowMessages: WorkflowTimelineMessages = { timeline: 'Ablauf', status: (status) => `Status: ${status}`, step: (position, total) => `${position} von ${total}`, evidence: 'Nachweis' };",
         "const workflow: WorkflowTimelineProps = { id: 'order-workflow', steps: [workflowStep], state: workflowState, messages: workflowMessages, role: 'Operations', evidence: 'Import log 42', attributes: workflowAttributes };",
-        "console.log(AppShell(shell), AsyncState(asyncState), ProductCard(productCard), ProductGrid(productGrid), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, organismManifest.entries);"
+        "const megaLink: MegaMenuLink = { id: 'orbit-lamp', label: 'Orbit lamp', href: '/products/orbit-lamp', description: 'Adjustable light for focused work.' };",
+        "const megaGroup: MegaMenuGroup = { id: 'lighting', label: 'Lighting', links: [megaLink] };",
+        "const megaAttributes: MegaMenuAttributes = { class: 'catalog-mega-menu' };",
+        "const megaTriggerAttributes: MegaMenuTriggerAttributes = { class: 'catalog-mega-trigger' };",
+        "const megaLinkAttributes: MegaMenuLinkAttributes = { class: 'catalog-mega-link' };",
+        "const megaOpenChangeEvent: MegaMenuOpenChangeEvent = new MouseEvent('open-change');",
+        "const megaMenu: MegaMenuProps = { id: 'shop-menu', label: 'Shop navigation', trigger: 'Shop', groups: [megaGroup], open: true, attributes: megaAttributes, triggerAttributes: megaTriggerAttributes, onOpenChange: (open, event) => console.log('shop menu', open, event.type) };",
+        "console.log(AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent);"
       ]
     },
     "router-application": {
@@ -6159,6 +6166,42 @@
     "packages/organisms/src/type-aliases/ProductGridColumns.md": {
       "recipe": "organism-components",
       "description": "Select one of the supported responsive product-grid column counts:"
+    },
+    "packages/organisms/src/variables/MegaMenu.md": {
+      "recipe": "organism-components",
+      "description": "Render a controlled responsive mega menu with grouped caller-owned navigation links:"
+    },
+    "packages/organisms/src/variables/megaMenuStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable MegaMenu stylesheet and tenant-scoped CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/MegaMenuProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure a labelled controlled mega menu while routing, authorization, and link effects remain caller-owned:"
+    },
+    "packages/organisms/src/interfaces/MegaMenuGroup.md": {
+      "recipe": "organism-components",
+      "description": "Describe one labelled mega-menu column with caller-owned navigation links:"
+    },
+    "packages/organisms/src/interfaces/MegaMenuLink.md": {
+      "recipe": "organism-components",
+      "description": "Describe one native mega-menu destination with active, disabled, and supplementary-copy states:"
+    },
+    "packages/organisms/src/type-aliases/MegaMenuAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native navigation attributes to the MegaMenu root:"
+    },
+    "packages/organisms/src/type-aliases/MegaMenuTriggerAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward native trigger attributes while MegaMenu owns disclosure relationships:"
+    },
+    "packages/organisms/src/type-aliases/MegaMenuLinkAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward typed native anchor attributes while MegaMenu owns destination semantics:"
+    },
+    "packages/organisms/src/type-aliases/MegaMenuOpenChangeEvent.md": {
+      "recipe": "organism-components",
+      "description": "Handle the native pointer, mouse, or keyboard event that requests a controlled menu-state change:"
     },
     "packages/organisms/src/variables/AppShell.md": {
       "recipe": "organism-components",

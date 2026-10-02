@@ -95,7 +95,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, ProductCard, ProductGrid, organismManifest, organismStyles } from '@gluonjs/organisms';
+import { AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, megaMenuStyles, organismManifest, organismStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2434,6 +2434,139 @@ describe('advanced data and workflow molecules', () => {
 
     render(ProductGrid({ items: [], emptyContent: 'No products found.', attributes: { id: 'empty-products' } }), document.body);
     expect(document.querySelector('#empty-products [part="empty"]')?.textContent).toContain('No products');
+  });
+
+  it('renders a controlled responsive MegaMenu with grouped links and keyboard focus management', async () => {
+    let isOpen = false;
+    const changes: boolean[] = [];
+    const renderMenu = (): void => render(MegaMenu({
+      id: 'shop-menu',
+      label: 'Shop navigation',
+      trigger: 'Shop',
+      open: isOpen,
+      groups: [
+        { id: 'lighting', label: 'Lighting', description: 'Lights for focused work.', links: [
+          { id: 'orbit-lamp', label: 'Orbit lamp', href: '/products/orbit-lamp', description: 'Adjustable light.', active: true },
+          { id: 'desk-light', label: 'Desk light', href: '/products/desk-light' },
+          { id: 'archived', label: 'Archived', href: '/products/archived', disabled: true },
+        ] },
+        { id: 'furniture', label: 'Furniture', links: [{ id: 'stack-tray', label: 'Stack tray', href: '/products/stack-tray' }] },
+      ],
+      onOpenChange: (open) => { changes.push(open); isOpen = open; renderMenu(); },
+      attributes: { class: 'shop-menu' },
+      triggerAttributes: { class: 'shop-trigger' },
+    }), document.body);
+    renderMenu();
+    const root = document.querySelector<HTMLElement>('#shop-menu')!;
+    const trigger = root.querySelector<HTMLButtonElement>('[data-mega-menu-trigger]')!;
+    expect(root.tagName).toBe('NAV');
+    expect(root.getAttribute('aria-label')).toBe('Shop navigation');
+    expect(trigger.getAttribute('aria-controls')).toBe('shop-menu-panel');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(root.querySelectorAll('.gluon-mega-menu-group')).toHaveLength(2);
+    expect(root.querySelectorAll('.gluon-mega-menu-link')).toHaveLength(4);
+    expect(root.querySelector('[aria-current="page"]')?.textContent).toContain('Orbit lamp');
+    expect(root.querySelector('[aria-disabled="true"]')?.textContent).toContain('Archived');
+
+    await userEvent.click(trigger);
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('shop-menu-link-orbit-lamp'));
+    expect(changes).toEqual([true]);
+    expect(document.querySelector<HTMLElement>('#shop-menu-panel')?.hidden).toBe(false);
+    const first = document.querySelector<HTMLElement>('#shop-menu-link-orbit-lamp')!;
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement?.id).toBe('shop-menu-link-desk-light');
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement?.id).toBe('shop-menu-link-stack-tray');
+    await userEvent.keyboard('{ArrowUp}');
+    expect(document.activeElement?.id).toBe('shop-menu-link-desk-light');
+    first.focus();
+    await userEvent.keyboard('{Escape}');
+    await vi.waitFor(() => expect(changes).toEqual([true, false]));
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('shop-menu-trigger'));
+    expect(getStyleSheetText(megaMenuStyles)).toContain('--gluon-mega-menu');
+
+    render(MegaMenu({ id: 'invalid-menu', label: 'Menu', trigger: 'Open', groups: [{ id: 'group', label: 'Group', links: [] }] }), document.body);
+    const invalidTrigger = document.querySelector<HTMLButtonElement>('#invalid-menu-trigger')!;
+    invalidTrigger.focus();
+    await userEvent.keyboard('{ArrowUp}');
+    expect(invalidTrigger).toBe(document.activeElement);
+    expect(() => render(MegaMenu({ id: 'bad id', label: 'Menu', trigger: 'Open', groups: [] }), document.body)).toThrow('whitespace');
+    expect(() => render(MegaMenu({ id: 'duplicate-menu', label: 'Menu', trigger: 'Open', groups: [{ id: 'one', label: 'One', links: [{ id: 'same', label: 'A' }] }, { id: 'two', label: 'Two', links: [{ id: 'same', label: 'B' }] }] }), document.body)).toThrow('unique');
+  });
+
+  it('keeps MegaMenu event ownership, disabled links, and empty-state validation explicit', async () => {
+    const changes: boolean[] = [];
+    const triggerListener = { handleEvent: vi.fn() };
+    const linkListener = vi.fn();
+    const externalLinkListener = { handleEvent: (event: MouseEvent) => { event.preventDefault(); linkListener(event); } };
+    render(MegaMenu({
+      id: 'event-menu',
+      label: 'Explore the collection',
+      trigger: 'Explore',
+      open: true,
+      groups: [{ id: 'collection', label: 'Collection', links: [
+        { id: 'featured', label: 'Featured', href: '/featured', description: 'Latest arrivals.' },
+        { id: 'disabled', label: 'Unavailable', disabled: true, attributes: { onClick: linkListener } },
+        { id: 'external', label: 'External', href: '/external', attributes: { onClick: externalLinkListener } },
+      ] }],
+      onOpenChange: (open) => changes.push(open),
+      triggerAttributes: { onKeydown: triggerListener },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#event-menu')!;
+    const trigger = root.querySelector<HTMLButtonElement>('[data-mega-menu-trigger]')!;
+    const panel = root.querySelector<HTMLElement>('.gluon-mega-menu-panel')!;
+    const links = root.querySelectorAll<HTMLAnchorElement>('.gluon-mega-menu-link');
+    const firstLink = links[0]!;
+    const disabledLink = links[1]!;
+    const externalLink = links[2]!;
+
+    trigger.focus();
+    const arrowDown = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+    trigger.dispatchEvent(arrowDown);
+    expect(arrowDown.defaultPrevented).toBe(true);
+    expect(triggerListener.handleEvent).toHaveBeenCalledWith(arrowDown);
+    await vi.waitFor(() => expect(document.activeElement).toBe(firstLink));
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(document.activeElement).toBe(firstLink));
+    expect(changes).toEqual([true, true, true, true]);
+
+    firstLink.focus();
+    firstLink.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(externalLink);
+    externalLink.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(firstLink);
+    firstLink.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(firstLink);
+    trigger.focus();
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
+    expect(changes).toEqual([true, true, true, true, false]);
+    panel.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(changes).toEqual([true, true, true, true, false, false]);
+    panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(changes).toEqual([true, true, true, true, false, false, false]);
+    disabledLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(linkListener).toHaveBeenCalledTimes(1);
+    expect(disabledLink.getAttribute('href')).toBeNull();
+    expect(externalLink.getAttribute('href')).toBe('/external');
+    externalLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(linkListener).toHaveBeenCalledTimes(2);
+
+    render(MegaMenu({ id: 'href-menu', label: 'Destination menu', trigger: 'Destinations', groups: [{ id: 'group', label: 'Group', links: [{ id: 'no-destination', label: 'No destination' }] }] }), document.body);
+    expect(document.querySelector('#href-menu-link-no-destination')?.getAttribute('href')).toBeNull();
+
+    expect(() => render(MegaMenu({ id: '', label: 'Menu', trigger: 'Open', groups: [] }), document.body)).toThrow('non-empty');
+    expect(() => render(MegaMenu({ id: 'empty-group', label: 'Menu', trigger: 'Open', groups: [{ id: '', label: 'Group', links: [] }] }), document.body)).toThrow('non-empty');
+
+    render(MegaMenu({ id: 'closed-menu', label: 'Closed menu', trigger: 'Closed', groups: [{ id: 'group', label: 'Group', links: [{ id: 'link', label: 'Link' }] }] }), document.body);
+    document.querySelector<HTMLButtonElement>('#closed-menu-trigger')!.focus();
+    await userEvent.keyboard('{Escape}');
+    const closedPanel = document.querySelector<HTMLElement>('#closed-menu-panel')!;
+    closedPanel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(changes).toEqual([true, true, true, true, false, false, false]);
   });
 
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {

@@ -11,4 +11,6 @@ export { ConfirmationDialog, createConfirmationDialogController, type Confirmati
 export { confirmationDialogStyles } from './confirmation-dialog-styles.js';
 export { WorkflowTimeline, type WorkflowTimelineAttributes, type WorkflowTimelineMessages, type WorkflowTimelineOverallState, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineStep } from './workflow-timeline.js';
 export { workflowTimelineStyles } from './workflow-timeline-styles.js';
+export { MegaMenu, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes } from './mega-menu.js';
+export { megaMenuStyles } from './mega-menu-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';
