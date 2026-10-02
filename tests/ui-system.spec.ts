@@ -10,6 +10,7 @@ import {
   avatarStyles,
   Checkbox,
   DateInput,
+  FileInput,
   Heading,
   Image,
   Icon,
@@ -29,6 +30,8 @@ import {
   Switch,
   Text,
   TimeInput,
+  accessibilityStyles,
+  focusRingAttributes,
   ToggleButton,
   defineToggleButtonPreset,
   Textarea,
@@ -44,6 +47,7 @@ import {
   installUiTheme,
   UiHydrationError,
   uiTokenStyles,
+  visuallyHiddenAttributes,
 } from '@gluonjs/atoms';
 import {
   adoptStyles,
@@ -144,6 +148,34 @@ describe('separate UI package contracts', () => {
     expect(document.querySelector('[role="status"]')?.getAttribute('aria-label')).toBe('Loading');
     expect(document.querySelector('.gluon-skeleton')?.getAttribute('style')).toContain('--gluon-skeleton-width');
     expect(document.querySelector<HTMLMeterElement>('meter')?.max).toBe(100);
+  });
+
+  it('keeps FileInput native and exposes opt-in accessibility utilities', () => {
+    render(q.main({ children: [
+      FileInput({
+        accept: 'image/*',
+        capture: 'environment',
+        multiple: true,
+        name: 'photos',
+        required: true,
+        invalid: true,
+        attributes: { id: 'photos' },
+      }),
+      q.a({ ...visuallyHiddenAttributes<HTMLAnchorElement>({ href: '#photos', id: 'skip' }), children: 'Skip to photos' }),
+      q.button({ ...focusRingAttributes<HTMLButtonElement>({ id: 'focus-target', type: 'button' }), children: 'Focus target' }),
+    ] }), document.body);
+
+    const input = document.querySelector<HTMLInputElement>('#photos')!;
+    expect(input.type).toBe('file');
+    expect(input.accept).toBe('image/*');
+    expect(input.getAttribute('capture')).toBe('environment');
+    expect(input.multiple).toBe(true);
+    expect(input.required).toBe(true);
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(input.classList).toContain('gluon-file-input');
+    expect(document.querySelector('#skip')?.classList).toContain('gluon-visually-hidden');
+    expect(document.querySelector('#focus-target')?.classList).toContain('gluon-focus-ring');
+    expect(getStyleSheetText(accessibilityStyles)).toContain('forced-colors');
   });
 
   it('renders AspectRatio with typed native attributes, merged classes, exact styles, and validated geometry', () => {

@@ -9,7 +9,9 @@
 Focused Gluon UI primitives plus the shared UI installation boundary, tokens,
 and themes.
 
-Foundation atoms include `AspectRatio`, `Avatar`, `ScrollArea`, and `Separator`.
+Foundation atoms include `AspectRatio`, `Avatar`, `FileInput`, `ScrollArea`, and
+`Separator`. Accessibility utilities provide token-backed visually-hidden and
+`:focus-visible` classes without taking ownership of navigation or focus state.
 Each owns a separately tree-shakable stylesheet and exposes only component-scoped
 `--gluon-*` properties. They do not fetch data, load account records, upload
 images, virtualize content, or own product state.
@@ -129,10 +131,11 @@ configuration match. Serialize the tenant id, theme, and token contract with
 the application state before hydration and install the matching owner before
 the tenant subtree is hydrated.
 
-`AspectRatio`, `Avatar`, `Badge`, `Button`, `Checkbox`, `DateInput`, `Heading`,
-`Icon`, `Image`, `Input`, `Label`, `Link`, `Meter`, `NumberInput`, `Progress`,
-`Radio`, `ScrollArea`, `Select`, `Separator`, `Skeleton`, `Slider`, `Spinner`,
-`StatusBadge`, `Switch`, `Text`, `Textarea`, `TimeInput`, and `ToggleButton` expose immutable `Component.styles`
+`AspectRatio`, `Avatar`, `Badge`, `Button`, `Checkbox`, `DateInput`, `FileInput`,
+`Heading`, `Icon`, `Image`, `Input`, `Label`, `Link`, `Meter`, `NumberInput`,
+`Progress`, `Radio`, `ScrollArea`, `Select`, `Separator`, `Skeleton`, `Slider`,
+`Spinner`, `StatusBadge`, `Switch`, `Text`, `Textarea`, `TimeInput`, and
+`ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. Nested composition stays on that same path, so a public Molecule that
@@ -140,6 +143,20 @@ calls `Radio()` directly still contributes the exact `radioStyles` sheet before
 the first measurable render and through hydration. `atomStyles` is deprecated; adopting it with exact rendering throws
 `GLUON_LEGACY_COMPONENT_STYLE_CONFLICT` rather than applying duplicate rules.
 `installUiTheme()` is deprecated in favor of `installUi()`.
+
+### File and accessibility utilities
+
+`FileInput` renders only the native file picker boundary. It exposes `accept`,
+`multiple`, `capture`, `name`, `required`, `invalid`, and `disabled`, while the
+application owns file reading, validation policy, upload transport, progress,
+and persistence. It never writes a file value programmatically.
+
+`accessibilityStyles` is an opt-in constructable stylesheet. Apply
+`visuallyHiddenAttributes()` to preserve semantic content for assistive
+technology while revealing it when focused, and apply `focusRingAttributes()`
+to use the token-backed `:focus-visible` outline. Both utilities support
+`--gluon-focus-width`, `--gluon-focus-offset`, and `--gluon-color-focus`, plus
+forced-colors mode.
 
 ## Concise app Atoms
 
