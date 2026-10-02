@@ -35,12 +35,14 @@ import {
 } from '@gluonjs/atoms';
 import {
   Accordion,
+  Breadcrumbs,
   Card,
   EmptyState,
   FormField,
   InlineNotice,
   NavigationMenu,
   NavigationStrip,
+  Pagination,
   OneTimePasswordField,
   ResponsiveDisclosure,
   ResponsiveActionBar,
@@ -56,6 +58,8 @@ import {
   type NavigationMenuLinkAttributes,
   type NavigationMenuProps,
   type NavigationStripProps,
+  type BreadcrumbsProps,
+  type PaginationProps,
   type OneTimePasswordFieldInputAttributes,
   type ResponsiveDisclosureAttributes,
   type ResponsiveDisclosureProps,
@@ -255,6 +259,17 @@ Field({ label: 'Email', children: q.input(), attributes: { class: 'app-field' } 
 FormField({ label: 'Email', attributes: { autocomplete: 'email' }, fieldAttributes: { data: { owner: 'app' } } });
 AppShell({ children: Card({ title: 'Card' }), attributes: { data: { owner: 'app' } } });
 NavigationStrip(navigationStripProps);
+const breadcrumbsProps: BreadcrumbsProps = {
+  label: 'Catalog breadcrumb',
+  items: [{ label: 'Catalog', href: '/catalog' }, { label: 'Lamp', current: true }],
+};
+const paginationProps: PaginationProps = {
+  currentPage: 2,
+  totalPages: 8,
+  getPageHref: (page) => `/catalog?page=${page}`,
+};
+Breadcrumbs(breadcrumbsProps);
+Pagination(paginationProps);
 const navigationMenuLinkAttributes = {
   target: '_self',
   data: { owner: 'catalog' },

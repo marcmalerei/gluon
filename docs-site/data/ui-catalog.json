@@ -865,6 +865,33 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "Breadcrumbs",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-breadcrumbs"
+      ],
+      "variants": [
+        "links",
+        "current"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "breadcrumbs",
+      "accessibility": "Renders a named breadcrumb navigation landmark with an ordered list, native links, and aria-current=page on the current location.",
+      "extension": "Callers own labels, URLs, current location, localization, and routing; the composition does not inspect or mutate router state.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Breadcrumbs.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "ButtonGroup",
       "kind": "component",
       "status": "stable",
@@ -1285,6 +1312,35 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/OneTimePasswordField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Pagination",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-pagination"
+      ],
+      "variants": [
+        "compact",
+        "windowed"
+      ],
+      "states": [
+        "default",
+        "first-page",
+        "last-page"
+      ],
+      "preview": "pagination",
+      "accessibility": "Renders a named pagination landmark with native page links, current-page semantics, keyboard targets, previous/next labels, and non-focusable ellipses.",
+      "extension": "Callers own page state, URL generation, data fetching, persistence, and authorization; the bounded visible page window remains request-free.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Pagination.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {

@@ -1137,10 +1137,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -1177,6 +1177,7 @@
         "import { html } from '@gluonjs/core';",
         "import {",
         "  Accordion,",
+        "  Breadcrumbs,",
         "  ButtonGroup,",
         "  Card,",
         "  ChoiceGroup,",
@@ -1191,6 +1192,7 @@
         "  InlineNotice,",
         "  NavigationMenu,",
         "  NavigationStrip,",
+        "  Pagination,",
         "  SearchField,",
         "  SearchResults,",
         "  Menubar,",
@@ -1204,6 +1206,8 @@
         "  moleculeManifest,",
         "  moleculeStyles,",
         "  passwordToggleFieldStyles,",
+        "  breadcrumbsStyles,",
+        "  paginationStyles,",
         "  searchFieldStyles,",
         "  searchResultsStyles,",
         "  oneTimePasswordFieldStyles,",
@@ -1262,6 +1266,14 @@
         "  type NavigationMenuProps,",
         "  type NavigationMenuTriggerAttributes,",
         "  type NavigationStripProps,",
+        "  type BreadcrumbItem,",
+        "  type BreadcrumbItemAttributes,",
+        "  type BreadcrumbLinkAttributes,",
+        "  type BreadcrumbsAttributes,",
+        "  type BreadcrumbsProps,",
+        "  type PaginationAttributes,",
+        "  type PaginationLinkAttributes,",
+        "  type PaginationProps,",
         "  type SearchFieldAttributes,",
         "  type SearchFieldInputAttributes,",
         "  type SearchFieldProps,",
@@ -1370,6 +1382,14 @@
         "  label: 'Order sections',",
         "  children: html`<a href=\"#summary\" aria-current=\"page\">Summary</a><a href=\"#delivery\">Delivery</a>`,",
         "} satisfies NavigationStripProps;",
+        "const breadcrumbItemAttributes = { class: 'breadcrumb-segment' } satisfies BreadcrumbItemAttributes;",
+        "const breadcrumbLinkAttributes = { data: { owner: 'catalog' } } satisfies BreadcrumbLinkAttributes;",
+        "const breadcrumbItems = [{ label: 'Catalog', href: '/catalog', attributes: breadcrumbItemAttributes, linkAttributes: breadcrumbLinkAttributes }, { label: 'Lighting', href: '/catalog/lighting' }, { label: 'Orbit lamp', current: true }] satisfies readonly BreadcrumbItem[];",
+        "const breadcrumbAttributes = { class: 'catalog-breadcrumbs' } satisfies BreadcrumbsAttributes;",
+        "const breadcrumbProps = { label: 'Catalog breadcrumb', items: breadcrumbItems, attributes: breadcrumbAttributes } satisfies BreadcrumbsProps;",
+        "const paginationLinkAttributes = { data: { owner: 'catalog-pagination' } } satisfies PaginationLinkAttributes;",
+        "const paginationAttributes = { class: 'catalog-pagination' } satisfies PaginationAttributes;",
+        "const pagination = { currentPage: 2, totalPages: 8, siblingCount: 1, getPageHref: (page: number) => `/catalog?page=${page}`, linkAttributes: paginationLinkAttributes, attributes: paginationAttributes } satisfies PaginationProps;",
         "const navigationMenu = { id: 'primary-navigation', label: 'Primary navigation', open: ['shop'], items: [{ id: 'shop', label: 'Shop', accessibleLabel: 'Open Shop navigation', href: '/shop', active: true, children: [{ id: 'new', label: 'New arrivals', href: '/shop?sort=new' }] }] } satisfies NavigationMenuProps;",
         "const searchFieldAttributes = { class: 'catalog-search' } satisfies SearchFieldAttributes;",
         "const searchInputAttributes = { autocomplete: 'off' } satisfies SearchFieldInputAttributes;",
@@ -1415,7 +1435,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
+        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -5644,6 +5664,23 @@
       "recipe": "molecule-components",
       "description": "Name a native navigation landmark, supply destinations in source order, and optionally customize the two overflow-control names:"
     },
+    "packages/molecules/src/interfaces/BreadcrumbItem.md": {
+      "recipe": "molecule-components",
+      "description": "Describe one caller-owned breadcrumb destination or the current page in an ordered path:"
+    },
+    "packages/molecules/src/interfaces/BreadcrumbsProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a named native breadcrumb landmark from caller-owned links and current-page state:"
+    },
+    "packages/molecules/src/interfaces/PaginationProps.md": {
+      "recipe": "molecule-components",
+      "description": "Compose a named native pagination landmark with a bounded page window and caller-owned URLs:"
+    },
+    "packages/molecules/src/type-aliases/BreadcrumbItemAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native list-item attributes for one breadcrumb segment:" },
+    "packages/molecules/src/type-aliases/BreadcrumbLinkAttributes.md": { "recipe": "molecule-components", "description": "Forward typed native anchor attributes for breadcrumb destinations:" },
+    "packages/molecules/src/type-aliases/BreadcrumbsAttributes.md": { "recipe": "molecule-components", "description": "Forward compatible native navigation attributes while Breadcrumbs owns its label and path structure:" },
+    "packages/molecules/src/type-aliases/PaginationAttributes.md": { "recipe": "molecule-components", "description": "Forward compatible native navigation attributes while Pagination owns its label and list structure:" },
+    "packages/molecules/src/type-aliases/PaginationLinkAttributes.md": { "recipe": "molecule-components", "description": "Forward typed native anchor attributes while Pagination owns page URLs and current-page semantics:" },
     "packages/molecules/src/interfaces/SegmentedControlOption.md": {
       "recipe": "molecule-components",
       "description": "Describe one caller-owned segmented value, visible label, accessible label, and disabled state:"
@@ -5869,6 +5906,10 @@
       "recipe": "molecule-components",
       "description": "Keep overflowing navigation destinations discoverable through native controls and automatically reveal the exact current destination:"
     },
+    "packages/molecules/src/variables/Breadcrumbs.md": { "recipe": "molecule-components", "description": "Render an ordered native breadcrumb path with caller-owned links and explicit current-page semantics:" },
+    "packages/molecules/src/variables/breadcrumbsStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separately tree-shakable Breadcrumbs stylesheet and its CSS-variable extension points:" },
+    "packages/molecules/src/variables/Pagination.md": { "recipe": "molecule-components", "description": "Render a bounded native pagination window with caller-owned URLs and labeled boundary links:" },
+    "packages/molecules/src/variables/paginationStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separately tree-shakable Pagination stylesheet and its CSS-variable extension points:" },
     "packages/molecules/src/variables/ContextMenu.md": { "recipe": "molecule-components", "description": "Render a controlled context menu without adding a synthetic dropdown trigger:" },
     "packages/molecules/src/variables/DropdownMenu.md": { "recipe": "molecule-components", "description": "Render a controlled keyboard-complete menu button and popup:" },
     "packages/molecules/src/variables/Menubar.md": { "recipe": "molecule-components", "description": "Render direct APG menubar semantics and controlled nested menus:" },

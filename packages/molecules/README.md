@@ -241,6 +241,36 @@ NavigationStrip({
 });
 ```
 
+`Breadcrumbs` renders a caller-owned ordered path with native links for prior
+destinations and an `aria-current="page"` span for the current location. It
+does not inspect a router or derive URLs; mark an item as `current` when the
+current page is not the final item.
+
+```ts
+Breadcrumbs({
+  label: 'Catalog breadcrumb',
+  items: [
+    { label: 'Catalog', href: '/catalog' },
+    { label: 'Lighting', href: '/catalog/lighting' },
+    { label: 'Orbit lamp', current: true },
+  ],
+});
+```
+
+`Pagination` renders a named native `nav` with a bounded page window, labeled
+previous/next links, and an `aria-current="page"` destination. URL generation
+and state ownership stay with the caller through `getPageHref`, which keeps
+the molecule usable for shops, admin tables, and server-rendered routes.
+
+```ts
+Pagination({
+  currentPage: 4,
+  totalPages: 9,
+  siblingCount: 1,
+  getPageHref: (page) => `/orders?page=${page}`,
+});
+```
+
 `NavigationMenu` is the hierarchical counterpart for site and product
 navigation. It renders native `nav`, `ul`, `li`, `a`, and `button` semantics;
 it is not a command menu and does not know a router, permissions, analytics, or
@@ -277,6 +307,8 @@ Styles use logical properties and shared Atom token names. `ButtonGroup`, `Card`
 `NavigationStrip` carries its own layout/control sheet, and `FormField` collects
 its nested `Label` and `Input` sheets through ordinary renderer traversal.
 `NavigationMenu` carries its own separately tree-shakable navigation stylesheet.
+`Breadcrumbs` and `Pagination` carry separate stylesheet dependencies with
+logical properties and CSS-variable overrides.
 Install the shared foundation and theme once through `installUi()`. The
 deprecated `moleculeStyles` aggregate remains the legacy Card/FormField sheet
 and cannot coexist silently with their exact rendering.
@@ -334,6 +366,12 @@ heading weight, colors, state sizing, padding, border, and radius properties.
 focus-outline, helper/error color, background, and text color custom properties.
 `PasswordToggleField` exposes helper/error colors and focus outline custom
 properties through its separately tree-shakable `passwordToggleFieldStyles`.
+`Breadcrumbs` exposes `--gluon-breadcrumbs-gap`,
+`--gluon-breadcrumbs-separator-color`, `--gluon-breadcrumbs-link-color`,
+and `--gluon-breadcrumbs-current-color`. `Pagination` exposes
+`--gluon-pagination-gap`, `--gluon-pagination-link-color`,
+`--gluon-pagination-current-background`, `--gluon-pagination-current-color`,
+and `--gluon-pagination-focus-color`.
 
 `Card.attributes` extends its native article. `ControlField.attributes` extends
 its outer div while structural content stays explicit. `FormField.attributes` extends

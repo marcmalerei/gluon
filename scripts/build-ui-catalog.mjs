@@ -13,12 +13,12 @@ const sources = [
 ];
 const renderedPreviewKeys = new Set([
   'accordion', 'action-bar', 'app-shell', 'aspect-ratio', 'avatar', 'badge', 'button',
-  'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'disclosure',
+  'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'disclosure',
   'empty-state', 'field', 'foundation-atoms--badge', 'foundation-atoms--date-input',
   'foundation-atoms--feedback', 'foundation-atoms--file-input', 'foundation-atoms--link', 'foundation-atoms--media',
   'foundation-atoms--numeric-input', 'foundation-atoms--time-input',
   'foundation-atoms--typography', 'icon', 'input', 'label', 'menu', 'menubar',
-  'navigation-menu', 'navigation-strip', 'notice', 'otp', 'password', 'progress',
+  'navigation-menu', 'navigation-strip', 'notice', 'otp', 'pagination', 'password', 'progress',
   'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',
   'slider', 'switch', 'table', 'tabs', 'textarea', 'toast', 'toast-viewport',
   'toggle-button', 'toolbar', 'workflow',
