@@ -1899,6 +1899,65 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "ProductCard",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-product-card"
+      ],
+      "variants": [
+        "linked",
+        "plain"
+      ],
+      "states": [
+        "default",
+        "available",
+        "unavailable"
+      ],
+      "preview": "product-card",
+      "accessibility": "Renders one native article with a heading, optional native destination, caller-owned media, price, availability, and action regions; no state is conveyed by color alone.",
+      "extension": "Product identity and visible copy are typed input; price, inventory, payment, analytics, routing, and mutations remain caller-owned while data-product-id, parts, attributes, and CSS variables support tenant-scoped styling.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/ProductCard.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
+      "name": "ProductGrid",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-product-grid"
+      ],
+      "variants": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ],
+      "states": [
+        "empty",
+        "populated"
+      ],
+      "preview": "product-grid",
+      "accessibility": "Renders a responsive section and ordered source-preserving card list, with explicit caller-owned empty content and a predictable one-column small-screen fallback.",
+      "extension": "Items, card rendering, empty copy, columns, sorting, filtering, pagination, virtualization, loading, authorization, and mutations remain caller-owned; data-columns and CSS variables are available for tenant-specific layout.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/ProductGrid.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "WorkflowTimeline",
       "kind": "component",
       "status": "stable",

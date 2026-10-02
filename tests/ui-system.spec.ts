@@ -89,7 +89,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, organismManifest, organismStyles } from '@gluonjs/organisms';
+import { AppShell, AsyncState, ProductCard, ProductGrid, organismManifest, organismStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2408,6 +2408,26 @@ describe('advanced data and workflow molecules', () => {
     expect(document.querySelector('#heading-four h4')).not.toBeNull();
     expect(document.querySelector('#heading-five h5')).not.toBeNull();
     expect(document.querySelector('#heading-six h6')).not.toBeNull();
+  });
+
+  it('renders typed product cards and grids without owning commerce behavior', () => {
+    render(ProductGrid({
+      items: [
+        { id: 'orbit-lamp', title: 'Orbit lamp', description: 'Adjustable light.' },
+        { id: 'stack-tray', title: 'Stack tray' },
+      ],
+      columns: 2,
+      renderCard: (product) => ProductCard({ product, href: `/${product.id}`, price: '€128', availability: 'In stock', actions: q.button({ type: 'button', children: 'Add to bag' }) }),
+    }), document.body);
+    const grid = document.querySelector<HTMLElement>('.gluon-product-grid')!;
+    expect(grid.dataset.columns).toBe('2');
+    expect(grid.querySelectorAll('.gluon-product-card')).toHaveLength(2);
+    expect(grid.querySelector('[data-product-id="orbit-lamp"] h3 a')?.getAttribute('href')).toBe('/orbit-lamp');
+    expect(grid.querySelector('[data-product-id="orbit-lamp"] [part="price"]')?.textContent).toBe('€128');
+    expect(grid.querySelectorAll('button')).toHaveLength(2);
+
+    render(ProductGrid({ items: [], emptyContent: 'No products found.', attributes: { id: 'empty-products' } }), document.body);
+    expect(document.querySelector('#empty-products [part="empty"]')?.textContent).toContain('No products');
   });
 
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {

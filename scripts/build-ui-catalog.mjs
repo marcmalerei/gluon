@@ -21,7 +21,7 @@ const renderedPreviewKeys = new Set([
   'navigation-menu', 'navigation-strip', 'notice', 'otp', 'pagination', 'password', 'progress',
   'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',
   'slider', 'switch', 'table', 'tabs', 'textarea', 'toast', 'toast-viewport',
-  'toggle-button', 'toolbar', 'workflow',
+  'toggle-button', 'toolbar', 'workflow', 'product-card', 'product-grid',
 ]);
 
 const entries = [];

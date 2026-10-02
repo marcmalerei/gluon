@@ -79,7 +79,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, ConfirmationDialog, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AppShell, AsyncState, ConfirmationDialog, ProductCard, ProductGrid, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -110,7 +110,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField };
 void dataMolecules;
-const applicationOrganisms = { AsyncState };
+const applicationOrganisms = { AsyncState, ProductCard, ProductGrid };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -220,6 +220,20 @@ createApp(() => AppShell({
   }),
   navigation: q.a({ href: '#profile', children: 'Profile' }),
   children: [
+    ProductGrid({
+      items: [
+        { id: 'orbit-lamp', title: 'Orbit lamp', description: 'Adjustable light for focused work.' },
+        { id: 'stack-tray', title: 'Stack tray', description: 'A modular tray for daily tools.' },
+      ],
+      columns: 2,
+      renderCard: (product) => ProductCard({
+        product,
+        href: `#${product.id}`,
+        price: product.id === 'orbit-lamp' ? '€128' : '€64',
+        availability: 'In stock',
+        actions: q.button({ type: 'button', children: 'Add to bag' }),
+      }),
+    }),
     AsyncState({
       id: 'ui-system-async-state',
       status: 'partial',

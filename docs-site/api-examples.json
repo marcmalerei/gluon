@@ -1472,7 +1472,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, AsyncState, ConfirmationDialog, WorkflowTimeline, createConfirmationDialogController, asyncStateStyles, confirmationDialogStyles, organismManifest, organismStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AppShell, AsyncState, ConfirmationDialog, ProductCard, ProductGrid, WorkflowTimeline, createConfirmationDialogController, asyncStateStyles, confirmationDialogStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1484,6 +1484,12 @@
         "const asyncAttributes: AsyncStateAttributes = { class: 'recommendations-state' };",
         "const asyncMessages: AsyncStateMessages = { partial: 'Recommendations are partially loaded.' };",
         "const asyncState: AsyncStateProps = { id: 'recommendations', status: asyncStatus, heading: 'Recommendations', headingLevel: 2 satisfies AsyncStateHeadingLevel, partialContent: html`<p>Profile data is ready while recommendations refresh.</p>`, actions: html`<button type=\"button\">Retry</button>`, messages: asyncMessages, attributes: asyncAttributes };",
+        "const product: ProductCardProduct = { id: 'orbit-lamp', title: 'Orbit lamp', description: 'Adjustable light for focused work.' };",
+        "const productCardAttributes: ProductCardAttributes = { class: 'catalog-product-card' };",
+        "const productCard: ProductCardProps = { product, href: '/products/orbit-lamp', media: html`<img src=\"/assets/orbit-lamp.webp\" alt=\"\" />`, price: '€128', availability: 'In stock', actions: html`<button type=\"button\">Add to bag</button>`, attributes: productCardAttributes };",
+        "const productColumns: ProductGridColumns = 3;",
+        "const productGridAttributes: ProductGridAttributes = { class: 'catalog-product-grid' };",
+        "const productGrid: ProductGridProps = { items: [product], columns: productColumns, renderCard: (item) => ProductCard({ product: item, price: '€128' }), emptyContent: 'No products found.', attributes: productGridAttributes };",
         "const initialFocus: ConfirmationDialogInitialFocus = '[data-confirm-primary]';",
         "const confirmationOptions = { initialFocus } satisfies ConfirmationDialogControllerOptions;",
         "const confirmationController: ConfirmationDialogController = createConfirmationDialogController(confirmationOptions);",
@@ -1494,7 +1500,7 @@
         "const workflowAttributes: WorkflowTimelineAttributes = { 'aria-label': 'Order workflow' };",
         "const workflowMessages: WorkflowTimelineMessages = { timeline: 'Ablauf', status: (status) => `Status: ${status}`, step: (position, total) => `${position} von ${total}`, evidence: 'Nachweis' };",
         "const workflow: WorkflowTimelineProps = { id: 'order-workflow', steps: [workflowStep], state: workflowState, messages: workflowMessages, role: 'Operations', evidence: 'Import log 42', attributes: workflowAttributes };",
-        "console.log(AppShell(shell), AsyncState(asyncState), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, organismStyles, workflowTimelineStyles, organismManifest.entries);"
+        "console.log(AppShell(shell), AsyncState(asyncState), ProductCard(productCard), ProductGrid(productGrid), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, organismManifest.entries);"
       ]
     },
     "router-application": {
@@ -6087,6 +6093,46 @@
     "packages/organisms/src/type-aliases/AsyncStateStatus.md": {
       "recipe": "organism-components",
       "description": "Select the validated AsyncState rendering status:"
+    },
+    "packages/organisms/src/variables/ProductCard.md": {
+      "recipe": "organism-components",
+      "description": "Render one domain-neutral product card with caller-owned commerce regions:"
+    },
+    "packages/organisms/src/variables/productCardStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable ProductCard stylesheet and its CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/ProductCardProduct.md": {
+      "recipe": "organism-components",
+      "description": "Describe the typed product identity shown by a ProductCard:"
+    },
+    "packages/organisms/src/interfaces/ProductCardProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure caller-owned media, price, availability, and actions for one product:"
+    },
+    "packages/organisms/src/type-aliases/ProductCardAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward native article attributes to the ProductCard root:"
+    },
+    "packages/organisms/src/variables/ProductGrid.md": {
+      "recipe": "organism-components",
+      "description": "Render a responsive source-preserving product grid with caller-owned cards:"
+    },
+    "packages/organisms/src/variables/productGridStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable ProductGrid stylesheet and responsive CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/ProductGridProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure product items, columns, card rendering, and empty content:"
+    },
+    "packages/organisms/src/type-aliases/ProductGridAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward native section attributes to the ProductGrid root:"
+    },
+    "packages/organisms/src/type-aliases/ProductGridColumns.md": {
+      "recipe": "organism-components",
+      "description": "Select one of the supported responsive product-grid column counts:"
     },
     "packages/organisms/src/variables/AppShell.md": {
       "recipe": "organism-components",
