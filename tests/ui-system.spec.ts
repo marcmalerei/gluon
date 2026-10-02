@@ -2565,13 +2565,79 @@ describe('advanced data and workflow molecules', () => {
     await userEvent.click(expressOption);
     expect(selected).toEqual(['orbit-cable']);
     expect(openStates).toEqual([true, false]);
+    listbox.querySelectorAll<HTMLElement>('[role="option"]')[2]!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(selected).toEqual(['orbit-cable']);
     expect(getStyleSheetText(comboboxFieldStyles)).toContain('--gluon-combobox-field');
 
-    render(ComboboxField({ id: 'empty-search', label: 'Search', open: true, loading: true, options: [] }), document.body);
-    expect(document.querySelector('#empty-search [role="status"]')?.textContent).toContain('Loading');
+    const keyboardSelected: string[] = [];
+    const keyboardActive: string[] = [];
+    const inputEvents: string[] = [];
+    const keydownEvents: string[] = [];
+    render(ComboboxField({
+      id: 'keyboard-search',
+      label: 'Keyboard search',
+      options: [{ value: 'orbit-lamp', label: 'Orbit lamp' }],
+      value: 'orbit-lamp',
+      activeValue: 'orbit-lamp',
+      open: true,
+      inputAttributes: {
+        onInput: { handleEvent: (event: InputEvent) => inputEvents.push(event.type) },
+        onKeydown: { handleEvent: (event: KeyboardEvent) => keydownEvents.push(event.key) },
+      },
+      onActiveChange: (value) => keyboardActive.push(value),
+      onSelect: (value) => keyboardSelected.push(value),
+    }), document.body);
+    const keyboardInput = document.querySelector<HTMLInputElement>('#keyboard-search [role="combobox"]')!;
+    await userEvent.click(keyboardInput);
+    await userEvent.keyboard('{ArrowUp}');
+    await userEvent.keyboard('{Escape}');
+    await userEvent.keyboard('{Enter}');
+    await userEvent.fill(keyboardInput, 'Orbit lamp');
+    expect(keyboardActive).toEqual([]);
+    expect(keyboardSelected).toEqual(['orbit-lamp']);
+    expect(inputEvents).toContain('input');
+    expect(keydownEvents).toEqual(expect.arrayContaining(['ArrowUp', 'Escape', 'Enter']));
+
+    render(ComboboxField({ id: 'empty-search', label: 'Search', open: true, options: [] }), document.body);
+    expect(document.querySelector('#empty-search .gluon-combobox-field-status')?.textContent).toContain('No matches');
+    const emptyInput = document.querySelector<HTMLInputElement>('#empty-search [role="combobox"]')!;
+    await userEvent.click(emptyInput);
+    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.keyboard('{ArrowUp}');
+
+    render(ComboboxField({
+      id: 'prevent-search',
+      label: 'Search',
+      open: true,
+      options: [{ value: 'orbit-lamp', label: 'Orbit lamp' }],
+      inputAttributes: {
+        onInput: (event) => event.preventDefault(),
+        onKeydown: (event) => event.preventDefault(),
+      },
+    }), document.body);
+    const preventedInput = document.querySelector<HTMLInputElement>('#prevent-search [role="combobox"]')!;
+    await userEvent.fill(preventedInput, 'Orbit');
+    await userEvent.keyboard('{ArrowDown}');
+
+    render(ComboboxField({
+      id: 'skip-search',
+      label: 'Search',
+      open: true,
+      activeValue: 'orbit-cable',
+      options: [{ value: 'orbit-lamp', label: 'Orbit lamp' }, { value: 'orbit-cable', label: 'Orbit cable' }, { value: 'orbit-shade', label: 'Orbit shade', disabled: true }],
+    }), document.body);
+    const skipInput = document.querySelector<HTMLInputElement>('#skip-search [role="combobox"]')!;
+    await userEvent.click(skipInput);
+    await userEvent.keyboard('{ArrowDown}');
+
+    render(ComboboxField({ id: 'loading-search', label: 'Search', open: true, loading: true, options: [] }), document.body);
+    expect(document.querySelector('#loading-search [role="status"]')?.textContent).toContain('Loading');
     render(ComboboxField({ id: 'invalid-search', label: 'Search', error: 'Choose a product.', options: [] }), document.body);
     expect(document.querySelector('#invalid-search [role="combobox"]')?.getAttribute('aria-invalid')).toBe('true');
     expect(document.querySelector('#invalid-search [role="alert"]')?.textContent).toContain('Choose');
+    expect(() => render(ComboboxField({ id: '', label: 'Search', options: [] }), document.body)).toThrow('ComboboxField.id');
+    expect(() => render(ComboboxField({ id: 'bad id', label: 'Search', options: [] }), document.body)).toThrow('whitespace');
+    expect(() => render(ComboboxField({ id: 'missing-label', label: ' ', options: [] }), document.body)).toThrow('ComboboxField.label');
   });
 
   it('covers optional states and rejects invalid molecule identifiers', () => {
