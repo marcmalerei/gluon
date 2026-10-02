@@ -439,13 +439,20 @@ function validateReleasedState() {
   } catch {
     throw new Error(`${releaseRef} does not descend from its recorded tested commit.`);
   }
-  const permittedEvidenceChanges = new Set([evidencePath, compatibilityPath]);
+  // A recovery release is allowed to carry the exact release-verification
+  // delta described by its manifest in addition to the two evidence files.
+  // The recovery delta was checked above against the same immutable allowlist;
+  // reuse it here so the released-state check validates the complete history
+  // without reopening the package/application boundary.
+  const permittedEvidenceChanges = new Set(
+    recovery ? expectedRecoveryPaths(version, recovery.failureCategory) : [evidencePath, compatibilityPath],
+  );
   const releaseCutChanges = execFileSync('git', ['diff', '--name-only', evidence.testedCommit, releaseCommit], {
     cwd: root,
     encoding: 'utf8',
   }).trim().split('\n').filter(Boolean);
   if (releaseCutChanges.some((changed) => !permittedEvidenceChanges.has(changed))) {
-    throw new Error(`${releaseRef} changed files other than its two reviewed evidence files after testing.`);
+    throw new Error(`${releaseRef} changed files outside the reviewed release evidence and recovery allowlist.`);
   }
 }
 

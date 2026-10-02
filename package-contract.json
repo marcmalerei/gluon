@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-09-24",
+    "checkedAt": "2026-10-02",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Release candidate 1.13.0 contains the current 22-package lockstep contract, including @gluonjs/graphql delivered after the 1.12.3 publication. Registry publication and immutable-release verification remain pending for the protected v1.13.0 workflow."
+    "publicationState": "released",
+    "observation": "Independent post-publication verification on 2026-10-02 confirms protected tag v1.13.0 and the complete 22-package lockstep train at 1.13.0 with latest 1.13.0; the immutable GitHub release v1.13.0 is published."
   },
   "packages": [
     {
@@ -88,7 +88,7 @@
       "directory": "packages/vite",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./tailwind"],
+      "exports": [".", "./tailwind", "./tailwind.css"],
       "currentDependencies": ["@gluonjs/compiler", "@gluonjs/core"],
       "dependencies": ["@gluonjs/compiler"]
     },

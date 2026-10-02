@@ -8,6 +8,12 @@ export interface UiContractEntry {
   readonly tests: readonly string[];
   /** Stable component stylesheet ids retained when this entry is rendered. */
   readonly styles?: readonly string[];
+  /** Public visual variants shown by the generated component catalog. */
+  readonly variants?: readonly string[];
+  /** Public interaction/loading/error states shown by the generated catalog. */
+  readonly states?: readonly string[];
+  /** Optional stable Storybook or docs preview id. */
+  readonly preview?: string;
 }
 
 export interface UiPackageManifest {

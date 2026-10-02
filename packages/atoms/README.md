@@ -95,9 +95,44 @@ carriers throw `UiHydrationError` before target mutation. Importing the package
 never changes a document or shadow root, and no browser `<style>` fallback is
 provided.
 
-`AspectRatio`, `Avatar`, `Button`, `Checkbox`, `Icon`, `Input`, `Label`,
-`Progress`, `Radio`, `ScrollArea`, `Select`, `Separator`, `Slider`, `StatusBadge`,
-`Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
+### Tenant-scoped CSS-variable themes
+
+Applications that render more than one brand or tenant in the same document can
+install an isolated owner for each tenant scope:
+
+```ts
+import { installUi } from '@gluonjs/atoms';
+
+const tenantRoot = document.querySelector<HTMLElement>('[data-tenant="acme"]')!;
+const tenantUi = installUi(document, {
+  tenant: {
+    id: 'acme',
+    scope: tenantRoot,
+    theme: 'light',
+    tokens: {
+      '--gluon-color-action': '#2457d6',
+      '--gluon-radius-control': '0.25rem',
+    },
+  },
+});
+
+tenantUi.setTokens({ '--gluon-color-action': '#163aa0' });
+tenantUi.setTheme('dark');
+tenantUi.dispose();
+```
+
+Tenant overrides are inherited CSS custom properties on the supplied scope;
+they never replace selectors, mutate another tenant, or require a Tailwind
+rebuild. Names must use the public `--gluon-*` namespace. A scope can have
+multiple reference-counted owners only when their tenant id, theme, and token
+configuration match. Serialize the tenant id, theme, and token contract with
+the application state before hydration and install the matching owner before
+the tenant subtree is hydrated.
+
+`AspectRatio`, `Avatar`, `Badge`, `Button`, `Checkbox`, `DateInput`, `Heading`,
+`Icon`, `Image`, `Input`, `Label`, `Link`, `Meter`, `NumberInput`, `Progress`,
+`Radio`, `ScrollArea`, `Select`, `Separator`, `Skeleton`, `Slider`, `Spinner`,
+`StatusBadge`, `Switch`, `Text`, `Textarea`, `TimeInput`, and `ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. Nested composition stays on that same path, so a public Molecule that

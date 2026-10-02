@@ -5,19 +5,30 @@ import {
   Button,
   AspectRatio,
   Avatar,
+  Badge,
   aspectRatioStyles,
   avatarStyles,
   Checkbox,
+  DateInput,
+  Heading,
+  Image,
   Icon,
   Input,
+  Link,
+  Meter,
+  NumberInput,
   Progress,
   Slider,
   normalizeSliderRange,
   normalizeSliderValue,
   Radio,
   Select,
+  Skeleton,
+  Spinner,
   StatusBadge,
   Switch,
+  Text,
+  TimeInput,
   ToggleButton,
   defineToggleButtonPreset,
   Textarea,
@@ -85,6 +96,56 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
+  it('renders the foundation atoms with native semantics, variants, and token-backed presentation', () => {
+    render(q.main({ children: [
+      Heading({ level: 2, children: 'Catalog' }),
+      Text({ tone: 'muted', children: 'Browse the collection.' }),
+      Link({ href: '/catalog', children: 'Open catalog' }),
+      Image({ src: '/assets/catalog-preview.webp', alt: 'Catalog preview', width: 120, height: 80 }),
+      Badge({ tone: 'success', children: 'Available' }),
+      Spinner({ label: 'Loading catalog' }),
+      Skeleton({ width: '12rem', height: '2rem' }),
+      Meter({ value: 72, max: 100, attributes: { id: 'completion', aria: { label: 'Completion' } } }),
+      NumberInput({ value: '2', attributes: { id: 'quantity' } }),
+      DateInput({ value: '2026-10-02', attributes: { id: 'date' } }),
+      TimeInput({ value: '09:30', attributes: { id: 'time' } }),
+    ] }), document.body);
+
+    expect(document.querySelector<HTMLElement>('h2.gluon-heading')?.dataset.gluonLevel).toBe('2');
+    expect(document.querySelector('.gluon-text.is-muted')).not.toBeNull();
+    expect(document.querySelector<HTMLAnchorElement>('.gluon-link')?.href).toContain('/catalog');
+    expect(document.querySelector<HTMLImageElement>('.gluon-image')?.alt).toBe('Catalog preview');
+    expect(document.querySelector('.gluon-badge.is-success')).not.toBeNull();
+    expect(document.querySelector('[role="status"]')?.getAttribute('aria-label')).toBe('Loading catalog');
+    expect(document.querySelector('.gluon-skeleton')?.getAttribute('aria-hidden')).toBe('true');
+    expect(document.querySelector('meter.gluon-meter')?.getAttribute('aria-label')).toBe('Completion');
+    expect(document.querySelector<HTMLInputElement>('#quantity')?.type).toBe('number');
+    expect(document.querySelector<HTMLInputElement>('#date')?.type).toBe('date');
+    expect(document.querySelector<HTMLInputElement>('#time')?.type).toBe('time');
+  });
+
+  it('covers foundation defaults, optional attributes, and alternate native styles', () => {
+    render(q.main({ children: [
+      Heading({ children: 'Default heading' }),
+      Text({ children: 'Default paragraph' }),
+      Link({ children: 'Unlinked text' }),
+      Image({ src: '/assets/catalog-preview.webp', alt: 'Preview' }),
+      Badge({ children: 'Neutral' }),
+      Spinner({}),
+      Skeleton({ attributes: { style: { '--gluon-skeleton-width': '4rem' } } }),
+      Meter({ value: 1 }),
+    ] }), document.body);
+
+    expect(document.querySelector('h2.gluon-heading')).not.toBeNull();
+    expect(document.querySelector('.gluon-text')).not.toHaveClass('is-default');
+    expect(document.querySelector<HTMLAnchorElement>('.gluon-link')?.hasAttribute('href')).toBe(false);
+    expect(document.querySelector<HTMLImageElement>('.gluon-image')?.loading).toBe('lazy');
+    expect(document.querySelector('.gluon-badge')?.className).not.toContain('is-neutral');
+    expect(document.querySelector('[role="status"]')?.getAttribute('aria-label')).toBe('Loading');
+    expect(document.querySelector('.gluon-skeleton')?.getAttribute('style')).toContain('--gluon-skeleton-width');
+    expect(document.querySelector<HTMLMeterElement>('meter')?.max).toBe(100);
+  });
+
   it('renders AspectRatio with typed native attributes, merged classes, exact styles, and validated geometry', () => {
     render(AspectRatio({
       ratio: 2,
@@ -1469,6 +1530,104 @@ describe('separate UI package contracts', () => {
     } as unknown as ShadowRoot;
     expect(() => installUi(failingTarget)).toThrow('adoption failed');
     expect(host.hasAttribute('data-gluon-theme')).toBe(false);
+  });
+
+  it('isolates tenant-scoped CSS variables, themes, and disposal across one document', () => {
+    const acme = document.createElement('section');
+    const northwind = document.createElement('section');
+    document.body.append(acme, northwind);
+
+    const acmeOwner = installUi(document, {
+      tenant: {
+        id: 'acme',
+        scope: acme,
+        theme: 'dark',
+        tokens: {
+          '--gluon-color-action': '#2457d6',
+          '--gluon-radius-control': '0.25rem',
+        },
+      },
+    });
+    const northwindOwner = installUi(document, {
+      tenant: {
+        id: 'northwind',
+        scope: northwind,
+        theme: 'light',
+        tokens: { '--gluon-color-action': '#b42318' },
+      },
+    });
+
+    expect(acmeOwner.tenantId).toBe('acme');
+    expect(acmeOwner.theme).toBe('dark');
+    expect(northwindOwner.tenantId).toBe('northwind');
+    expect(northwindOwner.theme).toBe('light');
+    expect(acme.dataset.gluonTenant).toBe('acme');
+    expect(northwind.dataset.gluonTenant).toBe('northwind');
+    expect(acme.style.getPropertyValue('--gluon-color-action')).toBe('#2457d6');
+    expect(northwind.style.getPropertyValue('--gluon-color-action')).toBe('#b42318');
+    expect(acme.style.getPropertyValue('--gluon-color-surface')).toBe('#172220');
+    expect(northwind.style.getPropertyValue('--gluon-color-surface')).toBe('#ffffff');
+
+    acmeOwner.setTokens({ '--gluon-color-action': '#163aa0' });
+    expect(acme.style.getPropertyValue('--gluon-color-action')).toBe('#163aa0');
+    expect(northwind.style.getPropertyValue('--gluon-color-action')).toBe('#b42318');
+
+    acmeOwner.dispose();
+    expect(acme.style.getPropertyValue('--gluon-color-action')).toBe('');
+    expect(acme.hasAttribute('data-gluon-tenant')).toBe(false);
+    expect(northwind.style.getPropertyValue('--gluon-color-action')).toBe('#b42318');
+    northwindOwner.dispose();
+  });
+
+  it('rejects invalid tenant token names and conflicting scope ownership', () => {
+    const scope = document.createElement('section');
+    document.body.append(scope);
+    expect(() => installUi(document, {
+      tenant: {
+        id: 'acme',
+        scope,
+        // @ts-expect-error Invalid custom-property namespace is rejected at runtime.
+        tokens: { '--app-color': '#fff' },
+      },
+    })).toThrow('Invalid Gluon UI token');
+
+    const owner = installUi(document, { tenant: { id: 'acme', scope } });
+    expect(() => installUi(document, {
+      tenant: { id: 'other', scope, tokens: { '--gluon-color-action': '#000' } },
+    })).toThrow('already owned with a different configuration');
+    owner.dispose();
+  });
+
+  it('validates tenant boundaries, preserves initial scope state, and ref-counts identical owners', () => {
+    const scope = document.createElement('section');
+    scope.dataset.gluonTheme = 'external';
+    scope.dataset.gluonTenant = 'legacy';
+    scope.style.setProperty('--gluon-color-action', '#111');
+    document.body.append(scope);
+
+    expect(() => installUi(document, { tenant: { id: ' ', scope } })).toThrow('non-empty id');
+    expect(() => installUi(document, {
+      tenant: { id: 'invalid', scope: document.createElement('section') },
+    })).toThrow('belong to the UI style target');
+    expect(() => installUi(document, {
+      tenant: { id: 'invalid', scope, tokens: { '--gluon-color-action': true as unknown as string } },
+    })).toThrow('Invalid value');
+
+    const first = installUi(document, {
+      tenant: { id: 'legacy', scope, theme: 'dark', tokens: { '--gluon-color-action': '#222', '--gluon-brand-accent': '#222' } },
+    });
+    const second = installUi(document, {
+      tenant: { id: 'legacy', scope, theme: 'dark', tokens: { '--gluon-color-action': '#222', '--gluon-brand-accent': '#222' } },
+    });
+    expect(second.tenantId).toBe('legacy');
+    first.dispose();
+    expect(scope.dataset.gluonTenant).toBe('legacy');
+    second.setTokens({ '--gluon-color-action': '#333' });
+    expect(scope.style.getPropertyValue('--gluon-brand-accent')).toBe('');
+    second.dispose();
+    expect(scope.dataset.gluonTheme).toBe('external');
+    expect(scope.dataset.gluonTenant).toBe('legacy');
+    expect(scope.style.getPropertyValue('--gluon-color-action')).toBe('#111');
   });
 
   it('installs independent nested ShadowRoot owners with host-scoped tokens', () => {

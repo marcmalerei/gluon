@@ -25,7 +25,7 @@ function packageLinks(version: string): DefaultTheme.SidebarItem[] {
 }
 
 function apiLinks(version: string): DefaultTheme.SidebarItem[] {
-  const entries = packages.flatMap((entry) => entry.exports.map((subpath) => {
+  const entries = packages.flatMap((entry) => entry.exports.filter((subpath) => !subpath.endsWith('.css')).map((subpath) => {
     const source = entry.directory === '.' ? 'src' : `${entry.directory}/src`;
     const modulePath = subpath === '.' ? source : `${source}/${subpath.slice(2)}`;
     return {
@@ -55,6 +55,7 @@ function documentationSidebar(version: string): DefaultTheme.SidebarItem[] {
         { text: 'Build one stateful component', link: `/${version}/guides/first-component/` },
         { text: 'Application architecture', link: `/${version}/guides/application/` },
         { text: 'Components', link: `/${version}/guides/components/` },
+        { text: 'UI catalog', link: `/${version}/guides/ui-catalog/` },
         { text: 'Presentational SFCs', link: `/${version}/guides/sfc-authoring/` },
         { text: 'Choose a component level', link: `/${version}/guides/component-decisions/` },
         { text: 'Universal rendering', link: `/${version}/guides/universal-rendering/` },
@@ -103,6 +104,7 @@ export default defineConfig({
   outDir: 'dist',
   cleanUrls: false,
   appearance: false,
+  head: [['link', { rel: 'icon', href: `${base}favicon.svg` }]],
   buildConcurrency: 8,
   srcExclude: archivedVersions.map((version) => `${version}/**`),
   lastUpdated: false,

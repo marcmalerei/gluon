@@ -16,7 +16,7 @@ diagnostics, and compatible state-preserving HMR.
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/vite/) · [npm](https://www.npmjs.com/package/@gluonjs/vite) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/vite/README.md)
 
-**Public API:** [`@gluonjs/vite`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/vite/src/) · [`@gluonjs/vite/tailwind`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/vite/src/tailwind/)
+**Public API:** [`@gluonjs/vite`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/vite/src/) · [`@gluonjs/vite/tailwind`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/vite/src/tailwind/) · `@gluonjs/vite/tailwind.css`
 
 ### Install
 
@@ -136,8 +136,17 @@ import { gluonTailwind } from '@gluonjs/vite/tailwind';
 export default defineConfig({ plugins: gluonTailwind() });
 ```
 
-Import Tailwind once from the application entry (for example,
-`import './tailwind.css'` where the file contains `@import "tailwindcss";`).
+Import the official Gluon entry once from the application entry:
+
+```css
+@import '@gluonjs/vite/tailwind.css';
+```
+
+It includes Tailwind v4 and maps utility namespaces to Gluon's semantic
+`--gluon-*` variables. Use classes such as `bg-action`, `text-muted`,
+`rounded-control`, and `shadow-surface`; a tenant can change those values with
+`installUi(..., { tenant: { tokens } })` without rebuilding Tailwind. Keep a
+local CSS entry when an application needs additional `@theme` namespaces.
 The generated `gluon-assets.json` then contains `shadowStyles`: immutable CSS
 asset references with stable IDs and content digests. Pass that manifest to
 `renderRequest()` and pass `assets.shadowStyles` to `hydrateApplication()` or

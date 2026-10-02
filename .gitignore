@@ -6,6 +6,10 @@ dist-static/
 dist-eleventy/
 coverage/
 playwright-report/
+\.playwright-cli/
+output/playwright/
+docs-site/.vitepress/cache/
+docs-site/.vitepress/.temp/
 test-results/
 .tmp/
 docs-site/content/*/api/generated/

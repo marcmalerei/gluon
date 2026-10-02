@@ -1,0 +1,1663 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": [
+    "packages/atoms/src/manifest.ts",
+    "packages/molecules/src/manifest.ts",
+    "packages/organisms/src/manifest.ts"
+  ],
+  "entries": [
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "AspectRatio",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-aspect-ratio"
+      ],
+      "variants": [
+        "16:9",
+        "1:1",
+        "4:3"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "aspect-ratio",
+      "accessibility": "Renders a native div without adding semantics; positive finite ratio validation prevents invalid geometry.",
+      "extension": "attributes targets HTMLDivElement; ratio maps to --gluon-aspect-ratio and caller classes/styles merge safely.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/AspectRatio.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Avatar",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-avatar"
+      ],
+      "variants": [
+        "image",
+        "initials",
+        "fallback"
+      ],
+      "states": [
+        "loading",
+        "loaded",
+        "error"
+      ],
+      "preview": "avatar",
+      "accessibility": "Loaded state renders one native img with meaningful alt; loading/error/no-src render one named fallback image without duplicate announcements.",
+      "extension": "attributes targets the loaded HTMLImageElement; src, alt, fallback, and lifecycle status stay caller-owned with no account, fetch, upload, or CDN ownership.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Avatar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Badge",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "neutral",
+        "info",
+        "success",
+        "warning",
+        "danger"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "foundation-atoms--badge",
+      "accessibility": "Renders a presentational status token without assuming live-region semantics or relying on color alone.",
+      "extension": "tone selects presentation; callers own text, semantics, and domain mapping.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Badge.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Button",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-button"
+      ],
+      "variants": [
+        "primary",
+        "secondary",
+        "ghost"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "loading"
+      ],
+      "preview": "button",
+      "accessibility": "Renders a native type=button control, preserves disabled semantics, and exposes a visible focus indicator with a 44px minimum target.",
+      "extension": "attributes targets HTMLButtonElement; children, type, and disabled stay explicit; defineButtonPreset owns app presets.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Button.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Checkbox",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-checkbox"
+      ],
+      "variants": [
+        "default",
+        "indeterminate"
+      ],
+      "states": [
+        "unchecked",
+        "checked",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "checkbox",
+      "accessibility": "Renders a native checkbox with Space-key, label, form, required, disabled, checked, indeterminate, forced-colors, and visible-focus semantics.",
+      "extension": "attributes targets HTMLInputElement; type, checked, indeterminate, validation, name, value, required, and disabled stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Checkbox.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "DateInput",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-input"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "foundation-atoms--date-input",
+      "accessibility": "Renders a native date input and preserves platform date-picker, keyboard, validation, and form behavior.",
+      "extension": "Uses the public Input contract with a fixed native date type; locale and timezone policy stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/DateInput.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Heading",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "level-1",
+        "level-2",
+        "level-3",
+        "level-4",
+        "level-5",
+        "level-6"
+      ],
+      "states": [
+        "default",
+        "focusable"
+      ],
+      "preview": "foundation-atoms--typography",
+      "accessibility": "Renders one native h1-h6 element with caller-owned heading hierarchy and no duplicate landmark semantics.",
+      "extension": "level selects the native heading tag; attributes target the heading and children remain explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Heading.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Icon",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-icon"
+      ],
+      "variants": [
+        "decorative",
+        "informative"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "icon",
+      "accessibility": "Decorative icons are aria-hidden; informative icons require a label and expose role=img.",
+      "extension": "attributes targets SVGSVGElement; role, naming, size, and body stay explicit; defineIcon owns custom geometry.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Icon.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Image",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "responsive",
+        "intrinsic"
+      ],
+      "states": [
+        "loading",
+        "loaded",
+        "error"
+      ],
+      "preview": "foundation-atoms--media",
+      "accessibility": "Renders one native image with required alternative text and caller-owned loading/error policy.",
+      "extension": "src, alt, dimensions, loading, decoding, and native image attributes remain explicit; fetching and fallback content stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Image.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Input",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-input"
+      ],
+      "variants": [
+        "text",
+        "email",
+        "search"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "input",
+      "accessibility": "Renders a native input; callers associate it with Label or FormField and may expose aria-invalid.",
+      "extension": "attributes targets HTMLInputElement; value, validation, type, name, placeholder, and disabled stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Input.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Label",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-label"
+      ],
+      "variants": [
+        "default",
+        "required",
+        "optional"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "label",
+      "accessibility": "Provides visible label text and is composed inside a native label by FormField.",
+      "extension": "attributes targets HTMLSpanElement; visible children stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Label.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Link",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "default",
+        "external"
+      ],
+      "states": [
+        "default",
+        "focus-visible"
+      ],
+      "preview": "foundation-atoms--link",
+      "accessibility": "Renders a native anchor when href is supplied and preserves browser navigation, keyboard, focus, and visited semantics.",
+      "extension": "href and native anchor attributes remain explicit; routing and authorization stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Link.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Meter",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "determinate"
+      ],
+      "preview": "foundation-atoms--feedback",
+      "accessibility": "Renders the native meter element; callers provide its accessible name and truthful min/max/value semantics.",
+      "extension": "Value, range, children, and native attributes stay explicit without owning domain thresholds.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Meter.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "NumberInput",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-input"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "foundation-atoms--numeric-input",
+      "accessibility": "Renders a native number input with browser editing, validation, keyboard, and form semantics.",
+      "extension": "Uses the public Input contract with a fixed native number type; callers own min/max/step through attributes.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/NumberInput.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Progress",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-progress"
+      ],
+      "variants": [
+        "determinate",
+        "indeterminate"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "progress",
+      "accessibility": "Renders a native progress element; determinate values expose value/max while indeterminate state omits value, and callers provide an accessible name.",
+      "extension": "attributes targets HTMLProgressElement; value, max, and full-width presentation stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Progress.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Radio",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-radio"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "unchecked",
+        "checked",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "radio",
+      "accessibility": "Renders a native radio with same-name grouping, Arrow/Space keyboard, label, form, required, disabled, checked, forced-colors, and visible-focus semantics.",
+      "extension": "attributes targets HTMLInputElement; type, checked, validation, name, value, required, and disabled stay explicit; callers or ChoiceGroup own the accessible group label.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Radio.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "ScrollArea",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-scroll-area"
+      ],
+      "variants": [
+        "vertical",
+        "horizontal",
+        "both"
+      ],
+      "states": [
+        "default",
+        "overflow"
+      ],
+      "preview": "scroll-area",
+      "accessibility": "Renders a named native section region with native overflow, caller-overridable tabIndex, visible focus, forced-colors focus, and reduced-motion scroll-behavior enforcement.",
+      "extension": "attributes targets HTMLElement; orientation is vertical, horizontal, or both; --gluon-scroll-area-max-inline-size, --gluon-scroll-area-max-block-size, and --gluon-scroll-area-scroll-behavior own bounded presentation without custom scrollbar or virtualization state.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/ScrollArea.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Select",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-select"
+      ],
+      "variants": [
+        "default",
+        "compact"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "select",
+      "accessibility": "Renders a native select with platform keyboard and option semantics, a 44px minimum target, visible focus, and explicit invalid state.",
+      "extension": "attributes targets HTMLSelectElement; children, value, validation, size, name, required, and disabled stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Select.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Separator",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-separator"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "separator",
+      "accessibility": "Renders a native hr with implicit horizontal separator semantics, explicit vertical orientation, or presentation/aria-hidden semantics when decorative.",
+      "extension": "attributes targets HTMLHRElement; logical sizing uses --gluon-separator-length and --gluon-separator-thickness while caller classes/styles merge safely.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Separator.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Skeleton",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "text",
+        "block"
+      ],
+      "states": [
+        "loading"
+      ],
+      "preview": "foundation-atoms--feedback",
+      "accessibility": "Renders an aria-hidden loading placeholder that does not announce duplicate progress.",
+      "extension": "width and height are CSS-variable-backed presentation hints; loaded content and timing remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Skeleton.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Slider",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-slider"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "default",
+        "disabled"
+      ],
+      "preview": "slider",
+      "accessibility": "Renders a native range input with normalized min/max/step, orientation, keyboard and pointer input, RTL, disabled/readonly, value text, 44px target, forced-colors, and zoom-safe semantics; it defines no animation.",
+      "extension": "attributes targets HTMLInputElement; controlled value and uncontrolled defaultValue are exclusive, while orientation, readonly, valueText, and native input/change callbacks stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Slider.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Spinner",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "inline"
+      ],
+      "states": [
+        "loading"
+      ],
+      "preview": "foundation-atoms--feedback",
+      "accessibility": "Renders one labelled status indicator; reduced motion disables the rotation animation.",
+      "extension": "label and native span attributes remain explicit; request lifecycle and cancellation stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Spinner.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "StatusBadge",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-status-badge"
+      ],
+      "variants": [
+        "neutral",
+        "success",
+        "warning",
+        "danger"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "badge",
+      "accessibility": "Renders a presentational span with one-line short labels, bounded long tokens, zoom, RTL, contrast, and forced-colors support; callers own visible status text and any live-region semantics.",
+      "extension": "attributes targets HTMLSpanElement; children and neutral, info, success, warning, or danger presentation stay explicit while domain mapping remains application-owned. Use app-owned multiline styling only when a product deliberately needs it.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/StatusBadge.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Switch",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-switch"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "off",
+        "on",
+        "disabled"
+      ],
+      "preview": "switch",
+      "accessibility": "Renders a native checkbox with role=switch, Space-key, label, form, required, disabled, checked, forced-colors, reduced-motion, RTL, and visible-focus semantics.",
+      "extension": "attributes targets HTMLInputElement; type, role, checked, name, value, required, and disabled stay explicit; callers own a stable accessible label.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Switch.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Text",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-foundation"
+      ],
+      "variants": [
+        "paragraph",
+        "span",
+        "muted",
+        "danger"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "foundation-atoms--typography",
+      "accessibility": "Renders caller-selected native paragraph, span, or div content without inventing a role or live-region announcement.",
+      "extension": "as and tone control presentation while native attributes and content remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Text.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "Textarea",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-textarea"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "textarea",
+      "accessibility": "Renders a native multiline text control with editing, selection, form, disabled, readonly, required, invalid, and visible-focus semantics.",
+      "extension": "attributes targets HTMLTextAreaElement; value, validation, rows, name, placeholder, readonly, required, and disabled stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/Textarea.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "TimeInput",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-input"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "foundation-atoms--time-input",
+      "accessibility": "Renders a native time input and preserves platform time-picker, keyboard, validation, and form behavior.",
+      "extension": "Uses the public Input contract with a fixed native time type; timezone and business-hours policy stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/TimeInput.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
+      "name": "ToggleButton",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-button",
+        "gluon-atom-toggle-button"
+      ],
+      "variants": [
+        "default",
+        "ghost"
+      ],
+      "states": [
+        "off",
+        "on",
+        "disabled"
+      ],
+      "preview": "toggle-button",
+      "accessibility": "Renders a native type=button control with required boolean aria-pressed, disabled semantics, visible focus, and a 44px minimum target.",
+      "extension": "attributes targets HTMLButtonElement; pressed, type, and disabled stay explicit; defineToggleButtonPreset owns app presets.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/ToggleButton.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Accordion",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-accordion"
+      ],
+      "variants": [
+        "single",
+        "multiple"
+      ],
+      "states": [
+        "collapsed",
+        "expanded"
+      ],
+      "preview": "accordion",
+      "accessibility": "Composes native Disclosure details and summary controls inside a named group with stable IDs, controlled single or multiple open values, heading levels, optional Arrow/Home/End focus movement, unavailable skipping, and unchanged Tab order.",
+      "extension": "attributes target the outer HTMLDivElement; callers own items, content loading, controlled values, collapse policy, unavailable reasons, and change effects.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Accordion.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ButtonGroup",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-button-group"
+      ],
+      "variants": [
+        "attached",
+        "spaced"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "button-group",
+      "accessibility": "Renders a named role=group around caller-owned native Button or ToggleButton controls while preserving source order, Tab order, and each child semantic.",
+      "extension": "attributes targets HTMLDivElement; accessible label, orientation, attached or spaced layout, wrapping, and child controls stay explicit without selection, routing, menu, or pressed-state ownership.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ButtonGroup.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Card",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-card"
+      ],
+      "variants": [
+        "default",
+        "interactive"
+      ],
+      "states": [
+        "default"
+      ],
+      "preview": "card",
+      "accessibility": "Renders a native article with optional heading content; callers preserve heading level order around repeated cards.",
+      "extension": "attributes targets HTMLElement article; title, media, actions, and body children stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Card.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ChoiceGroup",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-choice-group"
+      ],
+      "variants": [
+        "radio",
+        "checkbox"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "field",
+      "accessibility": "Renders a native fieldset and visible legend with optional helper, announced error, disabled propagation, and native Checkbox or Radio keyboard/form behavior.",
+      "extension": "attributes targets HTMLFieldSetElement; legend, option controls, values, checked state, copy, validation, and vertical or horizontal layout stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ChoiceGroup.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ContextMenu",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-menu-toolbar"
+      ],
+      "variants": [
+        "pointer",
+        "keyboard"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "menu",
+      "accessibility": "Supports pointer, ContextMenu-key, and Shift+F10 invocation without a synthetic trigger; opening focuses the menu and Escape returns focus to the native target surface.",
+      "extension": "Target content, instance ID, position gesture, controlled open state, item effects, routing, commands, and authorization remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ContextMenu.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ControlField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-control-field"
+      ],
+      "variants": [
+        "default",
+        "inline"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "field",
+      "accessibility": "Provides a visible native label plus deterministic label, helper, error, required-indicator, aria-describedby, aria-errormessage, and aria-invalid relationships for a caller-rendered control.",
+      "extension": "attributes targets the outer HTMLDivElement; a render callback receives public relationship metadata while control value, events, validation, and native attributes stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ControlField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "DialogSurface",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-dialog-surface"
+      ],
+      "variants": [
+        "default",
+        "destructive"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "dialog",
+      "accessibility": "Composes the ARIA Dialog and Overlay quarks with an explicit accessible name, Escape and overlay dismissal, a focus-scope controller for initial, contained, and return focus, optional description, and structured header, content, and footer regions.",
+      "extension": "Callers own open state, close action, title and copy, async and destructive decisions, native attributes, and controller lifecycle; this ARIA surface does not invoke the native dialog top layer.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/DialogSurface.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Disclosure",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-disclosure"
+      ],
+      "variants": [
+        "default",
+        "unavailable"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "disabled"
+      ],
+      "preview": "disclosure",
+      "accessibility": "Preserves native details and summary semantics, keyboard toggling, find-in-page expansion, open state, and toggle events; unavailable summaries remain focusable, expose aria-disabled and a visible reason, and prevent activation.",
+      "extension": "attributes target HTMLDetailsElement; summaryAttributes target the native summary; callers own controlled or initial open state, content, toggle effects, and unavailable reasons.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Disclosure.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "DropdownMenu",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-menu-toolbar"
+      ],
+      "variants": [
+        "default",
+        "nested"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "menu",
+      "accessibility": "Provides one roving Tab stop, buffered typeahead, disabled skipping, separators, checkbox/radio roles, controlled nested submenus, Escape/focus return, and RTL movement from a keyboard-complete menu button.",
+      "extension": "A collision-safe instance ID, item data, links, buttons, selection effects, checked state, submenu state, and controlled root open state remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/DropdownMenu.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "EmptyState",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-empty-state"
+      ],
+      "variants": [
+        "compact",
+        "full"
+      ],
+      "states": [
+        "empty",
+        "recovery"
+      ],
+      "preview": "empty-state",
+      "accessibility": "Renders optional media, a semantic heading level, body, and recovery action as static content without repeatedly announcing an unchanged empty state; dynamic feedback belongs in a separate live region.",
+      "extension": "attributes target the outer HTMLDivElement; callers own copy, media semantics, recovery controls, routes, loading, analytics, live feedback, and compact or full presentation.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/EmptyState.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "FormField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-form-field"
+      ],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "field",
+      "accessibility": "Uses implicit native label association, visible helper text, aria-invalid, and a role=alert validation message.",
+      "extension": "Input attributes target HTMLInputElement; fieldAttributes targets HTMLLabelElement; composed children stay explicit.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/FormField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "InlineNotice",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-inline-notice"
+      ],
+      "variants": [
+        "info",
+        "success",
+        "warning",
+        "danger"
+      ],
+      "states": [
+        "static",
+        "polite",
+        "assertive"
+      ],
+      "preview": "notice",
+      "accessibility": "Renders bounded feedback with a non-color marker and deliberate auto, polite status, assertive alert, or static off announcement semantics while keeping optional actions outside the live region.",
+      "extension": "attributes target the outer HTMLDivElement; callers own copy, title, action and dismiss controls, announcement timing, message lifecycle, and effects.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/InlineNotice.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Menubar",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-menu-toolbar"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "menubar",
+      "accessibility": "Renders an APG menubar with direct top-level menuitem semantics, one roving Tab stop, buffered typeahead, orientation/RTL movement, controlled nested submenus, and Escape focus behavior.",
+      "extension": "Items, links, checked/submenu state, effects, routing, authorization, and command execution remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Menubar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "NavigationMenu",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-navigation-menu"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "navigation-menu",
+      "accessibility": "Renders a router-independent native nav/list/link/button hierarchy with controlled disclosure state, active destinations, disabled or unavailable items, Escape/outside dismissal, focus return, keyboard traversal, RTL, and deterministic SSR/hydration cleanup.",
+      "extension": "Callers own URLs, active state, authorization, analytics, copy, and open state; the composition deliberately does not use command-menu roles, fetch data, or own routing.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/NavigationMenu.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "NavigationStrip",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-navigation-strip"
+      ],
+      "variants": [
+        "inline",
+        "overflow"
+      ],
+      "states": [
+        "default",
+        "overflow"
+      ],
+      "preview": "navigation-strip",
+      "accessibility": "Renders a named native navigation landmark, exposes keyboard-operable overflow controls, and reveals the exact aria-current destination.",
+      "extension": "attributes targets the native navigation landmark; destination markup and active-state semantics stay caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/NavigationStrip.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "OneTimePasswordField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-one-time-password-field"
+      ],
+      "variants": [
+        "numeric",
+        "alphanumeric"
+      ],
+      "states": [
+        "empty",
+        "complete",
+        "invalid"
+      ],
+      "preview": "otp",
+      "accessibility": "Renders a labelled bounded segmented editor with numeric or alphanumeric filtering, complete-code paste, native keyboard movement, IME-safe composition, helper/error relationships, and a single native form value.",
+      "extension": "Request-free and controlled; the caller owns value, change handling, validation, submission, authentication, transport, and ID uniqueness. Visible segment inputs never have a name; only the optional native value input participates in form submission.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/OneTimePasswordField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "PasswordToggleField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-password-toggle-field"
+      ],
+      "variants": [
+        "hidden",
+        "visible"
+      ],
+      "states": [
+        "default",
+        "invalid"
+      ],
+      "preview": "password",
+      "accessibility": "Composes one explicitly labelled native password/text input and one native type=button toggle with aria-pressed, caller-localized show/hide labels, native validation relationships, and no password-value announcement.",
+      "extension": "The component is request-free and controlled: callers own visible state, value, input handling, validation copy, authentication, storage, and password policy; id namespaces the input, label, helper, error, and aria-controls relationships.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/PasswordToggleField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ResponsiveActionBar",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-responsive-action-bar"
+      ],
+      "variants": [
+        "inline",
+        "sticky"
+      ],
+      "states": [
+        "idle",
+        "busy",
+        "disabled"
+      ],
+      "preview": "action-bar",
+      "accessibility": "Renders one semantic section with one caller-owned primary action instance, an optional compact control, native busy/disabled metadata, and one bounded status live region using only aria-live=polite or assertive; sticky mobile layout remains in normal flow and becomes inline at wider widths.",
+      "extension": "summary, status, primaryAction, compactControl, state, presentation, and application-owned labels/effects stay caller-owned. Invalid state or presentation values fail closed. Safe-area padding, logical sizing, short-viewport static fallback, forced colors, reduced motion, and 44px action targets are component-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ResponsiveActionBar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ResponsiveDisclosure",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-disclosure"
+      ],
+      "variants": [
+        "compact",
+        "expanded"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "disclosure",
+      "accessibility": "Uses one native details/summary tree, keeps desktop expanded, restores the last compact user choice across breakpoint changes, synchronizes aria-expanded, and removes its MediaQueryList listener on disconnect.",
+      "extension": "compactBreakpoint and compactInitialOpen define compact state; compactResetToken is the deliberate reset boundary; callers own content and effects.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ResponsiveDisclosure.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "SearchField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-search-field"
+      ],
+      "variants": [
+        "default",
+        "busy"
+      ],
+      "states": [
+        "empty",
+        "populated",
+        "busy",
+        "invalid"
+      ],
+      "preview": "search",
+      "accessibility": "Renders a native labelled search input inside a role=search form with a submit button, stable caller-owned DOM IDs, controlled query value, disabled state, and stable busy indication.",
+      "extension": "The component is request-free; IDs, names, and labels fail closed when empty or structurally invalid, native listener objects/functions compose before the controlled callbacks, and callers own query state, submission, network, ranking, routing, authorization, and analytics.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/SearchField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "SearchResults",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-search-results"
+      ],
+      "variants": [
+        "loaded",
+        "empty",
+        "partial-failure"
+      ],
+      "states": [
+        "loading",
+        "loaded",
+        "empty",
+        "error"
+      ],
+      "preview": "results",
+      "accessibility": "Renders grouped native sections with instance-namespaced headings, optional descriptions and counts, an unordered result list, and explicit loading, empty, partial-failure, and disabled states; partial failures retain available groups and announce their caller-localized content through one polite status.",
+      "extension": "Results are render-only TemplateValues; structurally valid DOM IDs, unique per-instance group IDs, states, and heading levels fail closed, while callers own result links, fetching, ranking, authorization, routing, and live-region timing beyond the component status.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/SearchResults.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "SegmentedControl",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-segmented-control"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "selected",
+        "disabled"
+      ],
+      "preview": "segmented",
+      "accessibility": "Renders a named toolbar of native toggle buttons with one controlled aria-pressed value, one Tab stop, disabled-option skipping, Arrow/Home/End navigation, RTL, and horizontal or vertical orientation.",
+      "extension": "attributes targets HTMLDivElement; caller owns value, options, labels, disabled states, change handling, routing, persistence, panels, and async work; it is not a tablist or radiogroup.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/SegmentedControl.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "TableRegion",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-table-region"
+      ],
+      "variants": [
+        "normal",
+        "overflow"
+      ],
+      "states": [
+        "loaded",
+        "empty",
+        "overflow"
+      ],
+      "preview": "table",
+      "accessibility": "Wraps a caller-owned native table in a named region, preserves table semantics and source order, exposes optional summary and overflow hint relationships, and adds one viewport Tab stop only while horizontal overflow exists.",
+      "extension": "attributes target the outer HTMLDivElement; callers own table markup, caption and headers, columns, rows, sorting, pagination, virtualization, selection, editing, empty content, data, and effects; it is not a DataGrid.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/TableRegion.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Tabs",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-tabs"
+      ],
+      "variants": [
+        "automatic",
+        "manual"
+      ],
+      "states": [
+        "selected",
+        "disabled"
+      ],
+      "preview": "tabs",
+      "accessibility": "Implements a labelled WAI-ARIA tablist with stable tab/panel IDs, controlled selection, one Tab stop, disabled skipping, Arrow/Home/End navigation, manual or automatic activation, orientation, RTL, and focus retention.",
+      "extension": "attributes targets the outer HTMLDivElement; callers own tab labels, panel content, value, loading, routing, persistence, and change effects.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Tabs.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Toast",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-toast"
+      ],
+      "variants": [
+        "polite",
+        "assertive"
+      ],
+      "states": [
+        "visible",
+        "dismissed"
+      ],
+      "preview": "toast",
+      "accessibility": "Renders the message in exactly one atomic polite status or assertive alert while keeping its caller-owned dismiss action outside the live region.",
+      "extension": "Toast is request-free and requires a stable safe DOM ID; copy, mutation effects, logging, analytics, and persistence remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Toast.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "ToastViewport",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-toast"
+      ],
+      "variants": [
+        "top",
+        "bottom"
+      ],
+      "states": [
+        "idle",
+        "visible"
+      ],
+      "preview": "toast-viewport",
+      "accessibility": "Provides a named region, keyed toast identity, source-owned hover/focus pause, and a customizable native 44px dismissal control.",
+      "extension": "createToastController owns validated queue, promotion, deadline, dismissal, and disposal lifecycle. Browser ref activation discards pre-activation requests so SSR and hydration never replay stale notifications.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ToastViewport.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Toolbar",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-toolbar"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "default",
+        "disabled"
+      ],
+      "preview": "toolbar",
+      "accessibility": "Renders a named toolbar of native buttons and links with one enabled Tab stop, disabled skipping, Home/End, and orientation/RTL Arrow movement.",
+      "extension": "The bounded item model preserves caller attributes and native activation while actions, links, labels, authorization, and command execution remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Toolbar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
+      "name": "AppShell",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-app-shell"
+      ],
+      "variants": [
+        "default",
+        "sidebar"
+      ],
+      "states": [
+        "default",
+        "responsive"
+      ],
+      "preview": "app-shell",
+      "accessibility": "Provides header, nav, main, and footer landmarks; callers give the navigation an accessible name when more than one nav exists.",
+      "extension": "attributes targets outer HTMLDivElement; landmark content remains explicit component input.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/AppShell.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
+      "name": "ConfirmationDialog",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-confirmation-dialog"
+      ],
+      "variants": [
+        "info",
+        "destructive"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "busy"
+      ],
+      "preview": "confirmation-dialog",
+      "accessibility": "Native modal dialog with stable title/description relationships, optional initial focus, native Escape/cancel/close behavior, focus restoration, inert busy/disabled actions, opt-in backdrop dismissal, and one polite status.",
+      "extension": "attributes target the native HTMLDialogElement and expose native events; the optional controller owns only showModal/close/focus lifecycle while callers own action controls, copy, mutation, routing, and controlled state.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/ConfirmationDialog.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
+      "name": "WorkflowTimeline",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-workflow-timeline"
+      ],
+      "variants": [
+        "active",
+        "blocked",
+        "complete"
+      ],
+      "states": [
+        "pending",
+        "active",
+        "complete"
+      ],
+      "preview": "workflow",
+      "accessibility": "Renders one ordered list with a truthful localized overall summary, instance-namespaced relationships, aria-current=\"step\" for at most one current stage, and explicit localized status, role, evidence, and action/link content.",
+      "extension": "Request-free and SSR-safe; a stable root id is required, omitted overall state derives as empty/active/blocked/complete, invalid input fails closed, attributes target the outer section, and steps accept native TemplateValue slots.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/WorkflowTimeline.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    }
+  ]
+}

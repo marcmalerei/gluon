@@ -20,7 +20,7 @@ if (!versions.supported.includes(versions.latest)) {
 const currentPackages = packageContract.packages.filter((entry) => entry.state === 'current');
 const requiredPages = [
   'index.html', 'guides/index.html', 'guides/getting-started/index.html',
-  'guides/learning-path/index.html', 'guides/components/index.html',
+  'guides/learning-path/index.html', 'guides/components/index.html', 'guides/ui-catalog/index.html',
   'guides/first-component/index.html', 'guides/async-ssr/index.html',
   'guides/sfc-authoring/index.html',
   'guides/application/index.html', 'guides/universal-rendering/index.html',
@@ -108,7 +108,7 @@ if (!bundledCss.includes('--vp-c-brand-1') && !bundledCss.includes('#1549f5')) {
 
 const expectedEntryPoints = packageContract.packages
   .filter((entry) => entry.state === 'current')
-  .reduce((total, entry) => total + entry.exports.length, 0);
+  .reduce((total, entry) => total + entry.exports.filter((exportPath) => !exportPath.endsWith('.css')).length, 0);
 const apiIndex = await readFile(resolve(apiRoot, 'index.md'), 'utf8');
 const documentedEntryPoints = (apiIndex.match(/^- \[[^\]]+\]\([^\)]+index\.md\)$/gm) ?? []).length;
 if (documentedEntryPoints !== expectedEntryPoints) {
