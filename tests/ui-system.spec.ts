@@ -124,6 +124,28 @@ describe('separate UI package contracts', () => {
     expect(document.querySelector<HTMLInputElement>('#time')?.type).toBe('time');
   });
 
+  it('covers foundation defaults, optional attributes, and alternate native styles', () => {
+    render(q.main({ children: [
+      Heading({ children: 'Default heading' }),
+      Text({ children: 'Default paragraph' }),
+      Link({ children: 'Unlinked text' }),
+      Image({ src: '/assets/catalog-preview.webp', alt: 'Preview' }),
+      Badge({ children: 'Neutral' }),
+      Spinner({}),
+      Skeleton({ attributes: { style: { '--gluon-skeleton-width': '4rem' } } }),
+      Meter({ value: 1 }),
+    ] }), document.body);
+
+    expect(document.querySelector('h2.gluon-heading')).not.toBeNull();
+    expect(document.querySelector('.gluon-text')).not.toHaveClass('is-default');
+    expect(document.querySelector<HTMLAnchorElement>('.gluon-link')?.hasAttribute('href')).toBe(false);
+    expect(document.querySelector<HTMLImageElement>('.gluon-image')?.loading).toBe('lazy');
+    expect(document.querySelector('.gluon-badge')?.className).not.toContain('is-neutral');
+    expect(document.querySelector('[role="status"]')?.getAttribute('aria-label')).toBe('Loading');
+    expect(document.querySelector('.gluon-skeleton')?.getAttribute('style')).toContain('--gluon-skeleton-width');
+    expect(document.querySelector<HTMLMeterElement>('meter')?.max).toBe(100);
+  });
+
   it('renders AspectRatio with typed native attributes, merged classes, exact styles, and validated geometry', () => {
     render(AspectRatio({
       ratio: 2,
@@ -1574,6 +1596,38 @@ describe('separate UI package contracts', () => {
       tenant: { id: 'other', scope, tokens: { '--gluon-color-action': '#000' } },
     })).toThrow('already owned with a different configuration');
     owner.dispose();
+  });
+
+  it('validates tenant boundaries, preserves initial scope state, and ref-counts identical owners', () => {
+    const scope = document.createElement('section');
+    scope.dataset.gluonTheme = 'external';
+    scope.dataset.gluonTenant = 'legacy';
+    scope.style.setProperty('--gluon-color-action', '#111');
+    document.body.append(scope);
+
+    expect(() => installUi(document, { tenant: { id: ' ', scope } })).toThrow('non-empty id');
+    expect(() => installUi(document, {
+      tenant: { id: 'invalid', scope: document.createElement('section') },
+    })).toThrow('belong to the UI style target');
+    expect(() => installUi(document, {
+      tenant: { id: 'invalid', scope, tokens: { '--gluon-color-action': true as unknown as string } },
+    })).toThrow('Invalid value');
+
+    const first = installUi(document, {
+      tenant: { id: 'legacy', scope, theme: 'dark', tokens: { '--gluon-color-action': '#222', '--gluon-brand-accent': '#222' } },
+    });
+    const second = installUi(document, {
+      tenant: { id: 'legacy', scope, theme: 'dark', tokens: { '--gluon-color-action': '#222', '--gluon-brand-accent': '#222' } },
+    });
+    expect(second.tenantId).toBe('legacy');
+    first.dispose();
+    expect(scope.dataset.gluonTenant).toBe('legacy');
+    second.setTokens({ '--gluon-color-action': '#333' });
+    expect(scope.style.getPropertyValue('--gluon-brand-accent')).toBe('');
+    second.dispose();
+    expect(scope.dataset.gluonTheme).toBe('external');
+    expect(scope.dataset.gluonTenant).toBe('legacy');
+    expect(scope.style.getPropertyValue('--gluon-color-action')).toBe('#111');
   });
 
   it('installs independent nested ShadowRoot owners with host-scoped tokens', () => {

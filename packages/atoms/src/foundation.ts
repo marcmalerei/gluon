@@ -111,7 +111,7 @@ export interface SpinnerProps {
   readonly attributes?: QuarkProps<HTMLSpanElement>;
 }
 
-function renderSpinner({ label = 'Loading', attributes = {} }: SpinnerProps): TemplateResult {
+function renderSpinner({ label = 'Loading', attributes = {} }: SpinnerProps = {}): TemplateResult {
   return q.span({
     ...attributes,
     class: [{ gluon: true, atom: true, 'gluon-spinner': true }, attributes.class],
