@@ -78,6 +78,14 @@ localization, and state transitions outside the organism. `id`, `part`,
 `data-state`, and CSS custom properties provide stable tenant-scoped styling
 hooks without requiring a framework-owned theme.
 
+`ProductCard` and `ProductGrid` are render-only commerce compositions. They
+accept typed product identity and caller-rendered media, prices, availability,
+actions, and cards; they do not fetch inventory, own prices, add payment or
+analytics behavior, or decide routing. `ProductGrid` preserves source order,
+supports an explicit empty surface, and falls back to one column on small
+screens. Both expose parts, data attributes, and CSS custom properties for
+tenant-specific themes.
+
 `AppShell` emits native `header`, `nav`, `main`, and `footer` landmarks only for
 content the caller supplies. When a page has multiple navigation landmarks, the
 caller must give the supplied navigation content a distinct accessible name.

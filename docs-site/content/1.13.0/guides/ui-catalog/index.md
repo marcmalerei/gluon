@@ -226,6 +226,12 @@ verification surface.
           <template v-else-if="entry.preview === 'async-state'">
             <div class="ui-sample-async-state"><strong>Recommendations</strong><span class="is-state">Partially loaded</span><span>Profile data is ready while recommendations refresh.</span><button class="ui-sample-button">Retry</button></div>
           </template>
+          <template v-else-if="entry.preview === 'product-card'">
+            <article class="ui-sample-product-card"><div class="ui-sample-product-media">Orbit lamp</div><strong>Orbit lamp</strong><span>€128 · In stock</span><button class="ui-sample-button">Add to bag</button></article>
+          </template>
+          <template v-else-if="entry.preview === 'product-grid'">
+            <div class="ui-sample-product-grid"><span>Orbit lamp</span><span>Stack tray</span><span>Field tote</span></div>
+          </template>
           <template v-else-if="entry.preview === 'aspect-ratio'">
             <div class="ui-sample-ratios" aria-label="Aspect ratio variants">
               <figure v-for="ratio in ['16:9', '1:1', '4:3']" :key="ratio" class="ui-sample-ratio">
