@@ -12,6 +12,10 @@ export { createFormController, type FormController, type FormControllerOptions, 
 export { InlineNotice, type InlineNoticeAnnouncement, type InlineNoticeAttributes, type InlineNoticeProps, type InlineNoticeTone } from './inline-notice.js';
 export { Toast, ToastViewport, createToastController, type ToastAnnouncement, type ToastAttributes, type ToastContent, type ToastController, type ToastControllerOptions, type ToastDismissLabel, type ToastPauseOwner, type ToastProps, type ToastRecord, type ToastRequest, type ToastTone, type ToastViewportAttributes, type ToastViewportProps } from './toast.js';
 export { NavigationStrip, type NavigationStripProps } from './navigation-strip.js';
+export { Breadcrumbs, type BreadcrumbItem, type BreadcrumbItemAttributes, type BreadcrumbLinkAttributes, type BreadcrumbsAttributes, type BreadcrumbsProps } from './breadcrumbs.js';
+export { breadcrumbsStyles } from './breadcrumbs-styles.js';
+export { Pagination, type PaginationAttributes, type PaginationLinkAttributes, type PaginationProps } from './pagination.js';
+export { paginationStyles } from './pagination-styles.js';
 export { ResponsiveActionBar, type ResponsiveActionBarAttributes, type ResponsiveActionBarPresentation, type ResponsiveActionBarProps, type ResponsiveActionBarState } from './responsive-action-bar.js';
 export { ContextMenu, DropdownMenu, Menubar, type ContextMenuProps, type DropdownMenuProps, type MenuActionItem, type MenuAttributes, type MenuCheckboxItem, type MenuCheckedChange, type MenuItem, type MenuItemKind, type MenuProps, type MenuRadioItem, type MenuSeparatorItem, type MenubarProps } from './menu-toolbar.js';
 export { Toolbar, type ToolbarButtonItem, type ToolbarItem, type ToolbarLinkItem, type ToolbarProps, type ToolbarSeparatorItem } from './toolbar.js';

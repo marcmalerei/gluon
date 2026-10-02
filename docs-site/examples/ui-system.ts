@@ -43,6 +43,7 @@ import {
 } from '@gluonjs/core';
 import {
   Accordion,
+  Breadcrumbs,
   Card,
   ButtonGroup,
   ChoiceGroup,
@@ -56,6 +57,7 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  Pagination,
   ResponsiveActionBar,
   NavigationMenu,
   OneTimePasswordField,
@@ -221,6 +223,20 @@ createApp(() => AppShell({
         q.a({ href: '#orders', children: 'Orders' }),
         q.a({ href: '#security', children: 'Security' }),
       ],
+    }),
+    Breadcrumbs({
+      label: 'Catalog breadcrumb',
+      items: [
+        { label: 'Catalog', href: '#profile' },
+        { label: 'Lighting', href: '#orders' },
+        { label: 'Orbit lamp', current: true },
+      ],
+    }),
+    Pagination({
+      currentPage: 2,
+      totalPages: 8,
+      getPageHref: (page) => `#page-${page}`,
+      siblingCount: 1,
     }),
     ResponsiveActionBar({
       summary: 'Profile changes ready',

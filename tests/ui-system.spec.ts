@@ -61,6 +61,7 @@ import {
 import { createStyleManifest, renderStyleCarriers } from '@gluonjs/ssr';
 import {
   Accordion,
+  Breadcrumbs,
   Card,
   ButtonGroup,
   ChoiceGroup,
@@ -72,6 +73,7 @@ import {
   FormField,
   InlineNotice,
   NavigationStrip,
+  Pagination,
   SegmentedControl,
   TableRegion,
   Tabs,
@@ -1950,6 +1952,60 @@ describe('headless interaction primitives', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
     document.querySelector<HTMLElement>('#empty-list')!.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(false);
+  });
+});
+
+describe('link-based navigation molecules', () => {
+  it('renders breadcrumbs with native links and current-page semantics', () => {
+    render(Breadcrumbs({
+      label: 'Catalog breadcrumb',
+      items: [
+        { label: 'Catalog', href: '/catalog' },
+        { label: 'Lighting', href: '/catalog/lighting' },
+        { label: 'Orbit lamp', current: true },
+      ],
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-breadcrumbs')!;
+    expect(root.tagName).toBe('NAV');
+    expect(root.getAttribute('aria-label')).toBe('Catalog breadcrumb');
+    expect(root.querySelectorAll('ol > li')).toHaveLength(3);
+    expect(root.querySelectorAll('a')).toHaveLength(2);
+    expect(root.querySelector<HTMLAnchorElement>('a')?.href).toContain('/catalog');
+    expect(root.querySelector('[aria-current="page"]')?.textContent).toBe('Orbit lamp');
+    expect(root.querySelector('[aria-current="page"]')?.tagName).toBe('SPAN');
+  });
+
+  it('renders windowed pagination with labeled native destinations', () => {
+    render(Pagination({
+      currentPage: 4,
+      totalPages: 9,
+      siblingCount: 1,
+      getPageHref: (page) => `/catalog?page=${page}`,
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-pagination')!;
+    expect(root.tagName).toBe('NAV');
+    expect(root.getAttribute('aria-label')).toBe('Pagination');
+    expect(root.querySelector<HTMLAnchorElement>('[aria-label="Previous page"]')?.getAttribute('href')).toBe('/catalog?page=3');
+    expect(root.querySelector<HTMLAnchorElement>('[aria-label="Next page"]')?.getAttribute('href')).toBe('/catalog?page=5');
+    expect(root.querySelector('[aria-current="page"]')?.textContent).toBe('4');
+    expect(root.querySelectorAll('.gluon-pagination-ellipsis')).toHaveLength(2);
+    expect(root.querySelector<HTMLAnchorElement>('.is-current')?.getAttribute('aria-label')).toBe('Page 4');
+  });
+
+  it('exposes disabled boundary state without inventing a destination', () => {
+    render(Pagination({
+      currentPage: 1,
+      totalPages: 3,
+      getPageHref: (page) => `/catalog?page=${page}`,
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('.gluon-pagination')!;
+    const previous = root.querySelector<HTMLElement>('.is-previous .gluon-pagination-link')!;
+    expect(previous.tagName).toBe('SPAN');
+    expect(previous.getAttribute('aria-disabled')).toBe('true');
+    expect(root.querySelector<HTMLAnchorElement>('[aria-label="Next page"]')?.getAttribute('href')).toBe('/catalog?page=2');
   });
 });
 

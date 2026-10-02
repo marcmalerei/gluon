@@ -75,6 +75,9 @@ verification surface.
             <span class="ui-sample-badge is-warning">Review</span>
             <span class="ui-sample-badge is-danger">Blocked</span>
           </template>
+          <template v-else-if="entry.preview === 'breadcrumbs'">
+            <nav class="ui-sample-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="#catalog">Catalog</a></li><li><a href="#catalog">Lighting</a></li><li aria-current="page">Orbit lamp</li></ol></nav>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>
@@ -140,6 +143,9 @@ verification surface.
           </template>
           <template v-else-if="['tabs', 'segmented', 'navigation-strip'].includes(entry.preview)">
             <div class="ui-sample-tabs"><span class="is-active">Overview</span><span>Details</span><span>Reviews</span></div>
+          </template>
+          <template v-else-if="entry.preview === 'pagination'">
+            <nav class="ui-sample-pagination" aria-label="Pagination"><a href="#catalog" aria-label="Previous page">‹</a><a href="#catalog">1</a><a href="#catalog" class="is-active" aria-current="page">2</a><span aria-hidden="true">…</span><a href="#catalog">8</a><a href="#catalog" aria-label="Next page">›</a></nav>
           </template>
           <template v-else-if="entry.preview === 'table'">
             <div class="ui-sample-table"><span>Product</span><span>Status</span><span>Orbit lamp</span><span class="is-success">Ready</span></div>
