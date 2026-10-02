@@ -22,6 +22,13 @@ and mobile interaction contracts. They are automated engine regression evidence,
 not branded-browser, operating-system, device, or assistive-technology support
 evidence.
 
+The complete UI-library quality boundary is maintained in the repository's
+machine-readable [UI quality matrix](https://github.com/marcmalerei/gluon/blob/main/docs/ui-quality-matrix.json).
+It connects every catalog layer to its public manifest, CSS-variable and
+tenant contract, Tailwind build, interaction, responsive, SSR/hydration,
+Storybook, shop-flow, and documentation evidence. Run its path and command
+integrity check with `npm run check:ui-quality-matrix`.
+
 The stable UI composition also has per-engine screenshot references. When a
 browser-matrix job fails that comparison, CI retains the Vitest actual and diff
 images for seven days in a `browser-differences-<engine>-<commit>` artifact.
