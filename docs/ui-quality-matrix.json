@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "scope": "@gluonjs/quarks, @gluonjs/atoms, @gluonjs/molecules, @gluonjs/organisms, the UI catalog, and GLUON GOODS",
+  "dimensions": [
+    {
+      "id": "public-api-and-manifest",
+      "title": "Public API and manifest compatibility",
+      "evidence": ["unit", "build", "docs"],
+      "commands": ["check:ui-contract", "typecheck:ui"],
+      "paths": ["scripts/validate-ui-contract.mjs", "tests/ui-system.spec.ts", "docs-site/examples/ui-system.ts", "packages/quarks/src/manifest.ts", "packages/atoms/src/manifest.ts", "packages/molecules/src/manifest.ts", "packages/organisms/src/manifest.ts"]
+    },
+    {
+      "id": "catalog-completeness",
+      "title": "Catalog entries, variations, and previews",
+      "evidence": ["build", "browser", "docs"],
+      "commands": ["check:ui-catalog", "check:ui-catalog-browser"],
+      "paths": ["scripts/build-ui-catalog.mjs", "scripts/validate-ui-catalog-browser.mjs", "docs-site/data/ui-catalog.json", "docs-site/content/1.13.0/guides/ui-catalog/index.md"]
+    },
+    {
+      "id": "css-variables-and-tenants",
+      "title": "CSS variables, style ownership, and multitenancy",
+      "evidence": ["unit", "browser", "ssr", "docs"],
+      "commands": ["check:ui-contract", "test:browser", "test:ssr"],
+      "paths": ["packages/atoms/src/theme.ts", "packages/atoms/src/tokens.ts", "tests/ui-system.spec.ts", "tests/component-styles.spec.ts", "tests/hydration.spec.ts", "docs/ui-extensibility.md"]
+    },
+    {
+      "id": "tailwind-and-clean-builds",
+      "title": "Tailwind build-time composition and clean package boundaries",
+      "evidence": ["build", "unit", "docs"],
+      "commands": ["check:ui-contract", "check:component-library-clean-install"],
+      "paths": ["packages/vite/src/tailwind.ts", "packages/vite/src/tailwind-css.ts", "packages/vite/tailwind.css", "tests/hydration.spec.ts", "docs/architecture.md"]
+    },
+    {
+      "id": "interaction-and-accessibility",
+      "title": "Keyboard, focus, RTL, forced colors, and reduced motion",
+      "evidence": ["unit", "browser", "visual"],
+      "commands": ["test:browser", "check:storybook:component-library"],
+      "paths": ["tests/ui-system.spec.ts", "tests/anchored-overlays.spec.ts", "tests/navigation-menu.spec.ts", "tests/toast-controller.spec.ts", "tests/ui-visual.spec.ts"]
+    },
+    {
+      "id": "responsive-layouts",
+      "title": "390px and small-mobile layout boundaries",
+      "evidence": ["browser", "visual", "e2e"],
+      "commands": ["check:ui-catalog-browser", "check:storybook:component-library", "check:shop-static"],
+      "paths": ["scripts/validate-ui-catalog-browser.mjs", "scripts/validate-responsive-action-bar.mjs", "tests/ui-visual.spec.ts", "tests/shop-example.spec.ts"]
+    },
+    {
+      "id": "ssr-dsd-hydration-disposal",
+      "title": "SSR, declarative Shadow DOM, hydration, and disposal",
+      "evidence": ["unit", "browser", "ssr"],
+      "commands": ["test:ssr", "test:browser"],
+      "paths": ["tests/hydration.spec.ts", "tests/component-styles.spec.ts", "tests/shop-example.spec.ts", "docs/hydration.md"]
+    },
+    {
+      "id": "storybook-visual-baselines",
+      "title": "Storybook interaction, accessibility, and visual baselines",
+      "evidence": ["browser", "visual", "docs"],
+      "commands": ["check:storybook:component-library"],
+      "paths": ["scripts/validate-component-library-storybook.mjs", "tests/storybook-renderer.spec.ts", "examples/component-library/storybook", "docs/storybook.md"]
+    },
+    {
+      "id": "shop-customer-flows",
+      "title": "GLUON GOODS discovery, configuration, bag, and checkout",
+      "evidence": ["browser", "e2e", "build"],
+      "commands": ["check:shop-static", "check:example-previews"],
+      "paths": ["tests/shop-example.spec.ts", "examples/shop/FEATURES.md", "examples/shop/README.md", "scripts/validate-shop-static-output.mjs"]
+    },
+    {
+      "id": "package-and-generated-docs",
+      "title": "Package README, generated API, and catalog documentation",
+      "evidence": ["docs", "build"],
+      "commands": ["check:docs", "check:readmes"],
+      "paths": ["scripts/validate-docs.mjs", "scripts/validate-readme-structure.mjs", "docs-site/examples/ui-system.ts", "packages/atoms/README.md", "packages/molecules/README.md", "packages/organisms/README.md"]
+    }
+  ]
+}

@@ -14,6 +14,27 @@ SSR-server, and static-generation sequence remains Node-safe and hydratable.
 Issue #38 established blocking repository, Playwright engine, Node runtime,
 security, accessibility, retention, performance-evidence, and shop-budget jobs.
 
+## UI-library quality matrix
+
+The UI-library contract is maintained as the machine-readable
+[`docs/ui-quality-matrix.json`](./ui-quality-matrix.json). It keeps the
+evidence boundary explicit for public API and manifests, the CSS-variable and
+tenant owner, Tailwind clean builds, interaction/accessibility behavior,
+responsive catalog previews, SSR/DSD/hydration/disposal, Storybook baselines,
+GLUON GOODS flows, and generated documentation.
+
+Each dimension names its evidence kind (`unit`, `browser`, `e2e`, `visual`,
+`ssr`, `build`, or `docs`), executable npm scripts, and repository paths. The
+validator checks that every referenced path and command exists:
+
+```sh
+npm run check:ui-quality-matrix
+```
+
+This matrix records verification boundaries; it does not turn a passing
+component test into a branded-browser, assistive-technology, or domain-state
+support claim.
+
 ## Automated matrix
 
 `.github/workflows/quality-gates.yml` runs on pull requests, `main`, and manual
@@ -27,7 +48,7 @@ bounded expensive steps:
 
 | Job                       |                   Job limit | Individually bounded expensive work                                                       |
 | ------------------------- | --------------------------: | ----------------------------------------------------------------------------------------- |
-| `repository`              |                  25 minutes | install 10, repository check 18 minutes                                                    |
+| `repository`              |                  25 minutes | install 10, repository check 24 minutes                                                    |
 | `create-gluon-fixtures`   |                  25 minutes | install/build 10 each, fixture matrix 15 minutes                                           |
 | `release-artifacts`       |                  25 minutes | install/build 10 each, release artifacts plus fresh VSIX package/LSP smoke check 12 minutes |
 | `browser-engines`         |       30 minutes per engine | install 10, browser matrix 15, individual evidence commands 10–15 minutes                 |
