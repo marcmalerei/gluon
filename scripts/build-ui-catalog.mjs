@@ -12,7 +12,7 @@ const sources = [
   { package: '@gluonjs/organisms', layer: 'organism', file: 'packages/organisms/src/manifest.ts' },
 ];
 const renderedPreviewKeys = new Set([
-  'accordion', 'action-bar', 'app-shell', 'aspect-ratio', 'avatar', 'badge', 'button',
+  'accordion', 'action-bar', 'app-shell', 'async-state', 'aspect-ratio', 'avatar', 'badge', 'button',
   'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'disclosure', 'tooltip', 'stepper', 'filter-bar', 'data-list',
   'empty-state', 'field', 'foundation-atoms--badge', 'foundation-atoms--date-input',
   'foundation-atoms--feedback', 'foundation-atoms--file-input', 'foundation-atoms--link', 'foundation-atoms--media',

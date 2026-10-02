@@ -223,6 +223,9 @@ verification surface.
           <template v-else-if="entry.preview === 'app-shell'">
             <div class="ui-sample-shell" aria-label="Application shell regions"><span class="is-bar">Nav</span><span class="is-header">Header</span><span class="is-content">Main</span><span class="is-footer">Footer</span></div>
           </template>
+          <template v-else-if="entry.preview === 'async-state'">
+            <div class="ui-sample-async-state"><strong>Recommendations</strong><span class="is-state">Partially loaded</span><span>Profile data is ready while recommendations refresh.</span><button class="ui-sample-button">Retry</button></div>
+          </template>
           <template v-else-if="entry.preview === 'aspect-ratio'">
             <div class="ui-sample-ratios" aria-label="Aspect ratio variants">
               <figure v-for="ratio in ['16:9', '1:1', '4:3']" :key="ratio" class="ui-sample-ratio">

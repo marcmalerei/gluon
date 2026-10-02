@@ -192,6 +192,10 @@ html { scroll-behavior: smooth; }
 .ui-sample-workflow .is-done, .ui-sample-workflow .is-active { color: var(--ui-catalog-accent); font-weight: 700; }
 .ui-sample-workflow .is-done::before { content: '✓'; }
 .ui-sample-workflow .is-active::before { content: '●'; }
+.ui-sample-async-state { display: grid; gap: 5px; width: 90%; border: 1px solid var(--vp-c-divider); border-radius: 8px; padding: 10px; text-align: start; font-size: .76rem; }
+.ui-sample-async-state .is-state { color: var(--ui-catalog-accent); font-size: .68rem; font-weight: 700; text-transform: uppercase; }
+.ui-sample-async-state > span:not(.is-state) { color: var(--vp-c-text-2); }
+.ui-sample-async-state .ui-sample-button { justify-self: start; min-block-size: 32px; }
 .ui-sample-media { display: grid; width: 80%; aspect-ratio: 4 / 3; place-items: center; background: linear-gradient(135deg, #12312f, #65d5c8); color: #fff; font-weight: 700; }
 .ui-sample-media.is-image { border: 1px solid var(--vp-c-divider); background: linear-gradient(135deg, #12312f, #65d5c8); }
 @keyframes ui-catalog-spin { to { transform: rotate(360deg); } }
