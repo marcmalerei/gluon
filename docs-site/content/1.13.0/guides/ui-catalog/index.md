@@ -14,14 +14,18 @@ onMounted(() => {
   const search = root?.querySelector<HTMLInputElement>('[data-ui-catalog-search]');
   const cards = [...(root?.querySelectorAll<HTMLElement>('[data-ui-catalog-card]') ?? [])];
   const filters = [...(root?.querySelectorAll<HTMLElement>('[data-layer-filter]') ?? [])];
+  const status = root?.querySelector<HTMLElement>('[data-ui-catalog-status]');
   let activeLayer = 'all';
   const update = () => {
     const query = search?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
     for (const card of cards) {
       const matchesLayer = activeLayer === 'all' || card.dataset.layer === activeLayer;
       const matchesSearch = !query || card.dataset.name?.includes(query);
       card.hidden = !(matchesLayer && matchesSearch);
+      if (!card.hidden) visible += 1;
     }
+    if (status) status.textContent = `${visible} component${visible === 1 ? '' : 's'} shown`;
   };
   search?.addEventListener('input', update);
   for (const filter of filters) filter.addEventListener('click', () => {
@@ -29,6 +33,7 @@ onMounted(() => {
     for (const item of filters) item.setAttribute('aria-pressed', String(item === filter));
     update();
   });
+  update();
 });
 </script>
 
@@ -51,6 +56,8 @@ verification surface.
     <button type="button" data-layer-filter="organism" aria-pressed="false">Organisms</button>
   </div>
 
+  <p class="ui-catalog-status" role="status" aria-live="polite" data-ui-catalog-status>{{ catalog.entries.length }} components shown</p>
+
   <div class="ui-catalog-grid" data-ui-catalog-grid>
     <article v-for="entry in catalog.entries" :key="`${entry.layer}-${entry.name}`" class="ui-catalog-card" data-ui-catalog-card :data-layer="entry.layer" :data-name="entry.name.toLowerCase()">
       <header>
@@ -71,9 +78,42 @@ verification surface.
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>
-          <template v-else-if="entry.preview === 'text' || entry.preview === 'link'">
+          <template v-else-if="entry.preview === 'text'">
             <span class="ui-sample-copy">Configure your product with confidence.</span>
-            <a href="#catalog-atom-Button" class="ui-sample-link">View details</a>
+          </template>
+          <template v-else-if="entry.preview === 'link'">
+            <a :href="`#catalog-${entry.layer}-${entry.name}`" class="ui-sample-link">View component details</a>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--badge'">
+            <span class="ui-sample-badge">Neutral</span>
+            <span class="ui-sample-badge is-info">Info</span>
+            <span class="ui-sample-badge is-success">Ready</span>
+            <span class="ui-sample-badge is-warning">Review</span>
+            <span class="ui-sample-badge is-danger">Blocked</span>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--typography'">
+            <h3 v-if="entry.name === 'Heading'" class="ui-sample-heading">Swiss editorials</h3>
+            <p v-else class="ui-sample-copy">Supporting copy stays readable and composable.</p>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--link'">
+            <a :href="`#catalog-${entry.layer}-${entry.name}`" class="ui-sample-link">Open component reference</a>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--media'">
+            <figure class="ui-sample-media is-image" aria-label="Responsive image preview"><span>Product image</span></figure>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--feedback'">
+            <meter v-if="entry.name === 'Meter'" class="ui-sample-meter" min="0" max="100" value="72">72%</meter>
+            <template v-else-if="entry.name === 'Spinner'"><span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span></template>
+            <template v-else><span class="ui-sample-skeleton is-wide" aria-hidden="true"></span><span class="ui-sample-skeleton is-short" aria-hidden="true"></span></template>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--numeric-input'">
+            <label class="ui-sample-field">Quantity<input type="number" min="1" max="9" value="2" /></label>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--date-input'">
+            <label class="ui-sample-field">Delivery date<input type="date" value="2026-10-02" /></label>
+          </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--time-input'">
+            <label class="ui-sample-field">Delivery time<input type="time" value="09:00" /></label>
           </template>
           <template v-else-if="['input', 'date-input', 'number-input', 'time-input', 'textarea'].includes(entry.preview)">
             <label class="ui-sample-field">{{ entry.name }}<input :type="entry.preview === 'date-input' ? 'date' : entry.preview === 'time-input' ? 'time' : entry.preview === 'number-input' ? 'number' : 'text'" :value="entry.preview === 'date-input' ? '2026-10-02' : entry.preview === 'time-input' ? '09:00' : entry.preview === 'number-input' ? '2' : 'Example value'" /></label>
@@ -153,15 +193,12 @@ verification surface.
           <template v-else-if="entry.preview === 'aspect-ratio' || entry.preview === 'image'">
             <div class="ui-sample-media"><span>{{ entry.name }}</span></div>
           </template>
-          <template v-else-if="entry.preview === 'segmented'">
-            <div class="ui-sample-tabs"><span class="is-active">Grid</span><span>List</span></div>
-          </template>
           <template v-else-if="entry.layer === 'organism'">
             <div class="ui-sample-shell"><span class="is-bar"></span><span class="is-content"></span><span class="is-content is-short"></span></div>
           </template>
           <template v-else>
-            <span class="ui-sample-component">{{ entry.name }}</span>
-            <span class="ui-sample-variant">{{ entry.variants[0] }}</span>
+            <span class="ui-sample-component" data-preview-fallback="true">{{ entry.name }}</span>
+            <span class="ui-sample-variant">Contract preview only · {{ entry.variants[0] }}</span>
           </template>
         </div>
         <span class="ui-catalog-preview-label">Representative {{ entry.preview ? 'component' : 'contract' }} preview</span>

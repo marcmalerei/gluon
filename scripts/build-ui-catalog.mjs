@@ -11,6 +11,18 @@ const sources = [
   { package: '@gluonjs/molecules', layer: 'molecule', file: 'packages/molecules/src/manifest.ts' },
   { package: '@gluonjs/organisms', layer: 'organism', file: 'packages/organisms/src/manifest.ts' },
 ];
+const renderedPreviewKeys = new Set([
+  'accordion', 'action-bar', 'app-shell', 'aspect-ratio', 'avatar', 'badge', 'button',
+  'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'disclosure',
+  'empty-state', 'field', 'foundation-atoms--badge', 'foundation-atoms--date-input',
+  'foundation-atoms--feedback', 'foundation-atoms--link', 'foundation-atoms--media',
+  'foundation-atoms--numeric-input', 'foundation-atoms--time-input',
+  'foundation-atoms--typography', 'icon', 'input', 'label', 'menu', 'menubar',
+  'navigation-menu', 'navigation-strip', 'notice', 'otp', 'password', 'progress',
+  'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',
+  'slider', 'switch', 'table', 'tabs', 'textarea', 'toast', 'toast-viewport',
+  'toggle-button', 'toolbar', 'workflow',
+]);
 
 const entries = [];
 for (const source of sources) {
@@ -27,6 +39,9 @@ for (const source of sources) {
     const preview = fieldString(fields, 'preview');
     if (!variants || !states || !preview) {
       throw new Error(`Incomplete catalog metadata for component ${source.package}/${name}`);
+    }
+    if (!renderedPreviewKeys.has(preview)) {
+      throw new Error(`Unknown UI catalog preview key ${preview} for ${source.package}/${name}`);
     }
     entries.push({
       package: source.package,
