@@ -45,6 +45,26 @@ try {
   if (await page.locator('[data-preview-fallback]').count() !== 0) {
     throw new Error('catalog contains a generic preview fallback');
   }
+  if (await page.locator('[data-preview-rendered]').count() !== catalog.entries.length) {
+    throw new Error('catalog does not render a preview region for every component');
+  }
+  for (const card of await page.locator('[data-ui-catalog-card]').all()) {
+    const contract = await card.evaluate((element) => ({
+      variantCount: element.querySelectorAll('.ui-catalog-preview-contract > div:first-child li').length,
+      stateCount: element.querySelectorAll('.ui-catalog-preview-contract > div:last-child li').length,
+      expectedVariants: Number(element.getAttribute('data-variant-count')),
+      expectedStates: Number(element.getAttribute('data-state-count')),
+    }));
+    if (contract.variantCount !== contract.expectedVariants || contract.stateCount !== contract.expectedStates) {
+      throw new Error(`catalog preview contract is incomplete: ${JSON.stringify(contract)}`);
+    }
+  }
+  if (await page.locator('[data-preview="aspect-ratio"] .ui-sample-ratio').count() !== 3) {
+    throw new Error('aspect-ratio preview does not show all ratio variants');
+  }
+  if (await page.locator('[data-preview="avatar"] .ui-sample-avatar-set > span').count() !== 3) {
+    throw new Error('avatar preview does not show image, initials, and fallback variants');
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }
