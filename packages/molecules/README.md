@@ -86,6 +86,7 @@ import {
   DataList,
   ListboxField,
   ComboboxField,
+  CommandPalette,
   TreeView,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
@@ -156,9 +157,12 @@ disabled options, Arrow/Home/End navigation, and caller-owned change effects.
 `ComboboxField` adds a controlled native input with a stable listbox
 relationship, keyboard selection, disabled options, loading/empty feedback,
 active-option reporting, and caller-owned filtering and open state.
+`CommandPalette` renders a controlled labelled dialog with grouped commands,
+native combobox semantics, active-descendant keyboard navigation, loading and
+empty states, shortcuts, and caller-owned query filtering and execution.
 `TreeView` renders a labelled controlled ARIA tree from hierarchical nodes with
 stable IDs, expand/select callbacks, Arrow/Home/End navigation, disabled-node
-skipping, and reduced-motion/forced-colors styling. All seven components expose `--gluon-*` presentation hooks and
+skipping, and reduced-motion/forced-colors styling. These components expose `--gluon-*` presentation hooks and
 keep data, routing, fetching, persistence, and mutations in the application.
 `Disclosure` renders native `details` and `summary`, preserving browser
 keyboard toggling, find-in-page expansion, semantics, and form behavior. Use
