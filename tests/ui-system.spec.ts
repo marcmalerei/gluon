@@ -2572,6 +2572,9 @@ describe('advanced data and workflow molecules', () => {
   it('renders a controlled responsive SiteHeader with semantic regions and mobile focus management', async () => {
     let mobileOpen = false;
     const changes: boolean[] = [];
+    const objectKeydown = { handleEvent: vi.fn() };
+    const functionKeydown = vi.fn();
+    let useFunctionKeydown = false;
     const renderHeader = (): void => render(SiteHeader({
       id: 'shop-header',
       brand: q.a({ href: '/', children: 'GLUON GOODS' }),
@@ -2580,6 +2583,7 @@ describe('advanced data and workflow molecules', () => {
       mobileNavigation: [q.a({ href: '/shop', children: 'Shop' }), q.a({ href: '/journal', children: 'Journal' })],
       mobileOpen,
       onMobileOpenChange: (open) => { changes.push(open); mobileOpen = open; renderHeader(); },
+      triggerAttributes: { onKeydown: useFunctionKeydown ? functionKeydown : objectKeydown },
       attributes: { class: 'commerce-header' },
     }), document.body);
     renderHeader();
@@ -2592,8 +2596,14 @@ describe('advanced data and workflow molecules', () => {
     expect(trigger.getAttribute('aria-controls')).toBe('shop-header-mobile-panel');
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(root.querySelector<HTMLElement>('#shop-header-mobile-panel')?.hidden).toBe(true);
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(objectKeydown.handleEvent).toHaveBeenCalledOnce();
+    useFunctionKeydown = true;
+    renderHeader();
+    document.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(functionKeydown).toHaveBeenCalledOnce();
 
-    await userEvent.click(trigger);
+    await userEvent.click(document.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')!);
     await vi.waitFor(() => expect(changes).toEqual([true]));
     const openRoot = document.querySelector<HTMLElement>('#shop-header')!;
     const openTrigger = openRoot.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')!;
