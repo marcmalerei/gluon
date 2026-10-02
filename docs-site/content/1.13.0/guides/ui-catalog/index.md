@@ -99,6 +99,10 @@ verification surface.
             <ul id="catalog-combobox-list" class="ui-sample-combobox-list" role="listbox"><li role="option" aria-selected="true">Orbit lamp</li><li role="option">Orbit cable</li><li role="option" aria-disabled="true">Orbit shade · unavailable</li></ul>
             <span class="ui-sample-variant">open · loading · empty · disabled</span>
           </template>
+          <template v-else-if="entry.preview === 'tree-view'">
+            <ul class="ui-sample-tree" role="tree" aria-label="Catalog navigation"><li role="treeitem" aria-expanded="true" aria-selected="true"><span class="ui-sample-tree-toggle">▾</span><span>Shop</span><ul role="group"><li role="treeitem"><span class="ui-sample-tree-toggle">·</span><span>Lighting</span></li><li role="treeitem" aria-disabled="true"><span class="ui-sample-tree-toggle">·</span><span>Archived · unavailable</span></li></ul></li></ul>
+            <span class="ui-sample-variant">Arrow keys · Home · End · nested groups</span>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>

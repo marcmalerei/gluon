@@ -1839,6 +1839,36 @@
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "TreeView",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-tree-view"
+      ],
+      "variants": [
+        "hierarchical",
+        "keyboard"
+      ],
+      "states": [
+        "collapsed",
+        "expanded",
+        "selected",
+        "disabled"
+      ],
+      "preview": "tree-view",
+      "accessibility": "Renders a labelled ARIA tree with nested groups, stable treeitem relationships, controlled expand/select state, Arrow/Home/End navigation, RTL-safe logical styling, and disabled-node skipping.",
+      "extension": "Nodes, expanded and selected values, authorization, loading, fetching, persistence, routing, mutations, and tenant-specific CSS variables remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/TreeView.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
       "package": "@gluonjs/organisms",
       "layer": "organism",
       "name": "AppShell",

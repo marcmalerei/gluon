@@ -1193,6 +1193,8 @@
         "  ListboxField,",
         "  ComboboxField,",
         "  comboboxFieldStyles,",
+        "  TreeView,",
+        "  treeViewStyles,",
         "  NavigationMenu,",
         "  NavigationStrip,",
         "  Pagination,",
@@ -1272,6 +1274,9 @@
         "  type ComboboxFieldInputAttributes,",
         "  type ComboboxFieldListboxAttributes,",
         "  type ComboboxFieldProps,",
+        "  type TreeViewAttributes,",
+        "  type TreeViewNode,",
+        "  type TreeViewProps,",
         "  type NavigationMenuAttributes,",
         "  type NavigationMenuItem,",
         "  type NavigationMenuItemAttributes,",
@@ -1362,6 +1367,9 @@
         "const deliveryField = { id: 'delivery-method', label: 'Delivery method', options: deliveryOptions, value: 'standard', helper: 'Choose the delivery speed for this order.', attributes: { class: 'checkout-delivery' } satisfies ListboxFieldAttributes, listboxAttributes: { class: 'delivery-options' } satisfies ListboxFieldListboxAttributes } satisfies ListboxFieldProps;",
         "const comboboxOptions = [{ value: 'orbit-lamp', label: 'Orbit lamp' }, { value: 'orbit-cable', label: 'Orbit cable' }, { value: 'orbit-shade', label: 'Orbit shade', disabled: true }] as const;",
         "const comboboxField = { id: 'product-search', label: 'Product search', options: comboboxOptions, value: 'orbit-lamp', inputValue: 'Orbit', open: true, placeholder: 'Search products', helper: 'Search the current catalog.', attributes: { class: 'catalog-product-search' } satisfies ComboboxFieldAttributes, inputAttributes: {} satisfies ComboboxFieldInputAttributes, listboxAttributes: { class: 'catalog-suggestions' } satisfies ComboboxFieldListboxAttributes, onActiveChange: (value) => console.log('active suggestion', value), onSelect: (value) => console.log('selected suggestion', value) } satisfies ComboboxFieldProps;",
+        "const treeNode: TreeViewNode = { id: 'shop', label: 'Shop', children: [{ id: 'lighting', label: 'Lighting' }, { id: 'archived', label: 'Archived', disabled: true }] };",
+        "const treeAttributes = { class: 'catalog-tree' } satisfies TreeViewAttributes;",
+        "const catalogTree = { id: 'catalog-tree', label: 'Catalog navigation', nodes: [treeNode, { id: 'settings', label: 'Settings' }], expanded: ['shop'], selected: 'lighting', attributes: treeAttributes, onExpandedChange: (id, expanded) => console.log(id, expanded), onSelect: (id) => console.log('selected node', id) } satisfies TreeViewProps;",
         "const buttonGroupName = { label: 'Order actions' } satisfies ButtonGroupAccessibleName;",
         "const buttonGroupAttributes = { class: 'order-actions' } satisfies ButtonGroupAttributes;",
         "const buttonGroupOrientation: ButtonGroupOrientation = 'horizontal';",
@@ -1473,7 +1481,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${ComboboxField(comboboxField)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, comboboxFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
+        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${ComboboxField(comboboxField)}${TreeView(catalogTree)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, comboboxFieldStyles, treeViewStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -8067,6 +8075,11 @@
     "packages/molecules/src/interfaces/ComboboxFieldProps.md": { "recipe": "molecule-components", "description": "Configure labels, suggestions, controlled input/open state, loading/empty feedback, and selection callbacks:" },
     "packages/molecules/src/type-aliases/ComboboxFieldAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the ComboboxField wrapper:" },
     "packages/molecules/src/type-aliases/ComboboxFieldInputAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native input attributes while ComboboxField owns combobox relationships and value semantics:" },
-    "packages/molecules/src/type-aliases/ComboboxFieldListboxAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native listbox attributes to the ComboboxField suggestions surface:" }
+    "packages/molecules/src/type-aliases/ComboboxFieldListboxAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native listbox attributes to the ComboboxField suggestions surface:" },
+    "packages/molecules/src/variables/TreeView.md": { "recipe": "molecule-components", "description": "Render a labelled hierarchical ARIA tree with caller-owned expansion, selection, and node data:" },
+    "packages/molecules/src/variables/treeViewStyles.md": { "recipe": "molecule-components", "description": "Inspect the separate constructable TreeView stylesheet and its CSS-variable hooks:" },
+    "packages/molecules/src/interfaces/TreeViewProps.md": { "recipe": "molecule-components", "description": "Configure a controlled keyboard-operable tree with stable hierarchy, selection, and native attribute extension points:" },
+    "packages/molecules/src/interfaces/TreeViewNode.md": { "recipe": "molecule-components", "description": "Describe one hierarchical TreeView node with caller-owned label, children, and disabled state:" },
+    "packages/molecules/src/type-aliases/TreeViewAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native list attributes while TreeView owns tree semantics and relationships:" }
   }
 }
