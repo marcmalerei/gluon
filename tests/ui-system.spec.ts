@@ -111,7 +111,7 @@ describe('separate UI package contracts', () => {
       TimeInput({ value: '09:30', attributes: { id: 'time' } }),
     ] }), document.body);
 
-    expect(document.querySelector('h2.gluon-heading')?.dataset.gluonLevel).toBe('2');
+    expect(document.querySelector<HTMLElement>('h2.gluon-heading')?.dataset.gluonLevel).toBe('2');
     expect(document.querySelector('.gluon-text.is-muted')).not.toBeNull();
     expect(document.querySelector<HTMLAnchorElement>('.gluon-link')?.href).toContain('/catalog');
     expect(document.querySelector<HTMLImageElement>('.gluon-image')?.alt).toBe('Catalog preview');
@@ -1561,7 +1561,12 @@ describe('separate UI package contracts', () => {
     const scope = document.createElement('section');
     document.body.append(scope);
     expect(() => installUi(document, {
-      tenant: { id: 'acme', scope, tokens: { '--app-color': '#fff' } },
+      tenant: {
+        id: 'acme',
+        scope,
+        // @ts-expect-error Invalid custom-property namespace is rejected at runtime.
+        tokens: { '--app-color': '#fff' },
+      },
     })).toThrow('Invalid Gluon UI token');
 
     const owner = installUi(document, { tenant: { id: 'acme', scope } });
