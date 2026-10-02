@@ -39,6 +39,8 @@ export { ListboxField, type ListboxFieldAttributes, type ListboxFieldListboxAttr
 export { listboxFieldStyles } from './listbox-field-styles.js';
 export { ComboboxField, type ComboboxFieldAttributes, type ComboboxFieldInputAttributes, type ComboboxFieldListboxAttributes, type ComboboxFieldProps } from './combobox-field.js';
 export { comboboxFieldStyles } from './combobox-field-styles.js';
+export { TreeView, type TreeViewAttributes, type TreeViewNode, type TreeViewProps } from './tree-view.js';
+export { treeViewStyles } from './tree-view-styles.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';

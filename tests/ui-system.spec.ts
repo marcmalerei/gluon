@@ -80,8 +80,10 @@ import {
   DataList,
   ListboxField,
   ComboboxField,
+  TreeView,
   comboboxFieldStyles,
   listboxFieldStyles,
+  treeViewStyles,
   tooltipStyles,
   SegmentedControl,
   TableRegion,
@@ -2638,6 +2640,76 @@ describe('advanced data and workflow molecules', () => {
     expect(() => render(ComboboxField({ id: '', label: 'Search', options: [] }), document.body)).toThrow('ComboboxField.id');
     expect(() => render(ComboboxField({ id: 'bad id', label: 'Search', options: [] }), document.body)).toThrow('whitespace');
     expect(() => render(ComboboxField({ id: 'missing-label', label: ' ', options: [] }), document.body)).toThrow('ComboboxField.label');
+  });
+
+  it('composes a controlled TreeView with hierarchy, selection, expansion, and keyboard navigation', async () => {
+    const selected: string[] = [];
+    const expanded: string[] = [];
+    render(TreeView({
+      id: 'catalog-tree',
+      label: 'Catalog navigation',
+      expanded: ['shop'],
+      selected: 'lighting',
+      nodes: [
+        { id: 'shop', label: 'Shop', children: [
+          { id: 'lighting', label: 'Lighting' },
+          { id: 'archived', label: 'Archived', disabled: true },
+        ] },
+        { id: 'settings', label: 'Settings' },
+      ],
+      attributes: { class: 'catalog-tree' },
+      onExpandedChange: (id, value) => expanded.push(`${id}:${value}`),
+      onSelect: (id) => selected.push(id),
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#catalog-tree')!;
+    expect(root.getAttribute('role')).toBe('tree');
+    expect(root.getAttribute('aria-label')).toBe('Catalog navigation');
+    expect(root.classList).toContain('catalog-tree');
+    expect(root.querySelectorAll('[role="treeitem"]')).toHaveLength(4);
+    expect(root.querySelector('[role="group"]')).not.toBeNull();
+    expect(root.querySelector('[role="treeitem"][aria-selected="true"]')?.getAttribute('data-tree-node')).toBe('lighting');
+    expect(root.querySelector('[data-tree-node="archived"]')?.getAttribute('aria-disabled')).toBe('true');
+    expect(root.querySelector('[data-tree-node="settings"]')?.getAttribute('tabindex')).toBe('-1');
+    expect(root.querySelector('[data-tree-node="lighting"]')?.getAttribute('tabindex')).toBe('0');
+
+    await userEvent.click(root.querySelector('[data-tree-node="settings"]')!);
+    expect(selected).toEqual(['settings']);
+    await userEvent.click(root.querySelector<HTMLButtonElement>('[data-tree-node="shop"] .gluon-tree-view-toggle')!);
+    expect(expanded).toEqual(['shop:false']);
+    root.querySelector('[data-tree-node="archived"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(selected).toEqual(['settings']);
+
+    const lighting = root.querySelector<HTMLElement>('[data-tree-node="lighting"]')!;
+    lighting.focus();
+    await userEvent.keyboard('{Home}');
+    expect(document.activeElement).toBe(root.querySelector('[data-tree-node="shop"]'));
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(lighting);
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement).toBe(root.querySelector('[data-tree-node="settings"]'));
+    await userEvent.keyboard('{ArrowUp}');
+    expect(document.activeElement).toBe(lighting);
+    await userEvent.keyboard('{End}');
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    expect(selected).toEqual(['settings', 'settings', 'settings']);
+
+    const shop = root.querySelector<HTMLElement>('[data-tree-node="shop"]')!;
+    shop.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(document.activeElement).toBe(root.querySelector('[data-tree-node="lighting"]'));
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(document.activeElement).toBe(shop);
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(expanded).toContain('shop:false');
+    expect(getStyleSheetText(treeViewStyles)).toContain('--gluon-tree-view');
+
+    render(TreeView({ id: 'empty-tree', label: 'Empty tree', nodes: [{ id: 'locked', label: 'Locked', disabled: true }] }), document.body);
+    expect(document.querySelector('#empty-tree [role="treeitem"]')?.getAttribute('tabindex')).toBe('-1');
+    expect(() => render(TreeView({ id: 'bad id', label: 'Tree', nodes: [] }), document.body)).toThrow('whitespace');
+    expect(() => render(TreeView({ id: 'missing-label', label: ' ', nodes: [] }), document.body)).toThrow('TreeView.label');
+    expect(() => render(TreeView({ id: 'duplicate-tree', label: 'Tree', nodes: [{ id: 'same', label: 'One' }, { id: 'same', label: 'Two' }] }), document.body)).toThrow('unique');
+    expect(() => render(TreeView({ id: 'child-tree', label: 'Tree', nodes: [{ id: 'parent', label: 'Parent', children: [{ id: 'bad child', label: 'Child' }] }] }), document.body)).toThrow('whitespace');
   });
 
   it('covers optional states and rejects invalid molecule identifiers', () => {
