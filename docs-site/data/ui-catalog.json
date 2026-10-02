@@ -1262,6 +1262,35 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "ListboxField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-listbox-field"
+      ],
+      "variants": [
+        "single-select",
+        "keyboard"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "listbox-field",
+      "accessibility": "Composes a visible label, the native ARIA listbox pattern, selected-option state, Arrow/Home/End keyboard movement, disabled options, helper text, and an announced error.",
+      "extension": "Options, value, change effects, validation, localization, persistence, and authorization stay caller-owned; listbox attributes remain available for tenant-specific styling and native event composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/ListboxField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "Menubar",
       "kind": "component",
       "status": "stable",

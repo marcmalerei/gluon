@@ -17,7 +17,7 @@ const renderedPreviewKeys = new Set([
   'empty-state', 'field', 'foundation-atoms--badge', 'foundation-atoms--date-input',
   'foundation-atoms--feedback', 'foundation-atoms--file-input', 'foundation-atoms--link', 'foundation-atoms--media',
   'foundation-atoms--numeric-input', 'foundation-atoms--time-input',
-  'foundation-atoms--typography', 'icon', 'input', 'label', 'menu', 'menubar',
+  'foundation-atoms--typography', 'icon', 'input', 'label', 'listbox-field', 'menu', 'menubar',
   'navigation-menu', 'navigation-strip', 'notice', 'otp', 'pagination', 'password', 'progress',
   'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',
   'slider', 'switch', 'table', 'tabs', 'textarea', 'toast', 'toast-viewport',

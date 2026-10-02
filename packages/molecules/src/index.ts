@@ -35,6 +35,8 @@ export { FilterBar, type FilterBarAttributes, type FilterBarProps } from './filt
 export { filterBarStyles } from './filter-bar-styles.js';
 export { DataList, type DataListAttributes, type DataListItem, type DataListProps } from './data-list.js';
 export { dataListStyles } from './data-list-styles.js';
+export { ListboxField, type ListboxFieldAttributes, type ListboxFieldListboxAttributes, type ListboxFieldProps } from './listbox-field.js';
+export { listboxFieldStyles } from './listbox-field-styles.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';
