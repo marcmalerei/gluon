@@ -1838,6 +1838,38 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "AsyncState",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-async-state"
+      ],
+      "variants": [
+        "loading",
+        "success",
+        "empty",
+        "error",
+        "partial"
+      ],
+      "states": [
+        "loading",
+        "ready",
+        "degraded"
+      ],
+      "preview": "async-state",
+      "accessibility": "Renders a labelled section with one truthful state message, status or alert announcement only for transient feedback, and caller-owned content and recovery actions.",
+      "extension": "Request-free and SSR-safe; callers own fetching, retry, authorization, routing, data, localization, and state transitions while id, attributes, parts, and CSS variables remain available for tenant-scoped styling.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/AsyncState.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "ConfirmationDialog",
       "kind": "component",
       "status": "stable",

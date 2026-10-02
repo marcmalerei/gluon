@@ -1472,7 +1472,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, ConfirmationDialog, WorkflowTimeline, createConfirmationDialogController, confirmationDialogStyles, organismManifest, organismStyles, workflowTimelineStyles, type AppShellProps, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AppShell, AsyncState, ConfirmationDialog, WorkflowTimeline, createConfirmationDialogController, asyncStateStyles, confirmationDialogStyles, organismManifest, organismStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1480,6 +1480,10 @@
         "  children: html`<h1>New arrivals</h1>`,",
         "  footer: html`<small>Free shipping over €100</small>`,",
         "} satisfies AppShellProps;",
+        "const asyncStatus: AsyncStateStatus = 'partial';",
+        "const asyncAttributes: AsyncStateAttributes = { class: 'recommendations-state' };",
+        "const asyncMessages: AsyncStateMessages = { partial: 'Recommendations are partially loaded.' };",
+        "const asyncState: AsyncStateProps = { id: 'recommendations', status: asyncStatus, heading: 'Recommendations', headingLevel: 2 satisfies AsyncStateHeadingLevel, partialContent: html`<p>Profile data is ready while recommendations refresh.</p>`, actions: html`<button type=\"button\">Retry</button>`, messages: asyncMessages, attributes: asyncAttributes };",
         "const initialFocus: ConfirmationDialogInitialFocus = '[data-confirm-primary]';",
         "const confirmationOptions = { initialFocus } satisfies ConfirmationDialogControllerOptions;",
         "const confirmationController: ConfirmationDialogController = createConfirmationDialogController(confirmationOptions);",
@@ -1490,7 +1494,7 @@
         "const workflowAttributes: WorkflowTimelineAttributes = { 'aria-label': 'Order workflow' };",
         "const workflowMessages: WorkflowTimelineMessages = { timeline: 'Ablauf', status: (status) => `Status: ${status}`, step: (position, total) => `${position} von ${total}`, evidence: 'Nachweis' };",
         "const workflow: WorkflowTimelineProps = { id: 'order-workflow', steps: [workflowStep], state: workflowState, messages: workflowMessages, role: 'Operations', evidence: 'Import log 42', attributes: workflowAttributes };",
-        "console.log(AppShell(shell), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), confirmationDialogStyles, organismStyles, workflowTimelineStyles, organismManifest.entries);"
+        "console.log(AppShell(shell), AsyncState(asyncState), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, organismStyles, workflowTimelineStyles, organismManifest.entries);"
       ]
     },
     "router-application": {
@@ -6055,6 +6059,34 @@
     "packages/organisms/src/variables/workflowTimelineStyles.md": {
       "recipe": "organism-components",
       "description": "Adopt the exact constructable stylesheet for the WorkflowTimeline organism:"
+    },
+    "packages/organisms/src/variables/AsyncState.md": {
+      "recipe": "organism-components",
+      "description": "Render a request-free loading, empty, error, success, or partial-content state:"
+    },
+    "packages/organisms/src/variables/asyncStateStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable stylesheet for the AsyncState organism:"
+    },
+    "packages/organisms/src/interfaces/AsyncStateProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure caller-owned async content and recovery actions without request ownership:"
+    },
+    "packages/organisms/src/type-aliases/AsyncStateAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward native section attributes to the AsyncState root:"
+    },
+    "packages/organisms/src/type-aliases/AsyncStateHeadingLevel.md": {
+      "recipe": "organism-components",
+      "description": "Select the semantic heading level for the AsyncState region:"
+    },
+    "packages/organisms/src/interfaces/AsyncStateMessages.md": {
+      "recipe": "organism-components",
+      "description": "Localize the bounded AsyncState state messages:"
+    },
+    "packages/organisms/src/type-aliases/AsyncStateStatus.md": {
+      "recipe": "organism-components",
+      "description": "Select the validated AsyncState rendering status:"
     },
     "packages/organisms/src/variables/AppShell.md": {
       "recipe": "organism-components",

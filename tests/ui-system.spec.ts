@@ -89,7 +89,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AppShell, organismManifest, organismStyles } from '@gluonjs/organisms';
+import { AppShell, AsyncState, organismManifest, organismStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2371,6 +2371,28 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
 });
 
 describe('advanced data and workflow molecules', () => {
+  it('renders caller-owned async states with bounded announcements and recovery actions', () => {
+    render(AsyncState({
+      id: 'recommendations',
+      status: 'partial',
+      heading: 'Recommendations',
+      children: q.ul({ children: q.li({ children: 'Orbit lamp' }) }),
+      partialContent: q.p({ children: 'Some recommendations are still loading.' }),
+      actions: q.button({ type: 'button', children: 'Retry' }),
+    }), document.body);
+    const partial = document.querySelector<HTMLElement>('#recommendations')!;
+    expect(partial.getAttribute('data-state')).toBe('partial');
+    expect(partial.getAttribute('aria-labelledby')).toBe('recommendations-heading');
+    expect(partial.querySelector('[role="status"]')?.textContent).toBe('Content partially loaded');
+    expect(partial.querySelector('[part="content"]')?.textContent).toContain('Some recommendations');
+    expect(partial.querySelector('button')?.textContent).toBe('Retry');
+
+    render(AsyncState({ id: 'recommendations-error', status: 'error', heading: 'Recommendations', errorContent: 'Try again later.' }), document.body);
+    const error = document.querySelector<HTMLElement>('#recommendations-error')!;
+    expect(error.querySelector('[role="alert"]')?.textContent).toBe('Content failed to load');
+    expect(error.querySelector('[part="content"]')?.textContent).toContain('Try again later.');
+  });
+
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {
     render(Tooltip({ id: 'delivery-help', content: 'Choose a saved delivery preference.', children: 'Help' }), document.body);
     const root = document.querySelector<HTMLElement>('.gluon-tooltip')!;

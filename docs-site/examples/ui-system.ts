@@ -79,7 +79,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AppShell, ConfirmationDialog, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AppShell, AsyncState, ConfirmationDialog, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -110,6 +110,8 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField };
 void dataMolecules;
+const applicationOrganisms = { AsyncState };
+void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
   viewBox: '0 0 24 24',
@@ -218,6 +220,13 @@ createApp(() => AppShell({
   }),
   navigation: q.a({ href: '#profile', children: 'Profile' }),
   children: [
+    AsyncState({
+      id: 'ui-system-async-state',
+      status: 'partial',
+      heading: 'Profile data',
+      partialContent: q.p({ children: 'Profile data is available while recommendations refresh.' }),
+      actions: q.button({ type: 'button', children: 'Retry recommendations' }),
+    }),
     WorkflowTimeline({
       id: 'ui-system-workflow',
       state: 'complete',

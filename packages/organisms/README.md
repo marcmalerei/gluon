@@ -70,6 +70,14 @@ retains one DOM tree across stacked/wide layouts, supports RTL, 44px action
 targets, forced colors, reduced motion, 200% text, and caller-owned native
 `action`/`link` TemplateValue slots.
 
+`AsyncState` renders a request-free, SSR-safe labelled section for `loading`,
+`success`, `empty`, `error`, and `partial` states. It selects only the
+caller-provided state content, announces loading/partial/error feedback through
+one bounded live region, and keeps fetching, retry, authorization, routing,
+localization, and state transitions outside the organism. `id`, `part`,
+`data-state`, and CSS custom properties provide stable tenant-scoped styling
+hooks without requiring a framework-owned theme.
+
 `AppShell` emits native `header`, `nav`, `main`, and `footer` landmarks only for
 content the caller supplies. When a page has multiple navigation landmarks, the
 caller must give the supplied navigation content a distinct accessible name.
