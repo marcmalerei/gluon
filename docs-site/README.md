@@ -100,9 +100,12 @@ verification checks the real VitePress search interaction, keyboard selection,
 deep-link reloads, desktop/mobile layouts, and server-rendered navigation with
 JavaScript disabled.
 
-`npm run check:docs` is the complete local gate. GitHub Actions runs the same
-gate before assembling the Pages artifact, then adds the separate Playground
-build under `/playground/`. Pages deployment remains an explicit CI operation;
+`npm run check:docs` is the complete local gate. It also checks that every
+manifest preview key has a renderer, that no component falls back to a generic
+placeholder, and that the catalog search, layer filters, accessible result
+count, and 390px layout work in Chromium. GitHub Actions runs the same gate
+before assembling the Pages artifact, then adds the separate Playground build
+under `/playground/`. Pages deployment remains an explicit CI operation;
 `npm run build:docs` only writes local static files to `docs-site/dist/`.
 
 ## Editing rules
