@@ -106,6 +106,10 @@ verification surface.
             <template v-else-if="entry.name === 'Spinner'"><span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span></template>
             <template v-else><span class="ui-sample-skeleton is-wide" aria-hidden="true"></span><span class="ui-sample-skeleton is-short" aria-hidden="true"></span></template>
           </template>
+          <template v-else-if="entry.preview === 'foundation-atoms--file-input'">
+            <label class="ui-sample-field">Product photos<input type="file" accept="image/*" multiple /></label>
+            <span class="ui-sample-variant">single · multiple · capture</span>
+          </template>
           <template v-else-if="entry.preview === 'foundation-atoms--numeric-input'">
             <label class="ui-sample-field">Quantity<input type="number" min="1" max="9" value="2" /></label>
           </template>

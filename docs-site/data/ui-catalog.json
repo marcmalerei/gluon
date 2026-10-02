@@ -185,6 +185,36 @@
     {
       "package": "@gluonjs/atoms",
       "layer": "atom",
+      "name": "FileInput",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-atom-file-input"
+      ],
+      "variants": [
+        "single",
+        "multiple",
+        "capture"
+      ],
+      "states": [
+        "default",
+        "disabled",
+        "invalid"
+      ],
+      "preview": "foundation-atoms--file-input",
+      "accessibility": "Renders a native file input with browser picker, keyboard, form, multiple, capture, disabled, required, and invalid semantics.",
+      "extension": "accept, multiple, capture, and native file selection remain caller-owned; it never uploads, reads, or stores files.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/atoms/src/variables/FileInput.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/atoms/src/"
+    },
+    {
+      "package": "@gluonjs/atoms",
+      "layer": "atom",
       "name": "Heading",
       "kind": "component",
       "status": "stable",

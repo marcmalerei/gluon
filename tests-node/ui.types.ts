@@ -3,6 +3,7 @@ import {
   AspectRatio,
   Avatar,
   Button,
+  FileInput,
   Icon,
   Input,
   Label,
@@ -22,6 +23,7 @@ import {
   type AvatarProps,
   type AvatarStatus,
   type ButtonProps,
+  type FileInputProps,
   type SliderProps,
   type ScrollAreaAttributes,
   type ScrollAreaOrientation,
@@ -82,6 +84,8 @@ import {
 } from '@gluonjs/quarks';
 
 const buttonProps: ButtonProps = { label: 'Save', variant: 'primary' };
+const fileInputProps: FileInputProps = { accept: 'image/*', multiple: true, capture: 'environment', name: 'photos' };
+FileInput(fileInputProps);
 const controlledSliderProps: SliderProps = { value: 0.4, min: 0, max: 1, step: 0.1 };
 const uncontrolledSliderProps: SliderProps = { defaultValue: 0.4, min: 0, max: 1, step: 0.1 };
 // @ts-expect-error controlled and uncontrolled Slider values are mutually exclusive

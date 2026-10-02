@@ -113,6 +113,7 @@ html { scroll-behavior: smooth; }
 .ui-sample-link { color: var(--ui-catalog-accent); text-underline-offset: 3px; }
 .ui-sample-field { display: grid; gap: 4px; width: min(100%, 220px); text-align: start; font-size: .78rem; font-weight: 650; }
 .ui-sample-field input { min-block-size: 34px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 5px 8px; color: inherit; }
+.ui-sample-field input[type="file"] { min-block-size: 44px; inline-size: 100%; max-inline-size: 100%; padding: 4px; }
 .ui-sample-field select { min-block-size: 34px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 5px 8px; color: inherit; }
 .ui-sample-label { font-weight: 650; }
 .ui-sample-label span { color: #a52222; }

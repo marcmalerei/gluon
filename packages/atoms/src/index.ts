@@ -38,6 +38,20 @@ export {
   type TimeInputProps,
 } from './foundation.js';
 export { foundationStyles } from './foundation-styles.js';
+export {
+  FileInput,
+  type FileInputAttributes,
+  type FileInputCapture,
+  type FileInputProps,
+} from './file-input.js';
+export { fileInputStyles } from './file-input-styles.js';
+export {
+  focusRingAttributes,
+  focusRingClass,
+  visuallyHiddenAttributes,
+  visuallyHiddenClass,
+} from './accessibility.js';
+export { accessibilityStyles } from './accessibility-styles.js';
 export { Avatar, type AvatarAttributes, type AvatarProps, type AvatarStatus } from './avatar.js';
 export { avatarStyles } from './avatar-styles.js';
 export {

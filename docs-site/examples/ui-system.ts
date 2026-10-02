@@ -5,6 +5,7 @@ import {
   Button,
   Checkbox,
   DateInput,
+  FileInput,
   Heading,
   Image,
   Radio,
@@ -27,6 +28,9 @@ import {
   ToggleButton,
   Textarea,
   TimeInput,
+  accessibilityStyles,
+  focusRingAttributes,
+  visuallyHiddenAttributes,
   defineButtonPreset,
   defineIcon,
   installUi,
@@ -153,6 +157,7 @@ function openDialog(trigger: HTMLElement): void {
 
 const uiOwner = installUi(document, { theme: 'light' });
 adoptStyles(document, exampleStyles);
+adoptStyles(document, accessibilityStyles);
 
 createApp(() => AppShell({
   header: q.div({
@@ -171,6 +176,9 @@ createApp(() => AppShell({
       NumberInput({ name: 'quantity', value: '1' }),
       DateInput({ name: 'delivery-date', value: '2026-10-02' }),
       TimeInput({ name: 'delivery-time', value: '09:00' }),
+      FileInput({ name: 'product-photos', accept: 'image/*', multiple: true }),
+      q.a({ ...visuallyHiddenAttributes<HTMLAnchorElement>({ href: '#profile' }), children: 'Skip to profile' }),
+      q.button({ ...focusRingAttributes<HTMLButtonElement>({ type: 'button' }), children: 'Keyboard focus' }),
       q.strong({ children: [Icon({ name: 'spark' }), Label({ children: ' GLUON UI' })] }),
       Button({
         label: `Use ${theme.value === 'light' ? 'dark' : 'light'} theme`,
