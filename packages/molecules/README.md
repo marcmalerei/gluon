@@ -84,6 +84,7 @@ import {
   Stepper,
   FilterBar,
   DataList,
+  ListboxField,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -147,7 +148,10 @@ an ordered workflow with optional native links and caller-owned statuses.
 `FilterBar` provides the labelled form shell around caller-owned filter
 controls, counts, summaries, and reset actions. `DataList` renders native
 `dl`/`dt`/`dd` semantics for detail summaries and collapses to one column on
-small screens. All four components expose `--gluon-*` presentation hooks and
+small screens. `ListboxField` composes a visible label and helper/error
+relationships around the public Quarks listbox, preserving controlled values,
+disabled options, Arrow/Home/End navigation, and caller-owned change effects.
+All five components expose `--gluon-*` presentation hooks and
 keep data, routing, fetching, persistence, and mutations in the application.
 `Disclosure` renders native `details` and `summary`, preserving browser
 keyboard toggling, find-in-page expansion, semantics, and form behavior. Use

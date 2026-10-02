@@ -1137,10 +1137,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -1190,6 +1190,7 @@
         "  EmptyState,",
         "  FormField,",
         "  InlineNotice,",
+        "  ListboxField,",
         "  NavigationMenu,",
         "  NavigationStrip,",
         "  Pagination,",
@@ -1262,6 +1263,9 @@
         "  type InlineNoticeAttributes,",
         "  type InlineNoticeProps,",
         "  type InlineNoticeTone,",
+        "  type ListboxFieldAttributes,",
+        "  type ListboxFieldListboxAttributes,",
+        "  type ListboxFieldProps,",
         "  type NavigationMenuAttributes,",
         "  type NavigationMenuItem,",
         "  type NavigationMenuItemAttributes,",
@@ -1348,6 +1352,8 @@
         "const filters = { id: 'catalog-filters', label: 'Catalog filters', activeCount: 2, summary: 'Two filters are active.', children: html`<label>Category <select><option>Lighting</option></select></label>`, clearAction: Button({ label: 'Clear filters', variant: 'ghost' }) } satisfies FilterBarProps;",
         "const listItems = [{ id: 'status', label: 'Status', value: 'Ready', description: 'Available to ship.' }, { id: 'delivery', label: 'Delivery', value: '2–4 working days' }] satisfies readonly DataListItem[];",
         "const orderData = { id: 'order-summary', items: listItems, columns: 2, attributes: { class: 'order-summary' } satisfies DataListAttributes } satisfies DataListProps;",
+        "const deliveryOptions = [{ value: 'standard', label: 'Standard · 2–4 days' }, { value: 'express', label: 'Express · next day' }, { value: 'pickup', label: 'Pickup', disabled: true }] as const;",
+        "const deliveryField = { id: 'delivery-method', label: 'Delivery method', options: deliveryOptions, value: 'standard', helper: 'Choose the delivery speed for this order.', attributes: { class: 'checkout-delivery' } satisfies ListboxFieldAttributes, listboxAttributes: { class: 'delivery-options' } satisfies ListboxFieldListboxAttributes } satisfies ListboxFieldProps;",
         "const buttonGroupName = { label: 'Order actions' } satisfies ButtonGroupAccessibleName;",
         "const buttonGroupAttributes = { class: 'order-actions' } satisfies ButtonGroupAttributes;",
         "const buttonGroupOrientation: ButtonGroupOrientation = 'horizontal';",
@@ -7964,6 +7970,11 @@
     "packages/molecules/src/variables/dataListStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separately tree-shakable DataList stylesheet and its responsive CSS-variable hooks:" },
     "packages/molecules/src/interfaces/DataListProps.md": { "recipe": "molecule-components", "description": "Configure a responsive native data list and its presentation columns:" },
     "packages/molecules/src/interfaces/DataListItem.md": { "recipe": "molecule-components", "description": "Describe one native data-list label, value, and optional explanation:" },
-    "packages/molecules/src/type-aliases/DataListAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native description-list attributes to the DataList root:" }
+    "packages/molecules/src/type-aliases/DataListAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native description-list attributes to the DataList root:" },
+    "packages/molecules/src/variables/ListboxField.md": { "recipe": "molecule-components", "description": "Compose a labelled, keyboard-operable listbox field with caller-owned options and selection:" },
+    "packages/molecules/src/variables/listboxFieldStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separate constructable ListboxField stylesheet and its CSS-variable hooks:" },
+    "packages/molecules/src/interfaces/ListboxFieldProps.md": { "recipe": "molecule-components", "description": "Configure a labelled ListboxField with controlled options, helper/error copy, and native attribute extension points:" },
+    "packages/molecules/src/type-aliases/ListboxFieldAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the ListboxField wrapper:" },
+    "packages/molecules/src/type-aliases/ListboxFieldListboxAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native listbox attributes to the ListboxField control:" }
   }
 }

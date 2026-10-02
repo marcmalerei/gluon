@@ -78,6 +78,8 @@ import {
   Stepper,
   FilterBar,
   DataList,
+  ListboxField,
+  listboxFieldStyles,
   tooltipStyles,
   SegmentedControl,
   TableRegion,
@@ -2425,6 +2427,42 @@ describe('advanced data and workflow molecules', () => {
     expect(list.tagName).toBe('DL');
     expect(list.querySelectorAll('dt')).toHaveLength(2);
     expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
+  });
+
+  it('composes a labelled ListboxField with selection, helper, and error relationships', async () => {
+    const values: string[] = [];
+    render(ListboxField({
+      id: 'delivery-method',
+      label: 'Delivery method',
+      value: 'standard',
+      options: [
+        { value: 'standard', label: 'Standard' },
+        { value: 'express', label: 'Express' },
+        { value: 'pickup', label: 'Pickup', disabled: true },
+      ],
+      helper: 'Choose how your order should arrive.',
+      onChange: (value) => values.push(value),
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#delivery-method')!;
+    const listbox = root.querySelector<HTMLElement>('[role="listbox"]')!;
+    expect(root.querySelector('.gluon-listbox-field-label')?.textContent).toBe('Delivery method');
+    expect(listbox.getAttribute('aria-label')).toBe('Delivery method');
+    expect(listbox.getAttribute('aria-describedby')).toBe('delivery-method-description');
+    expect(root.querySelectorAll('[role="option"]')).toHaveLength(3);
+    expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('Standard');
+    await userEvent.click(root.querySelectorAll<HTMLElement>('[role="option"]')[1]);
+    expect(values).toEqual(['express']);
+    expect(getStyleSheetText(listboxFieldStyles)).toContain('--gluon-listbox-field');
+
+    render(ListboxField({
+      id: 'invalid-delivery',
+      label: 'Delivery method',
+      options: [],
+      error: 'Choose a delivery method.',
+    }), document.body);
+    const invalid = document.querySelector<HTMLElement>('#invalid-delivery')!;
+    expect(invalid.querySelector('[role="listbox"]')?.getAttribute('aria-invalid')).toBe('true');
+    expect(invalid.querySelector('[role="alert"]')?.textContent).toContain('Choose');
   });
 
   it('covers optional states and rejects invalid molecule identifiers', () => {

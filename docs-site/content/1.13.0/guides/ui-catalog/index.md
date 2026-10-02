@@ -90,6 +90,10 @@ verification surface.
           <template v-else-if="entry.preview === 'data-list'">
             <dl class="ui-sample-data-list"><dt>Availability</dt><dd>In stock</dd><dt>Delivery</dt><dd>2–4 days</dd></dl>
           </template>
+          <template v-else-if="entry.preview === 'listbox-field'">
+            <label class="ui-sample-field">Delivery method<select><option>Standard · 2–4 days</option><option>Express · next day</option></select></label>
+            <span class="ui-sample-variant">Arrow keys · Home · End · disabled options</span>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>
