@@ -2450,7 +2450,9 @@ describe('advanced data and workflow molecules', () => {
     expect(listbox.getAttribute('aria-describedby')).toBe('delivery-method-description');
     expect(root.querySelectorAll('[role="option"]')).toHaveLength(3);
     expect(root.querySelector('[role="option"][aria-selected="true"]')?.textContent).toBe('Standard');
-    await userEvent.click(root.querySelectorAll<HTMLElement>('[role="option"]')[1]);
+    const expressOption = root.querySelectorAll<HTMLElement>('[role="option"]')[1];
+    expect(expressOption).toBeDefined();
+    await userEvent.click(expressOption!);
     expect(values).toEqual(['express']);
     expect(getStyleSheetText(listboxFieldStyles)).toContain('--gluon-listbox-field');
 
