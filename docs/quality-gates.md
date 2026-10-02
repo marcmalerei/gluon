@@ -48,7 +48,7 @@ bounded expensive steps:
 
 | Job                       |                   Job limit | Individually bounded expensive work                                                       |
 | ------------------------- | --------------------------: | ----------------------------------------------------------------------------------------- |
-| `repository`              |                  25 minutes | install 10, repository check 18 minutes                                                    |
+| `repository`              |                  25 minutes | install 10, repository check 24 minutes                                                    |
 | `create-gluon-fixtures`   |                  25 minutes | install/build 10 each, fixture matrix 15 minutes                                           |
 | `release-artifacts`       |                  25 minutes | install/build 10 each, release artifacts plus fresh VSIX package/LSP smoke check 12 minutes |
 | `browser-engines`         |       30 minutes per engine | install 10, browser matrix 15, individual evidence commands 10–15 minutes                 |
