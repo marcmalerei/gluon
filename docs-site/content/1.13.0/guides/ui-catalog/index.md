@@ -59,12 +59,12 @@ verification surface.
   <p class="ui-catalog-status" role="status" aria-live="polite" data-ui-catalog-status>{{ catalog.entries.length }} components shown</p>
 
   <div class="ui-catalog-grid" data-ui-catalog-grid>
-    <article v-for="entry in catalog.entries" :key="`${entry.layer}-${entry.name}`" class="ui-catalog-card" data-ui-catalog-card :data-layer="entry.layer" :data-name="entry.name.toLowerCase()">
+    <article v-for="entry in catalog.entries" :key="`${entry.layer}-${entry.name}`" class="ui-catalog-card" data-ui-catalog-card :data-layer="entry.layer" :data-name="entry.name.toLowerCase()" :data-preview-key="entry.preview" :data-variant-count="entry.variants.length" :data-state-count="entry.states.length">
       <header>
         <p class="ui-catalog-kicker">{{ labels[entry.layer] }} · {{ entry.package }}</p>
         <h2 :id="`catalog-${entry.layer}-${entry.name}`"><code>{{ entry.name }}</code></h2>
       </header>
-      <div class="ui-catalog-preview" :data-preview="entry.preview ?? 'manifest-only'">
+      <div class="ui-catalog-preview" :data-preview="entry.preview ?? 'manifest-only'" :aria-label="`${entry.name} rendered preview`" data-preview-rendered>
         <div class="ui-catalog-preview-body">
           <template v-if="entry.preview === 'button'">
             <button class="ui-sample-button">Add to bag</button>
@@ -177,8 +177,15 @@ verification surface.
           <template v-else-if="entry.preview === 'scroll-area'">
             <div class="ui-sample-scroll"><span v-for="item in ['Orbit lamp', 'Stack tray', 'Field tote']" :key="item">{{ item }}</span></div>
           </template>
-          <template v-else-if="['icon', 'avatar'].includes(entry.preview)">
-            <span class="ui-sample-avatar" aria-hidden="true">{{ entry.preview === 'icon' ? '✦' : 'AL' }}</span><span>{{ entry.preview === 'icon' ? 'Informative icon' : 'Ada Lovelace' }}</span>
+          <template v-else-if="entry.preview === 'icon'">
+            <span class="ui-sample-avatar" aria-hidden="true">✦</span><span>Informative icon</span>
+          </template>
+          <template v-else-if="entry.preview === 'avatar'">
+            <div class="ui-sample-avatar-set" aria-label="Avatar variants">
+              <span><span class="ui-sample-avatar is-image" aria-hidden="true">◉</span><small>Image</small></span>
+              <span><span class="ui-sample-avatar" aria-hidden="true">AL</span><small>Initials</small></span>
+              <span><span class="ui-sample-avatar is-fallback" aria-hidden="true">?</span><small>Fallback</small></span>
+            </div>
           </template>
           <template v-else-if="['toggle-button', 'button-group', 'toolbar'].includes(entry.preview)">
             <div class="ui-sample-tabs"><button class="is-active">View</button><button>Sort</button><button>Filter</button></div>
@@ -210,20 +217,32 @@ verification surface.
             <ol class="ui-sample-workflow"><li class="is-done">Configure</li><li class="is-active">Review</li><li>Complete</li></ol>
           </template>
           <template v-else-if="entry.preview === 'app-shell'">
-            <div class="ui-sample-shell"><span class="is-bar"></span><span class="is-content"></span><span class="is-content is-short"></span></div>
+            <div class="ui-sample-shell" aria-label="Application shell regions"><span class="is-bar">Nav</span><span class="is-header">Header</span><span class="is-content">Main</span><span class="is-footer">Footer</span></div>
           </template>
-          <template v-else-if="entry.preview === 'aspect-ratio' || entry.preview === 'image'">
+          <template v-else-if="entry.preview === 'aspect-ratio'">
+            <div class="ui-sample-ratios" aria-label="Aspect ratio variants">
+              <figure v-for="ratio in ['16:9', '1:1', '4:3']" :key="ratio" class="ui-sample-ratio">
+                <span :style="{ aspectRatio: ratio.replace(':', ' / ') }"></span>
+                <figcaption>{{ ratio }}</figcaption>
+              </figure>
+            </div>
+          </template>
+          <template v-else-if="entry.preview === 'image'">
             <div class="ui-sample-media"><span>{{ entry.name }}</span></div>
           </template>
           <template v-else-if="entry.layer === 'organism'">
-            <div class="ui-sample-shell"><span class="is-bar"></span><span class="is-content"></span><span class="is-content is-short"></span></div>
+            <div class="ui-sample-shell" aria-label="Organism layout regions"><span class="is-bar">Nav</span><span class="is-header">Header</span><span class="is-content">Content</span><span class="is-footer">Actions</span></div>
           </template>
           <template v-else>
             <span class="ui-sample-component" data-preview-fallback="true">{{ entry.name }}</span>
             <span class="ui-sample-variant">Contract preview only · {{ entry.variants[0] }}</span>
           </template>
         </div>
-        <span class="ui-catalog-preview-label">Representative {{ entry.preview ? 'component' : 'contract' }} preview</span>
+        <div class="ui-catalog-preview-contract" aria-label="Documented variants and states">
+          <div><span class="ui-catalog-contract-label">Variants</span><ul><li v-for="variant in entry.variants" :key="variant">{{ variant }}</li></ul></div>
+          <div><span class="ui-catalog-contract-label">States</span><ul><li v-for="state in entry.states" :key="state">{{ state }}</li></ul></div>
+        </div>
+        <span class="ui-catalog-preview-label">Rendered anatomy · {{ entry.name }}</span>
       </div>
       <dl>
         <dt>Variants</dt>
