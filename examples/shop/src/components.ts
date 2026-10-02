@@ -17,7 +17,7 @@ import {
   Toolbar,
   createDialogSurfaceController,
 } from '@gluonjs/molecules';
-import { MegaMenu } from '@gluonjs/organisms';
+import { MegaMenu, SiteHeader as SiteHeaderOrganism } from '@gluonjs/organisms';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink, useRoute } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -47,15 +47,16 @@ const bagDialogController = createDialogSurfaceController({
   initialFocus: '[data-dialog-initial-focus]',
 });
 
-export function SiteHeader(store: ShopStore): TemplateValue {
+export function ShopHeader(store: ShopStore): TemplateValue {
   const route = useRoute();
   return html`
-    <header class="site-header">
-      ${compose(RouterLink, {
+    ${SiteHeaderOrganism({
+      id: 'shop-site-header',
+      brand: compose(RouterLink, {
         to: '/',
         attributes: { class: 'wordmark', 'aria-label': 'GLUON GOODS home' },
-      })`GLUON GOODS`}
-      ${MegaMenu({
+      })`GLUON GOODS`,
+      navigation: MegaMenu({
         id: 'desktop-primary-navigation',
         label: 'Primary navigation',
         trigger: 'Shop',
@@ -78,45 +79,46 @@ export function SiteHeader(store: ShopStore): TemplateValue {
             links: [{ id: 'journal-navigation', label: 'Journal', href: '#journal', attributes: { class: 'shop-editorial-link' } }],
           },
         ],
-      })}
-      ${Toolbar({
+      }),
+      actions: Toolbar({
         id: 'shop-header-actions',
         label: 'Store actions',
         attributes: { class: 'header-actions' },
         items: [
-        {
-          id: 'search',
-          label: [SearchIcon(), html`<span>Search</span>`],
-          attributes: { class: 'search-action' },
-          onActivate: (event) => {
-            store.searchOpen = true;
-            focusOpenedDialog('search', event.currentTarget as HTMLElement);
+          {
+            id: 'search',
+            label: [SearchIcon(), html`<span>Search</span>`],
+            attributes: { class: 'search-action' },
+            onActivate: (event) => {
+              store.searchOpen = true;
+              focusOpenedDialog('search', event.currentTarget as HTMLElement);
+            },
           },
-        },
-        {
-          id: 'menu',
-          label: [html`<span>Menu</span>`, MenuIcon()],
-          attributes: { class: 'mobile-menu-button', aria: { label: 'Open menu' } },
-          onActivate: (event) => {
-            store.menuOpen = true;
-            focusOpenedDialog('menu', event.currentTarget as HTMLElement);
+          {
+            id: 'menu',
+            label: [html`<span>Menu</span>`, MenuIcon()],
+            attributes: { class: 'mobile-menu-button', aria: { label: 'Open menu' } },
+            onActivate: (event) => {
+              store.menuOpen = true;
+              focusOpenedDialog('menu', event.currentTarget as HTMLElement);
+            },
           },
-        },
-        {
-          id: 'bag',
-          label: `Bag ${store.bagCount}`,
-          attributes: {
-            class: 'bag-action',
-            aria: { label: `Open bag with ${store.bagCount} ${store.bagCount === 1 ? 'item' : 'items'}` },
+          {
+            id: 'bag',
+            label: `Bag ${store.bagCount}`,
+            attributes: {
+              class: 'bag-action',
+              aria: { label: `Open bag with ${store.bagCount} ${store.bagCount === 1 ? 'item' : 'items'}` },
+            },
+            onActivate: (event) => {
+              store.bagOpen = true;
+              focusOpenedDialog('bag', event.currentTarget as HTMLElement);
+            },
           },
-          onActivate: (event) => {
-            store.bagOpen = true;
-            focusOpenedDialog('bag', event.currentTarget as HTMLElement);
-          },
-        },
         ],
-      })}
-    </header>
+      }),
+      attributes: { class: 'site-header' },
+    })}
     ${SearchPanel(store)}
     ${MobileMenu(store)}
   `;

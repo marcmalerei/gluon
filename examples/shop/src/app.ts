@@ -9,7 +9,7 @@ import type { UiOwner } from '@gluonjs/atoms';
 import {
   BagOverlay,
   SiteFooter,
-  SiteHeader,
+  ShopHeader,
   disposeShopDialogs,
 } from './components.js';
 import {
@@ -93,7 +93,7 @@ export function createShopApplication(
     const route = router.currentRoute.value;
     return html`
       <a class="skip-link" href="#main-content">Skip to content</a>
-      ${SiteHeader(store)}
+      ${ShopHeader(store)}
       <main id="main-content">${KeepAlive({
         cacheKey: route.fullPath,
         max: 4,

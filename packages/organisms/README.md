@@ -86,6 +86,12 @@ supports an explicit empty surface, and falls back to one column on small
 screens. Both expose parts, data attributes, and CSS custom properties for
 tenant-specific themes.
 
+`SiteHeader` renders a semantic, responsive header with caller-owned brand,
+navigation, actions, and an optional controlled mobile navigation region. Its
+mobile disclosure supports Escape/focus return, 44px controls, and CSS-variable
+hooks for tenant-specific shells; routing, authorization, localization,
+analytics, and open state remain application-owned.
+
 `MegaMenu` renders a controlled, labelled native navigation with grouped links,
 responsive stacking, Escape/focus return, Arrow/Home/End traversal, disabled
 links, and CSS-variable styling hooks. Routing, authorization, analytics,

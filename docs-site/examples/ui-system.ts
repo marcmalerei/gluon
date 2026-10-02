@@ -82,7 +82,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteHeader, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -113,7 +113,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView };
 void dataMolecules;
-const applicationOrganisms = { AsyncState, MegaMenu, ProductCard, ProductGrid };
+const applicationOrganisms = { AsyncState, MegaMenu, ProductCard, ProductGrid, SiteHeader };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',

@@ -12,7 +12,7 @@ const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Tooltip', 'HoverCard', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['AspectRatio', 'Heading', 'Text', 'Link', 'Image', 'Badge', 'Spinner', 'Skeleton', 'Meter', 'NumberInput', 'DateInput', 'TimeInput', 'FileInput', 'Avatar', 'Button', 'Checkbox', 'Icon', 'Input', 'Label', 'Progress', 'Radio', 'Select', 'Slider', 'StatusBadge', 'ScrollArea', 'Separator', 'Switch', 'Textarea', 'ToggleButton', 'installUi']],
   ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'Toast', 'ToastViewport', 'NavigationStrip', 'Breadcrumbs', 'Pagination', 'NavigationMenu', 'ResponsiveActionBar', 'DropdownMenu', 'ContextMenu', 'Menubar', 'Toolbar', 'SegmentedControl', 'TableRegion', 'Tabs', 'SearchField', 'SearchResults', 'OneTimePasswordField', 'PasswordToggleField', 'Tooltip', 'Stepper', 'FilterBar', 'DataList', 'ListboxField', 'ComboboxField', 'CommandPalette', 'TreeView']],
-  ['@gluonjs/organisms', ['AppShell', 'AsyncState', 'ProductCard', 'ProductGrid', 'ConfirmationDialog', 'WorkflowTimeline', 'MegaMenu']],
+  ['@gluonjs/organisms', ['AppShell', 'AsyncState', 'ProductCard', 'ProductGrid', 'ConfirmationDialog', 'WorkflowTimeline', 'MegaMenu', 'SiteHeader']],
 ]);
 const manifestExports = new Map([
   ['@gluonjs/quarks', 'quarkManifest'],
