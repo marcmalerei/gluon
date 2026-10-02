@@ -64,6 +64,7 @@ function createOverview(entry, docs, version, slug, siteUrl) {
   const apiHref = `${siteUrl}/${version}/api/generated/${apiSource}/`;
   const guideRows = docs.relatedGuides.map(({ label, href }) => `- [${label}](${siteUrl}${href.replace(/^\/gluon/, '')})`);
   const publicLinks = entry.exports.map((subpath) => {
+    if (subpath.endsWith('.css')) return `\`${entry.name}${subpath.slice(1)}\``;
     const apiPath = subpath === '.' ? apiHref : `${apiHref}${subpath.slice(2)}/`;
     return `[\`${entry.name}${subpath === '.' ? '' : subpath.slice(1)}\`](${apiPath})`;
   }).join(' · ');

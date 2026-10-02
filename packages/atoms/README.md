@@ -129,9 +129,10 @@ configuration match. Serialize the tenant id, theme, and token contract with
 the application state before hydration and install the matching owner before
 the tenant subtree is hydrated.
 
-`AspectRatio`, `Avatar`, `Button`, `Checkbox`, `Icon`, `Input`, `Label`,
-`Progress`, `Radio`, `ScrollArea`, `Select`, `Separator`, `Slider`, `StatusBadge`,
-`Switch`, `Textarea`, and `ToggleButton` expose immutable `Component.styles`
+`AspectRatio`, `Avatar`, `Badge`, `Button`, `Checkbox`, `DateInput`, `Heading`,
+`Icon`, `Image`, `Input`, `Label`, `Link`, `Meter`, `NumberInput`, `Progress`,
+`Radio`, `ScrollArea`, `Select`, `Separator`, `Skeleton`, `Slider`, `Spinner`,
+`StatusBadge`, `Switch`, `Text`, `Textarea`, `TimeInput`, and `ToggleButton` expose immutable `Component.styles`
 metadata and have separately tree-shakable sheets. The renderer adopts only the
 sheets reachable from its active value tree and releases them with the render
 owner. Nested composition stays on that same path, so a public Molecule that

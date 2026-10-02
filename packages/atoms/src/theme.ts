@@ -12,18 +12,16 @@ import {
   type StyleSheetSelection,
   type StyleTarget,
 } from '@gluonjs/core';
+import {
+  getThemeTokenValues,
+  tokenDeclarations,
+  type UiTokenOverrides,
+  type UiTokenValue,
+} from './tokens.js';
+
+export type { UiTokenOverrides, UiTokenValue } from './tokens.js';
 
 export type UiThemeName = 'light' | 'dark';
-
-/** Public CSS custom-property values accepted by a tenant-scoped UI owner. */
-export type UiTokenValue = string | number;
-
-/**
- * Application and tenant theme extensions are deliberately CSS-variable based.
- * Only `--gluon-*` names are accepted so a tenant cannot replace component
- * selectors or inject a second styling mechanism through this API.
- */
-export type UiTokenOverrides = Readonly<Record<string, UiTokenValue>>;
 
 export interface UiTenantOptions {
   /** Stable identifier used for diagnostics and host metadata. */
@@ -39,12 +37,7 @@ export interface UiTenantOptions {
 export const uiTokenStyles = css`
   @layer atoms {
     :root, :host {
-      --gluon-font-family: ui-sans-serif, system-ui, sans-serif;
-      --gluon-radius-control: 0.625rem;
-      --gluon-radius-surface: 1rem;
-      --gluon-space-control-block: 0.75rem;
-      --gluon-space-control-inline: 1rem;
-      --gluon-focus-width: 3px;
+      ${tokenDeclarations(getThemeTokenValues('light'))}
     }
   }
 `;
@@ -53,17 +46,7 @@ export const lightThemeStyles = css`
   @layer atoms {
     :root, :host, [data-gluon-theme="light"], :host([data-gluon-theme="light"]) {
       color-scheme: light;
-      --gluon-color-canvas: #ffffff;
-      --gluon-color-surface: #ffffff;
-      --gluon-color-text: #12312f;
-      --gluon-color-muted: #526663;
-      --gluon-color-rule: #b8c9c6;
-      --gluon-color-action: #087f7b;
-      --gluon-color-action-text: #ffffff;
-      --gluon-color-action-soft: #e6f4f1;
-      --gluon-color-action-soft-text: #075e5b;
-      --gluon-color-focus: #173f91;
-      --gluon-color-danger: #a52222;
+      ${tokenDeclarations(getThemeTokenValues('light'))}
     }
   }
 `;
@@ -72,17 +55,7 @@ export const darkThemeStyles = css`
   @layer atoms {
     :root, :host, [data-gluon-theme="dark"], :host([data-gluon-theme="dark"]) {
       color-scheme: dark;
-      --gluon-color-canvas: #101716;
-      --gluon-color-surface: #172220;
-      --gluon-color-text: #f1f7f5;
-      --gluon-color-muted: #b8c9c6;
-      --gluon-color-rule: #526663;
-      --gluon-color-action: #65d5c8;
-      --gluon-color-action-text: #071f1c;
-      --gluon-color-action-soft: #20443f;
-      --gluon-color-action-soft-text: #e8fffb;
-      --gluon-color-focus: #8caeff;
-      --gluon-color-danger: #ff9b9b;
+      ${tokenDeclarations(getThemeTokenValues('dark'))}
     }
   }
 `;
@@ -255,35 +228,6 @@ export function installUi(
   return Object.freeze(owner);
 }
 
-const tenantThemeTokens: Readonly<Record<UiThemeName, UiTokenOverrides>> = Object.freeze({
-  light: Object.freeze({
-    '--gluon-color-canvas': '#ffffff',
-    '--gluon-color-surface': '#ffffff',
-    '--gluon-color-text': '#12312f',
-    '--gluon-color-muted': '#526663',
-    '--gluon-color-rule': '#b8c9c6',
-    '--gluon-color-action': '#087f7b',
-    '--gluon-color-action-text': '#ffffff',
-    '--gluon-color-action-soft': '#e6f4f1',
-    '--gluon-color-action-soft-text': '#075e5b',
-    '--gluon-color-focus': '#173f91',
-    '--gluon-color-danger': '#a52222',
-  }),
-  dark: Object.freeze({
-    '--gluon-color-canvas': '#101716',
-    '--gluon-color-surface': '#172220',
-    '--gluon-color-text': '#f1f7f5',
-    '--gluon-color-muted': '#b8c9c6',
-    '--gluon-color-rule': '#526663',
-    '--gluon-color-action': '#65d5c8',
-    '--gluon-color-action-text': '#071f1c',
-    '--gluon-color-action-soft': '#20443f',
-    '--gluon-color-action-soft-text': '#e8fffb',
-    '--gluon-color-focus': '#8caeff',
-    '--gluon-color-danger': '#ff9b9b',
-  }),
-});
-
 function validateTenantOptions(target: StyleTarget, tenant: UiTenantOptions): void {
   if (!tenant.id.trim()) throw new Error('A tenant-scoped UI owner requires a non-empty id.');
   if (!tenant.scope || tenant.scope.nodeType !== Node.ELEMENT_NODE) {
@@ -327,7 +271,7 @@ function acquireTenant(tenant: UiTenantOptions, fallbackTheme: UiThemeName): UiT
 
 function applyTenant(state: UiTenantState, theme: UiThemeName, tokens: UiTokenOverrides): void {
   const normalized = normalizeTokens(tokens);
-  const values = { ...tenantThemeTokens[theme], ...normalized };
+  const values = { ...getThemeTokenValues(theme), ...normalized };
   for (const key of state.ownedTokens) {
     if (!(key in values)) restoreToken(state, key);
   }
@@ -374,9 +318,11 @@ function normalizeTokens(tokens: UiTokenOverrides): UiTokenOverrides {
 }
 
 function sameTokens(a: UiTokenOverrides, b: UiTokenOverrides): boolean {
+  const left = a as Readonly<Record<string, UiTokenValue>>;
+  const right = b as Readonly<Record<string, UiTokenValue>>;
   const aEntries = Object.entries(a);
   const bEntries = Object.entries(b);
-  return aEntries.length === bEntries.length && aEntries.every(([key, value]) => b[key] === value);
+  return aEntries.length === bEntries.length && aEntries.every(([key, value]) => right[key] === value) && Object.keys(left).length === Object.keys(right).length;
 }
 
 /** @deprecated Use installUi() and call owner.dispose(). */

@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/* Tailwind generates utilities that read Gluon's runtime semantic values. */
+@theme inline {
+  --font-sans: var(--gluon-font-family);
+  --font-display: var(--gluon-font-family-display);
+  --text-base: var(--gluon-font-size-base);
+  --color-canvas: var(--gluon-color-canvas);
+  --color-surface: var(--gluon-color-surface);
+  --color-surface-raised: var(--gluon-color-surface-raised);
+  --color-text: var(--gluon-color-text);
+  --color-muted: var(--gluon-color-muted);
+  --color-rule: var(--gluon-color-rule);
+  --color-action: var(--gluon-color-action);
+  --color-action-text: var(--gluon-color-action-text);
+  --color-action-soft: var(--gluon-color-action-soft);
+  --color-action-soft-text: var(--gluon-color-action-soft-text);
+  --color-focus: var(--gluon-color-focus);
+  --color-danger: var(--gluon-color-danger);
+  --color-success: var(--gluon-color-success);
+  --color-warning: var(--gluon-color-warning);
+  --color-info: var(--gluon-color-info);
+  --radius-control: var(--gluon-radius-control);
+  --radius-surface: var(--gluon-radius-surface);
+  --radius-pill: var(--gluon-radius-pill);
+  --spacing-control-block: var(--gluon-space-control-block);
+  --spacing-control-inline: var(--gluon-space-control-inline);
+  --spacing-1: var(--gluon-space-1);
+  --spacing-2: var(--gluon-space-2);
+  --spacing-3: var(--gluon-space-3);
+  --spacing-4: var(--gluon-space-4);
+  --spacing-5: var(--gluon-space-5);
+  --spacing-6: var(--gluon-space-6);
+  --shadow-surface: var(--gluon-shadow-surface);
+}
+
+@layer base {
+  :where(html) {
+    background: var(--gluon-color-canvas, #fff);
+    color: var(--gluon-color-text, #12312f);
+    font-family: var(--gluon-font-family, ui-sans-serif, system-ui, sans-serif);
+  }
+  :where(:focus-visible) {
+    outline: var(--gluon-focus-width, 3px) solid var(--gluon-color-focus, currentcolor);
+    outline-offset: var(--gluon-focus-offset, 3px);
+  }
+}

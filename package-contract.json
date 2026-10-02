@@ -88,7 +88,7 @@
       "directory": "packages/vite",
       "state": "current",
       "environment": "node",
-      "exports": [".", "./tailwind"],
+      "exports": [".", "./tailwind", "./tailwind.css"],
       "currentDependencies": ["@gluonjs/compiler", "@gluonjs/core"],
       "dependencies": ["@gluonjs/compiler"]
     },

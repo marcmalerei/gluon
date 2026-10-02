@@ -26,10 +26,15 @@
     "./tailwind": {
       "types": "./dist/tailwind.d.ts",
       "import": "./dist/tailwind.js"
+    },
+    "./tailwind.css": {
+      "types": "./dist/tailwind-css.d.ts",
+      "import": "./tailwind.css"
     }
   },
   "files": [
     "dist",
+    "tailwind.css",
     "src/client.ts",
     "README.md",
     "LICENSE",

@@ -5,19 +5,30 @@ import {
   Button,
   AspectRatio,
   Avatar,
+  Badge,
   aspectRatioStyles,
   avatarStyles,
   Checkbox,
+  DateInput,
+  Heading,
+  Image,
   Icon,
   Input,
+  Link,
+  Meter,
+  NumberInput,
   Progress,
   Slider,
   normalizeSliderRange,
   normalizeSliderValue,
   Radio,
   Select,
+  Skeleton,
+  Spinner,
   StatusBadge,
   Switch,
+  Text,
+  TimeInput,
   ToggleButton,
   defineToggleButtonPreset,
   Textarea,
@@ -85,6 +96,34 @@ beforeEach(() => {
 });
 
 describe('separate UI package contracts', () => {
+  it('renders the foundation atoms with native semantics, variants, and token-backed presentation', () => {
+    render(q.main({ children: [
+      Heading({ level: 2, children: 'Catalog' }),
+      Text({ tone: 'muted', children: 'Browse the collection.' }),
+      Link({ href: '/catalog', children: 'Open catalog' }),
+      Image({ src: '/assets/catalog-preview.webp', alt: 'Catalog preview', width: 120, height: 80 }),
+      Badge({ tone: 'success', children: 'Available' }),
+      Spinner({ label: 'Loading catalog' }),
+      Skeleton({ width: '12rem', height: '2rem' }),
+      Meter({ value: 72, max: 100, attributes: { id: 'completion', aria: { label: 'Completion' } } }),
+      NumberInput({ value: '2', attributes: { id: 'quantity' } }),
+      DateInput({ value: '2026-10-02', attributes: { id: 'date' } }),
+      TimeInput({ value: '09:30', attributes: { id: 'time' } }),
+    ] }), document.body);
+
+    expect(document.querySelector('h2.gluon-heading')?.dataset.gluonLevel).toBe('2');
+    expect(document.querySelector('.gluon-text.is-muted')).not.toBeNull();
+    expect(document.querySelector<HTMLAnchorElement>('.gluon-link')?.href).toContain('/catalog');
+    expect(document.querySelector<HTMLImageElement>('.gluon-image')?.alt).toBe('Catalog preview');
+    expect(document.querySelector('.gluon-badge.is-success')).not.toBeNull();
+    expect(document.querySelector('[role="status"]')?.getAttribute('aria-label')).toBe('Loading catalog');
+    expect(document.querySelector('.gluon-skeleton')?.getAttribute('aria-hidden')).toBe('true');
+    expect(document.querySelector('meter.gluon-meter')?.getAttribute('aria-label')).toBe('Completion');
+    expect(document.querySelector<HTMLInputElement>('#quantity')?.type).toBe('number');
+    expect(document.querySelector<HTMLInputElement>('#date')?.type).toBe('date');
+    expect(document.querySelector<HTMLInputElement>('#time')?.type).toBe('time');
+  });
+
   it('renders AspectRatio with typed native attributes, merged classes, exact styles, and validated geometry', () => {
     render(AspectRatio({
       ratio: 2,
