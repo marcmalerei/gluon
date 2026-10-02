@@ -80,6 +80,10 @@ import {
   TableRegion,
   Tabs,
   Toolbar,
+  Tooltip,
+  Stepper,
+  FilterBar,
+  DataList,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -135,6 +139,16 @@ uses an ARIA dialog on a `div`; it deliberately does not call native
 `HTMLDialogElement.showModal()`, enter the top layer, or make background content
 inert. Applications that require the native-dialog boundary should own a
 native `<dialog>` lifecycle instead.
+
+`Tooltip` provides a small, request-free description attached to a focusable
+trigger. It is deliberately non-interactive; use `DialogSurface` or a caller-
+owned popover for links, forms, or other interactive content. `Stepper` renders
+an ordered workflow with optional native links and caller-owned statuses.
+`FilterBar` provides the labelled form shell around caller-owned filter
+controls, counts, summaries, and reset actions. `DataList` renders native
+`dl`/`dt`/`dd` semantics for detail summaries and collapses to one column on
+small screens. All four components expose `--gluon-*` presentation hooks and
+keep data, routing, fetching, persistence, and mutations in the application.
 `Disclosure` renders native `details` and `summary`, preserving browser
 keyboard toggling, find-in-page expansion, semantics, and form behavior. Use
 `open` with `onToggle` for controlled state or `defaultOpen` for the initial

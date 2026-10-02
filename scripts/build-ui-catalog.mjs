@@ -13,7 +13,7 @@ const sources = [
 ];
 const renderedPreviewKeys = new Set([
   'accordion', 'action-bar', 'app-shell', 'aspect-ratio', 'avatar', 'badge', 'button',
-  'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'disclosure',
+  'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'disclosure', 'tooltip', 'stepper', 'filter-bar', 'data-list',
   'empty-state', 'field', 'foundation-atoms--badge', 'foundation-atoms--date-input',
   'foundation-atoms--feedback', 'foundation-atoms--file-input', 'foundation-atoms--link', 'foundation-atoms--media',
   'foundation-atoms--numeric-input', 'foundation-atoms--time-input',

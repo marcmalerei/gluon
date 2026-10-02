@@ -74,6 +74,11 @@ import {
   InlineNotice,
   NavigationStrip,
   Pagination,
+  Tooltip,
+  Stepper,
+  FilterBar,
+  DataList,
+  tooltipStyles,
   SegmentedControl,
   TableRegion,
   Tabs,
@@ -2361,6 +2366,116 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
   });
   expect(results.violations, formatViolations(results.violations)).toEqual([]);
   uiOwner.dispose();
+});
+
+describe('advanced data and workflow molecules', () => {
+  it('renders a keyboard-discoverable tooltip without owning interactive content', () => {
+    render(Tooltip({ id: 'delivery-help', content: 'Choose a saved delivery preference.', children: 'Help' }), document.body);
+    const root = document.querySelector<HTMLElement>('.gluon-tooltip')!;
+    const trigger = root;
+    const content = root.querySelector<HTMLElement>('[role="tooltip"]')!;
+    expect(trigger.tabIndex).toBe(0);
+    expect(trigger.getAttribute('aria-describedby')).toBe('delivery-help-content');
+    expect(content.id).toBe('delivery-help-content');
+    expect(getStyleSheetText(tooltipStyles)).toContain('prefers-reduced-motion');
+  });
+
+  it('renders stepper statuses, native destinations, and current-step semantics', () => {
+    render(Stepper({
+      id: 'checkout-steps',
+      label: 'Checkout progress',
+      steps: [
+        { id: 'configure', label: 'Configure', status: 'complete', href: '/configure' },
+        { id: 'review', label: 'Review', status: 'current', description: 'Check the exact order.' },
+        { id: 'complete', label: 'Complete', status: 'upcoming' },
+      ],
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('.gluon-stepper')!;
+    expect(root.tagName).toBe('NAV');
+    expect(root.getAttribute('aria-label')).toBe('Checkout progress');
+    expect(root.querySelectorAll('ol > li')).toHaveLength(3);
+    expect(root.querySelector<HTMLAnchorElement>('a')?.getAttribute('href')).toBe('/configure');
+    expect(root.querySelector('[aria-current="step"]')?.id).toBe('checkout-steps-review');
+  });
+
+  it('keeps FilterBar controls and DataList values caller-owned while preserving native semantics', () => {
+    render(q.main({ children: [
+      FilterBar({
+        id: 'catalog-filters',
+        label: 'Catalog filters',
+        activeCount: 2,
+        summary: 'Two filters are active.',
+        children: q.label({ children: ['Category', q.select({ children: q.option({ children: 'Lighting' }) })] }),
+        clearAction: q.button({ type: 'reset', children: 'Clear filters' }),
+      }),
+      DataList({
+        id: 'order-summary',
+        items: [
+          { id: 'status', label: 'Status', value: 'Ready', description: 'Available to ship.' },
+          { id: 'delivery', label: 'Delivery', value: '2–4 working days' },
+        ],
+      }),
+    ] }), document.body);
+    const form = document.querySelector<HTMLFormElement>('#catalog-filters')!;
+    expect(form.tagName).toBe('FORM');
+    expect(form.getAttribute('aria-label')).toBe('Catalog filters');
+    expect(form.querySelector('[role="status"]')?.textContent).toBe('Two filters are active.');
+    expect(form.querySelector('button[type="reset"]')).not.toBeNull();
+    const list = document.querySelector<HTMLDListElement>('#order-summary')!;
+    expect(list.tagName).toBe('DL');
+    expect(list.querySelectorAll('dt')).toHaveLength(2);
+    expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
+  });
+
+  it('covers optional states and rejects invalid molecule identifiers', () => {
+    render(Tooltip({
+      id: 'disabled-help',
+      content: 'Unavailable help',
+      children: 'Help',
+      placement: 'inline-end',
+      disabled: true,
+      attributes: { class: 'custom-tooltip' },
+    }), document.body);
+    const disabledTooltip = document.querySelector<HTMLElement>('#disabled-help')!;
+    expect(disabledTooltip.tabIndex).toBe(-1);
+    expect(disabledTooltip.querySelector('[role="tooltip"]')).toBeNull();
+    expect(disabledTooltip.classList).toContain('custom-tooltip');
+
+    render(Stepper({
+      id: 'account-steps',
+      label: 'Account setup',
+      attributes: { class: 'custom-stepper' },
+      steps: [
+        { id: 'details', label: 'Details' },
+        { id: 'review', label: 'Review', status: 'disabled', href: '/review', content: 'Locked until details are saved.' },
+      ],
+    }), document.body);
+    const stepper = document.querySelector<HTMLElement>('#account-steps')!;
+    expect(stepper.classList).toContain('custom-stepper');
+    expect(stepper.querySelector('[aria-current="step"]')?.id).toBe('account-steps-details');
+    expect(stepper.querySelector('#account-steps-review a')).toBeNull();
+    expect(stepper.querySelector('#account-steps-review .gluon-stepper-content')?.textContent).toContain('Locked');
+
+    render(FilterBar({ id: 'empty-filters', label: 'Empty filters', children: 'No filters', activeCount: -1 }), document.body);
+    expect(document.querySelector('#empty-filters .gluon-filter-bar-count')?.textContent).toBe('0 active filters');
+    render(FilterBar({ id: 'one-filter', label: 'One filter', children: 'One filter', activeCount: 1 }), document.body);
+    expect(document.querySelector('#one-filter .gluon-filter-bar-count')?.textContent).toBe('1 active filter');
+    render(FilterBar({ id: 'no-count', label: 'No count', children: 'No count' }), document.body);
+    expect(document.querySelector('#no-count .gluon-filter-bar-count')).toBeNull();
+
+    render(DataList({ id: 'single-column', columns: 1, items: [{ id: 'owner', label: 'Owner', value: 'Ada' }] }), document.body);
+    expect(document.querySelector('#single-column')?.classList).toContain('is-1-columns');
+
+    expect(() => Tooltip({ id: 'bad id', content: 'x', children: 'x' })).toThrow(/Tooltip.id/);
+    expect(() => Tooltip({ id: '', content: 'x', children: 'x' })).toThrow(/Tooltip.id/);
+    expect(() => Stepper({ id: 'bad-stepper', label: ' ', steps: [] })).toThrow(/Stepper.label/);
+    expect(() => Stepper({ id: 'empty-stepper', label: 'Steps', steps: [] })).toThrow(/Stepper.steps/);
+    expect(() => Stepper({ id: 'duplicate-steps', label: 'Steps', steps: [{ id: 'same', label: 'A' }, { id: 'same', label: 'B' }] })).toThrow(/unique/);
+    expect(() => FilterBar({ id: 'bad id', label: 'Filters', children: 'x' })).toThrow(/FilterBar.id/);
+    expect(() => FilterBar({ id: 'valid-id', label: ' ', children: 'x' })).toThrow(/FilterBar.label/);
+    expect(() => DataList({ id: 'duplicate-data', items: [{ id: 'same', label: 'A', value: '1' }, { id: 'same', label: 'B', value: '2' }] })).toThrow(/unique/);
+    expect(() => DataList({ id: 'invalid-data', items: [{ id: 'bad id', label: 'A', value: '1' }] })).toThrow(/DataList item ids/);
+  });
 });
 
 function formatViolations(violations: readonly Result[]): string {
