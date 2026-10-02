@@ -517,6 +517,17 @@ request-derived exact component entries, then application-owned entries. This
 keeps server carriers and client validation identical when a page combines a
 named application selection with usage-derived component styles.
 
+Tenant-scoped UI ownership is additive to the target-level owner. A
+`UiTenantOptions` record supplies a stable tenant id, an HTMLElement scope, an
+optional light/dark mode, and `--gluon-*` token overrides. The owner applies
+those values as inherited custom properties on that scope and restores only the
+properties and attributes it changed at final disposal. Two tenant scopes can
+share one Document and one adopted stylesheet set without sharing token values;
+two owners for the same scope must agree on id, theme, and overrides. Tenant
+overrides never replace selectors or require a Tailwind rebuild. The server
+must serialize the tenant context with the application state and the browser
+must install the matching owner before hydrating that subtree.
+
 ## Report-only Vue migration analyzer
 
 [RFC 0003](rfcs/0003-report-only-vue-migration-analyzer.md) authorizes the

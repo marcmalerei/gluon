@@ -1471,6 +1471,67 @@ describe('separate UI package contracts', () => {
     expect(host.hasAttribute('data-gluon-theme')).toBe(false);
   });
 
+  it('isolates tenant-scoped CSS variables, themes, and disposal across one document', () => {
+    const acme = document.createElement('section');
+    const northwind = document.createElement('section');
+    document.body.append(acme, northwind);
+
+    const acmeOwner = installUi(document, {
+      tenant: {
+        id: 'acme',
+        scope: acme,
+        theme: 'dark',
+        tokens: {
+          '--gluon-color-action': '#2457d6',
+          '--gluon-radius-control': '0.25rem',
+        },
+      },
+    });
+    const northwindOwner = installUi(document, {
+      tenant: {
+        id: 'northwind',
+        scope: northwind,
+        theme: 'light',
+        tokens: { '--gluon-color-action': '#b42318' },
+      },
+    });
+
+    expect(acmeOwner.tenantId).toBe('acme');
+    expect(acmeOwner.theme).toBe('dark');
+    expect(northwindOwner.tenantId).toBe('northwind');
+    expect(northwindOwner.theme).toBe('light');
+    expect(acme.dataset.gluonTenant).toBe('acme');
+    expect(northwind.dataset.gluonTenant).toBe('northwind');
+    expect(acme.style.getPropertyValue('--gluon-color-action')).toBe('#2457d6');
+    expect(northwind.style.getPropertyValue('--gluon-color-action')).toBe('#b42318');
+    expect(acme.style.getPropertyValue('--gluon-color-surface')).toBe('#172220');
+    expect(northwind.style.getPropertyValue('--gluon-color-surface')).toBe('#ffffff');
+
+    acmeOwner.setTokens({ '--gluon-color-action': '#163aa0' });
+    expect(acme.style.getPropertyValue('--gluon-color-action')).toBe('#163aa0');
+    expect(northwind.style.getPropertyValue('--gluon-color-action')).toBe('#b42318');
+
+    acmeOwner.dispose();
+    expect(acme.style.getPropertyValue('--gluon-color-action')).toBe('');
+    expect(acme.hasAttribute('data-gluon-tenant')).toBe(false);
+    expect(northwind.style.getPropertyValue('--gluon-color-action')).toBe('#b42318');
+    northwindOwner.dispose();
+  });
+
+  it('rejects invalid tenant token names and conflicting scope ownership', () => {
+    const scope = document.createElement('section');
+    document.body.append(scope);
+    expect(() => installUi(document, {
+      tenant: { id: 'acme', scope, tokens: { '--app-color': '#fff' } },
+    })).toThrow('Invalid Gluon UI token');
+
+    const owner = installUi(document, { tenant: { id: 'acme', scope } });
+    expect(() => installUi(document, {
+      tenant: { id: 'other', scope, tokens: { '--gluon-color-action': '#000' } },
+    })).toThrow('already owned with a different configuration');
+    owner.dispose();
+  });
+
   it('installs independent nested ShadowRoot owners with host-scoped tokens', () => {
     const outerHost = document.createElement('section');
     const outer = outerHost.attachShadow({ mode: 'open' });
