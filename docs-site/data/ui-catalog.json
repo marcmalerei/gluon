@@ -1006,6 +1006,37 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "CommandPalette",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-command-palette"
+      ],
+      "variants": [
+        "grouped",
+        "keyboard",
+        "loading"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "selected",
+        "disabled"
+      ],
+      "preview": "command-palette",
+      "accessibility": "Renders a labelled dialog with a native combobox, grouped listbox commands, stable active-descendant relationships, Arrow/Home/End/Enter/Escape keyboard behavior, and disabled-command semantics.",
+      "extension": "Query filtering, command execution, routing, permissions, global shortcuts, focus restoration, persistence, localization, and tenant-specific CSS variables remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/CommandPalette.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "ContextMenu",
       "kind": "component",
       "status": "stable",

@@ -80,8 +80,10 @@ import {
   DataList,
   ListboxField,
   ComboboxField,
+  CommandPalette,
   TreeView,
   comboboxFieldStyles,
+  commandPaletteStyles,
   listboxFieldStyles,
   treeViewStyles,
   tooltipStyles,
@@ -2710,6 +2712,86 @@ describe('advanced data and workflow molecules', () => {
     expect(() => render(TreeView({ id: 'missing-label', label: ' ', nodes: [] }), document.body)).toThrow('TreeView.label');
     expect(() => render(TreeView({ id: 'duplicate-tree', label: 'Tree', nodes: [{ id: 'same', label: 'One' }, { id: 'same', label: 'Two' }] }), document.body)).toThrow('unique');
     expect(() => render(TreeView({ id: 'child-tree', label: 'Tree', nodes: [{ id: 'parent', label: 'Parent', children: [{ id: 'bad child', label: 'Child' }] }] }), document.body)).toThrow('whitespace');
+  });
+
+  it('composes a controlled CommandPalette with grouped commands and keyboard selection', async () => {
+    const active: string[] = [];
+    const selected: string[] = [];
+    const openStates: boolean[] = [];
+    const query: string[] = [];
+    let currentActive = 'dashboard';
+    const renderPalette = (): void => render(CommandPalette({
+      id: 'quick-actions',
+      label: 'Quick actions',
+      open: true,
+      activeId: currentActive,
+      groups: [
+        { id: 'navigation', label: 'Navigation', commands: [
+          { id: 'dashboard', label: 'Open dashboard', description: 'View today’s activity.', shortcut: '⌘K' },
+          { id: 'orders', label: 'Search orders', shortcut: '↵' },
+          { id: 'disabled', label: 'Disabled action', disabled: true },
+        ] },
+        { id: 'settings', label: 'Settings', commands: [{ id: 'preferences', label: 'Open preferences' }] },
+      ],
+      onQueryChange: (value) => query.push(value),
+      onActiveChange: (id) => { active.push(id); currentActive = id; renderPalette(); },
+      onSelect: (id) => selected.push(id),
+      onOpenChange: (open) => openStates.push(open),
+      attributes: { class: 'quick-actions' },
+      inputAttributes: { class: 'quick-actions-input' },
+      listboxAttributes: { class: 'quick-actions-list' },
+    }), document.body);
+    renderPalette();
+    const root = document.querySelector<HTMLElement>('#quick-actions')!;
+    const input = root.querySelector<HTMLInputElement>('[role="combobox"]')!;
+    const listbox = root.querySelector<HTMLElement>('[role="listbox"]')!;
+    expect(root.getAttribute('role')).toBe('dialog');
+    expect(root.getAttribute('aria-labelledby')).toBe('quick-actions-label');
+    expect(input.getAttribute('aria-controls')).toBe('quick-actions-listbox');
+    expect(input.getAttribute('aria-activedescendant')).toBe('quick-actions-command-dashboard');
+    expect(listbox.querySelectorAll('[role="group"]')).toHaveLength(2);
+    expect(listbox.querySelectorAll('[role="option"]')).toHaveLength(4);
+    expect(listbox.querySelector('[aria-selected="true"]')?.textContent).toContain('Open dashboard');
+    expect(listbox.querySelector('[data-missing]')).toBeNull();
+    expect(root.classList).toContain('quick-actions');
+    expect(input.classList).toContain('quick-actions-input');
+
+    await userEvent.click(input);
+    await userEvent.fill(input, 'order');
+    await userEvent.keyboard('{ArrowDown}');
+    expect(query).toEqual(['order']);
+    expect(active).toEqual(['orders']);
+    await userEvent.keyboard('{Enter}');
+    expect(selected).toEqual(['orders']);
+    expect(openStates).toEqual([true, true, false]);
+
+    const disabled = document.querySelector<HTMLButtonElement>('#quick-actions-command-disabled')!;
+    disabled.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(selected).toEqual(['orders']);
+    await userEvent.keyboard('{Home}');
+    await userEvent.keyboard('{End}');
+    expect(active).toEqual(['orders', 'dashboard', 'preferences']);
+    await userEvent.keyboard('{Escape}');
+    expect(openStates).toEqual([true, true, false, false]);
+    expect(getStyleSheetText(commandPaletteStyles)).toContain('--gluon-command-palette');
+
+    const directSelected: string[] = [];
+    render(CommandPalette({ id: 'direct-command', label: 'Direct command', open: true, groups: [{ id: 'actions', label: 'Actions', commands: [{ id: 'save', label: 'Save' }] }], onSelect: (id) => directSelected.push(id) }), document.body);
+    await userEvent.click(document.querySelector<HTMLButtonElement>('#direct-command-command-save')!);
+    expect(directSelected).toEqual(['save']);
+
+    render(CommandPalette({ id: 'loading-commands', label: 'Commands', open: true, loading: true, groups: [] }), document.body);
+    expect(document.querySelector('#loading-commands [role="status"]')?.textContent).toContain('Loading');
+    render(CommandPalette({ id: 'empty-commands', label: 'Commands', open: true, groups: [] }), document.body);
+    expect(document.querySelector('#empty-commands .gluon-command-palette-status')?.textContent).toContain('No commands');
+    const emptyInput = document.querySelector<HTMLInputElement>('#empty-commands [role="combobox"]')!;
+    emptyInput.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.keyboard('{ArrowUp}');
+    await userEvent.keyboard('{Enter}');
+    expect(() => render(CommandPalette({ id: 'bad id', label: 'Commands', groups: [] }), document.body)).toThrow('whitespace');
+    expect(() => render(CommandPalette({ id: 'missing-label', label: ' ', groups: [] }), document.body)).toThrow('CommandPalette.label');
+    expect(() => render(CommandPalette({ id: 'duplicate-command', label: 'Commands', groups: [{ id: 'one', label: 'One', commands: [{ id: 'same', label: 'One' }] }, { id: 'two', label: 'Two', commands: [{ id: 'same', label: 'Two' }] }] }), document.body)).toThrow('unique');
   });
 
   it('covers optional states and rejects invalid molecule identifiers', () => {
