@@ -2458,15 +2458,23 @@ describe('advanced data and workflow molecules', () => {
 
     render(FilterBar({ id: 'empty-filters', label: 'Empty filters', children: 'No filters', activeCount: -1 }), document.body);
     expect(document.querySelector('#empty-filters .gluon-filter-bar-count')?.textContent).toBe('0 active filters');
+    render(FilterBar({ id: 'one-filter', label: 'One filter', children: 'One filter', activeCount: 1 }), document.body);
+    expect(document.querySelector('#one-filter .gluon-filter-bar-count')?.textContent).toBe('1 active filter');
+    render(FilterBar({ id: 'no-count', label: 'No count', children: 'No count' }), document.body);
+    expect(document.querySelector('#no-count .gluon-filter-bar-count')).toBeNull();
 
     render(DataList({ id: 'single-column', columns: 1, items: [{ id: 'owner', label: 'Owner', value: 'Ada' }] }), document.body);
     expect(document.querySelector('#single-column')?.classList).toContain('is-1-columns');
 
     expect(() => Tooltip({ id: 'bad id', content: 'x', children: 'x' })).toThrow(/Tooltip.id/);
+    expect(() => Tooltip({ id: '', content: 'x', children: 'x' })).toThrow(/Tooltip.id/);
     expect(() => Stepper({ id: 'bad-stepper', label: ' ', steps: [] })).toThrow(/Stepper.label/);
+    expect(() => Stepper({ id: 'empty-stepper', label: 'Steps', steps: [] })).toThrow(/Stepper.steps/);
     expect(() => Stepper({ id: 'duplicate-steps', label: 'Steps', steps: [{ id: 'same', label: 'A' }, { id: 'same', label: 'B' }] })).toThrow(/unique/);
     expect(() => FilterBar({ id: 'bad id', label: 'Filters', children: 'x' })).toThrow(/FilterBar.id/);
+    expect(() => FilterBar({ id: 'valid-id', label: ' ', children: 'x' })).toThrow(/FilterBar.label/);
     expect(() => DataList({ id: 'duplicate-data', items: [{ id: 'same', label: 'A', value: '1' }, { id: 'same', label: 'B', value: '2' }] })).toThrow(/unique/);
+    expect(() => DataList({ id: 'invalid-data', items: [{ id: 'bad id', label: 'A', value: '1' }] })).toThrow(/DataList item ids/);
   });
 });
 
