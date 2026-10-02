@@ -202,6 +202,10 @@ html { scroll-behavior: smooth; }
 .ui-sample-product-card .ui-sample-button { justify-self: start; min-block-size: 32px; }
 .ui-sample-product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 92%; font-size: .7rem; }
 .ui-sample-product-grid span { display: grid; min-block-size: 48px; place-items: center; border: 1px solid var(--vp-c-divider); background: color-mix(in srgb, var(--ui-catalog-accent) 10%, var(--vp-c-bg)); }
+.ui-sample-combobox-list { display: grid; gap: 2px; width: min(100%, 220px); margin: -4px 0 0; padding: 4px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); list-style: none; text-align: start; font-size: .72rem; }
+.ui-sample-combobox-list li { min-block-size: 30px; padding: 7px; }
+.ui-sample-combobox-list li[aria-selected="true"] { background: color-mix(in srgb, var(--ui-catalog-accent) 16%, var(--vp-c-bg)); font-weight: 700; }
+.ui-sample-combobox-list li[aria-disabled="true"] { color: var(--vp-c-text-2); text-decoration: line-through; }
 .ui-sample-media { display: grid; width: 80%; aspect-ratio: 4 / 3; place-items: center; background: linear-gradient(135deg, #12312f, #65d5c8); color: #fff; font-weight: 700; }
 .ui-sample-media.is-image { border: 1px solid var(--vp-c-divider); background: linear-gradient(135deg, #12312f, #65d5c8); }
 @keyframes ui-catalog-spin { to { transform: rotate(360deg); } }

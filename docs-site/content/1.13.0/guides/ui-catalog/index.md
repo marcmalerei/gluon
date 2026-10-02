@@ -94,6 +94,11 @@ verification surface.
             <label class="ui-sample-field">Delivery method<select><option>Standard · 2–4 days</option><option>Express · next day</option></select></label>
             <span class="ui-sample-variant">Arrow keys · Home · End · disabled options</span>
           </template>
+          <template v-else-if="entry.preview === 'combobox-field'">
+            <label class="ui-sample-field">Product search<input role="combobox" value="Orbit" aria-expanded="true" aria-controls="catalog-combobox-list" /></label>
+            <ul id="catalog-combobox-list" class="ui-sample-combobox-list" role="listbox"><li role="option" aria-selected="true">Orbit lamp</li><li role="option">Orbit cable</li><li role="option" aria-disabled="true">Orbit shade · unavailable</li></ul>
+            <span class="ui-sample-variant">open · loading · empty · disabled</span>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>

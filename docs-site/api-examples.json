@@ -1191,6 +1191,8 @@
         "  FormField,",
         "  InlineNotice,",
         "  ListboxField,",
+        "  ComboboxField,",
+        "  comboboxFieldStyles,",
         "  NavigationMenu,",
         "  NavigationStrip,",
         "  Pagination,",
@@ -1266,6 +1268,10 @@
         "  type ListboxFieldAttributes,",
         "  type ListboxFieldListboxAttributes,",
         "  type ListboxFieldProps,",
+        "  type ComboboxFieldAttributes,",
+        "  type ComboboxFieldInputAttributes,",
+        "  type ComboboxFieldListboxAttributes,",
+        "  type ComboboxFieldProps,",
         "  type NavigationMenuAttributes,",
         "  type NavigationMenuItem,",
         "  type NavigationMenuItemAttributes,",
@@ -1354,6 +1360,8 @@
         "const orderData = { id: 'order-summary', items: listItems, columns: 2, attributes: { class: 'order-summary' } satisfies DataListAttributes } satisfies DataListProps;",
         "const deliveryOptions = [{ value: 'standard', label: 'Standard · 2–4 days' }, { value: 'express', label: 'Express · next day' }, { value: 'pickup', label: 'Pickup', disabled: true }] as const;",
         "const deliveryField = { id: 'delivery-method', label: 'Delivery method', options: deliveryOptions, value: 'standard', helper: 'Choose the delivery speed for this order.', attributes: { class: 'checkout-delivery' } satisfies ListboxFieldAttributes, listboxAttributes: { class: 'delivery-options' } satisfies ListboxFieldListboxAttributes } satisfies ListboxFieldProps;",
+        "const comboboxOptions = [{ value: 'orbit-lamp', label: 'Orbit lamp' }, { value: 'orbit-cable', label: 'Orbit cable' }, { value: 'orbit-shade', label: 'Orbit shade', disabled: true }] as const;",
+        "const comboboxField = { id: 'product-search', label: 'Product search', options: comboboxOptions, value: 'orbit-lamp', inputValue: 'Orbit', open: true, placeholder: 'Search products', helper: 'Search the current catalog.', attributes: { class: 'catalog-product-search' } satisfies ComboboxFieldAttributes, inputAttributes: {} satisfies ComboboxFieldInputAttributes, listboxAttributes: { class: 'catalog-suggestions' } satisfies ComboboxFieldListboxAttributes, onActiveChange: (value) => console.log('active suggestion', value), onSelect: (value) => console.log('selected suggestion', value) } satisfies ComboboxFieldProps;",
         "const buttonGroupName = { label: 'Order actions' } satisfies ButtonGroupAccessibleName;",
         "const buttonGroupAttributes = { class: 'order-actions' } satisfies ButtonGroupAttributes;",
         "const buttonGroupOrientation: ButtonGroupOrientation = 'horizontal';",
@@ -1465,7 +1473,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
+        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${ComboboxField(comboboxField)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, comboboxFieldStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -8053,6 +8061,12 @@
     "packages/molecules/src/variables/listboxFieldStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separate constructable ListboxField stylesheet and its CSS-variable hooks:" },
     "packages/molecules/src/interfaces/ListboxFieldProps.md": { "recipe": "molecule-components", "description": "Configure a labelled ListboxField with controlled options, helper/error copy, and native attribute extension points:" },
     "packages/molecules/src/type-aliases/ListboxFieldAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the ListboxField wrapper:" },
-    "packages/molecules/src/type-aliases/ListboxFieldListboxAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native listbox attributes to the ListboxField control:" }
+    "packages/molecules/src/type-aliases/ListboxFieldListboxAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native listbox attributes to the ListboxField control:" },
+    "packages/molecules/src/variables/ComboboxField.md": { "recipe": "molecule-components", "description": "Render a controlled native combobox field with a stable listbox relationship and caller-owned suggestions:" },
+    "packages/molecules/src/variables/comboboxFieldStyles.md": { "recipe": "molecule-components", "description": "Inspect the separate constructable ComboboxField stylesheet and its CSS-variable hooks:" },
+    "packages/molecules/src/interfaces/ComboboxFieldProps.md": { "recipe": "molecule-components", "description": "Configure labels, suggestions, controlled input/open state, loading/empty feedback, and selection callbacks:" },
+    "packages/molecules/src/type-aliases/ComboboxFieldAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the ComboboxField wrapper:" },
+    "packages/molecules/src/type-aliases/ComboboxFieldInputAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native input attributes while ComboboxField owns combobox relationships and value semantics:" },
+    "packages/molecules/src/type-aliases/ComboboxFieldListboxAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native listbox attributes to the ComboboxField suggestions surface:" }
   }
 }

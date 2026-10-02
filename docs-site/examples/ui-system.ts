@@ -69,6 +69,7 @@ import {
   FilterBar,
   DataList,
   ListboxField,
+  ComboboxField,
   Menubar,
   SegmentedControl,
   TableRegion,
@@ -108,7 +109,7 @@ const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
 const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
 void menuAndToolbarPrimitives;
-const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField };
+const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField };
 void dataMolecules;
 const applicationOrganisms = { AsyncState, ProductCard, ProductGrid };
 void applicationOrganisms;
