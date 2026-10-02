@@ -64,6 +64,10 @@ import {
   PasswordToggleField,
   SearchField,
   SearchResults,
+  Tooltip as MoleculeTooltip,
+  Stepper,
+  FilterBar,
+  DataList,
   Menubar,
   SegmentedControl,
   TableRegion,
@@ -103,6 +107,8 @@ const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
 const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
 void menuAndToolbarPrimitives;
+const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList };
+void dataMolecules;
 const customBagIcon = defineIcon({
   name: 'example-bag',
   viewBox: '0 0 24 24',

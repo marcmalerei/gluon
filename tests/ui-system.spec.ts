@@ -74,6 +74,11 @@ import {
   InlineNotice,
   NavigationStrip,
   Pagination,
+  Tooltip,
+  Stepper,
+  FilterBar,
+  DataList,
+  tooltipStyles,
   SegmentedControl,
   TableRegion,
   Tabs,
@@ -2361,6 +2366,66 @@ it('keeps the stable composed UI surface free of automated WCAG A/AA violations'
   });
   expect(results.violations, formatViolations(results.violations)).toEqual([]);
   uiOwner.dispose();
+});
+
+describe('advanced data and workflow molecules', () => {
+  it('renders a keyboard-discoverable tooltip without owning interactive content', () => {
+    render(Tooltip({ id: 'delivery-help', content: 'Choose a saved delivery preference.', children: 'Help' }), document.body);
+    const root = document.querySelector<HTMLElement>('.gluon-tooltip')!;
+    const trigger = root;
+    const content = root.querySelector<HTMLElement>('[role="tooltip"]')!;
+    expect(trigger.tabIndex).toBe(0);
+    expect(trigger.getAttribute('aria-describedby')).toBe('delivery-help-content');
+    expect(content.id).toBe('delivery-help-content');
+    expect(getStyleSheetText(tooltipStyles)).toContain('prefers-reduced-motion');
+  });
+
+  it('renders stepper statuses, native destinations, and current-step semantics', () => {
+    render(Stepper({
+      id: 'checkout-steps',
+      label: 'Checkout progress',
+      steps: [
+        { id: 'configure', label: 'Configure', status: 'complete', href: '/configure' },
+        { id: 'review', label: 'Review', status: 'current', description: 'Check the exact order.' },
+        { id: 'complete', label: 'Complete', status: 'upcoming' },
+      ],
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('.gluon-stepper')!;
+    expect(root.tagName).toBe('NAV');
+    expect(root.getAttribute('aria-label')).toBe('Checkout progress');
+    expect(root.querySelectorAll('ol > li')).toHaveLength(3);
+    expect(root.querySelector<HTMLAnchorElement>('a')?.getAttribute('href')).toBe('/configure');
+    expect(root.querySelector('[aria-current="step"]')?.id).toBe('checkout-steps-review');
+  });
+
+  it('keeps FilterBar controls and DataList values caller-owned while preserving native semantics', () => {
+    render(q.main({ children: [
+      FilterBar({
+        id: 'catalog-filters',
+        label: 'Catalog filters',
+        activeCount: 2,
+        summary: 'Two filters are active.',
+        children: q.label({ children: ['Category', q.select({ children: q.option({ children: 'Lighting' }) })] }),
+        clearAction: q.button({ type: 'reset', children: 'Clear filters' }),
+      }),
+      DataList({
+        id: 'order-summary',
+        items: [
+          { id: 'status', label: 'Status', value: 'Ready', description: 'Available to ship.' },
+          { id: 'delivery', label: 'Delivery', value: '2–4 working days' },
+        ],
+      }),
+    ] }), document.body);
+    const form = document.querySelector<HTMLFormElement>('#catalog-filters')!;
+    expect(form.tagName).toBe('FORM');
+    expect(form.getAttribute('aria-label')).toBe('Catalog filters');
+    expect(form.querySelector('[role="status"]')?.textContent).toBe('Two filters are active.');
+    expect(form.querySelector('button[type="reset"]')).not.toBeNull();
+    const list = document.querySelector<HTMLDListElement>('#order-summary')!;
+    expect(list.tagName).toBe('DL');
+    expect(list.querySelectorAll('dt')).toHaveLength(2);
+    expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
+  });
 });
 
 function formatViolations(violations: readonly Result[]): string {

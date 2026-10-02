@@ -27,6 +27,14 @@ export { SearchField, type SearchFieldAttributes, type SearchFieldInputAttribute
 export { SearchResults, type SearchResultGroup, type SearchResultsAttributes, type SearchResultsHeadingLevel, type SearchResultsProps, type SearchResultsState } from './search-results.js';
 export { OneTimePasswordField, type OneTimePasswordFieldAttributes, type OneTimePasswordFieldInputAttributes, type OneTimePasswordFieldMode, type OneTimePasswordFieldProps } from './one-time-password-field.js';
 export { PasswordToggleField, type PasswordToggleFieldAttributes, type PasswordToggleFieldInputAttributes, type PasswordToggleFieldProps } from './password-toggle-field.js';
+export { Tooltip, type TooltipAttributes, type TooltipPlacement, type TooltipProps } from './tooltip.js';
+export { tooltipStyles } from './tooltip-styles.js';
+export { Stepper, type StepperAttributes, type StepperProps, type StepperStep, type StepperStepStatus } from './stepper.js';
+export { stepperStyles } from './stepper-styles.js';
+export { FilterBar, type FilterBarAttributes, type FilterBarProps } from './filter-bar.js';
+export { filterBarStyles } from './filter-bar-styles.js';
+export { DataList, type DataListAttributes, type DataListItem, type DataListProps } from './data-list.js';
+export { dataListStyles } from './data-list-styles.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';

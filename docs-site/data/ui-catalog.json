@@ -1032,6 +1032,36 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "DataList",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-data-list"
+      ],
+      "variants": [
+        "one-column",
+        "two-column",
+        "three-column",
+        "four-column"
+      ],
+      "states": [
+        "empty",
+        "populated"
+      ],
+      "preview": "data-list",
+      "accessibility": "Preserves native dl/dt/dd semantics, stable instance relationships for optional descriptions, readable wrapping, and a one-column small-screen fallback.",
+      "extension": "Items are render-only and caller-owned; formatting, loading, filtering, pagination, mutation, and domain meaning remain outside the component.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/DataList.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "DialogSurface",
       "kind": "component",
       "status": "stable",
@@ -1140,6 +1170,34 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/EmptyState.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "FilterBar",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-filter-bar"
+      ],
+      "variants": [
+        "default",
+        "compact"
+      ],
+      "states": [
+        "empty",
+        "active"
+      ],
+      "preview": "filter-bar",
+      "accessibility": "Renders a labelled native form with caller-owned controls, optional polite summary, active-filter count, and an explicit clear action outside the live status.",
+      "extension": "Fetching, URL synchronization, filter values, sorting, authorization, persistence, and reset behavior remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/FilterBar.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {
@@ -1520,6 +1578,37 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "Stepper",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-stepper"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical"
+      ],
+      "states": [
+        "upcoming",
+        "current",
+        "complete",
+        "error",
+        "disabled"
+      ],
+      "preview": "stepper",
+      "accessibility": "Renders one named navigation landmark and ordered list, marks at most caller-selected current steps with aria-current=step, preserves native links, and exposes status through text and non-color markers.",
+      "extension": "Callers own step ids, labels, URLs, content, current state, validation, routing, persistence, and workflow effects.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Stepper.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "TableRegion",
       "kind": "component",
       "status": "stable",
@@ -1656,6 +1745,37 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Toolbar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Tooltip",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-tooltip"
+      ],
+      "variants": [
+        "block-start",
+        "block-end",
+        "inline-start",
+        "inline-end"
+      ],
+      "states": [
+        "hidden",
+        "visible",
+        "disabled"
+      ],
+      "preview": "tooltip",
+      "accessibility": "Associates one stable role=tooltip description with a keyboard-focusable trigger, preserves visible focus, hover/focus discovery, forced-colors, reduced motion, and a bounded small-screen width.",
+      "extension": "The component is request-free; callers own trigger content, tooltip copy, labels, localization, and any richer interactive popover behavior.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Tooltip.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {

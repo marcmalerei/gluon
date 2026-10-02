@@ -140,6 +140,21 @@ html { scroll-behavior: smooth; }
 .ui-sample-breadcrumbs [aria-current="page"], .ui-sample-pagination .is-active { font-weight: 700; }
 .ui-sample-pagination a, .ui-sample-pagination span { display: inline-grid; min-inline-size: 32px; min-block-size: 32px; place-items: center; padding: 4px 7px; }
 .ui-sample-pagination .is-active { background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); text-decoration: none; }
+.ui-sample-tooltip { position: relative; display: inline-flex; }
+.ui-sample-tooltip [role="tooltip"] { position: absolute; inset-block-start: calc(100% + 5px); inset-inline-start: 50%; z-index: 1; width: max-content; max-width: 190px; padding: 5px 7px; border: 1px solid var(--ui-catalog-ink); background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); font-size: .72rem; opacity: .92; transform: translateX(-50%); }
+.ui-sample-stepper { display: flex; gap: 10px; width: 95%; margin: 0; padding: 0; list-style: none; font-size: .75rem; }
+.ui-sample-stepper li { color: var(--vp-c-text-2); }
+.ui-sample-stepper li::before { content: '○'; margin-inline-end: 3px; }
+.ui-sample-stepper .is-done, .ui-sample-stepper .is-active { color: var(--ui-catalog-accent); font-weight: 700; }
+.ui-sample-stepper .is-done::before { content: '✓'; }
+.ui-sample-stepper .is-active::before { content: '●'; }
+.ui-sample-filter-bar { display: flex; flex-wrap: wrap; align-items: end; justify-content: center; gap: 7px; width: 100%; }
+.ui-sample-filter-bar .ui-sample-field { width: 112px; }
+.ui-sample-filter-bar select { min-block-size: 30px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 4px; color: inherit; }
+.ui-sample-filter-bar > span { color: var(--vp-c-text-2); font-size: .72rem; }
+.ui-sample-data-list { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; width: 90%; margin: 0; text-align: start; font-size: .76rem; }
+.ui-sample-data-list dt { color: var(--vp-c-text-2); font-weight: 650; }
+.ui-sample-data-list dd { margin: 0; }
 .ui-sample-table { display: grid; grid-template-columns: 1fr 1fr; width: 90%; border: 1px solid var(--vp-c-divider); font-size: .78rem; }
 .ui-sample-table span { padding: 5px 7px; border-bottom: 1px solid var(--vp-c-divider); text-align: start; }
 .ui-sample-shell { display: grid; grid-template-columns: 30% 1fr; gap: 6px; width: 90%; min-height: 70px; }

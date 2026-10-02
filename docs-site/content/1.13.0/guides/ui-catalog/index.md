@@ -78,6 +78,18 @@ verification surface.
           <template v-else-if="entry.preview === 'breadcrumbs'">
             <nav class="ui-sample-breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="#catalog">Catalog</a></li><li><a href="#catalog">Lighting</a></li><li aria-current="page">Orbit lamp</li></ol></nav>
           </template>
+          <template v-else-if="entry.preview === 'tooltip'">
+            <span class="ui-sample-tooltip"><button class="ui-sample-button is-secondary" type="button">Focus for help</button><span role="tooltip">Choose a saved configuration.</span></span>
+          </template>
+          <template v-else-if="entry.preview === 'stepper'">
+            <ol class="ui-sample-stepper"><li class="is-done">Configure</li><li class="is-active" aria-current="step">Review</li><li>Complete</li></ol>
+          </template>
+          <template v-else-if="entry.preview === 'filter-bar'">
+            <form class="ui-sample-filter-bar" @submit.prevent><label class="ui-sample-field">Category<select><option>All products</option><option>Lighting</option></select></label><label class="ui-sample-field">Availability<select><option>In stock</option><option>All</option></select></label><span>2 active filters</span><button class="ui-sample-link" type="button">Clear</button></form>
+          </template>
+          <template v-else-if="entry.preview === 'data-list'">
+            <dl class="ui-sample-data-list"><dt>Availability</dt><dd>In stock</dd><dt>Delivery</dt><dd>2–4 days</dd></dl>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>
