@@ -50,7 +50,7 @@ import { AppShell } from '@gluonjs/organisms';
 <!-- gluon-package-overview:end -->
 
 ```ts
-import { AppShell } from "@gluonjs/organisms";
+import { AppShell, MegaMenu } from "@gluonjs/organisms";
 ```
 
 `WorkflowTimeline` renders a request-free, SSR-safe ordered workflow from typed
@@ -85,6 +85,11 @@ analytics behavior, or decide routing. `ProductGrid` preserves source order,
 supports an explicit empty surface, and falls back to one column on small
 screens. Both expose parts, data attributes, and CSS custom properties for
 tenant-specific themes.
+
+`MegaMenu` renders a controlled, labelled native navigation with grouped links,
+responsive stacking, Escape/focus return, Arrow/Home/End traversal, disabled
+links, and CSS-variable styling hooks. Routing, authorization, analytics,
+localization, global shortcuts, and link data remain caller-owned.
 
 `AppShell` emits native `header`, `nav`, `main`, and `footer` landmarks only for
 content the caller supplies. When a page has multiple navigation landmarks, the

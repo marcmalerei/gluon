@@ -3,7 +3,8 @@ import { userEvent } from 'vitest/browser';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationMenuStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
+import { megaMenuStyles } from '@gluonjs/organisms';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -42,7 +43,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).toContain(shopUiTokenStyles);
     expect(document.adoptedStyleSheets).toContain(shopStyles);
     expect(document.adoptedStyleSheets).toContain(toolbarStyles);
-    expect(document.adoptedStyleSheets).toContain(navigationMenuStyles);
+    expect(document.adoptedStyleSheets).toContain(megaMenuStyles);
     expect(document.adoptedStyleSheets.some((sheet) => (
       getStyleSheetText(sheet).includes('.shop-editorial-link')
     ))).toBe(false);
@@ -57,6 +58,16 @@ describe('GLUON GOODS reference shop', () => {
     expect(skipLink.getAttribute('href')).toBe('#main-content');
     expect(root.querySelector('.site-header .header-actions')?.getAttribute('role')).toBe('toolbar');
     expect(root.querySelector('.site-header .header-actions')?.getAttribute('aria-label')).toBe('Store actions');
+    const desktopMenuTrigger = root.querySelector<HTMLButtonElement>('#desktop-primary-navigation-trigger')!;
+    desktopMenuTrigger.click();
+    await settleShop();
+    expect(store.navigationOpen).toEqual(['shop-navigation']);
+    expect(root.querySelector<HTMLElement>('#desktop-primary-navigation-panel')?.hidden).toBe(false);
+    expect(root.querySelector('#desktop-primary-navigation-panel .shop-editorial-link')?.textContent).toBe('Journal');
+    desktopMenuTrigger.click();
+    await settleShop();
+    expect(store.navigationOpen).toEqual([]);
+    expect(root.querySelector<HTMLElement>('#desktop-primary-navigation-panel')?.hidden).toBe(true);
 
     expect(root.querySelector('h1')?.textContent).toBe('Objects that work the way you do.');
     expect(root.querySelectorAll('.product-card')).toHaveLength(4);

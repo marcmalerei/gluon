@@ -1991,6 +1991,37 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "MegaMenu",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-mega-menu"
+      ],
+      "variants": [
+        "grouped",
+        "responsive",
+        "keyboard"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "active",
+        "disabled"
+      ],
+      "preview": "mega-menu",
+      "accessibility": "Renders a labelled native navigation with grouped links, controlled disclosure, Escape/focus return, Arrow/Home/End keyboard traversal, disabled-link semantics, mobile stacking, and forced-colors/reduced-motion support.",
+      "extension": "Groups, labels, URLs, active state, authorization, routing, analytics, localization, global shortcuts, and tenant-specific CSS variables remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/MegaMenu.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "ProductCard",
       "kind": "component",
       "status": "stable",
