@@ -53,6 +53,7 @@ jobs:
       - run: npm run build:vite
       - run: npm run build:playground
       - run: npm run build:json-forms
+      - run: npx playwright install --with-deps chromium
       - run: npm run check:docs
       - run: mkdir -p .pages/playground && cp -R docs-site/dist/. .pages/ && cp -R examples/playground/dist/. .pages/playground/
       - uses: actions/configure-pages@v6
