@@ -54,9 +54,15 @@ try {
       stateCount: element.querySelectorAll('.ui-catalog-preview-contract > div:last-child li').length,
       expectedVariants: Number(element.getAttribute('data-variant-count')),
       expectedStates: Number(element.getAttribute('data-state-count')),
+      preview: element.querySelector('[data-preview-rendered]')?.dataset.preview ?? '',
+      anatomy: element.querySelector('[data-preview-anatomy]')?.dataset.previewAnatomy ?? '',
+      anatomyChildren: element.querySelector('[data-preview-anatomy]')?.children.length ?? 0,
     }));
     if (contract.variantCount !== contract.expectedVariants || contract.stateCount !== contract.expectedStates) {
       throw new Error(`catalog preview contract is incomplete: ${JSON.stringify(contract)}`);
+    }
+    if (!contract.preview || contract.anatomy !== contract.preview || contract.anatomyChildren === 0) {
+      throw new Error(`catalog preview anatomy is incomplete: ${JSON.stringify(contract)}`);
     }
   }
   if (await page.locator('[data-preview="aspect-ratio"] .ui-sample-ratio').count() !== 3) {
@@ -64,6 +70,21 @@ try {
   }
   if (await page.locator('[data-preview="avatar"] .ui-sample-avatar-set > span').count() !== 3) {
     throw new Error('avatar preview does not show image, initials, and fallback variants');
+  }
+  if (await page.locator('[data-preview="table"] table').count() !== 1) {
+    throw new Error('table preview does not preserve native table anatomy');
+  }
+  if (await page.locator('[data-preview="tabs"] [role="tablist"] [role="tab"]').count() !== 3) {
+    throw new Error('tabs preview does not show a native tablist anatomy');
+  }
+  if (await page.locator('[data-preview="segmented"] [role="toolbar"] [aria-pressed]').count() !== 3) {
+    throw new Error('segmented preview does not show toggle-button anatomy');
+  }
+  if (await page.locator('[data-preview="otp"] .ui-sample-otp > span').count() !== 6) {
+    throw new Error('one-time-password preview does not show six code segments');
+  }
+  if (await page.locator('[data-preview="password"] .ui-sample-field + button').count() !== 1) {
+    throw new Error('password preview does not show its visibility control');
   }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');

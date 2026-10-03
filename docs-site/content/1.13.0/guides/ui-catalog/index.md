@@ -46,7 +46,7 @@ verification surface.
 <div class="ui-catalog" data-ui-catalog>
   <label class="ui-catalog-search">
     Search components
-    <input type="search" placeholder="Button, dialog, table…" data-ui-catalog-search />
+    <input type="search" autocomplete="off" placeholder="Button, dialog, table…" data-ui-catalog-search />
   </label>
 
   <div class="ui-catalog-filters" role="group" aria-label="Filter component layers">
@@ -65,10 +65,10 @@ verification surface.
         <h2 :id="`catalog-${entry.layer}-${entry.name}`"><code>{{ entry.name }}</code></h2>
       </header>
       <div class="ui-catalog-preview" :data-preview="entry.preview ?? 'manifest-only'" :aria-label="`${entry.name} rendered preview`" data-preview-rendered>
-        <div class="ui-catalog-preview-body">
+        <div class="ui-catalog-preview-body" :data-preview-anatomy="entry.preview ?? 'manifest-only'">
           <template v-if="entry.preview === 'button'">
-            <button class="ui-sample-button">Add to bag</button>
-            <button class="ui-sample-button is-secondary">Save</button>
+            <button class="ui-sample-button" type="button">Add to bag</button>
+            <button class="ui-sample-button is-secondary" type="button">Save</button>
           </template>
           <template v-else-if="entry.preview === 'badge'">
             <span class="ui-sample-badge is-success">Ready</span>
@@ -171,17 +171,29 @@ verification surface.
           <template v-else-if="entry.preview === 'skeleton'">
             <span class="ui-sample-skeleton is-wide"></span><span class="ui-sample-skeleton is-short"></span>
           </template>
-          <template v-else-if="['card', 'empty-state', 'notice'].includes(entry.preview)">
-            <div class="ui-sample-surface"><strong>{{ entry.name }}</strong><span>{{ entry.preview === 'notice' ? 'Action required · Success' : 'Composable content surface' }}</span></div>
+          <template v-else-if="entry.preview === 'card'">
+            <article class="ui-sample-surface ui-sample-card"><strong>Orbit lamp</strong><span>Composable content surface</span><a class="ui-sample-link" href="#catalog">View details</a></article>
           </template>
-          <template v-else-if="['tabs', 'segmented', 'navigation-strip'].includes(entry.preview)">
-            <div class="ui-sample-tabs"><span class="is-active">Overview</span><span>Details</span><span>Reviews</span></div>
+          <template v-else-if="entry.preview === 'empty-state'">
+            <section class="ui-sample-surface ui-sample-empty-state" aria-labelledby="catalog-empty-state-title"><strong id="catalog-empty-state-title">No saved configurations</strong><span>Start with a product to see your saved work here.</span><button class="ui-sample-button" type="button">Browse products</button></section>
+          </template>
+          <template v-else-if="entry.preview === 'notice'">
+            <div class="ui-sample-surface ui-sample-notice" role="status"><strong>Action required</strong><span>Success and warning messages stay visible without relying on color.</span><button class="ui-sample-link" type="button">Review</button></div>
+          </template>
+          <template v-else-if="entry.preview === 'tabs'">
+            <div class="ui-sample-tabs" role="tablist" aria-label="Product information"><button class="is-active" type="button" role="tab" aria-selected="true">Overview</button><button type="button" role="tab" aria-selected="false">Details</button><button type="button" role="tab" aria-selected="false">Reviews</button></div>
+          </template>
+          <template v-else-if="entry.preview === 'segmented'">
+            <div class="ui-sample-tabs" role="toolbar" aria-label="View mode"><button class="is-active" type="button" aria-pressed="true">Overview</button><button type="button" aria-pressed="false">Details</button><button type="button" aria-pressed="false">Reviews</button></div>
+          </template>
+          <template v-else-if="entry.preview === 'navigation-strip'">
+            <nav class="ui-sample-tabs" aria-label="Product sections"><a class="is-active" href="#catalog" aria-current="page">Overview</a><a href="#catalog">Details</a><a href="#catalog">Reviews</a></nav>
           </template>
           <template v-else-if="entry.preview === 'pagination'">
             <nav class="ui-sample-pagination" aria-label="Pagination"><a href="#catalog" aria-label="Previous page">‹</a><a href="#catalog">1</a><a href="#catalog" class="is-active" aria-current="page">2</a><span aria-hidden="true">…</span><a href="#catalog">8</a><a href="#catalog" aria-label="Next page">›</a></nav>
           </template>
           <template v-else-if="entry.preview === 'table'">
-            <div class="ui-sample-table"><span>Product</span><span>Status</span><span>Orbit lamp</span><span class="is-success">Ready</span></div>
+            <div class="ui-sample-table"><table><caption class="sr-only">Product status</caption><thead><tr><th scope="col">Product</th><th scope="col">Status</th></tr></thead><tbody><tr><td>Orbit lamp</td><td class="is-success">Ready</td></tr></tbody></table></div>
           </template>
           <template v-else-if="entry.preview === 'select'">
             <label class="ui-sample-field">Select<select><option>Orbit lamp</option><option>Stack tray</option></select></label>
@@ -209,24 +221,45 @@ verification surface.
             </div>
           </template>
           <template v-else-if="['toggle-button', 'button-group', 'toolbar'].includes(entry.preview)">
-            <div class="ui-sample-tabs"><button class="is-active">View</button><button>Sort</button><button>Filter</button></div>
+            <div class="ui-sample-tabs" :role="entry.preview === 'toolbar' ? 'toolbar' : 'group'" :aria-label="entry.name"><button class="is-active" type="button" :aria-pressed="entry.preview === 'toggle-button' ? 'true' : undefined">View</button><button type="button" :aria-pressed="entry.preview === 'toggle-button' ? 'false' : undefined">Sort</button><button type="button" :aria-pressed="entry.preview === 'toggle-button' ? 'false' : undefined">Filter</button></div>
           </template>
           <template v-else-if="['menu', 'menubar', 'navigation-menu'].includes(entry.preview)">
-            <nav class="ui-sample-menu" aria-label="Preview navigation"><a href="#catalog">Shop</a><a href="#catalog">Journal</a><a href="#catalog">About</a></nav>
+            <template v-if="entry.name === 'DropdownMenu' || entry.name === 'ContextMenu'">
+              <div class="ui-sample-menu ui-sample-menu-popover"><button class="ui-sample-button is-secondary" type="button" aria-haspopup="menu" aria-expanded="true">{{ entry.name === 'ContextMenu' ? 'Open context menu' : 'Shop menu' }}</button><ul role="menu"><li role="menuitem"><a href="#catalog">Shop</a></li><li role="menuitem"><a href="#catalog">Journal</a></li><li role="menuitem" aria-disabled="true">About</li></ul></div>
+            </template>
+            <template v-else-if="entry.name === 'Menubar'">
+              <div class="ui-sample-menu" role="menubar" aria-label="Preview navigation"><button type="button" role="menuitem" aria-haspopup="menu" aria-expanded="true">Shop</button><button type="button" role="menuitem">Journal</button><button type="button" role="menuitem">About</button></div>
+            </template>
+            <template v-else>
+              <nav class="ui-sample-menu" aria-label="Preview navigation"><a href="#catalog" aria-current="page">Shop</a><a href="#catalog">Journal</a><a href="#catalog">About</a></nav>
+            </template>
           </template>
           <template v-else-if="entry.preview === 'accordion' || entry.preview === 'disclosure'">
             <details open class="ui-sample-disclosure"><summary>{{ entry.name }} heading</summary><span>Expandable content</span></details>
           </template>
           <template v-else-if="entry.preview === 'field' || entry.preview === 'password' || entry.preview === 'otp'">
             <form class="ui-sample-form" @submit.prevent>
-              <label class="ui-sample-field">{{ entry.name }}<input :type="entry.preview === 'password' ? 'password' : 'text'" :value="entry.preview === 'otp' ? '123456' : 'Configured value'" /></label>
+              <template v-if="entry.preview === 'otp'">
+                <label class="ui-sample-field">One-time code<input inputmode="numeric" autocomplete="one-time-code" value="123456" /></label>
+                <span class="ui-sample-otp" aria-label="Six digit code"><span v-for="digit in 6" :key="digit">{{ digit }}</span></span>
+              </template>
+              <template v-else-if="entry.preview === 'password'">
+                <label class="sr-only">Username<input type="text" autocomplete="username" value="preview@example.test" /></label><label class="ui-sample-field">Password<input type="password" autocomplete="current-password" value="Configured value" /></label><button class="ui-sample-button is-secondary" type="button" aria-pressed="false">Show password</button>
+              </template>
+              <label v-else class="ui-sample-field">{{ entry.name }}<input type="text" autocomplete="off" value="Configured value" /></label>
             </form>
           </template>
           <template v-else-if="['dialog', 'confirmation-dialog'].includes(entry.preview)">
-            <div class="ui-sample-dialog"><strong>Confirm changes</strong><span>Your configuration is ready.</span><div><button class="ui-sample-button">Confirm</button><button class="ui-sample-button is-secondary">Cancel</button></div></div>
+            <div class="ui-sample-dialog" role="dialog" :aria-modal="entry.preview === 'confirmation-dialog' ? 'true' : undefined" aria-labelledby="catalog-dialog-title"><strong id="catalog-dialog-title">Confirm changes</strong><span>Your configuration is ready.</span><div><button class="ui-sample-button" type="button">Confirm</button><button class="ui-sample-button is-secondary" type="button">Cancel</button></div></div>
           </template>
-          <template v-else-if="['action-bar', 'toast', 'toast-viewport'].includes(entry.preview)">
-            <div class="ui-sample-surface"><strong>{{ entry.name }}</strong><span>Saved successfully</span><button class="ui-sample-button">Continue</button></div>
+          <template v-else-if="entry.preview === 'action-bar'">
+            <section class="ui-sample-surface ui-sample-action-bar" aria-label="Actions"><strong>Saved successfully</strong><button class="ui-sample-button" type="button">Continue</button></section>
+          </template>
+          <template v-else-if="entry.preview === 'toast'">
+            <div class="ui-sample-surface ui-sample-toast" role="status" aria-live="polite"><strong>Saved successfully</strong><button class="ui-sample-link" type="button">Dismiss</button></div>
+          </template>
+          <template v-else-if="entry.preview === 'toast-viewport'">
+            <section class="ui-sample-surface ui-sample-toast-viewport" aria-label="Notifications"><span role="status">Saved successfully</span><button class="ui-sample-button is-secondary" type="button">Dismiss</button></section>
           </template>
           <template v-else-if="entry.preview === 'search'">
             <label class="ui-sample-field">Search products<input type="search" value="cable" /></label>
