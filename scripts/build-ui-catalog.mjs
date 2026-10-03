@@ -14,14 +14,11 @@ const sources = [
 const renderedPreviewKeys = new Set([
   'accordion', 'action-bar', 'admin-shell', 'app-shell', 'async-state', 'aspect-ratio', 'avatar', 'badge', 'button',
   'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'popover', 'sheet', 'disclosure', 'tooltip', 'stepper', 'filter-bar', 'data-list',
-  'empty-state', 'field', 'foundation-atoms--badge', 'foundation-atoms--date-input',
-  'foundation-atoms--feedback', 'foundation-atoms--file-input', 'foundation-atoms--link', 'foundation-atoms--media',
-  'foundation-atoms--numeric-input', 'foundation-atoms--time-input',
-  'foundation-atoms--typography', 'icon', 'input', 'label', 'listbox-field', 'menu', 'menubar',
+  'choice-group', 'control-field', 'empty-state', 'form-field', 'icon', 'input', 'label', 'listbox-field', 'menubar',
   'navigation-menu', 'navigation-strip', 'notice', 'otp', 'pagination', 'password', 'progress',
   'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',
   'slider', 'switch', 'table', 'tabs', 'textarea', 'toast', 'toast-viewport',
-  'toggle-button', 'toolbar', 'workflow', 'product-card', 'product-gallery', 'product-grid', 'mega-menu', 'site-header', 'site-footer', 'page-layout', 'split-pane', 'resizable-panels', 'navigation-rail', 'combobox-field', 'command-palette', 'tree-view', 'sort-control', 'date-picker', 'date-range-picker', 'file-upload', 'time-picker', 'multi-select-field', 'calendar',
+  'toggle-button', 'toolbar', 'workflow', 'product-card', 'product-gallery', 'product-grid', 'mega-menu', 'site-header', 'site-footer', 'page-layout', 'split-pane', 'resizable-panels', 'navigation-rail', 'combobox-field', 'command-palette', 'tree-view', 'sort-control', 'date-picker', 'date-range-picker', 'file-upload', 'time-picker', 'multi-select-field', 'calendar', 'heading', 'text', 'link', 'image', 'badge', 'skeleton', 'meter', 'spinner', 'number-input', 'date-input', 'time-input', 'file-input', 'choice-group', 'control-field', 'form-field', 'dropdown-menu', 'context-menu', 'responsive-disclosure',
 ]);
 
 const entries = [];

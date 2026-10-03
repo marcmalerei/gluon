@@ -7,6 +7,17 @@ const root = resolve(import.meta.dirname, '..');
 const outputRoot = resolve(root, 'docs-site/dist');
 const catalog = JSON.parse(await readFile(resolve(root, 'docs-site/data/ui-catalog.json'), 'utf8'));
 const versions = JSON.parse(await readFile(resolve(root, 'docs-site/versions.json'), 'utf8'));
+const catalogTemplate = await readFile(resolve(root, 'docs-site/content/1.13.0/guides/ui-catalog/index.md'), 'utf8');
+const rendererKeys = new Set([
+  ...catalogTemplate.matchAll(/entry\.preview\s*===\s*'([^']+)'/g),
+].map((match) => match[1]));
+for (const match of catalogTemplate.matchAll(/\[([^\]]+)\]\.includes\(entry\.preview\)/g)) {
+  for (const key of match[1].matchAll(/'([^']+)'/g)) rendererKeys.add(key[1]);
+}
+if (catalogTemplate.includes('data-preview-fallback')) throw new Error('catalog still contains a generic preview fallback');
+for (const entry of catalog.entries) {
+  if (!rendererKeys.has(entry.preview)) throw new Error(`catalog preview renderer is missing for ${entry.name}: ${entry.preview}`);
+}
 
 const server = createServer(async (request, response) => {
   try {
@@ -32,10 +43,14 @@ if (!address || typeof address === 'string') throw new Error('catalog test serve
 const origin = `http://127.0.0.1:${address.port}`;
 const browser = await chromium.launch({ headless: true });
 const pageErrors = [];
+const consoleErrors = [];
+const failedResponses = [];
 
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  page.on('response', (response) => { if (response.status() >= 400) failedResponses.push(`${response.status()} ${response.url()}`); });
   await page.goto(`${origin}/gluon/${versions.latest}/guides/ui-catalog/`, { waitUntil: 'networkidle' });
 
   if (await page.title() !== 'UI catalog | Gluon') throw new Error('catalog page title is incorrect');
@@ -63,6 +78,25 @@ try {
     }
     if (!contract.preview || contract.anatomy !== contract.preview || contract.anatomyChildren === 0) {
       throw new Error(`catalog preview anatomy is incomplete: ${JSON.stringify(contract)}`);
+    }
+    const visual = await card.evaluate((element) => {
+      const preview = element.querySelector('[data-preview-rendered]');
+      const body = element.querySelector('[data-preview-anatomy]');
+      const rect = preview?.getBoundingClientRect();
+      return {
+        previewWidth: rect?.width ?? 0,
+        previewHeight: rect?.height ?? 0,
+        bodyChildren: body?.children.length ?? 0,
+        bodyText: body?.textContent?.replace(/\s+/g, '').length ?? 0,
+        renderedDescendants: body ? [...body.querySelectorAll('*')].filter((child) => {
+          const childRect = child.getBoundingClientRect();
+          return childRect.width > 0 && childRect.height > 0;
+        }).length : 0,
+        horizontalOverflow: preview ? preview.scrollWidth > preview.clientWidth + 1 : true,
+      };
+    });
+    if (visual.previewWidth <= 0 || visual.previewHeight <= 0 || visual.bodyChildren === 0 || (visual.bodyText === 0 && visual.renderedDescendants === 0) || visual.horizontalOverflow) {
+      throw new Error(`catalog preview is visually incomplete: ${JSON.stringify({ name: await card.locator('h2').textContent(), ...visual })}`);
     }
   }
   if (await page.locator('[data-preview="aspect-ratio"] .ui-sample-ratio').count() !== 3) {
@@ -127,6 +161,23 @@ try {
   if (await page.locator('[data-preview="calendar"] [role="grid"] [role="gridcell"]').count() !== 7) {
     throw new Error('calendar preview does not show a native day-grid anatomy');
   }
+  if (await page.locator('[data-preview="choice-group"] fieldset').count() !== 1
+    || await page.locator('[data-preview="choice-group"] input[type="radio"]').count() !== 2) {
+    throw new Error('choice-group preview does not show fieldset and option anatomy');
+  }
+  if (await page.locator('[data-preview="control-field"] input').count() !== 1
+    || await page.locator('[data-preview="form-field"] input[type="email"]').count() !== 1) {
+    throw new Error('field previews do not show their labelled control anatomy');
+  }
+  if (await page.locator('[data-preview="dropdown-menu"] [role="menu"]').count() !== 1
+    || await page.locator('[data-preview="context-menu"] [role="menu"]').count() !== 1) {
+    throw new Error('menu previews do not show explicit dropdown and context anatomy');
+  }
+  for (const obsoleteKey of ['field', 'menu', 'foundation-atoms--feedback', 'foundation-atoms--typography']) {
+    if (await page.locator(`[data-preview="${obsoleteKey}"]`).count() !== 0) {
+      throw new Error(`catalog still exposes obsolete generic preview key: ${obsoleteKey}`);
+    }
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }
@@ -159,7 +210,9 @@ try {
   if (mobileLayout.documentWidth > mobileLayout.viewportWidth || !mobileLayout.previewVisible) {
     throw new Error(`catalog mobile layout is invalid: ${JSON.stringify(mobileLayout)}`);
   }
-  if (pageErrors.length) throw new Error(`catalog emitted browser errors:\n- ${pageErrors.join('\n- ')}`);
+  if (pageErrors.length || consoleErrors.length || failedResponses.length) {
+    throw new Error(`catalog emitted browser failures:\n- ${[...pageErrors, ...consoleErrors, ...failedResponses].join('\n- ')}`);
+  }
 } finally {
   await browser.close();
   await new Promise((accept, reject) => server.close((error) => error ? reject(error) : accept()));
