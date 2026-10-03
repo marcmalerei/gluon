@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, DashboardShell, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, dashboardShellStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2729,6 +2729,36 @@ describe('advanced data and workflow molecules', () => {
     expect(getStyleSheetText(adminShellStyles)).toContain('forced-colors');
     expect(() => render(AdminShell({ id: 'bad shell', main: 'Main' }), document.body)).toThrow('whitespace');
     expect(() => render(AdminShell({ id: 'empty-label', main: 'Main', sidebar: 'Links', sidebarLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders a responsive DashboardShell with utility region and controlled mobile navigation', () => {
+    const onMobileOpenChange = vi.fn();
+    render(DashboardShell({
+      id: 'dashboard-shell',
+      header: q.strong({ children: 'Operations dashboard' }),
+      sidebar: [q.a({ href: '/overview', children: 'Overview' })],
+      main: q.h1({ children: 'Metrics' }),
+      utility: q.p({ children: 'Inspector tools' }),
+      footer: q.small({ children: 'Workspace status: ready' }),
+      sidebarLabel: 'Dashboard navigation',
+      utilityLabel: 'Dashboard tools',
+      mobileOpen: false,
+      onMobileOpenChange,
+      attributes: { class: 'tenant-dashboard-shell', style: { '--gluon-dashboard-shell-sidebar-size': '19rem' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#dashboard-shell')!;
+    expect(root.dataset.dashboardShellRoot).toBe('dashboard-shell');
+    expect(root.querySelector('.gluon-dashboard-shell-navigation')?.getAttribute('aria-label')).toBe('Dashboard navigation');
+    expect(root.querySelector('.gluon-dashboard-shell-utility')?.getAttribute('aria-label')).toBe('Dashboard tools');
+    expect(root.querySelector('.gluon-dashboard-shell-main h1')?.textContent).toBe('Metrics');
+    expect(root.querySelector('.gluon-dashboard-shell-footer')?.textContent).toContain('Workspace status');
+    expect(root.style.getPropertyValue('--gluon-dashboard-shell-sidebar-size')).toBe('19rem');
+    expect(getStyleSheetText(dashboardShellStyles)).toContain('--gluon-dashboard-shell');
+    expect(getStyleSheetText(dashboardShellStyles)).toContain('forced-colors');
+    (root.querySelector<HTMLButtonElement>('[data-dashboard-shell-mobile-button]')!).click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+    expect(() => render(DashboardShell({ id: 'bad dashboard shell', main: 'Main' }), document.body)).toThrow('whitespace');
+    expect(() => render(DashboardShell({ id: 'empty-label', main: 'Main', sidebar: 'Links', sidebarLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
   it('renders a controlled NavigationRail with active, disabled, mobile, and tenant styling semantics', async () => {

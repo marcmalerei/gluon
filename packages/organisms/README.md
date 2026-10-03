@@ -117,6 +117,13 @@ keeps routing, permissions, data loading, mutations, mobile state, localization,
 and tenant identity with the caller while exposing CSS-variable hooks and native
 region attributes for application-specific shells.
 
+`DashboardShell` renders a responsive dashboard workspace with semantic header,
+labelled sidebar navigation, main content, optional utility/inspector region,
+and footer. Its mobile navigation disclosure, CSS-variable hooks, parts, and
+native region attributes are reusable across admin, analytics, and configurator
+tenants; widgets, filters, routing, permissions, data, persistence, and tenant
+identity remain caller-owned.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and
