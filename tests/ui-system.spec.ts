@@ -2799,7 +2799,7 @@ describe('advanced data and workflow molecules', () => {
     expect(select.getAttribute('aria-labelledby')).toBe('catalog-sort-control-label');
     expect(select.getAttribute('aria-describedby')).toBe('catalog-sort-control-description');
     expect(select.querySelectorAll('option')).toHaveLength(3);
-    expect(select.querySelector('option[value="oldest"]')?.disabled).toBe(true);
+    expect(select.querySelector<HTMLOptionElement>('option[value="oldest"]')?.disabled).toBe(true);
     await userEvent.selectOptions(select, 'featured');
     expect(values).toEqual(['featured']);
     expect(getStyleSheetText(sortControlStyles)).toContain('--gluon-sort-control-gap');
