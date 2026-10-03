@@ -277,6 +277,10 @@ verification surface.
             <div class="ui-sample-page-layout" aria-label="Page layout regions"><span class="is-header">Breadcrumbs · Page title · Actions</span><span class="is-main">Main content</span><span class="is-aside">Aside</span><span class="is-footer">Footer</span></div>
             <span class="ui-sample-variant">content · aside · responsive</span>
           </template>
+          <template v-else-if="entry.preview === 'split-pane'">
+            <div class="ui-sample-split-pane" aria-label="Split pane regions"><span class="is-primary">Primary workspace</span><span class="is-secondary">Inspector <button type="button" aria-label="Collapse secondary panel">−</button></span></div>
+            <span class="ui-sample-variant">horizontal · vertical · responsive</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

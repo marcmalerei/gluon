@@ -23,4 +23,6 @@ export { SiteFooter, type SiteFooterAttributes, type SiteFooterNavigationAttribu
 export { siteFooterStyles } from './site-footer-styles.js';
 export { PageLayout, type PageLayoutAttributes, type PageLayoutHeadingLevel, type PageLayoutProps, type PageLayoutRegionAttributes } from './page-layout.js';
 export { pageLayoutStyles } from './page-layout-styles.js';
+export { SplitPane, type SplitPaneAttributes, type SplitPaneOpenChangeEvent, type SplitPaneOrientation, type SplitPaneProps, type SplitPaneRegionAttributes } from './split-pane.js';
+export { splitPaneStyles } from './split-pane-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';
