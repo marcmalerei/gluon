@@ -206,6 +206,9 @@ describe('component variants and utilities', () => {
     render(Popover({ id: 'closed-help', label: 'Closed help', trigger: (attributes) => q.button({ ...attributes, children: 'Help' }), children: 'Closed content' }), root);
     root.querySelector<HTMLButtonElement>('#closed-help-trigger')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(() => render(Popover({ id: 'bad id', label: 'Bad', trigger: () => 'Help', children: 'Content' }), root)).toThrow(/DOM id/);
+    expect(() => render(Popover({ id: 'empty-label', label: ' ', trigger: () => 'Help', children: 'Content' }), root)).toThrow(/non-empty/);
+    expect(() => render(Popover({ id: 'bad-label-ref', labelledBy: 'bad ref', trigger: () => 'Help', children: 'Content' }), root)).toThrow(/DOM id/);
+    expect(() => render(Popover({ id: 'bad-placement', label: 'Bad placement', placement: 'diagonal' as never, trigger: () => 'Help', children: 'Content' }), root)).toThrow(/placement/);
   });
 
   it('renders responsive Sheet regions with labelled dialog semantics', () => {
