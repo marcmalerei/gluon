@@ -147,6 +147,31 @@ describe('component variants and utilities', () => {
     expect(root.querySelector('.gluon-workflow-timeline')).not.toBeNull();
   });
 
+  it('supports every PageLayout heading level and validates stable region identifiers', () => {
+    const root = document.createElement('div');
+    const levels = [1, 2, 3, 4, 5, 6] as const;
+
+    render(fragment(levels.map((level) => PageLayout({
+      id: `level-${level}`,
+      title: `Level ${level}`,
+      headingLevel: level,
+      children: q.p({ children: `Content ${level}` }),
+    }))), root);
+
+    for (const level of levels) {
+      expect(root.querySelector(`.gluon-page-layout h${level}`)?.textContent).toBe(`Level ${level}`);
+    }
+
+    expect(() => PageLayout({ id: '', title: 'Invalid', children: 'Content' })).toThrow(TypeError);
+    expect(() => PageLayout({ id: 'invalid id', title: 'Invalid', children: 'Content' })).toThrow(TypeError);
+    expect(() => PageLayout({
+      id: 'invalid-aside-label',
+      title: 'Invalid',
+      asideLabel: ' ',
+      children: 'Content',
+    })).toThrow(TypeError);
+  });
+
   it('localizes status messages and creates safe unique relationships', () => {
     const root = document.createElement('div');
     render(WorkflowTimeline({
