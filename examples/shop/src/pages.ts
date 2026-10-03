@@ -1,6 +1,5 @@
 import { LayoutTransition, compose, html, repeat, type TemplateValue } from '@gluonjs/core';
-import { Select } from '@gluonjs/atoms';
-import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, TableRegion, Tabs, type ToastController } from '@gluonjs/molecules';
+import { Accordion, InlineNotice, NavigationStrip, SegmentedControl, SortControl, TableRegion, Tabs, type ToastController } from '@gluonjs/molecules';
 import { RouterLink, useRoute, useRouter } from '@gluonjs/router';
 import {
   categories,
@@ -101,21 +100,21 @@ export function CatalogPage(_store: ShopStore): TemplateValue {
           },
           attributes: { class: 'catalog-view' },
         })}
-        <label for="catalog-sort">Sort by</label>
-        ${Select({
+        ${SortControl({
+          id: 'catalog-sort',
+          label: 'Sort by',
           value: sort,
-          attributes: { id: 'catalog-sort', 'aria-label': 'Sort products' },
-          onChange: (event) => {
-            const value = (event.currentTarget as HTMLSelectElement).value;
+          options: [
+            { value: 'featured', label: 'Featured' },
+            { value: 'new', label: 'Newest' },
+            { value: 'name', label: 'Name' },
+            { value: 'price-low', label: 'Price: low to high' },
+            { value: 'price-high', label: 'Price: high to low' },
+          ],
+          onChange: (value) => {
             void router.push(catalogUrl(selected, value, view));
           },
-          children: html`
-            <option value="featured">Featured</option>
-            <option value="new">Newest</option>
-            <option value="name">Name</option>
-            <option value="price-low">Price: low to high</option>
-            <option value="price-high">Price: high to low</option>
-          `,
+          attributes: { class: 'catalog-sort-control' },
         })}
       </div>
       ${LayoutTransition({

@@ -18,6 +18,7 @@ boundary.
 The current slice uses the public Core, Reactivity, Router, and Store APIs to provide:
 
 - home, catalog, and deep-linkable product routes
+- URL-owned catalog sorting through the public `SortControl` molecule
 - desktop and mobile navigation plus the global footer, composed through the public `SiteHeader`, `MegaMenu`, and `SiteFooter` organisms
 - product detail media, composed through the public typed `ProductGallery` organism with app-owned crop classes and CSS-variable overrides
 - overflow-aware catalog category navigation with native links, a revealed

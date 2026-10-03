@@ -88,6 +88,7 @@ import {
   ComboboxField,
   CommandPalette,
   TreeView,
+  SortControl,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -96,6 +97,10 @@ import {
 place cards under a compatible heading hierarchy. `FormField` uses implicit
 native label association. An error sets the child input's `aria-invalid` state
 and exposes a visible `role="alert"`; helper text is visible supplementary copy.
+`SortControl` is a request-free labelled native select for product and data
+lists. Callers own option values, selected state, URL synchronization, and
+sorting effects; helper and error content receive deterministic relationships,
+while `--gluon-sort-control-*` variables provide tenant-safe styling hooks.
 `createFormController()` is the request-free behavioral companion for these
 field compositions. It exposes typed `register()`, values, touched/dirty
 state, field errors, async `validate()`, `submit()`, reset, subscriptions, and

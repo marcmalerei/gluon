@@ -1669,6 +1669,35 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "SortControl",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-sort-control"
+      ],
+      "variants": [
+        "select",
+        "responsive"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "sort-control",
+      "accessibility": "Renders a visible label and native select with stable IDs, helper/error relationships, platform keyboard semantics, and a 44px target.",
+      "extension": "Callers own option labels and values, selected state, URL synchronization, sorting, fetching, persistence, localization, authorization, and tenant-specific CSS variables remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/SortControl.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "Stepper",
       "kind": "component",
       "status": "stable",

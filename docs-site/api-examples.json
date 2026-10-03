@@ -1137,10 +1137,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, sortControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, segmentedControlStyles, sortControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles, appShellStyles];",
         "console.log(exactSheets.length);"
       ]
     },
@@ -1197,6 +1197,8 @@
         "  commandPaletteStyles,",
         "  TreeView,",
         "  treeViewStyles,",
+        "  SortControl,",
+        "  sortControlStyles,",
         "  NavigationMenu,",
         "  NavigationStrip,",
         "  Pagination,",
@@ -1285,6 +1287,9 @@
         "  type TreeViewAttributes,",
         "  type TreeViewNode,",
         "  type TreeViewProps,",
+        "  type SortControlAttributes,",
+        "  type SortControlOption,",
+        "  type SortControlProps,",
         "  type NavigationMenuAttributes,",
         "  type NavigationMenuItem,",
         "  type NavigationMenuItemAttributes,",
@@ -1378,6 +1383,10 @@
         "const treeNode: TreeViewNode = { id: 'shop', label: 'Shop', children: [{ id: 'lighting', label: 'Lighting' }, { id: 'archived', label: 'Archived', disabled: true }] };",
         "const treeAttributes = { class: 'catalog-tree' } satisfies TreeViewAttributes;",
         "const catalogTree = { id: 'catalog-tree', label: 'Catalog navigation', nodes: [treeNode, { id: 'settings', label: 'Settings' }], expanded: ['shop'], selected: 'lighting', attributes: treeAttributes, onExpandedChange: (id, expanded) => console.log(id, expanded), onSelect: (id) => console.log('selected node', id) } satisfies TreeViewProps;",
+        "const sortOptions = [{ value: 'featured', label: 'Featured' }, { value: 'price-low', label: 'Price: low to high' }, { value: 'newest', label: 'Newest' }] satisfies readonly SortControlOption[];",
+        "const sortAttributes = { class: 'catalog-sort' } satisfies SortControlAttributes;",
+        "const sortSelectAttributes = { autocomplete: 'off' } satisfies Omit<import('@gluonjs/atoms').SelectAttributes, 'id'>;",
+        "const sortControl = { id: 'catalog-sort', label: 'Sort products', options: sortOptions, value: 'featured', helper: 'Choose the catalog order.', attributes: sortAttributes, selectAttributes: sortSelectAttributes, onChange: (value, event) => console.log('sort changed', value, event.type) } satisfies SortControlProps;",
         "const commandGroups = [{ id: 'navigation', label: 'Navigation', commands: [{ id: 'dashboard', label: 'Open dashboard', description: 'View today’s activity.', shortcut: '⌘K' }, { id: 'orders', label: 'Search orders', shortcut: '↵' }] }] satisfies readonly CommandPaletteGroup[];",
         "const commandPalette = { id: 'quick-actions', label: 'Quick actions', groups: commandGroups, query: '', activeId: 'dashboard', open: true, attributes: { class: 'quick-actions' } satisfies CommandPaletteAttributes, inputAttributes: {} satisfies CommandPaletteInputAttributes, listboxAttributes: {} satisfies CommandPaletteListboxAttributes, onActiveChange: (id) => console.log('active command', id), onSelect: (id) => console.log('selected command', id) } satisfies CommandPaletteProps;",
         "const buttonGroupName = { label: 'Order actions' } satisfies ButtonGroupAccessibleName;",
@@ -1491,7 +1500,7 @@
         "const tabsItems = [{ id: 'order-summary', value: 'summary', label: 'Summary', panel: 'Order summary' }, { id: 'order-delivery', value: 'delivery', label: 'Delivery', panel: 'Delivery details' }] satisfies readonly TabsItem[];",
         "const handleTab = (value: string, event: TabsChangeEvent) => console.log(value, event.type);",
         "const orderTabs = { ...tabsName, value: 'summary', items: tabsItems, activation: tabsActivation, orientation: tabsOrientation, attributes: tabsAttributes, onChange: handleTab } satisfies TabsProps;",
-        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${ComboboxField(comboboxField)}${CommandPalette(commandPalette)}${TreeView(catalogTree)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, comboboxFieldStyles, commandPaletteStyles, treeViewStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
+        "console.log(html`${Breadcrumbs(breadcrumbProps)}${Pagination(pagination)}${NavigationStrip(sections)}${NavigationMenu(navigationMenu)}${SearchField(searchField)}${SearchResults(searchResults)}${OneTimePasswordField(checkoutCode)}${PasswordToggleField(passwordToggle)}${ComboboxField(comboboxField)}${CommandPalette(commandPalette)}${TreeView(catalogTree)}${SortControl(sortControl)}${Card(order)}${ButtonGroup(orderActions)}${DropdownMenu(dropdown)}${ContextMenu(contextMenu)}${Menubar(menubar)}${Toolbar(toolbar)}${SegmentedControl(orderView)}${Tabs(orderTabs)}${DialogSurface(archiveDialog)}${Disclosure(deliveryDisclosure)}${Accordion(accordionProps)}${Accordion(multipleAccordionProps)}${InlineNotice(orderNotice)}${EmptyState(emptyBag)}${TableRegion(recentOrders)}`, moleculeStyles, breadcrumbsStyles, paginationStyles, searchFieldStyles, searchResultsStyles, oneTimePasswordFieldStyles, passwordToggleFieldStyles, comboboxFieldStyles, commandPaletteStyles, treeViewStyles, sortControlStyles, retainedMenuProps, menuKind, checkedChange, moleculeManifest.entries);"
       ]
     },
     "organism-components": {
@@ -8263,6 +8272,11 @@
     "packages/molecules/src/type-aliases/CommandPaletteAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native dialog attributes while CommandPalette owns its labelled command surface:" },
     "packages/molecules/src/interfaces/TreeViewProps.md": { "recipe": "molecule-components", "description": "Configure a controlled keyboard-operable tree with stable hierarchy, selection, and native attribute extension points:" },
     "packages/molecules/src/interfaces/TreeViewNode.md": { "recipe": "molecule-components", "description": "Describe one hierarchical TreeView node with caller-owned label, children, and disabled state:" },
-    "packages/molecules/src/type-aliases/TreeViewAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native list attributes while TreeView owns tree semantics and relationships:" }
+    "packages/molecules/src/type-aliases/TreeViewAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native list attributes while TreeView owns tree semantics and relationships:" },
+    "packages/molecules/src/variables/SortControl.md": { "recipe": "molecule-components", "description": "Render a labelled native sort select while keeping selection, URL state, and sorting effects caller-owned:" },
+    "packages/molecules/src/variables/sortControlStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separately tree-shakable SortControl stylesheet and its tenant-safe CSS-variable hooks:" },
+    "packages/molecules/src/interfaces/SortControlProps.md": { "recipe": "molecule-components", "description": "Configure a responsive native sort field with controlled options, helper/error copy, and change handling:" },
+    "packages/molecules/src/interfaces/SortControlOption.md": { "recipe": "molecule-components", "description": "Describe one caller-owned sort value, label, and optional disabled state:" },
+    "packages/molecules/src/type-aliases/SortControlAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the SortControl wrapper:" }
   }
 }

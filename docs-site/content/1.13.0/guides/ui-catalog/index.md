@@ -107,6 +107,10 @@ verification surface.
             <ul class="ui-sample-tree" role="tree" aria-label="Catalog navigation"><li role="treeitem" aria-expanded="true" aria-selected="true"><span class="ui-sample-tree-toggle">▾</span><span>Shop</span><ul role="group"><li role="treeitem"><span class="ui-sample-tree-toggle">·</span><span>Lighting</span></li><li role="treeitem" aria-disabled="true"><span class="ui-sample-tree-toggle">·</span><span>Archived · unavailable</span></li></ul></li></ul>
             <span class="ui-sample-variant">Arrow keys · Home · End · nested groups</span>
           </template>
+          <template v-else-if="entry.preview === 'sort-control'">
+            <label class="ui-sample-sort-control">Sort products<select aria-label="Sort products"><option>Featured</option><option>Price: low to high</option><option>Newest</option></select></label>
+            <span class="ui-sample-variant">native select · helper/error · disabled</span>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>
