@@ -83,7 +83,7 @@
       "states": [
         "default"
       ],
-      "preview": "foundation-atoms--badge",
+      "preview": "badge",
       "accessibility": "Renders a presentational status token without assuming live-region semantics or relying on color alone.",
       "extension": "tone selects presentation; callers own text, semantics, and domain mapping.",
       "example": "docs-site/examples/ui-system.ts",
@@ -171,7 +171,7 @@
         "disabled",
         "invalid"
       ],
-      "preview": "foundation-atoms--date-input",
+      "preview": "date-input",
       "accessibility": "Renders a native date input and preserves platform date-picker, keyboard, validation, and form behavior.",
       "extension": "Uses the public Input contract with a fixed native date type; locale and timezone policy stay caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -201,7 +201,7 @@
         "disabled",
         "invalid"
       ],
-      "preview": "foundation-atoms--file-input",
+      "preview": "file-input",
       "accessibility": "Renders a native file input with browser picker, keyboard, form, multiple, capture, disabled, required, and invalid semantics.",
       "extension": "accept, multiple, capture, and native file selection remain caller-owned; it never uploads, reads, or stores files.",
       "example": "docs-site/examples/ui-system.ts",
@@ -233,7 +233,7 @@
         "default",
         "focusable"
       ],
-      "preview": "foundation-atoms--typography",
+      "preview": "heading",
       "accessibility": "Renders one native h1-h6 element with caller-owned heading hierarchy and no duplicate landmark semantics.",
       "extension": "level selects the native heading tag; attributes target the heading and children remain explicit.",
       "example": "docs-site/examples/ui-system.ts",
@@ -289,7 +289,7 @@
         "loaded",
         "error"
       ],
-      "preview": "foundation-atoms--media",
+      "preview": "image",
       "accessibility": "Renders one native image with required alternative text and caller-owned loading/error policy.",
       "extension": "src, alt, dimensions, loading, decoding, and native image attributes remain explicit; fetching and fallback content stay caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -375,7 +375,7 @@
         "default",
         "focus-visible"
       ],
-      "preview": "foundation-atoms--link",
+      "preview": "link",
       "accessibility": "Renders a native anchor when href is supplied and preserves browser navigation, keyboard, focus, and visited semantics.",
       "extension": "href and native anchor attributes remain explicit; routing and authorization stay caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -401,7 +401,7 @@
       "states": [
         "determinate"
       ],
-      "preview": "foundation-atoms--feedback",
+      "preview": "meter",
       "accessibility": "Renders the native meter element; callers provide its accessible name and truthful min/max/value semantics.",
       "extension": "Value, range, children, and native attributes stay explicit without owning domain thresholds.",
       "example": "docs-site/examples/ui-system.ts",
@@ -429,7 +429,7 @@
         "disabled",
         "invalid"
       ],
-      "preview": "foundation-atoms--numeric-input",
+      "preview": "number-input",
       "accessibility": "Renders a native number input with browser editing, validation, keyboard, and form semantics.",
       "extension": "Uses the public Input contract with a fixed native number type; callers own min/max/step through attributes.",
       "example": "docs-site/examples/ui-system.ts",
@@ -597,7 +597,7 @@
       "states": [
         "loading"
       ],
-      "preview": "foundation-atoms--feedback",
+      "preview": "skeleton",
       "accessibility": "Renders an aria-hidden loading placeholder that does not announce duplicate progress.",
       "extension": "width and height are CSS-variable-backed presentation hints; loaded content and timing remain caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -651,7 +651,7 @@
       "states": [
         "loading"
       ],
-      "preview": "foundation-atoms--feedback",
+      "preview": "spinner",
       "accessibility": "Renders one labelled status indicator; reduced motion disables the rotation animation.",
       "extension": "label and native span attributes remain explicit; request lifecycle and cancellation stay caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -737,7 +737,7 @@
       "states": [
         "default"
       ],
-      "preview": "foundation-atoms--typography",
+      "preview": "text",
       "accessibility": "Renders caller-selected native paragraph, span, or div content without inventing a role or live-region announcement.",
       "extension": "as and tone control presentation while native attributes and content remain caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -793,7 +793,7 @@
         "disabled",
         "invalid"
       ],
-      "preview": "foundation-atoms--time-input",
+      "preview": "time-input",
       "accessibility": "Renders a native time input and preserves platform time-picker, keyboard, validation, and form behavior.",
       "extension": "Uses the public Input contract with a fixed native time type; timezone and business-hours policy stay caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -991,7 +991,7 @@
         "invalid",
         "disabled"
       ],
-      "preview": "field",
+      "preview": "choice-group",
       "accessibility": "Renders a native fieldset and visible legend with optional helper, announced error, disabled propagation, and native Checkbox or Radio keyboard/form behavior.",
       "extension": "attributes targets HTMLFieldSetElement; legend, option controls, values, checked state, copy, validation, and vertical or horizontal layout stay explicit.",
       "example": "docs-site/examples/ui-system.ts",
@@ -1081,7 +1081,7 @@
         "closed",
         "open"
       ],
-      "preview": "menu",
+      "preview": "context-menu",
       "accessibility": "Supports pointer, ContextMenu-key, and Shift+F10 invocation without a synthetic trigger; opening focuses the menu and Escape returns focus to the native target surface.",
       "extension": "Target content, instance ID, position gesture, controlled open state, item effects, routing, commands, and authorization remain caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -1110,7 +1110,7 @@
         "invalid",
         "disabled"
       ],
-      "preview": "field",
+      "preview": "control-field",
       "accessibility": "Provides a visible native label plus deterministic label, helper, error, required-indicator, aria-describedby, aria-errormessage, and aria-invalid relationships for a caller-rendered control.",
       "extension": "attributes targets the outer HTMLDivElement; a render callback receives public relationship metadata while control value, events, validation, and native attributes stay caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -1285,7 +1285,7 @@
         "closed",
         "open"
       ],
-      "preview": "menu",
+      "preview": "dropdown-menu",
       "accessibility": "Provides one roving Tab stop, buffered typeahead, disabled skipping, separators, checkbox/radio roles, controlled nested submenus, Escape/focus return, and RTL movement from a keyboard-complete menu button.",
       "extension": "A collision-safe instance ID, item data, links, buttons, selection effects, checked state, submenu state, and controlled root open state remain caller-owned.",
       "example": "docs-site/examples/ui-system.ts",
@@ -1399,7 +1399,7 @@
         "invalid",
         "disabled"
       ],
-      "preview": "field",
+      "preview": "form-field",
       "accessibility": "Uses implicit native label association, visible helper text, aria-invalid, and a role=alert validation message.",
       "extension": "Input attributes target HTMLInputElement; fieldAttributes targets HTMLLabelElement; composed children stay explicit.",
       "example": "docs-site/examples/ui-system.ts",
@@ -1746,7 +1746,7 @@
         "closed",
         "open"
       ],
-      "preview": "disclosure",
+      "preview": "responsive-disclosure",
       "accessibility": "Uses one native details/summary tree, keeps desktop expanded, restores the last compact user choice across breakpoint changes, synchronizes aria-expanded, and removes its MediaQueryList listener on disconnect.",
       "extension": "compactBreakpoint and compactInitialOpen define compact state; compactResetToken is the deliberate reset boundary; callers own content and effects.",
       "example": "docs-site/examples/ui-system.ts",

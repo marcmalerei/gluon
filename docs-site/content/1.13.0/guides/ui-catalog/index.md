@@ -43,6 +43,11 @@ This catalog is generated from the public UI package manifests. It is the
 user-facing overview of the component library; Storybook remains the developer
 verification surface.
 
+Every card below is backed by an explicit renderer for its manifest preview key.
+The page intentionally fails verification when a component has no registered
+anatomy; the preview is representative documentation, while routing, data,
+permissions, and tenant-specific content remain caller-owned.
+
 <div class="ui-catalog" data-ui-catalog>
   <label class="ui-catalog-search">
     Search components
@@ -144,56 +149,50 @@ verification surface.
           <template v-else-if="entry.preview === 'link'">
             <a :href="`#catalog-${entry.layer}-${entry.name}`" class="ui-sample-link">View component details</a>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--badge'">
+          <template v-else-if="entry.preview === 'badge'">
             <span class="ui-sample-badge">Neutral</span>
             <span class="ui-sample-badge is-info">Info</span>
             <span class="ui-sample-badge is-success">Ready</span>
             <span class="ui-sample-badge is-warning">Review</span>
             <span class="ui-sample-badge is-danger">Blocked</span>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--typography'">
+          <template v-else-if="entry.preview === 'heading' || entry.preview === 'text'">
             <h3 v-if="entry.name === 'Heading'" class="ui-sample-heading">Swiss editorials</h3>
             <p v-else class="ui-sample-copy">Supporting copy stays readable and composable.</p>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--link'">
+          <template v-else-if="entry.preview === 'link'">
             <a :href="`#catalog-${entry.layer}-${entry.name}`" class="ui-sample-link">Open component reference</a>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--media'">
+          <template v-else-if="entry.preview === 'image'">
             <figure class="ui-sample-media is-image" aria-label="Responsive image preview"><span>Product image</span></figure>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--feedback'">
+          <template v-else-if="entry.preview === 'meter' || entry.preview === 'spinner' || entry.preview === 'skeleton'">
             <meter v-if="entry.name === 'Meter'" class="ui-sample-meter" min="0" max="100" value="72">72%</meter>
             <template v-else-if="entry.name === 'Spinner'"><span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span></template>
             <template v-else><span class="ui-sample-skeleton is-wide" aria-hidden="true"></span><span class="ui-sample-skeleton is-short" aria-hidden="true"></span></template>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--file-input'">
+          <template v-else-if="entry.preview === 'file-input'">
             <label class="ui-sample-field">Product photos<input type="file" accept="image/*" multiple /></label>
             <span class="ui-sample-variant">single · multiple · capture</span>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--numeric-input'">
+          <template v-else-if="entry.preview === 'number-input'">
             <label class="ui-sample-field">Quantity<input type="number" min="1" max="9" value="2" /></label>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--date-input'">
+          <template v-else-if="entry.preview === 'date-input'">
             <label class="ui-sample-field">Delivery date<input type="date" value="2026-10-02" /></label>
           </template>
-          <template v-else-if="entry.preview === 'foundation-atoms--time-input'">
+          <template v-else-if="entry.preview === 'time-input'">
             <label class="ui-sample-field">Delivery time<input type="time" value="09:00" /></label>
           </template>
-          <template v-else-if="['input', 'date-input', 'number-input', 'time-input', 'textarea'].includes(entry.preview)">
-            <label class="ui-sample-field">{{ entry.name }}<input :type="entry.preview === 'date-input' ? 'date' : entry.preview === 'time-input' ? 'time' : entry.preview === 'number-input' ? 'number' : 'text'" :value="entry.preview === 'date-input' ? '2026-10-02' : entry.preview === 'time-input' ? '09:00' : entry.preview === 'number-input' ? '2' : 'Example value'" /></label>
+          <template v-else-if="['input', 'textarea'].includes(entry.preview)">
+            <label class="ui-sample-field">{{ entry.name }}<textarea v-if="entry.preview === 'textarea'" rows="2">Example value</textarea><input v-else type="text" value="Example value" /></label>
           </template>
           <template v-else-if="['checkbox', 'radio', 'switch'].includes(entry.preview)">
             <label class="ui-sample-choice"><input :type="entry.preview === 'radio' ? 'radio' : 'checkbox'" :checked="entry.preview !== 'radio'" /> {{ entry.name }} option</label>
           </template>
-          <template v-else-if="entry.preview === 'progress' || entry.preview === 'meter'">
-            <div class="ui-sample-progress"><span :style="{ width: entry.preview === 'meter' ? '72%' : '48%' }"></span></div>
-            <small>{{ entry.preview === 'meter' ? '72 / 100' : 'Step 2 of 4' }}</small>
-          </template>
-          <template v-else-if="entry.preview === 'spinner'">
-            <span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span>
-          </template>
-          <template v-else-if="entry.preview === 'skeleton'">
-            <span class="ui-sample-skeleton is-wide"></span><span class="ui-sample-skeleton is-short"></span>
+          <template v-else-if="entry.preview === 'progress'">
+            <div class="ui-sample-progress"><span style="width: 48%"></span></div>
+            <small>Step 2 of 4</small>
           </template>
           <template v-else-if="entry.preview === 'card'">
             <article class="ui-sample-surface ui-sample-card"><strong>Orbit lamp</strong><span>Composable content surface</span><a class="ui-sample-link" href="#catalog">View details</a></article>
@@ -247,21 +246,30 @@ verification surface.
           <template v-else-if="['toggle-button', 'button-group', 'toolbar'].includes(entry.preview)">
             <div class="ui-sample-tabs" :role="entry.preview === 'toolbar' ? 'toolbar' : 'group'" :aria-label="entry.name"><button class="is-active" type="button" :aria-pressed="entry.preview === 'toggle-button' ? 'true' : undefined">View</button><button type="button" :aria-pressed="entry.preview === 'toggle-button' ? 'false' : undefined">Sort</button><button type="button" :aria-pressed="entry.preview === 'toggle-button' ? 'false' : undefined">Filter</button></div>
           </template>
-          <template v-else-if="['menu', 'menubar', 'navigation-menu'].includes(entry.preview)">
-            <template v-if="entry.name === 'DropdownMenu' || entry.name === 'ContextMenu'">
-              <div class="ui-sample-menu ui-sample-menu-popover"><button class="ui-sample-button is-secondary" type="button" aria-haspopup="menu" aria-expanded="true">{{ entry.name === 'ContextMenu' ? 'Open context menu' : 'Shop menu' }}</button><ul role="menu"><li role="menuitem"><a href="#catalog">Shop</a></li><li role="menuitem"><a href="#catalog">Journal</a></li><li role="menuitem" aria-disabled="true">About</li></ul></div>
+          <template v-else-if="['dropdown-menu', 'context-menu', 'menubar', 'navigation-menu'].includes(entry.preview)">
+            <template v-if="entry.preview === 'dropdown-menu' || entry.preview === 'context-menu'">
+              <div class="ui-sample-menu ui-sample-menu-popover"><button class="ui-sample-button is-secondary" type="button" aria-haspopup="menu" aria-expanded="true">{{ entry.preview === 'context-menu' ? 'Open context menu' : 'Shop menu' }}</button><ul role="menu"><li role="menuitem"><a href="#catalog">Shop</a></li><li role="menuitem"><a href="#catalog">Journal</a></li><li role="menuitem" aria-disabled="true">About</li></ul></div>
             </template>
-            <template v-else-if="entry.name === 'Menubar'">
+            <template v-else-if="entry.preview === 'menubar'">
               <div class="ui-sample-menu" role="menubar" aria-label="Preview navigation"><button type="button" role="menuitem" aria-haspopup="menu" aria-expanded="true">Shop</button><button type="button" role="menuitem">Journal</button><button type="button" role="menuitem">About</button></div>
             </template>
             <template v-else>
               <nav class="ui-sample-menu" aria-label="Preview navigation"><a href="#catalog" aria-current="page">Shop</a><a href="#catalog">Journal</a><a href="#catalog">About</a></nav>
             </template>
           </template>
-          <template v-else-if="entry.preview === 'accordion' || entry.preview === 'disclosure'">
-            <details open class="ui-sample-disclosure"><summary>{{ entry.name }} heading</summary><span>Expandable content</span></details>
+          <template v-else-if="entry.preview === 'accordion' || entry.preview === 'disclosure' || entry.preview === 'responsive-disclosure'">
+            <details open class="ui-sample-disclosure"><summary>{{ entry.name }} heading</summary><span>{{ entry.preview === 'responsive-disclosure' ? 'Expanded on desktop, user-controlled on compact layouts.' : 'Expandable content' }}</span></details>
           </template>
-          <template v-else-if="entry.preview === 'field' || entry.preview === 'password' || entry.preview === 'otp'">
+          <template v-else-if="entry.preview === 'choice-group'">
+            <fieldset class="ui-sample-choice-group"><legend>Delivery method</legend><label><input type="radio" name="catalog-delivery" checked /> Standard · 2–4 days</label><label><input type="radio" name="catalog-delivery" /> Express · next day</label><small>Choose one option.</small></fieldset>
+          </template>
+          <template v-else-if="entry.preview === 'control-field'">
+            <div class="ui-sample-form"><label class="ui-sample-field">Configuration name<input type="text" value="Orbit setup" aria-describedby="catalog-control-helper" /></label><small id="catalog-control-helper">Shown in your saved configurations.</small></div>
+          </template>
+          <template v-else-if="entry.preview === 'form-field'">
+            <form class="ui-sample-form" @submit.prevent><label class="ui-sample-field">Email address<input type="email" value="preview@example.test" aria-describedby="catalog-form-helper" /></label><small id="catalog-form-helper">We use this for order updates.</small></form>
+          </template>
+          <template v-else-if="entry.preview === 'password' || entry.preview === 'otp'">
             <form class="ui-sample-form" @submit.prevent>
               <template v-if="entry.preview === 'otp'">
                 <label class="ui-sample-field">One-time code<input inputmode="numeric" autocomplete="one-time-code" value="123456" /></label>
@@ -363,10 +371,6 @@ verification surface.
           </template>
           <template v-else-if="entry.layer === 'organism'">
             <div class="ui-sample-shell" aria-label="Organism layout regions"><span class="is-bar">Nav</span><span class="is-header">Header</span><span class="is-content">Content</span><span class="is-footer">Actions</span></div>
-          </template>
-          <template v-else>
-            <span class="ui-sample-component" data-preview-fallback="true">{{ entry.name }}</span>
-            <span class="ui-sample-variant">Contract preview only · {{ entry.variants[0] }}</span>
           </template>
         </div>
         <div class="ui-catalog-preview-contract" aria-label="Documented variants and states">
