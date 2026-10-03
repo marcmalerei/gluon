@@ -2783,7 +2783,7 @@ describe('advanced data and workflow molecules', () => {
 
   it('composes native DatePicker and FileUpload form fields with tenant token hooks', async () => {
     const dates: string[] = [];
-    const files: readonly File[][] = [];
+    const files: File[][] = [];
     const selected = [new File(['image'], 'lamp.png', { type: 'image/png' })];
     render(q.main({ children: [
       DatePicker({
