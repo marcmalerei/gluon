@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2729,6 +2729,83 @@ describe('advanced data and workflow molecules', () => {
     expect(getStyleSheetText(adminShellStyles)).toContain('forced-colors');
     expect(() => render(AdminShell({ id: 'bad shell', main: 'Main' }), document.body)).toThrow('whitespace');
     expect(() => render(AdminShell({ id: 'empty-label', main: 'Main', sidebar: 'Links', sidebarLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders a controlled NavigationRail with active, disabled, mobile, and tenant styling semantics', async () => {
+    const onCollapsedChange = vi.fn();
+    const onMobileOpenChange = vi.fn();
+    render(NavigationRail({
+      id: 'workspace-rail',
+      label: 'Workspace navigation',
+      groups: [{
+        id: 'workspace',
+        label: 'Workspace',
+        items: [
+          { id: 'overview', label: 'Overview', href: '/overview', active: true, icon: '⌂' },
+          { id: 'orders', label: 'Orders', href: '/orders', badge: '4' },
+          { id: 'archived', label: 'Archived', disabled: true },
+        ],
+      }],
+      header: q.strong({ children: 'GLUON GOODS' }),
+      footer: q.small({ children: 'Tenant workspace' }),
+      mobileOpen: true,
+      attributes: { class: 'tenant-navigation-rail', style: { '--gluon-navigation-rail-width': '19rem' } },
+      onCollapsedChange,
+      onMobileOpenChange,
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#workspace-rail')!;
+    expect(root.tagName).toBe('ASIDE');
+    expect(root.dataset.navigationRailRoot).toBe('workspace-rail');
+    expect(root.classList).toContain('tenant-navigation-rail');
+    expect(root.getAttribute('aria-label')).toBe('Workspace navigation');
+    expect(root.querySelector('.gluon-navigation-rail-navigation')?.getAttribute('aria-label')).toBe('Workspace navigation');
+    expect(root.querySelector('[aria-current="page"]')?.id).toBe('workspace-rail-item-overview');
+    expect(root.querySelector('#workspace-rail-item-orders .gluon-navigation-rail-badge')?.textContent).toBe('4');
+    expect(root.querySelector('#workspace-rail-item-archived')?.getAttribute('aria-disabled')).toBe('true');
+    expect(root.querySelector('#workspace-rail-panel')?.classList).toContain('gluon-navigation-rail-panel');
+    expect(root.querySelector('[data-navigation-rail-mobile-button]')?.getAttribute('aria-expanded')).toBe('true');
+    root.querySelector<HTMLButtonElement>('[data-navigation-rail-collapse-button]')!.click();
+    expect(onCollapsedChange).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+    root.querySelector<HTMLButtonElement>('[data-navigation-rail-mobile-button]')!.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
+    root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(KeyboardEvent));
+    expect(root.style.getPropertyValue('--gluon-navigation-rail-width')).toBe('19rem');
+    expect(getStyleSheetText(navigationRailStyles)).toContain('--gluon-navigation-rail');
+    expect(getStyleSheetText(navigationRailStyles)).toContain('forced-colors');
+
+    const onLinkClick = vi.fn((event: MouseEvent) => event.preventDefault());
+    const onOpenMobile = vi.fn();
+    render(NavigationRail({
+      id: 'mobile-navigation-rail',
+      label: 'Mobile navigation',
+      groups: [{ id: 'group', items: [{ id: 'link', label: 'Link', href: '/link', attributes: { onClick: onLinkClick } }, { id: 'disabled', label: 'Disabled', disabled: true }] }],
+      onMobileOpenChange: onOpenMobile,
+    }), document.body);
+    const mobileRoot = document.querySelector<HTMLElement>('#mobile-navigation-rail')!;
+    mobileRoot.querySelector<HTMLAnchorElement>('[data-navigation-rail-item="link"]')!.click();
+    expect(onLinkClick).toHaveBeenCalledWith(expect.any(MouseEvent));
+    const disabledEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+    mobileRoot.querySelector<HTMLAnchorElement>('[data-navigation-rail-item="disabled"]')!.dispatchEvent(disabledEvent);
+    expect(disabledEvent.defaultPrevented).toBe(true);
+    mobileRoot.querySelector<HTMLButtonElement>('[data-navigation-rail-mobile-button]')!.click();
+    expect(onOpenMobile).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+
+    const onOutsideClose = vi.fn();
+    render(NavigationRail({
+      id: 'outside-navigation-rail',
+      label: 'Outside navigation',
+      groups: [{ id: 'group', items: [{ id: 'link', label: 'Link' }] }],
+      mobileOpen: true,
+      onMobileOpenChange: onOutsideClose,
+    }), document.body);
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(onOutsideClose).toHaveBeenCalledWith(false, expect.any(PointerEvent));
+
+    expect(() => render(NavigationRail({ id: 'bad rail', label: 'Rail', groups: [] }), document.body)).toThrow(/NavigationRail.id/);
+    expect(() => render(NavigationRail({ id: 'empty-rail', label: 'Rail', groups: [] }), document.body)).toThrow(/at least one group/);
+    expect(() => render(NavigationRail({ id: 'empty-group', label: 'Rail', groups: [{ id: 'group', items: [] }] }), document.body)).toThrow(/at least one item/);
+    expect(() => render(NavigationRail({ id: 'duplicate-rail', label: 'Rail', groups: [{ id: 'group', items: [{ id: 'same', label: 'A' }] }, { id: 'same', items: [{ id: 'other', label: 'B' }] }] }), document.body)).toThrow(/unique/);
   });
 
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {

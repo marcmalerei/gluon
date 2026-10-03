@@ -2319,6 +2319,37 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "NavigationRail",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-navigation-rail"
+      ],
+      "variants": [
+        "expanded",
+        "collapsed",
+        "mobile"
+      ],
+      "states": [
+        "default",
+        "active",
+        "disabled",
+        "mobile-open"
+      ],
+      "preview": "navigation-rail",
+      "accessibility": "Renders a labelled navigation landmark with grouped links, active and disabled semantics, controlled desktop collapse, mobile disclosure, Escape/focus return, 44px controls, visible focus, forced-colors, and reduced-motion support.",
+      "extension": "Groups, labels, URLs, active state, badges, routing, authorization, permissions, analytics, localization, tenant identity, and state persistence remain caller-owned; region attributes, parts, and CSS variables support application-specific composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/NavigationRail.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "PageLayout",
       "kind": "component",
       "status": "stable",
