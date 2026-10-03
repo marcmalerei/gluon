@@ -112,6 +112,12 @@ try {
   if (await page.locator('[data-preview="time-picker"] input[type="time"]').count() !== 1) {
     throw new Error('time-picker preview does not show native time anatomy');
   }
+  if (await page.locator('[data-preview="multi-select-field"] select[multiple] option').count() !== 3) {
+    throw new Error('multi-select-field preview does not show native multiple-selection anatomy');
+  }
+  if (await page.locator('[data-preview="calendar"] [role="grid"] [role="gridcell"]').count() !== 7) {
+    throw new Error('calendar preview does not show a native day-grid anatomy');
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }

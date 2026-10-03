@@ -127,6 +127,14 @@ verification surface.
             <div class="ui-sample-field ui-sample-time-picker"><label for="catalog-time-preview">Delivery time</label><input id="catalog-time-preview" type="time" value="09:00" min="08:00" max="18:00" step="900" /><small>15-minute increments · 08:00–18:00</small></div>
             <span class="ui-sample-variant">native time · min/max · step · error</span>
           </template>
+          <template v-else-if="entry.preview === 'multi-select-field'">
+            <label class="ui-sample-field">Delivery methods<select multiple size="3" aria-label="Delivery methods"><option selected>Standard · 2–4 days</option><option>Express · next day</option><option disabled>Pickup · unavailable</option></select></label>
+            <span class="ui-sample-variant">native multiple · selected · disabled</span>
+          </template>
+          <template v-else-if="entry.preview === 'calendar'">
+            <div class="ui-sample-calendar" role="region" aria-label="Delivery date calendar"><header><button type="button" aria-label="Previous month">‹</button><strong>October 2026</strong><button type="button" aria-label="Next month">›</button></header><table role="grid" aria-label="October 2026"><thead><tr><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th></tr></thead><tbody><tr><td role="gridcell"><button type="button">28</button></td><td role="gridcell"><button type="button">29</button></td><td role="gridcell"><button type="button">30</button></td><td role="gridcell"><button type="button">1</button></td><td role="gridcell"><button type="button">2</button></td><td role="gridcell"><button type="button" aria-current="date">3</button></td><td role="gridcell"><button type="button" aria-selected="true">4</button></td></tr></tbody></table></div>
+            <span class="ui-sample-variant">month grid · selected · today · bounded</span>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>

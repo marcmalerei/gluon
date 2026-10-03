@@ -50,6 +50,8 @@ export { DatePicker, type DatePickerAttributes, type DatePickerInputAttributes, 
 export { DateRangePicker, type DateRangePickerAttributes, type DateRangePickerField, type DateRangePickerInputAttributes, type DateRangePickerProps, type DateRangeValue } from './date-range-picker.js';
 export { FileUpload, type FileUploadAttributes, type FileUploadInputAttributes, type FileUploadProps } from './file-upload.js';
 export { TimePicker, type TimePickerAttributes, type TimePickerInputAttributes, type TimePickerProps } from './time-picker.js';
+export { MultiSelectField, type MultiSelectFieldAttributes, type MultiSelectFieldOption, type MultiSelectFieldProps, type MultiSelectFieldSelectAttributes } from './multi-select-field.js';
+export { Calendar, type CalendarAttributes, type CalendarProps } from './calendar.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';
@@ -82,4 +84,6 @@ export { datePickerStyles } from './date-picker-styles.js';
 export { dateRangePickerStyles } from './date-range-picker-styles.js';
 export { fileUploadStyles } from './file-upload-styles.js';
 export { timePickerStyles } from './time-picker-styles.js';
+export { multiSelectFieldStyles } from './multi-select-field-styles.js';
+export { calendarStyles } from './calendar-styles.js';
 export { defineMolecule, type Component } from '@gluonjs/core';
