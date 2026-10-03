@@ -1498,7 +1498,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, adminShellStyles, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, type AdminShellAttributes, type AdminShellNavigationAttributes, type AdminShellProps, type AdminShellRegionAttributes, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, adminShellStyles, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGalleryStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, type AdminShellAttributes, type AdminShellNavigationAttributes, type AdminShellProps, type AdminShellRegionAttributes, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGalleryAttributes, type ProductGalleryImage, type ProductGalleryImageAttributes, type ProductGalleryProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1520,6 +1520,10 @@
         "const productColumns: ProductGridColumns = 3;",
         "const productGridAttributes: ProductGridAttributes = { class: 'catalog-product-grid' };",
         "const productGrid: ProductGridProps = { items: [product], columns: productColumns, renderCard: (item) => ProductCard({ product: item, price: '€128' }), emptyContent: 'No products found.', attributes: productGridAttributes };",
+        "const galleryImage: ProductGalleryImage = { id: 'orbit-primary', src: '/assets/orbit-lamp.webp', alt: 'Orbit lamp', primary: true };",
+        "const galleryImageAttributes: ProductGalleryImageAttributes = { class: 'catalog-gallery-image', loading: 'lazy' };",
+        "const galleryAttributes: ProductGalleryAttributes = { class: 'catalog-product-gallery', style: { '--gluon-product-gallery-gap': '1rem' } };",
+        "const productGallery: ProductGalleryProps = { id: 'catalog-gallery', label: 'Orbit lamp gallery', images: [{ ...galleryImage, attributes: galleryImageAttributes }, { id: 'orbit-detail', src: '/assets/orbit-lamp.webp', alt: '' }], attributes: galleryAttributes };",
         "const initialFocus: ConfirmationDialogInitialFocus = '[data-confirm-primary]';",
         "const confirmationOptions = { initialFocus } satisfies ConfirmationDialogControllerOptions;",
         "const confirmationController: ConfirmationDialogController = createConfirmationDialogController(confirmationOptions);",
@@ -1547,7 +1551,7 @@
         "const footerNavigationAttributes: SiteFooterNavigationAttributes = { 'aria-label': 'Catalog footer navigation' };",
         "const footerRegionAttributes: SiteFooterRegionAttributes = { class: 'catalog-footer-region' };",
         "const footer: SiteFooterProps = { id: 'catalog-footer', brand: html`<a href='/'>GLUON GOODS</a>`, navigation: html`<a href='/shop'>Shop</a><a href='/journal'>Journal</a>`, legal: html`<a href='/privacy'>Privacy</a>`, meta: html`<small>© 2026 Gluon Goods</small>`, attributes: footerAttributes, navigationAttributes: footerNavigationAttributes, brandAttributes: footerRegionAttributes, legalAttributes: footerRegionAttributes, metaAttributes: footerRegionAttributes };",
-        "console.log(AdminShell(adminShell), AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), SiteFooter(footer), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), adminShellStyles, asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
+        "console.log(AdminShell(adminShell), AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGallery(productGallery), ProductGrid(productGrid), SiteFooter(footer), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), adminShellStyles, asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGalleryStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
       ]
     },
     "router-application": {
@@ -6180,6 +6184,30 @@
     "packages/organisms/src/type-aliases/ProductGridColumns.md": {
       "recipe": "organism-components",
       "description": "Select one of the supported responsive product-grid column counts:"
+    },
+    "packages/organisms/src/variables/ProductGallery.md": {
+      "recipe": "organism-components",
+      "description": "Render a typed responsive product gallery while media selection, crop treatment, zoom, and routing remain caller-owned:"
+    },
+    "packages/organisms/src/variables/productGalleryStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable ProductGallery stylesheet and its tenant-scoped CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/ProductGalleryImage.md": {
+      "recipe": "organism-components",
+      "description": "Describe one accessible or decorative product-gallery image with a stable caller-owned identifier:"
+    },
+    "packages/organisms/src/interfaces/ProductGalleryProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure source-ordered gallery media, a labelled root, and tenant-specific native attributes:"
+    },
+    "packages/organisms/src/type-aliases/ProductGalleryAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native section attributes and CSS-variable overrides to the ProductGallery root:"
+    },
+    "packages/organisms/src/type-aliases/ProductGalleryImageAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native image attributes for caller-owned loading, decoding, and crop classes:"
     },
     "packages/organisms/src/variables/MegaMenu.md": {
       "recipe": "organism-components",

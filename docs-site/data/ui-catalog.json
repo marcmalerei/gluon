@@ -2079,6 +2079,36 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "ProductGallery",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-product-gallery"
+      ],
+      "variants": [
+        "primary",
+        "responsive",
+        "cropped"
+      ],
+      "states": [
+        "default",
+        "focusable",
+        "scrollable"
+      ],
+      "preview": "product-gallery",
+      "accessibility": "Renders a labelled figure collection with source-order-preserving primary media, meaningful alt text, decorative-image support, per-image identifiers, keyboard focus visibility, responsive scroll snapping, forced-colors, and reduced-motion support.",
+      "extension": "Image URLs, alt text, crop treatment, selection state, lightbox, zoom, thumbnails, inventory, routing, analytics, localization, tenant media, and CSS variables remain caller-owned; stable root and image IDs support integration and tenant-specific styling.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/ProductGallery.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "ProductGrid",
       "kind": "component",
       "status": "stable",

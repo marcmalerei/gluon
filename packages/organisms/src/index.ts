@@ -9,6 +9,8 @@ export { asyncStateStyles } from './async-state-styles.js';
 export { ProductCard, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps } from './product-card.js';
 export { ProductGrid, productGridStyles, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps } from './product-grid.js';
 export { productCardStyles } from './product-card-styles.js';
+export { ProductGallery, type ProductGalleryAttributes, type ProductGalleryImage, type ProductGalleryImageAttributes, type ProductGalleryProps } from './product-gallery.js';
+export { productGalleryStyles } from './product-gallery-styles.js';
 export { ConfirmationDialog, createConfirmationDialogController, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps } from './confirmation-dialog.js';
 export { confirmationDialogStyles } from './confirmation-dialog-styles.js';
 export { WorkflowTimeline, type WorkflowTimelineAttributes, type WorkflowTimelineMessages, type WorkflowTimelineOverallState, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineStep } from './workflow-timeline.js';

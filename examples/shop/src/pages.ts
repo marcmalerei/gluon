@@ -16,6 +16,7 @@ import {
   ProductConfigurator,
   type ProductConfiguratorRenderer,
 } from './product-configurator.js';
+import { ProductGallery as ProductGalleryOrganism } from '@gluonjs/organisms';
 import {
   CategoryLinks,
   ProductCard,
@@ -173,7 +174,16 @@ export function ProductPage(
         ${RouterLink({ to: '/shop', children: 'Back' })}
       </div>
       <div class="product-layout">
-        ${ProductGallery(product)}
+        ${ProductGalleryOrganism({
+          id: `${product.slug}-gallery`,
+          label: `${product.name} gallery`,
+          images: [
+            { id: 'primary', src: product.image, alt: product.alt, primary: true },
+            { id: 'detail-top', src: product.image, alt: '', attributes: { class: 'detail-crop detail-top' } },
+            { id: 'detail-base', src: product.image, alt: '', attributes: { class: 'detail-crop detail-base' } },
+          ],
+          attributes: { class: 'product-gallery', tabIndex: 0 },
+        })}
         ${renderProductConfigurator({
           product,
           configuration: store.configuration,
@@ -329,17 +339,6 @@ export function OrderConfirmationPage(store: ShopStore): TemplateValue {
       action: RouterLink({ to: '/shop', children: 'Continue shopping', attributes: { class: 'primary-button' } }),
     })}
   </section>`;
-}
-
-function ProductGallery(product: Product): TemplateValue {
-  return html`
-    <section class="product-gallery" aria-label=${`${product.name} gallery`} tabindex="0">
-      <figure class="gallery-primary"><img src=${product.image} alt=${product.alt}></figure>
-      <figure><img src=${product.image} alt="" class="detail-crop detail-top"></figure>
-      <figure><img src=${product.image} alt="" class="detail-crop detail-base"></figure>
-      <div class="gallery-dots" aria-hidden="true"><span class="is-active"></span><span></span><span></span></div>
-    </section>
-  `;
 }
 
 function PolicyPage(title: string, copy: string, details?: TemplateValue): TemplateValue {

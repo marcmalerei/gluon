@@ -86,6 +86,13 @@ supports an explicit empty surface, and falls back to one column on small
 screens. Both expose parts, data attributes, and CSS custom properties for
 tenant-specific themes.
 
+`ProductGallery` renders typed product media in source order while allowing one
+image to be the primary responsive panel. Decorative alternate views may use
+empty alt text, every image has a stable caller-owned identifier, and the
+component provides responsive scrolling, focus, forced-colors, reduced-motion,
+and CSS-variable hooks. Zoom, lightbox state, crop choices, tenant media,
+analytics, and routing remain application-owned.
+
 `SiteHeader` renders a semantic, responsive header with caller-owned brand,
 navigation, actions, and an optional controlled mobile navigation region. Its
 mobile disclosure supports Escape/focus return, 44px controls, and CSS-variable
