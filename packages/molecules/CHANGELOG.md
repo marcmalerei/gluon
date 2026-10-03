@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Added the CSS-variable-ready `SortControl` molecule with native select semantics, helper/error relationships, and caller-owned sorting state.
+
 ## [1.13.0] - 2026-09-25
 
 ### Changed

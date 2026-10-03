@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ConfirmationDialog, ProductGallery, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -193,6 +193,21 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('data-product-gallery-image="detail"');
     expect(rendered).toContain('alt="Orbit Lamp"');
     expect(rendered).toContain('aria-label="Orbit Lamp gallery"');
+  });
+
+  it('serializes SortControl label and native selection relationships without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(SortControl({
+      id: 'server-sort',
+      label: 'Sort products',
+      value: 'featured',
+      options: [{ value: 'featured', label: 'Featured' }, { value: 'price-low', label: 'Price: low to high' }],
+      helper: 'Choose the catalog order.',
+    })));
+    expect(rendered).toContain('id="server-sort"');
+    expect(rendered).toContain('id="server-sort-label"');
+    expect(rendered).toContain('for="server-sort-select"');
+    expect(rendered).toContain('aria-describedby="server-sort-description"');
+    expect(rendered).toContain('value="price-low"');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {

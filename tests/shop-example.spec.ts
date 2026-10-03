@@ -3,7 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
-import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
+import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, sortControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
 import { megaMenuStyles, productGalleryStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
@@ -257,13 +257,14 @@ describe('GLUON GOODS reference shop', () => {
         && currentRect.right <= currentViewportRect.right + 1;
     }).toBe(true);
     expect(root.querySelectorAll('.catalog-grid .product-card')).toHaveLength(1);
-    const sort = root.querySelector<HTMLSelectElement>('#catalog-sort')!;
+    const sort = root.querySelector<HTMLSelectElement>('#catalog-sort-select')!;
     expect(sort.value).toBe('featured');
+    expect(document.adoptedStyleSheets).toContain(sortControlStyles);
     sort.value = 'price-high';
     sort.dispatchEvent(new Event('change', { bubbles: true }));
     await settleShop();
     expect(router.currentRoute.value.fullPath).toBe('/shop?category=Seating&sort=price-high');
-    expect(root.querySelector<HTMLSelectElement>('#catalog-sort')?.value).toBe('price-high');
+    expect(root.querySelector<HTMLSelectElement>('#catalog-sort-select')?.value).toBe('price-high');
     expect(document.adoptedStyleSheets).toContain(segmentedControlStyles);
     const viewButtons = root.querySelectorAll<HTMLButtonElement>('.catalog-view button');
     expect(viewButtons).toHaveLength(2);
@@ -278,6 +279,7 @@ describe('GLUON GOODS reference shop', () => {
     app.unmount();
     expect(document.adoptedStyleSheets).not.toContain(navigationStripStyles);
     expect(document.adoptedStyleSheets).not.toContain(segmentedControlStyles);
+    expect(document.adoptedStyleSheets).not.toContain(sortControlStyles);
   });
 
   it('completes bag checkout and renders a durable order confirmation route', async () => {

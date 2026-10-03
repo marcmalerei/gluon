@@ -82,6 +82,8 @@ import {
   ComboboxField,
   CommandPalette,
   TreeView,
+  SortControl,
+  sortControlStyles,
   comboboxFieldStyles,
   commandPaletteStyles,
   listboxFieldStyles,
@@ -2775,6 +2777,34 @@ describe('advanced data and workflow molecules', () => {
     expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
   });
 
+  it('renders SortControl with native select semantics and caller-owned changes', async () => {
+    const values: string[] = [];
+    render(SortControl({
+      id: 'catalog-sort-control',
+      label: 'Sort products',
+      value: 'price-low',
+      options: [
+        { value: 'featured', label: 'Featured' },
+        { value: 'price-low', label: 'Price: low to high' },
+        { value: 'oldest', label: 'Oldest first', disabled: true },
+      ],
+      helper: 'Choose the order for this catalog.',
+      onChange: (value) => values.push(value),
+      attributes: { style: { '--gluon-sort-control-gap': '1rem' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#catalog-sort-control')!;
+    const select = root.querySelector<HTMLSelectElement>('select')!;
+    expect(select.id).toBe('catalog-sort-control-select');
+    expect(select.value).toBe('price-low');
+    expect(select.getAttribute('aria-labelledby')).toBe('catalog-sort-control-label');
+    expect(select.getAttribute('aria-describedby')).toBe('catalog-sort-control-description');
+    expect(select.querySelectorAll('option')).toHaveLength(3);
+    expect(select.querySelector('option[value="oldest"]')?.disabled).toBe(true);
+    await userEvent.selectOptions(select, 'featured');
+    expect(values).toEqual(['featured']);
+    expect(getStyleSheetText(sortControlStyles)).toContain('--gluon-sort-control-gap');
+  });
+
   it('composes a labelled ListboxField with selection, helper, and error relationships', async () => {
     const values: string[] = [];
     render(ListboxField({
@@ -3113,6 +3143,9 @@ describe('advanced data and workflow molecules', () => {
 
     render(DataList({ id: 'single-column', columns: 1, items: [{ id: 'owner', label: 'Owner', value: 'Ada' }] }), document.body);
     expect(document.querySelector('#single-column')?.classList).toContain('is-1-columns');
+    render(SortControl({ id: 'compact-sort', label: 'Sort', options: [{ value: 'featured', label: 'Featured' }], disabled: true, error: 'Sorting is unavailable.' }), document.body);
+    expect(document.querySelector<HTMLSelectElement>('#compact-sort-select')?.disabled).toBe(true);
+    expect(document.querySelector('#compact-sort-select')?.getAttribute('aria-invalid')).toBe('true');
 
     expect(() => Tooltip({ id: 'bad id', content: 'x', children: 'x' })).toThrow(/Tooltip.id/);
     expect(() => Tooltip({ id: '', content: 'x', children: 'x' })).toThrow(/Tooltip.id/);
@@ -3123,6 +3156,9 @@ describe('advanced data and workflow molecules', () => {
     expect(() => FilterBar({ id: 'valid-id', label: ' ', children: 'x' })).toThrow(/FilterBar.label/);
     expect(() => DataList({ id: 'duplicate-data', items: [{ id: 'same', label: 'A', value: '1' }, { id: 'same', label: 'B', value: '2' }] })).toThrow(/unique/);
     expect(() => DataList({ id: 'invalid-data', items: [{ id: 'bad id', label: 'A', value: '1' }] })).toThrow(/DataList item ids/);
+    expect(() => SortControl({ id: 'bad sort id', label: 'Sort', options: [] })).toThrow(/SortControl.id/);
+    expect(() => SortControl({ id: 'missing-sort-label', label: ' ', options: [] })).toThrow(/SortControl.label/);
+    expect(() => SortControl({ id: 'duplicate-sort', label: 'Sort', options: [{ value: 'same', label: 'A' }, { value: 'same', label: 'B' }] })).toThrow(/unique/);
   });
 });
 

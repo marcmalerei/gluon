@@ -43,6 +43,7 @@ export { CommandPalette, type CommandPaletteAttributes, type CommandPaletteComma
 export { commandPaletteStyles } from './command-palette-styles.js';
 export { TreeView, type TreeViewAttributes, type TreeViewNode, type TreeViewProps } from './tree-view.js';
 export { treeViewStyles } from './tree-view-styles.js';
+export { SortControl, type SortControlAttributes, type SortControlOption, type SortControlProps, type SortControlSelectAttributes } from './sort-control.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';
@@ -68,4 +69,5 @@ export { searchFieldStyles } from './search-field-styles.js';
 export { searchResultsStyles } from './search-results-styles.js';
 export { oneTimePasswordFieldStyles } from './one-time-password-field-styles.js';
 export { passwordToggleFieldStyles } from './password-toggle-field-styles.js';
+export { sortControlStyles } from './sort-control-styles.js';
 export { defineMolecule, type Component } from '@gluonjs/core';
