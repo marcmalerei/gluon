@@ -2761,6 +2761,31 @@ describe('advanced data and workflow molecules', () => {
     expect(() => render(DashboardShell({ id: 'empty-label', main: 'Main', sidebar: 'Links', sidebarLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
+  it('closes an open DashboardShell from Escape, toggle, and outside pointer input', async () => {
+    const onMobileOpenChange = vi.fn();
+    render(DashboardShell({
+      id: 'open-dashboard-shell',
+      sidebar: 'Navigation',
+      main: 'Workspace',
+      mobileOpen: true,
+      onMobileOpenChange,
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#open-dashboard-shell')!;
+    const button = root.querySelector<HTMLButtonElement>('[data-dashboard-shell-mobile-button]')!;
+    button.focus();
+    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    root.dispatchEvent(escape);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(escape.defaultPrevented).toBe(true);
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, escape);
+    expect(document.activeElement).toBe(button);
+
+    button.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(onMobileOpenChange).toHaveBeenCalledTimes(3);
+  });
+
   it('renders a controlled NavigationRail with active, disabled, mobile, and tenant styling semantics', async () => {
     const onCollapsedChange = vi.fn();
     const onMobileOpenChange = vi.fn();
