@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -174,6 +174,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('id="server-page-title"');
     expect(rendered).toContain('aria-labelledby="server-page-title"');
     expect(rendered).toContain('aria-label="Related content"');
+  });
+
+  it('serializes SplitPane regions and collapse relationships without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(SplitPane({
+      id: 'server-split',
+      primary: q.p({ children: 'Main workspace' }),
+      secondary: q.p({ children: 'Inspector' }),
+      secondaryLabel: 'Server inspector',
+      secondaryCollapsed: true,
+      orientation: 'vertical',
+    })));
+    expect(rendered).toContain('gluon-split-pane');
+    expect(rendered).toContain('data-orientation="vertical"');
+    expect(rendered).toContain('id="server-split-secondary"');
+    expect(rendered).toContain('aria-label="Server inspector"');
+    expect(rendered).toContain('aria-expanded="false"');
   });
 
   it('serializes AdminShell landmarks and navigation semantics without DOM state', async () => {

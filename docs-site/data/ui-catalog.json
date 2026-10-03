@@ -2259,6 +2259,36 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "SplitPane",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-split-pane"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical",
+        "responsive"
+      ],
+      "states": [
+        "expanded",
+        "collapsed",
+        "stacked"
+      ],
+      "preview": "split-pane",
+      "accessibility": "Renders labelled primary and secondary regions with a keyboard-operable native collapse control, responsive stacking, visible focus, forced-colors, and reduced-motion support.",
+      "extension": "Primary and secondary content, orientation, collapse state, labels, routing, permissions, data loading, mutations, localization, tenant identity, and domain state remain caller-owned; region attributes and CSS variables support tenant-safe composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/SplitPane.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "WorkflowTimeline",
       "kind": "component",
       "status": "stable",

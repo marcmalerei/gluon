@@ -17,6 +17,8 @@
   sidebar navigation, main workspace, optional footer, and CSS-variable hooks.
 - Added the typed `ProductGallery` organism with source-order-preserving media,
   stable image identifiers, responsive scrolling, and CSS-variable hooks.
+- Added the responsive `SplitPane` organism with labelled primary/secondary
+  regions, a keyboard-operable collapse control, and CSS-variable hooks.
 
 ## [1.13.0] - 2026-09-25
 

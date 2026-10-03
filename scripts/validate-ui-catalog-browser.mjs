@@ -89,6 +89,9 @@ try {
   if (await page.locator('[data-preview="page-layout"] .ui-sample-page-layout > .is-header').count() !== 1) {
     throw new Error('page-layout preview does not show its header anatomy');
   }
+  if (await page.locator('[data-preview="split-pane"] .ui-sample-split-pane > .is-primary').count() !== 1) {
+    throw new Error('split-pane preview does not show its primary anatomy');
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }

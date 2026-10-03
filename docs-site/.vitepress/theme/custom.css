@@ -171,6 +171,10 @@ html { scroll-behavior: smooth; }
 .ui-sample-page-layout .is-main { grid-row: 2; }
 .ui-sample-page-layout .is-aside { grid-row: 2; }
 .ui-sample-page-layout .is-footer { grid-column: 1 / -1; background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
+.ui-sample-split-pane { display: grid; grid-template-columns: minmax(0, 1fr) 34%; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-split-pane > span { display: grid; min-width: 0; min-height: 86px; place-items: center; border: 1px solid var(--vp-c-divider); background: color-mix(in srgb, var(--ui-catalog-accent) 12%, var(--vp-c-bg)); }
+.ui-sample-split-pane .is-secondary { grid-template-columns: 1fr auto; gap: 4px; padding-inline: 6px; background: color-mix(in srgb, var(--ui-catalog-accent) 5%, var(--vp-c-bg)); }
+.ui-sample-split-pane button { min-block-size: 24px; min-inline-size: 24px; border: 1px solid currentColor; border-radius: 3px; background: transparent; color: inherit; }
 .ui-sample-admin-shell { display: grid; grid-template-columns: 30% 1fr; grid-template-rows: auto 1fr auto; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
 .ui-sample-admin-shell > span { display: grid; min-height: 18px; place-items: center; background: color-mix(in srgb, var(--ui-catalog-accent) 14%, var(--vp-c-bg)); }
 .ui-sample-admin-shell .is-header { grid-column: 1 / -1; justify-content: start; padding-inline: 8px; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }

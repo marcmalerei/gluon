@@ -17,7 +17,7 @@ import {
 import { ref } from '@gluonjs/reactivity';
 import { Button, Icon } from '@gluonjs/atoms';
 import { Card, FormField } from '@gluonjs/molecules';
-import { AppShell, PageLayout, WorkflowTimeline, type WorkflowTimelineProps } from '@gluonjs/organisms';
+import { AppShell, PageLayout, SplitPane, WorkflowTimeline, type WorkflowTimelineProps } from '@gluonjs/organisms';
 import { fragment, q, quark } from '@gluonjs/quarks';
 
 describe('component variants and utilities', () => {
@@ -99,6 +99,14 @@ describe('component variants and utilities', () => {
         footer: q.small({ children: 'Last updated today' }),
         children: q.p({ children: 'Preferences' }),
       }),
+      SplitPane({
+        id: 'settings-split',
+        primary: q.p({ children: 'Editor' }),
+        secondary: q.p({ children: 'Inspector' }),
+        secondaryLabel: 'Settings inspector',
+        secondaryCollapsed: false,
+        attributes: { style: { '--gluon-split-pane-secondary-size': '18rem' } },
+      }),
       unnamed({}),
     ]), root);
 
@@ -113,6 +121,9 @@ describe('component variants and utilities', () => {
     expect(root.querySelector('.gluon-card-media img')).not.toBeNull();
     expect(root.querySelector('.gluon-card-body')?.textContent).toBe('0');
     expect(root.querySelector('.gluon-form-helper')).toBeNull();
+    expect(root.querySelector('.gluon-split-pane-primary')?.getAttribute('aria-label')).toBe('Primary panel');
+    expect(root.querySelector('.gluon-split-pane-secondary')?.getAttribute('aria-label')).toBe('Settings inspector');
+    expect(root.querySelector('.gluon-split-pane-toggle')?.getAttribute('aria-expanded')).toBe('true');
     expect(root.querySelector('.gluon-app-shell-header')).toBeNull();
     expect(root.querySelector('.gluon-app-shell-navigation')).toBeNull();
     expect(root.querySelector('.gluon-app-shell-footer')).toBeNull();
@@ -121,6 +132,28 @@ describe('component variants and utilities', () => {
     expect(root.querySelector('.gluon-page-layout-aside')?.getAttribute('aria-label')).toBe('Related content');
     expect(root.querySelector('.gluon-page-layout-footer')).not.toBeNull();
     expect(unnamed.displayName).toBe('AnonymousComponent');
+  });
+
+  it('supports split pane orientation, controlled collapse, and stable region identifiers', () => {
+    const root = document.createElement('div');
+    const onSecondaryCollapsedChange = vi.fn();
+    render(SplitPane({
+      id: 'workspace-pane',
+      primary: 'Workspace',
+      secondary: 'Inspector',
+      orientation: 'vertical',
+      secondaryCollapsed: true,
+      onSecondaryCollapsedChange,
+    }), root);
+    const pane = root.querySelector('.gluon-split-pane');
+    expect(pane?.getAttribute('data-orientation')).toBe('vertical');
+    expect(root.querySelector('.gluon-split-pane-secondary-content')?.hasAttribute('hidden')).toBe(true);
+    const toggle = root.querySelector<HTMLButtonElement>('#workspace-pane-toggle');
+    expect(toggle?.getAttribute('aria-expanded')).toBe('false');
+    toggle?.click();
+    expect(onSecondaryCollapsedChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
+    expect(() => render(SplitPane({ id: 'bad pane', primary: 'Primary' }), root)).toThrow(/whitespace/);
+    expect(() => render(SplitPane({ id: 'bad-label', primary: 'Primary', secondary: 'Secondary', secondaryLabel: ' ' }), root)).toThrow(/non-empty/);
   });
 
   it('renders WorkflowTimeline as one accessible ordered list across workflow states', () => {
