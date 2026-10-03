@@ -50,6 +50,8 @@ import {
   ControlField,
   ContextMenu,
   DialogSurface,
+  Popover,
+  Sheet,
   Disclosure,
   ResponsiveDisclosure,
   DropdownMenu,
@@ -89,7 +91,7 @@ import {
   Field,
   Listbox,
   Overlay,
-  Popover,
+  Popover as QuarkPopover,
   Tooltip,
   HoverCard,
   createFocusScope,
@@ -112,7 +114,7 @@ const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
 const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
 void menuAndToolbarPrimitives;
-const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl };
+const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet };
 void dataMolecules;
 const applicationOrganisms = { AdminShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, SplitPane };
 void applicationOrganisms;
@@ -486,7 +488,7 @@ createApp(() => AppShell({
       }),
       q.p({ children: `Selected finish: ${finish.value}` }),
       CheckoutActions({ total: '$128.00' }),
-      Popover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
+      QuarkPopover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
       Tooltip({ id: 'ui-tooltip', trigger: (attributes) => q.button({ ...attributes, children: 'Hover or focus' }), content: 'A concise description.' }),
       HoverCard({ id: 'ui-hover-card', label: 'More context', trigger: (attributes) => q.button({ ...attributes, children: 'More context' }), content: q.p({ children: 'A focusable explanation.' }) }),
         dialogOpen.value

@@ -13,10 +13,11 @@ import {
   model,
   repeat,
   render,
+  unmount,
 } from '../src/index.js';
 import { ref } from '@gluonjs/reactivity';
 import { Button, Icon } from '@gluonjs/atoms';
-import { Card, FormField } from '@gluonjs/molecules';
+import { Card, FormField, Popover, Sheet } from '@gluonjs/molecules';
 import { AppShell, PageLayout, SplitPane, WorkflowTimeline, type WorkflowTimelineProps } from '@gluonjs/organisms';
 import { fragment, q, quark } from '@gluonjs/quarks';
 
@@ -154,6 +155,89 @@ describe('component variants and utilities', () => {
     expect(onSecondaryCollapsedChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
     expect(() => render(SplitPane({ id: 'bad pane', primary: 'Primary' }), root)).toThrow(/whitespace/);
     expect(() => render(SplitPane({ id: 'bad-label', primary: 'Primary', secondary: 'Secondary', secondaryLabel: ' ' }), root)).toThrow(/non-empty/);
+  });
+
+  it('renders controlled Popover semantics and exposes dismissal callbacks', () => {
+    const root = document.createElement('div');
+    const onOpenChange = vi.fn();
+    const externalRef: { value?: HTMLDivElement } = {};
+    render(Popover({
+      id: 'finish-help',
+      label: 'Finish help',
+      trigger: (attributes) => q.button({ ...attributes, children: 'Help' }),
+      children: q.p({ children: 'Choose a saved finish.' }),
+      placement: 'inline-end',
+      onOpenChange,
+    }), root);
+    const trigger = root.querySelector<HTMLButtonElement>('#finish-help-trigger');
+    expect(trigger?.getAttribute('aria-controls')).toBe('finish-help-content');
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    expect(root.querySelector('[role="dialog"]')?.hasAttribute('hidden')).toBe(true);
+    trigger?.click();
+    expect(onOpenChange).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+
+    render(Popover({
+      id: 'finish-help',
+      label: 'Finish help',
+      open: true,
+      trigger: (attributes) => q.button({ ...attributes, children: 'Help' }),
+      children: q.p({ children: 'Choose a saved finish.' }),
+      attributes: { ref: externalRef },
+      onOpenChange,
+    }), root);
+    expect(externalRef.value).toBe(root.querySelector('.gluon-popover'));
+    expect(root.querySelector('[role="dialog"]')?.hasAttribute('hidden')).toBe(false);
+    expect(root.querySelector('[role="dialog"]')?.getAttribute('aria-label')).toBe('Finish help');
+    root.querySelector<HTMLDivElement>('[role="dialog"]')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(onOpenChange).toHaveBeenLastCalledWith(false, expect.any(KeyboardEvent));
+    root.querySelector<HTMLElement>('.gluon-popover')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    render(Popover({
+      id: 'finish-help',
+      label: 'Finish help',
+      open: true,
+      trigger: (attributes) => q.button({ ...attributes, children: 'Help' }),
+      children: q.p({ children: 'Choose a saved finish.' }),
+      onOpenChange,
+    }), root);
+    root.querySelector<HTMLDivElement>('[role="dialog"]')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    root.querySelector<HTMLButtonElement>('#finish-help-trigger')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    root.querySelector<HTMLButtonElement>('#finish-help-trigger')?.click();
+    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    render(Popover({ id: 'closed-help', label: 'Closed help', trigger: (attributes) => q.button({ ...attributes, children: 'Help' }), children: 'Closed content' }), root);
+    root.querySelector<HTMLButtonElement>('#closed-help-trigger')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(() => render(Popover({ id: 'bad id', label: 'Bad', trigger: () => 'Help', children: 'Content' }), root)).toThrow(/DOM id/);
+    expect(() => render(Popover({ id: 'empty-label', label: ' ', trigger: () => 'Help', children: 'Content' }), root)).toThrow(/non-empty/);
+    expect(() => render(Popover({ id: 'bad-label-ref', labelledBy: 'bad ref', trigger: () => 'Help', children: 'Content' }), root)).toThrow(/DOM id/);
+    expect(() => render(Popover({ id: 'bad-placement', label: 'Bad placement', placement: 'diagonal' as never, trigger: () => 'Help', children: 'Content' }), root)).toThrow(/placement/);
+  });
+
+  it('renders responsive Sheet regions with labelled dialog semantics', () => {
+    const root = document.createElement('div');
+    const onOpenChange = vi.fn();
+    render(Sheet({
+      id: 'filters-sheet',
+      label: 'Filters',
+      open: true,
+      placement: 'inline-start',
+      title: 'Filter products',
+      description: 'Narrow the product list.',
+      children: q.p({ children: 'Filter controls' }),
+      closeAction: q.button({ type: 'button', children: 'Close' }),
+      footer: q.button({ type: 'button', children: 'Apply filters' }),
+      onOpenChange,
+    }), root);
+    const sheet = root.querySelector<HTMLElement>('.gluon-sheet');
+    expect(root.querySelector('.gluon-sheet-overlay')?.getAttribute('data-placement')).toBe('inline-start');
+    expect(sheet?.getAttribute('role')).toBe('dialog');
+    expect(sheet?.getAttribute('aria-label')).toBe('Filters');
+    expect(root.querySelector('.gluon-sheet-title')?.textContent).toBe('Filter products');
+    expect(root.querySelector('.gluon-sheet-description')?.id).toBe('filters-sheet-description');
+    sheet?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.any(Event));
+    render(Sheet({ id: 'filters-sheet', label: 'Filters', open: false, dismissOnOverlay: false, children: 'Closed content', onOpenChange }), root);
+    render(Sheet({ id: 'no-callback-sheet', label: 'No callback', children: 'Closed content' }), root);
+    unmount(root);
+    expect(() => render(Sheet({ id: 'bad id', label: 'Bad', children: 'Content' }), root)).toThrow(/DOM id/);
   });
 
   it('renders WorkflowTimeline as one accessible ordered list across workflow states', () => {

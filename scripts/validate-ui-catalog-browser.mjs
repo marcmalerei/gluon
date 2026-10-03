@@ -92,6 +92,12 @@ try {
   if (await page.locator('[data-preview="split-pane"] .ui-sample-split-pane > .is-primary').count() !== 1) {
     throw new Error('split-pane preview does not show its primary anatomy');
   }
+  if (await page.locator('[data-preview="popover"] [role="dialog"]').count() !== 1) {
+    throw new Error('popover preview does not show its labelled dialog anatomy');
+  }
+  if (await page.locator('[data-preview="sheet"] .ui-sample-sheet-overlay .ui-sample-sheet').count() !== 1) {
+    throw new Error('sheet preview does not show its edge-panel anatomy');
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }

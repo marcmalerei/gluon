@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DialogSurface, Disclosure, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -285,6 +285,32 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-labelledby="server-dialog-title"');
     expect(rendered).toContain('aria-describedby="server-dialog-description"');
     expect(rendered).toContain('Server actions');
+  });
+
+  it('serializes Popover and Sheet overlay semantics without browser lifecycle calls', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(html`
+      ${Popover({
+        id: 'server-popover',
+        label: 'Server help',
+        open: true,
+        trigger: (attributes) => q.button({ ...attributes, children: 'Help' }),
+        children: 'Popover content',
+      })}
+      ${Sheet({
+        id: 'server-sheet',
+        labelledBy: 'server-sheet-title',
+        open: true,
+        title: 'Server sheet',
+        children: 'Sheet content',
+      })}
+    `));
+    expect(rendered).toContain('id="server-popover-trigger"');
+    expect(rendered).toContain('aria-controls="server-popover-content"');
+    expect(rendered).toContain('aria-expanded="true"');
+    expect(rendered).toContain('id="server-popover-content"');
+    expect(rendered).toContain('gluon-sheet-overlay');
+    expect(rendered).toContain('aria-labelledby="server-sheet-title"');
+    expect(rendered).toContain('Sheet content');
   });
 
   it('serializes native Disclosure open and unavailable relationships', async () => {

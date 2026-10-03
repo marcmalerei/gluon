@@ -252,6 +252,14 @@ verification surface.
           <template v-else-if="['dialog', 'confirmation-dialog'].includes(entry.preview)">
             <div class="ui-sample-dialog" role="dialog" :aria-modal="entry.preview === 'confirmation-dialog' ? 'true' : undefined" aria-labelledby="catalog-dialog-title"><strong id="catalog-dialog-title">Confirm changes</strong><span>Your configuration is ready.</span><div><button class="ui-sample-button" type="button">Confirm</button><button class="ui-sample-button is-secondary" type="button">Cancel</button></div></div>
           </template>
+          <template v-else-if="entry.preview === 'popover'">
+            <div class="ui-sample-popover"><button class="ui-sample-button is-secondary" type="button" aria-controls="catalog-popover-content" aria-expanded="true" aria-haspopup="dialog">Open finish help</button><div id="catalog-popover-content" class="ui-sample-popover-content" role="dialog" aria-label="Finish help"><strong>Finish help</strong><span>Choose a saved configuration.</span><a href="#catalog">View finishes</a></div></div>
+            <span class="ui-sample-variant">anchored · placement · escape</span>
+          </template>
+          <template v-else-if="entry.preview === 'sheet'">
+            <div class="ui-sample-sheet-overlay"><section class="ui-sample-sheet" role="dialog" aria-label="Filters"><header><strong>Filters</strong><button class="ui-sample-link" type="button">Close</button></header><div><label class="ui-sample-field">Availability<select><option>In stock</option></select></label></div><footer><button class="ui-sample-button" type="button">Apply filters</button></footer></section></div>
+            <span class="ui-sample-variant">edge panel · focus scope · responsive</span>
+          </template>
           <template v-else-if="entry.preview === 'action-bar'">
             <section class="ui-sample-surface ui-sample-action-bar" aria-label="Actions"><strong>Saved successfully</strong><button class="ui-sample-button" type="button">Continue</button></section>
           </template>

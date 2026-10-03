@@ -1523,6 +1523,36 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "Popover",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-popover"
+      ],
+      "variants": [
+        "block-start",
+        "block-end",
+        "inline-start",
+        "inline-end"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "popover",
+      "accessibility": "Renders a labelled interactive popup with a caller-rendered button trigger, stable controls/expanded relationships, Escape and outside dismissal, keyboard-sized trigger semantics, and responsive logical placements.",
+      "extension": "Open state, trigger content, popup content, labels, localization, actions, positioning tokens, and effects remain caller-owned; the molecule does not fetch, route, or mutate domain state.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Popover.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "ResponsiveActionBar",
       "kind": "component",
       "status": "stable",
@@ -1664,6 +1694,36 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/SegmentedControl.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "Sheet",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-sheet"
+      ],
+      "variants": [
+        "inline-start",
+        "inline-end",
+        "block-start",
+        "block-end"
+      ],
+      "states": [
+        "closed",
+        "open"
+      ],
+      "preview": "sheet",
+      "accessibility": "Composes an accessible dialog and overlay with labelled header/content/footer regions, Escape and optional overlay dismissal, focus containment and restoration, responsive edge placement, and forced-colors/reduced-motion support.",
+      "extension": "Open state, title/copy, close action, content, footer actions, routing, permissions, fetching, mutations, and tenant-specific CSS variables remain caller-owned.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Sheet.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {
