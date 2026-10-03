@@ -25,4 +25,6 @@ export { PageLayout, type PageLayoutAttributes, type PageLayoutHeadingLevel, typ
 export { pageLayoutStyles } from './page-layout-styles.js';
 export { SplitPane, type SplitPaneAttributes, type SplitPaneOpenChangeEvent, type SplitPaneOrientation, type SplitPaneProps, type SplitPaneRegionAttributes } from './split-pane.js';
 export { splitPaneStyles } from './split-pane-styles.js';
+export { ResizablePanels, type ResizablePanelsAttributes, type ResizablePanelsChangeEvent, type ResizablePanelsOrientation, type ResizablePanelsPanel, type ResizablePanelsProps, type ResizablePanelsRegionAttributes } from './resizable-panels.js';
+export { resizablePanelsStyles } from './resizable-panels-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

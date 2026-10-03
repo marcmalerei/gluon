@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -190,6 +190,23 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('id="server-split-secondary"');
     expect(rendered).toContain('aria-label="Server inspector"');
     expect(rendered).toContain('aria-expanded="false"');
+  });
+
+  it('serializes ResizablePanels regions and separator values without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(ResizablePanels({
+      id: 'server-resizable',
+      orientation: 'vertical',
+      panels: [
+        { id: 'workspace', label: 'Workspace', size: 65, content: q.p({ children: 'Workspace' }) },
+        { id: 'inspector', label: 'Inspector', size: 35, collapsed: true, content: q.p({ children: 'Inspector' }) },
+      ],
+    })));
+    expect(rendered).toContain('gluon-resizable-panels');
+    expect(rendered).toContain('data-orientation="vertical"');
+    expect(rendered).toContain('role="separator"');
+    expect(rendered).toContain('aria-valuenow="65"');
+    expect(rendered).toContain('aria-expanded="false"');
+    expect(rendered).toContain('id="server-resizable-inspector-content"');
   });
 
   it('serializes AdminShell landmarks and navigation semantics without DOM state', async () => {

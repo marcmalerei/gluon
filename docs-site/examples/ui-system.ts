@@ -91,7 +91,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, PageLayout, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, SplitPane, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, SplitPane, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -122,7 +122,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, SplitPane };
+const applicationOrganisms = { AdminShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, SplitPane };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -263,6 +263,13 @@ createApp(() => AppShell({
       heading: 'Profile data',
       partialContent: q.p({ children: 'Profile data is available while recommendations refresh.' }),
       actions: q.button({ type: 'button', children: 'Retry recommendations' }),
+    }),
+    ResizablePanels({
+      id: 'ui-system-resizable-panels',
+      panels: [
+        { id: 'workspace', label: 'Workspace', size: 68, content: q.p({ children: 'Caller-owned dashboard workspace.' }) },
+        { id: 'inspector', label: 'Inspector', size: 32, content: q.p({ children: 'Tenant-owned inspector content.' }) },
+      ],
     }),
     WorkflowTimeline({
       id: 'ui-system-workflow',

@@ -2437,6 +2437,36 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "ResizablePanels",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-resizable-panels"
+      ],
+      "variants": [
+        "horizontal",
+        "vertical",
+        "responsive"
+      ],
+      "states": [
+        "expanded",
+        "collapsed",
+        "resizable"
+      ],
+      "preview": "resizable-panels",
+      "accessibility": "Renders two or more labelled panel regions with keyboard-operable native separator semantics, bounded size values, controlled collapse buttons, responsive stacking, visible focus, forced-colors, and reduced-motion support.",
+      "extension": "Panel content, sizes, persistence, pointer/drag policy, routing, permissions, data loading, mutations, localization, and tenant identity remain caller-owned; stable IDs, parts, panel attributes, and CSS variables support application-specific composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/ResizablePanels.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "SiteFooter",
       "kind": "component",
       "status": "stable",

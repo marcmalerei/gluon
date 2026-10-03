@@ -313,6 +313,10 @@ verification surface.
             <div class="ui-sample-split-pane" aria-label="Split pane regions"><span class="is-primary">Primary workspace</span><span class="is-secondary">Inspector <button type="button" aria-label="Collapse secondary panel">−</button></span></div>
             <span class="ui-sample-variant">horizontal · vertical · responsive</span>
           </template>
+          <template v-else-if="entry.preview === 'resizable-panels'">
+            <div class="ui-sample-resizable-panels" aria-label="Resizable panel regions"><span class="is-workspace">Workspace</span><button type="button" role="separator" aria-label="Resize workspace and inspector" aria-valuenow="68" aria-valuemin="20" aria-valuemax="80">⋮</button><span class="is-inspector">Inspector <button type="button" aria-label="Collapse inspector">−</button></span></div>
+            <span class="ui-sample-variant">horizontal · vertical · responsive · keyboard</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>
