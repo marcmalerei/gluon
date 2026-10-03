@@ -92,6 +92,12 @@ mobile disclosure supports Escape/focus return, 44px controls, and CSS-variable
 hooks for tenant-specific shells; routing, authorization, localization,
 analytics, and open state remain application-owned.
 
+`AdminShell` renders a responsive administration layout with semantic header,
+labelled sidebar navigation, main workspace, and optional footer regions. It
+keeps routing, permissions, data loading, mutations, mobile state, localization,
+and tenant identity with the caller while exposing CSS-variable hooks and native
+region attributes for application-specific shells.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and

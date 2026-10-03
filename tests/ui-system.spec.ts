@@ -95,7 +95,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, megaMenuStyles, organismManifest, organismStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, organismManifest, organismStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2647,6 +2647,30 @@ describe('advanced data and workflow molecules', () => {
 
     expect(() => render(SiteFooter({ id: 'bad footer' }), document.body)).toThrow('whitespace');
     expect(() => render(SiteFooter({ id: 'empty-label', navigation: 'Links', navigationLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders a responsive AdminShell with labelled navigation and tenant styling hooks', () => {
+    render(AdminShell({
+      id: 'admin-shell',
+      header: q.strong({ children: 'Back office' }),
+      sidebar: [q.a({ href: '/overview', children: 'Overview' }), q.a({ href: '/settings', children: 'Settings' })],
+      main: q.h1({ children: 'Workspace' }),
+      footer: q.small({ children: 'Tenant: Gluon Goods' }),
+      sidebarLabel: 'Back office navigation',
+      attributes: { class: 'tenant-admin-shell', style: { '--gluon-admin-shell-sidebar-size': '20rem' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#admin-shell')!;
+    expect(root.tagName).toBe('DIV');
+    expect(root.dataset.adminShellRoot).toBe('admin-shell');
+    expect(root.querySelector('.gluon-admin-shell-header strong')?.textContent).toBe('Back office');
+    expect(root.querySelector('.gluon-admin-shell-navigation')?.getAttribute('aria-label')).toBe('Back office navigation');
+    expect(root.querySelector('.gluon-admin-shell-main h1')?.textContent).toBe('Workspace');
+    expect(root.querySelector('.gluon-admin-shell-footer')?.textContent).toContain('Tenant: Gluon Goods');
+    expect(root.style.getPropertyValue('--gluon-admin-shell-sidebar-size')).toBe('20rem');
+    expect(getStyleSheetText(adminShellStyles)).toContain('--gluon-admin-shell');
+    expect(getStyleSheetText(adminShellStyles)).toContain('forced-colors');
+    expect(() => render(AdminShell({ id: 'bad shell', main: 'Main' }), document.body)).toThrow('whitespace');
+    expect(() => render(AdminShell({ id: 'empty-label', main: 'Main', sidebar: 'Links', sidebarLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {

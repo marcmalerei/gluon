@@ -1,8 +1,10 @@
 export { AppShell, type AppShellProps } from './app-shell.js';
+export { AdminShell, type AdminShellAttributes, type AdminShellNavigationAttributes, type AdminShellProps, type AdminShellRegionAttributes } from './admin-shell.js';
 export { AsyncState, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus } from './async-state.js';
 export { organismManifest } from './manifest.js';
 export { organismStyles } from './styles.js';
 export { appShellStyles } from './app-shell-styles.js';
+export { adminShellStyles } from './admin-shell-styles.js';
 export { asyncStateStyles } from './async-state-styles.js';
 export { ProductCard, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps } from './product-card.js';
 export { ProductGrid, productGridStyles, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps } from './product-grid.js';

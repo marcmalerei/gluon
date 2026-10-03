@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
-import { ConfirmationDialog, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -159,6 +159,23 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-label="Server footer navigation"');
     expect(rendered).toContain('GLUON GOODS');
     expect(rendered).toContain('Objects for focused living.');
+  });
+
+  it('serializes AdminShell landmarks and navigation semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(AdminShell({
+      id: 'server-admin',
+      header: html`<strong>Back office</strong>`,
+      sidebar: html`<a href="/overview">Overview</a>`,
+      main: html`<h1>Workspace</h1>`,
+      footer: html`<small>Tenant: Gluon Goods</small>`,
+      sidebarLabel: 'Server administration navigation',
+    })));
+    expect(rendered).toContain('data-admin-shell-root="server-admin"');
+    expect(rendered).toContain('<header');
+    expect(rendered).toContain('<aside');
+    expect(rendered).toContain('aria-label="Server administration navigation"');
+    expect(rendered).toContain('<main');
+    expect(rendered).toContain('<footer');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {

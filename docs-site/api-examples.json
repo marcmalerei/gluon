@@ -1498,7 +1498,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, adminShellStyles, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, type AdminShellAttributes, type AdminShellNavigationAttributes, type AdminShellProps, type AdminShellRegionAttributes, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1506,6 +1506,10 @@
         "  children: html`<h1>New arrivals</h1>`,",
         "  footer: html`<small>Free shipping over €100</small>`,",
         "} satisfies AppShellProps;",
+        "const adminAttributes: AdminShellAttributes = { class: 'catalog-admin-shell' };",
+        "const adminRegionAttributes: AdminShellRegionAttributes = { class: 'catalog-admin-region' };",
+        "const adminNavigationAttributes: AdminShellNavigationAttributes = { class: 'catalog-admin-navigation' };",
+        "const adminShell: AdminShellProps = { id: 'catalog-admin', header: html`<strong>Back office</strong>`, sidebar: html`<a href='/overview'>Overview</a><a href='/settings'>Settings</a>`, main: html`<h1>Workspace</h1>`, footer: html`<small>Tenant: Gluon Goods</small>`, attributes: adminAttributes, headerAttributes: adminRegionAttributes, sidebarAttributes: adminRegionAttributes, navigationAttributes: adminNavigationAttributes, mainAttributes: adminRegionAttributes, footerAttributes: adminRegionAttributes, sidebarLabel: 'Back office navigation' };",
         "const asyncStatus: AsyncStateStatus = 'partial';",
         "const asyncAttributes: AsyncStateAttributes = { class: 'recommendations-state' };",
         "const asyncMessages: AsyncStateMessages = { partial: 'Recommendations are partially loaded.' };",
@@ -1543,7 +1547,7 @@
         "const footerNavigationAttributes: SiteFooterNavigationAttributes = { 'aria-label': 'Catalog footer navigation' };",
         "const footerRegionAttributes: SiteFooterRegionAttributes = { class: 'catalog-footer-region' };",
         "const footer: SiteFooterProps = { id: 'catalog-footer', brand: html`<a href='/'>GLUON GOODS</a>`, navigation: html`<a href='/shop'>Shop</a><a href='/journal'>Journal</a>`, legal: html`<a href='/privacy'>Privacy</a>`, meta: html`<small>© 2026 Gluon Goods</small>`, attributes: footerAttributes, navigationAttributes: footerNavigationAttributes, brandAttributes: footerRegionAttributes, legalAttributes: footerRegionAttributes, metaAttributes: footerRegionAttributes };",
-        "console.log(AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), SiteFooter(footer), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
+        "console.log(AdminShell(adminShell), AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), SiteFooter(footer), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), adminShellStyles, asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
       ]
     },
     "router-application": {
@@ -6212,6 +6216,30 @@
     "packages/organisms/src/type-aliases/MegaMenuOpenChangeEvent.md": {
       "recipe": "organism-components",
       "description": "Handle the native pointer, mouse, or keyboard event that requests a controlled menu-state change:"
+    },
+    "packages/organisms/src/variables/AdminShell.md": {
+      "recipe": "organism-components",
+      "description": "Render a responsive administration shell with semantic header, labelled sidebar navigation, workspace, and footer regions:"
+    },
+    "packages/organisms/src/variables/adminShellStyles.md": {
+      "recipe": "organism-components",
+      "description": "Inspect the separately tree-shakable AdminShell stylesheet and tenant-scoped CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/AdminShellProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure an AdminShell while routing, permissions, data loading, and tenant identity remain caller-owned:"
+    },
+    "packages/organisms/src/type-aliases/AdminShellAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native attributes to the AdminShell root:"
+    },
+    "packages/organisms/src/type-aliases/AdminShellNavigationAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward native attributes to the AdminShell navigation landmark:"
+    },
+    "packages/organisms/src/type-aliases/AdminShellRegionAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native attributes to AdminShell header, sidebar, main, and footer regions:"
     },
     "packages/organisms/src/variables/AppShell.md": {
       "recipe": "organism-components",
