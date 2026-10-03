@@ -197,6 +197,11 @@ html { scroll-behavior: smooth; }
 .ui-sample-split-pane > span { display: grid; min-width: 0; min-height: 86px; place-items: center; border: 1px solid var(--vp-c-divider); background: color-mix(in srgb, var(--ui-catalog-accent) 12%, var(--vp-c-bg)); }
 .ui-sample-split-pane .is-secondary { grid-template-columns: 1fr auto; gap: 4px; padding-inline: 6px; background: color-mix(in srgb, var(--ui-catalog-accent) 5%, var(--vp-c-bg)); }
 .ui-sample-split-pane button { min-block-size: 24px; min-inline-size: 24px; border: 1px solid currentColor; border-radius: 3px; background: transparent; color: inherit; }
+.ui-sample-resizable-panels { display: grid; grid-template-columns: minmax(0, 2fr) 8px minmax(0, 1fr); width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-resizable-panels > span { display: grid; min-width: 0; min-height: 86px; place-items: center; border: 1px solid var(--vp-c-divider); background: color-mix(in srgb, var(--ui-catalog-accent) 12%, var(--vp-c-bg)); }
+.ui-sample-resizable-panels .is-inspector { grid-template-columns: 1fr auto; gap: 4px; padding-inline: 6px; background: color-mix(in srgb, var(--ui-catalog-accent) 5%, var(--vp-c-bg)); }
+.ui-sample-resizable-panels > button { min-width: 8px; padding: 0; border: 0; background: color-mix(in srgb, var(--ui-catalog-accent) 26%, var(--vp-c-bg)); color: var(--vp-c-text-1); cursor: col-resize; }
+.ui-sample-resizable-panels .is-inspector button { min-block-size: 24px; min-inline-size: 24px; border: 1px solid currentColor; border-radius: 3px; background: transparent; color: inherit; }
 .ui-sample-admin-shell { display: grid; grid-template-columns: 30% 1fr; grid-template-rows: auto 1fr auto; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
 .ui-sample-admin-shell > span { display: grid; min-height: 18px; place-items: center; background: color-mix(in srgb, var(--ui-catalog-accent) 14%, var(--vp-c-bg)); }
 .ui-sample-admin-shell .is-header { grid-column: 1 / -1; justify-content: start; padding-inline: 8px; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }

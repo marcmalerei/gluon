@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, organismManifest, organismStyles, productGalleryStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -3451,6 +3451,73 @@ describe('advanced data and workflow molecules', () => {
     expect(() => SortControl({ id: 'bad sort id', label: 'Sort', options: [] })).toThrow(/SortControl.id/);
     expect(() => SortControl({ id: 'missing-sort-label', label: ' ', options: [] })).toThrow(/SortControl.label/);
     expect(() => SortControl({ id: 'duplicate-sort', label: 'Sort', options: [{ value: 'same', label: 'A' }, { value: 'same', label: 'B' }] })).toThrow(/unique/);
+  });
+
+  it('renders controlled resizable panel semantics and keyboard size changes', async () => {
+    const onSizeChange = vi.fn();
+    const onCollapsedChange = vi.fn();
+    render(ResizablePanels({
+      id: 'workspace-panels',
+      orientation: 'vertical',
+      step: 10,
+      panels: [
+        { id: 'canvas', label: 'Canvas', size: 60, minSize: 20, maxSize: 80, content: q.p({ children: 'Canvas content' }) },
+        { id: 'details', label: 'Details', size: 30, collapsed: true, content: q.p({ children: 'Details content' }) },
+        { id: 'audit', label: 'Audit', size: 10, content: q.p({ children: 'Audit content' }) },
+      ],
+      attributes: { class: 'tenant-panels' },
+      onSizeChange,
+      onCollapsedChange,
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#workspace-panels')!;
+    const separator = root.querySelector<HTMLElement>('[role="separator"]')!;
+    expect(root.classList).toContain('tenant-panels');
+    expect(root.dataset.orientation).toBe('vertical');
+    expect(separator.getAttribute('aria-orientation')).toBe('vertical');
+    expect(separator.getAttribute('aria-valuenow')).toBe('60');
+    separator.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+    expect(onSizeChange).toHaveBeenCalledWith('canvas', 70, expect.any(KeyboardEvent));
+    separator.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }));
+    expect(onSizeChange).toHaveBeenCalledWith('canvas', 50, expect.any(KeyboardEvent));
+    separator.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+    expect(onSizeChange).toHaveBeenCalledTimes(2);
+    const toggle = root.querySelector<HTMLButtonElement>('#workspace-panels-details-toggle')!;
+    toggle.click();
+    expect(onCollapsedChange).toHaveBeenCalledWith('details', false, expect.any(MouseEvent));
+    expect(root.querySelector('#workspace-panels-details-content')?.hasAttribute('hidden')).toBe(true);
+    expect(getStyleSheetText(resizablePanelsStyles)).toContain('@media (forced-colors: active)');
+    expect(getStyleSheetText(resizablePanelsStyles)).toContain('--gluon-resizable-panels-template');
+
+    const horizontalSize = vi.fn();
+    render(ResizablePanels({
+      id: 'horizontal-panels',
+      panels: [
+        { id: 'main', label: 'Main', size: 50, content: 'Main' },
+        { id: 'side', label: 'Side', size: 50, content: 'Side' },
+      ],
+      onSizeChange: horizontalSize,
+    }), document.body);
+    const horizontalSeparator = document.querySelector<HTMLElement>('#horizontal-panels-separator-1')!;
+    horizontalSeparator.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
+    horizontalSeparator.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }));
+    expect(horizontalSize).toHaveBeenNthCalledWith(1, 'main', 55, expect.any(KeyboardEvent));
+    expect(horizontalSize).toHaveBeenNthCalledWith(2, 'main', 45, expect.any(KeyboardEvent));
+  });
+
+  it('fails closed for invalid resizable panel contracts', () => {
+    expect(() => ResizablePanels({ id: 'one-panel', panels: [{ id: 'only', label: 'Only', size: 100, content: 'x' }] })).toThrow(/at least two/);
+    expect(() => ResizablePanels({ id: 'duplicate-panels', panels: [{ id: 'same', label: 'A', size: 50, content: 'a' }, { id: 'same', label: 'B', size: 50, content: 'b' }] })).toThrow(/unique/);
+    expect(() => ResizablePanels({ id: 'bad-panel-size', panels: [{ id: 'a', label: 'A', size: 101, content: 'a' }, { id: 'b', label: 'B', size: 0, content: 'b' }] })).toThrow(/between 0 and 100/);
+    expect(() => ResizablePanels({ id: 'bad-panel-range', panels: [{ id: 'a', label: 'A', size: 40, minSize: 60, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/below minSize/);
+    expect(() => ResizablePanels({ id: 'bad-min-size', panels: [{ id: 'a', label: 'A', size: 40, minSize: 101, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/minSize must be between/);
+    expect(() => ResizablePanels({ id: 'bad-max-size', panels: [{ id: 'a', label: 'A', size: 40, maxSize: -1, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/maxSize must be between/);
+    expect(() => ResizablePanels({ id: 'inverted-range', panels: [{ id: 'a', label: 'A', size: 40, minSize: 80, maxSize: 60, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/must not exceed maxSize/);
+    expect(() => ResizablePanels({ id: 'above-max', panels: [{ id: 'a', label: 'A', size: 70, maxSize: 60, content: 'a' }, { id: 'b', label: 'B', size: 30, content: 'b' }] })).toThrow(/must not exceed maxSize/);
+    expect(() => ResizablePanels({ id: 'bad-orientation', orientation: 'diagonal' as never, panels: [{ id: 'a', label: 'A', size: 40, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/orientation/);
+    expect(() => ResizablePanels({ id: 'bad-step', step: 0, panels: [{ id: 'a', label: 'A', size: 40, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/step/);
+    expect(() => ResizablePanels({ id: 'bad-separator', separatorLabel: ' ', panels: [{ id: 'a', label: 'A', size: 40, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/separatorLabel/);
+    expect(() => ResizablePanels({ id: 'bad root id', panels: [{ id: 'a', label: 'A', size: 40, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/ResizablePanels.id/);
+    expect(() => ResizablePanels({ id: 'bad-panel-id', panels: [{ id: 'bad panel', label: 'A', size: 40, content: 'a' }, { id: 'b', label: 'B', size: 60, content: 'b' }] })).toThrow(/panels\[0\]\.id/);
   });
 });
 

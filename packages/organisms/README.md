@@ -143,6 +143,14 @@ coexist silently with exact rendering.
 `organismManifest` records the stable contract, compiled interactive example,
 browser coverage, and visual-regression evidence.
 
+`ResizablePanels` renders two or more caller-owned regions with controlled size
+values, native keyboard separator semantics, bounded min/max values, responsive
+stacking, and independent collapse controls. Arrow keys call `onSizeChange`;
+buttons call `onCollapsedChange`; the organism does not own drag persistence,
+routing, data, authorization, or mutations. Use `part`, `data-panel-id`, region
+attributes, and the `--gluon-resizable-panels-*` custom properties to adapt a
+tenant shell without replacing stylesheet ownership.
+
 `ConfirmationDialog` is a native `<dialog>` composition. Callers provide copy,
 leading content, action controls, status content, and all mutation or routing.
 Use controlled `open` for SSR/Storybook markup; a connected browser upgrades an
