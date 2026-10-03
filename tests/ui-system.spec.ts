@@ -87,10 +87,14 @@ import {
   DateRangePicker,
   FileUpload,
   TimePicker,
+  MultiSelectField,
+  Calendar,
   datePickerStyles,
   dateRangePickerStyles,
   fileUploadStyles,
   timePickerStyles,
+  multiSelectFieldStyles,
+  calendarStyles,
   sortControlStyles,
   comboboxFieldStyles,
   commandPaletteStyles,
@@ -2865,6 +2869,91 @@ describe('advanced data and workflow molecules', () => {
     expect(() => DatePicker({ id: 'bad id', label: 'Appointment' })).toThrow('must not contain whitespace');
     expect(() => DatePicker({ id: 'appointment', label: ' ' })).toThrow('must be a non-empty string');
     expect(() => DatePicker({ id: 'appointment', label: 'Appointment', inputAttributes: { id: 'bad id' } })).toThrow('must not contain whitespace');
+  });
+
+  it('composes a native controlled MultiSelectField with selected values and relationships', async () => {
+    const values: string[][] = [];
+    const events: string[] = [];
+    render(MultiSelectField({
+      id: 'delivery-methods',
+      label: 'Delivery methods',
+      options: [
+        { value: 'standard', label: 'Standard' },
+        { value: 'express', label: 'Express' },
+        { value: 'pickup', label: 'Pickup', disabled: true },
+      ],
+      values: ['standard'],
+      name: 'deliveryMethods',
+      required: true,
+      helper: 'Select one or more methods.',
+      onChange: (next, event) => { values.push([...next]); events.push(event.type); },
+      selectAttributes: { onChange: { handleEvent: (event: Event) => events.push(`attribute:${event.type}`) } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#delivery-methods')!;
+    const select = root.querySelector<HTMLSelectElement>('select')!;
+    expect(select.multiple).toBe(true);
+    expect(select.required).toBe(true);
+    expect(select.name).toBe('deliveryMethods');
+    expect(select.getAttribute('aria-labelledby')).toBe('delivery-methods-label');
+    expect(select.getAttribute('aria-describedby')).toBe('delivery-methods-helper');
+    expect(select.options[0]?.selected).toBe(true);
+    expect(select.options[2]?.disabled).toBe(true);
+    select.options[1]!.selected = true;
+    await userEvent.selectOptions(select, ['standard', 'express']);
+    expect(values).toEqual([['standard', 'express']]);
+    expect(events).toEqual(['attribute:change', 'change']);
+    expect(getStyleSheetText(multiSelectFieldStyles)).toContain('--gluon-multi-select-field-gap');
+    expect(() => MultiSelectField({ id: 'bad id', label: 'Methods', options: [] })).toThrow('whitespace');
+    expect(() => MultiSelectField({ id: 'methods', label: ' ', options: [] })).toThrow('label');
+    expect(() => MultiSelectField({ id: 'methods', label: 'Methods', size: 1, options: [] })).toThrow('size');
+    expect(() => MultiSelectField({ id: 'methods', label: 'Methods', options: [{ value: ' ', label: 'Empty' }] })).toThrow('non-empty');
+    expect(() => MultiSelectField({ id: 'methods', label: 'Methods', options: [{ value: 'same', label: 'One' }, { value: 'same', label: 'Two' }] })).toThrow('unique');
+  });
+
+  it('renders Calendar month grid with bounded navigation and keyboard day movement', async () => {
+    const selected: string[] = [];
+    const months: string[] = [];
+    render(Calendar({
+      id: 'delivery-calendar',
+      label: 'Delivery date',
+      month: '2026-10',
+      selected: '2026-10-06',
+      today: '2026-10-03',
+      min: '2026-10-03',
+      max: '2026-11-20',
+      disabledDates: (date) => date === '2026-10-12',
+      onMonthChange: (month) => months.push(month),
+      onSelect: (date) => selected.push(date),
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#delivery-calendar')!;
+    expect(root.getAttribute('data-calendar')).toBe('true');
+    expect(root.querySelector('[role="grid"]')?.getAttribute('aria-labelledby')).toBe('delivery-calendar-label');
+    expect(root.querySelectorAll('[data-calendar-day]')).toHaveLength(42);
+    expect(root.querySelector('[data-calendar-day="2026-10-06"]')?.closest('[role="gridcell"]')?.getAttribute('aria-selected')).toBe('true');
+    expect(root.querySelector('[data-calendar-day="2026-10-03"]')?.getAttribute('aria-current')).toBe('date');
+    expect(root.querySelector('[data-calendar-day="2026-10-12"]')).toBeDisabled();
+    await userEvent.click(root.querySelector<HTMLButtonElement>('[aria-label="Next month"]')!);
+    expect(months).toEqual(['2026-11']);
+    const selectedDay = root.querySelector<HTMLButtonElement>('[data-calendar-day="2026-10-06"]')!;
+    selectedDay.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(document.activeElement).toBe(root.querySelector('[data-calendar-day="2026-10-07"]'));
+    await userEvent.keyboard('{ArrowLeft}');
+    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.keyboard('{ArrowUp}');
+    await userEvent.keyboard('{Home}');
+    await userEvent.keyboard('{End}');
+    await userEvent.click(root.querySelector<HTMLButtonElement>('[data-calendar-day="2026-10-07"]')!);
+    expect(selected).toEqual(['2026-10-07']);
+    expect(getStyleSheetText(calendarStyles)).toContain('--gluon-calendar-gap');
+    expect(() => Calendar({ id: 'calendar', label: 'Calendar', month: '2026-13' })).toThrow('YYYY-MM');
+    expect(() => Calendar({ id: 'calendar', label: 'Calendar', month: '2026-10', min: '2026-11-01', max: '2026-10-01' })).toThrow('after');
+    expect(() => Calendar({ id: 'calendar', label: 'Calendar', month: '2026-10', previousMonthLabel: ' ', nextMonthLabel: 'Next' })).toThrow('navigation labels');
+    render(Calendar({ id: 'bounded-calendar', label: 'Bounded calendar', month: '2026-10', min: '2026-10-01', max: '2026-10-31', weekStartsOn: 0, disabledDates: () => false }), document.body);
+    expect(document.querySelector('#bounded-calendar [aria-label="Previous month"]')).toBeDisabled();
+    expect(document.querySelector('#bounded-calendar [aria-label="Next month"]')).toBeDisabled();
+    render(Calendar({ id: 'plain-calendar', label: 'Plain calendar', month: '2026-10' }), document.body);
+    expect(document.querySelector('#plain-calendar [data-calendar-day="2026-10-01"]')).not.toBeNull();
   });
 
   it('renders FileUpload empty and custom states and forwards native change events', () => {

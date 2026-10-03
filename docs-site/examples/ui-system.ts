@@ -79,6 +79,8 @@ import {
   DateRangePicker,
   FileUpload,
   TimePicker,
+  MultiSelectField,
+  Calendar,
   Menubar,
   SegmentedControl,
   TableRegion,
@@ -118,7 +120,7 @@ const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
 const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
 void menuAndToolbarPrimitives;
-const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet };
+const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
 const applicationOrganisms = { AdminShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, SplitPane };
 void applicationOrganisms;

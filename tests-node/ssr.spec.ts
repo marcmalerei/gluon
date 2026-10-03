@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -247,6 +247,8 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
       ${DateRangePicker({ id: 'server-window', label: 'Delivery window', startValue: '2026-10-06', endValue: '2026-10-08', helper: 'Choose a dispatch window.' })}
       ${FileUpload({ id: 'server-upload', label: 'Product photos', accept: 'image/*', multiple: true, error: 'Review the selected files.' })}
       ${TimePicker({ id: 'server-time', label: 'Delivery time', value: '09:00', min: '08:00', max: '18:00', step: '900' })}
+      ${MultiSelectField({ id: 'server-methods', label: 'Delivery methods', options: [{ value: 'standard', label: 'Standard' }, { value: 'express', label: 'Express' }], values: ['standard'], helper: 'Select one or more methods.' })}
+      ${Calendar({ id: 'server-calendar', label: 'Delivery date', month: '2026-10', selected: '2026-10-06', today: '2026-10-03' })}
     `));
     expect(rendered).toContain('id="server-date"');
     expect(rendered).toContain('type="date"');
@@ -262,6 +264,10 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('Review the selected files.');
     expect(rendered).toContain('id="server-time-input"');
     expect(rendered).toContain('type="time"');
+    expect(rendered).toContain('id="server-methods-select"');
+    expect(rendered).toContain('multiple');
+    expect(rendered).toContain('id="server-calendar-grid"');
+    expect(rendered).toContain('data-calendar-day="2026-10-06"');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {

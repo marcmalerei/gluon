@@ -95,6 +95,8 @@ import {
   DateRangePicker,
   FileUpload,
   TimePicker,
+  MultiSelectField,
+  Calendar,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -184,6 +186,14 @@ empty states, shortcuts, and caller-owned query filtering and execution.
 stable IDs, expand/select callbacks, Arrow/Home/End navigation, disabled-node
 skipping, and reduced-motion/forced-colors styling. These components expose `--gluon-*` presentation hooks and
 keep data, routing, fetching, persistence, and mutations in the application.
+`MultiSelectField` composes a visible label and helper/error relationships
+around a native multiple select. Selected values, options, validation, and
+form effects remain controlled by the caller while `--gluon-multi-select-field-*`
+variables provide tenant-safe presentation hooks. `Calendar` renders a
+controlled month grid using native buttons and table semantics, with keyboard
+day movement, bounded previous/next navigation, selected/today/disabled states,
+and `--gluon-calendar-*` variables. Month, selection, disabled-date policy,
+localization, and persistence remain caller-owned.
 `Disclosure` renders native `details` and `summary`, preserving browser
 keyboard toggling, find-in-page expansion, semantics, and form behavior. Use
 `open` with `onToggle` for controlled state or `defaultOpen` for the initial

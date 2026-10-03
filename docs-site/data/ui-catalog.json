@@ -919,6 +919,36 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "Calendar",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-calendar"
+      ],
+      "variants": [
+        "month-grid",
+        "bounded"
+      ],
+      "states": [
+        "default",
+        "selected",
+        "disabled",
+        "today"
+      ],
+      "preview": "calendar",
+      "accessibility": "Renders a labelled native table grid with keyboard day movement, previous/next month buttons, selected/today/disabled states, and stable date IDs.",
+      "extension": "Callers own displayed month, selection, date constraints, disabled-date policy, localization, routing, persistence, and tenant-specific CSS variables; the calendar does not fetch or mutate domain state.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Calendar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "Card",
       "kind": "component",
       "status": "stable",
@@ -1466,6 +1496,36 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Menubar.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "MultiSelectField",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-multi-select-field"
+      ],
+      "variants": [
+        "native",
+        "sized"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled",
+        "required"
+      ],
+      "preview": "multi-select-field",
+      "accessibility": "Composes a visible label, native multiple select, disabled options, helper or announced error text, required state, and stable labelledby/describedby relationships.",
+      "extension": "The browser owns native multi-select keyboard and form semantics; callers own selected values, option data, validation, persistence, localization, and tenant-specific CSS variables.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/MultiSelectField.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {
