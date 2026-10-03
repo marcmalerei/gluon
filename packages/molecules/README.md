@@ -63,6 +63,8 @@ import {
   ChoiceGroup,
   ControlField,
   DialogSurface,
+  Popover,
+  Sheet,
   Disclosure,
   EmptyState,
   FormField,
@@ -148,6 +150,15 @@ uses an ARIA dialog on a `div`; it deliberately does not call native
 `HTMLDialogElement.showModal()`, enter the top layer, or make background content
 inert. Applications that require the native-dialog boundary should own a
 native `<dialog>` lifecycle instead.
+
+`Popover` is the controlled anchored popup composition for filters, help, and
+small interactive menus. Its trigger is caller-rendered through an attribute
+callback; Escape, outside pointer dismissal, logical placement, and focus
+return are provided while open state, copy, actions, and tenant CSS variables
+remain caller-owned. `Sheet` is the responsive edge-panel composition for
+mobile navigation, filters, and settings. It adds the same labelled dialog,
+overlay, focus-scope, Escape, reduced-motion, and forced-colors contracts with
+structured header, content, and footer regions.
 
 `Tooltip` provides a small, request-free description attached to a focusable
 trigger. It is deliberately non-interactive; use `DialogSurface` or a caller-
