@@ -50,8 +50,15 @@ import { AppShell } from '@gluonjs/organisms';
 <!-- gluon-package-overview:end -->
 
 ```ts
-import { AppShell, MegaMenu } from "@gluonjs/organisms";
+import { AppShell, MegaMenu, PageLayout } from "@gluonjs/organisms";
 ```
+
+`PageLayout` composes a caller-owned page title, breadcrumbs, actions, main
+content, optional related-content aside, and footer into semantic regions. It
+does not own routing, fetching, authorization, tenant identity, or copy. The
+responsive layout exposes `--gluon-page-layout-*` CSS variables so an
+application or tenant theme can adapt spacing, colors, sizing, and borders
+without replacing the component's DOM contract.
 
 `WorkflowTimeline` renders a request-free, SSR-safe ordered workflow from typed
 `steps`. Its `messages` API localizes every framework label and status; no

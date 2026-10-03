@@ -21,4 +21,6 @@ export { SiteHeader, type SiteHeaderAttributes, type SiteHeaderNavigationAttribu
 export { siteHeaderStyles } from './site-header-styles.js';
 export { SiteFooter, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes } from './site-footer.js';
 export { siteFooterStyles } from './site-footer-styles.js';
+export { PageLayout, type PageLayoutAttributes, type PageLayoutHeadingLevel, type PageLayoutProps, type PageLayoutRegionAttributes } from './page-layout.js';
+export { pageLayoutStyles } from './page-layout-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

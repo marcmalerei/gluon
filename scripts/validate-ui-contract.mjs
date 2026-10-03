@@ -12,7 +12,7 @@ const expected = new Map([
   ['@gluonjs/quarks', ['q/quark/fragment', 'createFocusScope', 'Overlay', 'Dialog', 'Popover', 'Tooltip', 'HoverCard', 'Listbox', 'Field']],
   ['@gluonjs/atoms', ['AspectRatio', 'Heading', 'Text', 'Link', 'Image', 'Badge', 'Spinner', 'Skeleton', 'Meter', 'NumberInput', 'DateInput', 'TimeInput', 'FileInput', 'Avatar', 'Button', 'Checkbox', 'Icon', 'Input', 'Label', 'Progress', 'Radio', 'Select', 'Slider', 'StatusBadge', 'ScrollArea', 'Separator', 'Switch', 'Textarea', 'ToggleButton', 'installUi']],
   ['@gluonjs/molecules', ['Accordion', 'ButtonGroup', 'Card', 'ChoiceGroup', 'ControlField', 'DialogSurface', 'Disclosure', 'ResponsiveDisclosure', 'EmptyState', 'FormField', 'InlineNotice', 'Toast', 'ToastViewport', 'NavigationStrip', 'Breadcrumbs', 'Pagination', 'NavigationMenu', 'ResponsiveActionBar', 'DropdownMenu', 'ContextMenu', 'Menubar', 'Toolbar', 'SegmentedControl', 'TableRegion', 'Tabs', 'SearchField', 'SearchResults', 'OneTimePasswordField', 'PasswordToggleField', 'Tooltip', 'Stepper', 'FilterBar', 'DataList', 'ListboxField', 'ComboboxField', 'CommandPalette', 'TreeView', 'SortControl']],
-  ['@gluonjs/organisms', ['AppShell', 'AdminShell', 'AsyncState', 'ProductCard', 'ProductGallery', 'ProductGrid', 'ConfirmationDialog', 'WorkflowTimeline', 'MegaMenu', 'SiteHeader', 'SiteFooter']],
+  ['@gluonjs/organisms', ['AppShell', 'AdminShell', 'AsyncState', 'ProductCard', 'ProductGallery', 'ProductGrid', 'ConfirmationDialog', 'WorkflowTimeline', 'MegaMenu', 'SiteHeader', 'SiteFooter', 'PageLayout']],
 ]);
 const manifestExports = new Map([
   ['@gluonjs/quarks', 'quarkManifest'],
@@ -96,7 +96,7 @@ try {
   const source = (await Promise.all(files
     .filter((file) => file.endsWith('.js'))
     .map((file) => readFile(resolve(output, file), 'utf8')))).join('\n');
-  for (const marker of ['gluon-button', 'gluon-card', 'gluon-app-shell', 'gluon-admin-shell', 'gluon-overlay']) {
+  for (const marker of ['gluon-button', 'gluon-card', 'gluon-app-shell', 'gluon-admin-shell', 'gluon-page-layout', 'gluon-overlay']) {
     if (source.includes(marker)) throw new Error(`Core-only bundle contains UI marker ${marker}.`);
   }
 } finally {

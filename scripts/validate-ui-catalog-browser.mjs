@@ -86,6 +86,9 @@ try {
   if (await page.locator('[data-preview="password"] .ui-sample-field + button').count() !== 1) {
     throw new Error('password preview does not show its visibility control');
   }
+  if (await page.locator('[data-preview="page-layout"] .ui-sample-page-layout > .is-header').count() !== 1) {
+    throw new Error('page-layout preview does not show its header anatomy');
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }
