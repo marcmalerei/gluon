@@ -4,6 +4,9 @@
 
 ### Added
 
+- Added the responsive `PageLayout` organism with semantic title/header/main,
+  optional aside and footer regions, CSS-variable hooks, and caller-owned
+  tenant/routing content.
 - Added the responsive, controlled `SiteHeader` organism with semantic brand,
   navigation, actions, mobile disclosure, focus restoration, CSS-variable hooks,
   and caller-owned tenant/routing content.

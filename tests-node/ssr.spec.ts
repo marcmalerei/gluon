@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, ProductGallery, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -159,6 +159,21 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-label="Server footer navigation"');
     expect(rendered).toContain('GLUON GOODS');
     expect(rendered).toContain('Objects for focused living.');
+  });
+
+  it('serializes PageLayout regions and title relationships without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(PageLayout({
+      id: 'server-page',
+      title: 'Server page',
+      breadcrumbs: q.nav({ 'aria-label': 'Breadcrumb', children: 'Home / Server page' }),
+      actions: q.button({ type: 'button', children: 'Continue' }),
+      aside: q.p({ children: 'Related content' }),
+      children: q.p({ children: 'Main content' }),
+    })));
+    expect(rendered).toContain('gluon-page-layout');
+    expect(rendered).toContain('id="server-page-title"');
+    expect(rendered).toContain('aria-labelledby="server-page-title"');
+    expect(rendered).toContain('aria-label="Related content"');
   });
 
   it('serializes AdminShell landmarks and navigation semantics without DOM state', async () => {

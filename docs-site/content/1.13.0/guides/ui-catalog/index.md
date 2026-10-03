@@ -273,6 +273,10 @@ verification surface.
           <template v-else-if="entry.preview === 'app-shell'">
             <div class="ui-sample-shell" aria-label="Application shell regions"><span class="is-bar">Nav</span><span class="is-header">Header</span><span class="is-content">Main</span><span class="is-footer">Footer</span></div>
           </template>
+          <template v-else-if="entry.preview === 'page-layout'">
+            <div class="ui-sample-page-layout" aria-label="Page layout regions"><span class="is-header">Breadcrumbs · Page title · Actions</span><span class="is-main">Main content</span><span class="is-aside">Aside</span><span class="is-footer">Footer</span></div>
+            <span class="ui-sample-variant">content · aside · responsive</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

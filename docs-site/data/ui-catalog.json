@@ -2079,6 +2079,35 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "PageLayout",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-page-layout"
+      ],
+      "variants": [
+        "content",
+        "aside",
+        "responsive"
+      ],
+      "states": [
+        "default",
+        "stacked"
+      ],
+      "preview": "page-layout",
+      "accessibility": "Renders a semantic header with a stable title, main content labelled by that title, optional labelled aside, and optional footer with responsive stacking and logical CSS.",
+      "extension": "Title, breadcrumbs, actions, main/aside/footer content, routing, data, authorization, localization, tenant identity, and application state remain caller-owned; region attributes and CSS variables support tenant-safe composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/PageLayout.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "ProductCard",
       "kind": "component",
       "status": "stable",

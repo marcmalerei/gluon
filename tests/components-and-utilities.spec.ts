@@ -17,7 +17,7 @@ import {
 import { ref } from '@gluonjs/reactivity';
 import { Button, Icon } from '@gluonjs/atoms';
 import { Card, FormField } from '@gluonjs/molecules';
-import { AppShell, WorkflowTimeline, type WorkflowTimelineProps } from '@gluonjs/organisms';
+import { AppShell, PageLayout, WorkflowTimeline, type WorkflowTimelineProps } from '@gluonjs/organisms';
 import { fragment, q, quark } from '@gluonjs/quarks';
 
 describe('component variants and utilities', () => {
@@ -90,6 +90,15 @@ describe('component variants and utilities', () => {
       }),
       FormField({ label: 'Name' }),
       AppShell({ children: q.p({ children: 'Content' }) }),
+      PageLayout({
+        id: 'settings-page',
+        title: 'Settings',
+        breadcrumbs: q.nav({ 'aria-label': 'Breadcrumb', children: 'Account / Settings' }),
+        actions: q.button({ type: 'button', children: 'Save' }),
+        aside: q.p({ children: 'Help' }),
+        footer: q.small({ children: 'Last updated today' }),
+        children: q.p({ children: 'Preferences' }),
+      }),
       unnamed({}),
     ]), root);
 
@@ -107,6 +116,10 @@ describe('component variants and utilities', () => {
     expect(root.querySelector('.gluon-app-shell-header')).toBeNull();
     expect(root.querySelector('.gluon-app-shell-navigation')).toBeNull();
     expect(root.querySelector('.gluon-app-shell-footer')).toBeNull();
+    expect(root.querySelector('.gluon-page-layout h1')?.textContent).toBe('Settings');
+    expect(root.querySelector('.gluon-page-layout-main')?.getAttribute('aria-labelledby')).toBe('settings-page-title');
+    expect(root.querySelector('.gluon-page-layout-aside')?.getAttribute('aria-label')).toBe('Related content');
+    expect(root.querySelector('.gluon-page-layout-footer')).not.toBeNull();
     expect(unnamed.displayName).toBe('AnonymousComponent');
   });
 
@@ -132,6 +145,31 @@ describe('component variants and utilities', () => {
     expect(root.textContent).toContain('Responsible role: Operations');
     expect(root.textContent).toContain('Last evidence: Import log 42');
     expect(root.querySelector('.gluon-workflow-timeline')).not.toBeNull();
+  });
+
+  it('supports every PageLayout heading level and validates stable region identifiers', () => {
+    const root = document.createElement('div');
+    const levels = [1, 2, 3, 4, 5, 6] as const;
+
+    render(fragment(levels.map((level) => PageLayout({
+      id: `level-${level}`,
+      title: `Level ${level}`,
+      headingLevel: level,
+      children: q.p({ children: `Content ${level}` }),
+    }))), root);
+
+    for (const level of levels) {
+      expect(root.querySelector(`.gluon-page-layout h${level}`)?.textContent).toBe(`Level ${level}`);
+    }
+
+    expect(() => PageLayout({ id: '', title: 'Invalid', children: 'Content' })).toThrow(TypeError);
+    expect(() => PageLayout({ id: 'invalid id', title: 'Invalid', children: 'Content' })).toThrow(TypeError);
+    expect(() => PageLayout({
+      id: 'invalid-aside-label',
+      title: 'Invalid',
+      asideLabel: ' ',
+      children: 'Content',
+    })).toThrow(TypeError);
   });
 
   it('localizes status messages and creates safe unique relationships', () => {

@@ -83,7 +83,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, ConfirmationDialog, MegaMenu, PageLayout, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -180,6 +180,17 @@ createApp(() => AppShell({
       label: 'Example actions',
       attributes: { class: 'example-actions' },
       children: [
+      PageLayout({
+        id: 'component-reference',
+        title: 'Component reference',
+        breadcrumbs: q.nav({ 'aria-label': 'Breadcrumb', children: 'Docs / Components' }),
+        actions: Button({ label: 'Copy import', variant: 'secondary' }),
+        aside: q.p({ children: 'CSS variables and tenant tokens remain caller-owned.' }),
+        children: [
+          Heading({ level: 2, children: 'Foundation atoms' }),
+          Text({ tone: 'muted', children: 'Native semantics with token-backed presentation.' }),
+        ],
+      }),
       Heading({ level: 2, children: 'Foundation atoms' }),
       Text({ tone: 'muted', children: 'Native semantics with token-backed presentation.' }),
       Link({ href: '#profile', children: 'Read the profile' }),
