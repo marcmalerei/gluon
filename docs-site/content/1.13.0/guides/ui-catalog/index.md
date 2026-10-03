@@ -244,6 +244,10 @@ verification surface.
             <header class="ui-sample-site-header"><strong>GLUON GOODS</strong><nav aria-label="Primary navigation"><a href="#catalog">Shop</a><a href="#catalog">Journal</a></nav><div><button type="button">Search</button><button type="button">Menu</button></div></header>
             <span class="ui-sample-variant">brand · navigation · actions · mobile</span>
           </template>
+          <template v-else-if="entry.preview === 'site-footer'">
+            <footer class="ui-sample-site-footer"><strong>GLUON GOODS</strong><nav aria-label="Footer navigation"><a href="#catalog">Shop</a><a href="#catalog">Journal</a><a href="#catalog">Support</a></nav><small>© 2026 Gluon Goods</small></footer>
+            <span class="ui-sample-variant">brand · navigation · legal · meta</span>
+          </template>
           <template v-else-if="entry.preview === 'async-state'">
             <div class="ui-sample-async-state"><strong>Recommendations</strong><span class="is-state">Partially loaded</span><span>Profile data is ready while recommendations refresh.</span><button class="ui-sample-button">Retry</button></div>
           </template>

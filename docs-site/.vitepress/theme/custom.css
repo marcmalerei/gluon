@@ -174,6 +174,10 @@ html { scroll-behavior: smooth; }
 .ui-sample-site-header nav, .ui-sample-site-header > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .ui-sample-site-header nav a, .ui-sample-site-header button { min-height: 28px; padding: 5px 7px; border: 0; background: transparent; color: inherit; font: inherit; }
 .ui-sample-site-header button { border: 1px solid var(--vp-c-divider); }
+.ui-sample-site-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; width: 94%; padding: 12px 10px; border-block-start: 1px solid var(--vp-c-divider); color: var(--vp-c-text-1); font-size: .7rem; text-align: start; }
+.ui-sample-site-footer nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.ui-sample-site-footer a { min-height: 28px; padding: 5px 7px; color: inherit; }
+.ui-sample-site-footer small { color: var(--vp-c-text-2); }
 .ui-sample-component { border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 8px 12px; font-weight: 650; }
 .ui-sample-variant { color: var(--vp-c-text-2); font-size: .78rem; }
 .ui-sample-separator { display: block; width: 80%; height: 1px; background: var(--vp-c-divider); }

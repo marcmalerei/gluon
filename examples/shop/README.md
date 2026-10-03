@@ -18,7 +18,7 @@ boundary.
 The current slice uses the public Core, Reactivity, Router, and Store APIs to provide:
 
 - home, catalog, and deep-linkable product routes
-- desktop and mobile navigation, composed through the public `SiteHeader` and `MegaMenu` organisms
+- desktop and mobile navigation plus the global footer, composed through the public `SiteHeader`, `MegaMenu`, and `SiteFooter` organisms
 - overflow-aware catalog category navigation with native links, a revealed
   current filter, and 44px previous/next controls at constrained widths
 - a realistic product catalog and product-detail surface

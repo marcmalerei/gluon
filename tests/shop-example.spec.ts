@@ -4,7 +4,7 @@ import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
 import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
-import { megaMenuStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { megaMenuStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -45,6 +45,7 @@ describe('GLUON GOODS reference shop', () => {
     expect(document.adoptedStyleSheets).toContain(toolbarStyles);
     expect(document.adoptedStyleSheets).toContain(megaMenuStyles);
     expect(document.adoptedStyleSheets).toContain(siteHeaderStyles);
+    expect(document.adoptedStyleSheets).toContain(siteFooterStyles);
     expect(document.adoptedStyleSheets.some((sheet) => (
       getStyleSheetText(sheet).includes('.shop-editorial-link')
     ))).toBe(false);
@@ -60,6 +61,8 @@ describe('GLUON GOODS reference shop', () => {
     expect(root.querySelector('.site-header .header-actions')?.getAttribute('role')).toBe('toolbar');
     expect(root.querySelector('.site-header .header-actions')?.getAttribute('aria-label')).toBe('Store actions');
     expect(root.querySelector('#shop-site-header')?.tagName).toBe('HEADER');
+    expect(root.querySelector('#journal')?.tagName).toBe('FOOTER');
+    expect(root.querySelector('#journal .gluon-site-footer-navigation')?.getAttribute('aria-label')).toBe('Footer navigation');
     const desktopMenuTrigger = root.querySelector<HTMLButtonElement>('#desktop-primary-navigation-trigger')!;
     desktopMenuTrigger.click();
     await settleShop();

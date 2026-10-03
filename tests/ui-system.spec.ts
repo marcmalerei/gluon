@@ -95,7 +95,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, SiteHeader, megaMenuStyles, organismManifest, organismStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, megaMenuStyles, organismManifest, organismStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2617,6 +2617,36 @@ describe('advanced data and workflow molecules', () => {
 
     expect(() => render(SiteHeader({ id: 'bad header', brand: 'Brand' }), document.body)).toThrow('whitespace');
     expect(() => render(SiteHeader({ id: 'empty-label', brand: 'Brand', mobileMenuLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders a responsive SiteFooter with labelled regions and tenant styling hooks', () => {
+    render(SiteFooter({
+      id: 'shop-footer',
+      brand: q.a({ href: '/', children: 'GLUON GOODS' }),
+      navigation: [q.a({ href: '/shop', children: 'Shop' }), q.a({ href: '/journal', children: 'Journal' })],
+      legal: q.a({ href: '/privacy', children: 'Privacy' }),
+      meta: q.small({ children: 'Objects for focused living.' }),
+      navigationLabel: 'Shop footer navigation',
+      attributes: { class: 'commerce-footer', style: { '--gluon-site-footer-gap': '2rem' } },
+      navigationAttributes: { class: 'footer-links' },
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('#shop-footer')!;
+    expect(root.tagName).toBe('FOOTER');
+    expect(root.classList).toContain('gluon-site-footer');
+    expect(root.classList).toContain('commerce-footer');
+    expect(root.dataset.siteFooterRoot).toBe('shop-footer');
+    expect(root.querySelector('.gluon-site-footer-brand a')?.textContent).toBe('GLUON GOODS');
+    expect(root.querySelector<HTMLElement>('.gluon-site-footer-navigation')?.getAttribute('aria-label')).toBe('Shop footer navigation');
+    expect(root.querySelectorAll('.gluon-site-footer-navigation a')).toHaveLength(2);
+    expect(root.querySelector('.gluon-site-footer-legal a')?.getAttribute('href')).toBe('/privacy');
+    expect(root.querySelector('.gluon-site-footer-meta')?.textContent).toContain('Objects for focused living.');
+    expect(root.style.getPropertyValue('--gluon-site-footer-gap')).toBe('2rem');
+    expect(getStyleSheetText(siteFooterStyles)).toContain('--gluon-site-footer');
+    expect(getStyleSheetText(siteFooterStyles)).toContain('forced-colors');
+
+    expect(() => render(SiteFooter({ id: 'bad footer' }), document.body)).toThrow('whitespace');
+    expect(() => render(SiteFooter({ id: 'empty-label', navigation: 'Links', navigationLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {

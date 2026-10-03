@@ -92,6 +92,14 @@ mobile disclosure supports Escape/focus return, 44px controls, and CSS-variable
 hooks for tenant-specific shells; routing, authorization, localization,
 analytics, and open state remain application-owned.
 
+`SiteFooter` renders a semantic, responsive footer with optional caller-owned
+brand, labelled navigation, legal, and metadata regions. It keeps URLs,
+content, routing, authorization, localization, analytics, tenant identity, and
+content order with the caller while exposing native region attributes and
+CSS-variable hooks for application-specific styling. The exact stylesheet
+stacks the regions on small screens and includes focus-visible,
+forced-colors, and reduced-motion behavior.
+
 `MegaMenu` renders a controlled, labelled native navigation with grouped links,
 responsive stacking, Escape/focus return, Arrow/Home/End traversal, disabled
 links, and CSS-variable styling hooks. Routing, authorization, analytics,
