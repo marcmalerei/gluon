@@ -1154,6 +1154,36 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "DateRangePicker",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-date-range-picker"
+      ],
+      "variants": [
+        "native",
+        "bounded"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled",
+        "required"
+      ],
+      "preview": "date-range-picker",
+      "accessibility": "Composes one named date-range group from two native date inputs with explicit start/end labels, shared constraints, helper or announced error text, and range-order validation.",
+      "extension": "The browser owns date parsing, locale presentation, keyboard behavior, and picker UI; callers own value, timezone policy, validation beyond range ordering, persistence, localization, and tenant-specific CSS variables.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/DateRangePicker.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "DialogSurface",
       "kind": "component",
       "status": "stable",
@@ -1901,6 +1931,36 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Tabs.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "TimePicker",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-time-picker"
+      ],
+      "variants": [
+        "native",
+        "bounded"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled",
+        "required"
+      ],
+      "preview": "time-picker",
+      "accessibility": "Composes a visible label, native time input, min/max/step constraints, helper or announced error text, required state, and stable labelledby/describedby relationships.",
+      "extension": "The browser owns time parsing, locale presentation, keyboard behavior, and picker UI; callers own value, timezone policy, validation, persistence, localization, and tenant-specific CSS variables.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/TimePicker.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {

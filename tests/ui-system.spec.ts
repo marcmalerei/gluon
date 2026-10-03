@@ -84,9 +84,13 @@ import {
   TreeView,
   SortControl,
   DatePicker,
+  DateRangePicker,
   FileUpload,
+  TimePicker,
   datePickerStyles,
+  dateRangePickerStyles,
   fileUploadStyles,
+  timePickerStyles,
   sortControlStyles,
   comboboxFieldStyles,
   commandPaletteStyles,
@@ -2900,6 +2904,80 @@ describe('advanced data and workflow molecules', () => {
     expect(() => FileUpload({ id: 'documents', label: 'Documents', files: [file, file] })).toThrow('only one file');
     expect(() => FileUpload({ id: 'documents', label: 'Documents', selectedFilesLabel: ' ' })).toThrow('must be a non-empty string');
     expect(() => FileUpload({ id: 'bad id', label: 'Documents' })).toThrow('must not contain whitespace');
+  });
+
+  it('composes DateRangePicker and TimePicker with native constraints and tenant styles', async () => {
+    const ranges: Array<{ start: string; end: string; field: string }> = [];
+    render(q.div({ children: [
+      DateRangePicker({
+        id: 'delivery-window',
+        label: 'Delivery window',
+        startLabel: 'From',
+        endLabel: 'Until',
+        startValue: '2026-10-06',
+        endValue: '2026-10-08',
+        startName: 'delivery-start',
+        endName: 'delivery-end',
+        min: '2026-10-03',
+        max: '2026-10-31',
+        required: true,
+        onInput: (value, field) => ranges.push({ ...value, field }),
+      }),
+      TimePicker({ id: 'delivery-time', label: 'Delivery time', value: '09:00', min: '08:00', max: '18:00', step: '900', helper: '15-minute increments.', onInput: (value) => ranges.push({ start: value, end: value, field: 'time' }) }),
+    ] }), document.body);
+
+    const range = document.querySelector<HTMLElement>('#delivery-window')!;
+    const start = range.querySelector<HTMLInputElement>('#delivery-window-start')!;
+    const end = range.querySelector<HTMLInputElement>('#delivery-window-end')!;
+    expect(start.name).toBe('delivery-start');
+    expect(end.name).toBe('delivery-end');
+    expect(start.min).toBe('2026-10-03');
+    expect(end.max).toBe('2026-10-31');
+    expect(start.required).toBe(true);
+    expect(start.getAttribute('aria-labelledby')).toBe('delivery-window-label delivery-window-start-label');
+    end.value = '2026-10-09';
+    end.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    expect(ranges.at(-1)).toEqual({ start: '2026-10-06', end: '2026-10-09', field: 'end' });
+
+    const time = document.querySelector<HTMLInputElement>('#delivery-time input[type="time"]')!;
+    expect(time.value).toBe('09:00');
+    expect(time.min).toBe('08:00');
+    expect(time.max).toBe('18:00');
+    expect(time.step).toBe('900');
+    expect(time.getAttribute('aria-describedby')).toBe('delivery-time-helper');
+    time.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    expect(ranges.at(-1)?.field).toBe('time');
+    expect(getStyleSheetText(dateRangePickerStyles)).toContain('--gluon-date-range-picker-gap');
+    expect(getStyleSheetText(timePickerStyles)).toContain('--gluon-time-picker-gap');
+
+    render(DateRangePicker({ id: 'custom-window', label: 'Custom window', helper: 'Choose two dates.', startInputAttributes: { id: 'custom-start' }, endInputAttributes: { id: 'custom-end', onInput: () => undefined } }), document.body);
+    expect(document.querySelector('#custom-window-helper')?.textContent).toBe('Choose two dates.');
+    expect(document.querySelector('#custom-start')?.getAttribute('aria-labelledby')).toBe('custom-window-label custom-window-start-label');
+    document.querySelector<HTMLInputElement>('#custom-end')?.dispatchEvent(new InputEvent('input', { bubbles: true }));
+  });
+
+  it('announces DateRangePicker order errors and composes caller listeners', () => {
+    const attributeEvents: string[] = [];
+    render(DateRangePicker({
+      id: 'invalid-window',
+      label: 'Delivery window',
+      startValue: '2026-10-10',
+      endValue: '2026-10-08',
+      startInputAttributes: { onInput: { handleEvent: (event: InputEvent) => attributeEvents.push(event.type) } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#invalid-window')!;
+    const inputs = root.querySelectorAll<HTMLInputElement>('input[type="date"]');
+    expect(inputs).toHaveLength(2);
+    expect(inputs[0]?.getAttribute('aria-invalid')).toBe('true');
+    expect(inputs[1]?.getAttribute('aria-describedby')).toBe('invalid-window-error');
+    expect(root.querySelector('[role="alert"]')?.textContent).toContain('start date');
+    inputs[0]?.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    expect(attributeEvents).toEqual(['input']);
+    inputs[1]?.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    expect(() => DateRangePicker({ id: 'bad id', label: 'Delivery window' })).toThrow('must not contain whitespace');
+    expect(() => TimePicker({ id: 'delivery-time', label: ' ' })).toThrow('must be a non-empty string');
+    render(TimePicker({ id: 'invalid-time', label: 'Invalid time', error: 'Choose a valid time.' }), document.body);
+    expect(document.querySelector('#invalid-time [role="alert"]')?.textContent).toContain('valid time');
   });
 
   it('renders SortControl with native select semantics and caller-owned changes', async () => {

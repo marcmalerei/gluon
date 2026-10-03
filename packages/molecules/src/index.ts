@@ -47,7 +47,9 @@ export { TreeView, type TreeViewAttributes, type TreeViewNode, type TreeViewProp
 export { treeViewStyles } from './tree-view-styles.js';
 export { SortControl, type SortControlAttributes, type SortControlOption, type SortControlProps } from './sort-control.js';
 export { DatePicker, type DatePickerAttributes, type DatePickerInputAttributes, type DatePickerProps } from './date-picker.js';
+export { DateRangePicker, type DateRangePickerAttributes, type DateRangePickerField, type DateRangePickerInputAttributes, type DateRangePickerProps, type DateRangeValue } from './date-range-picker.js';
 export { FileUpload, type FileUploadAttributes, type FileUploadInputAttributes, type FileUploadProps } from './file-upload.js';
+export { TimePicker, type TimePickerAttributes, type TimePickerInputAttributes, type TimePickerProps } from './time-picker.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';
@@ -77,5 +79,7 @@ export { oneTimePasswordFieldStyles } from './one-time-password-field-styles.js'
 export { passwordToggleFieldStyles } from './password-toggle-field-styles.js';
 export { sortControlStyles } from './sort-control-styles.js';
 export { datePickerStyles } from './date-picker-styles.js';
+export { dateRangePickerStyles } from './date-range-picker-styles.js';
 export { fileUploadStyles } from './file-upload-styles.js';
+export { timePickerStyles } from './time-picker-styles.js';
 export { defineMolecule, type Component } from '@gluonjs/core';
