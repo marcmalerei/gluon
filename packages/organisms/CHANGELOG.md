@@ -7,6 +7,9 @@
 - Added the responsive, controlled `SiteHeader` organism with semantic brand,
   navigation, actions, mobile disclosure, focus restoration, CSS-variable hooks,
   and caller-owned tenant/routing content.
+- Added the responsive `SiteFooter` organism with semantic brand, navigation,
+  legal, and metadata regions plus CSS-variable hooks and caller-owned
+  tenant/routing content.
 
 ## [1.13.0] - 2026-09-25
 

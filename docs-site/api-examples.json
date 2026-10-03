@@ -1498,7 +1498,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteHeader, WorkflowTimeline, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, siteHeaderStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, WorkflowTimeline, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1539,7 +1539,11 @@
         "const headerTriggerAttributes: SiteHeaderTriggerAttributes = { class: 'catalog-header-trigger' };",
         "const headerOpenChangeEvent: SiteHeaderOpenChangeEvent = new MouseEvent('mobile-open-change');",
         "const header: SiteHeaderProps = { id: 'catalog-header', brand: html`<a href='/'>GLUON GOODS</a>`, navigation: html`<a href='/shop'>Shop</a>`, actions: html`<button type='button'>Search</button>`, mobileNavigation: html`<a href='/shop'>Shop</a>`, attributes: headerAttributes, navigationAttributes: headerNavigationAttributes, brandAttributes: headerRegionAttributes, triggerAttributes: headerTriggerAttributes, onMobileOpenChange: (open, event) => console.log('mobile header', open, event.type) };",
-        "console.log(AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
+        "const footerAttributes: SiteFooterAttributes = { class: 'catalog-site-footer' };",
+        "const footerNavigationAttributes: SiteFooterNavigationAttributes = { 'aria-label': 'Catalog footer navigation' };",
+        "const footerRegionAttributes: SiteFooterRegionAttributes = { class: 'catalog-footer-region' };",
+        "const footer: SiteFooterProps = { id: 'catalog-footer', brand: html`<a href='/'>GLUON GOODS</a>`, navigation: html`<a href='/shop'>Shop</a><a href='/journal'>Journal</a>`, legal: html`<a href='/privacy'>Privacy</a>`, meta: html`<small>© 2026 Gluon Goods</small>`, attributes: footerAttributes, navigationAttributes: footerNavigationAttributes, brandAttributes: footerRegionAttributes, legalAttributes: footerRegionAttributes, metaAttributes: footerRegionAttributes };",
+        "console.log(AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), SiteFooter(footer), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, siteFooterStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
       ]
     },
     "router-application": {
@@ -6252,6 +6256,30 @@
     "packages/organisms/src/type-aliases/SiteHeaderTriggerAttributes.md": {
       "recipe": "organism-components",
       "description": "Forward native mobile-trigger attributes while SiteHeader owns disclosure relationships:"
+    },
+    "packages/organisms/src/variables/SiteFooter.md": {
+      "recipe": "organism-components",
+      "description": "Render a responsive footer with caller-owned brand, navigation, legal, and metadata regions:"
+    },
+    "packages/organisms/src/variables/siteFooterStyles.md": {
+      "recipe": "organism-components",
+      "description": "Inspect the separately tree-shakable SiteFooter stylesheet and its tenant-scoped CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/SiteFooterProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure a semantic SiteFooter while URLs, content, routing, and tenant identity remain caller-owned:"
+    },
+    "packages/organisms/src/type-aliases/SiteFooterAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native attributes to the SiteFooter root:"
+    },
+    "packages/organisms/src/type-aliases/SiteFooterNavigationAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward labelled native navigation attributes while SiteFooter owns the navigation landmark:"
+    },
+    "packages/organisms/src/type-aliases/SiteFooterRegionAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native attributes to caller-owned SiteFooter regions:"
     },
     "packages/quarks/src/functions/createFocusScope.md": {
       "recipe": "quark-headless",

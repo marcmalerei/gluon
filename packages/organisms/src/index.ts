@@ -15,4 +15,6 @@ export { MegaMenu, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLin
 export { megaMenuStyles } from './mega-menu-styles.js';
 export { SiteHeader, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes } from './site-header.js';
 export { siteHeaderStyles } from './site-header-styles.js';
+export { SiteFooter, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes } from './site-footer.js';
+export { siteFooterStyles } from './site-footer-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

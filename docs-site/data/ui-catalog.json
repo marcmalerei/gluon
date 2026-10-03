@@ -2081,6 +2081,37 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "SiteFooter",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-site-footer"
+      ],
+      "variants": [
+        "brand",
+        "navigation",
+        "legal",
+        "meta"
+      ],
+      "states": [
+        "default",
+        "stacked",
+        "compact"
+      ],
+      "preview": "site-footer",
+      "accessibility": "Renders a semantic footer with optional labelled navigation and caller-owned brand, legal, and metadata regions; responsive stacking, focus visibility, forced-colors, and reduced-motion support are provided by the exact stylesheet.",
+      "extension": "Brand, navigation, legal copy, metadata, URLs, routing, authorization, localization, analytics, tenant identity, and content order remain caller-owned; region attributes and CSS variables support application-specific composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/SiteFooter.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "SiteHeader",
       "kind": "component",
       "status": "stable",

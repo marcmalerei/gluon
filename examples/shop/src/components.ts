@@ -17,7 +17,7 @@ import {
   Toolbar,
   createDialogSurfaceController,
 } from '@gluonjs/molecules';
-import { MegaMenu, SiteHeader as SiteHeaderOrganism } from '@gluonjs/organisms';
+import { MegaMenu, SiteFooter as SiteFooterOrganism, SiteHeader as SiteHeaderOrganism } from '@gluonjs/organisms';
 import { createFocusScope, type FocusScope } from '@gluonjs/quarks';
 import { RouterLink, useRoute } from '@gluonjs/router';
 import { categories, formatPrice, products, type Product } from './data.js';
@@ -248,17 +248,18 @@ function BagDrawer(store: ShopStore): TemplateValue {
 }
 
 export function SiteFooter(): TemplateValue {
-  return html`
-    <footer class="site-footer" id="journal">
-      <strong>GLUON GOODS</strong>
-      <nav aria-label="Footer navigation">
-        ${compose(RouterLink, { to: '/shipping' })`Shipping`}
-        ${compose(RouterLink, { to: '/returns' })`Returns`}
-        ${compose(RouterLink, { to: '/#materials' })`Materials`}
-        <a href="mailto:hello@example.com">Contact</a>
-      </nav>
-    </footer>
-  `;
+  return SiteFooterOrganism({
+    id: 'journal',
+    brand: html`<strong>GLUON GOODS</strong>`,
+    navigation: html`
+      ${compose(RouterLink, { to: '/shipping' })`Shipping`}
+      ${compose(RouterLink, { to: '/returns' })`Returns`}
+      ${compose(RouterLink, { to: '/#materials' })`Materials`}
+    `,
+    legal: html`<a href="mailto:hello@example.com">Contact</a>`,
+    meta: html`<small>Objects for focused living.</small>`,
+    attributes: { class: 'site-footer' },
+  });
 }
 
 function SearchPanel(store: ShopStore): TemplateValue {

@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
-import { ConfirmationDialog, WorkflowTimeline } from '@gluonjs/organisms';
+import { ConfirmationDialog, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -142,6 +142,23 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(first).toContain('<ol');
     expect(first).toContain('Receipt 42');
     expect(first).toContain('data-gluon-h-');
+  });
+
+  it('serializes SiteFooter regions and navigation semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(SiteFooter({
+      id: 'server-footer',
+      brand: html`<strong>GLUON GOODS</strong>`,
+      navigation: html`<a href="/shop">Shop</a><a href="/support">Support</a>`,
+      legal: html`<a href="/privacy">Privacy</a>`,
+      meta: html`<small>Objects for focused living.</small>`,
+      navigationLabel: 'Server footer navigation',
+    })));
+    expect(rendered).toContain('<footer');
+    expect(rendered).toContain('id="server-footer"');
+    expect(rendered).toContain('data-site-footer-root="server-footer"');
+    expect(rendered).toContain('aria-label="Server footer navigation"');
+    expect(rendered).toContain('GLUON GOODS');
+    expect(rendered).toContain('Objects for focused living.');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {
@@ -901,6 +918,7 @@ describe('@gluonjs/ssr request ownership and state', () => {
       'gluon-molecule-toast',
       'gluon-organism-mega-menu',
       'gluon-organism-site-header',
+      'gluon-organism-site-footer',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
@@ -1224,7 +1242,7 @@ describe('@gluonjs/ssr static output and style transport', () => {
       assets: ['/assets/orbit.webp'],
     };
     const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
-    expect(response.styles.entries).toHaveLength(12);
+    expect(response.styles.entries).toHaveLength(13);
     expect(response.styles.entries.map((entry) => entry.id)).toEqual([
       'gluon-ui-layer-order',
       'gluon-ui-foundation',
@@ -1236,18 +1254,20 @@ describe('@gluonjs/ssr static output and style transport', () => {
       'gluon-molecule-toast',
       'gluon-organism-mega-menu',
       'gluon-organism-site-header',
+      'gluon-organism-site-footer',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
-    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     expect(response.styles.entries[4]?.cssText).toContain('.gluon-status-badge');
     expect(response.styles.entries[5]?.cssText).toContain('.gluon-tabs');
     expect(response.styles.entries[6]?.cssText).toContain('.gluon-toolbar');
     expect(response.styles.entries[7]?.cssText).toContain('.gluon-toast');
     expect(response.styles.entries[8]?.cssText).toContain('.gluon-mega-menu');
     expect(response.styles.entries[9]?.cssText).toContain('.gluon-site-header');
-    expect(response.styles.entries[10]?.cssText).toContain('--gluon-color-action: #c8ff00');
-    expect(response.styles.entries[11]?.cssText).toContain('.checkout-page');
+    expect(response.styles.entries[10]?.cssText).toContain('.gluon-site-footer');
+    expect(response.styles.entries[11]?.cssText).toContain('--gluon-color-action: #c8ff00');
+    expect(response.styles.entries[12]?.cssText).toContain('.checkout-page');
     expect(response.styles.entries.some((entry) => entry.id === 'gluon-atoms-components')).toBe(false);
     expect(response.head).toContain('data-gluon-style="gluon-ui-layer-order"');
     expect(response.head).toContain('nonce="request-nonce"');

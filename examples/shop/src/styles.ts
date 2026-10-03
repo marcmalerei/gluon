@@ -254,12 +254,12 @@ export const shopStyles = css`
     .category-link:hover { background: var(--shop-action); }
 
     .site-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 100px;
-      padding: 24px var(--shop-gutter);
-      border-top: 1px solid var(--shop-rule);
+      --gluon-site-footer-gap: 32px;
+      --gluon-site-footer-padding-block: 24px;
+      --gluon-site-footer-padding-inline: var(--shop-gutter);
+      --gluon-site-footer-border: var(--shop-rule);
+      --gluon-site-footer-color: var(--shop-black);
+      --gluon-site-footer-background: var(--shop-white);
     }
     .site-footer strong { font-size: 19px; letter-spacing: -0.03em; }
     .site-footer nav { display: flex; gap: clamp(20px, 4vw, 60px); font-size: 13px; }
@@ -497,7 +497,6 @@ export const shopStyles = css`
       .category-links { grid-template-columns: 1fr; }
       .category-link { min-height: 58px; padding: 0 var(--shop-gutter); border-right: 0; border-bottom: 1px solid var(--shop-rule); font-size: 18px; }
       .category-link:last-child { border-bottom: 0; }
-      .site-footer { align-items: flex-start; gap: 32px; min-height: 170px; }
       .site-footer nav { display: grid; grid-template-columns: 1fr 1fr; }
 
       .search-bar { grid-template-columns: 1fr 44px; gap: 10px; min-height: 108px; }
