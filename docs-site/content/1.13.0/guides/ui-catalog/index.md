@@ -236,6 +236,10 @@ verification surface.
           <template v-else-if="entry.preview === 'app-shell'">
             <div class="ui-sample-shell" aria-label="Application shell regions"><span class="is-bar">Nav</span><span class="is-header">Header</span><span class="is-content">Main</span><span class="is-footer">Footer</span></div>
           </template>
+          <template v-else-if="entry.preview === 'admin-shell'">
+            <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
+            <span class="ui-sample-variant">sidebar · responsive</span>
+          </template>
           <template v-else-if="entry.preview === 'mega-menu'">
             <div class="ui-sample-mega-menu"><button type="button" aria-expanded="true">Shop <span aria-hidden="true">⌃</span></button><div class="ui-sample-mega-panel"><section><strong>Lighting</strong><a href="#catalog">Orbit lamp</a><a href="#catalog">Desk light</a></section><section><strong>Furniture</strong><a href="#catalog">Stack tray</a><a href="#catalog">Fold stool</a></section></div></div>
             <span class="ui-sample-variant">grouped · responsive · keyboard</span>

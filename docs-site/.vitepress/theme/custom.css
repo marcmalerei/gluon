@@ -163,6 +163,12 @@ html { scroll-behavior: smooth; }
 .ui-sample-shell .is-header, .ui-sample-shell .is-footer { grid-column: 2; }
 .ui-sample-shell .is-content { grid-column: 2; min-height: 34px; }
 .ui-sample-shell .is-footer { background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
+.ui-sample-admin-shell { display: grid; grid-template-columns: 30% 1fr; grid-template-rows: auto 1fr auto; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-admin-shell > span { display: grid; min-height: 18px; place-items: center; background: color-mix(in srgb, var(--ui-catalog-accent) 14%, var(--vp-c-bg)); }
+.ui-sample-admin-shell .is-header { grid-column: 1 / -1; justify-content: start; padding-inline: 8px; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }
+.ui-sample-admin-shell .is-sidebar { grid-row: 2 / 4; }
+.ui-sample-admin-shell .is-content, .ui-sample-admin-shell .is-footer { grid-column: 2; }
+.ui-sample-admin-shell .is-footer { background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
 .ui-sample-mega-menu { display: grid; gap: 6px; width: 94%; text-align: start; font-size: .72rem; }
 .ui-sample-mega-menu > button { justify-self: start; min-block-size: 32px; padding: 5px 9px; border: 0; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); font: inherit; }
 .ui-sample-mega-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); box-shadow: 0 8px 18px rgb(0 0 0 / 8%); }

@@ -10,6 +10,8 @@
 - Added the responsive `SiteFooter` organism with semantic brand, navigation,
   legal, and metadata regions plus CSS-variable hooks and caller-owned
   tenant/routing content.
+- Added the responsive `AdminShell` organism with semantic header, labelled
+  sidebar navigation, main workspace, optional footer, and CSS-variable hooks.
 
 ## [1.13.0] - 2026-09-25
 
