@@ -333,6 +333,10 @@ permissions, and tenant-specific content remain caller-owned.
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>
           </template>
+          <template v-else-if="entry.preview === 'dashboard-shell'">
+            <div class="ui-sample-dashboard-shell" aria-label="Dashboard shell regions"><span class="is-header">Dashboard header</span><span class="is-sidebar">Navigation</span><span class="is-main">Widgets · filters · charts</span><span class="is-utility">Inspector</span><span class="is-footer">Workspace status</span></div>
+            <span class="ui-sample-variant">sidebar · utility · responsive · mobile</span>
+          </template>
           <template v-else-if="entry.preview === 'mega-menu'">
             <div class="ui-sample-mega-menu"><button type="button" aria-expanded="true">Shop <span aria-hidden="true">⌃</span></button><div class="ui-sample-mega-panel"><section><strong>Lighting</strong><a href="#catalog">Orbit lamp</a><a href="#catalog">Desk light</a></section><section><strong>Furniture</strong><a href="#catalog">Stack tray</a><a href="#catalog">Fold stool</a></section></div></div>
             <span class="ui-sample-variant">grouped · responsive · keyboard</span>

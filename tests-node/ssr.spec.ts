@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, DashboardShell, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -222,6 +222,26 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('<header');
     expect(rendered).toContain('<aside');
     expect(rendered).toContain('aria-label="Server administration navigation"');
+    expect(rendered).toContain('<main');
+    expect(rendered).toContain('<footer');
+  });
+
+  it('serializes DashboardShell landmarks and utility semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(DashboardShell({
+      id: 'server-dashboard',
+      header: html`<strong>Operations dashboard</strong>`,
+      sidebar: html`<a href="/overview">Overview</a>`,
+      main: html`<h1>Metrics</h1>`,
+      utility: html`<p>Inspector tools</p>`,
+      footer: html`<small>Status: ready</small>`,
+      sidebarLabel: 'Server dashboard navigation',
+      utilityLabel: 'Server dashboard tools',
+      mobileOpen: true,
+    })));
+    expect(rendered).toContain('data-dashboard-shell-root="server-dashboard"');
+    expect(rendered).toContain('aria-label="Server dashboard navigation"');
+    expect(rendered).toContain('aria-label="Server dashboard tools"');
+    expect(rendered).toContain('aria-expanded="true"');
     expect(rendered).toContain('<main');
     expect(rendered).toContain('<footer');
   });

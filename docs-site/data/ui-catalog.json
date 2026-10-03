@@ -2288,6 +2288,36 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "DashboardShell",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-dashboard-shell"
+      ],
+      "variants": [
+        "sidebar",
+        "utility",
+        "responsive"
+      ],
+      "states": [
+        "default",
+        "mobile-closed",
+        "mobile-open"
+      ],
+      "preview": "dashboard-shell",
+      "accessibility": "Renders semantic header, labelled dashboard navigation, main workspace, optional utility region, and footer with controlled mobile navigation, visible focus, forced-colors, and reduced-motion support.",
+      "extension": "Header, sidebar, widgets, utility content, footer, routing, permissions, data loading, filters, persistence, mobile state, localization, and tenant identity remain caller-owned; region attributes, parts, and CSS variables support tenant-safe composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/DashboardShell.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "MegaMenu",
       "kind": "component",
       "status": "stable",
