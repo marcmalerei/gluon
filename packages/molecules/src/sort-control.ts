@@ -10,7 +10,6 @@ export interface SortControlOption {
 }
 
 export type SortControlAttributes = Omit<QuarkProps<HTMLDivElement>, 'children' | 'id'>;
-export type SortControlSelectAttributes = Omit<SelectAttributes, 'id'>;
 
 export interface SortControlProps {
   readonly id: string;
@@ -22,7 +21,7 @@ export interface SortControlProps {
   readonly helper?: TemplateValue;
   readonly error?: TemplateValue;
   readonly onChange?: (value: string, event: Event) => void;
-  readonly selectAttributes?: SortControlSelectAttributes;
+  readonly selectAttributes?: Omit<SelectAttributes, 'id'>;
   readonly attributes?: SortControlAttributes;
 }
 

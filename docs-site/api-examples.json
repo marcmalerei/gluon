@@ -1290,7 +1290,6 @@
         "  type SortControlAttributes,",
         "  type SortControlOption,",
         "  type SortControlProps,",
-        "  type SortControlSelectAttributes,",
         "  type NavigationMenuAttributes,",
         "  type NavigationMenuItem,",
         "  type NavigationMenuItemAttributes,",
@@ -1386,7 +1385,7 @@
         "const catalogTree = { id: 'catalog-tree', label: 'Catalog navigation', nodes: [treeNode, { id: 'settings', label: 'Settings' }], expanded: ['shop'], selected: 'lighting', attributes: treeAttributes, onExpandedChange: (id, expanded) => console.log(id, expanded), onSelect: (id) => console.log('selected node', id) } satisfies TreeViewProps;",
         "const sortOptions = [{ value: 'featured', label: 'Featured' }, { value: 'price-low', label: 'Price: low to high' }, { value: 'newest', label: 'Newest' }] satisfies readonly SortControlOption[];",
         "const sortAttributes = { class: 'catalog-sort' } satisfies SortControlAttributes;",
-        "const sortSelectAttributes = { autocomplete: 'off' } satisfies SortControlSelectAttributes;",
+        "const sortSelectAttributes = { autocomplete: 'off' } satisfies Omit<import('@gluonjs/atoms').SelectAttributes, 'id'>;",
         "const sortControl = { id: 'catalog-sort', label: 'Sort products', options: sortOptions, value: 'featured', helper: 'Choose the catalog order.', attributes: sortAttributes, selectAttributes: sortSelectAttributes, onChange: (value, event) => console.log('sort changed', value, event.type) } satisfies SortControlProps;",
         "const commandGroups = [{ id: 'navigation', label: 'Navigation', commands: [{ id: 'dashboard', label: 'Open dashboard', description: 'View today’s activity.', shortcut: '⌘K' }, { id: 'orders', label: 'Search orders', shortcut: '↵' }] }] satisfies readonly CommandPaletteGroup[];",
         "const commandPalette = { id: 'quick-actions', label: 'Quick actions', groups: commandGroups, query: '', activeId: 'dashboard', open: true, attributes: { class: 'quick-actions' } satisfies CommandPaletteAttributes, inputAttributes: {} satisfies CommandPaletteInputAttributes, listboxAttributes: {} satisfies CommandPaletteListboxAttributes, onActiveChange: (id) => console.log('active command', id), onSelect: (id) => console.log('selected command', id) } satisfies CommandPaletteProps;",
@@ -8278,7 +8277,6 @@
     "packages/molecules/src/variables/sortControlStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separately tree-shakable SortControl stylesheet and its tenant-safe CSS-variable hooks:" },
     "packages/molecules/src/interfaces/SortControlProps.md": { "recipe": "molecule-components", "description": "Configure a responsive native sort field with controlled options, helper/error copy, and change handling:" },
     "packages/molecules/src/interfaces/SortControlOption.md": { "recipe": "molecule-components", "description": "Describe one caller-owned sort value, label, and optional disabled state:" },
-    "packages/molecules/src/type-aliases/SortControlAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the SortControl wrapper:" },
-    "packages/molecules/src/type-aliases/SortControlSelectAttributes.md": { "recipe": "molecule-components", "description": "Forward typed native select attributes while SortControl owns its label and value relationships:" }
+    "packages/molecules/src/type-aliases/SortControlAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native attributes to the SortControl wrapper:" }
   }
 }

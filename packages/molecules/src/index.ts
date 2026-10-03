@@ -43,7 +43,7 @@ export { CommandPalette, type CommandPaletteAttributes, type CommandPaletteComma
 export { commandPaletteStyles } from './command-palette-styles.js';
 export { TreeView, type TreeViewAttributes, type TreeViewNode, type TreeViewProps } from './tree-view.js';
 export { treeViewStyles } from './tree-view-styles.js';
-export { SortControl, type SortControlAttributes, type SortControlOption, type SortControlProps, type SortControlSelectAttributes } from './sort-control.js';
+export { SortControl, type SortControlAttributes, type SortControlOption, type SortControlProps } from './sort-control.js';
 export { moleculeManifest } from './manifest.js';
 export { moleculeStyles } from './styles.js';
 export { accordionStyles } from './accordion-styles.js';
