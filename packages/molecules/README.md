@@ -91,6 +91,8 @@ import {
   CommandPalette,
   TreeView,
   SortControl,
+  DatePicker,
+  FileUpload,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -509,3 +511,12 @@ focus. Styling is exposed through `part`, `data-state`, stable `gluon-*`
 classes, and component-scoped `--gluon-menu-*`/`--gluon-toolbar-*` properties.
 Routing, authorization, persistence, and command execution remain outside
 these compositions.
+
+`DatePicker` is a controlled labelled native date field. It forwards browser
+date constraints (`min`, `max`, and `step`), required/disabled/invalid state,
+and helper/error relationships while leaving locale, timezone, validation,
+and persistence to the caller. `FileUpload` is the matching native file-picker
+composition: it exposes accept/capture/multiple constraints, renders a
+caller-provided selected-file summary, composes native change listeners, and
+does not inspect, transform, or upload file contents. Both components expose
+component-scoped CSS variables for tenant-owned visual overrides.

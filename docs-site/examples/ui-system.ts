@@ -75,6 +75,8 @@ import {
   CommandPalette,
   TreeView,
   SortControl,
+  DatePicker,
+  FileUpload,
   Menubar,
   SegmentedControl,
   TableRegion,
@@ -470,6 +472,8 @@ createApp(() => AppShell({
           children: q.table({ children: q.tbody({ children: q.tr({ children: [q.th({ scope: 'row', children: 'A-101' }), q.td({ children: 'Ready' })] }) }) }),
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
+        DatePicker({ id: 'delivery-date-picker', label: 'Delivery date', value: '2026-10-06', min: '2026-10-03', helper: 'Choose a weekday for dispatch.' }),
+        FileUpload({ id: 'product-photo-upload', label: 'Product photos', accept: 'image/*', multiple: true, helper: 'JPEG or PNG, up to five files.' }),
       Field({
         label: 'Reference',
         helper: 'Optional order reference',

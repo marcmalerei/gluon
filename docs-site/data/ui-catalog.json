@@ -1124,6 +1124,36 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "DatePicker",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-date-picker"
+      ],
+      "variants": [
+        "native",
+        "bounded"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "disabled",
+        "required"
+      ],
+      "preview": "date-picker",
+      "accessibility": "Composes a visible label, native date input, min/max/step constraints, helper or announced error text, required state, and stable labelledby/describedby relationships.",
+      "extension": "The browser owns date parsing, locale presentation, keyboard behavior, and picker UI; callers own value, timezone policy, validation, persistence, localization, and tenant-specific CSS variables.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/DatePicker.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "DialogSurface",
       "kind": "component",
       "status": "stable",
@@ -1232,6 +1262,36 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/EmptyState.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "FileUpload",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-file-upload"
+      ],
+      "variants": [
+        "single",
+        "multiple"
+      ],
+      "states": [
+        "empty",
+        "selected",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "file-upload",
+      "accessibility": "Composes a visible label, native file input, accept/capture/multiple constraints, selected-file status, helper or announced error text, and stable labelledby/describedby relationships.",
+      "extension": "The browser owns file selection and form submission; callers own file validation, previews, upload transport, persistence, localization, and tenant-specific CSS variables. No network or file processing is performed by the molecule.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/FileUpload.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {

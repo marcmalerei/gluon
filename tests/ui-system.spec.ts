@@ -83,6 +83,10 @@ import {
   CommandPalette,
   TreeView,
   SortControl,
+  DatePicker,
+  FileUpload,
+  datePickerStyles,
+  fileUploadStyles,
   sortControlStyles,
   comboboxFieldStyles,
   commandPaletteStyles,
@@ -2775,6 +2779,55 @@ describe('advanced data and workflow molecules', () => {
     expect(list.tagName).toBe('DL');
     expect(list.querySelectorAll('dt')).toHaveLength(2);
     expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
+  });
+
+  it('composes native DatePicker and FileUpload form fields with tenant token hooks', async () => {
+    const dates: string[] = [];
+    const files: readonly File[][] = [];
+    const selected = [new File(['image'], 'lamp.png', { type: 'image/png' })];
+    render(q.main({ children: [
+      DatePicker({
+        id: 'delivery-date-picker',
+        label: 'Delivery date',
+        value: '2026-10-06',
+        min: '2026-10-03',
+        max: '2026-10-31',
+        required: true,
+        helper: 'Choose a dispatch date.',
+        onInput: (value) => dates.push(value),
+      }),
+      FileUpload({
+        id: 'product-photo-upload',
+        label: 'Product photos',
+        accept: 'image/*',
+        files: selected,
+        multiple: true,
+        error: 'Review the selected files.',
+        onChange: (value) => files.push(value),
+      }),
+    ] }), document.body);
+
+    const dateRoot = document.querySelector<HTMLElement>('#delivery-date-picker')!;
+    const dateInput = dateRoot.querySelector<HTMLInputElement>('input[type="date"]')!;
+    expect(dateInput.value).toBe('2026-10-06');
+    expect(dateInput.min).toBe('2026-10-03');
+    expect(dateInput.max).toBe('2026-10-31');
+    expect(dateInput.required).toBe(true);
+    expect(dateInput.getAttribute('aria-labelledby')).toBe('delivery-date-picker-label');
+    expect(dateInput.getAttribute('aria-describedby')).toBe('delivery-date-picker-helper');
+    await userEvent.fill(dateInput, '2026-10-07');
+    expect(dates.at(-1)).toBe('2026-10-07');
+
+    const uploadRoot = document.querySelector<HTMLElement>('#product-photo-upload')!;
+    const uploadInput = uploadRoot.querySelector<HTMLInputElement>('input[type="file"]')!;
+    expect(uploadInput.multiple).toBe(true);
+    expect(uploadInput.accept).toBe('image/*');
+    expect(uploadInput.getAttribute('aria-labelledby')).toBe('product-photo-upload-label');
+    expect(uploadInput.getAttribute('aria-describedby')).toContain('product-photo-upload-files');
+    expect(uploadRoot.querySelector('.gluon-file-upload-files')?.textContent).toContain('lamp.png');
+    expect(uploadRoot.querySelector('[role="alert"]')?.textContent).toContain('Review');
+    expect(getStyleSheetText(datePickerStyles)).toContain('--gluon-date-picker-gap');
+    expect(getStyleSheetText(fileUploadStyles)).toContain('--gluon-file-upload-gap');
   });
 
   it('renders SortControl with native select semantics and caller-owned changes', async () => {
