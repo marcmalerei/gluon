@@ -101,7 +101,8 @@
       "environment": "node",
       "exports": [
         ".",
-        "./tailwind"
+        "./tailwind",
+        "./tailwind.css"
       ]
     },
     {

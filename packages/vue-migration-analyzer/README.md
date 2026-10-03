@@ -70,7 +70,9 @@ named by their cutover-stage link.
 Reports contain normalized relative paths, source ranges, declared identifiers,
 static import sources, and byte digests. They omit source excerpts, absolute
 paths, timestamps, host data, and environment data. Symbolic links are never
-followed. Output is written only to stdout/stderr.
+followed. Common generated directories such as `dist`, `coverage`, and `.tmp`
+are skipped so a preceding build cannot consume the bounded discovery budget.
+Output is written only to stdout/stderr.
 
 ## Verification
 

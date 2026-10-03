@@ -83,6 +83,10 @@ import {
   CommandPalette,
   TreeView,
   SortControl,
+  DatePicker,
+  FileUpload,
+  datePickerStyles,
+  fileUploadStyles,
   sortControlStyles,
   comboboxFieldStyles,
   commandPaletteStyles,
@@ -2775,6 +2779,127 @@ describe('advanced data and workflow molecules', () => {
     expect(list.tagName).toBe('DL');
     expect(list.querySelectorAll('dt')).toHaveLength(2);
     expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
+  });
+
+  it('composes native DatePicker and FileUpload form fields with tenant token hooks', async () => {
+    const dates: string[] = [];
+    const files: (readonly File[])[] = [];
+    const selected = [new File(['image'], 'lamp.png', { type: 'image/png' })];
+    render(q.main({ children: [
+      DatePicker({
+        id: 'delivery-date-picker',
+        label: 'Delivery date',
+        value: '2026-10-06',
+        min: '2026-10-03',
+        max: '2026-10-31',
+        required: true,
+        helper: 'Choose a dispatch date.',
+        onInput: (value) => dates.push(value),
+      }),
+      FileUpload({
+        id: 'product-photo-upload',
+        label: 'Product photos',
+        accept: 'image/*',
+        files: selected,
+        multiple: true,
+        error: 'Review the selected files.',
+        onChange: (value) => files.push(value),
+      }),
+    ] }), document.body);
+
+    const dateRoot = document.querySelector<HTMLElement>('#delivery-date-picker')!;
+    const dateInput = dateRoot.querySelector<HTMLInputElement>('input[type="date"]')!;
+    expect(dateInput.value).toBe('2026-10-06');
+    expect(dateInput.min).toBe('2026-10-03');
+    expect(dateInput.max).toBe('2026-10-31');
+    expect(dateInput.required).toBe(true);
+    expect(dateInput.getAttribute('aria-labelledby')).toBe('delivery-date-picker-label');
+    expect(dateInput.getAttribute('aria-describedby')).toBe('delivery-date-picker-helper');
+    await userEvent.fill(dateInput, '2026-10-07');
+    expect(dates.at(-1)).toBe('2026-10-07');
+
+    const uploadRoot = document.querySelector<HTMLElement>('#product-photo-upload')!;
+    const uploadInput = uploadRoot.querySelector<HTMLInputElement>('input[type="file"]')!;
+    expect(uploadInput.multiple).toBe(true);
+    expect(uploadInput.accept).toBe('image/*');
+    expect(uploadInput.getAttribute('aria-labelledby')).toBe('product-photo-upload-label');
+    expect(uploadInput.getAttribute('aria-describedby')).toContain('product-photo-upload-files');
+    expect(uploadRoot.querySelector('.gluon-file-upload-files')?.textContent).toContain('lamp.png');
+    expect(uploadRoot.querySelector('[role="alert"]')?.textContent).toContain('Review');
+    expect(getStyleSheetText(datePickerStyles)).toContain('--gluon-date-picker-gap');
+    expect(getStyleSheetText(fileUploadStyles)).toContain('--gluon-file-upload-gap');
+  });
+
+  it('keeps DatePicker validation, caller attributes, and prevented input events explicit', () => {
+    const values: string[] = [];
+    const attributeEvents: string[] = [];
+    const inputAttributes = {
+      id: 'appointment-input',
+      aria: { describedby: 'appointment-help' },
+      onInput: { handleEvent: (event: InputEvent) => {
+        event.preventDefault();
+        attributeEvents.push(event.type);
+      } },
+    };
+    render(DatePicker({
+      id: 'appointment',
+      label: 'Appointment',
+      error: 'Choose a valid date.',
+      inputAttributes,
+      onInput: (value) => values.push(value),
+      attributes: { class: 'custom-date-picker' },
+    }), document.body);
+
+    const input = document.querySelector<HTMLInputElement>('#appointment-input')!;
+    expect(input.getAttribute('aria-describedby')).toBe('appointment-help appointment-error');
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(document.querySelector('#appointment .gluon-date-picker-error')?.getAttribute('role')).toBe('alert');
+    input.value = '2026-11-02';
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true }));
+    expect(attributeEvents).toEqual(['input']);
+    expect(values).toEqual([]);
+    expect(() => DatePicker({ id: 'bad id', label: 'Appointment' })).toThrow('must not contain whitespace');
+    expect(() => DatePicker({ id: 'appointment', label: ' ' })).toThrow('must be a non-empty string');
+    expect(() => DatePicker({ id: 'appointment', label: 'Appointment', inputAttributes: { id: 'bad id' } })).toThrow('must not contain whitespace');
+  });
+
+  it('renders FileUpload empty and custom states and forwards native change events', () => {
+    const values: (readonly File[])[] = [];
+    const attributeEvents: string[] = [];
+    render(FileUpload({
+      id: 'documents',
+      label: 'Documents',
+      accept: '.pdf',
+      capture: 'environment',
+      name: 'documents',
+      required: true,
+      emptyLabel: 'Attach a PDF.',
+      helper: 'PDF files only.',
+      inputAttributes: {
+        onChange: { handleEvent: (event: Event) => attributeEvents.push(event.type) },
+      },
+      onChange: (files) => values.push(files),
+    }), document.body);
+
+    const root = document.querySelector<HTMLElement>('#documents')!;
+    const input = root.querySelector<HTMLInputElement>('input[type="file"]')!;
+    expect(input.accept).toBe('.pdf');
+    expect(input.getAttribute('capture')).toBe('environment');
+    expect(input.name).toBe('documents');
+    expect(input.required).toBe(true);
+    expect(root.querySelector('.gluon-file-upload-empty')?.textContent).toBe('Attach a PDF.');
+    expect(root.querySelector('.gluon-file-upload-helper')?.textContent).toBe('PDF files only.');
+
+    const file = new File(['pdf'], 'invoice.pdf', { type: 'application/pdf' });
+    Object.defineProperty(input, 'files', { configurable: true, value: [file] });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(attributeEvents).toEqual(['change']);
+    expect(values).toHaveLength(1);
+    expect(values[0]?.[0]?.name).toBe('invoice.pdf');
+
+    expect(() => FileUpload({ id: 'documents', label: 'Documents', files: [file, file] })).toThrow('only one file');
+    expect(() => FileUpload({ id: 'documents', label: 'Documents', selectedFilesLabel: ' ' })).toThrow('must be a non-empty string');
+    expect(() => FileUpload({ id: 'bad id', label: 'Documents' })).toThrow('must not contain whitespace');
   });
 
   it('renders SortControl with native select semantics and caller-owned changes', async () => {

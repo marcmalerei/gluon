@@ -66,6 +66,15 @@ test('never executes adversarial source, package scripts, imports, or Vite confi
   expect(report.summary.supportState).toBe('supported');
 });
 
+test('skips generated temporary build output before applying discovery limits', async () => {
+  const fixture = await project();
+  await mkdir(resolve(fixture, '.tmp', 'api-examples'), { recursive: true });
+  await writeFile(resolve(fixture, '.tmp', 'api-examples', 'Generated.vue'), '<template>generated</template>');
+  const report = await analyzeVueMigration({ root: fixture });
+  expect(report.findings.some((finding) => finding.code === 'GVA9002')).toBe(false);
+  expect(report.files.some((file) => file.path.startsWith('.tmp/'))).toBe(false);
+});
+
 test('finds the production Vue host and links it to the tested cutover stages', async () => {
   const report = await analyzeVueMigration({ root });
   const host = report.components.find((component) => component.id === 'component:docs-site/examples/VueProductHost.vue');

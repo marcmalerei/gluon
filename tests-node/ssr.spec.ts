@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DialogSurface, Disclosure, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DatePicker, DialogSurface, Disclosure, FileUpload, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -239,6 +239,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('for="server-sort-select"');
     expect(rendered).toContain('aria-describedby="server-sort-description"');
     expect(rendered).toContain('value="price-low"');
+  });
+
+  it('serializes DatePicker and FileUpload native form relationships without browser state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(html`
+      ${DatePicker({ id: 'server-date', label: 'Delivery date', value: '2026-10-06', min: '2026-10-03', helper: 'Choose a dispatch date.' })}
+      ${FileUpload({ id: 'server-upload', label: 'Product photos', accept: 'image/*', multiple: true, error: 'Review the selected files.' })}
+    `));
+    expect(rendered).toContain('id="server-date"');
+    expect(rendered).toContain('type="date"');
+    expect(rendered).toContain('min="2026-10-03"');
+    expect(rendered).toContain('aria-labelledby="server-date-label"');
+    expect(rendered).toContain('id="server-upload"');
+    expect(rendered).toContain('type="file"');
+    expect(rendered).toContain('accept="image/*"');
+    expect(rendered).toContain('aria-describedby="server-upload-error"');
+    expect(rendered).toContain('Review the selected files.');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {

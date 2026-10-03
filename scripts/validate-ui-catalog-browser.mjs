@@ -98,6 +98,13 @@ try {
   if (await page.locator('[data-preview="sheet"] .ui-sample-sheet-overlay .ui-sample-sheet').count() !== 1) {
     throw new Error('sheet preview does not show its edge-panel anatomy');
   }
+  if (await page.locator('[data-preview="date-picker"] input[type="date"]').count() !== 1) {
+    throw new Error('date-picker preview does not show native date anatomy');
+  }
+  if (await page.locator('[data-preview="file-upload"] input[type="file"]').count() !== 1
+    || await page.locator('[data-preview="file-upload"] .ui-sample-file-upload li').count() !== 2) {
+    throw new Error('file-upload preview does not show native input and selected-file anatomy');
+  }
   if (await page.locator('[data-ui-catalog-status]').textContent() !== `${catalog.entries.length} components shown`) {
     throw new Error('catalog status does not report the initial component count');
   }

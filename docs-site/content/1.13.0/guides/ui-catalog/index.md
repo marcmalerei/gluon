@@ -111,6 +111,14 @@ verification surface.
             <label class="ui-sample-sort-control">Sort products<select aria-label="Sort products"><option>Featured</option><option>Price: low to high</option><option>Newest</option></select></label>
             <span class="ui-sample-variant">native select · helper/error · disabled</span>
           </template>
+          <template v-else-if="entry.preview === 'date-picker'">
+            <div class="ui-sample-field ui-sample-date-picker"><label for="catalog-date-preview">Delivery date</label><input id="catalog-date-preview" type="date" value="2026-10-06" min="2026-10-03" /><small>Choose a dispatch date.</small></div>
+            <span class="ui-sample-variant">native date · min/max · helper/error</span>
+          </template>
+          <template v-else-if="entry.preview === 'file-upload'">
+            <div class="ui-sample-field ui-sample-file-upload"><label for="catalog-file-preview">Product photos</label><input id="catalog-file-preview" type="file" accept="image/*" multiple /><small>JPEG or PNG · multiple files</small><ul><li>orbit-lamp.png</li><li>orbit-detail.png</li></ul></div>
+            <span class="ui-sample-variant">single/multiple · selected · disabled/error</span>
+          </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
           </template>

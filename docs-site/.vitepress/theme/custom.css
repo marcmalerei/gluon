@@ -270,6 +270,8 @@ html { scroll-behavior: smooth; }
 .ui-sample-tree-toggle { color: var(--vp-c-text-2); }
 .ui-sample-sort-control { display: grid; gap: 5px; width: min(100%, 220px); color: var(--vp-c-text-1); font-size: .72rem; font-weight: 650; text-align: start; }
 .ui-sample-sort-control select { min-block-size: 34px; padding: 6px 28px 6px 8px; border: 1px solid var(--vp-c-divider); border-radius: 5px; background: var(--vp-c-bg); color: inherit; font: inherit; }
+.ui-sample-date-picker small, .ui-sample-file-upload small { color: var(--vp-c-text-2); font-size: .68rem; font-weight: 500; }
+.ui-sample-file-upload ul { display: grid; gap: 2px; margin: 0; padding-inline-start: 1rem; color: var(--vp-c-text-2); font-size: .7rem; font-weight: 500; }
 .ui-sample-command-palette { display: grid; gap: 8px; width: 94%; padding: 10px; border: 1px solid var(--vp-c-divider); border-radius: 8px; background: var(--vp-c-bg); box-shadow: 0 10px 24px rgb(0 0 0 / 10%); text-align: start; font-size: .74rem; }
 .ui-sample-command-palette input { min-block-size: 34px; padding: 7px 9px; border: 1px solid var(--vp-c-divider); border-radius: 5px; background: var(--vp-c-bg-soft); color: inherit; }
 .ui-sample-command-group { display: grid; gap: 3px; }

@@ -5,6 +5,7 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { quark, q, type QuarkProps } from '@gluonjs/quarks';
+import { Input } from './input.js';
 import { inputStyleDependency } from './input-styles.js';
 import { foundationStyleDependency } from './foundation-styles.js';
 
@@ -172,13 +173,7 @@ export type DateInputProps = NumberInputProps;
 export type TimeInputProps = NumberInputProps;
 
 function renderSpecializedInput(type: 'number' | 'date' | 'time', props: NumberInputProps): TemplateResult {
-  const { attributes = {}, ...rest } = props;
-  return q.input({
-    ...attributes,
-    ...rest,
-    class: [{ gluon: true, atom: true, 'gluon-input': true }, attributes.class],
-    type,
-  } as QuarkProps<HTMLInputElement>);
+  return Input({ ...props, type });
 }
 
 export const NumberInput = defineAtom((props: NumberInputProps) => renderSpecializedInput('number', props), 'NumberInput', [inputStyleDependency]);
