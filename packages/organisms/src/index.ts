@@ -27,4 +27,6 @@ export { SplitPane, type SplitPaneAttributes, type SplitPaneOpenChangeEvent, typ
 export { splitPaneStyles } from './split-pane-styles.js';
 export { ResizablePanels, type ResizablePanelsAttributes, type ResizablePanelsChangeEvent, type ResizablePanelsOrientation, type ResizablePanelsPanel, type ResizablePanelsProps, type ResizablePanelsRegionAttributes } from './resizable-panels.js';
 export { resizablePanelsStyles } from './resizable-panels-styles.js';
+export { NavigationRail, type NavigationRailAttributes, type NavigationRailButtonAttributes, type NavigationRailGroup, type NavigationRailItem, type NavigationRailLinkAttributes, type NavigationRailNavigationAttributes, type NavigationRailOpenChangeEvent, type NavigationRailProps, type NavigationRailRegionAttributes } from './navigation-rail.js';
+export { navigationRailStyles } from './navigation-rail-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';
