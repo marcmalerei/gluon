@@ -21,7 +21,7 @@ jobs:
       options: --ipc=host --user pwuser
     # Independent fixture and release-artifact checks run in parallel jobs.
     # Keep enough headroom for a cold hosted runner while making a stuck runner visible.
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v7
         with:
@@ -34,7 +34,7 @@ jobs:
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
       - run: npm run check:repository
-        timeout-minutes: 24
+        timeout-minutes: 34
 
   create-gluon-fixtures:
     runs-on: ubuntu-latest
