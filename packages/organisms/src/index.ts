@@ -13,4 +13,6 @@ export { WorkflowTimeline, type WorkflowTimelineAttributes, type WorkflowTimelin
 export { workflowTimelineStyles } from './workflow-timeline-styles.js';
 export { MegaMenu, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes } from './mega-menu.js';
 export { megaMenuStyles } from './mega-menu-styles.js';
+export { SiteHeader, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes } from './site-header.js';
+export { siteHeaderStyles } from './site-header-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

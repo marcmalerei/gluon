@@ -240,6 +240,10 @@ verification surface.
             <div class="ui-sample-mega-menu"><button type="button" aria-expanded="true">Shop <span aria-hidden="true">⌃</span></button><div class="ui-sample-mega-panel"><section><strong>Lighting</strong><a href="#catalog">Orbit lamp</a><a href="#catalog">Desk light</a></section><section><strong>Furniture</strong><a href="#catalog">Stack tray</a><a href="#catalog">Fold stool</a></section></div></div>
             <span class="ui-sample-variant">grouped · responsive · keyboard</span>
           </template>
+          <template v-else-if="entry.preview === 'site-header'">
+            <header class="ui-sample-site-header"><strong>GLUON GOODS</strong><nav aria-label="Primary navigation"><a href="#catalog">Shop</a><a href="#catalog">Journal</a></nav><div><button type="button">Search</button><button type="button">Menu</button></div></header>
+            <span class="ui-sample-variant">brand · navigation · actions · mobile</span>
+          </template>
           <template v-else-if="entry.preview === 'async-state'">
             <div class="ui-sample-async-state"><strong>Recommendations</strong><span class="is-state">Partially loaded</span><span>Profile data is ready while recommendations refresh.</span><button class="ui-sample-button">Retry</button></div>
           </template>

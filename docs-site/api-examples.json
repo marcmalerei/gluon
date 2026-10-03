@@ -1498,7 +1498,7 @@
       "module": "@gluonjs/organisms",
       "code": [
         "import { html } from '@gluonjs/core';",
-        "import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, WorkflowTimeline, createConfirmationDialogController, asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
+        "import { AppShell, AsyncState, ConfirmationDialog, MegaMenu, ProductCard, ProductGrid, SiteHeader, WorkflowTimeline, asyncStateStyles, confirmationDialogStyles, createConfirmationDialogController, megaMenuStyles, organismManifest, organismStyles, productCardStyles, productGridStyles, siteHeaderStyles, workflowTimelineStyles, type AppShellProps, type AsyncStateAttributes, type AsyncStateHeadingLevel, type AsyncStateMessages, type AsyncStateProps, type AsyncStateStatus, type ConfirmationDialogAttributes, type ConfirmationDialogController, type ConfirmationDialogControllerOptions, type ConfirmationDialogInitialFocus, type ConfirmationDialogProps, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLink, type MegaMenuLinkAttributes, type MegaMenuOpenChangeEvent, type MegaMenuProps, type MegaMenuTriggerAttributes, type ProductCardAttributes, type ProductCardProduct, type ProductCardProps, type ProductGridAttributes, type ProductGridColumns, type ProductGridProps, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes, type WorkflowTimelineProps, type WorkflowTimelineStatus, type WorkflowTimelineOverallState, type WorkflowTimelineAttributes, type WorkflowTimelineStep, type WorkflowTimelineMessages } from '@gluonjs/organisms';",
         "",
         "const shell = {",
         "  header: html`<strong>GLUON GOODS</strong>`,",
@@ -1533,7 +1533,13 @@
         "const megaLinkAttributes: MegaMenuLinkAttributes = { class: 'catalog-mega-link' };",
         "const megaOpenChangeEvent: MegaMenuOpenChangeEvent = new MouseEvent('open-change');",
         "const megaMenu: MegaMenuProps = { id: 'shop-menu', label: 'Shop navigation', trigger: 'Shop', groups: [megaGroup], open: true, attributes: megaAttributes, triggerAttributes: megaTriggerAttributes, onOpenChange: (open, event) => console.log('shop menu', open, event.type) };",
-        "console.log(AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent);"
+        "const headerAttributes: SiteHeaderAttributes = { class: 'catalog-site-header' };",
+        "const headerNavigationAttributes: SiteHeaderNavigationAttributes = { 'aria-label': 'Catalog navigation' };",
+        "const headerRegionAttributes: SiteHeaderRegionAttributes = { class: 'catalog-header-region' };",
+        "const headerTriggerAttributes: SiteHeaderTriggerAttributes = { class: 'catalog-header-trigger' };",
+        "const headerOpenChangeEvent: SiteHeaderOpenChangeEvent = new MouseEvent('mobile-open-change');",
+        "const header: SiteHeaderProps = { id: 'catalog-header', brand: html`<a href='/'>GLUON GOODS</a>`, navigation: html`<a href='/shop'>Shop</a>`, actions: html`<button type='button'>Search</button>`, mobileNavigation: html`<a href='/shop'>Shop</a>`, attributes: headerAttributes, navigationAttributes: headerNavigationAttributes, brandAttributes: headerRegionAttributes, triggerAttributes: headerTriggerAttributes, onMobileOpenChange: (open, event) => console.log('mobile header', open, event.type) };",
+        "console.log(AppShell(shell), AsyncState(asyncState), MegaMenu(megaMenu), ProductCard(productCard), ProductGrid(productGrid), SiteHeader(header), ConfirmationDialog(confirmation), WorkflowTimeline(workflow), asyncStateStyles, confirmationDialogStyles, megaMenuStyles, organismStyles, productCardStyles, productGridStyles, siteHeaderStyles, workflowTimelineStyles, organismManifest.entries, megaOpenChangeEvent, headerOpenChangeEvent);"
       ]
     },
     "router-application": {
@@ -6214,6 +6220,38 @@
     "packages/organisms/src/variables/organismStyles.md": {
       "recipe": "organism-components",
       "description": "Adopt the constructable stylesheet that implements AppShell's public layout class contract:"
+    },
+    "packages/organisms/src/variables/SiteHeader.md": {
+      "recipe": "organism-components",
+      "description": "Render a controlled responsive header with caller-owned brand, navigation, actions, and mobile content:"
+    },
+    "packages/organisms/src/variables/siteHeaderStyles.md": {
+      "recipe": "organism-components",
+      "description": "Adopt the exact constructable SiteHeader stylesheet and tenant-scoped CSS-variable hooks:"
+    },
+    "packages/organisms/src/interfaces/SiteHeaderProps.md": {
+      "recipe": "organism-components",
+      "description": "Configure a semantic SiteHeader while routing, authorization, tenant identity, and open state remain caller-owned:"
+    },
+    "packages/organisms/src/type-aliases/SiteHeaderAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native attributes to the SiteHeader root:"
+    },
+    "packages/organisms/src/type-aliases/SiteHeaderNavigationAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward labelled native navigation attributes while SiteHeader owns its region relationship:"
+    },
+    "packages/organisms/src/type-aliases/SiteHeaderOpenChangeEvent.md": {
+      "recipe": "organism-components",
+      "description": "Handle the native pointer, mouse, or keyboard event that requests a controlled mobile header change:"
+    },
+    "packages/organisms/src/type-aliases/SiteHeaderRegionAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward safe native attributes to caller-owned SiteHeader regions:"
+    },
+    "packages/organisms/src/type-aliases/SiteHeaderTriggerAttributes.md": {
+      "recipe": "organism-components",
+      "description": "Forward native mobile-trigger attributes while SiteHeader owns disclosure relationships:"
     },
     "packages/quarks/src/functions/createFocusScope.md": {
       "recipe": "quark-headless",

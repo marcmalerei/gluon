@@ -126,13 +126,12 @@ export const shopStyles = css`
       position: sticky;
       top: 0;
       z-index: 30;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      height: var(--shop-header);
-      padding: 0 var(--shop-gutter);
-      border-bottom: 1px solid var(--shop-black);
-      background: rgb(255 255 255 / 96%);
+      --gluon-site-header-min-block-size: var(--shop-header);
+      --gluon-site-header-padding-inline: var(--shop-gutter);
+      --gluon-site-header-border: var(--shop-black);
+      --gluon-site-header-background: rgb(255 255 255 / 96%);
+      --gluon-site-header-color: var(--shop-black);
+      --gluon-site-header-trigger-border: var(--shop-rule);
       backdrop-filter: blur(16px);
     }
 
@@ -467,7 +466,7 @@ export const shopStyles = css`
 
     @media (max-width: 760px) {
       :root { --shop-header: 58px; --shop-gutter: 18px; }
-      .site-header { grid-template-columns: 1fr auto; padding-right: 8px; }
+      .site-header { --gluon-site-header-padding-inline: var(--shop-gutter) 8px; }
       .desktop-nav, .search-action { display: none; }
       .header-actions { gap: 0; }
       .mobile-menu-button { display: inline-flex; width: auto; gap: 7px; padding-inline: 7px; }

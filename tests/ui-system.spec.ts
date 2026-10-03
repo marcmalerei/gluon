@@ -95,7 +95,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, megaMenuStyles, organismManifest, organismStyles } from '@gluonjs/organisms';
+import { AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, SiteHeader, megaMenuStyles, organismManifest, organismStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2567,6 +2567,56 @@ describe('advanced data and workflow molecules', () => {
     const closedPanel = document.querySelector<HTMLElement>('#closed-menu-panel')!;
     closedPanel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
     expect(changes).toEqual([true, true, true, true, false, false, false]);
+  });
+
+  it('renders a controlled responsive SiteHeader with semantic regions and mobile focus management', async () => {
+    let mobileOpen = false;
+    const changes: boolean[] = [];
+    const objectKeydown = { handleEvent: vi.fn() };
+    const functionKeydown = vi.fn();
+    let useFunctionKeydown = false;
+    const renderHeader = (): void => render(SiteHeader({
+      id: 'shop-header',
+      brand: q.a({ href: '/', children: 'GLUON GOODS' }),
+      navigation: q.a({ href: '/shop', children: 'Shop' }),
+      actions: q.button({ type: 'button', children: 'Search' }),
+      mobileNavigation: [q.a({ href: '/shop', children: 'Shop' }), q.a({ href: '/journal', children: 'Journal' })],
+      mobileOpen,
+      onMobileOpenChange: (open) => { changes.push(open); mobileOpen = open; renderHeader(); },
+      triggerAttributes: { onKeydown: useFunctionKeydown ? functionKeydown : objectKeydown },
+      attributes: { class: 'commerce-header' },
+    }), document.body);
+    renderHeader();
+
+    const root = document.querySelector<HTMLElement>('#shop-header')!;
+    const trigger = root.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')!;
+    expect(root.tagName).toBe('HEADER');
+    expect(root.querySelector('.gluon-site-header-brand')?.textContent).toContain('GLUON GOODS');
+    expect(root.querySelector('.gluon-site-header-navigation nav, .gluon-site-header-navigation a')?.textContent).toContain('Shop');
+    expect(trigger.getAttribute('aria-controls')).toBe('shop-header-mobile-panel');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(root.querySelector<HTMLElement>('#shop-header-mobile-panel')?.hidden).toBe(true);
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(objectKeydown.handleEvent).toHaveBeenCalledOnce();
+    useFunctionKeydown = true;
+    renderHeader();
+    document.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(functionKeydown).toHaveBeenCalledOnce();
+
+    await userEvent.click(document.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')!);
+    await vi.waitFor(() => expect(changes).toEqual([true]));
+    const openRoot = document.querySelector<HTMLElement>('#shop-header')!;
+    const openTrigger = openRoot.querySelector<HTMLButtonElement>('[data-site-header-mobile-trigger]')!;
+    const panel = openRoot.querySelector<HTMLElement>('#shop-header-mobile-panel')!;
+    expect(openTrigger.getAttribute('aria-expanded')).toBe('true');
+    expect(panel.hidden).toBe(false);
+    panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(changes).toEqual([true, false]));
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('shop-header-mobile-trigger'));
+    expect(getStyleSheetText(siteHeaderStyles)).toContain('--gluon-site-header');
+
+    expect(() => render(SiteHeader({ id: 'bad header', brand: 'Brand' }), document.body)).toThrow('whitespace');
+    expect(() => render(SiteHeader({ id: 'empty-label', brand: 'Brand', mobileMenuLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
   it('renders a keyboard-discoverable tooltip without owning interactive content', () => {
