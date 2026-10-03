@@ -95,7 +95,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, MegaMenu, ProductCard, ProductGrid, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, organismManifest, organismStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, MegaMenu, ProductCard, ProductGallery, ProductGrid, SiteFooter, SiteHeader, adminShellStyles, megaMenuStyles, organismManifest, organismStyles, productGalleryStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2434,6 +2434,50 @@ describe('advanced data and workflow molecules', () => {
 
     render(ProductGrid({ items: [], emptyContent: 'No products found.', attributes: { id: 'empty-products' } }), document.body);
     expect(document.querySelector('#empty-products [part="empty"]')?.textContent).toContain('No products');
+  });
+
+  it('renders a source-order-preserving product gallery with image identity and tenant styling hooks', () => {
+    render(ProductGallery({
+      id: 'orbit-gallery',
+      label: 'Orbit Lamp gallery',
+      images: [
+        { id: 'primary', src: '/orbit.webp', alt: 'Orbit Lamp', primary: true },
+        { id: 'detail', src: '/orbit.webp', alt: '', attributes: { class: 'detail-crop', loading: 'lazy' } },
+      ],
+      attributes: { class: 'tenant-gallery', tabIndex: 0, style: { '--gluon-product-gallery-gap': '1rem' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#orbit-gallery')!;
+    expect(root.tagName).toBe('SECTION');
+    expect(root.classList).toContain('gluon-product-gallery');
+    expect(root.classList).toContain('tenant-gallery');
+    expect(root.dataset.productGalleryRoot).toBe('orbit-gallery');
+    expect(root.getAttribute('aria-label')).toBe('Orbit Lamp gallery');
+    expect(root.tabIndex).toBe(0);
+    expect([...root.querySelectorAll<HTMLElement>('[data-product-gallery-image]')].map((element) => element.dataset.productGalleryImage))
+      .toEqual(['primary', 'detail']);
+    expect(root.querySelector('.gluon-product-gallery-primary img')?.getAttribute('alt')).toBe('Orbit Lamp');
+    expect(root.querySelector('[data-product-gallery-image="detail"] img')?.getAttribute('alt')).toBe('');
+    expect(root.querySelector('[data-product-gallery-image="detail"] img')?.getAttribute('loading')).toBe('lazy');
+    expect(root.style.getPropertyValue('--gluon-product-gallery-gap')).toBe('1rem');
+    expect(getStyleSheetText(productGalleryStyles)).toContain('--gluon-product-gallery-mobile-item-size');
+    expect(getStyleSheetText(productGalleryStyles)).toContain('prefers-reduced-motion');
+
+    render(ProductGallery({
+      id: 'fallback-gallery',
+      label: 'Fallback gallery',
+      images: [{ id: 'fallback', src: '/fallback.webp', alt: 'Fallback media' }],
+      attributes: { aria: { label: 'Custom gallery label' } },
+    }), document.body);
+    expect(document.querySelector('#fallback-gallery')?.getAttribute('aria-label')).toBe('Custom gallery label');
+    expect(document.querySelector('#fallback-gallery .gluon-product-gallery-primary')).not.toBeNull();
+
+    expect(() => render(ProductGallery({ id: 'bad gallery', label: 'Gallery', images: [{ id: 'one', src: '/one.webp', alt: '' }] }), document.body)).toThrow('whitespace');
+    expect(() => render(ProductGallery({ id: 'duplicate-gallery', label: 'Gallery', images: [{ id: 'one', src: '/one.webp', alt: '' }, { id: 'one', src: '/two.webp', alt: '' }] }), document.body)).toThrow('duplicate');
+    expect(() => render(ProductGallery({ id: 'empty-gallery', label: 'Gallery', images: [] as never }), document.body)).toThrow('at least one');
+    expect(() => render(ProductGallery({ id: 'empty-label', label: ' ', images: [{ id: 'one', src: '/one.webp', alt: '' }] }), document.body)).toThrow('non-empty');
+    expect(() => render(ProductGallery({ id: 'empty-src', label: 'Gallery', images: [{ id: 'one', src: ' ', alt: '' }] }), document.body)).toThrow('src');
+    expect(() => render(ProductGallery({ id: 'empty-image-id', label: 'Gallery', images: [{ id: ' ', src: '/one.webp', alt: '' }] }), document.body)).toThrow('non-empty');
+    expect(() => render(ProductGallery({ id: 'spaced-image-id', label: 'Gallery', images: [{ id: 'one two', src: '/one.webp', alt: '' }] }), document.body)).toThrow('whitespace');
   });
 
   it('renders a controlled responsive MegaMenu with grouped links and keyboard focus management', async () => {

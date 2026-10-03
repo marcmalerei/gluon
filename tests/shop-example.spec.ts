@@ -4,7 +4,7 @@ import { getStyleSheetText } from '../src/index.js';
 import { nextTick } from '@gluonjs/reactivity';
 import { buttonStyles, checkboxStyles, inputStyles, labelStyles, progressStyles, radioStyles, sliderStyles, statusBadgeStyles, textareaStyles } from '@gluonjs/atoms';
 import { accordionStyles, choiceGroupStyles, controlFieldStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, formFieldStyles, inlineNoticeStyles, navigationStripStyles, segmentedControlStyles, tableRegionStyles, tabsStyles, toolbarStyles } from '@gluonjs/molecules';
-import { megaMenuStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { megaMenuStyles, productGalleryStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import { createMemoryHistory } from '@gluonjs/router';
 import { createShopApplication } from '../examples/shop/src/app.js';
 import { products } from '../examples/shop/src/data.js';
@@ -81,6 +81,9 @@ describe('GLUON GOODS reference shop', () => {
     await settleShop();
     expect(router.currentRoute.value.path).toBe('/products/orbit-lamp');
     expect(root.querySelector('#product-title')?.textContent).toBe('Orbit Lamp');
+    expect(document.adoptedStyleSheets).toContain(productGalleryStyles);
+    expect(root.querySelector('#orbit-lamp-gallery')?.classList).toContain('gluon-product-gallery');
+    expect(root.querySelectorAll('#orbit-lamp-gallery [data-product-gallery-image]')).toHaveLength(3);
     const productPage = root.querySelector('.product-page');
     const configurator = getProductConfigurator(root);
     await configurator.updateComplete;

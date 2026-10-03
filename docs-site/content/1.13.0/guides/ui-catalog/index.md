@@ -258,6 +258,10 @@ verification surface.
           <template v-else-if="entry.preview === 'product-card'">
             <article class="ui-sample-product-card"><div class="ui-sample-product-media">Orbit lamp</div><strong>Orbit lamp</strong><span>€128 · In stock</span><button class="ui-sample-button">Add to bag</button></article>
           </template>
+          <template v-else-if="entry.preview === 'product-gallery'">
+            <div class="ui-sample-product-gallery" aria-label="Product gallery preview"><figure class="is-primary"><span>Primary media</span></figure><figure><span>Detail crop</span></figure><figure><span>Alternate view</span></figure></div>
+            <span class="ui-sample-variant">primary · responsive · cropped</span>
+          </template>
           <template v-else-if="entry.preview === 'product-grid'">
             <div class="ui-sample-product-grid"><span>Orbit lamp</span><span>Stack tray</span><span>Field tote</span></div>
           </template>

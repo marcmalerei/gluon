@@ -19,6 +19,7 @@ The current slice uses the public Core, Reactivity, Router, and Store APIs to pr
 
 - home, catalog, and deep-linkable product routes
 - desktop and mobile navigation plus the global footer, composed through the public `SiteHeader`, `MegaMenu`, and `SiteFooter` organisms
+- product detail media, composed through the public typed `ProductGallery` organism with app-owned crop classes and CSS-variable overrides
 - overflow-aware catalog category navigation with native links, a revealed
   current filter, and 44px previous/next controls at constrained widths
 - a realistic product catalog and product-detail surface

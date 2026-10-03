@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Card, DialogSurface, Disclosure, ResponsiveDisclosure, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, ProductGallery, SiteFooter, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -176,6 +176,23 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-label="Server administration navigation"');
     expect(rendered).toContain('<main');
     expect(rendered).toContain('<footer');
+  });
+
+  it('serializes ProductGallery image identity and alternate-image semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(ProductGallery({
+      id: 'server-gallery',
+      label: 'Orbit Lamp gallery',
+      images: [
+        { id: 'primary', src: '/orbit.webp', alt: 'Orbit Lamp', primary: true },
+        { id: 'detail', src: '/orbit.webp', alt: '' },
+      ],
+    })));
+    expect(rendered).toContain('<section');
+    expect(rendered).toContain('data-product-gallery-root="server-gallery"');
+    expect(rendered).toContain('data-product-gallery-image="primary"');
+    expect(rendered).toContain('data-product-gallery-image="detail"');
+    expect(rendered).toContain('alt="Orbit Lamp"');
+    expect(rendered).toContain('aria-label="Orbit Lamp gallery"');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {
@@ -936,6 +953,7 @@ describe('@gluonjs/ssr request ownership and state', () => {
       'gluon-organism-mega-menu',
       'gluon-organism-site-header',
       'gluon-organism-site-footer',
+      'gluon-organism-product-gallery',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
@@ -1259,7 +1277,7 @@ describe('@gluonjs/ssr static output and style transport', () => {
       assets: ['/assets/orbit.webp'],
     };
     const response = await renderShopRequest('/products/orbit-lamp', { assets, nonce: 'request-nonce' });
-    expect(response.styles.entries).toHaveLength(13);
+    expect(response.styles.entries).toHaveLength(14);
     expect(response.styles.entries.map((entry) => entry.id)).toEqual([
       'gluon-ui-layer-order',
       'gluon-ui-foundation',
@@ -1272,10 +1290,11 @@ describe('@gluonjs/ssr static output and style transport', () => {
       'gluon-organism-mega-menu',
       'gluon-organism-site-header',
       'gluon-organism-site-footer',
+      'gluon-organism-product-gallery',
       'gluon-goods-ui-tokens',
       'gluon-goods',
     ]);
-    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(response.styles.entries.map((entry) => entry.order)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(response.styles.entries[4]?.cssText).toContain('.gluon-status-badge');
     expect(response.styles.entries[5]?.cssText).toContain('.gluon-tabs');
     expect(response.styles.entries[6]?.cssText).toContain('.gluon-toolbar');
@@ -1283,8 +1302,9 @@ describe('@gluonjs/ssr static output and style transport', () => {
     expect(response.styles.entries[8]?.cssText).toContain('.gluon-mega-menu');
     expect(response.styles.entries[9]?.cssText).toContain('.gluon-site-header');
     expect(response.styles.entries[10]?.cssText).toContain('.gluon-site-footer');
-    expect(response.styles.entries[11]?.cssText).toContain('--gluon-color-action: #c8ff00');
-    expect(response.styles.entries[12]?.cssText).toContain('.checkout-page');
+    expect(response.styles.entries[11]?.cssText).toContain('.gluon-product-gallery');
+    expect(response.styles.entries[12]?.cssText).toContain('--gluon-color-action: #c8ff00');
+    expect(response.styles.entries[13]?.cssText).toContain('.checkout-page');
     expect(response.styles.entries.some((entry) => entry.id === 'gluon-atoms-components')).toBe(false);
     expect(response.head).toContain('data-gluon-style="gluon-ui-layer-order"');
     expect(response.head).toContain('nonce="request-nonce"');
