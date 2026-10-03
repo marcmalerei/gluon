@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Card, DatePicker, DialogSurface, Disclosure, FileUpload, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -244,17 +244,24 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('serializes DatePicker and FileUpload native form relationships without browser state', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(html`
       ${DatePicker({ id: 'server-date', label: 'Delivery date', value: '2026-10-06', min: '2026-10-03', helper: 'Choose a dispatch date.' })}
+      ${DateRangePicker({ id: 'server-window', label: 'Delivery window', startValue: '2026-10-06', endValue: '2026-10-08', helper: 'Choose a dispatch window.' })}
       ${FileUpload({ id: 'server-upload', label: 'Product photos', accept: 'image/*', multiple: true, error: 'Review the selected files.' })}
+      ${TimePicker({ id: 'server-time', label: 'Delivery time', value: '09:00', min: '08:00', max: '18:00', step: '900' })}
     `));
     expect(rendered).toContain('id="server-date"');
     expect(rendered).toContain('type="date"');
     expect(rendered).toContain('min="2026-10-03"');
     expect(rendered).toContain('aria-labelledby="server-date-label"');
+    expect(rendered).toContain('id="server-window-start"');
+    expect(rendered).toContain('id="server-window-end"');
+    expect(rendered).toContain('aria-labelledby="server-window-label server-window-start-label"');
     expect(rendered).toContain('id="server-upload"');
     expect(rendered).toContain('type="file"');
     expect(rendered).toContain('accept="image/*"');
     expect(rendered).toContain('aria-describedby="server-upload-error"');
     expect(rendered).toContain('Review the selected files.');
+    expect(rendered).toContain('id="server-time-input"');
+    expect(rendered).toContain('type="time"');
   });
 
   it('serializes native ConfirmationDialog relationships without browser lifecycle calls', async () => {

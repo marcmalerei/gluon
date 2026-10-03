@@ -92,7 +92,9 @@ import {
   TreeView,
   SortControl,
   DatePicker,
+  DateRangePicker,
   FileUpload,
+  TimePicker,
   createDialogSurfaceController,
 } from "@gluonjs/molecules";
 ```
@@ -515,8 +517,13 @@ these compositions.
 `DatePicker` is a controlled labelled native date field. It forwards browser
 date constraints (`min`, `max`, and `step`), required/disabled/invalid state,
 and helper/error relationships while leaving locale, timezone, validation,
-and persistence to the caller. `FileUpload` is the matching native file-picker
+and persistence to the caller. `DateRangePicker` composes two labelled native
+date fields, forwards shared constraints, reports the controlled start/end
+value to the caller, and exposes a deterministic range-order error without
+owning date parsing or timezone policy. `TimePicker` applies the same contract
+to a native time field. `FileUpload` is the matching native file-picker
 composition: it exposes accept/capture/multiple constraints, renders a
 caller-provided selected-file summary, composes native change listeners, and
-does not inspect, transform, or upload file contents. Both components expose
-component-scoped CSS variables for tenant-owned visual overrides.
+does not inspect, transform, or upload file contents. These components expose
+component-scoped CSS variables for tenant-owned visual overrides and honor
+reduced-motion, RTL-safe logical layout, and forced-colors rules.

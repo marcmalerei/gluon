@@ -115,9 +115,17 @@ verification surface.
             <div class="ui-sample-field ui-sample-date-picker"><label for="catalog-date-preview">Delivery date</label><input id="catalog-date-preview" type="date" value="2026-10-06" min="2026-10-03" /><small>Choose a dispatch date.</small></div>
             <span class="ui-sample-variant">native date · min/max · helper/error</span>
           </template>
+          <template v-else-if="entry.preview === 'date-range-picker'">
+            <fieldset class="ui-sample-date-range-picker"><legend>Delivery window</legend><div><label for="catalog-date-range-start">Start date</label><input id="catalog-date-range-start" type="date" value="2026-10-06" min="2026-10-03" /></div><div><label for="catalog-date-range-end">End date</label><input id="catalog-date-range-end" type="date" value="2026-10-08" min="2026-10-03" /></div><small>Start and end dates preserve native date controls.</small></fieldset>
+            <span class="ui-sample-variant">native range · bounded · invalid order</span>
+          </template>
           <template v-else-if="entry.preview === 'file-upload'">
             <div class="ui-sample-field ui-sample-file-upload"><label for="catalog-file-preview">Product photos</label><input id="catalog-file-preview" type="file" accept="image/*" multiple /><small>JPEG or PNG · multiple files</small><ul><li>orbit-lamp.png</li><li>orbit-detail.png</li></ul></div>
             <span class="ui-sample-variant">single/multiple · selected · disabled/error</span>
+          </template>
+          <template v-else-if="entry.preview === 'time-picker'">
+            <div class="ui-sample-field ui-sample-time-picker"><label for="catalog-time-preview">Delivery time</label><input id="catalog-time-preview" type="time" value="09:00" min="08:00" max="18:00" step="900" /><small>15-minute increments · 08:00–18:00</small></div>
+            <span class="ui-sample-variant">native time · min/max · step · error</span>
           </template>
           <template v-else-if="entry.preview === 'heading'">
             <span class="ui-sample-heading">Swiss editorials</span>
