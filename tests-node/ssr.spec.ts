@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -224,6 +224,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-label="Server administration navigation"');
     expect(rendered).toContain('<main');
     expect(rendered).toContain('<footer');
+  });
+
+  it('serializes NavigationRail groups and controlled disclosure semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(NavigationRail({
+      id: 'server-navigation-rail',
+      label: 'Server workspace navigation',
+      groups: [{ id: 'workspace', label: 'Workspace', items: [{ id: 'overview', label: 'Overview', href: '/overview', active: true }, { id: 'orders', label: 'Orders', href: '/orders', badge: '4' }] }],
+      mobileOpen: false,
+      collapsed: true,
+    })));
+    expect(rendered).toContain('data-navigation-rail-root="server-navigation-rail"');
+    expect(rendered).toContain('aria-label="Server workspace navigation"');
+    expect(rendered).toContain('aria-current="page"');
+    expect(rendered).toContain('aria-expanded="false"');
+    expect(rendered).toContain('is-collapsed');
+    expect(rendered).toContain('data-navigation-rail-item="orders"');
   });
 
   it('serializes ProductGallery image identity and alternate-image semantics without DOM state', async () => {

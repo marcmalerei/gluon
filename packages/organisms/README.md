@@ -50,7 +50,7 @@ import { AppShell } from '@gluonjs/organisms';
 <!-- gluon-package-overview:end -->
 
 ```ts
-import { AppShell, MegaMenu, PageLayout, SplitPane } from "@gluonjs/organisms";
+import { AppShell, MegaMenu, NavigationRail, PageLayout, SplitPane } from "@gluonjs/organisms";
 ```
 
 `PageLayout` composes a caller-owned page title, breadcrumbs, actions, main
@@ -150,6 +150,14 @@ buttons call `onCollapsedChange`; the organism does not own drag persistence,
 routing, data, authorization, or mutations. Use `part`, `data-panel-id`, region
 attributes, and the `--gluon-resizable-panels-*` custom properties to adapt a
 tenant shell without replacing stylesheet ownership.
+
+`NavigationRail` renders a labelled, grouped navigation landmark for dashboards,
+admin panels, and configurators. Its expanded/collapsed desktop state and mobile
+disclosure are controlled by the caller; Escape, outside pointer, focus return,
+active/disabled link semantics, and responsive stacking are provided by the
+organism. Routes, permissions, badges, localization, persistence, and tenant
+identity remain caller-owned. Use `part`, region attributes, and the
+`--gluon-navigation-rail-*` custom properties for tenant-specific styling.
 
 `ConfirmationDialog` is a native `<dialog>` composition. Callers provide copy,
 leading content, action controls, status content, and all mutation or routing.

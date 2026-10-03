@@ -96,6 +96,11 @@ try {
     || await page.locator('[data-preview="resizable-panels"] [role="separator"]').getAttribute('aria-valuenow') !== '68') {
     throw new Error('resizable-panels preview does not show keyboard separator anatomy');
   }
+  if (await page.locator('[data-preview="navigation-rail"] nav a').count() !== 3
+    || await page.locator('[data-preview="navigation-rail"] nav a.is-active').count() !== 1
+    || await page.locator('[data-preview="navigation-rail"] nav a.is-disabled').count() !== 1) {
+    throw new Error('navigation-rail preview does not show grouped active and disabled link anatomy');
+  }
   if (await page.locator('[data-preview="popover"] [role="dialog"]').count() !== 1) {
     throw new Error('popover preview does not show its labelled dialog anatomy');
   }
