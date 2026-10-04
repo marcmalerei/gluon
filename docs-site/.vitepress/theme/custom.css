@@ -274,6 +274,18 @@ html { scroll-behavior: smooth; }
 .ui-sample-status-tracker section span { color: var(--vp-c-text-2); font-weight: 450; }
 .ui-sample-status-tracker footer { display: flex; justify-content: flex-end; }
 .ui-sample-status-tracker footer button { min-height: 28px; padding: 4px 8px; color: inherit; font: inherit; }
+.ui-sample-notification-center { display: grid; gap: 7px; width: 90%; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-notification-center > button { justify-self: start; min-height: 28px; padding: 4px 8px; border: 1px solid var(--vp-c-divider); background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); font: inherit; }
+.ui-sample-notification-center > button span { display: inline-grid; min-width: 18px; min-height: 18px; place-items: center; margin-inline-start: 3px; border-radius: 99px; background: var(--ui-catalog-accent); color: var(--ui-catalog-ink); }
+.ui-sample-notification-center section { display: grid; gap: 5px; padding: 7px; border: 1px solid var(--vp-c-divider); background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
+.ui-sample-notification-center header { padding: 5px; border-bottom: 1px solid var(--vp-c-divider); }
+.ui-sample-notification-center ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.ui-sample-notification-center li { display: grid; gap: 3px; padding: 6px; border-inline-start: 3px solid var(--vp-c-divider); background: var(--vp-c-bg); }
+.ui-sample-notification-center li.is-unread { border-inline-start-color: var(--ui-catalog-accent); }
+.ui-sample-notification-center li small, .ui-sample-notification-center li p { color: var(--vp-c-text-2); font-weight: 450; }
+.ui-sample-notification-center li p { margin: 0; }
+.ui-sample-notification-center li footer { display: flex; gap: 4px; }
+.ui-sample-notification-center li footer button { min-height: 26px; padding: 3px 6px; border: 1px solid var(--vp-c-divider); background: transparent; color: inherit; font: inherit; }
 .ui-sample-admin-shell { display: grid; grid-template-columns: 30% 1fr; grid-template-rows: auto 1fr auto; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
 .ui-sample-admin-shell > span { display: grid; min-height: 18px; place-items: center; background: color-mix(in srgb, var(--ui-catalog-accent) 14%, var(--vp-c-bg)); }
 .ui-sample-admin-shell .is-header { grid-column: 1 / -1; justify-content: start; padding-inline: 8px; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }

@@ -43,4 +43,6 @@ export { ApprovalFlow, type ApprovalFlowAttributes, type ApprovalFlowChangeEvent
 export { approvalFlowStyles } from './approval-flow-styles.js';
 export { StatusTracker, type StatusTrackerAttributes, type StatusTrackerItem, type StatusTrackerProps, type StatusTrackerStatus } from './status-tracker.js';
 export { statusTrackerStyles } from './status-tracker-styles.js';
+export { NotificationCenter, type NotificationCenterAttributes, type NotificationCenterItem, type NotificationCenterPanelAttributes, type NotificationCenterProps, type NotificationCenterTone, type NotificationCenterTriggerAttributes } from './notification-center.js';
+export { notificationCenterStyles } from './notification-center-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

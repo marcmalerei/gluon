@@ -93,7 +93,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, ApprovalFlow, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, NotificationCenter, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -124,7 +124,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, MoleculeHoverCard, Stepper, FilterBar, DataList, ListboxField, ComboboxField, Autocomplete, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard };
+const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, NotificationCenter, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -324,6 +324,17 @@ createApp(() => AppShell({
         { id: 'publish', label: 'Publish', status: 'pending', description: 'Waiting for validation.' },
       ],
       currentId: 'validate',
+    }),
+    NotificationCenter({
+      id: 'ui-system-notification-center',
+      label: 'Notifications',
+      open: true,
+      notifications: [
+        { id: 'import-finished', title: 'Import finished', body: '24 records are ready for review.', tone: 'success', timestamp: '2026-10-04T03:00:00Z', read: false, action: q.a({ href: '#details', children: 'View details' }) },
+        { id: 'workspace-invite', title: 'Workspace invite', body: 'One invitation needs attention.', tone: 'info', timestamp: '2026-10-03T15:00:00Z', read: true },
+      ],
+      onMarkRead: (id) => analyticsEvents.push(`notification-read:${id}`),
+      onDismiss: (id) => analyticsEvents.push(`notification-dismissed:${id}`),
     }),
     MarketingHeader({
       id: 'ui-system-marketing-header',

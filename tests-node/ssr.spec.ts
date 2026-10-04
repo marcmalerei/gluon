@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Autocomplete, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, HoverCard as MoleculeHoverCard, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ApprovalFlow, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, OnboardingFlow, PageLayout, ProductGallery, ResizablePanels, SidebarLayout, SiteFooter, SplitPane, StatusTracker, Wizard, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ApprovalFlow, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, NotificationCenter, OnboardingFlow, PageLayout, ProductGallery, ResizablePanels, SidebarLayout, SiteFooter, SplitPane, StatusTracker, Wizard, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -333,6 +333,11 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
   it('serializes StatusTracker progress and timestamp without DOM state', async () => {
     const rendered = withoutHydrationMarkers(await renderToString(StatusTracker({ id: 'server-status-tracker', title: 'Import status', currentId: 'validate', items: [{ id: 'validate', label: 'Validate', status: 'in-progress', progress: 68, timestamp: '2026-10-04T03:00:00Z' }] })));
     expect(rendered).toContain('data-state="in-progress"'); expect(rendered).toContain('aria-current="step"'); expect(rendered).toContain('value="68"'); expect(rendered).toContain('dateTime="2026-10-04T03:00:00Z"');
+  });
+
+  it('serializes NotificationCenter labels, unread state, and controlled panel without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(NotificationCenter({ id: 'server-notifications', label: 'Notifications', open: true, notifications: [{ id: 'import', title: 'Import finished', read: false, timestamp: '2026-10-04T03:00:00Z' }] })));
+    expect(rendered).toContain('aria-label="Notifications, 1 unread"'); expect(rendered).toContain('data-state="open"'); expect(rendered).toContain('aria-labelledby="server-notifications-heading"'); expect(rendered).toContain('dateTime="2026-10-04T03:00:00Z"');
   });
 
   it('serializes ProductGallery image identity and alternate-image semantics without DOM state', async () => {
