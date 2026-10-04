@@ -182,6 +182,11 @@ try {
     || await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-footer').count() !== 1) {
     throw new Error('sidebar-layout preview does not show sidebar, main, and footer anatomy');
   }
+  if (await page.locator('[data-preview="wizard"] .ui-sample-wizard [aria-current="step"]').count() !== 1
+    || await page.locator('[data-preview="wizard"] .ui-sample-wizard section').count() !== 1
+    || await page.locator('[data-preview="wizard"] .ui-sample-wizard footer button').count() !== 2) {
+    throw new Error('wizard preview does not show current step, content, and controls anatomy');
+  }
   if (await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-announcement').count() !== 1
     || await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-navigation').count() !== 1) {
     throw new Error('marketing-header preview does not show announcement and navigation anatomy');

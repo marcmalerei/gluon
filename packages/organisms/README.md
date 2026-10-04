@@ -141,6 +141,14 @@ and tenant identity remain caller-owned. Use its region attributes, parts, and
 `--gluon-sidebar-layout-*` CSS variables to adapt the layout per tenant while
 keeping one semantic DOM contract.
 
+`Wizard` renders a controlled, labelled multi-step workflow with current-step
+semantics, keyboard-operable step navigation, previous/next controls, live
+progress, responsive mobile stacking, and invalid-input fail-closed behavior.
+Steps, content, validation, routing, persistence, permissions, mutations,
+localization, analytics, and tenant identity remain caller-owned. Use
+`--gluon-wizard-*` variables, parts, and native attributes to theme a workflow
+per tenant without replacing its semantic DOM contract.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and

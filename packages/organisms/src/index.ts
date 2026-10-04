@@ -35,4 +35,6 @@ export { NavigationRail, type NavigationRailAttributes, type NavigationRailButto
 export { navigationRailStyles } from './navigation-rail-styles.js';
 export { SidebarLayout, type SidebarLayoutAttributes, type SidebarLayoutButtonAttributes, type SidebarLayoutNavigationAttributes, type SidebarLayoutOpenChangeEvent, type SidebarLayoutProps, type SidebarLayoutRegionAttributes } from './sidebar-layout.js';
 export { sidebarLayoutStyles } from './sidebar-layout-styles.js';
+export { Wizard, type WizardAttributes, type WizardOpenChangeEvent, type WizardProps, type WizardStep } from './wizard.js';
+export { wizardStyles } from './wizard-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SidebarLayout, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SidebarLayout, SiteFooter, SplitPane, Wizard, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -295,6 +295,20 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('<aside');
     expect(rendered).toContain('<main');
     expect(rendered).toContain('<footer');
+  });
+
+  it('serializes Wizard step navigation and current content without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(Wizard({
+      id: 'server-wizard',
+      title: 'Configure product',
+      steps: [{ id: 'details', label: 'Details', content: html`<p>Details</p>` }, { id: 'review', label: 'Review', content: html`<p>Review</p>` }],
+      currentStep: 1,
+    })));
+    expect(rendered).toContain('data-state="last"');
+    expect(rendered).toContain('aria-label="Wizard steps"');
+    expect(rendered).toContain('aria-current="step"');
+    expect(rendered).toContain('Configure product');
+    expect(rendered).toContain('Review');
   });
 
   it('serializes ProductGallery image identity and alternate-image semantics without DOM state', async () => {
