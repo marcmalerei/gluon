@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, Wizard, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, wizardStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, Wizard, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, wizardStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2899,6 +2899,18 @@ describe('advanced data and workflow molecules', () => {
     render(Wizard({ id: 'bad wizard', steps: [{ id: 'one', label: 'One', content: 'One' }] }), document.body);
     expect(document.querySelector('[data-state="invalid"]')).not.toBeNull();
     expect(() => render(Wizard({ id: 'empty-nav-label', stepNavigationLabel: ' ', steps: [{ id: 'one', label: 'One', content: 'One' }] }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders and completes a controlled OnboardingFlow with tenant hooks', () => {
+    const onStepChange = vi.fn(); const onComplete = vi.fn();
+    render(OnboardingFlow({ id: 'onboarding', title: 'Set up workspace', currentStep: 1, onStepChange, onComplete, steps: [{ id: 'profile', label: 'Profile', content: q.p({ children: 'Profile content' }) }, { id: 'workspace', label: 'Workspace', content: q.p({ children: 'Workspace content' }) }], attributes: { class: 'tenant-onboarding', style: { '--gluon-onboarding-flow-current': 'teal' } } }), document.body);
+    const root = document.querySelector<HTMLElement>('#onboarding')!;
+    expect(root.dataset.state).toBe('last'); expect(root.classList).toContain('tenant-onboarding'); expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Workspace'); expect(root.querySelector('[part="content"]')?.textContent).toContain('Workspace content');
+    root.querySelector<HTMLButtonElement>('[part="previous"]')!.click(); expect(onStepChange).toHaveBeenCalledWith(0, expect.any(MouseEvent));
+    render(OnboardingFlow({ id: 'completed-onboarding', title: 'Set up workspace', steps: [{ id: 'profile', label: 'Profile', content: 'Profile' }], completed: true, completionContent: q.strong({ children: 'Ready' }), onComplete, attributes: { style: { '--gluon-onboarding-flow-current': 'teal' } } }), document.body);
+    const completed = document.querySelector<HTMLElement>('#completed-onboarding')!; expect(completed.dataset.state).toBe('complete'); expect(completed.querySelector('[part="completion"]')?.textContent).toContain('Ready'); expect(getStyleSheetText(onboardingFlowStyles)).toContain('forced-colors');
+    render(OnboardingFlow({ id: 'invalid-onboarding', steps: [{ id: 'same', label: 'One', content: 'One' }, { id: 'same', label: 'Two', content: 'Two' }] }), document.body);
+    expect(document.querySelector('#invalid-onboarding')?.getAttribute('data-state')).toBe('invalid');
   });
 
   it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {

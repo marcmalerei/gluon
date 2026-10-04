@@ -149,6 +149,13 @@ localization, analytics, and tenant identity remain caller-owned. Use
 `--gluon-wizard-*` variables, parts, and native attributes to theme a workflow
 per tenant without replacing its semantic DOM contract.
 
+`OnboardingFlow` is the first-run/setup sibling for flows that need an explicit
+completion state and caller-owned completion callback. It keeps the controlled
+step navigation, responsive/mobile, focus, 44px, forced-colors, reduced-motion,
+parts, and CSS-variable guarantees while leaving setup data, validation,
+persistence, routing, permissions, mutations, localization, analytics, and
+tenant identity with the caller.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and

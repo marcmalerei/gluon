@@ -91,7 +91,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -122,7 +122,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard };
+const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -295,6 +295,12 @@ createApp(() => AppShell({
         { id: 'finish', label: 'Finish', description: 'Choose a tenant finish.', content: q.p({ children: 'Caller-owned finish selection.' }) },
         { id: 'review', label: 'Review', content: q.p({ children: 'Caller-owned review summary.' }) },
       ],
+      currentStep: 1,
+    }),
+    OnboardingFlow({
+      id: 'ui-system-onboarding-flow',
+      title: 'Set up workspace',
+      steps: [{ id: 'profile', label: 'Profile', content: q.p({ children: 'Caller-owned profile setup.' }) }, { id: 'workspace', label: 'Workspace', content: q.p({ children: 'Caller-owned workspace setup.' }) }],
       currentStep: 1,
     }),
     MarketingHeader({
