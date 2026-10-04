@@ -91,7 +91,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, ApprovalFlow, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -122,7 +122,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard };
+const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -311,6 +311,17 @@ createApp(() => AppShell({
         { id: 'security', label: 'Security', status: 'in-review', role: 'Security', content: q.p({ children: 'Caller-owned security review.' }), evidence: q.small({ children: 'Report 42' }), actions: q.button({ type: 'button', children: 'Approve' }) },
       ],
       currentStage: 1,
+    }),
+    StatusTracker({
+      id: 'ui-system-status-tracker',
+      title: 'Import status',
+      summary: 'Validation is in progress.',
+      items: [
+        { id: 'upload', label: 'Upload', status: 'success', description: 'Source accepted.', timestamp: '2026-10-04T03:00:00Z' },
+        { id: 'validate', label: 'Validate', status: 'in-progress', description: 'Checking records.', progress: 68, meta: q.small({ children: '68 of 100 records checked.' }), action: q.button({ type: 'button', children: 'View details' }) },
+        { id: 'publish', label: 'Publish', status: 'pending', description: 'Waiting for validation.' },
+      ],
+      currentId: 'validate',
     }),
     MarketingHeader({
       id: 'ui-system-marketing-header',

@@ -197,6 +197,12 @@ try {
     || await page.locator('[data-preview="approval-flow"] .ui-sample-approval-flow footer button').count() !== 2) {
     throw new Error('approval-flow preview does not show header, current stage, and action anatomy');
   }
+  if (await page.locator('[data-preview="status-tracker"] .ui-sample-status-tracker header').count() !== 1
+    || await page.locator('[data-preview="status-tracker"] .ui-sample-status-tracker [aria-current="step"]').count() !== 1
+    || await page.locator('[data-preview="status-tracker"] .ui-sample-status-tracker meter').count() !== 1
+    || await page.locator('[data-preview="status-tracker"] .ui-sample-status-tracker footer button').count() !== 1) {
+    throw new Error('status-tracker preview does not show header, current item, progress, and action anatomy');
+  }
   if (await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-announcement').count() !== 1
     || await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-navigation').count() !== 1) {
     throw new Error('marketing-header preview does not show announcement and navigation anatomy');
