@@ -329,6 +329,10 @@ permissions, and tenant-specific content remain caller-owned.
             <aside class="ui-sample-navigation-rail" aria-label="Workspace navigation"><header><strong>GLUON</strong><button type="button" aria-label="Collapse navigation">←</button></header><nav><strong>Workspace</strong><a class="is-active" href="#catalog">Overview</a><a href="#catalog">Orders <small>4</small></a><a class="is-disabled" aria-disabled="true">Archived</a></nav><footer>Tenant workspace</footer></aside>
             <span class="ui-sample-variant">expanded · collapsed · mobile · active · disabled</span>
           </template>
+          <template v-else-if="entry.preview === 'sidebar-layout'">
+            <div class="ui-sample-sidebar-layout" aria-label="Sidebar layout regions"><span class="is-header">Workspace header</span><span class="is-sidebar"><strong>Navigation</strong><a class="is-active" href="#catalog">Overview</a><a href="#catalog">Reports</a></span><span class="is-main"><strong>Main content</strong><small>Caller-owned page surface</small></span><span class="is-footer">Tenant footer</span></div>
+            <span class="ui-sample-variant">header · sidebar · main · footer · mobile</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

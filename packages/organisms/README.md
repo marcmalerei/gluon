@@ -132,6 +132,15 @@ native region attributes are reusable across admin, analytics, and configurator
 tenants; widgets, filters, routing, permissions, data, persistence, and tenant
 identity remain caller-owned.
 
+`SidebarLayout` is the smaller reusable shell for pages that need a caller-owned
+header, labelled sidebar navigation, main content, and optional footer without
+adopting a full application shell. Its controlled mobile disclosure supports
+Escape, outside-pointer close, focus return, 44px controls, forced colors, and
+reduced motion. Routing, permissions, data, localization, analytics, persistence,
+and tenant identity remain caller-owned. Use its region attributes, parts, and
+`--gluon-sidebar-layout-*` CSS variables to adapt the layout per tenant while
+keeping one semantic DOM contract.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and

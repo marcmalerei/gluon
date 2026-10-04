@@ -33,4 +33,6 @@ export { ResizablePanels, type ResizablePanelsAttributes, type ResizablePanelsCh
 export { resizablePanelsStyles } from './resizable-panels-styles.js';
 export { NavigationRail, type NavigationRailAttributes, type NavigationRailButtonAttributes, type NavigationRailGroup, type NavigationRailItem, type NavigationRailLinkAttributes, type NavigationRailNavigationAttributes, type NavigationRailOpenChangeEvent, type NavigationRailProps, type NavigationRailRegionAttributes } from './navigation-rail.js';
 export { navigationRailStyles } from './navigation-rail-styles.js';
+export { SidebarLayout, type SidebarLayoutAttributes, type SidebarLayoutButtonAttributes, type SidebarLayoutNavigationAttributes, type SidebarLayoutOpenChangeEvent, type SidebarLayoutProps, type SidebarLayoutRegionAttributes } from './sidebar-layout.js';
+export { sidebarLayoutStyles } from './sidebar-layout-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

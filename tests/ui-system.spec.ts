@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2784,6 +2784,90 @@ describe('advanced data and workflow molecules', () => {
     expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
     expect(onMobileOpenChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders a responsive SidebarLayout with semantic regions and tenant hooks', () => {
+    const onMobileOpenChange = vi.fn();
+    render(SidebarLayout({
+      id: 'sidebar-layout',
+      header: q.strong({ children: 'Workspace header' }),
+      sidebar: q.div({ children: [q.a({ href: '/overview', children: 'Overview' }), q.a({ href: '/reports', children: 'Reports' })] }),
+      main: q.h1({ children: 'Reports' }),
+      footer: q.small({ children: 'Tenant workspace' }),
+      sidebarLabel: 'Workspace navigation',
+      mobileOpen: false,
+      onMobileOpenChange,
+      attributes: { class: 'tenant-sidebar-layout', style: { '--gluon-sidebar-layout-sidebar-size': '20rem' } },
+      headerAttributes: { class: 'tenant-sidebar-header' },
+      navigationAttributes: { aria: { label: 'Tenant navigation' } },
+      mobileButtonAttributes: { aria: { describedby: 'sidebar-help' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#sidebar-layout')!;
+    expect(root.dataset.sidebarLayoutRoot).toBe('sidebar-layout');
+    expect(root.classList).toContain('tenant-sidebar-layout');
+    expect(root.querySelector('.gluon-sidebar-layout-header')?.classList).toContain('tenant-sidebar-header');
+    expect(root.querySelector('.gluon-sidebar-layout-navigation')?.getAttribute('aria-label')).toBe('Tenant navigation');
+    expect(root.querySelector('.gluon-sidebar-layout-main h1')?.textContent).toBe('Reports');
+    expect(root.querySelector('.gluon-sidebar-layout-footer')?.textContent).toContain('Tenant workspace');
+    expect(root.querySelector('[data-sidebar-layout-mobile-button]')?.getAttribute('aria-controls')).toBe('sidebar-layout-sidebar');
+    expect(root.style.getPropertyValue('--gluon-sidebar-layout-sidebar-size')).toBe('20rem');
+    expect(getStyleSheetText(sidebarLayoutStyles)).toContain('--gluon-sidebar-layout');
+    expect(getStyleSheetText(sidebarLayoutStyles)).toContain('44px');
+    expect(getStyleSheetText(sidebarLayoutStyles)).toContain('forced-colors');
+    root.querySelector<HTMLButtonElement>('[data-sidebar-layout-mobile-button]')!.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+    expect(() => render(SidebarLayout({ id: 'bad sidebar layout', main: 'Main' }), document.body)).toThrow('whitespace');
+    expect(() => render(SidebarLayout({ id: 'empty-label', main: 'Main', sidebar: 'Links', sidebarLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('closes an open SidebarLayout from Escape, toggle, and outside pointer input', async () => {
+    const onMobileOpenChange = vi.fn();
+    render(SidebarLayout({
+      id: 'open-sidebar-layout', sidebar: 'Navigation', main: 'Workspace', mobileOpen: true, onMobileOpenChange,
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#open-sidebar-layout')!;
+    const button = root.querySelector<HTMLButtonElement>('[data-sidebar-layout-mobile-button]')!;
+    button.focus();
+    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    root.dispatchEvent(escape);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(escape.defaultPrevented).toBe(true);
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, escape);
+    expect(document.activeElement).toBe(button);
+
+    button.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(onMobileOpenChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('supports inert states, native listener forwarding, and caller-prevented disclosure', () => {
+    const onMobileOpenChange = vi.fn();
+    render(SidebarLayout({ id: 'sidebar-without-navigation', main: 'Workspace' }), document.body);
+    const noNavigationRoot = document.querySelector<HTMLElement>('#sidebar-without-navigation')!;
+    expect(noNavigationRoot.querySelector('[data-sidebar-layout-mobile-button]')).toBeNull();
+    expect(noNavigationRoot.querySelector('.gluon-sidebar-layout-sidebar')).toBeNull();
+    noNavigationRoot.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    const closedEscape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    noNavigationRoot.dispatchEvent(closedEscape);
+    expect(closedEscape.defaultPrevented).toBe(true);
+
+    const handleEvent = vi.fn((event: MouseEvent) => event.preventDefault());
+    render(SidebarLayout({
+      id: 'prevented-sidebar-layout', sidebar: 'Navigation', main: 'Workspace', onMobileOpenChange,
+      mobileButtonAttributes: { onClick: { handleEvent } },
+      navigationAttributes: { aria: { label: 'Explicit navigation' } },
+      mobileMenuLabel: 'Show navigation',
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#prevented-sidebar-layout')!;
+    const button = root.querySelector<HTMLButtonElement>('[data-sidebar-layout-mobile-button]')!;
+    expect(root.querySelector('.gluon-sidebar-layout-navigation')?.getAttribute('aria-label')).toBe('Explicit navigation');
+    button.click();
+    expect(handleEvent).toHaveBeenCalledWith(expect.any(MouseEvent));
+    expect(onMobileOpenChange).not.toHaveBeenCalled();
+    root.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(onMobileOpenChange).not.toHaveBeenCalled();
+    expect(() => render(SidebarLayout({ id: 'empty-mobile-label', main: 'Main', mobileMenuLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
   it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {
