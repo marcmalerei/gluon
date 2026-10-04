@@ -37,9 +37,21 @@ identity, cleanup, styles, directives, and external-DOM recovery are unchanged.
 The pre-implementation browser prototype used the same 120-row clone and
 binding-traversal workload. Median time changed from 17.2 to 16.2 ms in
 Chromium 149 (−5.8%), 58 to 56 ms in Firefox 151 (−3.4%), and 37 to 35 ms in
-WebKit 26.5 (−5.4%). Firefox p95 increased, so the claim is limited to the
-single-element clone/traversal lane; application and full rendering evidence
-must be rerun before treating this as a general framework improvement.
+WebKit 26.5 (−5.4%). Firefox p95 increased, so the claim remains limited to
+the single-element clone/traversal lane.
+
+The paired production rendering run used 30 samples and 8 warm-ups on the
+same Apple M4 host. The 1,000-row create median changed from 0.3048 to 0.2905
+ms in Chromium (−4.7%); Firefox stayed at 0.5417 ms and WebKit at 0.4583 ms.
+Update and reverse medians stayed within run-to-run variation. The separate
+120-product application mount lane did not improve consistently, so this
+change makes no application-lifecycle claim. Raw samples and correctness
+snapshots are retained in:
+
+- [`rendering-comparison-632-baseline.json`](../benchmarks/results/rendering-comparison-632-baseline.json)
+- [`rendering-comparison-632-candidate.json`](../benchmarks/results/rendering-comparison-632-candidate.json)
+- [`application-comparison-632-baseline.json`](../benchmarks/results/application-comparison-632-baseline.json)
+- [`application-comparison-632-candidate.json`](../benchmarks/results/application-comparison-632-candidate.json)
 
 ## Stable primitive text update hotpath
 
