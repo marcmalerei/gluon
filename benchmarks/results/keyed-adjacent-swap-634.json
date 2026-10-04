@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "issue": 634,
+  "source": {
+    "branch": "codex/634-adjacent-keyed-swap",
+    "candidateCommit": "588ba30",
+    "workingTreeDirty": false
+  },
+  "environment": {
+    "platform": "darwin",
+    "cpu": "Apple M4",
+    "node": "v22.22.0",
+    "vitest": "4.1.10",
+    "browsers": ["chromium", "firefox", "webkit"]
+  },
+  "methodology": {
+    "prototypeCommand": "npx vitest bench --run .tmp/udomdiff-keyed-experiment.bench.ts -t 'swap one adjacent pair' --reporter=verbose",
+    "productionCommand": "npm run benchmark:keyed -- --reporter=verbose -t 'swap one adjacent pair'",
+    "rowCount": 1000,
+    "warmup": "Vitest browser benchmark defaults",
+    "unit": "milliseconds per operation; lower is faster",
+    "prototypeScope": "DOM-only movement with identical keyed element identities; correctness checked for order and identity",
+    "limitations": "The prototype excludes template binding work and layout/paint. The production harness includes Gluon template reconciliation but reports candidate-only results here; no cross-commit production baseline was inferred."
+  },
+  "prototypeResults": [
+    { "browser": "chromium", "currentStyleMeanMs": 0.1315, "candidateMeanMs": 0.0006, "speedup": 205.18 },
+    { "browser": "firefox", "currentStyleMeanMs": 0.1369, "candidateMeanMs": 0.0009, "speedup": 152.11 },
+    { "browser": "webkit", "currentStyleMeanMs": 0.1413, "candidateMeanMs": 0.0009, "speedup": 157.00 }
+  ],
+  "productionCandidate": [
+    { "browser": "chromium", "meanMs": 0.0645, "p99Ms": 0.2, "relativeMarginOfErrorPercent": 6.14, "samples": 7755 },
+    { "browser": "firefox", "meanMs": 0.1024, "p99Ms": 1.0, "relativeMarginOfErrorPercent": 8.38, "samples": 4884 },
+    { "browser": "webkit", "meanMs": 0.0399, "p99Ms": 1.0, "relativeMarginOfErrorPercent": 8.59, "samples": 12541 }
+  ]
+}

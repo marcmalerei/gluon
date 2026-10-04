@@ -928,6 +928,26 @@ class NodePart implements Part {
       return;
     }
 
+    const adjacentSwapIndex = findSingleAdjacentKeyedSwap(this.keyedChildren, keys);
+    if (adjacentSwapIndex >= 0 && parent && nodesAreInPlace(this.marker, this.nodes)) {
+      const left = this.keyedChildren[adjacentSwapIndex]!;
+      const right = this.keyedChildren[adjacentSwapIndex + 1]!;
+      this.updateKeyedChild(right, values[adjacentSwapIndex]!, true);
+      this.updateKeyedChild(left, values[adjacentSwapIndex + 1]!, true);
+      const leftNodes = keyedChildNodes(left);
+      const rightNodes = keyedChildNodes(right);
+      moveNodesBefore(parent, rightNodes, leftNodes[0]!);
+
+      const nextChildren = [...this.keyedChildren];
+      nextChildren[adjacentSwapIndex] = right;
+      nextChildren[adjacentSwapIndex + 1] = left;
+      this.keyedChildren = nextChildren;
+      this.nodes = nextChildren.flatMap(keyedChildNodes);
+      this.textNode = undefined;
+      this.lastPrimitive = unsetValue;
+      return;
+    }
+
     if (this.keyedChildren.length === 0) {
       const lazyPlan = createLazyPrimitivePlan(values[0]);
       const nextChildren: KeyedChild[] = new Array(keys.length);
@@ -3407,6 +3427,24 @@ function nodesAreInPlace(marker: Comment, nodes: readonly Node[]): boolean {
     cursor = cursor.nextSibling;
   }
   return true;
+}
+
+function findSingleAdjacentKeyedSwap(
+  previousChildren: readonly KeyedChild[],
+  nextKeys: readonly Key[],
+): number {
+  if (previousChildren.length !== nextKeys.length) return -1;
+  let index = 0;
+  for (; index < nextKeys.length; index += 1) {
+    if (previousChildren[index]!.key !== nextKeys[index]) break;
+  }
+  if (index + 1 >= nextKeys.length) return -1;
+  if (previousChildren[index]!.key !== nextKeys[index + 1]) return -1;
+  if (previousChildren[index + 1]!.key !== nextKeys[index]) return -1;
+  for (let suffix = index + 2; suffix < nextKeys.length; suffix += 1) {
+    if (previousChildren[suffix]!.key !== nextKeys[suffix]) return -1;
+  }
+  return index;
 }
 
 function moveNodesBefore(parent: Node, nodes: readonly Node[], reference: Node | null): void {
