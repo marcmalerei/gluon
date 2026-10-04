@@ -138,11 +138,20 @@ try {
   if (await page.locator('[data-preview="popover"] [role="dialog"]').count() !== 1) {
     throw new Error('popover preview does not show its labelled dialog anatomy');
   }
+  if (await page.locator('[data-preview="hover-card"] [role="dialog"]').count() !== 1
+    || await page.locator('[data-preview="hover-card"] [aria-expanded="true"]').count() !== 1
+    || await page.locator('[data-preview="hover-card"] a').count() !== 1) {
+    throw new Error('hover-card preview does not show trigger, interactive dialog, and link anatomy');
+  }
   if (await page.locator('[data-preview="sheet"] .ui-sample-sheet-overlay .ui-sample-sheet').count() !== 1) {
     throw new Error('sheet preview does not show its edge-panel anatomy');
   }
   if (await page.locator('[data-preview="date-picker"] input[type="date"]').count() !== 1) {
     throw new Error('date-picker preview does not show native date anatomy');
+  }
+  if (await page.locator('[data-preview="autocomplete"] [role="combobox"]').count() !== 1
+    || await page.locator('[data-preview="autocomplete"] [role="listbox"] [role="option"]').count() !== 3) {
+    throw new Error('autocomplete preview does not show combobox and suggestion anatomy');
   }
   if (await page.locator('[data-preview="date-range-picker"] input[type="date"]').count() !== 2
     || await page.locator('[data-preview="date-range-picker"] fieldset legend').count() !== 1) {

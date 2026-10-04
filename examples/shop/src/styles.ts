@@ -318,9 +318,10 @@ export const shopStyles = css`
     .menu-categories .category-link { min-height: 56px; border-right: 0; font-size: 16px; }
 
     .search-panel { position: fixed; inset: 0; z-index: 80; overflow: auto; background: var(--shop-white); animation: layer-in 160ms ease both; }
-    .search-bar { display: grid; grid-template-columns: minmax(190px, 0.4fr) 1fr 44px; align-items: center; gap: 24px; min-height: 100px; padding: 16px var(--shop-gutter); border-bottom: 1px solid var(--shop-black); }
+    .search-bar { display: grid; grid-template-columns: minmax(190px, 1fr) 44px; align-items: center; gap: 24px; min-height: 100px; padding: 16px var(--shop-gutter); border-bottom: 1px solid var(--shop-black); }
     .search-bar label { font-size: 24px; letter-spacing: -0.03em; }
     .search-input-wrap { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--shop-black); }
+    .search-input-wrap .shop-autocomplete { min-width: 0; flex: 1; }
     .search-input-wrap input { width: 100%; height: 54px; border: 0; outline: 0; background: transparent; font-size: clamp(20px, 3vw, 38px); letter-spacing: -0.035em; }
     .search-results > p { padding: 22px var(--shop-gutter); margin: 0; color: var(--shop-muted); font-size: 13px; }
 

@@ -31,6 +31,8 @@ export { OneTimePasswordField, type OneTimePasswordFieldAttributes, type OneTime
 export { PasswordToggleField, type PasswordToggleFieldAttributes, type PasswordToggleFieldInputAttributes, type PasswordToggleFieldProps } from './password-toggle-field.js';
 export { Tooltip, type TooltipAttributes, type TooltipPlacement, type TooltipProps } from './tooltip.js';
 export { tooltipStyles } from './tooltip-styles.js';
+export { HoverCard, type HoverCardAttributes, type HoverCardContentAttributes, type HoverCardPlacement, type HoverCardProps, type HoverCardTriggerAttributes } from './hover-card.js';
+export { hoverCardStyles } from './hover-card-styles.js';
 export { Stepper, type StepperAttributes, type StepperProps, type StepperStep, type StepperStepStatus } from './stepper.js';
 export { stepperStyles } from './stepper-styles.js';
 export { FilterBar, type FilterBarAttributes, type FilterBarProps } from './filter-bar.js';
@@ -41,6 +43,8 @@ export { ListboxField, type ListboxFieldAttributes, type ListboxFieldListboxAttr
 export { listboxFieldStyles } from './listbox-field-styles.js';
 export { ComboboxField, type ComboboxFieldAttributes, type ComboboxFieldInputAttributes, type ComboboxFieldListboxAttributes, type ComboboxFieldProps } from './combobox-field.js';
 export { comboboxFieldStyles } from './combobox-field-styles.js';
+export { Autocomplete, type AutocompleteAttributes, type AutocompleteOption, type AutocompleteProps } from './autocomplete.js';
+export { autocompleteStyles } from './autocomplete-styles.js';
 export { CommandPalette, type CommandPaletteAttributes, type CommandPaletteCommand, type CommandPaletteGroup, type CommandPaletteInputAttributes, type CommandPaletteListboxAttributes, type CommandPaletteProps } from './command-palette.js';
 export { commandPaletteStyles } from './command-palette-styles.js';
 export { TreeView, type TreeViewAttributes, type TreeViewNode, type TreeViewProps } from './tree-view.js';

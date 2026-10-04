@@ -537,3 +537,21 @@ caller-provided selected-file summary, composes native change listeners, and
 does not inspect, transform, or upload file contents. These components expose
 component-scoped CSS variables for tenant-owned visual overrides and honor
 reduced-motion, RTL-safe logical layout, and forced-colors rules.
+
+`HoverCard` composes the public headless anchored-overlay primitive with a
+styled, labelled trigger/content contract. The caller owns the trigger and
+content templates, placement, delay, routing, and any data loading; the
+molecule owns the overlay roles, focus/dismissal wiring, and stable styling
+hooks. Use `attributes` and `contentAttributes` for tenant-scoped classes,
+parts, data attributes, and CSS-variable overrides. The component exposes
+`--gluon-hover-card-*` properties and supports logical block/inline placement,
+forced-colors, reduced-motion, and keyboard dismissal.
+
+`Autocomplete` is the standalone suggestion-field composition built on the
+public `ComboboxField` molecule. It accepts caller-owned suggestions,
+selection/input callbacks, loading and empty states, disabled options, and
+application-owned fetching or routing while preserving native input and
+listbox semantics. Its `attributes` are forwarded to the composed field and
+its `--gluon-autocomplete-*` properties provide tenant-safe visual extension
+points. Both molecules are SSR-safe and keep async data, permissions, and
+navigation outside the component boundary.

@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Autocomplete, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, HoverCard as MoleculeHoverCard, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ApprovalFlow, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, OnboardingFlow, PageLayout, ProductGallery, ResizablePanels, SidebarLayout, SiteFooter, SplitPane, StatusTracker, Wizard, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -88,6 +88,11 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-expanded="false"');
     expect(rendered).toContain('aria-haspopup="dialog"');
     expect(rendered).toContain('role="dialog"');
+  });
+
+  it('serializes molecule HoverCard and Autocomplete semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(html`${MoleculeHoverCard({ id: 'server-molecule-card', label: 'Maker details', trigger: (attributes) => q.button({ ...attributes, children: 'Maker' }), content: q.p({ children: 'Ada' }) })}${Autocomplete({ id: 'server-autocomplete', label: 'Find product', suggestions: [{ value: 'orbit', label: 'Orbit lamp' }], open: true, inputValue: 'Orbit' })}`));
+    expect(rendered).toContain('class="gluon-anchored-overlay gluon molecule gluon-hover-card"'); expect(rendered).toContain('role="dialog"'); expect(rendered).toContain('id="server-autocomplete-listbox"'); expect(rendered).toContain('role="combobox"'); expect(rendered).toContain('Orbit lamp');
   });
 
   it('serializes deterministic OTP fields with one native form value per instance', async () => {

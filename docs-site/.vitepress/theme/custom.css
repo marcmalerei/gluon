@@ -171,6 +171,11 @@ html { scroll-behavior: smooth; }
 .ui-sample-pagination .is-active { background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); text-decoration: none; }
 .ui-sample-tooltip { position: relative; display: inline-flex; }
 .ui-sample-tooltip [role="tooltip"] { position: absolute; inset-block-start: calc(100% + 5px); inset-inline-start: 50%; z-index: 1; width: max-content; max-width: 190px; padding: 5px 7px; border: 1px solid var(--ui-catalog-ink); background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); font-size: .72rem; opacity: .92; transform: translateX(-50%); }
+.ui-sample-hover-card { position: relative; display: grid; gap: 6px; width: 90%; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-hover-card > button { justify-self: start; min-height: 28px; padding: 4px 8px; color: inherit; font: inherit; }
+.ui-sample-hover-card span[role="dialog"] { display: grid; gap: 4px; padding: 8px; border: 1px solid var(--ui-catalog-accent); background: color-mix(in srgb, var(--ui-catalog-accent) 10%, var(--vp-c-bg)); }
+.ui-sample-hover-card span[role="dialog"] small { color: var(--vp-c-text-2); font-weight: 450; }
+.ui-sample-hover-card span[role="dialog"] a { color: var(--ui-catalog-accent); }
 .ui-sample-stepper { display: flex; gap: 10px; width: 95%; margin: 0; padding: 0; list-style: none; font-size: .75rem; }
 .ui-sample-stepper li { color: var(--vp-c-text-2); }
 .ui-sample-stepper li::before { content: '○'; margin-inline-end: 3px; }

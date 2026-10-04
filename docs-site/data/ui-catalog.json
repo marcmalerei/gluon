@@ -865,6 +865,37 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "Autocomplete",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-autocomplete"
+      ],
+      "variants": [
+        "suggestions",
+        "loading",
+        "empty"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "invalid",
+        "disabled"
+      ],
+      "preview": "autocomplete",
+      "accessibility": "Composes the native labelled combobox contract for caller-owned suggestions with stable listbox relationships, keyboard selection, loading/empty/invalid/disabled semantics, and 44px controls.",
+      "extension": "Suggestion data, filtering, value, input value, open state, selection callbacks, fetching, localization, persistence, authorization, and tenant-specific CSS variables remain caller-owned; it composes ComboboxField without adding network or routing behavior.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/Autocomplete.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "Breadcrumbs",
       "kind": "component",
       "status": "stable",
@@ -1408,6 +1439,37 @@
         "tests/ui-visual.spec.ts"
       ],
       "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/FormField.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
+      "name": "HoverCard",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-hover-card"
+      ],
+      "variants": [
+        "block-start",
+        "block-end",
+        "inline-start",
+        "inline-end"
+      ],
+      "states": [
+        "hidden",
+        "visible",
+        "interactive"
+      ],
+      "preview": "hover-card",
+      "accessibility": "Composes the headless interactive HoverCard with labelled dialog semantics, pointer/focus discovery, Escape dismissal, intentional keyboard entry, responsive placement, forced-colors, and reduced-motion support.",
+      "extension": "Trigger/content rendering, open lifecycle, delay, placement, routing, fetching, authorization, localization, and tenant identity remain caller-owned; parts, native attributes, and CSS variables support tenant-safe styling.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/HoverCard.html",
       "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
     },
     {

@@ -67,11 +67,13 @@ import {
   SearchField,
   SearchResults,
   Tooltip as MoleculeTooltip,
+  HoverCard as MoleculeHoverCard,
   Stepper,
   FilterBar,
   DataList,
   ListboxField,
   ComboboxField,
+  Autocomplete,
   CommandPalette,
   TreeView,
   SortControl,
@@ -120,7 +122,7 @@ const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
 const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
 void menuAndToolbarPrimitives;
-const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
+const dataMolecules = { MoleculeTooltip, MoleculeHoverCard, Stepper, FilterBar, DataList, ListboxField, ComboboxField, Autocomplete, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
 const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard };
 void applicationOrganisms;
@@ -395,6 +397,14 @@ createApp(() => AppShell({
           submitLabel: 'Find',
           onQueryChange: (query) => { searchQuery.value = query; },
         }),
+        Autocomplete({
+          id: 'ui-example-autocomplete',
+          label: 'Find a product',
+          suggestions: [{ value: 'orbit', label: 'Orbit lamp' }, { value: 'cable', label: 'Cobalt cable' }, { value: 'shade', label: 'Orbit shade', disabled: true }],
+          inputValue: 'Orbit',
+          open: true,
+          onInputChange: (value) => { searchQuery.value = value; },
+        }),
         SearchResults({
           id: 'ui-example-results',
           heading: 'Search results',
@@ -575,6 +585,7 @@ createApp(() => AppShell({
       QuarkPopover({ id: 'ui-help', children: 'Native popover: Escape closes this surface.' }),
       Tooltip({ id: 'ui-tooltip', trigger: (attributes) => q.button({ ...attributes, children: 'Hover or focus' }), content: 'A concise description.' }),
       HoverCard({ id: 'ui-hover-card', label: 'More context', trigger: (attributes) => q.button({ ...attributes, children: 'More context' }), content: q.p({ children: 'A focusable explanation.' }) }),
+      MoleculeHoverCard({ id: 'ui-molecule-hover-card', label: 'Maker context', trigger: (attributes) => q.button({ ...attributes, children: 'Maker details' }), content: q.p({ children: 'An interactive molecule composition.' }) }),
         dialogOpen.value
           ? DialogSurface({
               id: 'profile-preferences',
