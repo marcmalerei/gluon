@@ -113,7 +113,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, StatusTracker, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, statusTrackerStyles, wizardStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, NotificationCenter, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, StatusTracker, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, notificationCenterStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, statusTrackerStyles, wizardStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2947,6 +2947,34 @@ describe('advanced data and workflow molecules', () => {
     render(StatusTracker({ id: '   ', items: [{ id: 'one', label: 'One', status: 'pending' }] }), document.body);
     expect(document.querySelector('#status-tracker-invalid')?.getAttribute('data-state')).toBe('invalid');
     expect(() => render(StatusTracker({ id: 'empty-item-label', itemLabel: ' ', items: [{ id: 'one', label: 'One', status: 'pending' }] }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders NotificationCenter unread semantics, controlled actions, and tenant hooks', async () => {
+    const openChanges: boolean[] = [];
+    const read: string[] = [];
+    const dismissed: string[] = [];
+    render(NotificationCenter({
+      id: 'notification-center',
+      label: 'Notifications',
+      open: true,
+      notifications: [
+        { id: 'import', title: 'Import finished', body: '24 records are ready.', tone: 'success', read: false, timestamp: '2026-10-04T03:00:00Z', action: q.a({ href: '#details', children: 'View details' }) },
+        { id: 'invite', title: 'Workspace invite', tone: 'info', read: true },
+      ],
+      onOpenChange: (open) => openChanges.push(open),
+      onMarkRead: (id) => read.push(id),
+      onDismiss: (id) => dismissed.push(id),
+      attributes: { class: 'tenant-notification-center', style: { '--gluon-notification-center-current': 'teal' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#notification-center')!;
+    expect(root.dataset.state).toBe('open'); expect(root.dataset.unreadCount).toBe('1'); expect(root.classList).toContain('tenant-notification-center');
+    expect(root.querySelector('[part="panel"]')?.getAttribute('aria-labelledby')).toBe('notification-center-heading');
+    expect(root.querySelectorAll('[part="item"]')).toHaveLength(2); expect(root.querySelector('[data-read="false"] [part="timestamp"]')?.getAttribute('datetime')).toBe('2026-10-04T03:00:00Z');
+    await userEvent.click(root.querySelector('[part="trigger"]')!); await userEvent.click(root.querySelector('[aria-label="Mark Import finished as read"]')!); await userEvent.click(root.querySelector('[aria-label="Dismiss Import finished"]')!);
+    expect(openChanges).toEqual([false]); expect(read).toEqual(['import']); expect(dismissed).toEqual(['import']); expect(getStyleSheetText(notificationCenterStyles)).toContain('forced-colors');
+    render(NotificationCenter({ id: 'empty-notifications', label: 'Notifications', notifications: [], open: true }), document.body);
+    expect(document.querySelector('#empty-notifications [part="empty"]')?.textContent).toContain('No notifications');
+    expect(() => render(NotificationCenter({ id: 'bad notifications', label: 'Notifications', notifications: [] }), document.body)).toThrow('HTML-safe');
   });
 
   it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {

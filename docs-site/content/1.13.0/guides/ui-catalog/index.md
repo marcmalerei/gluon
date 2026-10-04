@@ -358,6 +358,10 @@ permissions, and tenant-specific content remain caller-owned.
             <div class="ui-sample-status-tracker" aria-label="Status tracker preview"><header><strong>Import status</strong></header><ol><li class="is-success">Upload · Complete</li><li class="is-current" aria-current="step">Validate · In progress <meter min="0" max="100" value="68">68%</meter></li><li class="is-pending">Publish · Pending</li></ol><section><strong>Next: validate records</strong><span>Progress, timestamps, metadata, and actions remain caller-owned.</span></section><footer><button type="button">View details</button></footer></div>
             <span class="ui-sample-variant">progress · history · actions · current</span>
           </template>
+          <template v-else-if="entry.preview === 'notification-center'">
+            <div class="ui-sample-notification-center" aria-label="Notification center preview"><button type="button" aria-expanded="true">Notifications <span>3</span></button><section><header><strong>Notifications</strong></header><ul><li class="is-unread"><strong>Import finished</strong><small>2 minutes ago</small><p>24 records are ready for review.</p><footer><button type="button">Mark read</button><button type="button">Dismiss</button></footer></li><li class="is-info"><strong>Workspace invite</strong><small>Yesterday</small><p>One invitation needs attention.</p></li></ul></section></div>
+            <span class="ui-sample-variant">unread · grouped · actions · responsive</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

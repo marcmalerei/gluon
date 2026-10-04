@@ -2507,6 +2507,37 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "NotificationCenter",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-notification-center"
+      ],
+      "variants": [
+        "unread",
+        "grouped",
+        "actions"
+      ],
+      "states": [
+        "closed",
+        "open",
+        "empty",
+        "invalid"
+      ],
+      "preview": "notification-center",
+      "accessibility": "Renders a labelled notification trigger and controlled region with unread count, read state, timestamps, keyboard-operable caller callbacks, visible focus, 44px action targets, forced-colors, and reduced-motion support.",
+      "extension": "Notification records, fetching, persistence, routing, permissions, localization, authorization, and mutations remain caller-owned; controlled open state, item callbacks, parts, native attributes, and CSS variables support tenant-safe notification surfaces.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/NotificationCenter.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "OnboardingFlow",
       "kind": "component",
       "status": "stable",

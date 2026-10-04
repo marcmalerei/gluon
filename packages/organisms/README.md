@@ -171,6 +171,18 @@ parts, and `--gluon-status-tracker-*` variables. Fetching, transitions,
 persistence, routing, permissions, mutations, localization, analytics, and
 tenant identity remain caller-owned.
 
+`NotificationCenter` renders a controlled notification trigger and labelled
+responsive region for admin panels, dashboards, workspaces, and accounts. It
+derives the unread count from caller-owned records, preserves native list,
+heading, timestamp, and focus semantics, and can expose caller-owned
+mark-read, dismiss, and item-action callbacks. Fetching, persistence,
+routing, permissions, authorization, localization, and mutations remain
+outside the organism. Use `attributes`, `triggerAttributes`, and
+`panelAttributes` with the `--gluon-notification-center-*` custom properties
+and parts to adapt the surface per tenant without replacing the semantic DOM
+or stylesheet ownership. The controlled open state is serialized unchanged
+for SSR and hydration; no client-side notification replay is performed.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and
