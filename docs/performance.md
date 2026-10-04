@@ -129,9 +129,9 @@ Chromium 149.0.7827.55, 8 warm-ups, 30 interleaved samples, and the existing
 | Browser | Lane | Hydration median / p95 | Interaction median / p95 | Teardown median / p95 |
 | --- | --- | ---: | ---: | ---: |
 | Chromium | baseline | 1.4 / 2.7 ms | 0.1 / 0.2 ms | 0.0 / 0.1 ms |
-| Chromium | native equality candidate | **1.1 / 1.6 ms** | 0.1 / 0.2 ms | 0.1 / 0.1 ms |
+| Chromium | native equality candidate | **1.0 / 1.8 ms** | 0.1 / 0.2 ms | 0.0 / 0.2 ms |
 | Firefox | baseline | 3.0 / 5.0 ms | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
-| Firefox | native equality candidate | **2.0 / 4.0 ms** | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
+| Firefox | native equality candidate | **2.0 / 5.0 ms** | 0.0 / 1.0 ms | 0.0 / 0.0 ms |
 | WebKit | baseline | 1.0 / 2.0 ms | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
 | WebKit | native equality candidate | 1.0 / 2.0 ms | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
 
