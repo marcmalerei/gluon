@@ -24,6 +24,23 @@ The exact-reverse fast path reuses the direct element for each still-safe
 primitive row, avoiding per-row node-array materialization. Structural,
 mixed, or multi-node rows continue through generic keyed reconciliation.
 
+## Single-element root clone fast path (#632)
+
+Issue [#632](https://github.com/marcmalerei/gluon/issues/632) applies the
+single-root idea used by uhtml to Gluon's existing top-level renderer. When a
+compiled template has exactly one element root, the renderer clones that
+element directly and traverses it with the existing binding descriptors. Text,
+comment, and multi-root templates retain the previous `DocumentFragment` path.
+This is internal and additive: the public `html` and `render` APIs, DOM
+identity, cleanup, styles, directives, and external-DOM recovery are unchanged.
+
+The pre-implementation browser prototype used the same 120-row clone and
+binding-traversal workload. Median time changed from 17.2 to 16.2 ms in
+Chromium 149 (−5.8%), 58 to 56 ms in Firefox 151 (−3.4%), and 37 to 35 ms in
+WebKit 26.5 (−5.4%). Firefox p95 increased, so the claim is limited to the
+single-element clone/traversal lane; application and full rendering evidence
+must be rerun before treating this as a general framework improvement.
+
 ## Stable primitive text update hotpath
 
 Issue [#493](https://github.com/marcmalerei/gluon/issues/493) closes the small

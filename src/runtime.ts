@@ -2214,11 +2214,19 @@ export function render(
   }
 
   try {
-    const fragment = cloneTemplateContent(compiled);
-    const bindings = instantiateBindings(fragment, compiled.traversalDescriptors, styles);
+    const directRoot = compiled.singleRoot instanceof Element
+      ? compiled.singleRoot.cloneNode(true)
+      : undefined;
+    const mountContent = directRoot ?? cloneTemplateContent(compiled);
+    const bindings = instantiateBindings(
+      mountContent,
+      compiled.traversalDescriptors,
+      styles,
+      directRoot !== undefined,
+    );
     applyBindings(bindings, result.values);
-    const nodes = [...fragment.childNodes];
-    container.replaceChildren(fragment);
+    const nodes = directRoot ? [directRoot] : [...mountContent.childNodes];
+    container.replaceChildren(mountContent);
     setRootInstance(container, {
       template: compiled,
       bindings,
