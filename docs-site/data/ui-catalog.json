@@ -2682,6 +2682,37 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "Wizard",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-wizard"
+      ],
+      "variants": [
+        "linear",
+        "responsive",
+        "keyboard"
+      ],
+      "states": [
+        "first",
+        "middle",
+        "last",
+        "invalid"
+      ],
+      "preview": "wizard",
+      "accessibility": "Renders a labelled step navigation with current-step semantics, keyboard-operable step and previous/next buttons, live progress, visible focus, 44px targets, forced-colors, and reduced-motion support.",
+      "extension": "Steps, content, validation, routing, persistence, permissions, mutations, localization, analytics, and tenant identity remain caller-owned; controlled currentStep, callbacks, parts, native attributes, and CSS variables support tenant-safe workflows.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/Wizard.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "WorkflowTimeline",
       "kind": "component",
       "status": "stable",

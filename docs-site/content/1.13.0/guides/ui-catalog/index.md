@@ -333,6 +333,10 @@ permissions, and tenant-specific content remain caller-owned.
             <div class="ui-sample-sidebar-layout" aria-label="Sidebar layout regions"><span class="is-header">Workspace header</span><span class="is-sidebar"><strong>Navigation</strong><a class="is-active" href="#catalog">Overview</a><a href="#catalog">Reports</a></span><span class="is-main"><strong>Main content</strong><small>Caller-owned page surface</small></span><span class="is-footer">Tenant footer</span></div>
             <span class="ui-sample-variant">header · sidebar · main · footer · mobile</span>
           </template>
+          <template v-else-if="entry.preview === 'wizard'">
+            <div class="ui-sample-wizard" aria-label="Wizard preview"><ol><li class="is-complete">1 · Details</li><li class="is-current" aria-current="step">2 · Configure</li><li>3 · Review</li></ol><section><strong>Configure</strong><span>Caller-owned step content</span></section><footer><button type="button">Previous</button><button type="button">Next</button></footer></div>
+            <span class="ui-sample-variant">linear · responsive · keyboard · current</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

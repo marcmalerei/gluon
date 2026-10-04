@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, Wizard, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, wizardStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2868,6 +2868,37 @@ describe('advanced data and workflow molecules', () => {
     root.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     expect(onMobileOpenChange).not.toHaveBeenCalled();
     expect(() => render(SidebarLayout({ id: 'empty-mobile-label', main: 'Main', mobileMenuLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders a controlled Wizard with current-step semantics and tenant hooks', () => {
+    const onStepChange = vi.fn();
+    render(Wizard({
+      id: 'wizard', title: 'Configure product', currentStep: 1, onStepChange,
+      steps: [{ id: 'details', label: 'Details', content: q.p({ children: 'Details content' }) }, { id: 'finish', label: 'Finish', description: 'Tenant finish', content: q.p({ children: 'Finish content' }) }, { id: 'review', label: 'Review', content: q.p({ children: 'Review content' }) }],
+      attributes: { class: 'tenant-wizard', style: { '--gluon-wizard-current': 'rebeccapurple' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#wizard')!;
+    expect(root.dataset.state).toBe('middle');
+    expect(root.classList).toContain('tenant-wizard');
+    expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Finish');
+    expect(root.querySelector('.gluon-wizard-content')?.textContent).toContain('Finish content');
+    expect(root.querySelector('[part="current-step"]')?.textContent).toContain('2 / 3');
+    expect(root.style.getPropertyValue('--gluon-wizard-current')).toBe('rebeccapurple');
+    expect(getStyleSheetText(wizardStyles)).toContain('--gluon-wizard');
+    expect(getStyleSheetText(wizardStyles)).toContain('forced-colors');
+    root.querySelector<HTMLButtonElement>('[part="previous"]')!.click();
+    expect(onStepChange).toHaveBeenCalledWith(0, expect.any(MouseEvent));
+    root.querySelector<HTMLButtonElement>('[part="step-button"]')!.click();
+    expect(onStepChange).toHaveBeenCalledWith(0, expect.any(MouseEvent));
+  });
+
+  it('fails Wizard closed for invalid steps and labels', () => {
+    render(Wizard({ id: 'invalid-wizard', steps: [{ id: 'same', label: 'One', content: 'One' }, { id: 'same', label: 'Two', content: 'Two' }] }), document.body);
+    expect(document.querySelector<HTMLElement>('#invalid-wizard')?.dataset.state).toBe('invalid');
+    expect(document.querySelector('#invalid-wizard [part="state-message"]')?.textContent).toContain('unavailable');
+    render(Wizard({ id: 'bad wizard', steps: [{ id: 'one', label: 'One', content: 'One' }] }), document.body);
+    expect(document.querySelector('[data-state="invalid"]')).not.toBeNull();
+    expect(() => render(Wizard({ id: 'empty-nav-label', stepNavigationLabel: ' ', steps: [{ id: 'one', label: 'One', content: 'One' }] }), document.body)).toThrow('non-empty');
   });
 
   it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {

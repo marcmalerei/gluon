@@ -91,7 +91,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -122,7 +122,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane };
+const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -286,6 +286,16 @@ createApp(() => AppShell({
       main: q.p({ children: 'Caller-owned page content.' }),
       footer: q.small({ children: 'Tenant workspace' }),
       sidebarLabel: 'Workspace navigation',
+    }),
+    Wizard({
+      id: 'ui-system-wizard',
+      title: 'Configure product',
+      steps: [
+        { id: 'details', label: 'Details', content: q.p({ children: 'Caller-owned product details.' }) },
+        { id: 'finish', label: 'Finish', description: 'Choose a tenant finish.', content: q.p({ children: 'Caller-owned finish selection.' }) },
+        { id: 'review', label: 'Review', content: q.p({ children: 'Caller-owned review summary.' }) },
+      ],
+      currentStep: 1,
     }),
     MarketingHeader({
       id: 'ui-system-marketing-header',
