@@ -2747,6 +2747,40 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "StatusTracker",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-status-tracker"
+      ],
+      "variants": [
+        "progress",
+        "history",
+        "actions"
+      ],
+      "states": [
+        "pending",
+        "in-progress",
+        "success",
+        "warning",
+        "error",
+        "paused",
+        "invalid"
+      ],
+      "preview": "status-tracker",
+      "accessibility": "Renders a labelled status list with current-item semantics, truthful status text, native progress meters, timestamps, visible focus, 44px action targets, forced-colors, and reduced-motion support.",
+      "extension": "Items, status transitions, timestamps, progress, actions, fetching, persistence, routing, permissions, mutations, localization, analytics, and tenant identity remain caller-owned; currentId, parts, native attributes, and CSS variables support tenant-safe tracking surfaces.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/StatusTracker.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "Wizard",
       "kind": "component",
       "status": "stable",

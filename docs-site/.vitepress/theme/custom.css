@@ -259,6 +259,16 @@ html { scroll-behavior: smooth; }
 .ui-sample-approval-flow section span { color: var(--vp-c-text-2); font-weight: 450; }
 .ui-sample-approval-flow footer { display: flex; justify-content: space-between; }
 .ui-sample-approval-flow footer button { min-height: 28px; padding: 4px 8px; color: inherit; font: inherit; }
+.ui-sample-status-tracker { display: grid; gap: 7px; width: 90%; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-status-tracker header { padding: 6px 8px; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }
+.ui-sample-status-tracker ol { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 0; padding: 0; list-style: none; }
+.ui-sample-status-tracker li, .ui-sample-status-tracker section, .ui-sample-status-tracker footer button { border: 1px solid var(--vp-c-divider); background: color-mix(in srgb, var(--ui-catalog-accent) 10%, var(--vp-c-bg)); }
+.ui-sample-status-tracker li { display: grid; gap: 3px; padding: 5px; }
+.ui-sample-status-tracker li.is-current { border-color: var(--ui-catalog-accent); color: var(--ui-catalog-accent); }
+.ui-sample-status-tracker section { display: grid; gap: 4px; min-height: 42px; align-content: center; padding: 7px; }
+.ui-sample-status-tracker section span { color: var(--vp-c-text-2); font-weight: 450; }
+.ui-sample-status-tracker footer { display: flex; justify-content: flex-end; }
+.ui-sample-status-tracker footer button { min-height: 28px; padding: 4px 8px; color: inherit; font: inherit; }
 .ui-sample-admin-shell { display: grid; grid-template-columns: 30% 1fr; grid-template-rows: auto 1fr auto; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
 .ui-sample-admin-shell > span { display: grid; min-height: 18px; place-items: center; background: color-mix(in srgb, var(--ui-catalog-accent) 14%, var(--vp-c-bg)); }
 .ui-sample-admin-shell .is-header { grid-column: 1 / -1; justify-content: start; padding-inline: 8px; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }

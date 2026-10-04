@@ -41,4 +41,6 @@ export { OnboardingFlow, type OnboardingFlowAttributes, type OnboardingFlowChang
 export { onboardingFlowStyles } from './onboarding-flow-styles.js';
 export { ApprovalFlow, type ApprovalFlowAttributes, type ApprovalFlowChangeEvent, type ApprovalFlowProps, type ApprovalFlowStage, type ApprovalFlowStageStatus } from './approval-flow.js';
 export { approvalFlowStyles } from './approval-flow-styles.js';
+export { StatusTracker, type StatusTrackerAttributes, type StatusTrackerItem, type StatusTrackerProps, type StatusTrackerStatus } from './status-tracker.js';
+export { statusTrackerStyles } from './status-tracker-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

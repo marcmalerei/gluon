@@ -345,6 +345,10 @@ permissions, and tenant-specific content remain caller-owned.
             <div class="ui-sample-approval-flow" aria-label="Approval flow preview"><header><strong>Release review</strong></header><ol><li class="is-approved">Requester · Approved</li><li class="is-current" aria-current="step">Security · In review</li><li>Owner · Pending</li></ol><section><strong>Security review</strong><span>Evidence and decision actions remain caller-owned.</span></section><footer><button type="button">Request changes</button><button type="button">Approve</button></footer></div>
             <span class="ui-sample-variant">review · decision · evidence · current</span>
           </template>
+          <template v-else-if="entry.preview === 'status-tracker'">
+            <div class="ui-sample-status-tracker" aria-label="Status tracker preview"><header><strong>Import status</strong></header><ol><li class="is-success">Upload · Complete</li><li class="is-current" aria-current="step">Validate · In progress <meter min="0" max="100" value="68">68%</meter></li><li class="is-pending">Publish · Pending</li></ol><section><strong>Next: validate records</strong><span>Progress, timestamps, metadata, and actions remain caller-owned.</span></section><footer><button type="button">View details</button></footer></div>
+            <span class="ui-sample-variant">progress · history · actions · current</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

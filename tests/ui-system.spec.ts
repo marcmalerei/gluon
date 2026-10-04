@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, wizardStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, StatusTracker, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, statusTrackerStyles, wizardStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2928,6 +2928,21 @@ describe('advanced data and workflow molecules', () => {
     render(ApprovalFlow({ id: 'invalid-approval', stages: [{ id: 'same', label: 'One', status: 'approved', content: 'One' }, { id: 'same', label: 'Two', status: 'bad' as never, content: 'Two' }] }), document.body);
     expect(document.querySelector('#invalid-approval')?.getAttribute('data-state')).toBe('invalid');
     expect(() => render(ApprovalFlow({ id: 'empty-status-label', stages: [{ id: 'one', label: 'One', status: 'pending', content: 'One' }], statusLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders StatusTracker progress, timestamps, actions, and tenant hooks', () => {
+    render(StatusTracker({ id: 'status-tracker', title: 'Import status', summary: 'Validation is in progress.', currentId: 'validate', items: [
+      { id: 'upload', label: 'Upload', status: 'success', timestamp: '2026-10-04T03:00:00Z' },
+      { id: 'validate', label: 'Validate', status: 'in-progress', description: 'Checking records.', progress: 68, meta: q.small({ children: '68 records checked.' }), action: q.button({ type: 'button', children: 'View details' }) },
+      { id: 'publish', label: 'Publish', status: 'pending' },
+    ], attributes: { class: 'tenant-status-tracker', style: { '--gluon-status-tracker-current': 'teal' } } }), document.body);
+    const root = document.querySelector<HTMLElement>('#status-tracker')!;
+    expect(root.dataset.state).toBe('in-progress'); expect(root.classList).toContain('tenant-status-tracker'); expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Validate'); expect(root.querySelector('[part="progress"]')?.getAttribute('value')).toBe('68'); expect(root.querySelector('[part="timestamp"]')?.getAttribute('datetime')).toBe('2026-10-04T03:00:00Z'); expect(root.querySelector('[part="actions"] button')?.textContent).toBe('View details'); expect(getStyleSheetText(statusTrackerStyles)).toContain('forced-colors');
+    render(StatusTracker({ id: 'invalid-status-tracker', items: [{ id: 'same', label: 'One', status: 'bad' as never }, { id: 'same', label: 'Two', status: 'pending' }] }), document.body);
+    expect(document.querySelector('#invalid-status-tracker')?.getAttribute('data-state')).toBe('invalid');
+    render(StatusTracker({ id: '   ', items: [{ id: 'one', label: 'One', status: 'pending' }] }), document.body);
+    expect(document.querySelector('#status-tracker-invalid')?.getAttribute('data-state')).toBe('invalid');
+    expect(() => render(StatusTracker({ id: 'empty-item-label', itemLabel: ' ', items: [{ id: 'one', label: 'One', status: 'pending' }] }), document.body)).toThrow('non-empty');
   });
 
   it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {

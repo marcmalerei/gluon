@@ -163,6 +163,14 @@ mobile behavior, visible focus, 44px targets, forced-colors, reduced motion,
 parts, and `--gluon-approval-flow-*` variables. Authorization, mutations,
 routing, localization, analytics, and tenant identity remain caller-owned.
 
+`StatusTracker` renders caller-owned long-running status items for imports,
+orders, approvals, and operational workflows. It exposes current-item semantics,
+truthful statuses, native progress meters, timestamps, metadata, action slots,
+responsive layout, visible focus, 44px targets, forced-colors, reduced motion,
+parts, and `--gluon-status-tracker-*` variables. Fetching, transitions,
+persistence, routing, permissions, mutations, localization, analytics, and
+tenant identity remain caller-owned.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and
