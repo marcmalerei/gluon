@@ -521,6 +521,18 @@ The runner records the Gluon verification mode in JSON and Markdown. The
 ordinary comparison command continues to use strict Gluon verification, so
 strict and marker measurements are never conflated.
 
+The paired Chromium 149 run on Apple M4 used 50 interleaved samples after 8
+warm-ups on clean commit `fc9b37d`. Strict Gluon hydration measured 1.3 ms
+median / 2.6 ms p95; marker verification measured 0.6 ms / 1.3 ms — a 53.8%
+median and 50.0% p95 reduction within Gluon. In the same marker run Lit
+measured 0.2 ms / 0.4 ms and Vue 0.2 ms / 0.4 ms. The result is a validated
+Gluon fast-path improvement, not evidence that Gluon is faster than Lit or Vue
+for hydration. Raw samples and environment metadata are retained in the
+[`strict`](../benchmarks/results/hydration-comparison-637-strict-fc9b37d.json)
+and
+[`marker`](../benchmarks/results/hydration-comparison-637-markers-fc9b37d.json)
+evidence pairs.
+
 ### Hydration hot-path follow-up (#502)
 
 The successful Gluon hydration path now collects adoption markers while the
