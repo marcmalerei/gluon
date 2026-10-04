@@ -10,8 +10,8 @@ import {
   type TemplateValue,
 } from '@gluonjs/core';
 import { nextTick } from '@gluonjs/reactivity';
-import { Input } from '@gluonjs/atoms';
 import {
+  Autocomplete,
   DialogSurface,
   EmptyState,
   Toolbar,
@@ -269,24 +269,30 @@ function SearchPanel(store: ShopStore): TemplateValue {
   const matches = query
     ? products.filter((product) => `${product.name} ${product.category}`.toLocaleLowerCase().includes(query))
     : products;
+  const suggestions = matches.map((product) => ({ value: product.slug, label: `${product.name} · ${product.category}` }));
   return html`
-    <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title" @keydown=${(event: Event) => {
+    <section class="search-panel" role="dialog" aria-modal="true" aria-label="Search the collection" @keydown=${(event: Event) => {
       handleDialogKeydown(event as KeyboardEvent, 'search', close);
     }}>
       <div class="search-bar">
-        <label id="search-title" for="shop-search">Search the collection</label>
-        <div class="search-input-wrap">${SearchIcon()}${Input({
-          value: store.searchQuery,
-          type: 'search',
+        <div class="search-input-wrap">${SearchIcon()}${Autocomplete({
+          id: 'shop-search-autocomplete',
+          label: 'Search the collection',
+          suggestions,
+          inputValue: store.searchQuery,
+          open: query.length > 0,
           placeholder: 'Lamp, carry, workspace…',
-          onInput: (event) => {
-            store.searchQuery = (event.currentTarget as HTMLInputElement).value;
+          onInputChange: (value) => { store.searchQuery = value; },
+          onSelect: (value) => {
+            const product = products.find((candidate) => candidate.slug === value);
+            if (product) store.searchQuery = product.name;
           },
-          attributes: {
+          inputAttributes: {
             id: 'shop-search',
             class: 'shop-search-input',
             data: { dialogInitialFocus: true },
           },
+          attributes: { class: 'shop-autocomplete' },
         })}</div>
         ${ShopIconAction({
           children: CloseIcon(),

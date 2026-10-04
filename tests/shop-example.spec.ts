@@ -386,6 +386,9 @@ describe('GLUON GOODS reference shop', () => {
     input.value = 'lamp';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await settleShop();
+    expect(input.getAttribute('role')).toBe('combobox');
+    expect(input.getAttribute('aria-expanded')).toBe('true');
+    expect(root.querySelectorAll('.search-input-wrap [role="option"]')).toHaveLength(1);
     expect(root.querySelectorAll('.search-results .product-card')).toHaveLength(1);
     expect(root.querySelector('.search-results')?.textContent).toContain('1 object');
     root.querySelector<HTMLElement>('.search-panel')!.dispatchEvent(new KeyboardEvent('keydown', {

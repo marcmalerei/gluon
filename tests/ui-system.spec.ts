@@ -80,6 +80,8 @@ import {
   DataList,
   ListboxField,
   ComboboxField,
+  Autocomplete,
+  HoverCard as MoleculeHoverCard,
   CommandPalette,
   TreeView,
   SortControl,
@@ -97,6 +99,8 @@ import {
   calendarStyles,
   sortControlStyles,
   comboboxFieldStyles,
+  autocompleteStyles,
+  hoverCardStyles,
   commandPaletteStyles,
   listboxFieldStyles,
   treeViewStyles,
@@ -3603,6 +3607,20 @@ describe('advanced data and workflow molecules', () => {
     expect(() => render(ComboboxField({ id: '', label: 'Search', options: [] }), document.body)).toThrow('ComboboxField.id');
     expect(() => render(ComboboxField({ id: 'bad id', label: 'Search', options: [] }), document.body)).toThrow('whitespace');
     expect(() => render(ComboboxField({ id: 'missing-label', label: ' ', options: [] }), document.body)).toThrow('ComboboxField.label');
+  });
+
+  it('composes HoverCard and Autocomplete with interactive overlay and suggestion semantics', async () => {
+    render(MoleculeHoverCard({ id: 'maker-card', label: 'Maker details', placement: 'inline-end', delay: 0, trigger: (attributes) => q.button({ ...attributes, children: 'Maker details' }), content: q.a({ href: '#maker', children: 'View profile' }), attributes: { class: 'tenant-hover-card' }, contentAttributes: { class: 'tenant-hover-card-content' } }), document.body);
+    const hoverCard = document.querySelector<HTMLElement>('.gluon-hover-card.tenant-hover-card')!;
+    expect(hoverCard.classList).toContain('gluon-hover-card'); expect(hoverCard.classList).toContain('tenant-hover-card'); expect(hoverCard.dataset.placement).toBe('inline-end'); expect(hoverCard.querySelector('[part="content"]')?.getAttribute('role')).toBe('dialog'); expect(hoverCard.querySelector('[part="content"]')?.getAttribute('aria-label')).toBe('Maker details'); expect(getStyleSheetText(hoverCardStyles)).toContain('forced-colors');
+    expect(() => render(MoleculeHoverCard({ id: 'invalid-hover-card', label: ' ', trigger: (attributes) => q.button({ ...attributes, children: 'Invalid' }), content: 'Invalid' }), document.body)).toThrow('non-empty');
+
+    const selected: string[] = [];
+    render(Autocomplete({ id: 'product-autocomplete', label: 'Find product', suggestions: [{ value: 'orbit', label: 'Orbit lamp' }, { value: 'cable', label: 'Cobalt cable' }, { value: 'shade', label: 'Orbit shade', disabled: true }], inputValue: 'Orbit', open: true, onSelect: (value) => selected.push(value), attributes: { class: 'tenant-autocomplete' } }), document.body);
+    const autocomplete = document.querySelector<HTMLElement>('#product-autocomplete')!;
+    expect(autocomplete.classList).toContain('gluon-autocomplete'); expect(autocomplete.classList).toContain('tenant-autocomplete'); expect(autocomplete.querySelector('[role="combobox"]')?.getAttribute('aria-expanded')).toBe('true'); expect(autocomplete.querySelectorAll('[role="option"]')).toHaveLength(3); expect(getStyleSheetText(autocompleteStyles)).toContain('forced-colors');
+    await userEvent.click(autocomplete.querySelectorAll<HTMLElement>('[role="option"]')[1]!);
+    expect(selected).toEqual(['cable']);
   });
 
   it('composes a controlled TreeView with hierarchy, selection, expansion, and keyboard navigation', async () => {

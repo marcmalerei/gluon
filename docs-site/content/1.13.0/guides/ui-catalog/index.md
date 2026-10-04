@@ -86,6 +86,10 @@ permissions, and tenant-specific content remain caller-owned.
           <template v-else-if="entry.preview === 'tooltip'">
             <span class="ui-sample-tooltip"><button class="ui-sample-button is-secondary" type="button">Focus for help</button><span role="tooltip">Choose a saved configuration.</span></span>
           </template>
+          <template v-else-if="entry.preview === 'hover-card'">
+            <span class="ui-sample-hover-card"><button class="ui-sample-button is-secondary" type="button" aria-expanded="true">Maker details</button><span role="dialog"><strong>Ada Lovelace</strong><small>Designs caller-owned context.</small><a href="#catalog">View profile</a></span></span>
+            <span class="ui-sample-variant">focus · hover · interactive · responsive</span>
+          </template>
           <template v-else-if="entry.preview === 'stepper'">
             <ol class="ui-sample-stepper"><li class="is-done">Configure</li><li class="is-active" aria-current="step">Review</li><li>Complete</li></ol>
           </template>
@@ -103,6 +107,11 @@ permissions, and tenant-specific content remain caller-owned.
             <label class="ui-sample-field">Product search<input role="combobox" value="Orbit" aria-expanded="true" aria-controls="catalog-combobox-list" /></label>
             <ul id="catalog-combobox-list" class="ui-sample-combobox-list" role="listbox"><li role="option" aria-selected="true">Orbit lamp</li><li role="option">Orbit cable</li><li role="option" aria-disabled="true">Orbit shade · unavailable</li></ul>
             <span class="ui-sample-variant">open · loading · empty · disabled</span>
+          </template>
+          <template v-else-if="entry.preview === 'autocomplete'">
+            <label class="ui-sample-field">Find product<input role="combobox" value="Orbit" aria-expanded="true" aria-controls="catalog-autocomplete-list" /></label>
+            <ul id="catalog-autocomplete-list" class="ui-sample-combobox-list" role="listbox"><li role="option" aria-selected="true">Orbit lamp</li><li role="option">Orbit cable</li><li role="option" aria-disabled="true">Orbit shade · unavailable</li></ul>
+            <span class="ui-sample-variant">suggestions · loading · empty · disabled</span>
           </template>
           <template v-else-if="entry.preview === 'command-palette'">
             <div class="ui-sample-command-palette" role="dialog" aria-label="Command palette"><strong>Quick actions</strong><input value="" placeholder="Search commands" role="combobox" aria-expanded="true" /><div class="ui-sample-command-group"><small>Navigation</small><span aria-selected="true">Open dashboard <kbd>⌘K</kbd></span><span>Search orders <kbd>↵</kbd></span></div></div>
