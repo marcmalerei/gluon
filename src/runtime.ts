@@ -2288,14 +2288,18 @@ export function hydrate(
   assignTemplateHTML(expectedTemplate, options.expectedMarkup, 'hydration expected markup', trustedTypes);
   const mismatches: HydrationMismatch[] = [];
   const adoption = createHydrationAdoptionCollector();
-  compareHydrationNodes(
-    expectedTemplate.content.childNodes,
-    container.childNodes,
-    'root',
-    options,
-    mismatches,
-    adoption,
-  );
+  if (nativeHydrationChildrenEqual(expectedTemplate.content.childNodes, container.childNodes)) {
+    collectHydrationAdoptionNodes(container, adoption);
+  } else {
+    compareHydrationNodes(
+      expectedTemplate.content.childNodes,
+      container.childNodes,
+      'root',
+      options,
+      mismatches,
+      adoption,
+    );
+  }
   if (options.state && stableHydrationValue(options.state.server) !== stableHydrationValue(options.state.client)) {
     recordHydrationMismatch('state', 'state', options.state.server, options.state.client, options, mismatches);
   }
@@ -3561,6 +3565,29 @@ function compareHydrationNodes(
       );
     }
   }
+}
+
+/** Uses the browser's native subtree comparison for the overwhelmingly common matching case. */
+function nativeHydrationChildrenEqual(
+  expected: NodeListOf<ChildNode>,
+  actual: NodeListOf<ChildNode>,
+): boolean {
+  if (expected.length !== actual.length) return false;
+  for (let index = 0; index < expected.length; index += 1) {
+    if (!expected[index]!.isEqualNode(actual[index]!)) return false;
+  }
+  return true;
+}
+
+function collectHydrationAdoptionNodes(
+  container: Element | DocumentFragment,
+  adoption: HydrationAdoptionCollector,
+): void {
+  const walker = container.ownerDocument.createTreeWalker(
+    container,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
+  );
+  while (walker.nextNode()) adoption.visit(walker.currentNode);
 }
 
 function compareHydrationAttributes(
