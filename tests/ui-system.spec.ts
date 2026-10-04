@@ -2919,6 +2919,12 @@ describe('advanced data and workflow molecules', () => {
     const root = document.querySelector<HTMLElement>('#approval')!;
     expect(root.dataset.state).toBe('in-review'); expect(root.classList).toContain('tenant-approval'); expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Security'); expect(root.querySelector('[part="evidence"]')?.textContent).toContain('Report 42'); expect(root.querySelector('[part="actions"] button')?.textContent).toBe('Approve'); expect(getStyleSheetText(approvalFlowStyles)).toContain('forced-colors');
     root.querySelector<HTMLButtonElement>('[part="stage-button"]')!.click(); expect(onStageChange).toHaveBeenCalledWith(0, expect.any(MouseEvent));
+    render(ApprovalFlow({ id: 'single-approval', stages: [{ id: 'single', label: 'Single', status: 'pending', content: 'Single' }] }), document.body);
+    const single = document.querySelector<HTMLElement>('#single-approval')!;
+    single.querySelector<HTMLButtonElement>('[part="stage-button"]')!.click();
+    expect(single.querySelector('[part="header"]')).toBeNull();
+    render(ApprovalFlow({ id: '   ', stages: [{ id: 'single', label: 'Single', status: 'pending', content: 'Single' }] }), document.body);
+    expect(document.querySelector('#approval-flow-invalid')?.getAttribute('data-state')).toBe('invalid');
     render(ApprovalFlow({ id: 'invalid-approval', stages: [{ id: 'same', label: 'One', status: 'approved', content: 'One' }, { id: 'same', label: 'Two', status: 'bad' as never, content: 'Two' }] }), document.body);
     expect(document.querySelector('#invalid-approval')?.getAttribute('data-state')).toBe('invalid');
     expect(() => render(ApprovalFlow({ id: 'empty-status-label', stages: [{ id: 'one', label: 'One', status: 'pending', content: 'One' }], statusLabel: ' ' }), document.body)).toThrow('non-empty');
