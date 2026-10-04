@@ -948,6 +948,11 @@ must not be collapsed into one ranking. A ratio above `1×` means the compared
 framework's median was slower than Gluon in that exact row; it is not a general
 framework claim.
 
+The current run at commit `a658185` is retained as
+[`framework-comparison-634.md`](../benchmarks/results/framework-comparison-634.md)
+with the complete raw dataset in
+[`framework-comparison-634.json`](../benchmarks/results/framework-comparison-634.json).
+
 The browser coverage gate is also behavior-backed rather than ignored: the
 Core/browser suite exercises public spread, style, event, ref, keyed-list,
 observer, DataTable, and SettingsShell transitions. The current local result is
