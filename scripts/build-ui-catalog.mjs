@@ -18,7 +18,7 @@ const renderedPreviewKeys = new Set([
   'navigation-menu', 'navigation-strip', 'notice', 'otp', 'pagination', 'password', 'progress',
   'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',
   'slider', 'switch', 'table', 'tabs', 'textarea', 'toast', 'toast-viewport',
-  'toggle-button', 'toolbar', 'workflow', 'product-card', 'product-gallery', 'product-grid', 'mega-menu', 'site-header', 'site-footer', 'page-layout', 'split-pane', 'resizable-panels', 'navigation-rail', 'dashboard-shell', 'combobox-field', 'command-palette', 'tree-view', 'sort-control', 'date-picker', 'date-range-picker', 'file-upload', 'time-picker', 'multi-select-field', 'calendar', 'heading', 'text', 'link', 'image', 'badge', 'skeleton', 'meter', 'spinner', 'number-input', 'date-input', 'time-input', 'file-input', 'choice-group', 'control-field', 'form-field', 'dropdown-menu', 'context-menu', 'responsive-disclosure',
+  'toggle-button', 'toolbar', 'workflow', 'product-card', 'product-gallery', 'product-grid', 'mega-menu', 'site-header', 'marketing-header', 'site-footer', 'page-layout', 'split-pane', 'resizable-panels', 'navigation-rail', 'dashboard-shell', 'combobox-field', 'command-palette', 'tree-view', 'sort-control', 'date-picker', 'date-range-picker', 'file-upload', 'time-picker', 'multi-select-field', 'calendar', 'heading', 'text', 'link', 'image', 'badge', 'skeleton', 'meter', 'spinner', 'number-input', 'date-input', 'time-input', 'file-input', 'choice-group', 'control-field', 'form-field', 'dropdown-menu', 'context-menu', 'responsive-disclosure',
 ]);
 
 const entries = [];

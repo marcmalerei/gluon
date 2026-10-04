@@ -91,7 +91,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MegaMenu, NavigationRail, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, SplitPane, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, SplitPane, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -122,7 +122,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, SplitPane };
+const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, SplitPane };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -278,6 +278,14 @@ createApp(() => AppShell({
       main: q.p({ children: 'Caller-owned dashboard widgets and filters.' }),
       utility: q.p({ children: 'Tenant-owned activity and inspector tools.' }),
       footer: q.small({ children: 'Workspace status: ready' }),
+    }),
+    MarketingHeader({
+      id: 'ui-system-marketing-header',
+      announcement: q.strong({ children: 'Free shipping this week' }),
+      brand: q.a({ href: '#profile', children: 'GLUON GOODS' }),
+      navigation: q.div({ children: [q.a({ href: '#profile', children: 'Shop' }), q.a({ href: '#orders', children: 'Journal' })] }),
+      actions: q.button({ type: 'button', children: 'Search' }),
+      mobileNavigation: q.a({ href: '#profile', children: 'Shop' }),
     }),
     NavigationRail({
       id: 'ui-system-navigation-rail',

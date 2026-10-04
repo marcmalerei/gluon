@@ -111,6 +111,14 @@ mobile disclosure supports Escape/focus return, 44px controls, and CSS-variable
 hooks for tenant-specific shells; routing, authorization, localization,
 analytics, and open state remain application-owned.
 
+`MarketingHeader` is the campaign-oriented sibling for storefronts and
+marketing pages. It adds an optional announcement region while retaining
+caller-owned brand, navigation, actions, links, routing, analytics, tenant
+identity, and mobile state. Its controlled mobile disclosure supports Escape,
+focus return, 44px controls, native region attributes, `part` hooks, and
+`--gluon-marketing-header-*` CSS variables so each tenant can adapt the visual
+system without replacing the semantic DOM contract.
+
 `AdminShell` renders a responsive administration layout with semantic header,
 labelled sidebar navigation, main workspace, and optional footer regions. It
 keeps routing, permissions, data loading, mutations, mobile state, localization,

@@ -2318,6 +2318,38 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "MarketingHeader",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-marketing-header"
+      ],
+      "variants": [
+        "announcement",
+        "brand",
+        "navigation",
+        "actions",
+        "mobile"
+      ],
+      "states": [
+        "default",
+        "mobile-closed",
+        "mobile-open"
+      ],
+      "preview": "marketing-header",
+      "accessibility": "Renders a semantic marketing header with optional announcement, labelled primary navigation, caller-owned brand/actions, controlled mobile disclosure, Escape/focus return, 44px controls, and reduced-motion/forced-colors support.",
+      "extension": "Announcement, brand, navigation, actions, links, routing, authorization, localization, analytics, tenant identity, and mobile open state remain caller-owned; region attributes, parts, and CSS variables support campaign- and tenant-specific composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/MarketingHeader.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "MegaMenu",
       "kind": "component",
       "status": "stable",

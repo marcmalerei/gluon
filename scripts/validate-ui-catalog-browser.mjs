@@ -177,6 +177,10 @@ try {
     || await page.locator('[data-preview="dashboard-shell"] .ui-sample-dashboard-shell .is-utility').count() !== 1) {
     throw new Error('dashboard-shell preview does not show workspace and utility anatomy');
   }
+  if (await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-announcement').count() !== 1
+    || await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-navigation').count() !== 1) {
+    throw new Error('marketing-header preview does not show announcement and navigation anatomy');
+  }
   for (const obsoleteKey of ['field', 'menu', 'foundation-atoms--feedback', 'foundation-atoms--typography']) {
     if (await page.locator(`[data-preview="${obsoleteKey}"]`).count() !== 0) {
       throw new Error(`catalog still exposes obsolete generic preview key: ${obsoleteKey}`);

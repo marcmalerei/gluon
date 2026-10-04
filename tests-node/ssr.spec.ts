@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, DashboardShell, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -244,6 +244,22 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-expanded="true"');
     expect(rendered).toContain('<main');
     expect(rendered).toContain('<footer');
+  });
+
+  it('serializes MarketingHeader announcement, navigation, and mobile semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(MarketingHeader({
+      id: 'server-marketing-header',
+      announcement: html`<strong>Free shipping this week</strong>`,
+      brand: html`<a href="/home">GLUON GOODS</a>`,
+      navigation: html`<a href="/shop">Shop</a>`,
+      mobileNavigation: html`<a href="/shop">Shop</a>`,
+      mobileOpen: true,
+    })));
+    expect(rendered).toContain('data-marketing-header-root="server-marketing-header"');
+    expect(rendered).toContain('Free shipping this week');
+    expect(rendered).toContain('aria-label="Primary marketing navigation"');
+    expect(rendered).toContain('aria-expanded="true"');
+    expect(rendered).toContain('gluon-marketing-header-mobile-panel');
   });
 
   it('serializes NavigationRail groups and controlled disclosure semantics without DOM state', async () => {

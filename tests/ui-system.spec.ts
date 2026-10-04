@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, DashboardShell, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, dashboardShellStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SiteFooter, SiteHeader, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, siteFooterStyles, siteHeaderStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2783,6 +2783,73 @@ describe('advanced data and workflow molecules', () => {
     button.click();
     expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(onMobileOpenChange).toHaveBeenCalledTimes(3);
+  });
+
+  it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {
+    const onMobileOpenChange = vi.fn();
+    const onTriggerKeydown = vi.fn();
+    render(MarketingHeader({
+      id: 'marketing-header',
+      announcement: q.strong({ children: 'Free shipping this week' }),
+      brand: q.a({ href: '/home', children: 'GLUON GOODS' }),
+      navigation: q.div({ children: [q.a({ href: '/shop', children: 'Shop' }), q.a({ href: '/journal', children: 'Journal' })] }),
+      actions: q.button({ type: 'button', children: 'Search' }),
+      mobileNavigation: q.a({ href: '/shop', children: 'Shop' }),
+      mobileOpen: false,
+      onMobileOpenChange,
+      triggerAttributes: { onKeydown: onTriggerKeydown },
+      announcementAttributes: { class: 'tenant-announcement' },
+      attributes: { class: 'tenant-marketing-header', style: { '--gluon-marketing-header-padding-inline': '2rem' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#marketing-header')!;
+    expect(root.tagName).toBe('HEADER');
+    expect(root.dataset.marketingHeaderRoot).toBe('marketing-header');
+    expect(root.querySelector('.gluon-marketing-header-announcement strong')?.textContent).toBe('Free shipping this week');
+    expect(root.querySelector('.gluon-marketing-header-brand a')?.textContent).toBe('GLUON GOODS');
+    expect(root.querySelector('.gluon-marketing-header-navigation')?.getAttribute('aria-label')).toBe('Primary marketing navigation');
+    expect(root.querySelector('.gluon-marketing-header-mobile-panel')?.hasAttribute('hidden')).toBe(true);
+    root.querySelector<HTMLElement>('.gluon-marketing-header-mobile-panel')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    root.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    root.querySelector<HTMLButtonElement>('[data-marketing-header-mobile-trigger]')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(onTriggerKeydown).toHaveBeenCalledWith(expect.any(KeyboardEvent));
+    expect(root.style.getPropertyValue('--gluon-marketing-header-padding-inline')).toBe('2rem');
+    expect(getStyleSheetText(marketingHeaderStyles)).toContain('--gluon-marketing-header');
+    expect(getStyleSheetText(marketingHeaderStyles)).toContain('forced-colors');
+    root.querySelector<HTMLButtonElement>('[data-marketing-header-mobile-trigger]')!.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+    expect(() => render(MarketingHeader({ id: 'bad marketing header', brand: 'Brand' }), document.body)).toThrow('whitespace');
+    expect(() => render(MarketingHeader({ id: 'empty-label', brand: 'Brand', mobileMenuLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('closes an open MarketingHeader from Escape, toggle, and outside pointer input', async () => {
+    const onMobileOpenChange = vi.fn();
+    const onTriggerKeydown = vi.fn();
+    render(MarketingHeader({
+      id: 'open-marketing-header',
+      brand: 'Brand',
+      mobileNavigation: 'Navigation',
+      mobileOpen: true,
+      onMobileOpenChange,
+      triggerAttributes: { onKeydown: { handleEvent: onTriggerKeydown } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#open-marketing-header')!;
+    const trigger = root.querySelector<HTMLButtonElement>('[data-marketing-header-mobile-trigger]')!;
+    const panel = root.querySelector<HTMLElement>('.gluon-marketing-header-mobile-panel')!;
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(onTriggerKeydown).toHaveBeenCalledWith(expect.any(KeyboardEvent));
+    trigger.focus();
+    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    panel.dispatchEvent(escape);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(escape.defaultPrevented).toBe(true);
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, escape);
+    expect(document.activeElement).toBe(trigger);
+
+    trigger.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     expect(onMobileOpenChange).toHaveBeenCalledTimes(3);
   });
 
