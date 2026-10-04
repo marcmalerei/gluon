@@ -3,7 +3,7 @@
   "issue": 634,
   "source": {
     "branch": "codex/634-adjacent-keyed-swap",
-    "candidateCommit": "d66396d",
+    "candidateCommit": "588ba30",
     "workingTreeDirty": false
   },
   "environment": {
