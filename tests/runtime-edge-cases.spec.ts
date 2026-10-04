@@ -336,7 +336,7 @@ describe('template runtime edge cases', () => {
     const first = vi.fn();
     const second = vi.fn();
     const callbackRef = vi.fn<(element: Element | undefined) => void>();
-    const view = (props: unknown) => html`<button ...=${props}>Save</button>`;
+    const view = (props: TemplateValue) => html`<button ...=${props}>Save</button>`;
 
     render(view({
       style: 'color: red; padding: 4px;',
@@ -390,14 +390,14 @@ describe('template runtime edge cases', () => {
     const root = document.createElement('div');
     const first = vi.fn();
     const second = vi.fn();
-    const callbackRef = vi.fn<(element: Element | undefined) => void>();
+    const objectRef: { value?: Element } = {};
     const view = (
-      style: unknown,
-      data: unknown,
-      aria: unknown,
-      className: unknown,
-      ref: unknown,
-      listener: unknown,
+      style: string | Readonly<Record<string, unknown>> | null,
+      data: Readonly<Record<string, unknown>> | null,
+      aria: Readonly<Record<string, unknown>> | null,
+      className: string | boolean | readonly (string | boolean | Readonly<Record<string, boolean>>)[] | null,
+      ref: TemplateValue,
+      listener: EventListener | null,
     ) => html`<button
       style=${style}
       data=${data}
@@ -412,7 +412,7 @@ describe('template runtime edge cases', () => {
       { trackId: 'alpha' },
       { label: 'Save' },
       ['action', { active: true }],
-      callbackRef,
+      objectRef,
       first,
     ), root);
     const button = root.querySelector('button') as HTMLButtonElement;
@@ -420,7 +420,7 @@ describe('template runtime edge cases', () => {
     expect(button.style.color).toBe('red');
     expect(button.dataset.trackId).toBe('alpha');
     expect(button.getAttribute('aria-label')).toBe('Save');
-    expect(callbackRef).toHaveBeenLastCalledWith(button);
+    expect(objectRef.value).toBe(button);
 
     render(view(
       'color: blue; margin-top: 2px;',
@@ -433,7 +433,7 @@ describe('template runtime edge cases', () => {
     button.click();
     expect(first).not.toHaveBeenCalled();
     expect(second).toHaveBeenCalledOnce();
-    expect(callbackRef).toHaveBeenLastCalledWith(undefined);
+    expect(objectRef.value).toBeUndefined();
     expect(button.className).toBe('');
     expect(button.style.color).toBe('blue');
     expect(button.style.padding).toBe('');
@@ -444,7 +444,7 @@ describe('template runtime edge cases', () => {
     expect(button.style.length).toBe(0);
     expect(button.dataset.trackId).toBeUndefined();
     expect(button.hasAttribute('aria-expanded')).toBe(false);
-    expect(callbackRef).toHaveBeenLastCalledWith(undefined);
+    expect(objectRef.value).toBeUndefined();
   });
 
   it('rejects raw-text and RCDATA child expressions with targeted diagnostics', () => {
