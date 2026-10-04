@@ -21,6 +21,8 @@ export { MegaMenu, type MegaMenuAttributes, type MegaMenuGroup, type MegaMenuLin
 export { megaMenuStyles } from './mega-menu-styles.js';
 export { SiteHeader, type SiteHeaderAttributes, type SiteHeaderNavigationAttributes, type SiteHeaderOpenChangeEvent, type SiteHeaderProps, type SiteHeaderRegionAttributes, type SiteHeaderTriggerAttributes } from './site-header.js';
 export { siteHeaderStyles } from './site-header-styles.js';
+export { MarketingHeader, type MarketingHeaderAttributes, type MarketingHeaderNavigationAttributes, type MarketingHeaderOpenChangeEvent, type MarketingHeaderProps, type MarketingHeaderRegionAttributes, type MarketingHeaderTriggerAttributes } from './marketing-header.js';
+export { marketingHeaderStyles } from './marketing-header-styles.js';
 export { SiteFooter, type SiteFooterAttributes, type SiteFooterNavigationAttributes, type SiteFooterProps, type SiteFooterRegionAttributes } from './site-footer.js';
 export { siteFooterStyles } from './site-footer-styles.js';
 export { PageLayout, type PageLayoutAttributes, type PageLayoutHeadingLevel, type PageLayoutProps, type PageLayoutRegionAttributes } from './page-layout.js';
