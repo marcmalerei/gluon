@@ -113,7 +113,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, NotificationCenter, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, StatusTracker, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, notificationCenterStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, statusTrackerStyles, wizardStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, NotificationCenter, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SettingsShell, SidebarLayout, SiteFooter, SiteHeader, StatusTracker, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, notificationCenterStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, settingsShellStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, statusTrackerStyles, wizardStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2872,6 +2872,26 @@ describe('advanced data and workflow molecules', () => {
     root.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     expect(onMobileOpenChange).not.toHaveBeenCalled();
     expect(() => render(SidebarLayout({ id: 'empty-mobile-label', main: 'Main', mobileMenuLabel: ' ' }), document.body)).toThrow('non-empty');
+  });
+
+  it('renders a controlled SettingsShell with tenant hooks and caller-owned regions', () => {
+    const onMobileOpenChange = vi.fn();
+    render(SettingsShell({
+      id: 'settings-shell', title: q.strong({ children: 'Workspace settings' }), navigation: q.div({ children: [q.a({ href: '#profile', children: 'Profile' }), q.a({ href: '#members', children: 'Members' })] }), content: q.h1({ children: 'Profile' }), footer: q.small({ children: 'Tenant footer' }),
+      navigationLabel: 'Workspace settings sections', mobileOpen: false, onMobileOpenChange,
+      attributes: { class: 'tenant-settings-shell', style: { '--gluon-settings-shell-navigation-size': '19rem' } }, navigationListAttributes: { aria: { label: 'Explicit settings sections' } },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#settings-shell')!;
+    expect(root.dataset.settingsShellRoot).toBe('settings-shell');
+    expect(root.classList).toContain('tenant-settings-shell');
+    expect(root.querySelector('.gluon-settings-shell-navigation-list')?.getAttribute('aria-label')).toBe('Explicit settings sections');
+    expect(root.querySelector('.gluon-settings-shell-content h1')?.textContent).toBe('Profile');
+    expect(root.querySelector('[data-settings-shell-mobile-button]')?.getAttribute('aria-controls')).toBe('settings-shell-navigation');
+    expect(root.style.getPropertyValue('--gluon-settings-shell-navigation-size')).toBe('19rem');
+    expect(getStyleSheetText(settingsShellStyles)).toContain('--gluon-settings-shell');
+    root.querySelector<HTMLButtonElement>('[data-settings-shell-mobile-button]')!.click();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(true, expect.any(MouseEvent));
+    expect(() => render(SettingsShell({ id: 'bad settings shell', content: 'Main' }), document.body)).toThrow('whitespace');
   });
 
   it('renders a controlled Wizard with current-step semantics and tenant hooks', () => {

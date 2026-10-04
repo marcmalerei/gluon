@@ -2718,6 +2718,36 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "SettingsShell",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-settings-shell"
+      ],
+      "variants": [
+        "navigation",
+        "responsive",
+        "mobile"
+      ],
+      "states": [
+        "default",
+        "mobile-closed",
+        "mobile-open"
+      ],
+      "preview": "settings-shell",
+      "accessibility": "Renders semantic title, labelled settings navigation, main content, and optional footer with controlled mobile disclosure, Escape/focus return, 44px controls, visible focus, forced-colors, reduced-motion, and logical RTL-safe layout.",
+      "extension": "Title, navigation, section content, active state, routing, permissions, authorization, data loading, persistence, save/reset actions, localization, analytics, tenant identity, and mutations remain caller-owned; region attributes, parts, and CSS variables support tenant-safe composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/SettingsShell.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "SidebarLayout",
       "kind": "component",
       "status": "stable",
