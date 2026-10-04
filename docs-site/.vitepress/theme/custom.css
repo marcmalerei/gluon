@@ -300,6 +300,16 @@ html { scroll-behavior: smooth; }
 .ui-sample-dashboard-shell .is-main { grid-row: 2; min-height: 34px; }
 .ui-sample-dashboard-shell .is-utility { grid-row: 2; background: color-mix(in srgb, var(--ui-catalog-accent) 7%, var(--vp-c-bg)); }
 .ui-sample-dashboard-shell .is-footer { background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
+.ui-sample-settings-shell { display: grid; grid-template-columns: 24% minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: 4px; width: 90%; min-height: 86px; color: var(--vp-c-text-2); font-size: .64rem; font-weight: 650; }
+.ui-sample-settings-shell > span { display: grid; min-height: 20px; align-content: center; gap: 3px; padding: 6px; background: color-mix(in srgb, var(--ui-catalog-accent) 12%, var(--vp-c-bg)); }
+.ui-sample-settings-shell .is-title, .ui-sample-settings-shell .is-footer { grid-column: 1 / -1; }
+.ui-sample-settings-shell .is-title { display: flex; justify-content: space-between; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); }
+.ui-sample-settings-shell .is-navigation { grid-row: 2; align-content: start; }
+.ui-sample-settings-shell .is-navigation a { color: inherit; text-decoration: none; }
+.ui-sample-settings-shell .is-navigation .is-active { color: var(--ui-catalog-ink); text-decoration: underline; text-decoration-color: var(--ui-catalog-accent); text-decoration-thickness: 2px; }
+.ui-sample-settings-shell .is-content { grid-row: 2; align-content: start; min-height: 42px; background: var(--vp-c-bg); }
+.ui-sample-settings-shell .is-content button { justify-self: start; min-height: 24px; padding: 3px 6px; border: 1px solid var(--vp-c-divider); background: var(--ui-catalog-accent); color: var(--ui-catalog-ink); font: inherit; }
+.ui-sample-settings-shell .is-footer { background: color-mix(in srgb, var(--ui-catalog-accent) 8%, var(--vp-c-bg)); }
 .ui-sample-mega-menu { display: grid; gap: 6px; width: 94%; text-align: start; font-size: .72rem; }
 .ui-sample-mega-menu > button { justify-self: start; min-block-size: 32px; padding: 5px 9px; border: 0; background: var(--ui-catalog-ink); color: var(--ui-catalog-inverse); font: inherit; }
 .ui-sample-mega-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); box-shadow: 0 8px 18px rgb(0 0 0 / 8%); }

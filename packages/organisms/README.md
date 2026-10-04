@@ -141,6 +141,14 @@ and tenant identity remain caller-owned. Use its region attributes, parts, and
 `--gluon-sidebar-layout-*` CSS variables to adapt the layout per tenant while
 keeping one semantic DOM contract.
 
+`SettingsShell` is the settings-oriented sibling: it renders an optional title,
+labelled navigation, main content, and footer with controlled responsive mobile
+disclosure, Escape/focus return, logical RTL-safe layout, and constructable
+stylesheets. Section content, active state, routes, permissions, persistence,
+save/reset actions, localization, mutations, and tenant identity remain
+caller-owned. Use its region attributes, parts, and
+`--gluon-settings-shell-*` CSS variables for tenant-specific styling.
+
 `Wizard` renders a controlled, labelled multi-step workflow with current-step
 semantics, keyboard-operable step navigation, previous/next controls, live
 progress, responsive mobile stacking, and invalid-input fail-closed behavior.

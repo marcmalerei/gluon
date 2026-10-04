@@ -186,6 +186,10 @@ try {
     || await page.locator('[data-preview="dashboard-shell"] .ui-sample-dashboard-shell .is-utility').count() !== 1) {
     throw new Error('dashboard-shell preview does not show workspace and utility anatomy');
   }
+  if (await page.locator('[data-preview="settings-shell"] .ui-sample-settings-shell .is-navigation a').count() !== 3
+    || await page.locator('[data-preview="settings-shell"] .ui-sample-settings-shell .is-content button').count() !== 1) {
+    throw new Error('settings-shell preview does not show navigation, content, and save anatomy');
+  }
   if (await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-sidebar').count() !== 1
     || await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-main').count() !== 1
     || await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-footer').count() !== 1) {

@@ -370,6 +370,10 @@ permissions, and tenant-specific content remain caller-owned.
             <div class="ui-sample-dashboard-shell" aria-label="Dashboard shell regions"><span class="is-header">Dashboard header</span><span class="is-sidebar">Navigation</span><span class="is-main">Widgets · filters · charts</span><span class="is-utility">Inspector</span><span class="is-footer">Workspace status</span></div>
             <span class="ui-sample-variant">sidebar · utility · responsive · mobile</span>
           </template>
+          <template v-else-if="entry.preview === 'settings-shell'">
+            <div class="ui-sample-settings-shell" aria-label="Settings shell regions"><span class="is-title">Workspace settings · Acme tenant</span><span class="is-navigation"><strong>Settings</strong><a class="is-active" href="#profile">Profile</a><a href="#members">Members</a><a href="#billing">Billing</a></span><span class="is-content"><strong>Profile</strong><small>Caller-owned form and save actions</small><button type="button">Save changes</button></span><span class="is-footer">Tenant footer</span></div>
+            <span class="ui-sample-variant">navigation · responsive · mobile · RTL-safe</span>
+          </template>
           <template v-else-if="entry.preview === 'mega-menu'">
             <div class="ui-sample-mega-menu"><button type="button" aria-expanded="true">Shop <span aria-hidden="true">⌃</span></button><div class="ui-sample-mega-panel"><section><strong>Lighting</strong><a href="#catalog">Orbit lamp</a><a href="#catalog">Desk light</a></section><section><strong>Furniture</strong><a href="#catalog">Stack tray</a><a href="#catalog">Fold stool</a></section></div></div>
             <span class="ui-sample-variant">grouped · responsive · keyboard</span>
