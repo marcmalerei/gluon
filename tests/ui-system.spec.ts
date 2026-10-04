@@ -78,6 +78,7 @@ import {
   Stepper,
   FilterBar,
   DataList,
+  DataTable,
   ListboxField,
   ComboboxField,
   Autocomplete,
@@ -97,6 +98,7 @@ import {
   timePickerStyles,
   multiSelectFieldStyles,
   calendarStyles,
+  dataTableStyles,
   sortControlStyles,
   comboboxFieldStyles,
   autocompleteStyles,
@@ -3197,6 +3199,42 @@ describe('advanced data and workflow molecules', () => {
     expect(list.tagName).toBe('DL');
     expect(list.querySelectorAll('dt')).toHaveLength(2);
     expect(list.querySelector<HTMLElement>('dd')?.getAttribute('aria-describedby')).toBe('order-summary-status-description');
+  });
+
+  it('renders DataTable native semantics with controlled sorting, selection, and states', () => {
+    const onSort = vi.fn();
+    const onSelectionChange = vi.fn();
+    render(DataTable<{ product: string; status: string }>({
+      id: 'inventory-table',
+      label: 'Inventory',
+      columns: [
+        { id: 'product', header: 'Product', sortable: true, sortDirection: 'ascending', cell: (row: { product: string }) => row.product },
+        { id: 'status', header: 'Status', cell: (row: { status: string }) => row.status },
+      ],
+      rows: [
+        { id: 'orbit-lamp', value: { product: 'Orbit lamp', status: 'Ready' } },
+        { id: 'stack-tray', value: { product: 'Stack tray', status: 'Review' }, disabled: true },
+      ],
+      selectable: true,
+      selectedRowIds: ['orbit-lamp'],
+      onSort,
+      onSelectionChange,
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#inventory-table')!;
+    expect(root.getAttribute('role')).toBe('region');
+    expect(root.getAttribute('aria-label')).toBe('Inventory');
+    expect(root.querySelectorAll('thead th')).toHaveLength(3);
+    expect(root.querySelector('th[aria-sort="ascending"]')).not.toBeNull();
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(root.querySelector<HTMLInputElement>('tbody input')?.checked).toBe(true);
+    expect(root.querySelectorAll('tbody input')).toHaveLength(2);
+    root.querySelector<HTMLButtonElement>('.gluon-data-table-sort')!.click();
+    expect(onSort).toHaveBeenCalledWith('product', 'descending', expect.any(MouseEvent));
+    const second = root.querySelectorAll<HTMLInputElement>('tbody input')[1]!;
+    expect(second.disabled).toBe(true);
+    expect(getStyleSheetText(dataTableStyles)).toContain('--gluon-data-table');
+    expect(() => render(DataTable({ id: 'bad id', label: 'Inventory', columns: [{ id: 'product', header: 'Product', cell: () => 'x' }], rows: [] }), document.body)).toThrow(/DataTable.id/);
+    expect(() => render(DataTable({ id: 'duplicate-columns', label: 'Inventory', columns: [{ id: 'same', header: 'A', cell: () => 'x' }, { id: 'same', header: 'B', cell: () => 'y' }], rows: [] }), document.body)).toThrow(/column ids/);
   });
 
   it('composes native DatePicker and FileUpload form fields with tenant token hooks', async () => {

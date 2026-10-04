@@ -39,6 +39,8 @@ export { FilterBar, type FilterBarAttributes, type FilterBarProps } from './filt
 export { filterBarStyles } from './filter-bar-styles.js';
 export { DataList, type DataListAttributes, type DataListItem, type DataListProps } from './data-list.js';
 export { dataListStyles } from './data-list-styles.js';
+export { DataTable, type DataTableAccessibleName, type DataTableAttributes, type DataTableColumn, type DataTableProps, type DataTableRow, type DataTableState, type DataTableSortDirection, type DataTableTableAttributes } from './data-table.js';
+export { dataTableStyles } from './data-table-styles.js';
 export { ListboxField, type ListboxFieldAttributes, type ListboxFieldListboxAttributes, type ListboxFieldProps } from './listbox-field.js';
 export { listboxFieldStyles } from './listbox-field-styles.js';
 export { ComboboxField, type ComboboxFieldAttributes, type ComboboxFieldInputAttributes, type ComboboxFieldListboxAttributes, type ComboboxFieldProps } from './combobox-field.js';

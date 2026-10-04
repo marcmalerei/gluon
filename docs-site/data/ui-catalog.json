@@ -1185,6 +1185,36 @@
     {
       "package": "@gluonjs/molecules",
       "layer": "molecule",
+      "name": "DataTable",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-molecule-data-table"
+      ],
+      "variants": [
+        "sortable",
+        "selectable",
+        "responsive"
+      ],
+      "states": [
+        "ready",
+        "loading",
+        "empty"
+      ],
+      "preview": "data-table",
+      "accessibility": "Preserves native table semantics with labelled headers, optional keyboard-operable sort buttons, controlled row-selection checkboxes, truthful loading/empty cells, visible focus, and horizontal overflow containment.",
+      "extension": "Columns, rows, cell rendering, sort direction, selected row ids, pagination, fetching, authorization, persistence, virtualization, mutations, localization, and tenant identity remain caller-owned; attributes, parts, and CSS variables support tenant-safe styling.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/molecules/src/variables/DataTable.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/molecules/src/"
+    },
+    {
+      "package": "@gluonjs/molecules",
+      "layer": "molecule",
       "name": "DatePicker",
       "kind": "component",
       "status": "stable",

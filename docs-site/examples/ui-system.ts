@@ -71,6 +71,7 @@ import {
   Stepper,
   FilterBar,
   DataList,
+  DataTable,
   ListboxField,
   ComboboxField,
   Autocomplete,
@@ -122,7 +123,7 @@ const headlessDialogPrimitives = { Dialog, Overlay, createFocusScope };
 void headlessDialogPrimitives;
 const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar };
 void menuAndToolbarPrimitives;
-const dataMolecules = { MoleculeTooltip, MoleculeHoverCard, Stepper, FilterBar, DataList, ListboxField, ComboboxField, Autocomplete, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
+const dataMolecules = { MoleculeTooltip, MoleculeHoverCard, Stepper, FilterBar, DataList, DataTable, ListboxField, ComboboxField, Autocomplete, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
 const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, NotificationCenter, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SettingsShell, SidebarLayout, SiteFooter, SiteHeader, SplitPane, StatusTracker, Wizard };
 void applicationOrganisms;
@@ -576,6 +577,21 @@ createApp(() => AppShell({
           summary: 'One recent order.',
           scrollHint: 'Scroll horizontally to review every column.',
           children: q.table({ children: q.tbody({ children: q.tr({ children: [q.th({ scope: 'row', children: 'A-101' }), q.td({ children: 'Ready' })] }) }) }),
+        }),
+        DataTable({
+          id: 'inventory-table',
+          label: 'Inventory',
+          columns: [
+            { id: 'product', header: 'Product', sortable: true, sortDirection: 'ascending', cell: (row) => row.product },
+            { id: 'status', header: 'Status', cell: (row) => row.status },
+            { id: 'units', header: 'Units', cell: (row) => row.units },
+          ],
+          rows: [
+            { id: 'orbit-lamp', value: { product: 'Orbit lamp', status: 'Ready', units: 24 } },
+            { id: 'stack-tray', value: { product: 'Stack tray', status: 'Review', units: 8 } },
+          ],
+          selectable: true,
+          selectedRowIds: ['orbit-lamp'],
         }),
         FormField({ label: 'Name', value: 'Ada Lovelace', helper: 'Shown on receipts' }),
       DatePicker({ id: 'delivery-date-picker', label: 'Delivery date', value: '2026-10-06', min: '2026-10-03', helper: 'Choose a weekday for dispatch.' }),
