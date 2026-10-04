@@ -111,6 +111,48 @@ retained in the
 [`spread-bindings-issue-487-comparison.md`](../benchmarks/results/spread-bindings-issue-487-comparison.md)
 report.
 
+## Hydration tree validation fast path
+
+Issue [#630](https://github.com/marcmalerei/gluon/issues/630) adds an internal
+native `Node.isEqualNode()` fast path for matching hydration trees. When the
+server markup and browser DOM are equal, Gluon uses the browser's subtree
+comparison and a native `TreeWalker` to collect hydration markers. Any
+difference still enters the existing recursive comparison, preserving URL
+equivalence, marker-attribute handling, mismatch categories, diagnostics,
+recovery, and `recovery: 'throw'` behavior. No public API or hydration option
+changed.
+
+The paired production hydration benchmark used the same Apple M4 host,
+Chromium 149.0.7827.55, 8 warm-ups, 30 interleaved samples, and the existing
+120-row catalog fixture. Lower is faster:
+
+| Browser | Lane | Hydration median / p95 | Interaction median / p95 | Teardown median / p95 |
+| --- | --- | ---: | ---: | ---: |
+| Chromium | baseline | 1.4 / 2.7 ms | 0.1 / 0.2 ms | 0.0 / 0.1 ms |
+| Chromium | native equality candidate | **1.0 / 1.8 ms** | 0.1 / 0.2 ms | 0.0 / 0.2 ms |
+| Firefox | baseline | 3.0 / 5.0 ms | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
+| Firefox | native equality candidate | **2.0 / 5.0 ms** | 0.0 / 1.0 ms | 0.0 / 0.0 ms |
+| WebKit | baseline | 1.0 / 2.0 ms | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
+| WebKit | native equality candidate | 1.0 / 2.0 ms | 0.0 / 1.0 ms | 0.0 / 1.0 ms |
+
+All lanes retained the server `main`, activated the row-119 interaction, and
+left an empty root after teardown. The result is a bounded hydration-fixture
+improvement, not a universal ranking against Vue or Lit. The paired JSON and
+Markdown files retain the raw samples, correctness snapshots, toolchain, and
+browser metadata:
+
+- [`hydration-native-equality-630-baseline.json`](../benchmarks/results/hydration-native-equality-630-baseline.json)
+- [`hydration-native-equality-630-candidate.json`](../benchmarks/results/hydration-native-equality-630-candidate.json)
+
+Reproduce the candidate lane with:
+
+```bash
+npm run benchmark:hydration -- \
+  --samples=30 \
+  --warmup=8 \
+  --output=.tmp/hydration-native-equality-630.json
+```
+
 ## Renderer-owned node-array reuse
 
 Issue #295 removed two redundant array copies before private DOM

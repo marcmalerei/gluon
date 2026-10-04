@@ -928,6 +928,22 @@ describe('SSR hydration', () => {
     })).toThrow('Hydration aborted');
   });
 
+  it('uses native subtree equality for matching hydration roots before detailed diagnostics', () => {
+    const root = document.createElement('div');
+    root.innerHTML = '<p>value</p>';
+    const serverNode = root.firstElementChild;
+    const equality = vi.spyOn(Node.prototype, 'isEqualNode');
+    try {
+      const result = hydrate(html`<p>value</p>`, root, { expectedMarkup: '<p>value</p>' });
+
+      expect(result).toEqual({ mismatches: [], retained: true, recovered: false });
+      expect(root.firstElementChild).toBe(serverNode);
+      expect(equality).toHaveBeenCalled();
+    } finally {
+      equality.mockRestore();
+    }
+  });
+
   it('propagates browser response cancellation into progressive async sources', async () => {
     const controller = new AbortController();
     let aborted = false;
