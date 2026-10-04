@@ -6,8 +6,16 @@ customer-visible responsible role and last evidence. Adding one would be a
 decorative, disconnected surface. The organism is covered by package,
 SSR/hydration, browser, and Storybook contracts instead.
 
+`NotificationCenter` is intentionally not integrated into GLUON GOODS: the
+current shop has no honest account, order, or operational notification product
+surface with caller-owned persistence, routing, and permissions. Adding a
+decorative notification bell would invent customer behavior. The organism is
+covered by package, SSR/hydration, browser, catalog, and Storybook contracts
+instead.
+
 | Gluon capability | Shop surface | Automated evidence | Status |
 | --- | --- | --- | --- |
+| `@gluonjs/organisms` `NotificationCenter` (#624) | No honest current adoption: GLUON GOODS has no account, order, or operational notification surface, so adding a notification trigger would manufacture product behavior rather than extend the existing customer journey. | NotificationCenter package/SSR/hydration/browser/catalog/Storybook contracts | Package-only, verified reason recorded |
 | `@gluonjs/organisms` `ConfirmationDialog` | No honest current adoption: GLUON GOODS has no destructive or confirmation action in its current customer journey; adding a decorative trigger would violate the living-shop contract. The native organism is covered by package, browser, SSR, hydration, and Storybook contracts. | Organism browser/SSR/hydration/Storybook contracts | Documented as intentionally not integrated |
 | `@gluonjs/quarks` `Tooltip` and `HoverCard` | Product detail help copy asynchronously loads the public Tooltip contract for a concise “how availability works” explanation without adding it to the initial shop entry; the shop does not use HoverCard because this surface has no honest interactive detail card | `tests/quarks.spec.ts`, `tests/shop-example.spec.ts`, `packages/quarks/README.md`, `npm run check:quality-budgets` | Integrated Tooltip; HoverCard remains covered as framework infrastructure |
 | `@gluonjs/atoms` `AspectRatio`, `Avatar`, `ScrollArea`, and `Separator` | No honest current surface: product media already owns its aspect-ratio contract, no account/avatar workflow exists, catalog volume does not need a new scrolling region, and existing rules are not standalone separators. Adding decorative wrappers would manufacture product behavior. | Atom semantics, geometry, accessibility, exact-style, SSR/hydration, type, package, Storybook, and cross-engine visual evidence | Shop unchanged for the verified scope reasons |
