@@ -107,8 +107,11 @@ tables, tabs, menus, fields, and segmented controls where applicable), and
 that the catalog search, layer filters, accessible result count, and 390px
 layout work in Chromium. GitHub Actions runs the same gate
 before assembling the Pages artifact, then adds the separate Playground build
-under `/playground/`. Pages deployment remains an explicit CI operation;
-`npm run build:docs` only writes local static files to `docs-site/dist/`.
+under `/playground/`. The VitePress build is bounded to a 14.5 GB Node heap;
+this is required by the generated API corpus and prevents the Pages job from
+publishing a stale catalog after a heap-out-of-memory failure. Pages deployment
+remains an explicit CI operation; `npm run build:docs` only writes local static
+files to `docs-site/dist/`.
 
 ## Editing rules
 

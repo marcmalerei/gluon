@@ -149,6 +149,8 @@ html { scroll-behavior: smooth; }
 .ui-sample-progress { width: min(100%, 220px); height: 8px; overflow: hidden; border-radius: 99px; background: #d8d8d2; }
 .ui-sample-progress span { display: block; height: 100%; background: var(--ui-catalog-accent); }
 .ui-sample-progress + small { color: var(--vp-c-text-2); }
+.ui-sample-meter-field { display: grid; gap: 6px; width: min(100%, 220px); text-align: start; font-size: .78rem; font-weight: 650; }
+.ui-sample-meter-field output { color: var(--vp-c-text-2); font-size: .72rem; font-weight: 450; }
 .ui-sample-meter { width: min(100%, 220px); height: 12px; accent-color: var(--ui-catalog-accent); }
 .ui-sample-spinner { width: 22px; height: 22px; border: 3px solid var(--vp-c-divider); border-top-color: var(--ui-catalog-accent); border-radius: 50%; animation: ui-catalog-spin 900ms linear infinite; }
 .ui-sample-skeleton { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #d8d8d2 25%, #ededE8 50%, #d8d8d2 75%); background-size: 200% 100%; }

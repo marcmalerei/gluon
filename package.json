@@ -99,7 +99,7 @@
     "check:component-library-loader-build": "npm run build:core && npm run build:compiler && npm run build:vite && npm run build:component-library && node scripts/validate-component-library-loader-build.mjs",
     "docs:api": "node scripts/build-docs-api.mjs",
     "docs:package-readmes": "node scripts/generate-package-readmes.mjs",
-    "build:docs": "npm run docs:api && npm run docs:ui-catalog && node scripts/generate-package-readmes.mjs --check && node scripts/generate-package-doc-pages.mjs --check && node --max-old-space-size=12288 ./node_modules/vitepress/bin/vitepress.js build docs-site && npm run build:docs-examples && node scripts/mirror-latest-docs.mjs",
+    "build:docs": "npm run docs:api && npm run docs:ui-catalog && node scripts/generate-package-readmes.mjs --check && node scripts/generate-package-doc-pages.mjs --check && node --max-old-space-size=14500 ./node_modules/vitepress/bin/vitepress.js build docs-site && npm run build:docs-examples && node scripts/mirror-latest-docs.mjs",
     "docs:dev": "npm run docs:api && npm run docs:ui-catalog && node scripts/generate-package-readmes.mjs --check && node scripts/generate-package-doc-pages.mjs --check && vitepress dev docs-site",
     "docs:preview": "vitepress preview docs-site",
     "build:docs-examples": "node scripts/build-docs-examples.mjs",

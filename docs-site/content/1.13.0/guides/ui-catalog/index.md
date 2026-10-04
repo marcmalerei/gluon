@@ -76,6 +76,8 @@ permissions, and tenant-specific content remain caller-owned.
             <button class="ui-sample-button is-secondary" type="button">Save</button>
           </template>
           <template v-else-if="entry.preview === 'badge'">
+            <span class="ui-sample-badge">Neutral</span>
+            <span class="ui-sample-badge is-info">Info</span>
             <span class="ui-sample-badge is-success">Ready</span>
             <span class="ui-sample-badge is-warning">Review</span>
             <span class="ui-sample-badge is-danger">Blocked</span>
@@ -158,26 +160,14 @@ permissions, and tenant-specific content remain caller-owned.
           <template v-else-if="entry.preview === 'link'">
             <a :href="`#catalog-${entry.layer}-${entry.name}`" class="ui-sample-link">View component details</a>
           </template>
-          <template v-else-if="entry.preview === 'badge'">
-            <span class="ui-sample-badge">Neutral</span>
-            <span class="ui-sample-badge is-info">Info</span>
-            <span class="ui-sample-badge is-success">Ready</span>
-            <span class="ui-sample-badge is-warning">Review</span>
-            <span class="ui-sample-badge is-danger">Blocked</span>
-          </template>
-          <template v-else-if="entry.preview === 'heading' || entry.preview === 'text'">
-            <h3 v-if="entry.name === 'Heading'" class="ui-sample-heading">Swiss editorials</h3>
-            <p v-else class="ui-sample-copy">Supporting copy stays readable and composable.</p>
-          </template>
-          <template v-else-if="entry.preview === 'link'">
-            <a :href="`#catalog-${entry.layer}-${entry.name}`" class="ui-sample-link">Open component reference</a>
-          </template>
           <template v-else-if="entry.preview === 'image'">
             <figure class="ui-sample-media is-image" aria-label="Responsive image preview"><span>Product image</span></figure>
           </template>
-          <template v-else-if="entry.preview === 'meter' || entry.preview === 'spinner' || entry.preview === 'skeleton'">
-            <meter v-if="entry.name === 'Meter'" class="ui-sample-meter" min="0" max="100" value="72">72%</meter>
-            <template v-else-if="entry.name === 'Spinner'"><span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span></template>
+          <template v-else-if="entry.preview === 'meter'">
+            <label class="ui-sample-meter-field">Availability <meter class="ui-sample-meter" min="0" max="100" value="72">72%</meter><output>72% available</output></label>
+          </template>
+          <template v-else-if="entry.preview === 'spinner' || entry.preview === 'skeleton'">
+            <template v-if="entry.name === 'Spinner'"><span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span></template>
             <template v-else><div class="ui-sample-skeleton-preview" aria-label="Loading placeholder"><span class="ui-sample-skeleton is-wide" aria-hidden="true"></span><span class="ui-sample-skeleton is-short" aria-hidden="true"></span><small>Loading placeholder</small></div></template>
           </template>
           <template v-else-if="entry.preview === 'file-input'">
@@ -197,7 +187,9 @@ permissions, and tenant-specific content remain caller-owned.
             <label class="ui-sample-field">{{ entry.name }}<textarea v-if="entry.preview === 'textarea'" rows="2">Example value</textarea><input v-else type="text" value="Example value" /></label>
           </template>
           <template v-else-if="['checkbox', 'radio', 'switch'].includes(entry.preview)">
-            <label class="ui-sample-choice"><input :type="entry.preview === 'radio' ? 'radio' : 'checkbox'" :checked="entry.preview !== 'radio'" /> {{ entry.name }} option</label>
+            <fieldset v-if="entry.preview === 'radio'" class="ui-sample-choice-group"><legend>Delivery method</legend><label class="ui-sample-choice"><input type="radio" name="catalog-radio-preview" checked /> Standard</label><label class="ui-sample-choice"><input type="radio" name="catalog-radio-preview" /> Express</label></fieldset>
+            <label v-else-if="entry.preview === 'switch'" class="ui-sample-choice"><input type="checkbox" role="switch" checked aria-checked="true" /> Enable notifications</label>
+            <fieldset v-else class="ui-sample-choice-group"><legend>Consent</legend><label class="ui-sample-choice"><input type="checkbox" checked /> Accepted</label><label class="ui-sample-choice"><input type="checkbox" /> Optional</label></fieldset>
           </template>
           <template v-else-if="entry.preview === 'progress'">
             <div class="ui-sample-progress"><span style="width: 48%"></span></div>
