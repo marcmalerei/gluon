@@ -2560,6 +2560,36 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "SidebarLayout",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-sidebar-layout"
+      ],
+      "variants": [
+        "sidebar",
+        "responsive",
+        "mobile"
+      ],
+      "states": [
+        "default",
+        "mobile-closed",
+        "mobile-open"
+      ],
+      "preview": "sidebar-layout",
+      "accessibility": "Renders semantic optional header/footer regions, a labelled sidebar navigation, and main content with controlled mobile disclosure, Escape/focus return, 44px controls, visible focus, forced-colors, and reduced-motion support.",
+      "extension": "Header, sidebar content, main content, footer, routing, permissions, authorization, data loading, mobile state, localization, analytics, persistence, and tenant identity remain caller-owned; region attributes, parts, and CSS variables support tenant-safe composition.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/SidebarLayout.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "SiteFooter",
       "kind": "component",
       "status": "stable",

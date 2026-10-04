@@ -177,6 +177,11 @@ try {
     || await page.locator('[data-preview="dashboard-shell"] .ui-sample-dashboard-shell .is-utility').count() !== 1) {
     throw new Error('dashboard-shell preview does not show workspace and utility anatomy');
   }
+  if (await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-sidebar').count() !== 1
+    || await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-main').count() !== 1
+    || await page.locator('[data-preview="sidebar-layout"] .ui-sample-sidebar-layout .is-footer').count() !== 1) {
+    throw new Error('sidebar-layout preview does not show sidebar, main, and footer anatomy');
+  }
   if (await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-announcement').count() !== 1
     || await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-navigation').count() !== 1) {
     throw new Error('marketing-header preview does not show announcement and navigation anatomy');

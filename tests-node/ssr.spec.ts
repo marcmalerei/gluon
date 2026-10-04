@@ -69,7 +69,7 @@ import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
 import { Accordion, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
-import { AdminShell, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
+import { AdminShell, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, PageLayout, ProductGallery, ResizablePanels, SidebarLayout, SiteFooter, SplitPane, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
 
@@ -276,6 +276,25 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('aria-expanded="false"');
     expect(rendered).toContain('is-collapsed');
     expect(rendered).toContain('data-navigation-rail-item="orders"');
+  });
+
+  it('serializes SidebarLayout landmarks and controlled mobile semantics without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(SidebarLayout({
+      id: 'server-sidebar-layout',
+      header: html`<strong>Workspace</strong>`,
+      sidebar: html`<a href="/overview">Overview</a>`,
+      main: html`<h1>Reports</h1>`,
+      footer: html`<small>Tenant workspace</small>`,
+      sidebarLabel: 'Server workspace navigation',
+      mobileOpen: true,
+    })));
+    expect(rendered).toContain('data-sidebar-layout-root="server-sidebar-layout"');
+    expect(rendered).toContain('aria-label="Server workspace navigation"');
+    expect(rendered).toContain('aria-expanded="true"');
+    expect(rendered).toContain('<header');
+    expect(rendered).toContain('<aside');
+    expect(rendered).toContain('<main');
+    expect(rendered).toContain('<footer');
   });
 
   it('serializes ProductGallery image identity and alternate-image semantics without DOM state', async () => {
