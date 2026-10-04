@@ -3435,14 +3435,12 @@ function findSingleAdjacentKeyedSwap(
 ): number {
   if (previousChildren.length !== nextKeys.length) return -1;
   let index = 0;
-  while (index < nextKeys.length && previousChildren[index]!.key === nextKeys[index]) index += 1;
-  if (
-    index + 1 >= nextKeys.length
-    || previousChildren[index]!.key !== nextKeys[index + 1]
-    || previousChildren[index + 1]!.key !== nextKeys[index]
-  ) {
-    return -1;
+  for (; index < nextKeys.length; index += 1) {
+    if (previousChildren[index]!.key !== nextKeys[index]) break;
   }
+  if (index + 1 >= nextKeys.length) return -1;
+  if (previousChildren[index]!.key !== nextKeys[index + 1]) return -1;
+  if (previousChildren[index + 1]!.key !== nextKeys[index]) return -1;
   for (let suffix = index + 2; suffix < nextKeys.length; suffix += 1) {
     if (previousChildren[suffix]!.key !== nextKeys[suffix]) return -1;
   }

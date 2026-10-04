@@ -152,18 +152,37 @@ describe('keyed list renderer conformance', () => {
       (item) => item.id,
       (item) => html`<li data-id=${item.id}>${item.label}</li>`,
     )}</ul>`;
-    const initial = [row('a', 'Alpha'), row('b', 'Beta'), row('c', 'Gamma')];
+    const initial = [row('a', 'Alpha'), row('b', 'Beta'), row('c', 'Gamma'), row('d', 'Delta')];
 
     render(view(initial), root);
     const identities = new Map(
       [...root.querySelectorAll('li')].map((item) => [item.dataset.id!, item]),
     );
-    render(view([row('a', 'Alpha updated'), row('c', 'Gamma updated'), row('b', 'Beta updated')]), root);
+    render(view([row('a', 'Alpha updated'), row('c', 'Gamma updated'), row('b', 'Beta updated'), row('d', 'Delta updated')]), root);
 
-    expect([...root.querySelectorAll('li')].map((item) => item.dataset.id)).toEqual(['a', 'c', 'b']);
+    expect([...root.querySelectorAll('li')].map((item) => item.dataset.id)).toEqual(['a', 'c', 'b', 'd']);
     for (const [id, item] of identities) expect(root.querySelector(`[data-id="${id}"]`)).toBe(item);
     expect(root.querySelector('[data-id="c"]')?.textContent).toBe('Gamma updated');
     expect(root.querySelector('[data-id="b"]')?.textContent).toBe('Beta updated');
+  });
+
+  it('falls back when an adjacent swap also changes a later key', () => {
+    const root = document.createElement('div');
+    const view = (ids: readonly string[]) => html`<ul>${repeat(
+      ids,
+      (id) => id,
+      (id) => html`<li data-id=${id}>${id}</li>`,
+    )}</ul>`;
+    render(view(['a', 'b', 'c', 'd']), root);
+    const b = root.querySelector('[data-id="b"]');
+    const c = root.querySelector('[data-id="c"]');
+
+    render(view(['a', 'c', 'b', 'new']), root);
+
+    expect([...root.querySelectorAll('li')].map((item) => item.dataset.id)).toEqual(['a', 'c', 'b', 'new']);
+    expect(root.querySelector('[data-id="b"]')).toBe(b);
+    expect(root.querySelector('[data-id="c"]')).toBe(c);
+    expect(root.querySelector('[data-id="d"]')).toBeNull();
   });
 
   it('reuses a recently removed keyed child after suspending its listeners', () => {
