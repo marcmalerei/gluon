@@ -191,6 +191,12 @@ html { scroll-behavior: smooth; }
 .ui-sample-data-list { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; width: 90%; margin: 0; text-align: start; font-size: .76rem; }
 .ui-sample-data-list dt { color: var(--vp-c-text-2); font-weight: 650; }
 .ui-sample-data-list dd { margin: 0; }
+.ui-sample-data-table { width: 100%; overflow-x: auto; text-align: start; font-size: .72rem; }
+.ui-sample-data-table table { min-width: 270px; width: 100%; border-collapse: collapse; }
+.ui-sample-data-table th, .ui-sample-data-table td { padding: 6px; border-block-end: 1px solid var(--vp-c-divider); white-space: nowrap; }
+.ui-sample-data-table th { background: var(--vp-c-bg-alt); font-weight: 700; }
+.ui-sample-data-table button { min-block-size: 30px; border: 0; background: transparent; color: inherit; font: inherit; font-weight: inherit; text-align: start; }
+.ui-sample-data-table input { accent-color: var(--ui-catalog-accent); }
 .ui-sample-table { width: 90%; overflow-x: auto; border: 1px solid var(--vp-c-divider); font-size: .78rem; }
 .ui-sample-table table { width: 100%; border-collapse: collapse; text-align: start; }
 .ui-sample-table th, .ui-sample-table td { padding: 5px 7px; border-bottom: 1px solid var(--vp-c-divider); text-align: start; }

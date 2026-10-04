@@ -101,6 +101,10 @@ permissions, and tenant-specific content remain caller-owned.
           <template v-else-if="entry.preview === 'data-list'">
             <dl class="ui-sample-data-list"><dt>Availability</dt><dd>In stock</dd><dt>Delivery</dt><dd>2–4 days</dd></dl>
           </template>
+          <template v-else-if="entry.preview === 'data-table'">
+            <div class="ui-sample-data-table" role="region" aria-label="Inventory table"><table><thead><tr><th scope="col"><button type="button" aria-label="Sort by product">Product</button></th><th scope="col">Status</th><th scope="col">Units</th></tr></thead><tbody><tr><td><label><input type="checkbox" checked /> Orbit lamp</label></td><td>Ready</td><td>24</td></tr><tr><td><label><input type="checkbox" /> Stack tray</label></td><td>Review</td><td>8</td></tr></tbody></table></div>
+            <span class="ui-sample-variant">sortable · selectable · loading · empty · overflow</span>
+          </template>
           <template v-else-if="entry.preview === 'listbox-field'">
             <label class="ui-sample-field">Delivery method<select><option>Standard · 2–4 days</option><option>Express · next day</option></select></label>
             <span class="ui-sample-variant">Arrow keys · Home · End · disabled options</span>

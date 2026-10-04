@@ -13,7 +13,7 @@ const sources = [
 ];
 const renderedPreviewKeys = new Set([
   'accordion', 'action-bar', 'admin-shell', 'app-shell', 'async-state', 'aspect-ratio', 'avatar', 'badge', 'button',
-  'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'popover', 'sheet', 'disclosure', 'tooltip', 'hover-card', 'stepper', 'filter-bar', 'data-list',
+  'breadcrumbs', 'button-group', 'card', 'checkbox', 'confirmation-dialog', 'dialog', 'popover', 'sheet', 'disclosure', 'tooltip', 'hover-card', 'stepper', 'filter-bar', 'data-list', 'data-table',
   'choice-group', 'control-field', 'empty-state', 'form-field', 'icon', 'input', 'label', 'listbox-field', 'autocomplete', 'menubar',
   'navigation-menu', 'navigation-strip', 'notice', 'otp', 'pagination', 'password', 'progress',
   'radio', 'results', 'scroll-area', 'search', 'segmented', 'select', 'separator',

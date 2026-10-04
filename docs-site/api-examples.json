@@ -1137,10 +1137,10 @@
       "module": "@gluonjs/atoms",
       "code": [
         "import { buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles } from '@gluonjs/atoms';",
-        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, calendarStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, datePickerStyles, dateRangePickerStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, fileUploadStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, multiSelectFieldStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, popoverStyles, segmentedControlStyles, sheetStyles, sortControlStyles, stepperStyles, tableRegionStyles, tabsStyles, timePickerStyles, tooltipStyles, toolbarStyles } from '@gluonjs/molecules';",
+        "import { accordionStyles, breadcrumbsStyles, buttonGroupStyles, calendarStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dataTableStyles, datePickerStyles, dateRangePickerStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, fileUploadStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, multiSelectFieldStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, popoverStyles, segmentedControlStyles, sheetStyles, sortControlStyles, stepperStyles, tableRegionStyles, tabsStyles, timePickerStyles, tooltipStyles, toolbarStyles } from '@gluonjs/molecules';",
         "import { appShellStyles } from '@gluonjs/organisms';",
         "",
-        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, datePickerStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, fileUploadStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, popoverStyles, segmentedControlStyles, sheetStyles, sortControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles, appShellStyles];",
+        "const exactSheets = [buttonStyles, checkboxStyles, iconStyles, inputStyles, labelStyles, progressStyles, radioStyles, selectStyles, sliderStyles, statusBadgeStyles, switchStyles, textareaStyles, toggleButtonStyles, accordionStyles, breadcrumbsStyles, buttonGroupStyles, cardStyles, choiceGroupStyles, controlFieldStyles, dataListStyles, dataTableStyles, datePickerStyles, dialogSurfaceStyles, disclosureStyles, emptyStateStyles, fileUploadStyles, filterBarStyles, formFieldStyles, inlineNoticeStyles, listboxFieldStyles, menuToolbarStyles, navigationMenuStyles, navigationStripStyles, paginationStyles, popoverStyles, segmentedControlStyles, sheetStyles, sortControlStyles, stepperStyles, tableRegionStyles, tabsStyles, tooltipStyles, toolbarStyles, appShellStyles];",
         "const newerExactSheets = [dateRangePickerStyles, timePickerStyles, calendarStyles, multiSelectFieldStyles];",
         "console.log(exactSheets.length + newerExactSheets.length);"
       ]
@@ -1169,6 +1169,27 @@
         "]);",
         "const manifest = createStyleManifest(source);",
         "console.log(manifest.entries[0]?.id, manifest.entries[0]?.scope);"
+      ]
+    },
+    "data-table-contract": {
+      "module": "@gluonjs/molecules",
+      "code": [
+        "import { DataTable, dataTableStyles } from '@gluonjs/molecules';",
+        "import type { DataTableAccessibleName, DataTableAttributes, DataTableColumn, DataTableProps, DataTableRow, DataTableSortDirection, DataTableState, DataTableTableAttributes } from '@gluonjs/molecules';",
+        "type InventoryRow = { product: string; status: string; units: number };",
+        "const accessibleName: DataTableAccessibleName = { label: 'Inventory' };",
+        "const attributes: DataTableAttributes = { class: 'inventory-table' };",
+        "const tableAttributes: DataTableTableAttributes = { class: 'inventory-table-native' };",
+        "const direction: DataTableSortDirection = 'ascending';",
+        "const state: DataTableState = 'ready';",
+        "const columns: readonly DataTableColumn<InventoryRow>[] = [",
+        "  { id: 'product', header: 'Product', sortable: true, sortDirection: direction, cell: (row) => row.product },",
+        "  { id: 'status', header: 'Status', cell: (row) => row.status },",
+        "  { id: 'units', header: 'Units', cell: (row) => row.units },",
+        "];",
+        "const rows: readonly DataTableRow<InventoryRow>[] = [{ id: 'orbit-lamp', value: { product: 'Orbit lamp', status: 'Ready', units: 24 } }];",
+        "const props: DataTableProps<InventoryRow> = { ...accessibleName, id: 'inventory', columns, rows, state, selectable: true, selectedRowIds: ['orbit-lamp'], attributes, tableAttributes, onSort: (columnId, nextDirection) => console.log(columnId, nextDirection) };",
+        "console.log(DataTable(props), dataTableStyles, 'DataTable dataTableStyles DataTableAccessibleName DataTableAttributes DataTableColumn DataTableProps DataTableRow DataTableSortDirection DataTableState DataTableTableAttributes');"
       ]
     },
     "molecule-components": {
@@ -8545,6 +8566,16 @@
     "packages/molecules/src/interfaces/DataListProps.md": { "recipe": "molecule-components", "description": "Configure a responsive native data list and its presentation columns:" },
     "packages/molecules/src/interfaces/DataListItem.md": { "recipe": "molecule-components", "description": "Describe one native data-list label, value, and optional explanation:" },
     "packages/molecules/src/type-aliases/DataListAttributes.md": { "recipe": "molecule-components", "description": "Forward safe native description-list attributes to the DataList root:" },
+    "packages/molecules/src/variables/DataTable.md": { "recipe": "data-table-contract", "description": "Render a native sortable and selectable data table while keeping rows and mutations caller-owned:" },
+    "packages/molecules/src/variables/dataTableStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separately tree-shakable DataTable stylesheet and its CSS-variable hooks:" },
+    "packages/molecules/src/type-aliases/DataTableAccessibleName.md": { "recipe": "data-table-contract", "description": "Choose the accessible name source for a DataTable region:" },
+    "packages/molecules/src/type-aliases/DataTableAttributes.md": { "recipe": "data-table-contract", "description": "Forward safe native region attributes to the DataTable root:" },
+    "packages/molecules/src/type-aliases/DataTableProps.md": { "recipe": "data-table-contract", "description": "Configure caller-owned columns, rows, sorting, selection, and loading or empty state:" },
+    "packages/molecules/src/type-aliases/DataTableSortDirection.md": { "recipe": "data-table-contract", "description": "Declare the controlled sort direction for one DataTable column:" },
+    "packages/molecules/src/type-aliases/DataTableState.md": { "recipe": "data-table-contract", "description": "Declare the truthful ready, loading, or empty DataTable state:" },
+    "packages/molecules/src/type-aliases/DataTableTableAttributes.md": { "recipe": "data-table-contract", "description": "Forward native table attributes to the DataTable table element:" },
+    "packages/molecules/src/interfaces/DataTableColumn.md": { "recipe": "data-table-contract", "description": "Describe one labelled DataTable column with a caller-owned cell renderer and optional sorting:" },
+    "packages/molecules/src/interfaces/DataTableRow.md": { "recipe": "data-table-contract", "description": "Describe one stable DataTable row and its caller-owned value:" },
     "packages/molecules/src/variables/ListboxField.md": { "recipe": "molecule-components", "description": "Compose a labelled, keyboard-operable listbox field with caller-owned options and selection:" },
     "packages/molecules/src/variables/listboxFieldStyles.md": { "recipe": "ui-exact-component-styles", "description": "Inspect the separate constructable ListboxField stylesheet and its CSS-variable hooks:" },
     "packages/molecules/src/interfaces/ListboxFieldProps.md": { "recipe": "molecule-components", "description": "Configure a labelled ListboxField with controlled options, helper/error copy, and native attribute extension points:" },

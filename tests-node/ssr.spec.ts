@@ -68,7 +68,7 @@ import { renderReactQuantityShadow } from '../benchmarks/dx/stateful-form-contro
 import { product } from '../benchmarks/dx/stateful-form-control/shared.js';
 import { renderVueQuantityShadow } from '../benchmarks/dx/stateful-form-control/vue.js';
 import { AspectRatio, Avatar, Button, ScrollArea, Separator } from '@gluonjs/atoms';
-import { Accordion, Autocomplete, Calendar, Card, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, HoverCard as MoleculeHoverCard, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
+import { Accordion, Autocomplete, Calendar, Card, DataTable, DatePicker, DateRangePicker, DialogSurface, Disclosure, FileUpload, HoverCard as MoleculeHoverCard, MultiSelectField, Popover, ResponsiveDisclosure, Sheet, EmptyState, InlineNotice, OneTimePasswordField, SearchField, SearchResults, SortControl, TableRegion, TimePicker, createDialogSurfaceController } from '@gluonjs/molecules';
 import { AdminShell, ApprovalFlow, ConfirmationDialog, DashboardShell, MarketingHeader, NavigationRail, NotificationCenter, OnboardingFlow, PageLayout, ProductGallery, ResizablePanels, SettingsShell, SidebarLayout, SiteFooter, SplitPane, StatusTracker, Wizard, WorkflowTimeline } from '@gluonjs/organisms';
 import { ProductBadge, ProductPicker } from '@gluonjs/example-component-library';
 import { HoverCard, q, Tooltip } from '@gluonjs/quarks';
@@ -378,6 +378,28 @@ describe('@gluonjs/ssr DOM-independent serialization', () => {
     expect(rendered).toContain('for="server-sort-select"');
     expect(rendered).toContain('aria-describedby="server-sort-description"');
     expect(rendered).toContain('value="price-low"');
+  });
+
+  it('serializes DataTable native headers, rows, selection, and sorting without DOM state', async () => {
+    const rendered = withoutHydrationMarkers(await renderToString(DataTable({
+      id: 'server-inventory',
+      label: 'Inventory',
+      columns: [
+        { id: 'product', header: 'Product', sortable: true, sortDirection: 'ascending', cell: (row: { product: string }) => row.product },
+        { id: 'status', header: 'Status', cell: (row: { status: string }) => row.status },
+      ],
+      rows: [{ id: 'orbit-lamp', value: { product: 'Orbit lamp', status: 'Ready' } }],
+      selectable: true,
+      selectedRowIds: ['orbit-lamp'],
+    })));
+    expect(rendered).toContain('id="server-inventory"');
+    expect(rendered).toContain('role="region"');
+    expect(rendered).toContain('aria-label="Inventory"');
+    expect(rendered).toContain('<table');
+    expect(rendered).toContain('aria-sort="ascending"');
+    expect(rendered).toContain('Orbit lamp');
+    expect(rendered).toContain('type="checkbox"');
+    expect(rendered).toContain('data-row-id="orbit-lamp"');
   });
 
   it('serializes DatePicker and FileUpload native form relationships without browser state', async () => {

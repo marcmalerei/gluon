@@ -16,6 +16,12 @@ reduced-motion handling, and a 44px minimum action target. Safe-area behavior
 uses the platform environment variables; applications remain responsible for
 device-specific inset behavior.
 
+`DataTable` composes caller-owned columns and rows into a native table with
+optional sorting and row selection. It keeps pagination, fetching,
+authorization, persistence, virtualization, and mutations outside the
+component while exposing responsive overflow, loading/empty states, and
+tenant-safe `--gluon-data-table-*` variables.
+
 <!-- gluon-package-overview:start -->
 ## @gluonjs/molecules at a glance
 
@@ -86,6 +92,7 @@ import {
   Stepper,
   FilterBar,
   DataList,
+  DataTable,
   ListboxField,
   ComboboxField,
   CommandPalette,
