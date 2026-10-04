@@ -234,6 +234,17 @@ try {
     || await page.locator('[data-preview="skeleton"] .ui-sample-skeleton-preview small').count() !== 1) {
     throw new Error('skeleton preview does not show loading placeholder anatomy');
   }
+  if (await page.locator('[data-preview="badge"]').first().locator('.ui-sample-badge').count() !== 5) {
+    throw new Error('badge preview does not show all five tone variants');
+  }
+  if (await page.locator('[data-preview="checkbox"] fieldset input[type="checkbox"]').count() !== 2
+    || await page.locator('[data-preview="radio"] fieldset input[type="radio"]').count() !== 2
+    || await page.locator('[data-preview="switch"] [role="switch"][aria-checked="true"]').count() !== 1) {
+    throw new Error('choice previews do not show their complete native control anatomy');
+  }
+  if (await page.locator('[data-preview="meter"] .ui-sample-meter-field output').count() !== 1) {
+    throw new Error('meter preview does not show a labelled value alongside the native meter');
+  }
   for (const obsoleteKey of ['field', 'menu', 'foundation-atoms--feedback', 'foundation-atoms--typography']) {
     if (await page.locator(`[data-preview="${obsoleteKey}"]`).count() !== 0) {
       throw new Error(`catalog still exposes obsolete generic preview key: ${obsoleteKey}`);
