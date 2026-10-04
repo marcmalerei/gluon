@@ -55,6 +55,8 @@ describe('platform observers', () => {
     const current = TestObserver.instances[1]!;
     handle.stop();
     expect(current.disconnect).toHaveBeenCalledOnce();
+    handle.stop();
+    handle.ref(undefined);
     handle.ref(first);
     expect(TestObserver.instances).toHaveLength(2);
     expect(handle.supported.value).toBe(false);

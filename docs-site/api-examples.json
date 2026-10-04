@@ -7385,6 +7385,18 @@
       "recipe": "ssr-eleventy",
       "description": "Map an Eleventy input and data record to one public URL or explicitly classify it as a dynamic deployment fallback:"
     },
+    "packages/ssr/src/functions/resolveForHydration.md": {
+      "module": "@gluonjs/ssr",
+      "description": "Resolve the server value tree once before using marker-based hydration without serializing a duplicate expected HTML string:",
+      "code": [
+        "import { html } from '@gluonjs/core';",
+        "import { resolveForHydration } from '@gluonjs/ssr';",
+        "",
+        "const serverValue = html`<main><h1>GLUON GOODS</h1><p>Ready for hydration.</p></main>`;",
+        "const resolvedValue = await resolveForHydration(serverValue);",
+        "console.log(resolvedValue);"
+      ]
+    },
     "packages/ssr/src/hydration/functions/hydrateApplication.md": {
       "recipe": "ssr-hydration",
       "description": "Bind an application to its marker-preserving server HTML and then mount the reactive client runtime on the retained root:"

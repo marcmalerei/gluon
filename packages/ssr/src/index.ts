@@ -245,15 +245,24 @@ export interface PreparedHydration {
   readonly html: string;
 }
 
+/** Resolves server async contracts without serializing the expected markup. */
+export async function resolveForHydration(
+  value: TemplateValue,
+  options: Pick<RenderSerializationOptions, 'signal'> = {},
+): Promise<TemplateValue> {
+  throwIfAborted(options.signal);
+  const pending = resolveHydrationValue(value, options.signal);
+  const prepared = options.signal ? await abortable(pending, options.signal) : await pending;
+  throwIfAborted(options.signal);
+  return prepared;
+}
+
 /** Resolves server async contracts once and returns the matching marker HTML and value tree. */
 export async function prepareForHydration(
   value: TemplateValue,
   options: RenderSerializationOptions = {},
 ): Promise<PreparedHydration> {
-  throwIfAborted(options.signal);
-  const pending = resolveHydrationValue(value, options.signal);
-  const prepared = options.signal ? await abortable(pending, options.signal) : await pending;
-  throwIfAborted(options.signal);
+  const prepared = await resolveForHydration(value, options);
   return Object.freeze({ value: prepared, html: await renderToString(prepared, options) });
 }
 

@@ -17,6 +17,7 @@ export interface HydrationFixtures {
 export interface HydrationBenchmarkConfig {
   readonly samples?: number;
   readonly warmupRounds?: number;
+  readonly gluonVerification?: 'strict' | 'markers';
 }
 
 export interface HydrationMeasurement {
@@ -39,6 +40,7 @@ export interface HydrationComparisonResult {
   readonly schemaVersion: 1;
   readonly sampleCount: number;
   readonly warmupRounds: number;
+  readonly gluonVerification: 'strict' | 'markers';
   readonly results: readonly HydrationFrameworkResult[];
 }
 
@@ -55,10 +57,11 @@ export async function runHydrationComparison(
 ): Promise<HydrationComparisonResult> {
   const samples = positiveInteger(config.samples ?? 12, 'samples');
   const warmupRounds = nonNegativeInteger(config.warmupRounds ?? 4, 'warmupRounds');
+  const gluonVerification = config.gluonVerification ?? 'strict';
   const measurements: Record<Framework, HydrationMeasurement[]> = { gluon: [], lit: [], vue: [] };
   for (let round = 0; round < warmupRounds + samples; round += 1) {
     for (const framework of rotatedFrameworks(round)) {
-      const measurement = await runFramework(framework, fixtures[framework]);
+      const measurement = await runFramework(framework, fixtures[framework], gluonVerification);
       if (round >= warmupRounds) measurements[framework].push(measurement);
     }
   }
@@ -66,6 +69,7 @@ export async function runHydrationComparison(
     schemaVersion: 1,
     sampleCount: samples,
     warmupRounds,
+    gluonVerification,
     results: frameworks.map((framework) => ({
       framework,
       samples: measurements[framework],
@@ -78,13 +82,17 @@ export async function runHydrationComparison(
   };
 }
 
-async function runFramework(framework: Framework, markup: string): Promise<HydrationMeasurement> {
+async function runFramework(
+  framework: Framework,
+  markup: string,
+  gluonVerification: 'strict' | 'markers',
+): Promise<HydrationMeasurement> {
   const root = document.createElement('div');
   root.dataset.framework = framework;
   root.innerHTML = markup;
   document.querySelector('#benchmark-root')?.append(root);
   try {
-    if (framework === 'gluon') return await hydrateGluon(root, markup);
+    if (framework === 'gluon') return await hydrateGluon(root, markup, gluonVerification);
     if (framework === 'lit') return await hydrateLit(root, markup);
     return await hydrateVue(root, markup);
   } finally {
@@ -92,12 +100,19 @@ async function runFramework(framework: Framework, markup: string): Promise<Hydra
   }
 }
 
-async function hydrateGluon(root: HTMLElement, markup: string): Promise<HydrationMeasurement> {
+async function hydrateGluon(
+  root: HTMLElement,
+  markup: string,
+  verification: 'strict' | 'markers',
+): Promise<HydrationMeasurement> {
   const state = reactive<HydrationState>({ selectedId: 0 });
   const app = createGluonApplication(state, (id) => { state.selectedId = id; });
   const mainBefore = root.querySelector('main');
   const started = performance.now();
-  const hydrated = await hydrateApplication(app, root, { recovery: 'throw' });
+  const hydrated = await hydrateApplication(app, root, {
+    recovery: 'throw',
+    ...(verification === 'markers' ? { verification } : {}),
+  });
   const hydrationMs = performance.now() - started;
   if (!hydrated.hydration.retained || root.querySelector('main') !== mainBefore) {
     throw new Error('Gluon hydration did not retain the server main element.');

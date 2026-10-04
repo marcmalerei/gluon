@@ -2896,6 +2896,30 @@ describe('advanced data and workflow molecules', () => {
     expect(() => render(SettingsShell({ id: 'bad settings shell', content: 'Main' }), document.body)).toThrow('whitespace');
   });
 
+  it('closes an open SettingsShell from Escape and outside pointer events', () => {
+    const onMobileOpenChange = vi.fn();
+    const handleEvent = { handleEvent: vi.fn<(event: MouseEvent) => void>() };
+    render(SettingsShell({
+      id: 'open-settings-shell',
+      navigation: q.a({ href: '#account', children: 'Account' }),
+      content: 'Content',
+      mobileOpen: true,
+      onMobileOpenChange,
+      mobileButtonAttributes: { onClick: handleEvent },
+    }), document.body);
+    const root = document.querySelector<HTMLElement>('#open-settings-shell')!;
+    const button = root.querySelector<HTMLButtonElement>('[data-settings-shell-mobile-button]')!;
+    expect(button.textContent).toBe('Close');
+    button.click();
+    expect(handleEvent.handleEvent).toHaveBeenCalledOnce();
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(MouseEvent));
+
+    root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(KeyboardEvent));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(onMobileOpenChange).toHaveBeenCalledWith(false, expect.any(PointerEvent));
+  });
+
   it('renders a controlled Wizard with current-step semantics and tenant hooks', () => {
     const onStepChange = vi.fn();
     render(Wizard({
@@ -3235,6 +3259,49 @@ describe('advanced data and workflow molecules', () => {
     expect(getStyleSheetText(dataTableStyles)).toContain('--gluon-data-table');
     expect(() => render(DataTable({ id: 'bad id', label: 'Inventory', columns: [{ id: 'product', header: 'Product', cell: () => 'x' }], rows: [] }), document.body)).toThrow(/DataTable.id/);
     expect(() => render(DataTable({ id: 'duplicate-columns', label: 'Inventory', columns: [{ id: 'same', header: 'A', cell: () => 'x' }, { id: 'same', header: 'B', cell: () => 'y' }], rows: [] }), document.body)).toThrow(/column ids/);
+  });
+
+  it('renders DataTable loading and empty states and toggles selection off', () => {
+    const onSelectionChange = vi.fn();
+    const columns = [{ id: 'product', header: 'Product', cell: (row: { product: string }) => row.product }] as const;
+    render(DataTable({
+      id: 'loading-table',
+      labelledBy: 'inventory-heading',
+      columns,
+      rows: [{ id: 'lamp', value: { product: 'Lamp' } }],
+      state: 'loading',
+      loadingContent: 'Fetching inventory',
+      attributes: { 'aria-describedby': 'inventory-description' },
+    }), document.body);
+    expect(document.querySelector('#loading-table')).not.toBeNull();
+    expect(document.querySelector('.gluon-data-table-state')?.textContent).toBe('Fetching inventory');
+    expect(document.querySelector('.gluon-data-table-state')?.getAttribute('aria-busy')).toBe('true');
+
+    render(DataTable({
+      id: 'empty-table',
+      label: 'Empty inventory',
+      columns,
+      rows: [],
+      emptyContent: 'Nothing here',
+      onSelectionChange,
+    }), document.body);
+    expect(document.querySelector('.gluon-data-table-state')?.textContent).toBe('Nothing here');
+    expect(document.querySelector('#empty-table')?.getAttribute('data-state')).toBe('empty');
+
+    render(DataTable({
+      id: 'selection-table',
+      label: 'Inventory',
+      columns,
+      rows: [{ id: 'lamp', value: { product: 'Lamp' } }],
+      selectable: true,
+      selectedRowIds: ['lamp'],
+      onSelectionChange,
+    }), document.body);
+    const checkbox = document.querySelector<HTMLInputElement>('#selection-table input')!;
+    checkbox.click();
+    expect(onSelectionChange).toHaveBeenCalledWith([], expect.any(Event));
+    expect(() => render(DataTable({ id: 'no-columns', label: 'Invalid', columns: [], rows: [] }), document.body)).toThrow(/columns/);
+    expect(() => render(DataTable({ id: 'bad-row', label: 'Invalid', columns, rows: [{ id: 'bad row', value: { product: 'Lamp' } }] }), document.body)).toThrow(/row ids/);
   });
 
   it('composes native DatePicker and FileUpload form fields with tenant token hooks', async () => {

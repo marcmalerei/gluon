@@ -21,11 +21,17 @@ import type { StoreManager, StoreSnapshot } from '@gluonjs/store';
 import {
   createStyleManifest,
   prepareForHydration,
+  resolveForHydration,
   SSR_HYDRATION_MARKER_ATTRIBUTE,
 } from './index.js';
 import type { ShadowStyleAsset, SsrHydrationMarkerTransport, StyleManifest } from './index.js';
 
 export interface HydrateTemplateOptions {
+  /**
+   * Selects the hydration verification contract. Strict verification is the
+   * default; marker verification is an opt-in trusted SSR transport fast path.
+   */
+  readonly verification?: 'strict' | 'markers';
   readonly recovery?: 'replace' | 'throw';
   readonly suppress?: boolean | readonly HydrationMismatchCategory[];
   readonly onMismatch?: Parameters<typeof hydrate>[2]['onMismatch'];
@@ -123,12 +129,14 @@ export async function hydrateTemplate(
   const nested = options.hydrateElements ? collectNestedGluonElements(container as ParentNode) : [];
   const hydratedElements = options.hydratedElements ?? new Set<GluonElement>();
   for (const child of nested) child.beginHydration();
-  const prepared = await prepareForHydration(result, options.markerTransport || options.hydrateElements
-    ? {
-        ...(options.markerTransport ? { markerOffset: options.markerTransport.start } : {}),
-        omitServerElementShadowRoots: true,
-      }
-    : {});
+  const prepared: { readonly value: import('@gluonjs/core').TemplateValue; readonly html?: string } = options.verification === 'markers'
+    ? { value: await resolveForHydration(result) }
+    : await prepareForHydration(result, options.markerTransport || options.hydrateElements
+      ? {
+          ...(options.markerTransport ? { markerOffset: options.markerTransport.start } : {}),
+          omitServerElementShadowRoots: true,
+        }
+      : {});
   if (!(prepared.value instanceof TemplateResult)) {
     throw new TypeError('A hydration root must resolve to a TemplateResult.');
   }
@@ -148,7 +156,7 @@ export async function hydrateTemplate(
   let completed = false;
   try {
     const hydration = hydrate(prepared.value, container, {
-      expectedMarkup: prepared.html,
+      ...(options.verification === 'markers' ? { verification: 'markers' as const } : { expectedMarkup: prepared.html! }),
       ...(options.markerTransport ? {
         markerOffset: options.markerTransport.start,
       } : {}),
@@ -483,11 +491,13 @@ export async function hydrateApplication<Public = unknown>(
   let completed = false;
   try {
     const root = renderGluonApplicationForServer(app);
-    const prepared = await prepareForHydration(root, {
-      // Nested server elements have already adopted their DSD templates into
-      // their own roots before the application root is retained.
-      omitServerElementShadowRoots: true,
-    });
+    const prepared: { readonly value: import('@gluonjs/core').TemplateValue; readonly html?: string } = options.verification === 'markers'
+      ? { value: await resolveForHydration(root) }
+      : await prepareForHydration(root, {
+          // Nested server elements have already adopted their DSD templates into
+          // their own roots before the application root is retained.
+          omitServerElementShadowRoots: true,
+        });
     if (!(prepared.value instanceof TemplateResult)) {
       throw new TypeError('A Gluon application hydration root must resolve to a TemplateResult.');
     }
@@ -502,7 +512,7 @@ export async function hydrateApplication<Public = unknown>(
       ? prepareStyleHandoff(options.styleRoot ?? container.getRootNode() as Document | ShadowRoot, manifest, selection)
       : undefined;
     const hydration = await app.run(() => hydrate(prepared.value as TemplateResult, container, {
-      expectedMarkup: prepared.html,
+      ...(options.verification === 'markers' ? { verification: 'markers' as const } : { expectedMarkup: prepared.html! }),
       recovery: options.recovery,
       suppress: options.suppress,
       onMismatch: options.onMismatch,

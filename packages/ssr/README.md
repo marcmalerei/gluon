@@ -138,6 +138,13 @@ roots, pass `hydrateElements: true` to `hydrateTemplate()` so its nested
 Declarative Shadow DOM roots are validated and hydrated as part of the same
 retained handoff.
 
+For a trusted, marker-bearing SSR transport, pass `verification: 'markers'`
+with `recovery: 'throw'`. This opt-in path resolves async server values without
+serializing and reparsing a second expected HTML copy, validates marker
+pairing and complete marker consumption, and retains the existing DOM nodes.
+It does not compare arbitrary text or ordinary attributes; use the default
+strict verification when those diagnostics or root recovery are required.
+
 `@gluonjs/ssr/streaming` exposes ordered chunks, byte `ReadableStream`s, and
 progressive rendering. Shell and boundary records include newly required exact
 component styles, and the stream writes their carriers before dependent HTML.

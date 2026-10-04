@@ -4,9 +4,12 @@ import {
   isTemplateResult,
   nothing,
   render,
+  releaseRenderStyles,
   suspendRender,
   svg,
+  trustedHTML,
   unmount,
+  createApp,
   type TemplateResult,
   type TemplateValue,
 } from '../src/index.js';
@@ -42,6 +45,24 @@ describe('template runtime edge cases', () => {
     expect(isTemplateResult({})).toBe(false);
     render(graphic, root);
     expect(root.querySelector('circle')?.namespaceURI).toBe('http://www.w3.org/2000/svg');
+  });
+
+  it('renders trusted markup and tolerates releasing styles from an empty container', () => {
+    const root = document.createElement('div');
+
+    const app = createApp(() => html`<section>${trustedHTML('<strong>trusted</strong>')}</section>`);
+    const trustedTypesFactory = (globalThis as typeof globalThis & {
+      readonly trustedTypes?: { createPolicy(name: string, rules: { createHTML(value: string): unknown }): { name: string; createHTML(value: string): unknown } };
+    }).trustedTypes;
+    app.config.trustedTypes = {
+      policyName: 'runtime-edge-cases',
+      policy: trustedTypesFactory?.createPolicy('runtime-edge-cases', { createHTML: (value) => value })
+        ?? { name: 'runtime-edge-cases', createHTML: (value: string) => value },
+    };
+    app.mount(root);
+    expect(root.querySelector('strong')?.textContent).toBe('trusted');
+    releaseRenderStyles(null);
+    app.unmount();
   });
 
   it('renders into document fragments, ignores null containers, and rejects invalid input', () => {
@@ -308,6 +329,122 @@ describe('template runtime edge cases', () => {
     expect(second).toHaveBeenCalledOnce();
     expect(ref.value).toBeUndefined();
     expect(removeEventListener).toHaveBeenCalledTimes(2);
+  });
+
+  it('covers spread removal, invalid values, and style mode transitions', () => {
+    const root = document.createElement('div');
+    const first = vi.fn();
+    const second = vi.fn();
+    const callbackRef = vi.fn<(element: Element | undefined) => void>();
+    const view = (props: TemplateValue) => html`<button ...=${props}>Save</button>`;
+
+    render(view({
+      style: 'color: red; padding: 4px;',
+      data: { trackId: 'alpha' },
+      aria: { label: 'Save' },
+      ref: callbackRef,
+      onClick: first,
+      '.value': 'first',
+      '?disabled': true,
+      title: 'Initial',
+    }), root);
+    const button = root.querySelector('button') as HTMLButtonElement & { value?: unknown };
+    expect(button.style.color).toBe('red');
+    expect(button.dataset.trackId).toBe('alpha');
+    expect(button.getAttribute('aria-label')).toBe('Save');
+    expect(button.value).toBe('first');
+    expect(button.disabled).toBe(true);
+
+    render(view({
+      style: { color: 'blue', marginTop: '2px' },
+      data: null,
+      aria: 'invalid',
+      ref: 'invalid',
+      onClick: second,
+      '.value': 'second',
+      '?disabled': false,
+      title: false,
+    }), root);
+    button.click();
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledOnce();
+    expect(callbackRef).toHaveBeenLastCalledWith(undefined);
+    expect(button.style.color).toBe('blue');
+    expect(button.style.padding).toBe('');
+    expect(button.style.marginTop).toBe('2px');
+    expect(button.dataset.trackId).toBeUndefined();
+    expect(button.hasAttribute('aria-label')).toBe(false);
+    expect(button.disabled).toBe(false);
+    expect(button.hasAttribute('title')).toBe(false);
+    expect(button.value).toBe('second');
+
+    render(view(null), root);
+    button.click();
+    expect(second).toHaveBeenCalledOnce();
+    expect(button.style.length).toBe(0);
+    expect(button.value).toBe('undefined');
+    expect(button.disabled).toBe(false);
+  });
+
+  it('covers direct style, map, class, ref, and event transitions', () => {
+    const root = document.createElement('div');
+    const first = vi.fn();
+    const second = vi.fn();
+    const objectRef: { value?: Element } = {};
+    const view = (
+      style: string | Readonly<Record<string, unknown>> | null,
+      data: Readonly<Record<string, unknown>> | null,
+      aria: Readonly<Record<string, unknown>> | null,
+      className: string | boolean | readonly (string | boolean | Readonly<Record<string, boolean>>)[] | null,
+      ref: TemplateValue,
+      listener: EventListener | null,
+    ) => html`<button
+      style=${style}
+      data=${data}
+      aria=${aria}
+      class=${className}
+      ref=${ref}
+      @click=${listener}
+    >Save</button>`;
+
+    render(view(
+      'color: red; padding: 4px;',
+      { trackId: 'alpha' },
+      { label: 'Save' },
+      ['action', { active: true }],
+      objectRef,
+      first,
+    ), root);
+    const button = root.querySelector('button') as HTMLButtonElement;
+    expect(button.className).toBe('action active');
+    expect(button.style.color).toBe('red');
+    expect(button.dataset.trackId).toBe('alpha');
+    expect(button.getAttribute('aria-label')).toBe('Save');
+    expect(objectRef.value).toBe(button);
+
+    render(view(
+      'color: blue; margin-top: 2px;',
+      { trackId: 'beta' },
+      { expanded: false },
+      false,
+      'invalid',
+      second,
+    ), root);
+    button.click();
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledOnce();
+    expect(objectRef.value).toBeUndefined();
+    expect(button.className).toBe('');
+    expect(button.style.color).toBe('blue');
+    expect(button.style.padding).toBe('');
+    expect(button.dataset.trackId).toBe('beta');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+
+    render(view(null, null, null, null, null, null), root);
+    expect(button.style.length).toBe(0);
+    expect(button.dataset.trackId).toBeUndefined();
+    expect(button.hasAttribute('aria-expanded')).toBe(false);
+    expect(objectRef.value).toBeUndefined();
   });
 
   it('rejects raw-text and RCDATA child expressions with targeted diagnostics', () => {
