@@ -2199,6 +2199,39 @@
     {
       "package": "@gluonjs/organisms",
       "layer": "organism",
+      "name": "ApprovalFlow",
+      "kind": "component",
+      "status": "stable",
+      "styles": [
+        "gluon-organism-approval-flow"
+      ],
+      "variants": [
+        "review",
+        "decision",
+        "evidence"
+      ],
+      "states": [
+        "pending",
+        "in-review",
+        "approved",
+        "rejected",
+        "changes-requested",
+        "invalid"
+      ],
+      "preview": "approval-flow",
+      "accessibility": "Renders a labelled approval-stage navigation with current-stage semantics, truthful statuses, caller-owned evidence and actions, visible focus, 44px targets, forced-colors, and reduced-motion support.",
+      "extension": "Stages, statuses, content, roles, evidence, actions, routing, permissions, authorization, localization, analytics, and mutations remain caller-owned; controlled currentStage, callbacks, parts, native attributes, and CSS variables support tenant-safe review workflows.",
+      "example": "docs-site/examples/ui-system.ts",
+      "tests": [
+        "tests/ui-system.spec.ts",
+        "tests/ui-visual.spec.ts"
+      ],
+      "api": "/gluon/1.13.0/api/generated/packages/organisms/src/variables/ApprovalFlow.html",
+      "source": "https://github.com/marcmalerei/gluon/blob/main/packages/organisms/src/"
+    },
+    {
+      "package": "@gluonjs/organisms",
+      "layer": "organism",
       "name": "AppShell",
       "kind": "component",
       "status": "stable",

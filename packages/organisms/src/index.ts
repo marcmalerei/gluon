@@ -39,4 +39,6 @@ export { Wizard, type WizardAttributes, type WizardOpenChangeEvent, type WizardP
 export { wizardStyles } from './wizard-styles.js';
 export { OnboardingFlow, type OnboardingFlowAttributes, type OnboardingFlowChangeEvent, type OnboardingFlowProps, type OnboardingFlowStep } from './onboarding-flow.js';
 export { onboardingFlowStyles } from './onboarding-flow-styles.js';
+export { ApprovalFlow, type ApprovalFlowAttributes, type ApprovalFlowChangeEvent, type ApprovalFlowProps, type ApprovalFlowStage, type ApprovalFlowStageStatus } from './approval-flow.js';
+export { approvalFlowStyles } from './approval-flow-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';

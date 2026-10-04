@@ -156,6 +156,13 @@ parts, and CSS-variable guarantees while leaving setup data, validation,
 persistence, routing, permissions, mutations, localization, analytics, and
 tenant identity with the caller.
 
+`ApprovalFlow` renders controlled review stages with truthful pending, in-review,
+approved, rejected, and changes-requested statuses. It exposes caller-owned
+evidence and decision-action slots, semantic current-stage navigation, responsive
+mobile behavior, visible focus, 44px targets, forced-colors, reduced motion,
+parts, and `--gluon-approval-flow-*` variables. Authorization, mutations,
+routing, localization, analytics, and tenant identity remain caller-owned.
+
 `SiteFooter` renders a semantic, responsive footer with optional caller-owned
 brand, labelled navigation, legal, and metadata regions. It keeps URLs,
 content, routing, authorization, localization, analytics, tenant identity, and

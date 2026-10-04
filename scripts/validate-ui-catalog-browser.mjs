@@ -192,6 +192,11 @@ try {
     || await page.locator('[data-preview="onboarding-flow"] .ui-sample-onboarding-flow section').count() !== 1) {
     throw new Error('onboarding-flow preview does not show header, current step, and content anatomy');
   }
+  if (await page.locator('[data-preview="approval-flow"] .ui-sample-approval-flow header').count() !== 1
+    || await page.locator('[data-preview="approval-flow"] .ui-sample-approval-flow [aria-current="step"]').count() !== 1
+    || await page.locator('[data-preview="approval-flow"] .ui-sample-approval-flow footer button').count() !== 2) {
+    throw new Error('approval-flow preview does not show header, current stage, and action anatomy');
+  }
   if (await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-announcement').count() !== 1
     || await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-navigation').count() !== 1) {
     throw new Error('marketing-header preview does not show announcement and navigation anatomy');
