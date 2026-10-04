@@ -109,7 +109,7 @@ import {
   moleculeManifest,
   moleculeStyles,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, Wizard, adminShellStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, wizardStyles } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, Wizard, adminShellStyles, approvalFlowStyles, dashboardShellStyles, marketingHeaderStyles, megaMenuStyles, navigationRailStyles, onboardingFlowStyles, organismManifest, organismStyles, productGalleryStyles, resizablePanelsStyles, sidebarLayoutStyles, siteFooterStyles, siteHeaderStyles, wizardStyles } from '@gluonjs/organisms';
 import {
   Dialog,
   type DialogProps,
@@ -2911,6 +2911,17 @@ describe('advanced data and workflow molecules', () => {
     const completed = document.querySelector<HTMLElement>('#completed-onboarding')!; expect(completed.dataset.state).toBe('complete'); expect(completed.querySelector('[part="completion"]')?.textContent).toContain('Ready'); expect(getStyleSheetText(onboardingFlowStyles)).toContain('forced-colors');
     render(OnboardingFlow({ id: 'invalid-onboarding', steps: [{ id: 'same', label: 'One', content: 'One' }, { id: 'same', label: 'Two', content: 'Two' }] }), document.body);
     expect(document.querySelector('#invalid-onboarding')?.getAttribute('data-state')).toBe('invalid');
+  });
+
+  it('renders ApprovalFlow stages, statuses, evidence, actions, and tenant hooks', () => {
+    const onStageChange = vi.fn();
+    render(ApprovalFlow({ id: 'approval', title: 'Release review', currentStage: 1, onStageChange, stages: [{ id: 'request', label: 'Request', status: 'approved', content: 'Request' }, { id: 'security', label: 'Security', status: 'in-review', role: 'Security', content: q.p({ children: 'Security review' }), evidence: q.small({ children: 'Report 42' }), actions: q.button({ type: 'button', children: 'Approve' }) }], attributes: { class: 'tenant-approval', style: { '--gluon-approval-flow-current': 'teal' } } }), document.body);
+    const root = document.querySelector<HTMLElement>('#approval')!;
+    expect(root.dataset.state).toBe('in-review'); expect(root.classList).toContain('tenant-approval'); expect(root.querySelector('[aria-current="step"]')?.textContent).toContain('Security'); expect(root.querySelector('[part="evidence"]')?.textContent).toContain('Report 42'); expect(root.querySelector('[part="actions"] button')?.textContent).toBe('Approve'); expect(getStyleSheetText(approvalFlowStyles)).toContain('forced-colors');
+    root.querySelector<HTMLButtonElement>('[part="stage-button"]')!.click(); expect(onStageChange).toHaveBeenCalledWith(0, expect.any(MouseEvent));
+    render(ApprovalFlow({ id: 'invalid-approval', stages: [{ id: 'same', label: 'One', status: 'approved', content: 'One' }, { id: 'same', label: 'Two', status: 'bad' as never, content: 'Two' }] }), document.body);
+    expect(document.querySelector('#invalid-approval')?.getAttribute('data-state')).toBe('invalid');
+    expect(() => render(ApprovalFlow({ id: 'empty-status-label', stages: [{ id: 'one', label: 'One', status: 'pending', content: 'One' }], statusLabel: ' ' }), document.body)).toThrow('non-empty');
   });
 
   it('renders a responsive MarketingHeader with announcement, tenant hooks, and controlled mobile navigation', () => {

@@ -91,7 +91,7 @@ import {
   createToastController,
   defineMolecule,
 } from '@gluonjs/molecules';
-import { AdminShell, AppShell, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
+import { AdminShell, AppShell, ApprovalFlow, AsyncState, ConfirmationDialog, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, PageLayout, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard, WorkflowTimeline, defineOrganism } from '@gluonjs/organisms';
 import {
   Dialog,
   Field,
@@ -122,7 +122,7 @@ const menuAndToolbarPrimitives = { ContextMenu, DropdownMenu, Menubar, Toolbar }
 void menuAndToolbarPrimitives;
 const dataMolecules = { MoleculeTooltip, Stepper, FilterBar, DataList, ListboxField, ComboboxField, CommandPalette, TreeView, SortControl, Popover, Sheet, MultiSelectField, Calendar };
 void dataMolecules;
-const applicationOrganisms = { AdminShell, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard };
+const applicationOrganisms = { AdminShell, ApprovalFlow, AsyncState, DashboardShell, MarketingHeader, MegaMenu, NavigationRail, OnboardingFlow, ProductCard, ProductGallery, ProductGrid, ResizablePanels, SidebarLayout, SiteFooter, SiteHeader, SplitPane, Wizard };
 void applicationOrganisms;
 const customBagIcon = defineIcon({
   name: 'example-bag',
@@ -302,6 +302,15 @@ createApp(() => AppShell({
       title: 'Set up workspace',
       steps: [{ id: 'profile', label: 'Profile', content: q.p({ children: 'Caller-owned profile setup.' }) }, { id: 'workspace', label: 'Workspace', content: q.p({ children: 'Caller-owned workspace setup.' }) }],
       currentStep: 1,
+    }),
+    ApprovalFlow({
+      id: 'ui-system-approval-flow',
+      title: 'Release review',
+      stages: [
+        { id: 'request', label: 'Request', status: 'approved', content: q.p({ children: 'Caller-owned request details.' }) },
+        { id: 'security', label: 'Security', status: 'in-review', role: 'Security', content: q.p({ children: 'Caller-owned security review.' }), evidence: q.small({ children: 'Report 42' }), actions: q.button({ type: 'button', children: 'Approve' }) },
+      ],
+      currentStage: 1,
     }),
     MarketingHeader({
       id: 'ui-system-marketing-header',
