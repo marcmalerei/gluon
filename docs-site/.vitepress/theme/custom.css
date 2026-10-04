@@ -154,6 +154,8 @@ html { scroll-behavior: smooth; }
 .ui-sample-skeleton { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #d8d8d2 25%, #ededE8 50%, #d8d8d2 75%); background-size: 200% 100%; }
 .ui-sample-skeleton.is-wide { width: 80%; }
 .ui-sample-skeleton.is-short { width: 45%; }
+.ui-sample-skeleton-preview { display: grid; gap: 8px; width: min(100%, 220px); text-align: start; }
+.ui-sample-skeleton-preview small, .ui-sample-separator-preview small { color: var(--vp-c-text-2); font-size: .72rem; }
 .ui-sample-surface { display: grid; gap: 4px; width: 85%; border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 12px; text-align: start; }
 .ui-sample-surface span { color: var(--vp-c-text-2); font-size: .78rem; }
 .ui-sample-tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--vp-c-divider); padding-block-end: 6px; }
@@ -255,7 +257,11 @@ html { scroll-behavior: smooth; }
 .ui-sample-site-footer small { color: var(--vp-c-text-2); }
 .ui-sample-component { border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); padding: 8px 12px; font-weight: 650; }
 .ui-sample-variant { color: var(--vp-c-text-2); font-size: .78rem; }
-.ui-sample-separator { display: block; width: 80%; height: 1px; background: var(--vp-c-divider); }
+.ui-sample-separator-preview { display: flex; align-items: center; gap: 10px; min-block-size: 72px; color: var(--vp-c-text-2); }
+.ui-sample-separator { display: block; background: var(--vp-c-divider); }
+.ui-sample-separator.is-horizontal { width: 110px; height: 1px; }
+.ui-sample-separator.is-vertical { width: 1px; height: 48px; }
+.ui-sample-separator-preview small { align-self: end; white-space: nowrap; }
 .ui-sample-scroll { display: grid; max-block-size: 72px; gap: 4px; width: 85%; overflow: auto; border: 1px solid var(--vp-c-divider); padding: 6px; text-align: start; font-size: .78rem; }
 .ui-sample-avatar { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #12312f; color: #fff; font-weight: 700; }
 .ui-sample-avatar.is-image { background: linear-gradient(135deg, #12312f, #65d5c8); }

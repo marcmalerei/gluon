@@ -95,7 +95,7 @@ try {
         horizontalOverflow: preview ? preview.scrollWidth > preview.clientWidth + 1 : true,
       };
     });
-    if (visual.previewWidth <= 0 || visual.previewHeight <= 0 || visual.bodyChildren === 0 || (visual.bodyText === 0 && visual.renderedDescendants === 0) || visual.horizontalOverflow) {
+    if (visual.previewWidth <= 0 || visual.previewHeight <= 0 || visual.bodyChildren === 0 || visual.bodyText === 0 || visual.horizontalOverflow) {
       throw new Error(`catalog preview is visually incomplete: ${JSON.stringify({ name: await card.locator('h2').textContent(), ...visual })}`);
     }
   }
@@ -180,6 +180,15 @@ try {
   if (await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-announcement').count() !== 1
     || await page.locator('[data-preview="marketing-header"] .ui-sample-marketing-header .is-navigation').count() !== 1) {
     throw new Error('marketing-header preview does not show announcement and navigation anatomy');
+  }
+  if (await page.locator('[data-preview="separator"] .ui-sample-separator-preview .is-horizontal').count() !== 1
+    || await page.locator('[data-preview="separator"] .ui-sample-separator-preview .is-vertical').count() !== 1
+    || await page.locator('[data-preview="separator"] .ui-sample-separator-preview small').count() !== 1) {
+    throw new Error('separator preview does not show horizontal and vertical anatomy');
+  }
+  if (await page.locator('[data-preview="skeleton"] .ui-sample-skeleton-preview .ui-sample-skeleton').count() !== 2
+    || await page.locator('[data-preview="skeleton"] .ui-sample-skeleton-preview small').count() !== 1) {
+    throw new Error('skeleton preview does not show loading placeholder anatomy');
   }
   for (const obsoleteKey of ['field', 'menu', 'foundation-atoms--feedback', 'foundation-atoms--typography']) {
     if (await page.locator(`[data-preview="${obsoleteKey}"]`).count() !== 0) {

@@ -169,7 +169,7 @@ permissions, and tenant-specific content remain caller-owned.
           <template v-else-if="entry.preview === 'meter' || entry.preview === 'spinner' || entry.preview === 'skeleton'">
             <meter v-if="entry.name === 'Meter'" class="ui-sample-meter" min="0" max="100" value="72">72%</meter>
             <template v-else-if="entry.name === 'Spinner'"><span class="ui-sample-spinner" aria-label="Loading"></span><span>Loading</span></template>
-            <template v-else><span class="ui-sample-skeleton is-wide" aria-hidden="true"></span><span class="ui-sample-skeleton is-short" aria-hidden="true"></span></template>
+            <template v-else><div class="ui-sample-skeleton-preview" aria-label="Loading placeholder"><span class="ui-sample-skeleton is-wide" aria-hidden="true"></span><span class="ui-sample-skeleton is-short" aria-hidden="true"></span><small>Loading placeholder</small></div></template>
           </template>
           <template v-else-if="entry.preview === 'file-input'">
             <label class="ui-sample-field">Product photos<input type="file" accept="image/*" multiple /></label>
@@ -225,7 +225,7 @@ permissions, and tenant-specific content remain caller-owned.
             <label class="ui-sample-label">Email address <span aria-hidden="true">*</span></label>
           </template>
           <template v-else-if="entry.preview === 'separator'">
-            <span class="ui-sample-separator"></span>
+            <div class="ui-sample-separator-preview" aria-label="Separator orientations"><span class="ui-sample-separator is-horizontal"></span><span class="ui-sample-separator is-vertical"></span><small>Horizontal · vertical rules</small></div>
           </template>
           <template v-else-if="entry.preview === 'slider'">
             <label class="ui-sample-field">Cable length<input type="range" min="1" max="5" value="3" /></label>
