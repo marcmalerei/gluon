@@ -948,8 +948,10 @@ must not be collapsed into one ranking. A ratio above `1×` means the compared
 framework's median was slower than Gluon in that exact row; it is not a general
 framework claim.
 
-The current run at commit `a658185` is retained as
-[`framework-comparison-634.md`](../benchmarks/results/framework-comparison-634.md)
+The current run at commit `84342c2` is retained as
+[`framework-comparison-636.md`](../benchmarks/results/framework-comparison-636.md)
+with its raw JSON evidence in
+[`framework-comparison-636.json`](../benchmarks/results/framework-comparison-636.json).
 with the complete raw dataset in
 [`framework-comparison-634.json`](../benchmarks/results/framework-comparison-634.json).
 
