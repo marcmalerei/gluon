@@ -337,6 +337,10 @@ permissions, and tenant-specific content remain caller-owned.
             <div class="ui-sample-wizard" aria-label="Wizard preview"><ol><li class="is-complete">1 · Details</li><li class="is-current" aria-current="step">2 · Configure</li><li>3 · Review</li></ol><section><strong>Configure</strong><span>Caller-owned step content</span></section><footer><button type="button">Previous</button><button type="button">Next</button></footer></div>
             <span class="ui-sample-variant">linear · responsive · keyboard · current</span>
           </template>
+          <template v-else-if="entry.preview === 'onboarding-flow'">
+            <div class="ui-sample-onboarding-flow" aria-label="Onboarding flow preview"><header><strong>Set up workspace</strong></header><ol><li class="is-complete">Profile</li><li class="is-current" aria-current="step">Workspace</li><li>Invite team</li></ol><section><strong>Workspace</strong><span>Caller-owned setup content</span></section><footer><button type="button">Back</button><button type="button">Continue</button></footer></div>
+            <span class="ui-sample-variant">setup · responsive · completion · current</span>
+          </template>
           <template v-else-if="entry.preview === 'admin-shell'">
             <div class="ui-sample-admin-shell" aria-label="Admin shell regions"><span class="is-header">Admin header</span><span class="is-sidebar">Navigation</span><span class="is-content">Workspace</span><span class="is-footer">Status</span></div>
             <span class="ui-sample-variant">sidebar · responsive</span>

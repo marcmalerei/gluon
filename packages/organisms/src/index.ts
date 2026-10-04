@@ -37,4 +37,6 @@ export { SidebarLayout, type SidebarLayoutAttributes, type SidebarLayoutButtonAt
 export { sidebarLayoutStyles } from './sidebar-layout-styles.js';
 export { Wizard, type WizardAttributes, type WizardOpenChangeEvent, type WizardProps, type WizardStep } from './wizard.js';
 export { wizardStyles } from './wizard-styles.js';
+export { OnboardingFlow, type OnboardingFlowAttributes, type OnboardingFlowChangeEvent, type OnboardingFlowProps, type OnboardingFlowStep } from './onboarding-flow.js';
+export { onboardingFlowStyles } from './onboarding-flow-styles.js';
 export { defineOrganism, type Component } from '@gluonjs/core';
