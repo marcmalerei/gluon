@@ -39,6 +39,12 @@ function createHarness() {
       )];
       render(view(), root);
     },
+    swapAdjacent(): void {
+      const next = [...rows];
+      [next[499], next[500]] = [next[500]!, next[499]!];
+      rows = next;
+      render(view(), root);
+    },
   };
 }
 
@@ -46,6 +52,7 @@ describe(`keyed reconciliation (${SIZE.toLocaleString('en-US')} rows)`, () => {
   const reverseHarness = createHarness();
   const rotateHarness = createHarness();
   const replaceHarness = createHarness();
+  const adjacentSwapHarness = createHarness();
 
   bench('reverse all surviving rows', () => {
     reverseHarness.reverse();
@@ -57,5 +64,9 @@ describe(`keyed reconciliation (${SIZE.toLocaleString('en-US')} rows)`, () => {
 
   bench('remove 100 rows and append 100 rows', () => {
     replaceHarness.replaceWindow();
+  });
+
+  bench('swap one adjacent pair', () => {
+    adjacentSwapHarness.swapAdjacent();
   });
 });

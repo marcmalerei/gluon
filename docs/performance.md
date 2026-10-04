@@ -902,6 +902,33 @@ made reverse faster. The runs are separate and Vitest retains aggregate
 statistics rather than individual samples, so these ratios are not generalized
 beyond the recorded commits, machine, browser, and workloads.
 
+## Single adjacent keyed swap fast path (#634)
+
+The keyed renderer now recognizes one narrow shape: an unchanged-length list
+where exactly one adjacent pair swaps positions, every other key stays at its
+index, and the current node range is still in place. It updates both existing
+keyed children, moves their complete node groups once, and leaves all other
+shapes on the existing reconciliation path. The public `repeat()` API and
+keyed DOM identity contract are unchanged.
+
+The read-only prototype experiment used 1,000 keyed nodes and compared the
+existing Gluon-style movement strategy with the direct group move. Both paths
+passed order and node-identity checks:
+
+| Browser | Existing-style prototype mean ms/op | Candidate mean ms/op | Speedup |
+| --- | ---: | ---: | ---: |
+| Chromium | 0.1315 | 0.0006 | 205.18x |
+| Firefox | 0.1369 | 0.0009 | 152.11x |
+| WebKit | 0.1413 | 0.0009 | 157.00x |
+
+These are isolated DOM-movement measurements, not a general framework or
+application claim. The production Gluon harness now includes the focused
+workload and measured 0.0645 ms/op in Chromium, 0.1024 ms/op in Firefox, and
+0.0399 ms/op in WebKit after implementation; no cross-commit production
+baseline is inferred. The complete raw evidence and commands are retained in
+[`keyed-adjacent-swap-634.json`](../benchmarks/results/keyed-adjacent-swap-634.json)
+and [`keyed-adjacent-swap-634.md`](../benchmarks/results/keyed-adjacent-swap-634.md).
+
 ## Interpretation and limits
 
 The benchmark measures synchronous template creation, renderer reconciliation,

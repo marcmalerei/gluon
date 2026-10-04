@@ -111,6 +111,61 @@ describe('keyed list renderer conformance', () => {
     expect(moved.textContent?.trim()).toBe('Bee');
   });
 
+  it('fast-paths one adjacent keyed swap while updating complete keyed groups', () => {
+    const root = document.createElement('div');
+    const view = (rows: readonly Row[]) => html`<section>${repeat(
+      rows,
+      (item) => item.id,
+      (item) => html`
+        <article data-id=${item.id}>${item.label}</article>
+        <small data-detail=${item.id}>detail ${item.label}</small>
+      `,
+    )}</section>`;
+
+    const initial = [row('a', 'Alpha'), row('b', 'Beta'), row('c', 'Gamma')];
+    render(view(initial), root);
+    const identities = new Map(
+      [...root.querySelectorAll('[data-id], [data-detail]')].map((node) => [
+        node.getAttribute('data-id') ?? `detail:${node.getAttribute('data-detail')}`,
+        node,
+      ]),
+    );
+
+    render(view([row('a', 'Alpha updated'), row('c', 'Gamma updated'), row('b', 'Beta updated')]), root);
+
+    expect([...root.querySelectorAll('[data-id]')].map((node) => node.getAttribute('data-id'))).toEqual(['a', 'c', 'b']);
+    expect([...root.querySelectorAll('[data-detail]')].map((node) => node.getAttribute('data-detail'))).toEqual(['a', 'c', 'b']);
+    for (const [key, node] of identities) {
+      const selector = key.startsWith('detail:')
+        ? `[data-detail="${key.slice(7)}"]`
+        : `[data-id="${key}"]`;
+      expect(root.querySelector(selector)).toBe(node);
+    }
+    expect(root.querySelector('[data-id="c"]')?.textContent).toBe('Gamma updated');
+    expect(root.querySelector('[data-detail="b"]')?.textContent).toBe('detail Beta updated');
+  });
+
+  it('fast-paths adjacent lazy primitive keyed rows without replacing their elements', () => {
+    const root = document.createElement('div');
+    const view = (rows: readonly Row[]) => html`<ul>${repeat(
+      rows,
+      (item) => item.id,
+      (item) => html`<li data-id=${item.id}>${item.label}</li>`,
+    )}</ul>`;
+    const initial = [row('a', 'Alpha'), row('b', 'Beta'), row('c', 'Gamma')];
+
+    render(view(initial), root);
+    const identities = new Map(
+      [...root.querySelectorAll('li')].map((item) => [item.dataset.id!, item]),
+    );
+    render(view([row('a', 'Alpha updated'), row('c', 'Gamma updated'), row('b', 'Beta updated')]), root);
+
+    expect([...root.querySelectorAll('li')].map((item) => item.dataset.id)).toEqual(['a', 'c', 'b']);
+    for (const [id, item] of identities) expect(root.querySelector(`[data-id="${id}"]`)).toBe(item);
+    expect(root.querySelector('[data-id="c"]')?.textContent).toBe('Gamma updated');
+    expect(root.querySelector('[data-id="b"]')?.textContent).toBe('Beta updated');
+  });
+
   it('reuses a recently removed keyed child after suspending its listeners', () => {
     const root = document.createElement('div');
     const clicks: string[] = [];
