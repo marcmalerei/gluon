@@ -11,7 +11,7 @@ const sourceCommit = git('rev-parse', 'HEAD');
 await mkdir(workDir, { recursive: true });
 run('node', ['scripts/run-rendering-benchmark.mjs', ...runnerArgs('rendering')]);
 run('node', ['scripts/run-application-benchmark.mjs', ...runnerArgs('application')]);
-run('node', ['scripts/run-hydration-comparison-benchmark.mjs', ...runnerArgs('hydration')]);
+run('node', ['scripts/run-hydration-comparison-benchmark.mjs', ...runnerArgs('hydration'), `--gluon-verification=${options.gluonVerification}`]);
 run('npm', ['run', 'build:core']);
 run('npm', ['run', 'build:ssr']);
 run('node', ['scripts/run-ssr-comparison-benchmark.mjs', `--samples=${options.samples}`, `--warmup=${options.warmupRounds}`, `--output=${pathFor('ssr')}`]);
@@ -34,6 +34,7 @@ const evidence = {
     includedOptimizations: [
       'All current Gluon production code at the recorded commit, including the adjacent keyed-swap fast path.',
       'Current template, spread, allocation, style, SSR, and hydration paths built by the repository runners.',
+      `Gluon hydration verification: ${options.gluonVerification}.`,
     ],
     adjacentSwapEvidence: 'benchmarks/results/keyed-adjacent-swap-634.json',
   },
@@ -81,9 +82,13 @@ function parseOptions(args) {
   const samples = positiveInteger(values['--samples'] ?? '20', 'samples');
   const warmupRounds = nonNegativeInteger(values['--warmup'] ?? '5', 'warmup');
   const timeout = positiveInteger(values['--timeout'] ?? '300000', 'timeout');
+  const gluonVerification = values['--gluon-verification'] ?? 'strict';
+  if (gluonVerification !== 'strict' && gluonVerification !== 'markers') {
+    throw new Error('--gluon-verification must be strict or markers.');
+  }
   const output = values['--output'] ?? 'benchmarks/results/framework-comparison-634.json';
   if (!output.endsWith('.json')) throw new Error('--output must end in .json.');
-  return { browsers, samples, warmupRounds, timeout, output };
+  return { browsers, samples, warmupRounds, timeout, gluonVerification, output };
 }
 
 function positiveInteger(value, name) {

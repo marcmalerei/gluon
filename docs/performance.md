@@ -493,6 +493,34 @@ per framework because Lit SSR markers, Gluon hydration markers, and Vue's SSR
 output are not byte-identical. This lane does not claim streaming,
 concurrent-request, or memory/GC results.
 
+Issue [#637](https://github.com/marcmalerei/gluon/issues/637) adds an additive,
+opt-in Gluon marker-verification lane. Passing
+`verification: 'markers'` to `hydrateTemplate()`, `hydrateApplication()`, or
+`hydrateElement()` resolves the server value tree but does not serialize a
+second expected HTML string or parse it into a comparison template. The core
+runtime validates marker pairing, duplicate and malformed transport, consumes
+every range and attribute marker, and retains DOM identity. The default remains
+strict comparison with the existing mismatch diagnostics and recovery policy.
+Marker verification is a trusted transport contract: it detects marker
+corruption, but it intentionally does not compare arbitrary text or ordinary
+attributes. It therefore uses `recovery: 'throw'` and aborts on transport
+failure instead of silently replacing the root.
+
+To compare the opt-in lane against Lit and Vue on the same 120-row fixture:
+
+```bash
+npm run benchmark:hydration -- \
+  --browsers=chromium \
+  --samples=20 \
+  --warmup=5 \
+  --gluon-verification=markers \
+  --output=.tmp/hydration-markers.json
+```
+
+The runner records the Gluon verification mode in JSON and Markdown. The
+ordinary comparison command continues to use strict Gluon verification, so
+strict and marker measurements are never conflated.
+
 ### Hydration hot-path follow-up (#502)
 
 The successful Gluon hydration path now collects adoption markers while the

@@ -44,7 +44,14 @@ try {
       const result = await withTimeout(
         page.evaluate(
           ({ hydrationFixtures, config }) => window.runHydrationComparison(hydrationFixtures, config),
-          { hydrationFixtures: fixtures, config: { samples: options.samples, warmupRounds: options.warmupRounds } },
+          {
+            hydrationFixtures: fixtures,
+            config: {
+              samples: options.samples,
+              warmupRounds: options.warmupRounds,
+              gluonVerification: options.gluonVerification,
+            },
+          },
         ),
         options.browserTimeoutMs,
         `${browserName} hydration benchmark`,
@@ -97,6 +104,7 @@ const evidence = {
     hydration: 'parse server markup before timing; measure framework hydration only',
     interaction: 'click row 119 after hydration and await framework update completion',
     teardown: 'unmount hydrated application and require an empty benchmark root',
+    gluonVerification: options.gluonVerification,
     boundary: 'equivalent behavior with framework-native SSR and hydration APIs; markup transport remains framework-specific',
   },
   fixtures: {
@@ -123,7 +131,11 @@ function parseOptions(args) {
   const browserTimeoutMs = positiveInteger(values['--timeout'] ?? '300000', 'timeout');
   const output = values['--output'] ?? '.tmp/hydration-comparison-results.json';
   if (extname(output) !== '.json') throw new Error('--output must end in .json.');
-  return { browsers, samples, warmupRounds, browserTimeoutMs, output };
+  const gluonVerification = values['--gluon-verification'] ?? 'strict';
+  if (gluonVerification !== 'strict' && gluonVerification !== 'markers') {
+    throw new Error('--gluon-verification must be strict or markers.');
+  }
+  return { browsers, samples, warmupRounds, browserTimeoutMs, gluonVerification, output };
 }
 
 function positiveInteger(value, name) {
@@ -182,7 +194,7 @@ function renderMarkdown(evidence) {
     '',
     `Packages: Gluon ${evidence.environment.packages.gluon}, Lit ${evidence.environment.packages.lit} with SSR ${evidence.environment.packages.litSsr}/${evidence.environment.packages.litSsrClient}, Vue ${evidence.environment.packages.vue}, Playwright ${evidence.environment.packages.playwright}`,
     '',
-    `Method: ${evidence.methodology.samples} interleaved samples after ${evidence.methodology.warmupRounds} warm-ups. The server markup is installed before timing; hydration, row-119 interaction, and teardown are measured separately.`,
+    `Method: ${evidence.methodology.samples} interleaved samples after ${evidence.methodology.warmupRounds} warm-ups. The server markup is installed before timing; hydration, row-119 interaction, and teardown are measured separately. Gluon verification: ${evidence.methodology.gluonVerification}.`,
     '',
   ];
   for (const run of evidence.runs) {

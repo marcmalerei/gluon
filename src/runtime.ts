@@ -2268,7 +2268,9 @@ export interface HydrationMismatch {
 }
 
 export interface HydrationOptions {
-  readonly expectedMarkup: string;
+  /** Strict compares the serialized tree; markers skips the duplicate parse/compare step. */
+  readonly verification?: 'strict' | 'markers';
+  readonly expectedMarkup?: string;
   /** Application-owned policy used only for browser HTML parser sinks. */
   readonly trustedTypes?: TrustedTypesConfig;
   /** @internal SSR supplies the deterministic marker range start for a nested root. */
@@ -2300,27 +2302,46 @@ export function hydrate(
 ): HydrationResult {
   if (!container) return Object.freeze({ mismatches: [], retained: false, recovered: false });
   if (!isTemplateResult(result)) throw new TypeError('hydrate() expects a TemplateResult created by html or svg.');
+  const verification = options.verification ?? 'strict';
+  if (verification === 'markers' && options.recovery === 'replace') {
+    throw new TypeError('Marker hydration verification requires recovery: "throw".');
+  }
+  if (verification !== 'markers' && options.expectedMarkup === undefined) {
+    throw new TypeError('Strict hydration verification requires expectedMarkup.');
+  }
+  const recovery = verification === 'markers' ? 'throw' : options.recovery;
+  const effectiveOptions = recovery === options.recovery ? options : { ...options, recovery };
   const trustedTypes = options.trustedTypes ?? resolveApplicationContext(container)?.config.trustedTypes;
   validateTrustedTypesConfig(trustedTypes);
   const styleDependencies = collectComponentStyleDependencies(result);
   const compiled = getCompiledTemplate(result, trustedTypes);
-  const expectedTemplate = document.createElement('template');
-  assignTemplateHTML(expectedTemplate, options.expectedMarkup, 'hydration expected markup', trustedTypes);
   const mismatches: HydrationMismatch[] = [];
   const adoption = createHydrationAdoptionCollector();
-  compareHydrationNodes(
-    expectedTemplate.content.childNodes,
-    container.childNodes,
-    'root',
-    options,
-    mismatches,
-    adoption,
-  );
+  if (verification === 'markers') {
+    try {
+      adoption.collect(container);
+      adoption.validate();
+    } catch (error) {
+      recordHydrationMismatch('structure', 'root', 'valid hydration markers', error, effectiveOptions, mismatches);
+      throw new HydrationMismatchError(Object.freeze([...mismatches]));
+    }
+  } else {
+    const expectedTemplate = document.createElement('template');
+    assignTemplateHTML(expectedTemplate, options.expectedMarkup!, 'hydration expected markup', trustedTypes);
+    compareHydrationNodes(
+      expectedTemplate.content.childNodes,
+      container.childNodes,
+      'root',
+      effectiveOptions,
+      mismatches,
+      adoption,
+    );
+  }
   if (options.state && stableHydrationValue(options.state.server) !== stableHydrationValue(options.state.client)) {
-    recordHydrationMismatch('state', 'state', options.state.server, options.state.client, options, mismatches);
+    recordHydrationMismatch('state', 'state', options.state.server, options.state.client, effectiveOptions, mismatches);
   }
   if (mismatches.length > 0) {
-    if (options.recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
+    if (recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
     render(result, container);
     return Object.freeze({ mismatches: Object.freeze(mismatches), retained: false, recovered: true });
   }
@@ -2331,6 +2352,7 @@ export function hydrate(
   try {
     const context = adoption.createContext(styles, options.markerOffset ?? 0);
     const bindings = instantiateHydratedBindings(compiled.descriptors, result.values, context);
+    if (verification === 'markers') adoption.assertComplete(context);
     setRootInstance(container, {
       template: compiled,
       bindings,
@@ -2345,8 +2367,8 @@ export function hydrate(
     return Object.freeze({ mismatches: [], retained: true, recovered: false });
   } catch (error) {
     styles.dispose();
-    recordHydrationMismatch('structure', 'root', 'valid hydration markers', error, options, mismatches);
-    if (options.recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
+    recordHydrationMismatch('structure', 'root', 'valid hydration markers', error, effectiveOptions, mismatches);
+    if (recovery === 'throw') throw new HydrationMismatchError(Object.freeze([...mismatches]));
     render(result, container);
     return Object.freeze({ mismatches: Object.freeze(mismatches), retained: false, recovered: true });
   }
@@ -2610,6 +2632,8 @@ interface HydrationAdoptionContext {
   marker: number;
   readonly ranges: Map<string, HydrationRange>;
   readonly attributes: Map<number, Element>;
+  readonly consumedRanges: Set<string>;
+  readonly consumedAttributes: Set<number>;
   readonly styles: RenderStyleTracker;
 }
 
@@ -2617,6 +2641,9 @@ interface HydrationAdoptionCollector {
   readonly ranges: Map<string, HydrationRange>;
   readonly starts: Map<string, Comment>;
   readonly attributes: Map<number, Element>;
+  collect(root: Node): void;
+  validate(): void;
+  assertComplete(context: HydrationAdoptionContext): void;
   visit(node: Node): void;
   createContext(styles: RenderStyleTracker, markerOffset: number): HydrationAdoptionContext;
 }
@@ -2624,21 +2651,63 @@ interface HydrationAdoptionCollector {
 function createHydrationAdoptionCollector(): HydrationAdoptionCollector {
   const ranges = new Map<string, HydrationRange>();
   const starts = new Map<string, Comment>();
+  const openStack: string[] = [];
   const attributes = new Map<number, Element>();
+  const markerErrors: string[] = [];
   return {
     ranges,
     starts,
     attributes,
+    collect(root: Node): void {
+      const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
+      );
+      while (walker.nextNode()) this.visit(walker.currentNode);
+    },
+    validate(): void {
+      if (starts.size > 0) {
+        markerErrors.push(`Unclosed hydration marker range: ${[...starts.keys()].join(', ')}.`);
+      }
+      if (openStack.length > 0) {
+        markerErrors.push(`Unclosed hydration marker nesting: ${openStack.join(', ')}.`);
+      }
+      if (markerErrors.length > 0) throw new Error(markerErrors.join(' '));
+    },
+    assertComplete(context: HydrationAdoptionContext): void {
+      const unusedRanges = [...ranges.keys()].filter((key) => !context.consumedRanges.has(key));
+      const unusedAttributes = [...attributes.keys()].filter((marker) => !context.consumedAttributes.has(marker));
+      if (unusedRanges.length > 0 || unusedAttributes.length > 0) {
+        throw new Error(
+          `Unexpected hydration markers: ${[...unusedRanges, ...unusedAttributes.map((marker) => `h:${marker}`)].join(', ')}.`,
+        );
+      }
+    },
     visit(node: Node): void {
       if (node.nodeType === Node.COMMENT_NODE) {
         const comment = node as Comment;
         const start = comment.data.match(/^gluon:([hik]):(\d+)$/);
-        if (start?.[1] && start[2]) starts.set(`${start[1]}:${start[2]}`, comment);
         const end = comment.data.match(/^gluon:\/([hik]):(\d+)$/);
-        if (end?.[1] && end[2]) {
+        if (start?.[1] && start[2]) {
+          const key = `${start[1]}:${start[2]}`;
+          if (starts.has(key) || ranges.has(key)) markerErrors.push(`Duplicate hydration marker range ${key}.`);
+          starts.set(key, comment);
+          openStack.push(key);
+        } else if (end?.[1] && end[2]) {
           const key = `${end[1]}:${end[2]}`;
           const opening = starts.get(key);
-          if (opening) ranges.set(key, { start: opening, end: comment });
+          if (!opening) markerErrors.push(`Missing opening hydration marker range ${key}.`);
+          else {
+            if (openStack.at(-1) !== key) {
+              markerErrors.push(`Out-of-order hydration marker range ${key}.`);
+            } else {
+              openStack.pop();
+            }
+            ranges.set(key, { start: opening, end: comment });
+            starts.delete(key);
+          }
+        } else if (comment.data.startsWith('gluon:')) {
+          markerErrors.push(`Malformed hydration marker ${comment.data}.`);
         }
         return;
       }
@@ -2647,11 +2716,22 @@ function createHydrationAdoptionCollector(): HydrationAdoptionCollector {
       for (let index = 0; index < element.attributes.length; index += 1) {
         const attribute = element.attributes[index]!;
         const match = attribute.name.match(/^data-gluon-h-(\d+)$/);
-        if (match?.[1]) attributes.set(Number(match[1]), element);
+        if (match?.[1]) {
+          const marker = Number(match[1]);
+          if (attributes.has(marker)) markerErrors.push(`Duplicate hydration attribute marker ${marker}.`);
+          attributes.set(marker, element);
+        }
       }
     },
     createContext(styles: RenderStyleTracker, markerOffset: number): HydrationAdoptionContext {
-      return { marker: markerOffset, ranges, attributes, styles };
+      return {
+        marker: markerOffset,
+        ranges,
+        attributes,
+        consumedRanges: new Set(),
+        consumedAttributes: new Set(),
+        styles,
+      };
     },
   };
 }
@@ -2667,8 +2747,10 @@ function instantiateHydratedBindings(
     const value = descriptor.index < values.length ? values[descriptor.index]! : nothing;
     let part: Part;
     if (descriptor.kind === 'node') {
-      const range = context.ranges.get(`h:${marker}`);
+      const rangeKey = `h:${marker}`;
+      const range = context.ranges.get(rangeKey);
       if (!range) throw new Error(`Missing child hydration marker ${marker}.`);
+      context.consumedRanges.add(rangeKey);
       const nodePart = new NodePart(range.start, range.start, context.styles);
       nodePart.hydrateValue(value, range.end, context);
       range.end.remove();
@@ -2676,6 +2758,7 @@ function instantiateHydratedBindings(
     } else {
       const element = context.attributes.get(marker);
       if (!element) throw new Error(`Missing attribute hydration marker ${marker}.`);
+      context.consumedAttributes.add(marker);
       element.removeAttribute(`data-gluon-h-${marker}`);
       part = descriptor.kind === 'spread'
         ? new SpreadPart(element)
@@ -2707,8 +2790,10 @@ function takeHydrationRange(
   kind: 'i' | 'k',
 ): HydrationRange {
   const marker = context.marker++;
-  const range = context.ranges.get(`${kind}:${marker}`);
+  const rangeKey = `${kind}:${marker}`;
+  const range = context.ranges.get(rangeKey);
   if (!range) throw new Error(`Missing ${kind === 'i' ? 'array' : 'keyed'} hydration marker ${marker}.`);
+  context.consumedRanges.add(rangeKey);
   return range;
 }
 

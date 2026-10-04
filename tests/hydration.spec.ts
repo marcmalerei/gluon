@@ -393,6 +393,59 @@ describe('SSR hydration', () => {
     expect(root.firstChild).toBe(original);
   });
 
+  it('supports opt-in marker verification without reparsing expected markup', async () => {
+    const result = html`<article title=${'expected'}><span>${'text'}</span></article>`;
+    const prepared = await prepareForHydration(result);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const article = root.firstElementChild;
+    const span = root.querySelector('span');
+
+    const hydrated = await hydrateTemplate(result, root, {
+      verification: 'markers',
+      recovery: 'throw',
+    });
+
+    expect(hydrated).toEqual({ mismatches: [], retained: true, recovered: false });
+    expect(root.firstElementChild).toBe(article);
+    expect(root.querySelector('span')).toBe(span);
+    expect(root.querySelector('[data-gluon-h-0]')).toBeNull();
+  });
+
+  it('aborts marker verification when marker transport is missing or out of order', async () => {
+    const result = html`<p>${'value'}</p>`;
+    const prepared = await prepareForHydration(result);
+
+    const missingRoot = document.createElement('div');
+    missingRoot.innerHTML = prepared.html.replace(/<!--gluon:h:\d+-->/, '');
+    await expect(hydrateTemplate(result, missingRoot, {
+      verification: 'markers',
+      recovery: 'throw',
+    })).rejects.toMatchObject({
+      mismatches: [expect.objectContaining({ category: 'structure', recovery: 'abort' })],
+    });
+
+    const outOfOrderResult = html`<p>${'first'}${'second'}</p>`;
+    const outOfOrderPrepared = await prepareForHydration(outOfOrderResult);
+    const outOfOrderRoot = document.createElement('div');
+    outOfOrderRoot.innerHTML = outOfOrderPrepared.html;
+    const commentWalker = document.createTreeWalker(outOfOrderRoot, NodeFilter.SHOW_COMMENT);
+    const endMarkers: Comment[] = [];
+    while (commentWalker.nextNode()) {
+      if (commentWalker.currentNode.textContent?.startsWith('gluon:/h:')) {
+        endMarkers.push(commentWalker.currentNode as Comment);
+      }
+    }
+    expect(endMarkers).toHaveLength(2);
+    [endMarkers[0]!.data, endMarkers[1]!.data] = [endMarkers[1]!.data, endMarkers[0]!.data];
+    await expect(hydrateTemplate(outOfOrderResult, outOfOrderRoot, {
+      verification: 'markers',
+      recovery: 'throw',
+    })).rejects.toMatchObject({
+      mismatches: [expect.objectContaining({ category: 'structure', recovery: 'abort' })],
+    });
+  });
+
   it('retains missing and extra attribute diagnostics while comparing without attribute snapshots', async () => {
     const result = html`<p title=${'expected'}>${'text'}</p>`;
     const prepared = await prepareForHydration(result);
@@ -873,6 +926,26 @@ describe('SSR hydration', () => {
     const result = await hydrateTemplate(value, root);
     expect(result.retained).toBe(true);
     expect([...root.querySelectorAll('b, i, u')]).toEqual(elements);
+  });
+
+  it('marker-verifies array and keyed child ranges without changing their identity', async () => {
+    const value = html`<main>${[
+      'A',
+      html`<b>${'B'}</b>`,
+      null,
+    ]}${repeat([1, 2], (item) => item, (item) => html`<i>${item}</i>`)}</main>`;
+    const prepared = await prepareForHydration(value);
+    const root = document.createElement('div');
+    root.innerHTML = prepared.html;
+    const elements = [...root.querySelectorAll('b, i')];
+
+    const result = await hydrateTemplate(value, root, {
+      verification: 'markers',
+      recovery: 'throw',
+    });
+
+    expect(result).toEqual({ mismatches: [], retained: true, recovered: false });
+    expect([...root.querySelectorAll('b, i')]).toEqual(elements);
   });
 
   it('retains deterministic menu nodes and activates controlled behavior after hydration', async () => {
