@@ -33,6 +33,7 @@ import { defineStore } from '@gluonjs/store';
 import {
   SsrRenderError,
   prepareForHydration,
+  resolveForHydration,
   createStyleManifest,
   renderResourceHints,
   renderStyleCarriers,
@@ -1380,6 +1381,20 @@ describe('@gluonjs/ssr stream-oriented interfaces', () => {
     expect(transport).toContain('loading');
     expect(transport).toContain('data-gluon-async-patch="0"');
     expect(transport).toContain('done');
+  });
+
+  it('reuses already-resolved hydration trees but still resolves server contracts', async () => {
+    const resolvedValue = html`<main>${['ready', html`<p>nested</p>`]}</main>`;
+    expect(await resolveForHydration(resolvedValue)).toBe(resolvedValue);
+
+    const contractValue = html`<main>${Suspense({
+      source: Promise.resolve('ready'),
+      fallback: html`<i>pending</i>`,
+      children: (value) => html`<strong>${value}</strong>`,
+    })}</main>`;
+    const resolvedContract = await resolveForHydration(contractValue);
+    expect(resolvedContract).not.toBe(contractValue);
+    expect(withoutHydrationMarkers(await renderToString(resolvedContract))).toContain('<strong>ready</strong>');
   });
 
   it('applies progressive patches to a DOM, installs styles, and handles nested boundaries', () => {
