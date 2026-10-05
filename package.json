@@ -85,6 +85,7 @@
     "build:language-server": "npm run build --workspace @gluonjs/language-server",
     "build:vue-analyzer": "npm run build --workspace @gluonjs/vue-migration-analyzer",
     "build:create-gluon": "npm run build --workspace create-gluon",
+    "build:packages": "npm run build:core && npm run build:json-forms && npm run build:ui && npm run build:router && npm run build:store && npm run build:i18n && npm run build:ssr && npm run build:graphql && npm run build:compiler && npm run build:vite && npm run build:gluon-components-vite && npm run build:test-utils && npm run build:devtools-api && npm run build:devtools && npm run build:graph && npm run build:language-server && npm run build:vue-analyzer && npm run build:create-gluon",
     "build:shop": "vite build --config examples/shop/vite.config.ts",
     "build:shop:server": "vite build --config examples/shop/vite.config.ts --ssr src/server.ts --outDir dist-server",
     "build:shop:static": "node scripts/generate-shop-static.mjs",

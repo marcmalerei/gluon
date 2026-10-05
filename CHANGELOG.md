@@ -38,6 +38,10 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 - Increased clean-runner build headroom in the quality and release workflows so
   the complete versioned documentation build is not cut off before artifact and
   fixture verification can run (#643).
+- Node 22/24 runtime compatibility checks now build the published packages
+  without duplicating the memory-intensive full documentation/examples build;
+  the full build remains covered by the repository and release-artifact gates
+  (#643).
 
 ## [1.13.0] - 2026-09-25
 

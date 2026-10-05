@@ -52,7 +52,7 @@ bounded expensive steps:
 | `create-gluon-fixtures`   |                  60 minutes | install 10, build 30, fixture matrix 15 minutes                                             |
 | `release-artifacts`       |                  60 minutes | install 10, build 30, release artifacts plus fresh VSIX package/LSP smoke check 12 minutes |
 | `browser-engines`         |       30 minutes per engine | install 10, browser matrix 15, individual evidence commands 10–15 minutes                 |
-| `node-runtime`            | 60 minutes per Node version | install 10, build 30, SSR suite 10 minutes                                                |
+| `node-runtime`            | 60 minutes per Node version | install 10, package build 30, SSR suite 10 minutes; full repository/docs build is covered by `repository` and `release-artifacts` |
 | `budgets`                 |                  20 minutes | install 10; each build/budget command 5 minutes                                           |
 | `performance-evidence`    |                  10 minutes | artifact aggregation and completeness validation 5 minutes                                |
 
