@@ -54,7 +54,7 @@ jobs:
             echo "RELEASE_TAG=v$DISPATCH_VERSION" >> "$GITHUB_ENV"
           fi
       - run: node scripts/validate-release-recovery.mjs --version "$RELEASE_VERSION" --allow-pending-evidence
-      - run: npm run check:repository
+      - run: npm run build:packages
       - run: npm run release:validate -- --candidate "$RELEASE_VERSION"
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION"
       - run: npm run release:vscode -- --version "$RELEASE_VERSION" --tag "$RELEASE_TAG"
@@ -203,7 +203,7 @@ jobs:
             echo "RELEASE_VERSION=$DISPATCH_VERSION" >> "$GITHUB_ENV"
             echo "RELEASE_TAG=v$DISPATCH_VERSION" >> "$GITHUB_ENV"
           fi
-      - run: npm run build
+      - run: npm run build:packages
         timeout-minutes: 30
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION" --output .tmp/release-reproduced
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
