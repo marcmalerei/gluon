@@ -1,0 +1,43 @@
+{
+  "$schema": "../release-cut-evidence.schema.json",
+  "schemaVersion": 1,
+  "releaseVersion": "1.14.0",
+  "testedCommit": "d4020fd9282a1cc8cc475d8cc4195ebbeabb4048",
+  "cutAt": "2026-10-05T10:44:52Z",
+  "automatedQualityRun": {
+    "url": "https://github.com/marcmalerei/gluon/actions/runs/37293684489",
+    "conclusion": "success"
+  },
+  "hostingPreflight": {
+    "immutableReleases": {
+      "enabled": true,
+      "enforcedByOwner": false,
+      "checkedBy": "marcmalerei",
+      "checkedAt": "2026-10-05T10:44:52Z"
+    },
+    "releaseTagRulesets": {
+      "creationRulesetId": 18869893,
+      "immutabilityRulesetId": 18869897,
+      "creationBypass": {
+        "actorId": 25964605,
+        "actorType": "User",
+        "bypassMode": "always"
+      },
+      "immutabilityBypassActorCount": 0,
+      "checkedBy": "marcmalerei",
+      "checkedAt": "2026-10-05T10:44:52Z"
+    }
+  },
+  "supportBoundary": {
+    "model": "automated-engine-evidence-only",
+    "brandedBrowserSupportClaimed": false,
+    "operatingSystemSupportClaimed": false,
+    "deviceSupportClaimed": false,
+    "assistiveTechnologySupportClaimed": false,
+    "manualBrowserDeviceEvidenceRequired": false,
+    "manualAssistiveTechnologyEvidenceRequired": false,
+    "singleOperatorRiskAccepted": true
+  },
+  "acceptedBy": "marcmalerei",
+  "acceptedAt": "2026-10-05T10:44:52Z"
+}
