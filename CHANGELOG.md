@@ -35,6 +35,9 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 - Repaired catalog previews, documentation builds, example boundaries, and
   generated package metadata across the new UI surfaces.
+- Increased clean-runner build headroom in the quality and release workflows so
+  the complete versioned documentation build is not cut off before artifact and
+  fixture verification can run (#643).
 
 ## [1.13.0] - 2026-09-25
 

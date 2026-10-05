@@ -21,7 +21,7 @@ jobs:
       options: --ipc=host --user pwuser
     # Independent fixture and release-artifact checks run in parallel jobs.
     # Keep enough headroom for a cold hosted runner while making a stuck runner visible.
-    timeout-minutes: 35
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
         with:
@@ -34,14 +34,14 @@ jobs:
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
       - run: npm run check:repository
-        timeout-minutes: 34
+        timeout-minutes: 55
 
   create-gluon-fixtures:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
       options: --ipc=host --user pwuser
-    timeout-minutes: 35
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
       - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -52,13 +52,13 @@ jobs:
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
       - run: npm run build
-        timeout-minutes: 15
+        timeout-minutes: 30
       - run: npm run check:create-gluon-fixtures
         timeout-minutes: 15
 
   release-artifacts:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
         with:
@@ -70,7 +70,7 @@ jobs:
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
       - run: npm run build
-        timeout-minutes: 15
+        timeout-minutes: 30
       - run: npm run check:release-artifacts
         timeout-minutes: 12
 
@@ -151,7 +151,7 @@ jobs:
 
   node-runtime:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -165,7 +165,7 @@ jobs:
       - run: npm ci --ignore-scripts --legacy-peer-deps
         timeout-minutes: 10
       - run: npm run build
-        timeout-minutes: 15
+        timeout-minutes: 30
       - run: npm run test:ssr
         timeout-minutes: 10
 

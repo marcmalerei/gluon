@@ -204,7 +204,7 @@ jobs:
             echo "RELEASE_TAG=v$DISPATCH_VERSION" >> "$GITHUB_ENV"
           fi
       - run: npm run build
-        timeout-minutes: 15
+        timeout-minutes: 30
       - run: npm run release:artifacts -- --version "$RELEASE_VERSION" --output .tmp/release-reproduced
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -235,7 +235,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
       - run: npm run build
-        timeout-minutes: 15
+        timeout-minutes: 30
       - run: npm run check:create-gluon-fixtures
 
   browser-engines:
@@ -316,7 +316,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --legacy-peer-deps
       - run: npm run build
-        timeout-minutes: 15
+        timeout-minutes: 30
       - run: npm run test:ssr
 
   performance-evidence:
