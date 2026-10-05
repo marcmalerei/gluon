@@ -561,6 +561,15 @@ README, license, and changelog path. The recovery workflow therefore publishes
 the unchanged `1.0.7` archives and creates the GitHub release against canonical
 tag `v1.0.7`; the recovery tag is only the protected OIDC execution ref.
 
+For v1.14.0, the canonical tag's first candidate run stopped before publication
+because the Node 24 runner exhausted its JavaScript heap while duplicating the
+full VitePress documentation build. Recovery issue [#646](https://github.com/marcmalerei/gluon/issues/646)
+keeps the canonical package tree unchanged and uses the existing recovery-tag
+protocol: candidate and reproducibility jobs build the published packages only,
+while the successful Quality Gates repository and release-artifact jobs remain
+the evidence for the full documentation/examples build. The recovery manifest
+and refreshed evidence files remain within the exact validator allowlist.
+
 If publication instead stops before any release archive is published because a
 new package lacks its reviewed bootstrap record, use the distinct
 `missing-bootstrap-record` recovery category. It still preserves the canonical
