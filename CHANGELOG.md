@@ -7,6 +7,35 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-05
+
+### Added
+
+- Added the CSS-variable-ready `DataTable`, `Autocomplete`, `HoverCard`,
+  `Breadcrumbs`, `Pagination`, `Calendar`, `DatePicker`, `DateRangePicker`,
+  `TimePicker`, `FileUpload`, `MultiSelectField`, `ListboxField`, `Tooltip`,
+  `TreeView`, `CommandPalette`, `Popover`, `Sheet`, and `ComboboxField`
+  molecules.
+- Added `NotificationCenter`, `SettingsShell`, `StatusTracker`,
+  `ApprovalFlow`, `OnboardingFlow`, `Wizard`, `SidebarLayout`,
+  `MarketingHeader`, `DashboardShell`, `NavigationRail`, `AdminShell`,
+  `SiteHeader`, `SiteFooter`, `MegaMenu`, `PageLayout`, `ProductGallery`,
+  `ProductGrid`, `ResizablePanels`, and `SplitPane` organisms.
+- Added tenant-scoped UI foundation and accessibility/file-input utilities,
+  plus the completed versioned UI catalog and documentation information
+  architecture.
+
+### Performance
+
+- Added hydration marker verification and SSR hydration-value reuse fast paths;
+  both preserve the existing public API and keep server contracts and fallback
+  resolution intact.
+
+### Fixed
+
+- Repaired catalog previews, documentation builds, example boundaries, and
+  generated package metadata across the new UI surfaces.
+
 ## [1.13.0] - 2026-09-25
 
 ### Added

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-05
+
+### Performance
+
+- Added hydration marker verification and resolved-value reuse fast paths while retaining server-contract resolution, fallback handling, and the existing SSR API.
+
 ## [1.13.0] - 2026-09-25
 
 ### Changed

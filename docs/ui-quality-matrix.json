@@ -14,7 +14,7 @@
       "title": "Catalog entries, variations, and previews",
       "evidence": ["build", "browser", "docs"],
       "commands": ["check:ui-catalog", "check:ui-catalog-browser"],
-      "paths": ["scripts/build-ui-catalog.mjs", "scripts/validate-ui-catalog-browser.mjs", "docs-site/data/ui-catalog.json", "docs-site/content/1.13.0/guides/ui-catalog/index.md"]
+      "paths": ["scripts/build-ui-catalog.mjs", "scripts/validate-ui-catalog-browser.mjs", "docs-site/data/ui-catalog.json", "docs-site/content/1.14.0/guides/ui-catalog/index.md"]
     },
     {
       "id": "css-variables-and-tenants",

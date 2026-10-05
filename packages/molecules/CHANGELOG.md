@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-05
+
 - Added the CSS-variable-ready `SortControl` molecule with native select semantics, helper/error relationships, and caller-owned sorting state.
 - Added controlled `Popover` and `Sheet` overlay molecules with responsive placements, focus and dismissal semantics, and tenant-safe style hooks.
 
