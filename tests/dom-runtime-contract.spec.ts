@@ -46,6 +46,25 @@ describe('DOM runtime contract', () => {
     }
   });
 
+  it('keeps single-element roots and falls back for multi-root templates', () => {
+    const singleRoot = document.createElement('div');
+    const multiRoot = document.createElement('div');
+    const view = (value: string) => html`<article data-value=${value}><p>${value}</p></article>`;
+
+    render(view('first'), singleRoot);
+    const article = singleRoot.firstElementChild;
+    const paragraph = article?.firstElementChild;
+    render(view('second'), singleRoot);
+
+    expect(singleRoot.innerHTML).toBe('<article data-value="second"><p><!--gluon:1-->second</p></article>');
+    expect(singleRoot.firstElementChild).toBe(article);
+    expect(singleRoot.querySelector('p')).toBe(paragraph);
+
+    render(html`<span>first</span><span>second</span>`, multiRoot);
+    expect(multiRoot.children).toHaveLength(2);
+    expect(multiRoot.textContent).toBe('firstsecond');
+  });
+
   it('imports each inert template once and clones independent active-document instances', () => {
     const importNode = vi.spyOn(document, 'importNode');
     const cloneNode = vi.spyOn(Node.prototype, 'cloneNode');
@@ -63,7 +82,7 @@ describe('DOM runtime contract', () => {
       expect(cloneNode).toHaveBeenCalledTimes(2);
       expect(cloneNode.mock.contexts).toHaveLength(2);
       expect(cloneNode.mock.contexts.every((context) => (
-        context instanceof DocumentFragment && context.ownerDocument === document
+        context instanceof Element && context.ownerDocument === document
       ))).toBe(true);
 
       const firstArticle = firstRoot.querySelector('article')!;
