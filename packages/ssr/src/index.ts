@@ -822,6 +822,7 @@ function allocateMarker(context: SerializationContext): number {
 
 async function resolveHydrationValue(value: TemplateValue, signal?: AbortSignal): Promise<TemplateValue> {
   throwIfAborted(signal);
+  if (isHydrationValueAlreadyResolved(value)) return value;
   if (Array.isArray(value)) {
     return Promise.all(value.map((child) => resolveHydrationValue(child, signal)));
   }
@@ -864,6 +865,12 @@ async function resolveHydrationValue(value: TemplateValue, signal?: AbortSignal)
     return repeat(items, (item) => item.key, (item) => item.value as TemplateValue);
   }
   return value;
+}
+
+function isHydrationValueAlreadyResolved(value: TemplateValue): boolean {
+  if (Array.isArray(value)) return value.every(isHydrationValueAlreadyResolved);
+  if (isTemplateResult(value)) return value.values.every(isHydrationValueAlreadyResolved);
+  return !getServerElementValue(value) && !getBuiltinServerContract(value) && !getTemplateValueServerContract(value);
 }
 
 function serializeBinding(name: string, value: unknown, assets?: AssetManifest): string {

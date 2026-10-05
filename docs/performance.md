@@ -533,6 +533,21 @@ and
 [`marker`](../benchmarks/results/hydration-comparison-637-markers-fc9b37d.json)
 evidence pairs.
 
+### Reuse of already-resolved hydration values (#641)
+
+`resolveForHydration()` now returns a synchronous SSR `TemplateResult` or value
+array unchanged when it contains no server-element, built-in, or repeat
+contract. This avoids rebuilding a value tree that is already ready for
+hydration. Contract-bearing values retain the existing recursive resolution
+path, so Suspense, server elements, and repeats keep their previous behavior.
+
+The experiment used Apple M4, Chromium 149, Node 24.18, 100 samples, and 12
+warm-ups. On the standard 120-row marker workload the median stayed at 0.6 ms
+while p95 moved from 1.3 to 1.0 ms. On a 1,000-row stress workload the median
+moved from 5.7 to 5.2 ms and p95 from 8.8 to 7.6 ms. These are bounded
+workload results, not a universal framework ranking; the paired Lit and Vue
+measurements remain separate comparison baselines.
+
 ### Hydration hot-path follow-up (#502)
 
 The successful Gluon hydration path now collects adoption markers while the
