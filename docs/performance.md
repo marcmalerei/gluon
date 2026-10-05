@@ -542,11 +542,15 @@ hydration. Contract-bearing values retain the existing recursive resolution
 path, so Suspense, server elements, and repeats keep their previous behavior.
 
 The experiment used Apple M4, Chromium 149, Node 24.18, 100 samples, and 12
-warm-ups. On the standard 120-row marker workload the median stayed at 0.6 ms
-while p95 moved from 1.3 to 1.0 ms. On a 1,000-row stress workload the median
-moved from 5.7 to 5.2 ms and p95 from 8.8 to 7.6 ms. These are bounded
+warm-ups. On the standard 120-row marker workload the median stayed at 0.6 ms;
+p95 varied between 1.0 and 1.4 ms across repeated clean runs, so this lane does
+not establish a stable small-tree gain. On a 1,000-row stress workload the
+median moved from 5.7 to 5.2 ms and p95 from 8.8 to 7.6 ms. These are bounded
 workload results, not a universal framework ranking; the paired Lit and Vue
-measurements remain separate comparison baselines.
+measurements remain separate comparison baselines. Final clean marker evidence
+is retained in
+[`hydration-comparison-641-candidate-da11703.json`](../benchmarks/results/hydration-comparison-641-candidate-da11703.json)
+and its Markdown summary.
 
 ### Hydration hot-path follow-up (#502)
 
