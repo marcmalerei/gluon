@@ -5,11 +5,11 @@
   "versioning": "lockstep",
   "registry": {
     "url": "https://registry.npmjs.org",
-    "checkedAt": "2026-10-02",
+    "checkedAt": "2026-10-05",
     "scope": "@gluonjs",
     "scopeControl": "verified",
-    "publicationState": "ready",
-    "observation": "Release candidate 1.14.0 contains the current 22-package lockstep contract after the published 1.13.0 baseline. Registry publication and immutable-release verification remain pending for the protected v1.14.0 workflow."
+    "publicationState": "released",
+    "observation": "The current 22-package lockstep contract was published as 1.14.0 through the protected v1.14.0-recovery.1 workflow. All package versions, npm latest dist-tags, provenance, and the immutable GitHub release were independently verified on 2026-10-05."
   },
   "packages": [
     {

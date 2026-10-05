@@ -9,24 +9,27 @@ For day-to-day version upgrades, start with the
 
 ## Current publication state
 
-The current lockstep line is `1.14.0`. The published baseline remains
-`1.13.0`; its protected tag resolves to the published GitHub release
-[`v1.13.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.13.0), and npm
-reports `1.13.0` as the `latest` dist-tag for `@gluonjs/core`. The release is
-the 22-package current line; validate the local release contract with:
+The current lockstep line is `1.14.0`. Its protected tag resolves to the
+immutable GitHub release [`v1.14.0`](https://github.com/marcmalerei/gluon/releases/tag/v1.14.0),
+and npm reports `1.14.0` as the `latest` dist-tag for `@gluonjs/core` and all
+21 companion packages. The release is the 22-package current line; validate
+the local release contract with:
 
 ```sh
 npm run check:release-contract
 ```
 
-## v1.14.0 candidate
+## v1.14.0 publication
 
-Issue [#643](https://github.com/marcmalerei/gluon/issues/643) tracks the
+Issue [#643](https://github.com/marcmalerei/gluon/issues/643) tracked the
 22-package release candidate for the post-1.13.0 UI composition train,
 tenant-scoped UI foundation, catalog/documentation work, and hydration/SSR
-performance improvements. The candidate remains unpublished until the
-protected release workflow, registry verification, and release-cut evidence
-establish the immutable `v1.14.0` artifacts.
+performance improvements. The first protected run stopped before publication
+because the Node 24 candidate runner exhausted its heap while duplicating the
+full VitePress build. Recovery issue [#646](https://github.com/marcmalerei/gluon/issues/646)
+recorded the allowlisted package-build workflow repair. Recovery run
+`37317286631` published and verified all 22 immutable package versions, then
+finalized the immutable GitHub release through `v1.14.0-recovery.1`.
 
 ## v1.13.0 publication
 

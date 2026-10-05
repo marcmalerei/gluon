@@ -16,7 +16,10 @@ The release group contains 22 public packages. All package manifests and
 official internal dependencies are pinned to `1.14.0`; the protected tag,
 GitHub release, and npm `latest` registry state have been verified.
 
-The release runbook is maintained in
+The recovery publication completed in Release workflow run
+[`37317286631`](https://github.com/marcmalerei/gluon/actions/runs/37317286631);
+the npm registry exposes `1.14.0` as `latest` for all 22 packages and the
+GitHub release is immutable. The release runbook is maintained in
 [`docs/releasing.md`](https://github.com/marcmalerei/gluon/blob/main/docs/releasing.md).
 Validate the release contract with:
 
