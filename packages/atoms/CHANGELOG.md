@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-05
+
+### Added
+
+- Added the tenant-scoped UI foundation, shared tokens, themes, and accessibility/file-input utilities while preserving the existing public API.
+
 ## [1.13.0] - 2026-09-25
 
 ### Changed

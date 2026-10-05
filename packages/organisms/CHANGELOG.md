@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-05
+
 ### Added
 
 - Added the responsive `PageLayout` organism with semantic title/header/main,

@@ -25,11 +25,11 @@ tenant-safe `--gluon-data-table-*` variables.
 <!-- gluon-package-overview:start -->
 ## @gluonjs/molecules at a glance
 
-**Runtime:** browser · **Release:** 1.13.0
+**Runtime:** browser · **Release:** 1.14.0
 
 [Documentation guide](https://marcmalerei.github.io/gluon/latest/packages/molecules/) · [npm](https://www.npmjs.com/package/@gluonjs/molecules) · [Source](https://github.com/marcmalerei/gluon/blob/main/packages/molecules/README.md)
 
-**Public API:** [`@gluonjs/molecules`](https://marcmalerei.github.io/gluon/1.13.0/api/generated/packages/molecules/src/)
+**Public API:** [`@gluonjs/molecules`](https://marcmalerei.github.io/gluon/1.14.0/api/generated/packages/molecules/src/)
 
 ### Install
 

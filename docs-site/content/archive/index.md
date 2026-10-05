@@ -8,11 +8,12 @@ archive trees.
 
 ## Supported
 
-- [Gluon 1.13.0 documentation](/gluon/1.13.0/) — current supported release.
+- [Gluon 1.14.0 documentation](/gluon/1.14.0/) — current release candidate.
 
 ## Archived
 
 - Gluon 1.12.3 — previous supported release line, retained in repository history.
+- Gluon 1.13.0 — previous supported release line, retained in repository history.
 - Gluon 1.9.0 — previous supported release line, retained in repository history.
 - Gluon 1.10.0 — previous supported release line, retained in repository history.
 - Gluon 1.7.0 — previous supported release line, retained in repository history.

@@ -7,7 +7,7 @@ const root = resolve(import.meta.dirname, '..');
 const outputRoot = resolve(root, 'docs-site/dist');
 const catalog = JSON.parse(await readFile(resolve(root, 'docs-site/data/ui-catalog.json'), 'utf8'));
 const versions = JSON.parse(await readFile(resolve(root, 'docs-site/versions.json'), 'utf8'));
-const catalogTemplate = await readFile(resolve(root, 'docs-site/content/1.13.0/guides/ui-catalog/index.md'), 'utf8');
+const catalogTemplate = await readFile(resolve(root, 'docs-site/content/1.14.0/guides/ui-catalog/index.md'), 'utf8');
 const rendererKeys = new Set([
   ...catalogTemplate.matchAll(/entry\.preview\s*===\s*'([^']+)'/g),
 ].map((match) => match[1]));

@@ -7,6 +7,42 @@ and released versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-05
+
+### Added
+
+- Added the CSS-variable-ready `DataTable`, `Autocomplete`, `HoverCard`,
+  `Breadcrumbs`, `Pagination`, `Calendar`, `DatePicker`, `DateRangePicker`,
+  `TimePicker`, `FileUpload`, `MultiSelectField`, `ListboxField`, `Tooltip`,
+  `TreeView`, `CommandPalette`, `Popover`, `Sheet`, and `ComboboxField`
+  molecules.
+- Added `NotificationCenter`, `SettingsShell`, `StatusTracker`,
+  `ApprovalFlow`, `OnboardingFlow`, `Wizard`, `SidebarLayout`,
+  `MarketingHeader`, `DashboardShell`, `NavigationRail`, `AdminShell`,
+  `SiteHeader`, `SiteFooter`, `MegaMenu`, `PageLayout`, `ProductGallery`,
+  `ProductGrid`, `ResizablePanels`, and `SplitPane` organisms.
+- Added tenant-scoped UI foundation and accessibility/file-input utilities,
+  plus the completed versioned UI catalog and documentation information
+  architecture.
+
+### Performance
+
+- Added hydration marker verification and SSR hydration-value reuse fast paths;
+  both preserve the existing public API and keep server contracts and fallback
+  resolution intact.
+
+### Fixed
+
+- Repaired catalog previews, documentation builds, example boundaries, and
+  generated package metadata across the new UI surfaces.
+- Increased clean-runner build headroom in the quality and release workflows so
+  the complete versioned documentation build is not cut off before artifact and
+  fixture verification can run (#643).
+- Node 22/24 runtime compatibility checks now build the published packages
+  without duplicating the memory-intensive full documentation/examples build;
+  the full build remains covered by the repository and release-artifact gates
+  (#643).
+
 ## [1.13.0] - 2026-09-25
 
 ### Added

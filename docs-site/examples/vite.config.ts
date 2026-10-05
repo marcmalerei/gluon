@@ -4,7 +4,7 @@ import gluon from '@gluonjs/vite';
 import { defineConfig } from 'vite';
 
 const repositoryRoot = resolve(import.meta.dirname, '../..');
-const docsVersion = process.env.GLUON_DOCS_VERSION ?? '1.13.0';
+const docsVersion = process.env.GLUON_DOCS_VERSION ?? '1.14.0';
 
 export default defineConfig({
   plugins: [gluon(), vue({

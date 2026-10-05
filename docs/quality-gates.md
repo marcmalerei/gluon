@@ -48,11 +48,11 @@ bounded expensive steps:
 
 | Job                       |                   Job limit | Individually bounded expensive work                                                       |
 | ------------------------- | --------------------------: | ----------------------------------------------------------------------------------------- |
-| `repository`              |                  35 minutes | install 10, repository check 34 minutes                                                    |
-| `create-gluon-fixtures`   |                  35 minutes | install 10, build 15, fixture matrix 15 minutes                                             |
-| `release-artifacts`       |                  35 minutes | install 10, build 15, release artifacts plus fresh VSIX package/LSP smoke check 12 minutes |
+| `repository`              |                  60 minutes | install 10, repository check 55 minutes                                                    |
+| `create-gluon-fixtures`   |                  60 minutes | install 10, build 30, fixture matrix 15 minutes                                             |
+| `release-artifacts`       |                  60 minutes | install 10, build 30, release artifacts plus fresh VSIX package/LSP smoke check 12 minutes |
 | `browser-engines`         |       30 minutes per engine | install 10, browser matrix 15, individual evidence commands 10–15 minutes                 |
-| `node-runtime`            | 35 minutes per Node version | install 10, build 15, SSR suite 10 minutes                                                |
+| `node-runtime`            | 60 minutes per Node version | install 10, package build 30, SSR suite 10 minutes; full repository/docs build is covered by `repository` and `release-artifacts` |
 | `budgets`                 |                  20 minutes | install 10; each build/budget command 5 minutes                                           |
 | `performance-evidence`    |                  10 minutes | artifact aggregation and completeness validation 5 minutes                                |
 
@@ -278,7 +278,7 @@ hydration diagnostics, cleanup, and screenshot-regression suites in Chromium,
 Firefox, and WebKit. Node SSR tests retain the named UI selection and GLUON
 GOODS carrier order. The root browser coverage gate includes every source file
 owned by the four UI packages. The compiled interactive example is published at
-`/1.13.0/examples/ui.html` with the other versioned documentation examples.
+`/1.14.0/examples/ui.html` with the other versioned documentation examples.
 
 The same UI gate requires extension metadata for all 16 stable entries, the
 documented matrix in `docs/ui-extensibility.md`, and the branded-purchase,
